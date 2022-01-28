@@ -147,7 +147,7 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
     public BehandlingStegModell finnTidligsteStegFor(Collection<AksjonspunktDefinisjon> aksjonspunkter) {
         for (var stegModell : steg) {
             var hørerTilSteget = aksjonspunkter.stream().map(AksjonspunktDefinisjon::getBehandlingSteg)
-                .anyMatch(s -> s.getKode().equals(stegModell.getBehandlingStegType().getKode()));
+                    .anyMatch(s -> s.getKode().equals(stegModell.getBehandlingStegType().getKode()));
             if (hørerTilSteget) {
                 return stegModell;
             }
@@ -159,8 +159,8 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
     public BehandlingStegModell finnTidligsteStegForAksjonspunktDefinisjon(Collection<AksjonspunktDefinisjon> aksjonspunktDefinisjoner) {
         for (var stegModell : steg) {
             var hørerTilSteget = aksjonspunktDefinisjoner.stream()
-                .map(AksjonspunktDefinisjon::getBehandlingSteg)
-                .anyMatch(s -> s.getKode().equals(stegModell.getBehandlingStegType().getKode()));
+                    .map(AksjonspunktDefinisjon::getBehandlingSteg)
+                    .anyMatch(s -> s.getKode().equals(stegModell.getBehandlingStegType().getKode()));
             if (hørerTilSteget) {
                 return stegModell;
             }
@@ -171,7 +171,7 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
     @Override
     public BehandlingStegModell finnFørsteSteg(BehandlingStegType... behandlingStegTyper) {
         Set<BehandlingStegType> stegTyper = new LinkedHashSet<>(Arrays.stream(behandlingStegTyper).filter(Objects::nonNull)
-            .collect(Collectors.toList()));
+                .collect(Collectors.toList()));
 
         for (var stegModell : steg) {
             var sjekkSteg = stegModell.getBehandlingStegType();
@@ -181,8 +181,8 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
         }
 
         throw new IllegalArgumentException(
-            "Utvikler-feil: Ingen av forespurte steg er kjent i BehandlingModell: behandlingType=" + behandlingType //$NON-NLS-1$
-                + ", forspurteSteg=" + Arrays.asList(stegTyper) // NOSONAR //$NON-NLS-1$
+                "Utvikler-feil: Ingen av forespurte steg er kjent i BehandlingModell: behandlingType=" + behandlingType //$NON-NLS-1$
+                        + ", forspurteSteg=" + Arrays.asList(stegTyper) // NOSONAR //$NON-NLS-1$
         );
     }
 
@@ -325,7 +325,7 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
      *                   fra begynnelsen.
      * @param visitor    - kalles for hvert steg definert
      * @return null hvis alle steg til slutt ble kalt. Eller siste stegType som ble
-     *         forsøkt.
+     * forsøkt.
      */
     @Override
     public BehandlingStegUtfall prosesserFra(BehandlingStegType førsteSteg, BehandlingModellVisitor visitor) {
@@ -357,7 +357,7 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
         var transisjon = finnTransisjon(resultat.getTransisjon()); // TODO (jol) rydd opp henleggelse. HENLEGGELSE er avbrutt, ikke
         // framoverført
         return resultat.getNyStegStatus().kanFortsetteTilNeste()
-            || (transisjon.getMålstegHvisHopp().isPresent() && !FellesTransisjoner.HENLAGT.getId().equals(transisjon.getId()));
+                || (transisjon.getMålstegHvisHopp().isPresent() && !FellesTransisjoner.HENLAGT.getId().equals(transisjon.getId()));
     }
 
     void leggTil(BehandlingStegType stegType, BehandlingType behandlingType) {
@@ -366,9 +366,9 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
         var entry = lookup.apply(stegType, behandlingType);
         if (entry == null) {
             throw new IllegalArgumentException(
-                "Fant ikke steg for kode: " + //$NON-NLS-1$
-                    stegType.getKode() +
-                    ", [behandlingType=" + behandlingType + "]"); // NOSONAR //$NON-NLS-1$ //$NON-NLS-2$
+                    "Fant ikke steg for kode: " + //$NON-NLS-1$
+                            stegType.getKode() +
+                            ", [behandlingType=" + behandlingType + "]"); // NOSONAR //$NON-NLS-1$ //$NON-NLS-2$
         }
         this.steg.add(entry);
         leggTilAksjonspunktDefinisjoner(stegType, entry);
@@ -376,10 +376,10 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
 
     protected void leggTilAksjonspunktDefinisjoner(BehandlingStegType stegType, BehandlingStegModellImpl entry) {
         AksjonspunktDefinisjon.finnAksjonspunktDefinisjoner(stegType, VurderingspunktType.INN)
-            .forEach(entry::leggTilAksjonspunktVurderingInngang);
+                .forEach(entry::leggTilAksjonspunktVurderingInngang);
 
         AksjonspunktDefinisjon.finnAksjonspunktDefinisjoner(stegType, VurderingspunktType.UT)
-            .forEach(entry::leggTilAksjonspunktVurderingUtgang);
+                .forEach(entry::leggTilAksjonspunktVurderingUtgang);
     }
 
     void validerErIkkeAlleredeMappet(AksjonspunktDefinisjon aksjonspunktDefinisjon) {
@@ -388,15 +388,15 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
         for (var bsm : this.steg) {
             if (bsm.getInngangAksjonpunkt().contains(aksjonspunktDefinisjon)) {
                 throw new IllegalStateException("Aksjonpunktkode [" + aksjonspunktDefinisjon + "] allerede mappet til inngang av " + //$NON-NLS-1$ //$NON-NLS-2$
-                    bsm.getBehandlingStegType().getKode()
-                    + " [behandlingType=" + behandlingType + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+                        bsm.getBehandlingStegType().getKode()
+                        + " [behandlingType=" + behandlingType + "]"); //$NON-NLS-1$ //$NON-NLS-2$
                 // //
                 // NOSONAR
             }
             if (bsm.getUtgangAksjonpunkt().contains(aksjonspunktDefinisjon)) {
                 throw new IllegalStateException("Aksjonpunktkode [" + aksjonspunktDefinisjon + "] allerede mappet til utgang av " + //$NON-NLS-1$ //$NON-NLS-2$
-                    bsm.getBehandlingStegType().getKode()
-                    + " [behandlingType=" + behandlingType + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+                        bsm.getBehandlingStegType().getKode()
+                        + " [behandlingType=" + behandlingType + "]"); //$NON-NLS-1$ //$NON-NLS-2$
                 // //
                 // NOSONAR
             }
@@ -421,7 +421,7 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
             }
         }
         throw new IllegalArgumentException("Ukjent behandlingssteg: " + stegType.getKode() +
-            ", [behandlingType=" + behandlingType + "]"); //$NON-NLS-1$ //$NON-NLS-2$ // NOSONAR
+                ", [behandlingType=" + behandlingType + "]"); //$NON-NLS-1$ //$NON-NLS-2$ // NOSONAR
     }
 
     @Override
@@ -429,7 +429,9 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
         return indexOfNullable(stegA) < indexOfNullable(stegB);
     }
 
-    /** Legger til default. */
+    /**
+     * Legger til default.
+     */
     protected void leggTil(BehandlingStegType... stegTyper) {
         List.of(stegTyper).forEach(s -> leggTil(s, behandlingType));
     }

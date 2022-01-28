@@ -44,17 +44,17 @@ public class HistorikkinnslagTjeneste {
                                          List<HistorikkinnslagDokumentLink> dokumentLinks) {
 
         Historikkinnslag historikkinnslag = new Historikkinnslag.Builder()
-            .medAktør(historikkAktør)
-            .medKjoenn(setKjønn(aktørId, historikkAktør))
-            .medType(historikkinnslagType)
-            .medBehandlingId(behandlingId)
-            .medFagsakId(fagsakId)
-            .medDokumentLinker(dokumentLinks).build();
+                .medAktør(historikkAktør)
+                .medKjoenn(setKjønn(aktørId, historikkAktør))
+                .medType(historikkinnslagType)
+                .medBehandlingId(behandlingId)
+                .medFagsakId(fagsakId)
+                .medDokumentLinker(dokumentLinks).build();
 
         settHistorikkinnslagIHverDokumentLink(dokumentLinks, historikkinnslag);
 
         HistorikkInnslagTekstBuilder builder = new HistorikkInnslagTekstBuilder()
-            .medHendelse(historikkinnslagType);
+                .medHendelse(historikkinnslagType);
         builder.build(historikkinnslag);
 
         historikkRepository.lagre(historikkinnslag);
@@ -76,25 +76,25 @@ public class HistorikkinnslagTjeneste {
         dokumentLink.setLinkTekst(tittel);
 
         opprettHistorikkinnslag(
-            behandling.getId(),
-            behandling.getAktørId(),
-            behandling.getFagsakId(),
-            HistorikkinnslagType.BREV_SENT,
-            HistorikkAktør.VEDTAKSLØSNINGEN,
-            Collections.singletonList(dokumentLink));
+                behandling.getId(),
+                behandling.getAktørId(),
+                behandling.getFagsakId(),
+                HistorikkinnslagType.BREV_SENT,
+                HistorikkAktør.VEDTAKSLØSNINGEN,
+                Collections.singletonList(dokumentLink));
     }
 
-    public void opprettHistorikkinnslagForBrevBestilt(Behandling behandling, DokumentMalType malType){
+    public void opprettHistorikkinnslagForBrevBestilt(Behandling behandling, DokumentMalType malType) {
         Historikkinnslag historikkinnslag = new Historikkinnslag.Builder()
-            .medAktør(HistorikkAktør.SAKSBEHANDLER)
-            .medKjoenn(setKjønn(behandling.getAktørId(), HistorikkAktør.SAKSBEHANDLER))
-            .medType(HistorikkinnslagType.BREV_BESTILT)
-            .medBehandlingId(behandling.getId())
-            .medFagsakId(behandling.getFagsakId()).build();
+                .medAktør(HistorikkAktør.SAKSBEHANDLER)
+                .medKjoenn(setKjønn(behandling.getAktørId(), HistorikkAktør.SAKSBEHANDLER))
+                .medType(HistorikkinnslagType.BREV_BESTILT)
+                .medBehandlingId(behandling.getId())
+                .medFagsakId(behandling.getFagsakId()).build();
 
         HistorikkInnslagTekstBuilder builder = new HistorikkInnslagTekstBuilder()
-            .medHendelse(HistorikkinnslagType.BREV_BESTILT)
-            .medBegrunnelse(malType.getNavn());
+                .medHendelse(HistorikkinnslagType.BREV_BESTILT)
+                .medBegrunnelse(malType.getNavn());
         builder.build(historikkinnslag);
 
         historikkRepository.lagre(historikkinnslag);
@@ -107,12 +107,12 @@ public class HistorikkinnslagTjeneste {
         HistorikkAktør historikkAktør = behandling.isManueltOpprettet() ? HistorikkAktør.SAKSBEHANDLER : HistorikkAktør.VEDTAKSLØSNINGEN;
 
         opprettHistorikkinnslag(
-            behandling.getId(),
-            behandling.getAktørId(),
-            behandling.getFagsakId(),
-            HistorikkinnslagType.TBK_OPPR,
-            historikkAktør,
-            Collections.emptyList());
+                behandling.getId(),
+                behandling.getAktørId(),
+                behandling.getFagsakId(),
+                HistorikkinnslagType.TBK_OPPR,
+                historikkAktør,
+                Collections.emptyList());
     }
 
     private NavBrukerKjønn setKjønn(AktørId aktørId, HistorikkAktør historikkAktør) {
@@ -137,9 +137,9 @@ public class HistorikkinnslagTjeneste {
 
     public void opprettHistorikkinnslagForHenleggelse(Behandling behandling, HistorikkinnslagType historikkinnslagType, BehandlingResultatType årsak, String begrunnelse, HistorikkAktør aktør) {
         HistorikkInnslagTekstBuilder builder = new HistorikkInnslagTekstBuilder()
-            .medHendelse(historikkinnslagType)
-            .medÅrsak(årsak)
-            .medBegrunnelse(begrunnelse);
+                .medHendelse(historikkinnslagType)
+                .medÅrsak(årsak)
+                .medBegrunnelse(begrunnelse);
         Historikkinnslag historikkinnslag = new Historikkinnslag();
         historikkinnslag.setType(historikkinnslagType);
         historikkinnslag.setBehandling(behandling);

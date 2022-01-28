@@ -349,7 +349,6 @@
             </dependency>
 
 
-
             <!-- tidligere fra fp-felles -->
             <dependency>
                 <groupId>org.glassfish.jersey</groupId>
@@ -641,7 +640,8 @@
                     <configuration>
                         <useFile>true</useFile>
                         <argLine>-XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Xms256m -Dfile.encoding=UTF-8
-                            -Dlog.level.no.nav=WARN</argLine>
+                            -Dlog.level.no.nav=WARN
+                        </argLine>
                     </configuration>
                 </plugin>
                 <plugin>

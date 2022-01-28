@@ -71,26 +71,26 @@ public class JournalføringTjeneste {
         boolean forsøkFerdigstill = true;
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         OpprettJournalpostRequest request = OpprettJournalpostRequest.builder()
-            .medTema(utledTema(behandling.getFagsak().getFagsakYtelseType()))
-            .medBehandlingstema(BehandlingTema.TILBAKEBETALING)
-            .medBruker(new Bruker(BrukerIdType.AktørId, behandling.getAktørId().getId()))
-            .medJournalførendeEnhet(behandling.getBehandlendeEnhetId())
-            .medJournalposttype(Journalposttype.NOTAT)
-            .medTittel("Oversikt over resultatet av tilbakebetalingssaken")
-            .medSak(lagSaksreferanse(behandling.getFagsak()))
-            .medHoveddokument(Dokument.builder()
-                .medDokumentkategori(Dokumentkategori.Infobrev)
+                .medTema(utledTema(behandling.getFagsak().getFagsakYtelseType()))
+                .medBehandlingstema(BehandlingTema.TILBAKEBETALING)
+                .medBruker(new Bruker(BrukerIdType.AktørId, behandling.getAktørId().getId()))
+                .medJournalførendeEnhet(behandling.getBehandlendeEnhetId())
+                .medJournalposttype(Journalposttype.NOTAT)
                 .medTittel("Oversikt over resultatet av tilbakebetalingssaken")
-                .medBrevkode("FP-TILB")
-                .leggTilDokumentvariant(Dokumentvariant.builder()
-                    .medFilnavn("vedlegg.pdf")
-                    .medVariantformat(Variantformat.Arkiv)
-                    .medDokument(vedleggPdf)
-                    .medFiltype(Filtype.PDFA)
-                    .build())
-                .build())
-            .leggTilTilleggsopplysning(new Tilleggsopplysning("bruksområde", "brukes i vedlegg til vedtaksbrev for tilbakekreving"))
-            .build();
+                .medSak(lagSaksreferanse(behandling.getFagsak()))
+                .medHoveddokument(Dokument.builder()
+                        .medDokumentkategori(Dokumentkategori.Infobrev)
+                        .medTittel("Oversikt over resultatet av tilbakebetalingssaken")
+                        .medBrevkode("FP-TILB")
+                        .leggTilDokumentvariant(Dokumentvariant.builder()
+                                .medFilnavn("vedlegg.pdf")
+                                .medVariantformat(Variantformat.Arkiv)
+                                .medDokument(vedleggPdf)
+                                .medFiltype(Filtype.PDFA)
+                                .build())
+                        .build())
+                .leggTilTilleggsopplysning(new Tilleggsopplysning("bruksområde", "brukes i vedlegg til vedtaksbrev for tilbakekreving"))
+                .build();
 
         OpprettJournalpostResponse response = journalpostApiKlient.opprettJournalpost(request, forsøkFerdigstill);
         JournalpostId journalpostId = new JournalpostId(response.getJournalpostId());
@@ -105,9 +105,9 @@ public class JournalføringTjeneste {
         Adresseinfo adresseinfo = brevMetadata.getMottakerAdresse();
         return switch (mottaker) {
             case BRUKER -> AvsenderMottaker.builder()
-                .medId(SenderMottakerIdType.NorskIdent, adresseinfo.getPersonIdent().getIdent())
-                .medNavn(adresseinfo.getMottakerNavn())
-                .build();
+                    .medId(SenderMottakerIdType.NorskIdent, adresseinfo.getPersonIdent().getIdent())
+                    .medNavn(adresseinfo.getMottakerNavn())
+                    .build();
             case VERGE -> lagMottakerVerge(behandlingId);
             default -> throw new IllegalArgumentException("Ikke-støttet mottaker: " + mottaker);
         };
@@ -117,15 +117,15 @@ public class JournalføringTjeneste {
         VergeEntitet verge = vergeRepository.finnVergeInformasjon(behandlingId).orElseThrow();
         if (verge.getOrganisasjonsnummer() != null) {
             return AvsenderMottaker.builder()
-                .medId(SenderMottakerIdType.Organisasjonsnummer, verge.getOrganisasjonsnummer())
-                .medNavn(verge.getNavn())
-                .build();
+                    .medId(SenderMottakerIdType.Organisasjonsnummer, verge.getOrganisasjonsnummer())
+                    .medNavn(verge.getNavn())
+                    .build();
         } else {
             String fnrVerge = aktørConsumer.hentFnrForAktør(verge.getVergeAktørId()).map(PersonIdent::getIdent).orElseThrow();
             return AvsenderMottaker.builder()
-                .medId(SenderMottakerIdType.NorskIdent, fnrVerge)
-                .medNavn(verge.getNavn())
-                .build();
+                    .medId(SenderMottakerIdType.NorskIdent, fnrVerge)
+                    .medNavn(verge.getNavn())
+                    .build();
         }
     }
 
@@ -135,26 +135,26 @@ public class JournalføringTjeneste {
         boolean forsøkFerdigstill = true;
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         OpprettJournalpostRequest request = OpprettJournalpostRequest.builder()
-            .medTema(utledTema(behandling.getFagsak().getFagsakYtelseType()))
-            .medBehandlingstema(BehandlingTema.TILBAKEBETALING)
-            .medBruker(new Bruker(BrukerIdType.AktørId, behandling.getAktørId().getId()))
-            .medAvsenderMottaker(lagMottaker(behandlingId, brevMottaker, brevMetadata))
-            .medJournalførendeEnhet(behandling.getBehandlendeEnhetId())
-            .medJournalposttype(Journalposttype.UTGÅENDE)
-            .medTittel(brevMetadata.getTittel())
-            .medSak(lagSaksreferanse(behandling.getFagsak()))
-            .medHoveddokument(Dokument.builder()
-                .medDokumentkategori(dokumentkategori)
+                .medTema(utledTema(behandling.getFagsak().getFagsakYtelseType()))
+                .medBehandlingstema(BehandlingTema.TILBAKEBETALING)
+                .medBruker(new Bruker(BrukerIdType.AktørId, behandling.getAktørId().getId()))
+                .medAvsenderMottaker(lagMottaker(behandlingId, brevMottaker, brevMetadata))
+                .medJournalførendeEnhet(behandling.getBehandlendeEnhetId())
+                .medJournalposttype(Journalposttype.UTGÅENDE)
                 .medTittel(brevMetadata.getTittel())
-                .medBrevkode(brevMetadata.getFagsaktype().getKode() + "-TILB")
-                .leggTilDokumentvariant(Dokumentvariant.builder()
-                    .medFilnavn(dokumentkategori == Dokumentkategori.Vedtaksbrev ? "vedtak.pdf" : "brev.pdf")
-                    .medVariantformat(Variantformat.Arkiv)
-                    .medDokument(vedleggPdf)
-                    .medFiltype(Filtype.PDFA)
-                    .build())
-                .build())
-            .build();
+                .medSak(lagSaksreferanse(behandling.getFagsak()))
+                .medHoveddokument(Dokument.builder()
+                        .medDokumentkategori(dokumentkategori)
+                        .medTittel(brevMetadata.getTittel())
+                        .medBrevkode(brevMetadata.getFagsaktype().getKode() + "-TILB")
+                        .leggTilDokumentvariant(Dokumentvariant.builder()
+                                .medFilnavn(dokumentkategori == Dokumentkategori.Vedtaksbrev ? "vedtak.pdf" : "brev.pdf")
+                                .medVariantformat(Variantformat.Arkiv)
+                                .medDokument(vedleggPdf)
+                                .medFiltype(Filtype.PDFA)
+                                .build())
+                        .build())
+                .build();
 
         OpprettJournalpostResponse response = journalpostApiKlient.opprettJournalpost(request, forsøkFerdigstill);
         JournalpostId journalpostId = new JournalpostId(response.getJournalpostId());
@@ -186,7 +186,6 @@ public class JournalføringTjeneste {
     private static IntegrasjonException uforventetAntallDokumenterIRespons(Integer antallDokumenter) {
         return new IntegrasjonException("FPT-496149", String.format("Forsøkte å journalføre 1 dokument (vedlegg til vedtaksbrev), fikk %s dokumenter i respons fra dokarkiv", antallDokumenter));
     }
-
 
 
 }

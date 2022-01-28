@@ -55,10 +55,10 @@ public class FPPdpRequestBuilderTest {
     @Test
     public void skal_hente_behandling_og_fagsak_informasjon_når_input_er_behandling_id() {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
-            AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID));
+                AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID));
 
         when(pipRepository.hentBehandlingData(BEHANDLING_ID))
-            .thenReturn(returnData(true, true));
+                .thenReturn(returnData(true, true));
 
         PdpRequest request = requestBuilder.lagPdpRequest(attributter);
         assertThat(request.getListOfString(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1, PERSON2);
@@ -71,10 +71,10 @@ public class FPPdpRequestBuilderTest {
     @Test
     public void skal_hente_behandling_og_fagsak_informasjon_når_input_er_behandlinguuid() {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
-            AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID));
+                AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID));
 
         when(pipRepository.hentBehandlingData(BEHANDLING_UUID))
-            .thenReturn(returnData(true, true));
+                .thenReturn(returnData(true, true));
 
         PdpRequest request = requestBuilder.lagPdpRequest(attributter);
         assertThat(request.getListOfString(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1, PERSON2);
@@ -87,7 +87,7 @@ public class FPPdpRequestBuilderTest {
     @Test
     public void skal_hente_behandlinginfo_fra_fpsak_når_input_er_fpsak_behandlingid() {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
-            AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
+                AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
 
         PipDto pipDto = new PipDto();
         pipDto.setAktørIder(Set.of(new AktørId(PERSON1)));
@@ -107,7 +107,7 @@ public class FPPdpRequestBuilderTest {
     @Test
     public void skal_hente_aktører_fra_fpsak_når_input_er_saksnummer() {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
-            AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.SAKSNUMMER, SAKSNUMMER));
+                AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.SAKSNUMMER, SAKSNUMMER));
 
         when(fpsakPipKlient.hentAktørIderSomString(new Saksnummer(SAKSNUMMER))).thenReturn(Set.of(PERSON2));
 
@@ -120,10 +120,10 @@ public class FPPdpRequestBuilderTest {
     @Test
     public void skal_hente_behandling_og_fagsak_informasjon_når_saksnummer_er_input_uten_saksbehandler() {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
-            AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID));
+                AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID));
 
         when(pipRepository.hentBehandlingData(BEHANDLING_ID))
-            .thenReturn(returnData(true, false));
+                .thenReturn(returnData(true, false));
 
         PdpRequest request = requestBuilder.lagPdpRequest(attributter);
         assertThat(request.getListOfString(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1, PERSON2);
@@ -136,49 +136,49 @@ public class FPPdpRequestBuilderTest {
     @Test
     public void skal_kaste_feil_ved_flere_behandlingIder() {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
-            AbacDataAttributter.opprett()
-                .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
-                .leggTil(StandardAbacAttributtType.BEHANDLING_ID, 85392L));
+                AbacDataAttributter.opprett()
+                        .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
+                        .leggTil(StandardAbacAttributtType.BEHANDLING_ID, 85392L));
 
         assertThatThrownBy(() -> requestBuilder.lagPdpRequest(attributter))
-            .isInstanceOf(TekniskException.class)
-            .hasMessageContaining("FPT-426124");
+                .isInstanceOf(TekniskException.class)
+                .hasMessageContaining("FPT-426124");
     }
 
     @Test
     public void skal_kaste_feil_ved_både_behandlingId_og_fpsak_behandlingUuid() {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
-            AbacDataAttributter.opprett()
-                .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
-                .leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
+                AbacDataAttributter.opprett()
+                        .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
+                        .leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
 
-        assertThatThrownBy(() ->  requestBuilder.lagPdpRequest(attributter))
-            .isInstanceOf(TekniskException.class)
-            .hasMessageContainingAll("FPT-317633", BEHANDLING_ID.toString(), FPSAK_BEHANDLING_UUID.toString());
+        assertThatThrownBy(() -> requestBuilder.lagPdpRequest(attributter))
+                .isInstanceOf(TekniskException.class)
+                .hasMessageContainingAll("FPT-317633", BEHANDLING_ID.toString(), FPSAK_BEHANDLING_UUID.toString());
     }
 
     @Test
     public void skal_kaste_feil_ved_både_behandlingId_og_behandlingUuid() {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
-            AbacDataAttributter.opprett()
-                .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
-                .leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID));
+                AbacDataAttributter.opprett()
+                        .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
+                        .leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID));
 
-        assertThatThrownBy(() ->  requestBuilder.lagPdpRequest(attributter))
-            .isInstanceOf(TekniskException.class)
-            .hasMessageContainingAll("FPT-317633", BEHANDLING_ID.toString(), BEHANDLING_UUID.toString());
+        assertThatThrownBy(() -> requestBuilder.lagPdpRequest(attributter))
+                .isInstanceOf(TekniskException.class)
+                .hasMessageContainingAll("FPT-317633", BEHANDLING_ID.toString(), BEHANDLING_UUID.toString());
     }
 
     @Test
     public void skal_kaste_feil_ved_både_behandlingUuid_og_fpsak_behandlingUuid() {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
-            AbacDataAttributter.opprett()
-                .leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID)
-                .leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
+                AbacDataAttributter.opprett()
+                        .leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID)
+                        .leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
 
-        assertThatThrownBy(() ->  requestBuilder.lagPdpRequest(attributter))
-            .isInstanceOf(TekniskException.class)
-            .hasMessageContainingAll("FPT-317634", BEHANDLING_UUID.toString(), FPSAK_BEHANDLING_UUID.toString());
+        assertThatThrownBy(() -> requestBuilder.lagPdpRequest(attributter))
+                .isInstanceOf(TekniskException.class)
+                .hasMessageContainingAll("FPT-317634", BEHANDLING_UUID.toString(), FPSAK_BEHANDLING_UUID.toString());
     }
 
     private AbacAttributtSamling byggAbacAttributtsamling() {

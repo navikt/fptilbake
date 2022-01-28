@@ -47,8 +47,8 @@ public class PersonIdent implements Comparable<PersonIdent>, IndexKey {
 
     private static String getPersonnummer(String str) {
         return (str == null || str.length() < PERSONNR_LENGDE)
-            ? null
-            : str.substring(str.length() - PERSONNR_LENGDE, str.length());
+                ? null
+                : str.substring(str.length() - PERSONNR_LENGDE, str.length());
     }
 
     private static boolean isFdatNummer(String personnummer) {
@@ -76,7 +76,7 @@ public class PersonIdent implements Comparable<PersonIdent>, IndexKey {
             checksumTo = 0;
         }
         return checksumEn == Character.digit(foedselsnummer.charAt(FNR_LENGDE - 2), 10)
-            && checksumTo == Character.digit(foedselsnummer.charAt(FNR_LENGDE - 1), 10);
+                && checksumTo == Character.digit(foedselsnummer.charAt(FNR_LENGDE - 1), 10);
     }
 
     public static PersonIdent fra(String ident) {

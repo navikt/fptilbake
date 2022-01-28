@@ -33,11 +33,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ki
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.vedtak.exception.TekniskException;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class VergeRestTjenesteTest {
 
     private final VergeTjeneste vergeTjenesteMock = mock(VergeTjeneste.class);
@@ -57,7 +57,7 @@ public class VergeRestTjenesteTest {
         behandling.avsluttBehandling();
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
         BehandlingReferanse behandlingReferanse = new BehandlingReferanse(behandling.getId());
-        var e= assertThrows(TekniskException.class, () -> vergeRestTjeneste.opprettVerge(mock(HttpServletRequest.class), behandlingReferanse));
+        var e = assertThrows(TekniskException.class, () -> vergeRestTjeneste.opprettVerge(mock(HttpServletRequest.class), behandlingReferanse));
         assertThat(e.getMessage()).contains("FPT-763493");
     }
 
@@ -68,7 +68,7 @@ public class VergeRestTjenesteTest {
         Behandling behandling = scenario.lagre(repositoryProvider);
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
         BehandlingReferanse behandlingReferanse = new BehandlingReferanse(behandling.getId());
-        var e= assertThrows(TekniskException.class, () -> vergeRestTjeneste.opprettVerge(mock(HttpServletRequest.class), behandlingReferanse));
+        var e = assertThrows(TekniskException.class, () -> vergeRestTjeneste.opprettVerge(mock(HttpServletRequest.class), behandlingReferanse));
         assertThat(e.getMessage()).contains("FPT-763493");
     }
 
@@ -79,7 +79,7 @@ public class VergeRestTjenesteTest {
         Behandling behandling = scenario.lagre(repositoryProvider);
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
         BehandlingReferanse behandlingReferanse = new BehandlingReferanse(behandling.getId());
-        var e= assertThrows(TekniskException.class, () -> vergeRestTjeneste.opprettVerge(mock(HttpServletRequest.class), behandlingReferanse));
+        var e = assertThrows(TekniskException.class, () -> vergeRestTjeneste.opprettVerge(mock(HttpServletRequest.class), behandlingReferanse));
         assertThat(e.getMessage()).contains("FPT-185321");
     }
 
@@ -99,7 +99,7 @@ public class VergeRestTjenesteTest {
         behandling.avsluttBehandling();
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
         BehandlingReferanse behandlingReferanse = new BehandlingReferanse(behandling.getId());
-        var e= assertThrows(TekniskException.class, () -> vergeRestTjeneste.fjernVerge(mock(HttpServletRequest.class), behandlingReferanse));
+        var e = assertThrows(TekniskException.class, () -> vergeRestTjeneste.fjernVerge(mock(HttpServletRequest.class), behandlingReferanse));
         assertThat(e.getMessage()).contains("FPT-763494");
     }
 
@@ -110,7 +110,7 @@ public class VergeRestTjenesteTest {
         Behandling behandling = scenario.lagre(repositoryProvider);
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
         BehandlingReferanse behandlingReferanse = new BehandlingReferanse(behandling.getId());
-        var e= assertThrows(TekniskException.class, () -> vergeRestTjeneste.fjernVerge(mock(HttpServletRequest.class), behandlingReferanse));
+        var e = assertThrows(TekniskException.class, () -> vergeRestTjeneste.fjernVerge(mock(HttpServletRequest.class), behandlingReferanse));
         assertThat(e.getMessage()).contains("FPT-763494");
     }
 
@@ -141,11 +141,11 @@ public class VergeRestTjenesteTest {
         Behandling behandling = scenario.lagre(repositoryProvider);
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
         VergeEntitet vergeEntitet = VergeEntitet.builder().medVergeAktørId(behandling.getAktørId())
-            .medVergeType(VergeType.BARN)
-            .medKilde(KildeType.FPTILBAKE.name())
-            .medNavn("John Doe")
-            .medGyldigPeriode(LocalDate.now().minusMonths(1), LocalDate.now())
-            .medBegrunnelse("begunnlese").build();
+                .medVergeType(VergeType.BARN)
+                .medKilde(KildeType.FPTILBAKE.name())
+                .medNavn("John Doe")
+                .medGyldigPeriode(LocalDate.now().minusMonths(1), LocalDate.now())
+                .medBegrunnelse("begunnlese").build();
         when(vergeTjenesteMock.hentVergeInformasjon(anyLong())).thenReturn(Optional.of(vergeEntitet));
         Response response = vergeRestTjeneste.hentBehandlingsmenyvalg(new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
@@ -153,9 +153,9 @@ public class VergeRestTjenesteTest {
     }
 
     @Test
-    public void skal_hente_behandlingsmenyvalg_når_behandling_er_på_vent(){
+    public void skal_hente_behandlingsmenyvalg_når_behandling_er_på_vent() {
         ScenarioSimple scenario = ScenarioSimple.simple();
-        scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,BehandlingStegType.TBKGSTEG);
+        scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG);
         Behandling behandling = scenario.lagre(repositoryProvider);
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
         when(vergeTjenesteMock.hentVergeInformasjon(anyLong())).thenReturn(Optional.empty());

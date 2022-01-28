@@ -26,10 +26,10 @@ public class VilkårsvurderingHjelperUtil {
     static void formGodTroEntitet(VilkårsvurderingPerioderDto periode, VilkårVurderingPeriodeEntitet periodeEntitet) {
         VilkårResultatGodTroDto godTro = (VilkårResultatGodTroDto) periode.getVilkarResultatInfo();
         VilkårVurderingGodTroEntitet godTroEntitet = VilkårVurderingGodTroEntitet.builder().medPeriode(periodeEntitet)
-            .medBegrunnelse(godTro.getBegrunnelse())
-            .medBeløpErIBehold(godTro.getErBelopetIBehold())
-            .medBeløpTilbakekreves(godTro.getTilbakekrevesBelop())
-            .build();
+                .medBegrunnelse(godTro.getBegrunnelse())
+                .medBeløpErIBehold(godTro.getErBelopetIBehold())
+                .medBeløpTilbakekreves(godTro.getTilbakekrevesBelop())
+                .build();
         periodeEntitet.setGodTro(godTroEntitet);
     }
 
@@ -40,8 +40,8 @@ public class VilkårsvurderingHjelperUtil {
         if (Aktsomhet.FORSETT.equals(annetDto.getAktsomhet())) {
             VilkårVurderingAktsomhetEntitet.Builder builder = VilkårVurderingAktsomhetEntitet.builder();
             builder.medPeriode(periodeEntitet)
-                .medAktsomhet(aktsomhet)
-                .medBegrunnelse(annetDto.getBegrunnelse());
+                    .medAktsomhet(aktsomhet)
+                    .medBegrunnelse(annetDto.getBegrunnelse());
             if (VilkårResultat.FORSTO_BURDE_FORSTÅTT.equals(periodeEntitet.getVilkårResultat())) {
                 builder.medIleggRenter(annetDto.getAktsomhetInfo().isIleggRenter());
             }
@@ -49,20 +49,20 @@ public class VilkårsvurderingHjelperUtil {
         } else {
             VilkårResultatAktsomhetDto aktsomhetInfo = annetDto.getAktsomhetInfo();
             aktsomhetEntitet = VilkårVurderingAktsomhetEntitet.builder().medPeriode(periodeEntitet)
-                .medAktsomhet(aktsomhet)
-                .medBegrunnelse(annetDto.getBegrunnelse())
-                .medSærligGrunnerTilReduksjon(aktsomhetInfo.isHarGrunnerTilReduksjon())
-                .medProsenterSomTilbakekreves(aktsomhetInfo.isHarGrunnerTilReduksjon() ? aktsomhetInfo.getAndelTilbakekreves() : null)
-                .medIleggRenter(aktsomhetInfo.isIleggRenter())
-                .medBeløpTilbakekreves(aktsomhetInfo.getTilbakekrevesBelop())
-                .medTilbakekrevSmåBeløp(aktsomhetInfo.isTilbakekrevSelvOmBeloepErUnder4Rettsgebyr())
-                .medSærligGrunnerBegrunnelse(aktsomhetInfo.getSærligGrunnerBegrunnelse()).build();
+                    .medAktsomhet(aktsomhet)
+                    .medBegrunnelse(annetDto.getBegrunnelse())
+                    .medSærligGrunnerTilReduksjon(aktsomhetInfo.isHarGrunnerTilReduksjon())
+                    .medProsenterSomTilbakekreves(aktsomhetInfo.isHarGrunnerTilReduksjon() ? aktsomhetInfo.getAndelTilbakekreves() : null)
+                    .medIleggRenter(aktsomhetInfo.isIleggRenter())
+                    .medBeløpTilbakekreves(aktsomhetInfo.getTilbakekrevesBelop())
+                    .medTilbakekrevSmåBeløp(aktsomhetInfo.isTilbakekrevSelvOmBeloepErUnder4Rettsgebyr())
+                    .medSærligGrunnerBegrunnelse(aktsomhetInfo.getSærligGrunnerBegrunnelse()).build();
 
             for (SærligGrunn grunn : aktsomhetInfo.getSærligeGrunner()) {
                 VilkårVurderingSærligGrunnEntitet særligGrunnEntitet = VilkårVurderingSærligGrunnEntitet.builder()
-                    .medGrunn(grunn)
-                    .medVurdertAktsomhet(aktsomhetEntitet)
-                    .medBegrunnelse(SærligGrunn.ANNET.equals(grunn) ? aktsomhetInfo.getAnnetBegrunnelse() : null).build();
+                        .medGrunn(grunn)
+                        .medVurdertAktsomhet(aktsomhetEntitet)
+                        .medBegrunnelse(SærligGrunn.ANNET.equals(grunn) ? aktsomhetInfo.getAnnetBegrunnelse() : null).build();
                 aktsomhetEntitet.leggTilSærligGrunn(særligGrunnEntitet);
             }
         }
@@ -73,7 +73,7 @@ public class VilkårsvurderingHjelperUtil {
         if (periodeEntitet.getGodTro() != null) {
             VilkårVurderingGodTroEntitet godTroEntitet = periodeEntitet.getGodTro();
             return new VilkårResultatGodTroDto(godTroEntitet.getBegrunnelse(), godTroEntitet.isBeløpErIBehold(),
-                godTroEntitet.getBeløpTilbakekreves());
+                    godTroEntitet.getBeløpTilbakekreves());
         } else {
             return fylleUtPeiodeForAktsomhet(periodeEntitet);
         }

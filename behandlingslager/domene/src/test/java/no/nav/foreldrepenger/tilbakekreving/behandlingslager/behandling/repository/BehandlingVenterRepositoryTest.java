@@ -23,11 +23,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class BehandlingVenterRepositoryTest {
 
     private BehandlingVenterRepository repository;
@@ -107,8 +107,8 @@ public class BehandlingVenterRepositoryTest {
 
         // opprett behandling
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, behandlingType)
-            .medOpprettetDato(LocalDateTime.now())
-            .build();
+                .medOpprettetDato(LocalDateTime.now())
+                .build();
 
         // lagre behandling
         Long id = lagreBehandling(behandling);
@@ -124,13 +124,13 @@ public class BehandlingVenterRepositoryTest {
 
     private void settVenterPåBrukerRespons(Behandling behandling, LocalDateTime frist) {
         aksjonspunktRepository.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
-            BehandlingStegType.VARSEL, frist, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+                BehandlingStegType.VARSEL, frist, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
         lagreBehandling(behandling);
     }
 
     private void settVenterPåTilbakekrevinggrunnlag(Behandling behandling) {
         aksjonspunktRepository.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
-            BehandlingStegType.VARSEL, null, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+                BehandlingStegType.VARSEL, null, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         lagreBehandling(behandling);
     }
 

@@ -2,7 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposit
 
 import no.nav.vedtak.exception.TekniskException;
 
-public class BehandlingRepositoryFeil  {
+public class BehandlingRepositoryFeil {
 
 
     public static TekniskException fantIkkeEntitetForLåsing(String entityClassName, long id) {

@@ -22,7 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 /**
  * Brukes for å generere tekster for oppsummering av vedtaket i vedtaksbrevet. Resultatet er tekster med markup, som med
  * "Insert markup"-macroen kan limes inn i Confluence, og dermed bli formattert tekst.
- *
+ * <p>
  * Confluence:
  * FP/SVP/ES: https://confluence.adeo.no/display/TVF/Generert+dokumentasjon
  * FRISINN: https://confluence.adeo.no/display/MODNAV/Generert+dokumentasjon
@@ -33,12 +33,14 @@ public class DokumentasjonGeneratorVedtakOppsummering {
     private final static LocalDate JANUAR_15 = LocalDate.of(2020, 1, 15);
 
     private static List<VedtakResultatType> tilbakekrevingsResultat = new ArrayList<>();
+
     static {
         tilbakekrevingsResultat.add(VedtakResultatType.FULL_TILBAKEBETALING);
         tilbakekrevingsResultat.add(VedtakResultatType.DELVIS_TILBAKEBETALING);
         tilbakekrevingsResultat.add(VedtakResultatType.INGEN_TILBAKEBETALING);
     }
-    private static boolean[] trueFalse = new boolean[] { true, false};
+
+    private static boolean[] trueFalse = new boolean[]{true, false};
 
     @Test
     public void list_ut_vedtak_start_for_fp() {
@@ -198,9 +200,9 @@ public class DokumentasjonGeneratorVedtakOppsummering {
                                     int skatt,
                                     boolean medKorrigertBeløp) {
         HbSak.Builder sakBuilder = HbSak.build()
-            .medYtelsetype(ytelseType)
-            .medAntallBarn(1)
-            .medErFødsel(true);
+                .medYtelsetype(ytelseType)
+                .medAntallBarn(1)
+                .medErFødsel(true);
         if (!medVarsel) {
             sakBuilder.medDatoFagsakvedtak(JANUAR_15);
         }
@@ -208,38 +210,38 @@ public class DokumentasjonGeneratorVedtakOppsummering {
 
         int totaltMedRenter = totalt + renter;
         HbTotalresultat resultat = HbTotalresultat.builder()
-            .medHovedresultat(tilbakebetaling)
-            .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(totalt))
-            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(totaltMedRenter))
-            .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(totaltMedRenter - skatt))
-            .medTotaltRentebeløp(BigDecimal.valueOf(renter))
-            .build();
+                .medHovedresultat(tilbakebetaling)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(totalt))
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(totaltMedRenter))
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(totaltMedRenter - skatt))
+                .medTotaltRentebeløp(BigDecimal.valueOf(renter))
+                .build();
         HbVedtaksbrevFelles.Builder fellesBuilder = HbVedtaksbrevFelles.builder()
-            .medSak(sak)
-            .medVedtakResultat(resultat)
-            .medSøker(HbPerson.builder()
-                .medNavn("")
-                .build())
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .medKlagefristUker(6)
-                .build())
-            .medLovhjemmelVedtak("")
-            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR);
+                .medSak(sak)
+                .medVedtakResultat(resultat)
+                .medSøker(HbPerson.builder()
+                        .medNavn("")
+                        .build())
+                .medKonfigurasjon(HbKonfigurasjon.builder()
+                        .medKlagefristUker(6)
+                        .build())
+                .medLovhjemmelVedtak("")
+                .medVedtaksbrevType(VedtaksbrevType.ORDINÆR);
         if (medKorrigertBeløp) {
             fellesBuilder.medVarsel(HbVarsel.builder()
-                .medVarsletBeløp(25000L)
-                .medVarsletDato(JANUAR_15)
-                .build())
-                .medErFeilutbetaltBeløpKorrigertNed(true)
-                .medTotaltFeilutbetaltBeløp(BigDecimal.valueOf(1000));
+                            .medVarsletBeløp(25000L)
+                            .medVarsletDato(JANUAR_15)
+                            .build())
+                    .medErFeilutbetaltBeløpKorrigertNed(true)
+                    .medTotaltFeilutbetaltBeløp(BigDecimal.valueOf(1000));
         } else if (medVarsel) {
             fellesBuilder.medVarsel(HbVarsel.builder()
-                .medVarsletBeløp(1000L)
-                .medVarsletDato(JANUAR_15)
-                .build());
+                    .medVarsletBeløp(1000L)
+                    .medVarsletDato(JANUAR_15)
+                    .build());
         }
         HbVedtaksbrevFelles felles = fellesBuilder
-            .medSpråkkode(språkkode).build();
+                .medSpråkkode(språkkode).build();
         String vedtakStart = TekstformatererVedtaksbrev.lagVedtakStart(felles);
 
         prettyPrint(tilbakebetaling, medVarsel, renter, skatt, vedtakStart, medKorrigertBeløp);
@@ -252,21 +254,21 @@ public class DokumentasjonGeneratorVedtakOppsummering {
                              String generertTekst,
                              boolean medKorrigertBeløp) {
         System.out.println("*[ "
-            + tilbakebetaling.getNavn() + " - "
-            + (medVarsel ? "med varsel" : "uten varsel") + " - "
-            + (skatt != 0 ? "med skatt" : "uten skatt") + " - "
-            + (renter != 0 ? "med renter" : "uten renter")
-            + (medKorrigertBeløp ? " - med korrigert beløp" : "")
-            + " ]*");
+                + tilbakebetaling.getNavn() + " - "
+                + (medVarsel ? "med varsel" : "uten varsel") + " - "
+                + (skatt != 0 ? "med skatt" : "uten skatt") + " - "
+                + (renter != 0 ? "med renter" : "uten renter")
+                + (medKorrigertBeløp ? " - med korrigert beløp" : "")
+                + " ]*");
         String parametrisertTekst = generertTekst
-            .replaceAll(" 1\u00A0010\u00A0kroner", " <skyldig beløp> kroner")
-            .replaceAll(" 1\u00A0000\u00A0kroner", " <skyldig beløp> kroner")
-            .replaceAll(" 910\u00A0kroner", " <skyldig beløp uten skatt> kroner")
-            .replaceAll(" 900\u00A0kroner", " <skyldig beløp uten skatt> kroner")
-            .replaceAll(" 25\u00A0000\u00A0kroner", " <varslet beløp> kroner")
-            .replaceAll("15. januar 2020", medVarsel ? "<varseldato>" : "<vedtaksdato>")
-            .replaceAll("\\[", "[ ")
-            .replaceAll("]", " ]");
+                .replaceAll(" 1\u00A0010\u00A0kroner", " <skyldig beløp> kroner")
+                .replaceAll(" 1\u00A0000\u00A0kroner", " <skyldig beløp> kroner")
+                .replaceAll(" 910\u00A0kroner", " <skyldig beløp uten skatt> kroner")
+                .replaceAll(" 900\u00A0kroner", " <skyldig beløp uten skatt> kroner")
+                .replaceAll(" 25\u00A0000\u00A0kroner", " <varslet beløp> kroner")
+                .replaceAll("15. januar 2020", medVarsel ? "<varseldato>" : "<vedtaksdato>")
+                .replaceAll("\\[", "[ ")
+                .replaceAll("]", " ]");
 
         System.out.println(parametrisertTekst);
         System.out.println();

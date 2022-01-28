@@ -32,7 +32,7 @@ public class Saksnummer implements SakId, IndexKey {
         if (!VALID.matcher(saksnummer).matches()) {
             // skal ikke skje, funksjonelle feilmeldinger håndteres ikke her.
             throw new IllegalArgumentException(
-                "Ugyldig saksnummer, støtter kun A-Z/0-9/:/-/_ tegn. Var: " + saksnummer.replaceAll(INVALID.pattern(), "?") + " (vasket)");
+                    "Ugyldig saksnummer, støtter kun A-Z/0-9/:/-/_ tegn. Var: " + saksnummer.replaceAll(INVALID.pattern(), "?") + " (vasket)");
         }
         this.saksnummer = saksnummer;
     }
@@ -42,7 +42,7 @@ public class Saksnummer implements SakId, IndexKey {
         this(sakId);
         // FIXME (FC): Set fagsystem
     }
-    
+
     @Override
     public String getIndexKey() {
         return saksnummer;

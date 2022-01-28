@@ -36,11 +36,11 @@ public class Historikkinnslag extends BaseEntitet {
     private Long fagsakId;
 
     @Convert(converter = HistorikkAktør.KodeverdiConverter.class)
-    @Column(name = "historikk_aktoer_id",nullable = false)
+    @Column(name = "historikk_aktoer_id", nullable = false)
     private HistorikkAktør aktør = HistorikkAktør.UDEFINERT;
 
     @Convert(converter = HistorikkinnslagType.KodeverdiConverter.class)
-    @Column(name = "historikkinnslag_type",nullable = false)
+    @Column(name = "historikkinnslag_type", nullable = false)
     private HistorikkinnslagType type = HistorikkinnslagType.UDEFINIERT;
 
     @OneToMany(mappedBy = "historikkinnslag", cascade = CascadeType.ALL)
@@ -50,7 +50,7 @@ public class Historikkinnslag extends BaseEntitet {
     private List<HistorikkinnslagDel> historikkinnslagDeler = new ArrayList<>();
 
     @Convert(converter = NavBrukerKjønn.KodeverdiConverter.class)
-    @Column(name = "bruker_kjoenn",nullable = false)
+    @Column(name = "bruker_kjoenn", nullable = false)
     private NavBrukerKjønn kjoenn = NavBrukerKjønn.UDEFINERT;
 
     public Long getId() {

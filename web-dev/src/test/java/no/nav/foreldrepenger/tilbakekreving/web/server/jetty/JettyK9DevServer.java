@@ -39,11 +39,11 @@ public class JettyK9DevServer extends JettyServer {
 
     public static void main(String[] args) throws Exception {
         /* holder ikke å konfigurere disse i k9tilbake.application.properties, da den ikke leses av Environment-klassen */
-        System.setProperty("abac.attributt.applikasjon","no.nav.abac.attributter.k9");
-        System.setProperty("abac.attributt.fagsak","no.nav.abac.attributter.k9.fagsak");
-        System.setProperty("abac.attributt.ventefrist","no.nav.abac.attributter.k9.fagsak.ventefrist");
-        System.setProperty("abac.attributt.drift","no.nav.abac.attributter.k9.drift");
-        System.setProperty("abac.attributt.batch","no.nav.abac.attributter.k9.batch");
+        System.setProperty("abac.attributt.applikasjon", "no.nav.abac.attributter.k9");
+        System.setProperty("abac.attributt.fagsak", "no.nav.abac.attributter.k9.fagsak");
+        System.setProperty("abac.attributt.ventefrist", "no.nav.abac.attributter.k9.fagsak.ventefrist");
+        System.setProperty("abac.attributt.drift", "no.nav.abac.attributter.k9.drift");
+        System.setProperty("abac.attributt.batch", "no.nav.abac.attributter.k9.batch");
 
         for (String arg : args) {
             if (arg.equals(VTP_ARGUMENT)) {
@@ -113,8 +113,8 @@ public class JettyK9DevServer extends JettyServer {
         File storeFile = new File(storePath);
         if (!storeFile.exists()) {
             throw new IllegalStateException("Finner ikke " + storeName + " i " + storePath
-                + "\n\tKonfigurer enten som System property \'" + storeProperty + "\' eller environment variabel \'"
-                + storeProperty.toUpperCase().replace('.', '_') + "\'");
+                    + "\n\tKonfigurer enten som System property \'" + storeProperty + "\' eller environment variabel \'"
+                    + storeProperty.toUpperCase().replace('.', '_') + "\'");
         }
         String password = getProperty(storePasswordProperty, defaultPassword);
         if (password == null) {
@@ -160,8 +160,8 @@ public class JettyK9DevServer extends JettyServer {
         https.addCustomizer(new SecureRequestCustomizer());
 
         ServerConnector sslConnector = new ServerConnector(server,
-            new SslConnectionFactory(sslContextFactory, "http/1.1"),
-            new HttpConnectionFactory(https));
+                new SslConnectionFactory(sslContextFactory, "http/1.1"),
+                new HttpConnectionFactory(https));
         sslConnector.setPort(appKonfigurasjon.getSslPort());
         connectors.add(sslConnector);
 
@@ -180,8 +180,8 @@ public class JettyK9DevServer extends JettyServer {
     @Override
     protected ResourceCollection createResourceCollection() throws IOException {
         return new ResourceCollection(
-            Resource.newClassPathResource("/META-INF/resources/webjars/"),
-            Resource.newClassPathResource("/web")
+                Resource.newClassPathResource("/META-INF/resources/webjars/"),
+                Resource.newClassPathResource("/web")
         );
     }
 }

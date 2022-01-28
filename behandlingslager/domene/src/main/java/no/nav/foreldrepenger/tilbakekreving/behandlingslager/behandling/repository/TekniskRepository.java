@@ -17,4 +17,4 @@ public class TekniskRepository {
         RunWithSavepoint setJdbcSavepoint = new RunWithSavepoint(repositoryProvider.getEntityManager());
         return setJdbcSavepoint.doWork(work);
     }
- }
+}

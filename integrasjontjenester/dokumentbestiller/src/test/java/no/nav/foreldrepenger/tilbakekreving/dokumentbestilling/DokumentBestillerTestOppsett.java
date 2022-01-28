@@ -15,7 +15,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
@@ -86,25 +85,25 @@ public abstract class DokumentBestillerTestOppsett {
 
     protected Personinfo byggStandardPerson(String navn, String personnummer, Språkkode språkkode) {
         return new Personinfo.Builder()
-            .medPersonIdent(PersonIdent.fra(personnummer))
-            .medNavn(navn)
-            .medAktørId(new AktørId(9000000030014L))
-            .medFødselsdato(LocalDate.of(1990, 2, 2))
-            .build();
+                .medPersonIdent(PersonIdent.fra(personnummer))
+                .medNavn(navn)
+                .medAktørId(new AktørId(9000000030014L))
+                .medFødselsdato(LocalDate.of(1990, 2, 2))
+                .build();
     }
 
     protected Adresseinfo lagStandardNorskAdresse() {
         return new Adresseinfo.Builder(new PersonIdent("12345678901"), "Jens Trallala")
-            .build();
+                .build();
     }
 
     protected VergeEntitet lagVerge() {
         return VergeEntitet.builder()
-            .medVergeType(VergeType.ADVOKAT)
-            .medOrganisasjonnummer("1232456")
-            .medBegrunnelse("test")
-            .medKilde(KildeType.FPTILBAKE.name())
-            .medNavn("John Doe")
-            .medGyldigPeriode(LocalDate.now().minusDays(30), LocalDate.now()).build();
+                .medVergeType(VergeType.ADVOKAT)
+                .medOrganisasjonnummer("1232456")
+                .medBegrunnelse("test")
+                .medKilde(KildeType.FPTILBAKE.name())
+                .medNavn("John Doe")
+                .medGyldigPeriode(LocalDate.now().minusDays(30), LocalDate.now()).build();
     }
 }

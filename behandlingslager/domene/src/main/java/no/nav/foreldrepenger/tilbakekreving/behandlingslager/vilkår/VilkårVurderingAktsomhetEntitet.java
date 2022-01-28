@@ -60,7 +60,7 @@ public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
     @Column(name = "tilbakekrev_smaabeloep", updatable = false)
     private Boolean tilbakekrevSmåBeløp;
 
-    @Column(name = "sarlig_grunner_begrunnelse",updatable = false)
+    @Column(name = "sarlig_grunner_begrunnelse", updatable = false)
     private String særligGrunnerBegrunnelse;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "vurdertAktsomhet")

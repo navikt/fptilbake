@@ -28,14 +28,14 @@ public enum AdresseType implements Kodeverdi {
 
     public static final String KODEVERK = "ADRESSE_TYPE";
     public static final List<AdresseType> kjentePostadressetyper = Collections.unmodifiableList(
-        List.of(
-            AdresseType.BOSTEDSADRESSE,
-            AdresseType.POSTADRESSE,
-            AdresseType.POSTADRESSE_UTLAND,
-            AdresseType.MIDLERTIDIG_POSTADRESSE_NORGE,
-            AdresseType.MIDLERTIDIG_POSTADRESSE_UTLAND,
-            AdresseType.UKJENT_ADRESSE
-        )
+            List.of(
+                    AdresseType.BOSTEDSADRESSE,
+                    AdresseType.POSTADRESSE,
+                    AdresseType.POSTADRESSE_UTLAND,
+                    AdresseType.MIDLERTIDIG_POSTADRESSE_NORGE,
+                    AdresseType.MIDLERTIDIG_POSTADRESSE_UTLAND,
+                    AdresseType.UKJENT_ADRESSE
+            )
     );
     private static final Map<String, AdresseType> KODER = new LinkedHashMap<>();
 

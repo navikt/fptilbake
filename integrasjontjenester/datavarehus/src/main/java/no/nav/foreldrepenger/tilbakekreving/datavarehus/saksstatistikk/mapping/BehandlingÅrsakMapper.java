@@ -8,11 +8,11 @@ import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.RevurderingOpprett
 
 public class BehandlingÅrsakMapper {
     private static final Map<BehandlingÅrsakType, RevurderingOpprettetÅrsak> MAPPING = Map.of(
-        BehandlingÅrsakType.RE_KLAGE_KA, RevurderingOpprettetÅrsak.KLAGE_KA,
-        BehandlingÅrsakType.RE_KLAGE_NFP, RevurderingOpprettetÅrsak.KLAGE_NFP,
-        BehandlingÅrsakType.RE_OPPLYSNINGER_OM_FORELDELSE, RevurderingOpprettetÅrsak.OPPLYSNINGER_OM_FORELDELSE,
-        BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR, RevurderingOpprettetÅrsak.OPPLYSNINGER_OM_VILKÅR,
-        BehandlingÅrsakType.RE_FEILUTBETALT_BELØP_HELT_ELLER_DELVIS_BORTFALT, RevurderingOpprettetÅrsak.FEILUTBETALING_BORTFALT);
+            BehandlingÅrsakType.RE_KLAGE_KA, RevurderingOpprettetÅrsak.KLAGE_KA,
+            BehandlingÅrsakType.RE_KLAGE_NFP, RevurderingOpprettetÅrsak.KLAGE_NFP,
+            BehandlingÅrsakType.RE_OPPLYSNINGER_OM_FORELDELSE, RevurderingOpprettetÅrsak.OPPLYSNINGER_OM_FORELDELSE,
+            BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR, RevurderingOpprettetÅrsak.OPPLYSNINGER_OM_VILKÅR,
+            BehandlingÅrsakType.RE_FEILUTBETALT_BELØP_HELT_ELLER_DELVIS_BORTFALT, RevurderingOpprettetÅrsak.FEILUTBETALING_BORTFALT);
 
     public static RevurderingOpprettetÅrsak getRevurderingÅrsak(BehandlingÅrsak behandlingÅrsak) {
         return getRevurderingÅrsak(behandlingÅrsak.getBehandlingÅrsakType());

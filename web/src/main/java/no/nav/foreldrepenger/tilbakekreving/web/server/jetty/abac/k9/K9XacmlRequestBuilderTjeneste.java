@@ -81,5 +81,6 @@ public class K9XacmlRequestBuilderTjeneste implements XacmlRequestBuilderTjenest
         return identer;
     }
 
-    private static record IdentKey(String key, String ident) {}
+    private static record IdentKey(String key, String ident) {
+    }
 }

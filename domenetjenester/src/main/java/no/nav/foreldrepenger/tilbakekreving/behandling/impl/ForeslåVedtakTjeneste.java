@@ -39,13 +39,12 @@ public class ForeslåVedtakTjeneste {
 
         BeregningResultat beregningResultat = beregningTjeneste.beregn(behandlingId);
         tekstBuilder.medSkjermlenke(SkjermlenkeType.VEDTAK)
-            .medResultat(beregningResultat.getVedtakResultatType())
-            .medHendelse(HistorikkinnslagType.FORSLAG_VEDTAK)
-            .build(historikkinnslag);
+                .medResultat(beregningResultat.getVedtakResultatType())
+                .medHendelse(HistorikkinnslagType.FORSLAG_VEDTAK)
+                .build(historikkinnslag);
 
         historikkTjenesteAdapter.lagInnslag(historikkinnslag);
     }
-
 
 
 }

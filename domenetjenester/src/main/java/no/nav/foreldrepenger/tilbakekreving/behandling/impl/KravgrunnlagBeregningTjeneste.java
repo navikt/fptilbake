@@ -65,9 +65,9 @@ public class KravgrunnlagBeregningTjeneste {
 
     private BigDecimal beregnFeilutbetaltBeløp(Kravgrunnlag431 kravgrunnlag, Periode periode) {
         Function<KravgrunnlagPeriode432, BigDecimal> feilutbetaltBeløpUtleder = kgPeriode -> kgPeriode.getKravgrunnlagBeloper433().stream()
-            .filter(kgBeløp -> kgBeløp.getKlasseType().equals(KlasseType.FEIL))
-            .map(KravgrunnlagBelop433::getNyBelop)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .filter(kgBeløp -> kgBeløp.getKlasseType().equals(KlasseType.FEIL))
+                .map(KravgrunnlagBelop433::getNyBelop)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         return beregnBeløp(kravgrunnlag, periode, feilutbetaltBeløpUtleder);
     }
 
@@ -76,9 +76,9 @@ public class KravgrunnlagBeregningTjeneste {
      */
     private BigDecimal beregnUtbetaltYtelseBeløp(Kravgrunnlag431 kravgrunnlag, Periode periode) {
         Function<KravgrunnlagPeriode432, BigDecimal> feilutbetaltBeløpUtleder = kgPeriode -> kgPeriode.getKravgrunnlagBeloper433().stream()
-            .filter(kgBeløp -> kgBeløp.getKlasseType().equals(KlasseType.YTEL))
-            .map(KravgrunnlagBelop433::getOpprUtbetBelop)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .filter(kgBeløp -> kgBeløp.getKlasseType().equals(KlasseType.YTEL))
+                .map(KravgrunnlagBelop433::getOpprUtbetBelop)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         return beregnBeløp(kravgrunnlag, periode, feilutbetaltBeløpUtleder);
     }
 
@@ -87,9 +87,9 @@ public class KravgrunnlagBeregningTjeneste {
      */
     private BigDecimal beregnRiktigYtelseBeløp(Kravgrunnlag431 kravgrunnlag, Periode periode) {
         Function<KravgrunnlagPeriode432, BigDecimal> feilutbetaltBeløpUtleder = kgPeriode -> kgPeriode.getKravgrunnlagBeloper433().stream()
-            .filter(kgBeløp -> kgBeløp.getKlasseType().equals(KlasseType.YTEL))
-            .map(KravgrunnlagBelop433::getNyBelop)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .filter(kgBeløp -> kgBeløp.getKlasseType().equals(KlasseType.YTEL))
+                .map(KravgrunnlagBelop433::getNyBelop)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         return beregnBeløp(kravgrunnlag, periode, feilutbetaltBeløpUtleder);
     }
 

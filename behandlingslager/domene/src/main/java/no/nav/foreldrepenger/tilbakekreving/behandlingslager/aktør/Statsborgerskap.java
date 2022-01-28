@@ -4,7 +4,7 @@ public class Statsborgerskap {
 
     private String landkode;
 
-    public Statsborgerskap(String landkode){
+    public Statsborgerskap(String landkode) {
         this.landkode = landkode;
     }
 

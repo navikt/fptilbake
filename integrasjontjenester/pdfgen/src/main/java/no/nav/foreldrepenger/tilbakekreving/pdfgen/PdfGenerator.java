@@ -51,17 +51,17 @@ public class PdfGenerator {
         PdfRendererBuilder builder = new PdfRendererBuilder();
         try {
             builder
-                .useFont(fontSupplier("SourceSansPro-Regular.ttf"), "Source Sans Pro", 400, BaseRendererBuilder.FontStyle.NORMAL, true)
-                .useFont(fontSupplier("SourceSansPro-Bold.ttf"), "Source Sans Pro", 700, BaseRendererBuilder.FontStyle.OBLIQUE, true)
-                .useFont(fontSupplier("SourceSansPro-It.ttf"), "Source Sans Pro", 400, BaseRendererBuilder.FontStyle.ITALIC, true)
-                .useColorProfile(FileStructureUtil.getColorProfile())
-                .useSVGDrawer(new BatikSVGDrawer())
-                .usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_2_U)
-                .withHtmlContent(htmlDocument, "")
-                .toStream(outputStream)
-                .useFastMode()
-                .buildPdfRenderer()
-                .createPDF();
+                    .useFont(fontSupplier("SourceSansPro-Regular.ttf"), "Source Sans Pro", 400, BaseRendererBuilder.FontStyle.NORMAL, true)
+                    .useFont(fontSupplier("SourceSansPro-Bold.ttf"), "Source Sans Pro", 700, BaseRendererBuilder.FontStyle.OBLIQUE, true)
+                    .useFont(fontSupplier("SourceSansPro-It.ttf"), "Source Sans Pro", 400, BaseRendererBuilder.FontStyle.ITALIC, true)
+                    .useColorProfile(FileStructureUtil.getColorProfile())
+                    .useSVGDrawer(new BatikSVGDrawer())
+                    .usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_2_U)
+                    .withHtmlContent(htmlDocument, "")
+                    .toStream(outputStream)
+                    .useFastMode()
+                    .buildPdfRenderer()
+                    .createPDF();
         } catch (IOException e) {
             throw new RuntimeException("Feil ved generering av pdf", e);
         }

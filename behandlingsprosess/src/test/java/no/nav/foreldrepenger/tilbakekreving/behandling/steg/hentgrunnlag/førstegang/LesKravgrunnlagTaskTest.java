@@ -60,7 +60,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_ikke_utføre_leskravgrunnlag_task_når_grunnlag_referanse_ikke_finnes_i_fagsystem(){
+    public void skal_ikke_utføre_leskravgrunnlag_task_når_grunnlag_referanse_ikke_finnes_i_fagsystem() {
         when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(Collections.emptyList());
 
         var e = assertThrows(TekniskException.class, () -> lesKravgrunnlagTask.doTask(lagProsessTaskData()));
@@ -72,7 +72,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
         when(fagsystemKlientMock.finnesBehandlingIFagsystem(fagsak.getSaksnummer().getVerdi(), HENVISNING)).thenReturn(false);
 
         assertThatThrownBy(() -> lesKravgrunnlagTask.doTask(lagProsessTaskData()))
-            .hasMessageContaining("FPT-587195");
+                .hasMessageContaining("FPT-587195");
     }
 
     @Test
@@ -80,13 +80,13 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ugyldig_referanse.xml"));
 
         assertThatThrownBy(() -> lesKravgrunnlagTask.doTask(lagProsessTaskData()))
-            .hasMessageContaining("Mottok et tilbakekrevingsgrunnlag fra Økonomi med henvisning som ikke er i støttet format."
-                + " henvisning=ABC. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!");
+                .hasMessageContaining("Mottok et tilbakekrevingsgrunnlag fra Økonomi med henvisning som ikke er i støttet format."
+                        + " henvisning=ABC. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!");
 
     }
 
     @Test
-    public void skal_utføre_les_kravgrunnlag_task_for_ugyldig_kravgrunnlag(){
+    public void skal_utføre_les_kravgrunnlag_task_for_ugyldig_kravgrunnlag() {
         when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(lagResponsFraFagsystemKlient());
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_ugyldig_ENDR_negativ_beløp.xml"));
         lesKravgrunnlagTask.doTask(lagProsessTaskData());
@@ -104,7 +104,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
         return behandling;
     }
 
-    private List<EksternBehandlingsinfoDto> lagResponsFraFagsystemKlient(){
+    private List<EksternBehandlingsinfoDto> lagResponsFraFagsystemKlient() {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setUuid(UUID.randomUUID());
         eksternBehandlingsinfoDto.setHenvisning(Henvisning.fraEksternBehandlingId(REFERANSE));

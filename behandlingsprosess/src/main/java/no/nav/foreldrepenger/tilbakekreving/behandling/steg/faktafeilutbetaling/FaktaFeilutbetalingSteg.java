@@ -50,12 +50,12 @@ public class FaktaFeilutbetalingSteg implements BehandlingSteg {
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
         return BehandleStegResultat.utførtMedAksjonspunkter(
-            Collections.singletonList(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
+                Collections.singletonList(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
     }
 
     protected void utførStegAutomatisk(Behandling behandling) {
         logger.info("utfører fakta steg automatisk for behandling={}", behandling.getId());
-        faktaFastsettelseTjeneste.fastsettFaktaAutomatisk(behandling,AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE);
+        faktaFastsettelseTjeneste.fastsettFaktaAutomatisk(behandling, AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE);
     }
 
 }

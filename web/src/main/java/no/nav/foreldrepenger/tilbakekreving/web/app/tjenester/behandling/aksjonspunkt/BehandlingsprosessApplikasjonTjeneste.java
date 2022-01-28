@@ -9,7 +9,9 @@ public interface BehandlingsprosessApplikasjonTjeneste {
 
     Behandling hentBehandling(Long behandlingId);
 
-    /** Sjekker om det pågår åpne prosess tasks (for angitt gruppe). Returnerer eventuelt task gruppe for eventuell åpen prosess task gruppe. */
+    /**
+     * Sjekker om det pågår åpne prosess tasks (for angitt gruppe). Returnerer eventuelt task gruppe for eventuell åpen prosess task gruppe.
+     */
     Optional<AsyncPollingStatus> sjekkProsessTaskPågårForBehandling(Behandling behandling, String gruppe);
 
 }

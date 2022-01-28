@@ -71,7 +71,7 @@ public class AksjonspunktResultat {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "<" + aksjonspunktDefinisjon.getKode() + ":" + aksjonspunktDefinisjon.getNavn()
-            + ", frist=" + getFrist() + ", venteårsak=" + getVenteårsak() + ">";
+                + ", frist=" + getFrist() + ", venteårsak=" + getVenteårsak() + ">";
     }
 
     @Override

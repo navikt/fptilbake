@@ -21,28 +21,28 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum FagOmrådeKode implements Kodeverdi {
 
-    FORELDREPENGER("FP","Foreldrepenger"),
-    FORELDREPENGER_ARBEIDSGIVER("FPREF","Foreldrepenger refusjon"),
-    SYKEPENGER("SP","Sykepenger"),
-    SYKEPENGER_ARBEIDSGIVER("SPREF","Sykepenger refusjon"),
-    PLEIEPENGER_V1("OOP","Pleiepenger sykt barn"),
-    PLEIEPENGER_V1_ARBEIDSGIVER("OOPREF","Pleiepenger sykt barn"),
-    ENGANGSSTØNAD("REFUTG","Engangsstønad"),
-    SVANGERSKAPSPENGER("SVP","Svangerskapspenger"),
-    SVANGERSKAPSPENGER_ARBEIDSGIVER("SVPREF","Svangerskapspenger refusjon til arbeidsgiver"),
+    FORELDREPENGER("FP", "Foreldrepenger"),
+    FORELDREPENGER_ARBEIDSGIVER("FPREF", "Foreldrepenger refusjon"),
+    SYKEPENGER("SP", "Sykepenger"),
+    SYKEPENGER_ARBEIDSGIVER("SPREF", "Sykepenger refusjon"),
+    PLEIEPENGER_V1("OOP", "Pleiepenger sykt barn"),
+    PLEIEPENGER_V1_ARBEIDSGIVER("OOPREF", "Pleiepenger sykt barn"),
+    ENGANGSSTØNAD("REFUTG", "Engangsstønad"),
+    SVANGERSKAPSPENGER("SVP", "Svangerskapspenger"),
+    SVANGERSKAPSPENGER_ARBEIDSGIVER("SVPREF", "Svangerskapspenger refusjon til arbeidsgiver"),
 
     //K9
-    PLEIEPENGER_SYKT_BARN("PB","Pleiepenger sykt barn"),
-    PLEIEPENGER_SYKT_BARN_ARBEIDSGIVER("PBREF","Pleiepenger sykt barn"),
-    PLEIEPENGER_NÆRSTÅENDE("PN","Pleiepenger nærstående"),
-    PLEIEPENGER_NÆRSTÅENDE_ARBEIDSGIVER("PNREF","Pleiepenger nærstående"),
-    OMSORGSPENGER("OM","Omsorgspenger"),
-    OMSORGSPENGER_ARBEIDSGIVER("OMREF","Omsorgspenger"),
-    OPPLÆRINGSPENGER("OPP","Opplæringspenger"),
-    OPPLÆRINGSPENGER_ARBEIDSGIVER("OPPREF","Opplæringspenger"),
-    FRISINN("FRISINN","FRIlansere og Selstendig næringsdrivendes INNtektskompensasjon"),
+    PLEIEPENGER_SYKT_BARN("PB", "Pleiepenger sykt barn"),
+    PLEIEPENGER_SYKT_BARN_ARBEIDSGIVER("PBREF", "Pleiepenger sykt barn"),
+    PLEIEPENGER_NÆRSTÅENDE("PN", "Pleiepenger nærstående"),
+    PLEIEPENGER_NÆRSTÅENDE_ARBEIDSGIVER("PNREF", "Pleiepenger nærstående"),
+    OMSORGSPENGER("OM", "Omsorgspenger"),
+    OMSORGSPENGER_ARBEIDSGIVER("OMREF", "Omsorgspenger"),
+    OPPLÆRINGSPENGER("OPP", "Opplæringspenger"),
+    OPPLÆRINGSPENGER_ARBEIDSGIVER("OPPREF", "Opplæringspenger"),
+    FRISINN("FRISINN", "FRIlansere og Selstendig næringsdrivendes INNtektskompensasjon"),
 
-    UDEFINERT("-","udefinert");
+    UDEFINERT("-", "udefinert");
 
     private String kode;
     private String navn;

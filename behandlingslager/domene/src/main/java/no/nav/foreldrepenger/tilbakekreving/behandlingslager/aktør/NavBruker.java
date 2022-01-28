@@ -48,8 +48,8 @@ public class NavBruker extends Person {
     }
 
     /**
-     * @deprecated Ikke bruk denne metoden. Bruk språkkode i grunninformasjonen fra fpsak.
      * @return Språkkode fra tps
+     * @deprecated Ikke bruk denne metoden. Bruk språkkode i grunninformasjonen fra fpsak.
      */
     public Språkkode getSpråkkode() {
         return språkkode;

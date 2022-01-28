@@ -52,13 +52,13 @@ import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 // mapping for BehandlingInfo klassen
 @SqlResultSetMapping(name = "PipBehandlingInfo", classes = {
-    @ConstructorResult(targetClass = BehandlingInfo.class, columns = {
-        @ColumnResult(name = "behandlingId", type = Long.class),
-        @ColumnResult(name = "saksnummer"),
-        @ColumnResult(name = "aktørId"),
-        @ColumnResult(name = "behandlingstatus"),
-        @ColumnResult(name = "ansvarligSaksbehandler")
-    })
+        @ConstructorResult(targetClass = BehandlingInfo.class, columns = {
+                @ColumnResult(name = "behandlingId", type = Long.class),
+                @ColumnResult(name = "saksnummer"),
+                @ColumnResult(name = "aktørId"),
+                @ColumnResult(name = "behandlingstatus"),
+                @ColumnResult(name = "ansvarligSaksbehandler")
+        })
 })
 
 @Entity(name = "Behandling")
@@ -66,25 +66,25 @@ import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 public class Behandling extends BaseEntitet {
 
     private static final Comparator<BaseEntitet> COMPARATOR_OPPRETTET_TID = Comparator
-        .comparing(BaseEntitet::getOpprettetTidspunkt, (a, b) -> {
-            if (a != null && b != null) {
-                return a.compareTo(b);
-            } else if (a == null && b == null) {
-                return 0;
-            } else {
-                return a == null ? -1 : 1;
-            }
-        });
+            .comparing(BaseEntitet::getOpprettetTidspunkt, (a, b) -> {
+                if (a != null && b != null) {
+                    return a.compareTo(b);
+                } else if (a == null && b == null) {
+                    return 0;
+                } else {
+                    return a == null ? -1 : 1;
+                }
+            });
     private static final Comparator<BaseEntitet> COMPARE_ENDRET_TID = Comparator
-        .comparing(BaseEntitet::getEndretTidspunkt, (a, b) -> {
-            if (a != null && b != null) {
-                return a.compareTo(b);
-            } else if (a == null && b == null) {
-                return 0;
-            } else {
-                return a == null ? -1 : 1;
-            }
-        });
+            .comparing(BaseEntitet::getEndretTidspunkt, (a, b) -> {
+                if (a != null && b != null) {
+                    return a.compareTo(b);
+                } else if (a == null && b == null) {
+                    return 0;
+                } else {
+                    return a == null ? -1 : 1;
+                }
+            });
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BEHANDLING")
@@ -230,8 +230,8 @@ public class Behandling extends BaseEntitet {
 
     private void lukkBehandlingStegStatuser(Collection<BehandlingStegTilstand> stegTilstander, BehandlingStegStatus sluttStatusForSteg) {
         stegTilstander.stream()
-            .filter(t -> !BehandlingStegStatus.erSluttStatus(t.getBehandlingStegStatus()))
-            .forEach(t -> t.setBehandlingStegStatus(sluttStatusForSteg));
+                .filter(t -> !BehandlingStegStatus.erSluttStatus(t.getBehandlingStegStatus()))
+                .forEach(t -> t.setBehandlingStegStatus(sluttStatusForSteg));
     }
 
     public BehandlingType getType() {
@@ -240,8 +240,8 @@ public class Behandling extends BaseEntitet {
 
     public Optional<BehandlingStegTilstand> getBehandlingStegTilstand() {
         List<BehandlingStegTilstand> tilstander = behandlingStegTilstander.stream()
-            .filter(t -> !BehandlingStegStatus.erSluttStatus(t.getBehandlingStegStatus()))
-            .collect(Collectors.toList());
+                .filter(t -> !BehandlingStegStatus.erSluttStatus(t.getBehandlingStegStatus()))
+                .collect(Collectors.toList());
         if (tilstander.size() > 1) {
             throw new IllegalStateException("Utvikler-feil: Kan ikke ha flere steg samtidig åpne: " + tilstander); //$NON-NLS-1$
         }
@@ -267,12 +267,12 @@ public class Behandling extends BaseEntitet {
 
     public Optional<BehandlingStegTilstand> getBehandlingStegTilstand(BehandlingStegType stegType) {
         List<BehandlingStegTilstand> tilstander = behandlingStegTilstander.stream()
-            .filter(t -> !BehandlingStegStatus.erSluttStatus(t.getBehandlingStegStatus())
-                && Objects.equals(stegType, t.getBehandlingSteg()))
-            .collect(Collectors.toList());
+                .filter(t -> !BehandlingStegStatus.erSluttStatus(t.getBehandlingStegStatus())
+                        && Objects.equals(stegType, t.getBehandlingSteg()))
+                .collect(Collectors.toList());
         if (tilstander.size() > 1) {
             throw new IllegalStateException(
-                "Utvikler-feil: Kan ikke ha flere steg samtidig åpne for stegType[" + stegType + "]: " + tilstander); //$NON-NLS-1$ //$NON-NLS-2$
+                    "Utvikler-feil: Kan ikke ha flere steg samtidig åpne for stegType[" + stegType + "]: " + tilstander); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         return tilstander.isEmpty() ? Optional.empty() : Optional.of(tilstander.get(0));
@@ -305,8 +305,8 @@ public class Behandling extends BaseEntitet {
         }
         Behandling other = (Behandling) object;
         return Objects.equals(getFagsak(), other.getFagsak())
-            && Objects.equals(getType(), other.getType())
-            && Objects.equals(getOpprettetTidspunkt(), other.getOpprettetTidspunkt());
+                && Objects.equals(getType(), other.getType())
+                && Objects.equals(getOpprettetTidspunkt(), other.getOpprettetTidspunkt());
     }
 
     @Override
@@ -317,13 +317,13 @@ public class Behandling extends BaseEntitet {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "<" //$NON-NLS-1$
-            + (id != null ? "id=" + id + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + "fagsak=" + fagsak + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "status=" + status + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "type=" + behandlingType + "," //$NON-NLS-1$ //$NON-NLS-2$
-            + "steg=" + (getBehandlingStegTilstand().orElse(null)) + "," //$NON-NLS-1$ //$NON-NLS-2$
-            + "opprettetTs=" + getOpprettetTidspunkt() //$NON-NLS-1$
-            + ">"; //$NON-NLS-1$
+                + (id != null ? "id=" + id + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                + "fagsak=" + fagsak + ", " //$NON-NLS-1$ //$NON-NLS-2$
+                + "status=" + status + ", " //$NON-NLS-1$ //$NON-NLS-2$
+                + "type=" + behandlingType + "," //$NON-NLS-1$ //$NON-NLS-2$
+                + "steg=" + (getBehandlingStegTilstand().orElse(null)) + "," //$NON-NLS-1$ //$NON-NLS-2$
+                + "opprettetTs=" + getOpprettetTidspunkt() //$NON-NLS-1$
+                + ">"; //$NON-NLS-1$
     }
 
     public Fagsak getFagsak() {
@@ -342,34 +342,34 @@ public class Behandling extends BaseEntitet {
      */
     void fjernAksjonspunkt(Aksjonspunkt aksjonspunkt) {
         Set<Aksjonspunkt> beholdes = aksjonspunkter.stream()
-            .filter(ap -> !ap.getAksjonspunktDefinisjon().getKode()
-                .equals(aksjonspunkt.getAksjonspunktDefinisjon().getKode()))
-            .collect(toSet());
+                .filter(ap -> !ap.getAksjonspunktDefinisjon().getKode()
+                        .equals(aksjonspunkt.getAksjonspunktDefinisjon().getKode()))
+                .collect(toSet());
         aksjonspunkter.clear();
         aksjonspunkter.addAll(beholdes);
     }
 
     public Set<Aksjonspunkt> getAksjonspunkter() {
         return getAksjonspunkterStream()
-            .collect(toSet());
+                .collect(toSet());
     }
 
     public Optional<Aksjonspunkt> getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon definisjon) {
         return getAksjonspunkterStream()
-            .filter(a -> a.getAksjonspunktDefinisjon().equals(definisjon))
-            .findFirst();
+                .filter(a -> a.getAksjonspunktDefinisjon().equals(definisjon))
+                .findFirst();
     }
 
     public Aksjonspunkt getAksjonspunktFor(AksjonspunktDefinisjon definisjon) {
         return getAksjonspunkterStream()
-            .filter(a -> a.getAksjonspunktDefinisjon().equals(definisjon))
-            .findFirst()
-            .orElseThrow(() -> new TekniskException("FPT-473718", String.format("Behandling har ikke aksjonspunkt for definisjon [%s].", definisjon.getKode())));
+                .filter(a -> a.getAksjonspunktDefinisjon().equals(definisjon))
+                .findFirst()
+                .orElseThrow(() -> new TekniskException("FPT-473718", String.format("Behandling har ikke aksjonspunkt for definisjon [%s].", definisjon.getKode())));
     }
 
     public List<Aksjonspunkt> getÅpneAksjonspunkter() {
         return getÅpneAksjonspunkterStream()
-            .collect(Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     public Set<Aksjonspunkt> getAlleAksjonspunkterInklInaktive() {
@@ -378,20 +378,20 @@ public class Behandling extends BaseEntitet {
 
     public List<Aksjonspunkt> getÅpneAksjonspunkter(AksjonspunktType aksjonspunktType) {
         return getÅpneAksjonspunkterStream()
-            .filter(ad -> aksjonspunktType.equals(ad.getAksjonspunktDefinisjon().getAksjonspunktType()))
-            .collect(Collectors.toList());
+                .filter(ad -> aksjonspunktType.equals(ad.getAksjonspunktDefinisjon().getAksjonspunktType()))
+                .collect(Collectors.toList());
     }
 
     public List<Aksjonspunkt> getÅpneAksjonspunkter(Collection<AksjonspunktDefinisjon> matchKriterier) {
         return getÅpneAksjonspunkterStream()
-            .filter(a -> matchKriterier.contains(a.getAksjonspunktDefinisjon()))
-            .collect(Collectors.toList());
+                .filter(a -> matchKriterier.contains(a.getAksjonspunktDefinisjon()))
+                .collect(Collectors.toList());
     }
 
     public List<Aksjonspunkt> getAksjonspunkterMedTotrinnskontroll() {
         return getAksjonspunkterStream()
-            .filter(a -> !a.erAvbrutt() && a.isToTrinnsBehandling())
-            .collect(Collectors.toList());
+                .filter(a -> !a.erAvbrutt() && a.isToTrinnsBehandling())
+                .collect(Collectors.toList());
     }
 
     public LocalDate getFristDatoBehandlingPåVent() {
@@ -421,7 +421,7 @@ public class Behandling extends BaseEntitet {
 
     private Optional<Aksjonspunkt> getFørsteÅpneAutopunkt() {
         return getÅpneAksjonspunkter(AksjonspunktType.AUTOPUNKT).stream()
-            .findFirst();
+                .findFirst();
     }
 
     public boolean isBehandlingPåVent() {
@@ -435,7 +435,7 @@ public class Behandling extends BaseEntitet {
 
     private Stream<Aksjonspunkt> getÅpneAksjonspunkterStream() {
         return getAksjonspunkterStream()
-            .filter(Aksjonspunkt::erÅpentAksjonspunkt);
+                .filter(Aksjonspunkt::erÅpentAksjonspunkt);
     }
 
 
@@ -548,9 +548,9 @@ public class Behandling extends BaseEntitet {
         return erBehandlingRevurderingOgHarÅrsakFeilutbetalingBortfalt() ? VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT : VedtaksbrevType.ORDINÆR;
     }
 
-    private boolean erBehandlingRevurderingOgHarÅrsakFeilutbetalingBortfalt(){
+    private boolean erBehandlingRevurderingOgHarÅrsakFeilutbetalingBortfalt() {
         return BehandlingType.REVURDERING_TILBAKEKREVING.equals(this.behandlingType) && this.behandlingÅrsaker.stream()
-            .anyMatch(behandlingÅrsak -> BehandlingÅrsakType.RE_FEILUTBETALT_BELØP_HELT_ELLER_DELVIS_BORTFALT.equals(behandlingÅrsak.getBehandlingÅrsakType()));
+                .anyMatch(behandlingÅrsak -> BehandlingÅrsakType.RE_FEILUTBETALT_BELØP_HELT_ELLER_DELVIS_BORTFALT.equals(behandlingÅrsak.getBehandlingÅrsakType()));
     }
 
     @SuppressWarnings("unchecked")

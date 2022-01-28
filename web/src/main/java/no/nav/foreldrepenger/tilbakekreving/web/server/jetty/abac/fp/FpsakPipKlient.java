@@ -48,15 +48,15 @@ public class FpsakPipKlient {
 
     public PipDto hentPipdataForFpsakBehandling(UUID behandlingUUid) {
         URI uri = UriBuilder.fromUri(endpointFpsakBehandlingPip)
-            .queryParam("behandlingUuid", behandlingUUid.toString())
-            .build();
+                .queryParam("behandlingUuid", behandlingUUid.toString())
+                .build();
         return restClient.get(uri, PipDto.class);
     }
 
     public Set<String> hentAktørIderSomString(Saksnummer saksnummer) {
         URI uri = UriBuilder.fromUri(endpointFpsakSakPip)
-            .queryParam("saksnummer", saksnummer.getVerdi())
-            .build();
+                .queryParam("saksnummer", saksnummer.getVerdi())
+                .build();
 
         return restClient.get(uri, HashSet.class);
     }
@@ -64,8 +64,8 @@ public class FpsakPipKlient {
     public Set<AktørId> hentAktørIder(Saksnummer saksnummer) {
         Set<String> aktørIder = hentAktørIderSomString(saksnummer);
         return aktørIder.stream()
-            .map(AktørId::new)
-            .collect(Collectors.toSet());
+                .map(AktørId::new)
+                .collect(Collectors.toSet());
     }
 
     private URI baseUri() {

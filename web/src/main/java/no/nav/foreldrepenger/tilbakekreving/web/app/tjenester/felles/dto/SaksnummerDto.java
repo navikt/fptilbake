@@ -41,8 +41,8 @@ public class SaksnummerDto implements AbacDto {
     @Override
     public String toString() {
         return "SaksnummerDto{" +
-            "saksnummer='" + saksnummer + '\'' +
-            '}';
+                "saksnummer='" + saksnummer + '\'' +
+                '}';
     }
 
     @Override

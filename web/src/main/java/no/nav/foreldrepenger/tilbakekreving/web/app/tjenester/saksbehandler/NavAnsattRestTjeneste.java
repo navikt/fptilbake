@@ -38,13 +38,13 @@ public class NavAnsattRestTjeneste {
 
     @Inject
     public NavAnsattRestTjeneste(
-        @KonfigVerdi(value = "bruker.gruppenavn.saksbehandler") String gruppenavnSaksbehandler,
-        @KonfigVerdi(value = "bruker.gruppenavn.veileder") String gruppenavnVeileder,
-        @KonfigVerdi(value = "bruker.gruppenavn.beslutter") String gruppenavnBeslutter,
-        @KonfigVerdi(value = "bruker.gruppenavn.overstyrer") String gruppenavnOverstyrer,
-        @KonfigVerdi(value = "bruker.gruppenavn.egenansatt") String gruppenavnEgenAnsatt,
-        @KonfigVerdi(value = "bruker.gruppenavn.kode6") String gruppenavnKode6,
-        @KonfigVerdi(value = "bruker.gruppenavn.kode7") String gruppenavnKode7
+            @KonfigVerdi(value = "bruker.gruppenavn.saksbehandler") String gruppenavnSaksbehandler,
+            @KonfigVerdi(value = "bruker.gruppenavn.veileder") String gruppenavnVeileder,
+            @KonfigVerdi(value = "bruker.gruppenavn.beslutter") String gruppenavnBeslutter,
+            @KonfigVerdi(value = "bruker.gruppenavn.overstyrer") String gruppenavnOverstyrer,
+            @KonfigVerdi(value = "bruker.gruppenavn.egenansatt") String gruppenavnEgenAnsatt,
+            @KonfigVerdi(value = "bruker.gruppenavn.kode6") String gruppenavnKode6,
+            @KonfigVerdi(value = "bruker.gruppenavn.kode7") String gruppenavnKode7
     ) {
         this.gruppenavnSaksbehandler = gruppenavnSaksbehandler;
         this.gruppenavnVeileder = gruppenavnVeileder;
@@ -58,8 +58,8 @@ public class NavAnsattRestTjeneste {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(description = "Returnerer fullt navn for ident",
-        summary = "Ident hentes fra sikkerhetskonteksten som er tilgjengelig etter innlogging.",
-        tags = "nav-ansatt")
+            summary = "Ident hentes fra sikkerhetskonteksten som er tilgjengelig etter innlogging.",
+            tags = "nav-ansatt")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK, sporingslogg = false)
     public InnloggetNavAnsattDto innloggetBruker() {
         String ident = SubjectHandler.getSubjectHandler().getUid();
@@ -71,16 +71,16 @@ public class NavAnsattRestTjeneste {
         String navn = ldapBruker.getDisplayName();
         Collection<String> grupper = LdapUtil.filtrerGrupper(ldapBruker.getGroups());
         return InnloggetNavAnsattDto.builder()
-            .setBrukernavn(ident)
-            .setNavn(navn)
-            .setKanSaksbehandle(grupper.contains(gruppenavnSaksbehandler))
-            .setKanVeilede(grupper.contains(gruppenavnVeileder))
-            .setKanBeslutte(grupper.contains(gruppenavnBeslutter))
-            .setKanOverstyre(grupper.contains(gruppenavnOverstyrer))
-            .setKanBehandleKodeEgenAnsatt(grupper.contains(gruppenavnEgenAnsatt))
-            .setKanBehandleKode6(grupper.contains(gruppenavnKode6))
-            .setKanBehandleKode7(grupper.contains(gruppenavnKode7))
-            .create();
+                .setBrukernavn(ident)
+                .setNavn(navn)
+                .setKanSaksbehandle(grupper.contains(gruppenavnSaksbehandler))
+                .setKanVeilede(grupper.contains(gruppenavnVeileder))
+                .setKanBeslutte(grupper.contains(gruppenavnBeslutter))
+                .setKanOverstyre(grupper.contains(gruppenavnOverstyrer))
+                .setKanBehandleKodeEgenAnsatt(grupper.contains(gruppenavnEgenAnsatt))
+                .setKanBehandleKode6(grupper.contains(gruppenavnKode6))
+                .setKanBehandleKode7(grupper.contains(gruppenavnKode7))
+                .create();
     }
 
 }

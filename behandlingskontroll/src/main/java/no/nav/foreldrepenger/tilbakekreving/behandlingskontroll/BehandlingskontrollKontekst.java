@@ -51,8 +51,8 @@ public class BehandlingskontrollKontekst {
         }
         var other = (BehandlingskontrollKontekst) obj;
         return Objects.equals(fagsakId, other.fagsakId)
-            && Objects.equals(aktørId, other.aktørId)
-            && Objects.equals(getBehandlingId(), other.getBehandlingId());
+                && Objects.equals(aktørId, other.aktørId)
+                && Objects.equals(getBehandlingId(), other.getBehandlingId());
     }
 
     @Override

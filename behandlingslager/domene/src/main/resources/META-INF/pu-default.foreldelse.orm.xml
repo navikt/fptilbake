@@ -5,7 +5,8 @@
       http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
                  version="2.1">
 
-    <sequence-generator name="SEQ_GR_VURDERT_FORELDELSE" allocation-size="50" sequence-name="SEQ_GR_VURDERT_FORELDELSE"/>
+    <sequence-generator name="SEQ_GR_VURDERT_FORELDELSE" allocation-size="50"
+                        sequence-name="SEQ_GR_VURDERT_FORELDELSE"/>
     <sequence-generator name="SEQ_VURDERT_FORELDELSE" allocation-size="50" sequence-name="SEQ_VURDERT_FORELDELSE"/>
     <sequence-generator name="SEQ_FORELDELSE_PERIODE" allocation-size="50" sequence-name="SEQ_FORELDELSE_PERIODE"/>
 

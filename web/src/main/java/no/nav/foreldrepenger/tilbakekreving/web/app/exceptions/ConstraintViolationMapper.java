@@ -45,20 +45,20 @@ public class ConstraintViolationMapper implements ExceptionMapper<ConstraintViol
         }
         var feltNavn = feilene.stream().map(FeltFeilDto::navn).collect(Collectors.toList());
         var feilmelding = String.format(
-            "Det oppstod en valideringsfeil på felt %s. Vennligst kontroller at alle feltverdier er korrekte.",
-            feltNavn);
+                "Det oppstod en valideringsfeil på felt %s. Vennligst kontroller at alle feltverdier er korrekte.",
+                feltNavn);
         return Response.status(Response.Status.BAD_REQUEST)
-            .entity(new FeilDto(feilmelding, feilene))
-            .type(MediaType.APPLICATION_JSON)
-            .build();
+                .entity(new FeilDto(feilmelding, feilene))
+                .type(MediaType.APPLICATION_JSON)
+                .build();
     }
 
     private static Set<String> constraints(ConstraintViolationException exception) {
         return exception.getConstraintViolations()
-            .stream()
-            .map(cv -> cv.getRootBeanClass().getSimpleName() + "." + cv.getLeafBean().getClass().getSimpleName()
-                + "." + fieldName(cv) + " - " + cv.getMessage())
-            .collect(Collectors.toSet());
+                .stream()
+                .map(cv -> cv.getRootBeanClass().getSimpleName() + "." + cv.getLeafBean().getClass().getSimpleName()
+                        + "." + fieldName(cv) + " - " + cv.getMessage())
+                .collect(Collectors.toSet());
     }
 
     private static List<String> finnAksjonspunktKoder(ConstraintViolationException exception) {
@@ -69,9 +69,9 @@ public class ConstraintViolationMapper implements ExceptionMapper<ConstraintViol
             if (executableParameter instanceof BekreftedeAksjonspunkterDto) {
                 //Flere aksjonspunkt kan bekreftes i samme kall
                 return ((BekreftedeAksjonspunkterDto) executableParameter).getBekreftedeAksjonspunktDtoer()
-                    .stream()
-                    .map(ConstraintViolationMapper::getKode)
-                    .collect(Collectors.toList());
+                        .stream()
+                        .map(ConstraintViolationMapper::getKode)
+                        .collect(Collectors.toList());
             }
         }
         var aksjonspunktKode = getKode(førsteConstraint.getLeafBean());

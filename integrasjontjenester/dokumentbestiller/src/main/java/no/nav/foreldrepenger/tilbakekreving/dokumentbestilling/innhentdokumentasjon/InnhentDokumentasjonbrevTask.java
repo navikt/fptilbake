@@ -50,7 +50,7 @@ public class InnhentDokumentasjonbrevTask implements ProsessTaskHandler {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         String friTekst = prosessTaskData.getPayloadAsString();
 
-        if(vergeRepository.finnesVerge(behandlingId)){
+        if (vergeRepository.finnesVerge(behandlingId)) {
             innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, friTekst, BrevMottaker.VERGE);
         }
         innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, friTekst, BrevMottaker.BRUKER);
@@ -58,6 +58,6 @@ public class InnhentDokumentasjonbrevTask implements ProsessTaskHandler {
         LocalDateTime fristTid = LocalDateTime.now().plus(ventefrist).plusDays(1);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
-            fristTid, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+                fristTid, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
     }
 }

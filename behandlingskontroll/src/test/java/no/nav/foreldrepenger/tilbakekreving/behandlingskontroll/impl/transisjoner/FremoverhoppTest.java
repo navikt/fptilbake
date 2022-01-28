@@ -40,9 +40,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class FremoverhoppTest {
 
     private final List<StegTransisjon> transisjoner = new ArrayList<>();
@@ -71,7 +71,7 @@ public class FremoverhoppTest {
             protected void hoppFramover(BehandlingStegModell stegModell, BehandlingTransisjonEvent transisjonEvent, BehandlingStegType sisteSteg,
                                         BehandlingStegType finalFørsteSteg) {
                 transisjoner.add(new StegTransisjon(BehandlingSteg.TransisjonType.HOPP_OVER_FRAMOVER,
-                    stegModell.getBehandlingStegType()));
+                        stegModell.getBehandlingStegType()));
             }
         };
 
@@ -114,12 +114,12 @@ public class FremoverhoppTest {
     @Test
     public void skal_kalle_transisjoner_på_steg_det_hoppes_over() throws Exception {
         assertThat(transisjonerVedFremoverhopp(fra(steg1, INN), til(steg3))).contains(
-            StegTransisjon.hoppFremoverOver(steg1),
-            StegTransisjon.hoppFremoverOver(steg2));
+                StegTransisjon.hoppFremoverOver(steg1),
+                StegTransisjon.hoppFremoverOver(steg2));
         assertThat(transisjonerVedFremoverhopp(fra(steg1, UT), til(steg3)))
-            .contains(StegTransisjon.hoppFremoverOver(steg2));
+                .contains(StegTransisjon.hoppFremoverOver(steg2));
         assertThat(transisjonerVedFremoverhopp(fra(steg2, INN), til(steg3)))
-            .contains(StegTransisjon.hoppFremoverOver(steg2));
+                .contains(StegTransisjon.hoppFremoverOver(steg2));
         assertThat(transisjonerVedFremoverhopp(fra(steg2, UT), til(steg3))).isEmpty();
     }
 
@@ -169,7 +169,7 @@ public class FremoverhoppTest {
          * Optional.of(fraTilstand), Optional.of(tilTilstand));
          */
         var transisjonEvent = new BehandlingTransisjonEvent(kontekst, FellesTransisjoner.FREMHOPP_TIL_FORESLÅ_VEDTAK, fraTilstand,
-            til, true);
+                til, true);
 
         // act
         observer.observerBehandlingSteg(transisjonEvent);

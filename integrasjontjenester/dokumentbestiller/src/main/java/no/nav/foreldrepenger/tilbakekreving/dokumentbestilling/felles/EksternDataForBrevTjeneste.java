@@ -61,7 +61,7 @@ public class EksternDataForBrevTjeneste {
 
     public Personinfo hentPerson(String aktørId) {
         return tpsTjeneste.hentBrukerForAktør(new AktørId(aktørId))
-            .orElseThrow(() -> new TekniskException("FPT-089912", String.format("Fant ikke person med aktørId %s i tps", aktørId)));
+                .orElseThrow(() -> new TekniskException("FPT-089912", String.format("Fant ikke person med aktørId %s i tps", aktørId)));
     }
 
     public Adresseinfo hentAdresse(Personinfo personinfo) {
@@ -111,7 +111,7 @@ public class EksternDataForBrevTjeneste {
         Adresseinfo adresseinfo;
         if (BrevMottaker.VERGE.equals(brevMottaker)) {
             adresseinfo = new Adresseinfo.Builder(personinfo.getPersonIdent(), organisasjonNavn)
-                .medAnnenMottakerNavn(personinfo.getNavn()).build();
+                    .medAnnenMottakerNavn(personinfo.getNavn()).build();
         } else {
             adresseinfo = hentAdresse(personinfo);
             adresseinfo.setAnnenMottakerNavn(annenMottakerNavn);

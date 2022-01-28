@@ -87,8 +87,8 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         String avsluttendeTekst = konverterMedPartialTemplate("vedtak/periode_slutt", data);
 
         Avsnitt.Builder avsnittBuilder = new Avsnitt.Builder()
-            .medAvsnittstype(Avsnitt.Avsnittstype.PERIODE)
-            .medPeriode(data.getPeriode().getPeriode());
+                .medAvsnittstype(Avsnitt.Avsnittstype.PERIODE)
+                .medPeriode(data.getPeriode().getPeriode());
         if (overskrift != null && !overskrift.isEmpty()) {
             avsnittBuilder.medOverskrift(fjernOverskriftFormattering(overskrift));
         }
@@ -147,13 +147,13 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
 
     private static Underavsnitt lagUnderavsnitt(Underavsnitt.Underavsnittstype underavsnittstype, String overskrift, String brødtekst, boolean kanHaFritekst, boolean måHaFritekst, String fritekst) {
         return new Underavsnitt.Builder().
-            medUnderavsnittstype(underavsnittstype)
-            .medOverskrift(overskrift)
-            .medBrødtekst(brødtekst)
-            .medErFritekstTillatt(kanHaFritekst)
-            .medErFritekstPåkrevet(måHaFritekst)
-            .medFritekst(fritekst)
-            .build();
+                medUnderavsnittstype(underavsnittstype)
+                .medOverskrift(overskrift)
+                .medBrødtekst(brødtekst)
+                .medErFritekstTillatt(kanHaFritekst)
+                .medErFritekstPåkrevet(måHaFritekst)
+                .medFritekst(fritekst)
+                .build();
     }
 
     static List<TekstElement> parse(String generertTekst, Underavsnitt.Underavsnittstype underavsnittstype) {
@@ -305,8 +305,8 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
             //3. unngår at template feiler når variable endrer navn
             JsonNode jsonNode = OM.valueToTree(data);
             Context context = Context.newBuilder(jsonNode)
-                .resolver(JsonNodeValueResolver.INSTANCE, JavaBeanValueResolver.INSTANCE, MapValueResolver.INSTANCE)
-                .build();
+                    .resolver(JsonNodeValueResolver.INSTANCE, JavaBeanValueResolver.INSTANCE, MapValueResolver.INSTANCE)
+                    .build();
             return template.apply(context).stripLeading().stripTrailing();
         } catch (IOException e) {
             throw TekstformatererBrevFeil.feilVedTekstgenerering(e);
@@ -328,8 +328,8 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
             return TEMPLATE_CACHE.get(språkstøttetFilsti);
         }
         TEMPLATE_CACHE.put(språkstøttetFilsti, opprettTemplateFraPartials(
-            lagSpråkstøttetFilsti("vedtak/vedtak_felles", språkkode),
-            språkstøttetFilsti
+                lagSpråkstøttetFilsti("vedtak/vedtak_felles", språkkode),
+                språkstøttetFilsti
         ));
         return TEMPLATE_CACHE.get(språkstøttetFilsti);
     }
@@ -338,9 +338,9 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         StringBuilder builder = new StringBuilder();
         for (String partial : partials) {
             builder.append("{{> ")
-                .append(partial)
-                .append("}}")
-                .append("\n");
+                    .append(partial)
+                    .append("}}")
+                    .append("\n");
         }
 
         Handlebars handlebars = opprettHandlebarsKonfigurasjon();

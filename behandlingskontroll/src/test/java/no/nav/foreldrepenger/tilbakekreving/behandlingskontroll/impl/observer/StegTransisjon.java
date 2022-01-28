@@ -30,7 +30,7 @@ public class StegTransisjon {
         }
         var that = (StegTransisjon) o;
         return (transisjonType == that.transisjonType)
-            && Objects.equals(behandlingStegType, that.behandlingStegType);
+                && Objects.equals(behandlingStegType, that.behandlingStegType);
     }
 
     @Override
@@ -41,8 +41,8 @@ public class StegTransisjon {
     @Override
     public String toString() {
         return "StegTransisjon{" +
-            "transisjonType=" + transisjonType +
-            ", behandlingStegType=" + behandlingStegType +
-            '}';
+                "transisjonType=" + transisjonType +
+                ", behandlingStegType=" + behandlingStegType +
+                '}';
     }
 }

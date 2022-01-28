@@ -24,7 +24,7 @@ public class ØkonomiMottattXmlRepository {
     }
 
     @Inject
-    public ØkonomiMottattXmlRepository( EntityManager entityManager) {
+    public ØkonomiMottattXmlRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -99,8 +99,8 @@ public class ØkonomiMottattXmlRepository {
     }
 
     public List<Long> hentGamleUkobledeKravgrunnlagXmlIds(LocalDateTime dato) {
-        TypedQuery<Long> query = entityManager.createQuery("select id from ØkonomiXmlMottatt where tilkoblet='N' and opprettetTidspunkt < :dato"+
-            " and melding like '%detaljertKravgrunnlagMelding%'", Long.class);
+        TypedQuery<Long> query = entityManager.createQuery("select id from ØkonomiXmlMottatt where tilkoblet='N' and opprettetTidspunkt < :dato" +
+                " and melding like '%detaljertKravgrunnlagMelding%'", Long.class);
         query.setParameter("dato", dato);
         return query.getResultList();
     }

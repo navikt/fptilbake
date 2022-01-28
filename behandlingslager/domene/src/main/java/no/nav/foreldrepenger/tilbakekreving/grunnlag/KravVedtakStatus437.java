@@ -48,7 +48,7 @@ public class KravVedtakStatus437 extends BaseEntitet {
     private GjelderType gjelderType;
 
     @AttributeOverrides({
-        @AttributeOverride(name = "henvisning", column = @Column(name = "referanse"))
+            @AttributeOverride(name = "henvisning", column = @Column(name = "referanse"))
     })
     private Henvisning referanse;
 

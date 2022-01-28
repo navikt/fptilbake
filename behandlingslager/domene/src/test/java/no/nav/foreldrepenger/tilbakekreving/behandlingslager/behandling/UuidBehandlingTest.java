@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -25,7 +23,7 @@ public class UuidBehandlingTest {
         for (int i = 0; i < antKjøringer; i++) {
             UUID genUuid = UUID.randomUUID();
             if (genUuid.version() != 4) {
-            System.out.println(String.format("%d: %s, (%s, %s)", i, genUuid.toString(), genUuid.version(), genUuid.variant()));
+                System.out.println(String.format("%d: %s, (%s, %s)", i, genUuid.toString(), genUuid.version(), genUuid.variant()));
             }
         }
         System.out.println("Sjekken gjort!");

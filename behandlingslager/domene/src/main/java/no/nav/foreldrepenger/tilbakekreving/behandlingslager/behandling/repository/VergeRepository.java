@@ -34,7 +34,7 @@ public class VergeRepository {
             entityManager.persist(forrigeAggregate);
         }
         VergeAggregateEntitet vergeAggregateEntitet = VergeAggregateEntitet.builder().medBehandlingId(behandlingId)
-            .medVergeEntitet(vergeEntitet).build();
+                .medVergeEntitet(vergeEntitet).build();
         entityManager.persist(vergeEntitet);
         entityManager.persist(vergeAggregateEntitet);
         return vergeEntitet.getId();

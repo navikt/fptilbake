@@ -47,30 +47,30 @@ public class HendelseHåndtererTjeneste {
     public void håndterHendelse(HendelseTaskDataWrapper hendelseTaskDataWrapper, Henvisning henvisning, String kaller) {
         var eksternBehandlingUuid = hendelseTaskDataWrapper.getBehandlingUuid();
         fagsystemKlient.hentTilbakekrevingValg(eksternBehandlingUuid)
-            .ifPresent(tbkData -> {
-                if (erRelevantHendelseForOpprettTilbakekreving(tbkData)) {
-                    if (eksternBehandlingRepository.harEksternBehandlingForEksternUuid(eksternBehandlingUuid)) {
-                        logger.info("Hendelse={} allerede opprettet tilbakekreving for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
-                    } else {
-                        logger.info("Hendelse={} er relevant for tilbakekreving opprett for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
-                        lagOpprettBehandlingTask(hendelseTaskDataWrapper, henvisning);
+                .ifPresent(tbkData -> {
+                    if (erRelevantHendelseForOpprettTilbakekreving(tbkData)) {
+                        if (eksternBehandlingRepository.harEksternBehandlingForEksternUuid(eksternBehandlingUuid)) {
+                            logger.info("Hendelse={} allerede opprettet tilbakekreving for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
+                        } else {
+                            logger.info("Hendelse={} er relevant for tilbakekreving opprett for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
+                            lagOpprettBehandlingTask(hendelseTaskDataWrapper, henvisning);
+                        }
+                    } else if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {
+                        logger.info("Hendelse={} for henvisning={} var tidligere relevant for å oppdatere behandling. Nå ignoreres den",
+                                tbkData.getVidereBehandling(), henvisning);
                     }
-                } else if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {
-                    logger.info("Hendelse={} for henvisning={} var tidligere relevant for å oppdatere behandling. Nå ignoreres den",
-                        tbkData.getVidereBehandling(), henvisning);
-                }
-            });
+                });
     }
 
     public Henvisning hentHenvisning(UUID behandling) {
         return fagsystemKlient.hentBehandlingOptional(behandling)
-            .map(EksternBehandlingsinfoDto::getHenvisning)
-            .orElseThrow(() -> new NullPointerException("Henvisning fra saksbehandlingsklienten var null for behandling " + behandling.toString()));
+                .map(EksternBehandlingsinfoDto::getHenvisning)
+                .orElseThrow(() -> new NullPointerException("Henvisning fra saksbehandlingsklienten var null for behandling " + behandling.toString()));
     }
 
     private boolean erRelevantHendelseForOpprettTilbakekreving(TilbakekrevingValgDto tbkData) {
         return VidereBehandling.TILBAKEKREV_I_INFOTRYGD.equals(tbkData.getVidereBehandling())
-            || VidereBehandling.TILBAKEKR_OPPRETT.equals(tbkData.getVidereBehandling());
+                || VidereBehandling.TILBAKEKR_OPPRETT.equals(tbkData.getVidereBehandling());
     }
 
     private boolean erRelevantHendelseForOppdatereTilbakekreving(TilbakekrevingValgDto tbkData) {
@@ -79,9 +79,9 @@ public class HendelseHåndtererTjeneste {
 
     private void lagOpprettBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper, Henvisning henvisning) {
         HendelseTaskDataWrapper taskData = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(hendelseTaskDataWrapper.getBehandlingUuid(),
-            henvisning,
-            hendelseTaskDataWrapper.getAktørId(),
-            hendelseTaskDataWrapper.getSaksnummer());
+                henvisning,
+                hendelseTaskDataWrapper.getAktørId(),
+                hendelseTaskDataWrapper.getSaksnummer());
 
         taskData.setFagsakYtelseType(hendelseTaskDataWrapper.getFagsakYtelseType());
         taskData.setBehandlingType(BehandlingType.TILBAKEKREVING);

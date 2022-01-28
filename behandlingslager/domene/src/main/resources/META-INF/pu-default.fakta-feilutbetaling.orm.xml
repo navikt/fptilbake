@@ -5,9 +5,11 @@
       http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
                  version="2.1">
 
-    <sequence-generator name="SEQ_GR_FAKTA_FEILUTBETALING" allocation-size="50" sequence-name="SEQ_GR_FAKTA_FEILUTBETALING"/>
+    <sequence-generator name="SEQ_GR_FAKTA_FEILUTBETALING" allocation-size="50"
+                        sequence-name="SEQ_GR_FAKTA_FEILUTBETALING"/>
     <sequence-generator name="SEQ_FAKTA_FEILUTBETALING" allocation-size="50" sequence-name="SEQ_FAKTA_FEILUTBETALING"/>
-    <sequence-generator name="SEQ_FAKTA_FEILUTB_PERIODE" allocation-size="50" sequence-name="SEQ_FAKTA_FEILUTB_PERIODE"/>
+    <sequence-generator name="SEQ_FAKTA_FEILUTB_PERIODE" allocation-size="50"
+                        sequence-name="SEQ_FAKTA_FEILUTB_PERIODE"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling"/>

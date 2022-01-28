@@ -39,7 +39,7 @@ public class HbTotalresultat {
         return totaltTilbakekrevesBeløpMedRenterUtenSkatt.compareTo(totaltTilbakekrevesBeløpMedRenter) < 0;
     }
 
-    public static Builder builder(){
+    public static Builder builder() {
         return new Builder();
     }
 

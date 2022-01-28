@@ -19,7 +19,7 @@ public class FagsakTjenesteTest extends FellesTestOppsett {
         assertThat(fagsak).isNotNull();
         // vi må sammenligne det med fagsak fra behandling fordi fagsakId generert automatisk
         assertThat(fagsak.getId()).isEqualTo(behandling.getFagsakId());
-        fellesAssert(fagsak,saksnummer);
+        fellesAssert(fagsak, saksnummer);
     }
 
     @Test
@@ -28,10 +28,10 @@ public class FagsakTjenesteTest extends FellesTestOppsett {
         Fagsak fagsak = fagsakTjeneste.opprettFagsak(nyeSaksnummer, aktørId, FagsakYtelseType.FORELDREPENGER, Språkkode.DEFAULT);
         assertThat(fagsak).isNotNull();
         assertThat(fagsak.getId()).isNotEqualTo(behandling.getFagsakId());
-        fellesAssert(fagsak,nyeSaksnummer);
+        fellesAssert(fagsak, nyeSaksnummer);
     }
 
-    private void fellesAssert(Fagsak fagsak,Saksnummer saksnummer) {
+    private void fellesAssert(Fagsak fagsak, Saksnummer saksnummer) {
         assertThat(fagsak.getStatus()).isEqualByComparingTo(FagsakStatus.OPPRETTET);
         assertThat(fagsak.getFagsakYtelseType()).isEqualByComparingTo(FagsakYtelseType.FORELDREPENGER);
         assertThat(fagsak.getSaksnummer()).isEqualTo(saksnummer);

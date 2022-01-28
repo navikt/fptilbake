@@ -83,10 +83,10 @@ public class AvstemmingTjeneste {
         }
         if (antallFeilet == 0) {
             logger.info("Avstemmer {}. Sender {} vedtak til avstemming. Totalt ble {} vedtak sendt til OS dette døgnet. {} førstegangsvedtak uten tilbakekreving sendes ikke til avstemming",
-                dato, avstemmingCsvFormatter.getAntallRader(), sendteVedtak.size(), antallFørstegangsvedtakUtenTilbakekreving);
+                    dato, avstemmingCsvFormatter.getAntallRader(), sendteVedtak.size(), antallFørstegangsvedtakUtenTilbakekreving);
         } else {
             logger.warn("Avstemmer {}. Sender {} vedtak til avstemming. Totalt ble {} vedtak sendt til OS dette døgnet. {} førstegangsvedtak uten tilbakekreving sendes ikke til avstemming. {} vedtak fikk negativ kvittering fra OS og sendes ikke til avstemming",
-                dato, avstemmingCsvFormatter.getAntallRader(), sendteVedtak.size(), antallFørstegangsvedtakUtenTilbakekreving, antallFeilet);
+                    dato, avstemmingCsvFormatter.getAntallRader(), sendteVedtak.size(), antallFørstegangsvedtakUtenTilbakekreving, antallFeilet);
         }
         if (avstemmingCsvFormatter.getAntallRader() == 0) {
             return Optional.empty();
@@ -103,19 +103,19 @@ public class AvstemmingTjeneste {
         BehandlingVedtak behandlingVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandlingId).orElseThrow();
 
         String fnr = aktørConsumer.hentFnrForAktør(behandling.getAktørId()).map(PersonIdent::getIdent)
-            .orElseThrow(() -> new IllegalArgumentException("Avstemming feilet, fant ikke ident. Gjelder behandlingId=" + behandlingId));
+                .orElseThrow(() -> new IllegalArgumentException("Avstemming feilet, fant ikke ident. Gjelder behandlingId=" + behandlingId));
 
         avstemmingCsvFormatter.leggTilRad(AvstemmingCsvFormatter.radBuilder()
-            .medAvsender(avsender)
-            .medVedtakId(oppsummering.getØkonomiVedtakId())
-            .medFnr(fnr)
-            .medVedtaksdato(behandlingVedtak.getVedtaksdato())
-            .medFagsakYtelseType(behandling.getFagsak().getFagsakYtelseType())
-            .medTilbakekrevesBruttoUtenRenter(oppsummering.getTilbakekrevesBruttoUtenRenter())
-            .medTilbakekrevesNettoUtenRenter(oppsummering.getTilbakekrevesNettoUtenRenter())
-            .medSkatt(oppsummering.getSkatt())
-            .medRenter(oppsummering.getRenter())
-            .medErOmgjøringTilIngenTilbakekreving(erOmgjøringTilIngenTilbakekreving(oppsummering, behandling))
+                .medAvsender(avsender)
+                .medVedtakId(oppsummering.getØkonomiVedtakId())
+                .medFnr(fnr)
+                .medVedtaksdato(behandlingVedtak.getVedtaksdato())
+                .medFagsakYtelseType(behandling.getFagsak().getFagsakYtelseType())
+                .medTilbakekrevesBruttoUtenRenter(oppsummering.getTilbakekrevesBruttoUtenRenter())
+                .medTilbakekrevesNettoUtenRenter(oppsummering.getTilbakekrevesNettoUtenRenter())
+                .medSkatt(oppsummering.getSkatt())
+                .medRenter(oppsummering.getRenter())
+                .medErOmgjøringTilIngenTilbakekreving(erOmgjøringTilIngenTilbakekreving(oppsummering, behandling))
         );
     }
 

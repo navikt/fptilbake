@@ -26,7 +26,7 @@ public class HbPerson {
     private HbPerson() {
     }
 
-    public static Builder builder(){
+    public static Builder builder() {
         return new Builder();
     }
 

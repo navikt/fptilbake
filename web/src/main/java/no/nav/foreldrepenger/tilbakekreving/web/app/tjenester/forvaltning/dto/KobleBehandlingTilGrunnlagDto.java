@@ -20,11 +20,11 @@ public class KobleBehandlingTilGrunnlagDto implements AbacDto {
     @Max(Long.MAX_VALUE)
     private Long mottattXmlId;
 
-    public KobleBehandlingTilGrunnlagDto(){
+    public KobleBehandlingTilGrunnlagDto() {
         // for REST
     }
 
-    public KobleBehandlingTilGrunnlagDto(Long behandlingId,Long mottattXmlId){
+    public KobleBehandlingTilGrunnlagDto(Long behandlingId, Long mottattXmlId) {
         this.behandlingId = behandlingId;
         this.mottattXmlId = mottattXmlId;
     }

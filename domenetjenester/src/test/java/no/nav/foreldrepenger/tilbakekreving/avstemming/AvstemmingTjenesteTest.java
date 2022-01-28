@@ -59,11 +59,11 @@ public class AvstemmingTjenesteTest {
     @Test
     public void skal_ha_med_vedtak_om_tilbakekreving_som_er_sendt_og_har_OK_kvittering() {
         Behandling behandling = scenario
-            .medDefaultKravgrunnlag()
-            .medFullInnkreving()
-            .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
-            .medVedtak(LocalDate.now())
-            .lagre(behandlingRepositoryProvider);
+                .medDefaultKravgrunnlag()
+                .medFullInnkreving()
+                .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
+                .medVedtak(LocalDate.now())
+                .lagre(behandlingRepositoryProvider);
 
         Long behandlingId = behandling.getId();
         Long xmlId = lagOgLagreVedtak(behandlingId);
@@ -77,11 +77,11 @@ public class AvstemmingTjenesteTest {
     @Test
     public void skal_ikke_ha_med_vedtak_om_tilbakekreving_som_er_sendt_og_har_feilet() {
         Behandling behandling = scenario
-            .medDefaultKravgrunnlag()
-            .medFullInnkreving()
-            .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
-            .medVedtak(LocalDate.now())
-            .lagre(behandlingRepositoryProvider);
+                .medDefaultKravgrunnlag()
+                .medFullInnkreving()
+                .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
+                .medVedtak(LocalDate.now())
+                .lagre(behandlingRepositoryProvider);
 
         Long behandlingId = behandling.getId();
         Long xmlId = lagOgLagreVedtak(behandlingId);
@@ -95,11 +95,11 @@ public class AvstemmingTjenesteTest {
     @Test
     public void skal_ikke_ha_med_førstegangsvedtak_som_har_ingen_innkreving() {
         Behandling behandling = scenario
-            .medDefaultKravgrunnlag()
-            .medIngenInnkreving()
-            .medBehandlingResultatType(BehandlingResultatType.INGEN_TILBAKEBETALING)
-            .medVedtak(LocalDate.now())
-            .lagre(behandlingRepositoryProvider);
+                .medDefaultKravgrunnlag()
+                .medIngenInnkreving()
+                .medBehandlingResultatType(BehandlingResultatType.INGEN_TILBAKEBETALING)
+                .medVedtak(LocalDate.now())
+                .lagre(behandlingRepositoryProvider);
         when(aktørConsumerMock.hentFnrForAktør(Mockito.any())).thenReturn(Optional.of(new PersonIdent("12345678901")));
 
         Long behandlingId = behandling.getId();
@@ -119,12 +119,12 @@ public class AvstemmingTjenesteTest {
     @Test
     public void skal_ha_med_revurderingsvedtak_som_har_ingen_innkreving() {
         Behandling behandling = scenario
-            .medBehandlingType(BehandlingType.REVURDERING_TILBAKEKREVING)
-            .medDefaultKravgrunnlag()
-            .medIngenInnkreving()
-            .medBehandlingResultatType(BehandlingResultatType.INGEN_TILBAKEBETALING)
-            .medVedtak(LocalDate.now())
-            .lagre(behandlingRepositoryProvider);
+                .medBehandlingType(BehandlingType.REVURDERING_TILBAKEKREVING)
+                .medDefaultKravgrunnlag()
+                .medIngenInnkreving()
+                .medBehandlingResultatType(BehandlingResultatType.INGEN_TILBAKEBETALING)
+                .medVedtak(LocalDate.now())
+                .lagre(behandlingRepositoryProvider);
 
         Long behandlingId = behandling.getId();
         Long xmlId = lagOgLagreVedtak(behandlingId);

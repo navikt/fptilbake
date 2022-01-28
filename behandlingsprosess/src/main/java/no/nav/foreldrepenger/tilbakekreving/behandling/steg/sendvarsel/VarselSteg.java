@@ -78,7 +78,7 @@ public class VarselSteg implements BehandlingSteg {
         opprettSendVarselTask(behandling);
 
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
-            BehandlingStegType.VARSEL, fristTid, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+                BehandlingStegType.VARSEL, fristTid, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
 
         return BehandleStegResultat.settPåVent();
     }

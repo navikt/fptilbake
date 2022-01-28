@@ -67,11 +67,11 @@ public class InnhentDokumentasjonbrevTjeneste {
         FritekstbrevData fritekstbrevData = lagInnhentDokumentasjonBrev(innhentDokumentasjonBrevSamletInfo);
 
         pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.INNHENT_DOKUMETASJON, BrevData.builder()
-            .setMottaker(brevMottaker)
-            .setMetadata(fritekstbrevData.getBrevMetadata())
-            .setOverskrift(fritekstbrevData.getOverskrift())
-            .setBrevtekst(fritekstbrevData.getBrevtekst())
-            .build());
+                .setMottaker(brevMottaker)
+                .setMetadata(fritekstbrevData.getBrevMetadata())
+                .setOverskrift(fritekstbrevData.getOverskrift())
+                .setBrevtekst(fritekstbrevData.getBrevtekst())
+                .build());
 
     }
 
@@ -81,21 +81,21 @@ public class InnhentDokumentasjonbrevTjeneste {
         InnhentDokumentasjonbrevSamletInfo dokumentasjonBrevSamletInfo = settOppInnhentDokumentasjonBrevSamletInfo(behandling, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = lagInnhentDokumentasjonBrev(dokumentasjonBrevSamletInfo);
         return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
-            .setMottaker(brevMottaker)
-            .setMetadata(fritekstbrevData.getBrevMetadata())
-            .setOverskrift(fritekstbrevData.getOverskrift())
-            .setBrevtekst(fritekstbrevData.getBrevtekst())
-            .build());
+                .setMottaker(brevMottaker)
+                .setMetadata(fritekstbrevData.getBrevMetadata())
+                .setOverskrift(fritekstbrevData.getOverskrift())
+                .setBrevtekst(fritekstbrevData.getBrevtekst())
+                .build());
     }
 
     private FritekstbrevData lagInnhentDokumentasjonBrev(InnhentDokumentasjonbrevSamletInfo dokumentasjonBrevSamletInfo) {
         String overskrift = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevOverskrift(dokumentasjonBrevSamletInfo);
         String brevtekst = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(dokumentasjonBrevSamletInfo);
         return new FritekstbrevData.Builder()
-            .medOverskrift(overskrift)
-            .medBrevtekst(brevtekst)
-            .medMetadata(dokumentasjonBrevSamletInfo.getBrevMetadata())
-            .build();
+                .medOverskrift(overskrift)
+                .medBrevtekst(brevtekst)
+                .medMetadata(dokumentasjonBrevSamletInfo.getBrevMetadata())
+                .build();
     }
 
     private InnhentDokumentasjonbrevSamletInfo settOppInnhentDokumentasjonBrevSamletInfo(Behandling behandling,
@@ -115,26 +115,26 @@ public class InnhentDokumentasjonbrevTjeneste {
         Period brukersSvarfrist = eksternDataForBrevTjeneste.getBrukersSvarfrist();
 
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
-            .medBehandlendeEnhetNavn(behandling.getBehandlendeEnhetNavn())
-            .medSakspartId(personinfo.getPersonIdent().getIdent())
-            .medMottakerAdresse(adresseinfo)
-            .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
-            .medSakspartNavn(personinfo.getNavn())
-            .medFagsaktype(ytelseType)
-            .medSprakkode(mottakersSpråkkode)
-            .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
-            .medAnsvarligSaksbehandler(StringUtils.isNotEmpty(behandling.getAnsvarligSaksbehandler()) ? behandling.getAnsvarligSaksbehandler() : "VL")
-            .medTittel(getTittel(brevMottaker) + ytelseNavn.getNavnPåBokmål())
-            .medFinnesVerge(finnesVerge)
-            .medVergeNavn(vergeNavn)
-            .build();
+                .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
+                .medBehandlendeEnhetNavn(behandling.getBehandlendeEnhetNavn())
+                .medSakspartId(personinfo.getPersonIdent().getIdent())
+                .medMottakerAdresse(adresseinfo)
+                .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
+                .medSakspartNavn(personinfo.getNavn())
+                .medFagsaktype(ytelseType)
+                .medSprakkode(mottakersSpråkkode)
+                .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
+                .medAnsvarligSaksbehandler(StringUtils.isNotEmpty(behandling.getAnsvarligSaksbehandler()) ? behandling.getAnsvarligSaksbehandler() : "VL")
+                .medTittel(getTittel(brevMottaker) + ytelseNavn.getNavnPåBokmål())
+                .medFinnesVerge(finnesVerge)
+                .medVergeNavn(vergeNavn)
+                .build();
 
         return InnhentDokumentasjonbrevSamletInfo.builder()
-            .medBrevMetaData(brevMetadata)
-            .medFristDato(LocalDate.now().plus(brukersSvarfrist))
-            .medFritekstFraSaksbehandler(fritekst)
-            .build();
+                .medBrevMetaData(brevMetadata)
+                .medFristDato(LocalDate.now().plus(brukersSvarfrist))
+                .medFritekstFraSaksbehandler(fritekst)
+                .build();
     }
 
     private Språkkode hentSpråkkode(Long behandlingId) {
@@ -145,6 +145,6 @@ public class InnhentDokumentasjonbrevTjeneste {
 
     private String getTittel(BrevMottaker brevMottaker) {
         return BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_INNHENTDOKUMENTASJONBREV_HISTORIKKINNSLAG_TIL_VERGE
-            : TITTEL_INNHENTDOKUMENTASJONBREV_HISTORIKKINNSLAG;
+                : TITTEL_INNHENTDOKUMENTASJONBREV_HISTORIKKINNSLAG;
     }
 }

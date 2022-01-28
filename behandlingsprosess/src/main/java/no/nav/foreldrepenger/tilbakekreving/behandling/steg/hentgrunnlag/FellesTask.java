@@ -39,13 +39,13 @@ public abstract class FellesTask {
         return behandlingRepository.hentAlleBehandlingerForSaksnummer(new Saksnummer(saksnummer));
     }
 
-    protected Optional<Behandling> finnÅpenTilbakekrevingBehandling(String saksnummer){
+    protected Optional<Behandling> finnÅpenTilbakekrevingBehandling(String saksnummer) {
         List<Behandling> behandlinger = hentBehandlingerForSaksnummer(saksnummer);
         List<Behandling> åpneBehandlinger = behandlinger.stream()
-            .filter(beh -> BehandlingType.TILBAKEKREVING.equals(beh.getType()))
-            .filter(beh -> !beh.erAvsluttet()).collect(Collectors.toList());
-        if(åpneBehandlinger.size() > 1){
-            throw new IllegalArgumentException("Utvikler feil: Kan ikke ha flere åpne behandling for saksnummer="+ saksnummer);
+                .filter(beh -> BehandlingType.TILBAKEKREVING.equals(beh.getType()))
+                .filter(beh -> !beh.erAvsluttet()).collect(Collectors.toList());
+        if (åpneBehandlinger.size() > 1) {
+            throw new IllegalArgumentException("Utvikler feil: Kan ikke ha flere åpne behandling for saksnummer=" + saksnummer);
         }
         return åpneBehandlinger.stream().findAny();
     }

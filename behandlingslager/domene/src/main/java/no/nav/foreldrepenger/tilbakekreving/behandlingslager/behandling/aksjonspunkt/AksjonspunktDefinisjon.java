@@ -31,26 +31,26 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
     // Manuelle
 
     VURDER_TILBAKEKREVING(AksjonspunktKodeDefinisjon.VURDER_TILBAKEKREVING, AksjonspunktType.MANUELL,
-        "Vurder tilbakekreving.",BehandlingStegType.VTILBSTEG, VurderingspunktType.UT, TOTRINN),
+            "Vurder tilbakekreving.", BehandlingStegType.VTILBSTEG, VurderingspunktType.UT, TOTRINN),
     VURDER_FORELDELSE(AksjonspunktKodeDefinisjon.VURDER_FORELDELSE, AksjonspunktType.MANUELL,
-        "Vurder foreldelse", BehandlingStegType.FORELDELSEVURDERINGSTEG, VurderingspunktType.UT, TOTRINN),
+            "Vurder foreldelse", BehandlingStegType.FORELDELSEVURDERINGSTEG, VurderingspunktType.UT, TOTRINN),
     FORESLÅ_VEDTAK(AksjonspunktKodeDefinisjon.FORESLÅ_VEDTAK, AksjonspunktType.MANUELL,
-        "Foreslå vedtak", BehandlingStegType.FORESLÅ_VEDTAK, VurderingspunktType.UT, TOTRINN),
+            "Foreslå vedtak", BehandlingStegType.FORESLÅ_VEDTAK, VurderingspunktType.UT, TOTRINN),
     FATTE_VEDTAK(AksjonspunktKodeDefinisjon.FATTE_VEDTAK, AksjonspunktType.MANUELL,
-        "Fatte vedtak", BehandlingStegType.FATTE_VEDTAK, VurderingspunktType.INN, ENTRINN),
+            "Fatte vedtak", BehandlingStegType.FATTE_VEDTAK, VurderingspunktType.INN, ENTRINN),
     AVKLAR_VERGE(AksjonspunktKodeDefinisjon.AVKLAR_VERGE, AksjonspunktType.MANUELL,
-        "Avklar verge", BehandlingStegType.FAKTA_VERGE, VurderingspunktType.UT, ENTRINN),
+            "Avklar verge", BehandlingStegType.FAKTA_VERGE, VurderingspunktType.UT, ENTRINN),
     AVKLART_FAKTA_FEILUTBETALING(AksjonspunktKodeDefinisjon.AVKLART_FAKTA_FEILUTBETALING, AksjonspunktType.MANUELL,
-        "Avklart fakta for feilutbetaling", BehandlingStegType.FAKTA_FEILUTBETALING, VurderingspunktType.UT, TOTRINN),
+            "Avklart fakta for feilutbetaling", BehandlingStegType.FAKTA_FEILUTBETALING, VurderingspunktType.UT, TOTRINN),
 
     // Autopunkter
 
     VENT_PÅ_BRUKERTILBAKEMELDING(AksjonspunktKodeDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, AksjonspunktType.AUTOPUNKT,
             "Venter på tilbakemelding fra bruker", BehandlingStegType.VARSEL, VurderingspunktType.UT, ENTRINN,
-                                 FORBLI, "P4W"),
+            FORBLI, "P4W"),
     VENT_PÅ_TILBAKEKREVINGSGRUNNLAG(AksjonspunktKodeDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, AksjonspunktType.AUTOPUNKT,
             "Venter på tilbakekrevingsgrunnlag fra økonomi", BehandlingStegType.TBKGSTEG, VurderingspunktType.UT, ENTRINN,
-                                    FORBLI, "P4W"),
+            FORBLI, "P4W"),
 
 
     UNDEFINED,
@@ -108,7 +108,9 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
         // for CDI
     }
 
-    /** Brukes for utgåtte aksjonspunkt. Disse skal ikke kunne gjenoppstå. */
+    /**
+     * Brukes for utgåtte aksjonspunkt. Disse skal ikke kunne gjenoppstå.
+     */
     private AksjonspunktDefinisjon(String kode, AksjonspunktType type, String navn) {
         this.kode = kode;
         this.aksjonspunktType = type;
@@ -118,11 +120,11 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
 
     // Bruk for ordinære aksjonspunkt og overstyring
     private AksjonspunktDefinisjon(String kode,
-                         AksjonspunktType aksjonspunktType,
-                         String navn,
-                         BehandlingStegType behandlingStegType,
-                         VurderingspunktType vurderingspunktType,
-                         boolean defaultTotrinnBehandling) {
+                                   AksjonspunktType aksjonspunktType,
+                                   String navn,
+                                   BehandlingStegType behandlingStegType,
+                                   VurderingspunktType vurderingspunktType,
+                                   boolean defaultTotrinnBehandling) {
         this.kode = Objects.requireNonNull(kode);
         this.navn = navn;
         this.aksjonspunktType = aksjonspunktType;
@@ -135,13 +137,13 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
 
     // Bruk for autopunkt i 7nnn serien
     private AksjonspunktDefinisjon(String kode,
-                         AksjonspunktType aksjonspunktType,
-                         String navn,
-                         BehandlingStegType behandlingStegType,
-                         VurderingspunktType vurderingspunktType,
-                         boolean defaultTotrinnBehandling,
-                         boolean tilbakehoppVedGjenopptakelse,
-                         String fristPeriode) {
+                                   AksjonspunktType aksjonspunktType,
+                                   String navn,
+                                   BehandlingStegType behandlingStegType,
+                                   VurderingspunktType vurderingspunktType,
+                                   boolean defaultTotrinnBehandling,
+                                   boolean tilbakehoppVedGjenopptakelse,
+                                   String fristPeriode) {
         this.kode = Objects.requireNonNull(kode);
         this.navn = navn;
         this.aksjonspunktType = aksjonspunktType;
@@ -201,7 +203,9 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
         return KODEVERK;
     }
 
-    /** Aksjonspunkt tidligere brukt, nå utgått (kan ikke gjenoppstå). */
+    /**
+     * Aksjonspunkt tidligere brukt, nå utgått (kan ikke gjenoppstå).
+     */
     public boolean erUtgått() {
         return erUtgått;
     }
@@ -229,8 +233,8 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
 
     public static List<AksjonspunktDefinisjon> finnAksjonspunktDefinisjoner(BehandlingStegType behandlingStegType, VurderingspunktType vurderingspunktType) {
         return KODER.values().stream()
-            .filter(ad -> Objects.equals(ad.getBehandlingSteg(), behandlingStegType) && Objects.equals(ad.getVurderingspunktType(), vurderingspunktType))
-            .collect(Collectors.toList());
+                .filter(ad -> Objects.equals(ad.getBehandlingSteg(), behandlingStegType) && Objects.equals(ad.getVurderingspunktType(), vurderingspunktType))
+                .collect(Collectors.toList());
     }
 
     @Converter(autoApply = true)

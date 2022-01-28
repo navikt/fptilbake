@@ -51,7 +51,7 @@ public class VergeTjenesteTest extends FellesTestOppsett {
         vergeTjeneste.opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(behandling);
         assertThat(behandling.getAktivtBehandlingSteg()).isEqualTo(BehandlingStegType.FAKTA_VERGE);
         assertThat(
-            behandling.getÅpneAksjonspunkter(Lists.newArrayList(AksjonspunktDefinisjon.AVKLAR_VERGE))).isNotEmpty();
+                behandling.getÅpneAksjonspunkter(Lists.newArrayList(AksjonspunktDefinisjon.AVKLAR_VERGE))).isNotEmpty();
     }
 
     @Test
@@ -60,31 +60,31 @@ public class VergeTjenesteTest extends FellesTestOppsett {
         vergeTjeneste.opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(behandling);
         assertThat(behandling.getAktivtBehandlingSteg()).isEqualTo(BehandlingStegType.FAKTA_VERGE);
         assertThat(
-            behandling.getÅpneAksjonspunkter(Lists.newArrayList(AksjonspunktDefinisjon.AVKLAR_VERGE))).isNotEmpty();
+                behandling.getÅpneAksjonspunkter(Lists.newArrayList(AksjonspunktDefinisjon.AVKLAR_VERGE))).isNotEmpty();
     }
 
     @Test
     public void skal_fjerne_verge() {
         entityManager.setFlushMode(FlushModeType.AUTO);
         VergeEntitet vergeEntitet = VergeEntitet.builder()
-            .medVergeAktørId(behandling.getAktørId())
-            .medVergeType(VergeType.BARN)
-            .medKilde(KildeType.FPTILBAKE.name())
-            .medNavn("John Doe")
-            .medGyldigPeriode(FOM, TOM)
-            .medBegrunnelse("begunnlese")
-            .build();
+                .medVergeAktørId(behandling.getAktørId())
+                .medVergeType(VergeType.BARN)
+                .medKilde(KildeType.FPTILBAKE.name())
+                .medNavn("John Doe")
+                .medGyldigPeriode(FOM, TOM)
+                .medBegrunnelse("begunnlese")
+                .build();
         vergeRepository.lagreVergeInformasjon(internBehandlingId, vergeEntitet);
         AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE, BehandlingStegType.FAKTA_VERGE);
         assertThat(vergeRepository.finnVergeInformasjon(internBehandlingId)).isNotEmpty();
         assertThat(
-            behandling.getÅpneAksjonspunkter(Lists.newArrayList(AksjonspunktDefinisjon.AVKLAR_VERGE))).isNotEmpty();
+                behandling.getÅpneAksjonspunkter(Lists.newArrayList(AksjonspunktDefinisjon.AVKLAR_VERGE))).isNotEmpty();
         vergeTjeneste.fjernVergeGrunnlagOgAksjonspunkt(behandling);
 
         assertThat(vergeRepository.finnVergeInformasjon(internBehandlingId)).isEmpty();
         assertThat(behandling.getÅpneAksjonspunkter(Lists.newArrayList(AksjonspunktDefinisjon.AVKLAR_VERGE))).isEmpty();
         Optional<Aksjonspunkt> aksjonspunkt = behandling.getAksjonspunktMedDefinisjonOptional(
-            AksjonspunktDefinisjon.AVKLAR_VERGE);
+                AksjonspunktDefinisjon.AVKLAR_VERGE);
         assertThat(aksjonspunkt).isPresent();
         assertThat(aksjonspunkt.get().erAvbrutt()).isTrue();
         List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(internBehandlingId);

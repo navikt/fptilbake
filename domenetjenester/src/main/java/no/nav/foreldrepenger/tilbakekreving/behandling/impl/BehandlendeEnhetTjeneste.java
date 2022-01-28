@@ -24,13 +24,13 @@ public class BehandlendeEnhetTjeneste {
 
     private BehandlingEnhetEventPubliserer eventPubliserer;
 
-    BehandlendeEnhetTjeneste(){
+    BehandlendeEnhetTjeneste() {
         // for CDI proxy
     }
 
     @Inject
     public BehandlendeEnhetTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                    BehandlingEnhetEventPubliserer eventPubliserer){
+                                    BehandlingEnhetEventPubliserer eventPubliserer) {
         this.historikkRepository = repositoryProvider.getHistorikkRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eventPubliserer = eventPubliserer;
@@ -50,10 +50,10 @@ public class BehandlendeEnhetTjeneste {
         OrganisasjonsEnhet eksisterende = behandling.getBehandlendeOrganisasjonsEnhet();
         String fraMessage = eksisterende != null ? eksisterende.getEnhetId() + " " + eksisterende.getEnhetNavn() : "ukjent";
         HistorikkInnslagTekstBuilder builder = new HistorikkInnslagTekstBuilder()
-            .medHendelse(HistorikkinnslagType.BYTT_ENHET)
-            .medEndretFelt(HistorikkEndretFeltType.BEHANDLENDE_ENHET,
-                fraMessage,
-                nyEnhet.getEnhetId() + " " + nyEnhet.getEnhetNavn());
+                .medHendelse(HistorikkinnslagType.BYTT_ENHET)
+                .medEndretFelt(HistorikkEndretFeltType.BEHANDLENDE_ENHET,
+                        fraMessage,
+                        nyEnhet.getEnhetId() + " " + nyEnhet.getEnhetNavn());
 
         Historikkinnslag innslag = new Historikkinnslag();
         innslag.setAktør(aktør);

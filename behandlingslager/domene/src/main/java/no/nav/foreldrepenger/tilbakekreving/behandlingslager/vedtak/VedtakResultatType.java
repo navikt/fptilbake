@@ -18,9 +18,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum VedtakResultatType implements Kodeverdi { //Kun brukes for å sende data til frontend
 
-    FULL_TILBAKEBETALING("FULL_TILBAKEBETALING","Tilbakebetaling"),
-    DELVIS_TILBAKEBETALING("DELVIS_TILBAKEBETALING","Delvis tilbakebetaling"),
-    INGEN_TILBAKEBETALING("INGEN_TILBAKEBETALING","Ingen tilbakebetaling");
+    FULL_TILBAKEBETALING("FULL_TILBAKEBETALING", "Tilbakebetaling"),
+    DELVIS_TILBAKEBETALING("DELVIS_TILBAKEBETALING", "Delvis tilbakebetaling"),
+    INGEN_TILBAKEBETALING("INGEN_TILBAKEBETALING", "Ingen tilbakebetaling");
 
     private String kode;
     private String navn;

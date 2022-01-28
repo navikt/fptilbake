@@ -12,7 +12,7 @@ public class HistorikkInnslagMal {
     public static final String MAL_TYPE_9 = "TYPE9";
     public static final String MAL_TYPE_10 = "TYPE10";
 
-    private HistorikkInnslagMal(){
+    private HistorikkInnslagMal() {
         // sonar
     }
 }

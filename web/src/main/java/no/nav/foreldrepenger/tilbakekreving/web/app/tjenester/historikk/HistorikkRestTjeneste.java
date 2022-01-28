@@ -65,7 +65,7 @@ public class HistorikkRestTjeneste {
         String url = requestURL + "/dokument/hent-dokument";
 
         List<HistorikkinnslagDto> historikkInnslagDtoList = historikkTjeneste.hentAlleHistorikkInnslagForSak(
-            new Saksnummer(saksnummerDto.getVerdi()));
+                new Saksnummer(saksnummerDto.getVerdi()));
         if (!historikkInnslagDtoList.isEmpty()) {
             responseBuilder.entity(historikkInnslagDtoList);
             for (HistorikkinnslagDto dto : historikkInnslagDtoList) {
@@ -89,13 +89,13 @@ public class HistorikkRestTjeneste {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append(request.getScheme())
-            .append("://")
-            .append(request.getLocalName())
-            .append(":") // NOSONAR
-            .append(request.getLocalPort());
+                .append("://")
+                .append(request.getLocalName())
+                .append(":") // NOSONAR
+                .append(request.getLocalPort());
 
         stringBuilder.append(request.getContextPath())
-            .append(request.getServletPath());
+                .append(request.getServletPath());
         return stringBuilder.toString();
     }
 }

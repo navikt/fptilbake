@@ -29,9 +29,9 @@ public class VirksomhetTjeneste {
         Objects.requireNonNull(orgNummer, "orgNummer");
         var response = organisasjonConsumer.hentOrganisasjon(orgNummer);
         return new Virksomhet.Builder()
-            .medOrgnr(orgNummer)
-            .medNavn(response.getNavn())
-            .build();
+                .medOrgnr(orgNummer)
+                .medNavn(response.getNavn())
+                .build();
     }
 
     public boolean validerOrganisasjon(String orgNummer) {

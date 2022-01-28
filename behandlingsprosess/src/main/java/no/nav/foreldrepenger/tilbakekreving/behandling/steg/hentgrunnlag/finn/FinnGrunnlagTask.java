@@ -95,8 +95,8 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         if (!alleXmlMeldinger.isEmpty()) {
             logger.info("Fant {} meldinger som ikke er koblet for behandlingId={} og saksnummer={}", alleXmlMeldinger.size(), behandlingId, saksnummer);
             alleXmlMeldinger = alleXmlMeldinger.stream()
-                .sorted(Comparator.comparing(ØkonomiXmlMottatt::getOpprettetTidspunkt))
-                .collect(Collectors.toList());
+                    .sorted(Comparator.comparing(ØkonomiXmlMottatt::getOpprettetTidspunkt))
+                    .collect(Collectors.toList());
             for (ØkonomiXmlMottatt økonomiXmlMottatt : alleXmlMeldinger) {
                 Long mottattXmlId = økonomiXmlMottatt.getId();
                 String mottattXml = økonomiXmlMottatt.getMottattXml();
@@ -108,7 +108,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
                     logger.info("xml er status xml med mottattXmlId={}", mottattXmlId);
                     boolean erAvsluttMelding = mottattXml.contains(KravStatusKode.AVSLUTTET.getKode());
                     boolean finnesFlereMeldingerEtterAvsluttMelding = erAvsluttMelding &&
-                        (alleXmlMeldinger.size() > alleXmlMeldinger.indexOf(økonomiXmlMottatt) + 1);
+                            (alleXmlMeldinger.size() > alleXmlMeldinger.indexOf(økonomiXmlMottatt) + 1);
                     håndtereGrunnlagStatusForBehandling(behandlingId, mottattXmlId, mottattXml, finnesFlereMeldingerEtterAvsluttMelding);
                 } else {
                     logger.warn("xml rekkefølge er ikke riktig med mottattXmlId={}", mottattXmlId);
@@ -165,7 +165,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         List<EksternBehandlingsinfoDto> eksternBehandlinger = fagsystemKlient.hentBehandlingForSaksnummer(saksnummer);
         if (!eksternBehandlinger.isEmpty()) {
             Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDto = eksternBehandlinger.stream()
-                .filter(eksternBehandling -> grunnlagReferanse.equals(eksternBehandling.getHenvisning())).findFirst();
+                    .filter(eksternBehandling -> grunnlagReferanse.equals(eksternBehandling.getHenvisning())).findFirst();
             if (eksternBehandlingsinfoDto.isPresent()) {
                 logger.info("Oppdaterer ekstern behandling referanse med referanse={} for behandlingId={}", grunnlagReferanse, behandling.getId());
                 EksternBehandlingsinfoDto eksternBehandlingDto = eksternBehandlingsinfoDto.get();
@@ -173,7 +173,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
                 eksternBehandlingRepository.lagre(eksternBehandling);
             } else {
                 throw new TekniskException("FPT-783524",
-                    String.format("Grunnlag fra Økonomi har mottatt med feil referanse for behandlingId=%s. Den finnes ikke i fpsak for saksnummer=%s", behandling.getId(), saksnummer));
+                        String.format("Grunnlag fra Økonomi har mottatt med feil referanse for behandlingId=%s. Den finnes ikke i fpsak for saksnummer=%s", behandling.getId(), saksnummer));
             }
         }
     }

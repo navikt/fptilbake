@@ -75,8 +75,8 @@ public class FatteVedtakSteg implements BehandlingSteg {
         Collection<Totrinnsvurdering> totrinnsvurderinger = totrinnRepository.hentTotrinnsvurderinger(behandling);
         if (sendesTilbakeTilSaksbehandler(totrinnsvurderinger)) {
             List<AksjonspunktDefinisjon> aksjonspunktDefinisjoner = totrinnsvurderinger.stream()
-                .filter(totrinnsvurdering -> !TRUE.equals(totrinnsvurdering.isGodkjent()))
-                .map(Totrinnsvurdering::getAksjonspunktDefinisjon).collect(Collectors.toList());
+                    .filter(totrinnsvurdering -> !TRUE.equals(totrinnsvurdering.isGodkjent()))
+                    .map(Totrinnsvurdering::getAksjonspunktDefinisjon).collect(Collectors.toList());
             return BehandleStegResultat.tilbakeførtMedAksjonspunkter(aksjonspunktDefinisjoner);
         } else {
             //TODO Velge mer fingranulert ved revurdering
@@ -91,7 +91,7 @@ public class FatteVedtakSteg implements BehandlingSteg {
 
     private boolean sendesTilbakeTilSaksbehandler(Collection<Totrinnsvurdering> totrinnsvurderinger) {
         return totrinnsvurderinger.stream()
-            .anyMatch(totrinnsvurdering -> !TRUE.equals(totrinnsvurdering.isGodkjent()));
+                .anyMatch(totrinnsvurdering -> !TRUE.equals(totrinnsvurdering.isGodkjent()));
     }
 
     private void opprettBehandlingVedtak(Behandling behandling) {
@@ -105,34 +105,34 @@ public class FatteVedtakSteg implements BehandlingSteg {
             BehandlingVedtak eksisterende = eksisterendeVedtak.get();
             behandlingsresultat = oppdaterBehandlingsResultat(behandling, eksisterende.getBehandlingsresultat(), behandlingResultatType);
             behandlingVedtak = BehandlingVedtak.builderEndreEksisterende(eksisterende)
-                .medAnsvarligSaksbehandler(finnSaksBehandler(behandling))
-                .medBehandlingsresultat(behandlingsresultat)
-                .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
-                .medVedtaksdato(LocalDate.now()).build();
+                    .medAnsvarligSaksbehandler(finnSaksBehandler(behandling))
+                    .medBehandlingsresultat(behandlingsresultat)
+                    .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
+                    .medVedtaksdato(LocalDate.now()).build();
         } else {
             behandlingsresultat = opprettBehandlingsResultat(behandling, behandlingResultatType);
             behandlingVedtak = BehandlingVedtak.builder()
-                .medAnsvarligSaksbehandler(finnSaksBehandler(behandling))
-                .medBehandlingsresultat(behandlingsresultat)
-                .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
-                .medVedtaksdato(LocalDate.now()).build();
+                    .medAnsvarligSaksbehandler(finnSaksBehandler(behandling))
+                    .medBehandlingsresultat(behandlingsresultat)
+                    .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
+                    .medVedtaksdato(LocalDate.now()).build();
         }
         behandlingVedtakRepository.lagre(behandlingVedtak);
     }
 
-    private Behandlingsresultat opprettBehandlingsResultat(Behandling behandling, BehandlingResultatType behandlingResultatType){
-        Behandlingsresultat behandlingsresultat =Behandlingsresultat.builder().medBehandling(behandling)
-            .medBehandlingResultatType(behandlingResultatType).build();
+    private Behandlingsresultat opprettBehandlingsResultat(Behandling behandling, BehandlingResultatType behandlingResultatType) {
+        Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder().medBehandling(behandling)
+                .medBehandlingResultatType(behandlingResultatType).build();
         behandlingresultatRepository.lagre(behandlingsresultat);
         return behandlingsresultat;
     }
 
     private Behandlingsresultat oppdaterBehandlingsResultat(Behandling behandling, Behandlingsresultat eksisterende,
-                                                            BehandlingResultatType behandlingResultatType){
+                                                            BehandlingResultatType behandlingResultatType) {
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builderEndreEksisterende(eksisterende)
-            .medBehandling(behandling)
-            .medBehandlingResultatType(behandlingResultatType)
-            .build();
+                .medBehandling(behandling)
+                .medBehandlingResultatType(behandlingResultatType)
+                .build();
         behandlingresultatRepository.lagre(behandlingsresultat);
         return behandlingsresultat;
     }
@@ -156,9 +156,9 @@ public class FatteVedtakSteg implements BehandlingSteg {
 
         BeregningResultat beregningResultat = beregningTjeneste.beregn(behandling.getId());
         tekstBuilder.medSkjermlenke(SkjermlenkeType.VEDTAK)
-            .medResultat(beregningResultat.getVedtakResultatType())
-            .medHendelse(HistorikkinnslagType.VEDTAK_FATTET_AUTOMATISK)
-            .build(historikkinnslag);
+                .medResultat(beregningResultat.getVedtakResultatType())
+                .medHendelse(HistorikkinnslagType.VEDTAK_FATTET_AUTOMATISK)
+                .build(historikkinnslag);
 
         historikkTjenesteAdapter.lagInnslag(historikkinnslag);
     }

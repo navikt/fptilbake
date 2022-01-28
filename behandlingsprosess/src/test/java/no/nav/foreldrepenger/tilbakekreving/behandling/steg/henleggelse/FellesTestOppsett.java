@@ -95,7 +95,7 @@ public abstract class FellesTestOppsett {
         revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider, behandlingskontrollTjeneste);
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollProvider,
-            fagsakTjeneste,  mock(HistorikkinnslagTjeneste.class), mockFagsystemKlient, defaultVentetid);
+                fagsakTjeneste, mock(HistorikkinnslagTjeneste.class), mockFagsystemKlient, defaultVentetid);
         testUtility = new TestUtility(behandlingTjeneste);
         aktørId = testUtility.genererAktørId();
         when(mockTpsTjeneste.hentBrukerForAktør(aktørId)).thenReturn(testUtility.lagPersonInfo(aktørId));
@@ -104,7 +104,7 @@ public abstract class FellesTestOppsett {
         when(mockFagsystemKlient.hentBehandlingOptional(any(UUID.class))).thenReturn(optBehandlingsinfo);
         when(mockFagsystemKlient.hentBehandling(any(UUID.class))).thenReturn(behandlingsinfoDto);
         when(mockFagsystemKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(
-            lagSamletEksternBehandlingInfo(behandlingsinfoDto));
+                lagSamletEksternBehandlingInfo(behandlingsinfoDto));
 
         TestUtility.SakDetaljer sakDetaljer = testUtility.opprettFørstegangsBehandling(aktørId);
         mapSakDetaljer(sakDetaljer);
@@ -136,8 +136,8 @@ public abstract class FellesTestOppsett {
 
     private SamletEksternBehandlingInfo lagSamletEksternBehandlingInfo(EksternBehandlingsinfoDto behandlingsinfoDto) {
         return SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER)
-            .setGrunninformasjon(behandlingsinfoDto)
-            .setPersonopplysninger(lagPersonOpplysningDto())
-            .build();
+                .setGrunninformasjon(behandlingsinfoDto)
+                .setPersonopplysninger(lagPersonOpplysningDto())
+                .build();
     }
 }

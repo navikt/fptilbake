@@ -70,7 +70,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, null);
         henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, taskTjeneste,
-            behandlingskontrollTjeneste, historikkinnslagTjeneste);
+                behandlingskontrollTjeneste, historikkinnslagTjeneste);
     }
 
     @Test
@@ -97,9 +97,9 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         lagKravgrunnlag(behandling.getId());
 
         assertThatThrownBy(
-            () -> henleggBehandlingTjeneste.henleggBehandlingManuelt(behandling.getId(), behandlingsresultat, "", ""))
-            .isInstanceOf(FunksjonellException.class)
-            .hasMessageContaining("FPT-663491");
+                () -> henleggBehandlingTjeneste.henleggBehandlingManuelt(behandling.getId(), behandlingsresultat, "", ""))
+                .isInstanceOf(FunksjonellException.class)
+                .hasMessageContaining("FPT-663491");
     }
 
     @Test
@@ -121,20 +121,20 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         lagKravgrunnlag(revurderingBehandlingId);
 
         henleggBehandlingTjeneste.henleggBehandlingManuelt(revurderingBehandlingId,
-            BehandlingResultatType.HENLAGT_FEILOPPRETTET, "hello all", "hello all");
+                BehandlingResultatType.HENLAGT_FEILOPPRETTET, "hello all", "hello all");
 
         Assertions.assertThat(historikkRepository.hentHistorikk(revurderingBehandlingId)).isNotEmpty();
         Assertions.assertThat(behandlingRepository.hentBehandling(revurderingBehandlingId).getStatus()).isEqualByComparingTo(
-            BehandlingStatus.AVSLUTTET);
+                BehandlingStatus.AVSLUTTET);
         Assertions.assertThat(
-            repoProvider.getEksternBehandlingRepository().hentOptionalFraInternId(revurderingBehandlingId)).isEmpty();
+                repoProvider.getEksternBehandlingRepository().hentOptionalFraInternId(revurderingBehandlingId)).isEmpty();
     }
 
     @Test
     public void kan_henlegge_behandling_som_er_satt_på_vent() {
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING,
-            BehandlingStegType.VARSEL, LocalDateTime.now(), Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+                BehandlingStegType.VARSEL, LocalDateTime.now(), Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
 
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
         assertHenleggelse(internBehandlingId);
@@ -153,9 +153,9 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.IVERKSETT_VEDTAK);
 
         assertThatThrownBy(
-            () -> henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat))
-            .isInstanceOf(TekniskException.class)
-            .hasMessageContaining("FPT-143308");
+                () -> henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat))
+                .isInstanceOf(TekniskException.class)
+                .hasMessageContaining("FPT-143308");
     }
 
     @Test
@@ -163,9 +163,9 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
         // forsøker å henlegge behandlingen igjen
         assertThatThrownBy(
-            () -> henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat))
-            .isInstanceOf(TekniskException.class)
-            .hasMessageContaining("FPT-143308");
+                () -> henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat))
+                .isInstanceOf(TekniskException.class)
+                .hasMessageContaining("FPT-143308");
     }
 
     @Test
@@ -180,7 +180,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
     public void kan_ikke_sende_henleggelsesbrev_for_tilbakekreving_revurdering_med_henlagt_feilopprettet_uten_brev() {
         Long revuderingBehandlingId = opprettTilbakekrevingRevurdering();
         henleggBehandlingTjeneste.henleggBehandling(revuderingBehandlingId,
-            BehandlingResultatType.HENLAGT_FEILOPPRETTET_UTEN_BREV);
+                BehandlingResultatType.HENLAGT_FEILOPPRETTET_UTEN_BREV);
 
         Mockito.verifyNoInteractions(taskTjeneste);
         assertHenleggelse(revuderingBehandlingId);
@@ -190,10 +190,10 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
     public void kan_sende_henleggelsesbrev_hvis_varselbrev_er_sendt() {
         JournalpostId journalpostId = new JournalpostId("123");
         BrevSporing henleggelsesBrevsporing = new BrevSporing.Builder().medBehandlingId(internBehandlingId)
-            .medJournalpostId(journalpostId)
-            .medDokumentId("123")
-            .medBrevType(BrevType.VARSEL_BREV)
-            .build();
+                .medJournalpostId(journalpostId)
+                .medDokumentId("123")
+                .medBrevType(BrevType.VARSEL_BREV)
+                .build();
         brevSporingRepository.lagre(henleggelsesBrevsporing);
 
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
@@ -210,7 +210,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
     public void kan_sende_henleggelsesbrev_for_tilbakekreving_revurdering_med_henlagt_feilopprettet_med_brev() {
         Long revuderingBehandlingId = opprettTilbakekrevingRevurdering();
         henleggBehandlingTjeneste.henleggBehandling(revuderingBehandlingId,
-            BehandlingResultatType.HENLAGT_FEILOPPRETTET_MED_BREV);
+                BehandlingResultatType.HENLAGT_FEILOPPRETTET_MED_BREV);
 
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
         verify(taskTjeneste, times(1)).lagre(captor.capture());
@@ -225,14 +225,14 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         Long revuderingBehandlingId = opprettTilbakekrevingRevurdering();
         JournalpostId journalpostId = new JournalpostId("123");
         BrevSporing henleggelsesBrevsporing = new BrevSporing.Builder().medBehandlingId(revuderingBehandlingId)
-            .medJournalpostId(journalpostId)
-            .medDokumentId("123")
-            .medBrevType(BrevType.VARSEL_BREV)
-            .build();
+                .medJournalpostId(journalpostId)
+                .medDokumentId("123")
+                .medBrevType(BrevType.VARSEL_BREV)
+                .build();
         brevSporingRepository.lagre(henleggelsesBrevsporing);
 
         henleggBehandlingTjeneste.henleggBehandling(revuderingBehandlingId,
-            BehandlingResultatType.HENLAGT_FEILOPPRETTET_MED_BREV);
+                BehandlingResultatType.HENLAGT_FEILOPPRETTET_MED_BREV);
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
         verify(taskTjeneste, times(2)).lagre(captor.capture());
         var prosessTaskData = captor.getAllValues();
@@ -244,27 +244,27 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
     private void lagKravgrunnlag(long behandlingId) {
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FellesTestOppsett.FOM, LocalDate.of(2016, 3, 31), KlasseType.FEIL,
-            BigDecimal.valueOf(11000), BigDecimal.ZERO);
+                BigDecimal.valueOf(11000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FellesTestOppsett.FOM, LocalDate.of(2016, 3, 31), KlasseType.YTEL,
-            BigDecimal.ZERO, BigDecimal.valueOf(11000));
+                BigDecimal.ZERO, BigDecimal.valueOf(11000));
         mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(
-            Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
+                Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
         grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
     }
 
     private Long opprettTilbakekrevingRevurdering() {
         behandling.avsluttBehandling();
         Behandling revurdering = revurderingTjeneste.opprettRevurdering(behandling.getId(),
-            BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
+                BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
         return revurdering.getId();
     }
 
     private void assertHenleggelse(Long behandlingId) {
         Assertions.assertThat(historikkRepository.hentHistorikk(behandlingId)).isNotEmpty();
         Assertions.assertThat(behandlingRepository.hentBehandling(behandlingId).getStatus()).isEqualByComparingTo(
-            BehandlingStatus.AVSLUTTET);
+                BehandlingStatus.AVSLUTTET);
         Assertions.assertThat(repoProvider.getEksternBehandlingRepository().hentOptionalFraInternId(behandlingId)).isEmpty();
     }
 }

@@ -7,14 +7,14 @@ import java.time.Period;
 
 class BehandlingUtil {
 
-    BehandlingUtil(){
+    BehandlingUtil() {
         // for CDI proxy
     }
 
     static LocalDateTime bestemFristForBehandlingVent(LocalDate frist, Period defaultVentefrist) {
         return frist != null
-            ? LocalDateTime.of(frist, LocalDateTime.now().toLocalTime())
-            : LocalDateTime.now().plus(defaultVentefrist);
+                ? LocalDateTime.of(frist, LocalDateTime.now().toLocalTime())
+                : LocalDateTime.now().plus(defaultVentefrist);
     }
 
     static boolean sjekkAvvikHvisSisteDagIHelgen(LocalDate sisteDag, int antallDager) {

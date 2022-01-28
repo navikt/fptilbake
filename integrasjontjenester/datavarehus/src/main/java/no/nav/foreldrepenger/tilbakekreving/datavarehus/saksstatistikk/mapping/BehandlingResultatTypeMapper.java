@@ -12,7 +12,7 @@ public class BehandlingResultatTypeMapper {
 
 
     private static final Map<BehandlingResultatType, BehandlingResultat> MAPPING = Arrays.stream(BehandlingResultat.values())
-        .collect(Collectors.toMap(yt -> BehandlingResultatType.fraKode(yt.name()), Function.identity()));
+            .collect(Collectors.toMap(yt -> BehandlingResultatType.fraKode(yt.name()), Function.identity()));
 
     public static BehandlingResultat getBehandlingResultatType(BehandlingResultatType behandlingResultatType) {
         var verdi = MAPPING.get(behandlingResultatType);

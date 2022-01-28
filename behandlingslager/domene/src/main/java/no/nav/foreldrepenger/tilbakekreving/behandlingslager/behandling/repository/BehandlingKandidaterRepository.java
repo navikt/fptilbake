@@ -32,7 +32,7 @@ public class BehandlingKandidaterRepository {
         Collection<Behandling> ventendeBehandlinger = sharedQueries.finnVentendeBehandlingerMedAktivtAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
         return ventendeBehandlinger.stream()
-            .filter(o -> iDag.isAfter(o.getFristDatoBehandlingPåVent()))
-            .collect(Collectors.toSet());
+                .filter(o -> iDag.isAfter(o.getFristDatoBehandlingPåVent()))
+                .collect(Collectors.toSet());
     }
 }

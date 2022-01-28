@@ -55,10 +55,10 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
         if (vetoed) {
             ProsessTaskData blokker = taskTjeneste.finn(blokkerendeTask.get().getProsessTaskId());
             log.info("Vetoer kjøring av prosesstask[{}] av type[{}] for fagsak [{}] , er blokkert av prosesstask[{}] av type[{}] for samme fagsak.",
-                ptData.getId(), ptData.getTaskType(), ptData.getFagsakId(), blokker.getId(), blokker.getTaskType());
+                    ptData.getId(), ptData.getTaskType(), ptData.getFagsakId(), blokker.getId(), blokker.getTaskType());
 
             return new ProsessTaskVeto(false, ptData.getId(), blokker.getId(), getClass().getSimpleName()
-                + " vetoer pga definert rekkefølge i FAGSAK_PROSESS_TASK.GRUPPE_SEKVENSNR. Blir pukket når blokkerende task kjøres FERDIG.");
+                    + " vetoer pga definert rekkefølge i FAGSAK_PROSESS_TASK.GRUPPE_SEKVENSNR. Blir pukket når blokkerende task kjøres FERDIG.");
         }
 
         return new ProsessTaskVeto(false, ptData.getId()); // do nothing, er ikke relatert til fagsak/behandling
@@ -109,7 +109,7 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
             Class<?> clazz = getTargetClassExpectingAnnotation(FagsakProsesstaskRekkefølge.class);
             if (!clazz.isAnnotationPresent(FagsakProsesstaskRekkefølge.class)) {
                 throw new UnsupportedOperationException(clazz.getSimpleName() + " må være annotert med "
-                    + FagsakProsesstaskRekkefølge.class.getSimpleName() + " for å kobles til en Fagsak");
+                        + FagsakProsesstaskRekkefølge.class.getSimpleName() + " for å kobles til en Fagsak");
             }
             return clazz.getAnnotation(FagsakProsesstaskRekkefølge.class);
         }

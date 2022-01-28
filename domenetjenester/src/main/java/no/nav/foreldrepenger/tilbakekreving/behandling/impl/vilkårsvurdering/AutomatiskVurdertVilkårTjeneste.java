@@ -41,8 +41,8 @@ public class AutomatiskVurdertVilkårTjeneste {
         long behandlingId = behandling.getId();
         List<DetaljertFeilutbetalingPeriodeDto> feilutbetaltePerioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(behandlingId);
         List<VilkårsvurderingPerioderDto> vilkårsvurdertePerioder = feilutbetaltePerioder.stream().filter(periode -> !periode.isForeldet())
-            .map(periode -> lagVilkårsvurderingPeriode(periode.tilPeriode(), begrunnelse))
-            .collect(Collectors.toList());
+                .map(periode -> lagVilkårsvurderingPeriode(periode.tilPeriode(), begrunnelse))
+                .collect(Collectors.toList());
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(behandlingId, vilkårsvurdertePerioder);
         //Aksjonpunkt oppretter ikke automatisk for automatisk saksbehandling. Det opprettes manuelt for å vise vilkår data i frontend.
         lagUtførtAksjonspunkt(kontekst, behandling);
@@ -61,7 +61,7 @@ public class AutomatiskVurdertVilkårTjeneste {
         return vilkårsvurderingPeriode;
     }
 
-    private void lagUtførtAksjonspunkt(BehandlingskontrollKontekst kontekst, Behandling behandling){
+    private void lagUtførtAksjonspunkt(BehandlingskontrollKontekst kontekst, Behandling behandling) {
         behandlingskontrollTjeneste.lagreAksjonspunktOpprettetUtførtUtenEvent(kontekst, behandling.getAktivtBehandlingSteg(), AksjonspunktDefinisjon.VURDER_TILBAKEKREVING);
     }
 }

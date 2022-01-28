@@ -21,12 +21,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum VergeType implements Kodeverdi {
 
-    BARN("BARN","Verge for barn under 18 år"),
-    FBARN("FBARN","Verge for foreldreløst barn under 18 år"),
-    VOKSEN("VOKSEN","Verge for voksen"),
-    ADVOKAT("ADVOKAT","Advokat/advokatfullmektig"),
-    ANNEN_F("ANNEN_F","Annen fullmektig"),
-    UDEFINERT("-","UDefinert");
+    BARN("BARN", "Verge for barn under 18 år"),
+    FBARN("FBARN", "Verge for foreldreløst barn under 18 år"),
+    VOKSEN("VOKSEN", "Verge for voksen"),
+    ADVOKAT("ADVOKAT", "Advokat/advokatfullmektig"),
+    ANNEN_F("ANNEN_F", "Annen fullmektig"),
+    UDEFINERT("-", "UDefinert");
 
     private String kode;
     private String navn;

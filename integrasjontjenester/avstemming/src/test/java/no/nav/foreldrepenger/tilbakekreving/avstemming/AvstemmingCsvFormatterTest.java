@@ -34,25 +34,25 @@ public class AvstemmingCsvFormatterTest {
     public void skal_bruke_kode_i_siste_kolonne_når_det_er_omgjøring_til_ingen_tilbakekreving() {
         AvstemmingCsvFormatter formatter = new AvstemmingCsvFormatter();
         formatter.leggTilRad(testRad()
-            .medTilbakekrevesBruttoUtenRenter(BigDecimal.ZERO)
-            .medTilbakekrevesNettoUtenRenter(BigDecimal.ZERO)
-            .medRenter(BigDecimal.ZERO)
-            .medSkatt(BigDecimal.ZERO)
-            .medErOmgjøringTilIngenTilbakekreving(true));
+                .medTilbakekrevesBruttoUtenRenter(BigDecimal.ZERO)
+                .medTilbakekrevesNettoUtenRenter(BigDecimal.ZERO)
+                .medRenter(BigDecimal.ZERO)
+                .medSkatt(BigDecimal.ZERO)
+                .medErOmgjøringTilIngenTilbakekreving(true));
         assertThat(formatter.getData()).isEqualTo(FORVENTET_HEADER + "fptilbake;1234;12345678901;20191231;FP;0;0;0;0;Omgjoring0");
     }
 
     private AvstemmingCsvFormatter.RadBuilder testRad() {
         return AvstemmingCsvFormatter.radBuilder()
-            .medAvsender("fptilbake")
-            .medVedtakId("1234")
-            .medFnr("12345678901")
-            .medVedtaksdato(LocalDate.of(2019, 12, 31))
-            .medFagsakYtelseType(FagsakYtelseType.FORELDREPENGER)
-            .medTilbakekrevesBruttoUtenRenter(BigDecimal.valueOf(1000))
-            .medTilbakekrevesNettoUtenRenter(BigDecimal.valueOf(800))
-            .medSkatt(BigDecimal.valueOf(200))
-            .medRenter(BigDecimal.valueOf(100))
-            .medErOmgjøringTilIngenTilbakekreving(false);
+                .medAvsender("fptilbake")
+                .medVedtakId("1234")
+                .medFnr("12345678901")
+                .medVedtaksdato(LocalDate.of(2019, 12, 31))
+                .medFagsakYtelseType(FagsakYtelseType.FORELDREPENGER)
+                .medTilbakekrevesBruttoUtenRenter(BigDecimal.valueOf(1000))
+                .medTilbakekrevesNettoUtenRenter(BigDecimal.valueOf(800))
+                .medSkatt(BigDecimal.valueOf(200))
+                .medRenter(BigDecimal.valueOf(100))
+                .medErOmgjøringTilIngenTilbakekreving(false);
     }
 }

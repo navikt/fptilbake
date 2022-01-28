@@ -102,11 +102,11 @@ public class VilkårsvurderingTjeneste {
                 continue;
             }
             VilkårVurderingPeriodeEntitet periodeEntitet = VilkårVurderingPeriodeEntitet.builder()
-                .medPeriode(periode.getFom(), periode.getTom())
-                .medBegrunnelse(periode.getBegrunnelse())
-                .medVilkårResultat(periode.getVilkårResultat())
-                .medVurderinger(vilkårVurderingEntitet)
-                .build();
+                    .medPeriode(periode.getFom(), periode.getTom())
+                    .medBegrunnelse(periode.getBegrunnelse())
+                    .medVilkårResultat(periode.getVilkårResultat())
+                    .medVurderinger(vilkårVurderingEntitet)
+                    .build();
             if (VilkårResultat.GOD_TRO.equals(periode.getVilkårResultat())) {
                 formGodTroEntitet(periode, periodeEntitet);
             } else {
@@ -155,7 +155,7 @@ public class VilkårsvurderingTjeneste {
             HendelseTypeMedUndertypeDto årsak = hentHendelseType(faktaFeilutbetalingPerioder, new Periode(periode.getFom(), periode.getTom()));
 
             DetaljertFeilutbetalingPeriodeDto periodeDto = new DetaljertFeilutbetalingPeriodeDto(periode.getFom(), periode.getTom(),
-                årsak, periode.getBelop());
+                    årsak, periode.getBelop());
             List<YtelseDto> ytelser = henteYtelse(behandlingId, new Periode(periode.getFom(), periode.getTom()));
             periodeDto.setYtelser(oppsummereYtelser(ytelser));
             periodeDto.setRedusertBeloper(henteRedusertBeløper(behandlingId, new Periode(periode.getFom(), periode.getTom())));
@@ -191,10 +191,10 @@ public class VilkårsvurderingTjeneste {
         //TODO unødvendig if
         if (!CollectionUtils.isEmpty(feilutbetalingPerioderDto.getPerioder())) {
             Optional<ForeldelsePeriodeMedBeløpDto> periode = feilutbetalingPerioderDto.getPerioder().stream()
-                //TODO bruk en Periode-implementasjon og overlap-funksjon
-                .filter(periodeDto -> fom.equals(periodeDto.getFom()) && tom.equals(periodeDto.getTom()))
-                .filter(periodeDto -> ForeldelseVurderingType.FORELDET.equals(periodeDto.getForeldelseVurderingType()))
-                .findFirst();
+                    //TODO bruk en Periode-implementasjon og overlap-funksjon
+                    .filter(periodeDto -> fom.equals(periodeDto.getFom()) && tom.equals(periodeDto.getTom()))
+                    .filter(periodeDto -> ForeldelseVurderingType.FORELDET.equals(periodeDto.getForeldelseVurderingType()))
+                    .findFirst();
             if (periode.isPresent()) {
                 return true;
             }
@@ -224,9 +224,9 @@ public class VilkårsvurderingTjeneste {
             Periode grunnlagPeriode = kgPeriode.getPeriode();
             if (feilutbetalingPeriode.overlapper(grunnlagPeriode)) {
                 List<KravgrunnlagBelop433> beloper = kgPeriode.getKravgrunnlagBeloper433().stream()
-                    .filter(belop433 -> KlasseType.YTEL.equals(belop433.getKlasseType()))
-                    .filter(belop433 -> BigDecimal.ZERO.compareTo(belop433.getTilbakekrevesBelop()) != 0)
-                    .collect(Collectors.toList());
+                        .filter(belop433 -> KlasseType.YTEL.equals(belop433.getKlasseType()))
+                        .filter(belop433 -> BigDecimal.ZERO.compareTo(belop433.getTilbakekrevesBelop()) != 0)
+                        .collect(Collectors.toList());
                 ytelser.addAll(opprettYtelser(feilutbetalingPeriode, grunnlagPeriode, beloper, beregnBeløpUtil));
             }
         }
@@ -241,18 +241,18 @@ public class VilkårsvurderingTjeneste {
             if (feilutbetalingPeriode.overlapper(grunnlagPeriode)) {
                 List<KravgrunnlagBelop433> skattogTrekkBeløoper = new ArrayList<>();
                 skattogTrekkBeløoper.addAll(kgPeriode.getKravgrunnlagBeloper433().stream()
-                    .filter(belop433 -> KlasseType.TREK.equals(belop433.getKlasseType()))
-                    .filter(belop433 -> belop433.getOpprUtbetBelop().signum() == -1)
-                    .collect(Collectors.toList())); //redusertBeløp
+                        .filter(belop433 -> KlasseType.TREK.equals(belop433.getKlasseType()))
+                        .filter(belop433 -> belop433.getOpprUtbetBelop().signum() == -1)
+                        .collect(Collectors.toList())); //redusertBeløp
                 skattogTrekkBeløoper.addAll(kgPeriode.getKravgrunnlagBeloper433().stream()
-                    .filter(belop433 -> KlasseType.SKAT.equals(belop433.getKlasseType()))
-                    .filter(belop433 -> belop433.getOpprUtbetBelop().signum() == -1)
-                    .collect(Collectors.toList())); //redusertBeløp
+                        .filter(belop433 -> KlasseType.SKAT.equals(belop433.getKlasseType()))
+                        .filter(belop433 -> belop433.getOpprUtbetBelop().signum() == -1)
+                        .collect(Collectors.toList())); //redusertBeløp
                 List<KravgrunnlagBelop433> redusertYtelseBeløper = kgPeriode.getKravgrunnlagBeloper433().stream()
-                    .filter(belop433 -> KlasseType.JUST.equals(belop433.getKlasseType()))
-                    .filter(belop433 -> belop433.getOpprUtbetBelop().signum() == 0)
-                    .filter(belop433 -> belop433.getNyBelop().signum() == 1)
-                    .collect(Collectors.toList()); // etterbetaling
+                        .filter(belop433 -> KlasseType.JUST.equals(belop433.getKlasseType()))
+                        .filter(belop433 -> belop433.getOpprUtbetBelop().signum() == 0)
+                        .filter(belop433 -> belop433.getNyBelop().signum() == 1)
+                        .collect(Collectors.toList()); // etterbetaling
 
                 redusertBeløper.addAll(opprettRedusertBeløper(skattogTrekkBeløoper, redusertYtelseBeløper));
             }
@@ -308,8 +308,8 @@ public class VilkårsvurderingTjeneste {
             oppsummertYtelseMap.put(ytelseDto.getAktivitet(), ytelseDto.getBelop());
         }
         return oppsummertYtelseMap.entrySet().stream()
-            .map(ytelseMap -> new YtelseDto(ytelseMap.getKey(), ytelseMap.getValue()))
-            .collect(Collectors.toList());
+                .map(ytelseMap -> new YtelseDto(ytelseMap.getKey(), ytelseMap.getValue()))
+                .collect(Collectors.toList());
 
     }
 

@@ -41,11 +41,11 @@ public class FeilutbetalingÅrsakRestTjeneste {
 
     @GET
     @Operation(
-        tags="kodeverk",
-        description = "Henter kodeverk for årsak med underårsaker for feilutbetaling",
-    responses = {
-            @ApiResponse(responseCode = "200", description = "Kodeverk", content = @Content(schema = @Schema(implementation = HendelseTypeMedUndertypeDto.class)))
-    })
+            tags = "kodeverk",
+            description = "Henter kodeverk for årsak med underårsaker for feilutbetaling",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Kodeverk", content = @Content(schema = @Schema(implementation = HendelseTypeMedUndertypeDto.class)))
+            })
     @BeskyttetRessurs(action = READ, property = AbacProperty.APPLIKASJON)
     public List<HendelseTyperPrYtelseTypeDto> hentAlleFeilutbetalingÅrsaker() {
         return feilutbetalingÅrsakTjeneste.hentFeilutbetalingårsaker();

@@ -95,8 +95,8 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
         String saksnummer = utledSaksnummer(attributter, behandlingData);
 
         return behandlingData != null
-            ? lagPdpRequest(attributter, aktørIder, saksnummer, aksjonspunkttype, behandlingData)
-            : lagPdpRequest(attributter, aktørIder, saksnummer, aksjonspunkttype);
+                ? lagPdpRequest(attributter, aktørIder, saksnummer, aksjonspunkttype, behandlingData)
+                : lagPdpRequest(attributter, aktørIder, saksnummer, aksjonspunkttype);
     }
 
     private String utledSaksnummer(AbacAttributtSamling attributter, PipBehandlingData behandlingData) {
@@ -163,11 +163,11 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
         PdpRequest pdpRequest = lagPdpRequest(attributter, aktørId, saksnummer, aksjonspunktType);
 
         oversettFagstatus(behandlingData.getFagsakstatus())
-            .ifPresent(it -> pdpRequest.put(K9AbacAttributter.RESOURCE_K9_SAK_SAKSSTATUS, it.getEksternKode()));
+                .ifPresent(it -> pdpRequest.put(K9AbacAttributter.RESOURCE_K9_SAK_SAKSSTATUS, it.getEksternKode()));
         oversettBehandlingStatus(behandlingData.getStatusForBehandling())
-            .ifPresent(it -> pdpRequest.put(K9AbacAttributter.RESOURCE_K9_SAK_BEHANDLINGSSTATUS, it.getEksternKode()));
+                .ifPresent(it -> pdpRequest.put(K9AbacAttributter.RESOURCE_K9_SAK_BEHANDLINGSSTATUS, it.getEksternKode()));
         behandlingData.getAnsvarligSaksbehandler()
-            .ifPresent(it -> pdpRequest.put(K9AbacAttributter.RESOURCE_K9_SAK_ANSVARLIG_SAKSBEHANDLER, it));
+                .ifPresent(it -> pdpRequest.put(K9AbacAttributter.RESOURCE_K9_SAK_ANSVARLIG_SAKSBEHANDLER, it));
 
 
         return pdpRequest;

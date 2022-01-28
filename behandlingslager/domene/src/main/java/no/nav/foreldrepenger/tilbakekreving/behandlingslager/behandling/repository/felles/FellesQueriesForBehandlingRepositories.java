@@ -26,7 +26,7 @@ public class FellesQueriesForBehandlingRepositories {
     }
 
     @Inject
-    public FellesQueriesForBehandlingRepositories( EntityManager entityManager) {
+    public FellesQueriesForBehandlingRepositories(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -35,13 +35,13 @@ public class FellesQueriesForBehandlingRepositories {
      */
     public Collection<Behandling> finnVentendeBehandlingerMedAktivtAksjonspunkt(AksjonspunktDefinisjon... aksjonspunktDefinisjoner) {
         TypedQuery<Behandling> query = entityManager.createQuery("""
-            select distinct b
-              from Aksjonspunkt ap
-              inner join ap.behandling b on ap.behandling.id = b.id
-              where ap.status = :åpneAksjonspunktKoder
-              and ap.aksjonspunktDefinisjon in (:aksjonspunkt)
-            """,
-            Behandling.class);
+                        select distinct b
+                          from Aksjonspunkt ap
+                          inner join ap.behandling b on ap.behandling.id = b.id
+                          where ap.status = :åpneAksjonspunktKoder
+                          and ap.aksjonspunktDefinisjon in (:aksjonspunkt)
+                        """,
+                Behandling.class);
 
         setParametre(query, aksjonspunktDefinisjoner);
         return query.getResultList();
@@ -52,15 +52,15 @@ public class FellesQueriesForBehandlingRepositories {
      */
     public Optional<Behandling> finnVentendeBehandlingMedAktivtAksjonspunkt(Long behandingId, AksjonspunktDefinisjon... aksjonspunktDefinisjoner) {
         TypedQuery<Behandling> query = entityManager.createQuery("""
-            select b
-              from Behandling b
-              where b.id = :behandlingId
-              and exists (select 1 from Aksjonspunkt ap
-                          where ap.behandling = b
-                          and ap.status = :åpneAksjonspunktKoder
-                          and ap.aksjonspunktDefinisjon in (:aksjonspunkt) )
-            """,
-            Behandling.class);
+                        select b
+                          from Behandling b
+                          where b.id = :behandlingId
+                          and exists (select 1 from Aksjonspunkt ap
+                                      where ap.behandling = b
+                                      and ap.status = :åpneAksjonspunktKoder
+                                      and ap.aksjonspunktDefinisjon in (:aksjonspunkt) )
+                        """,
+                Behandling.class);
 
         setParametre(query, aksjonspunktDefinisjoner);
         query.setHint(QueryHints.HINT_READONLY, "true");

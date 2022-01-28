@@ -20,9 +20,9 @@ class TekstformatererInnhentDokumentasjonbrev extends FellesTekstformaterer {
     public static String lagInnhentDokumentasjonBrevFritekst(InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo) {
         try {
             Template template = opprettHandlebarsTemplate("innhentdokumentasjon/innhent_dokumentasjon",
-                innhentDokumentasjonBrevSamletInfo.getBrevMetadata().getSpråkkode());
+                    innhentDokumentasjonBrevSamletInfo.getBrevMetadata().getSpråkkode());
             InnhentDokumentasjonbrevDokument innhentDokumentasjonBrevDokument = mapTilInnhentDokumentasjonBrevDokument(
-                innhentDokumentasjonBrevSamletInfo);
+                    innhentDokumentasjonBrevSamletInfo);
 
             return applyTemplate(template, innhentDokumentasjonBrevDokument);
         } catch (IOException e) {
@@ -33,7 +33,7 @@ class TekstformatererInnhentDokumentasjonbrev extends FellesTekstformaterer {
     public static String lagInnhentDokumentasjonBrevOverskrift(InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo) {
         try {
             Template template = opprettHandlebarsTemplate("innhentdokumentasjon/innhent_dokumentasjon_overskrift",
-                innhentDokumentasjonBrevSamletInfo.getBrevMetadata().getSpråkkode());
+                    innhentDokumentasjonBrevSamletInfo.getBrevMetadata().getSpråkkode());
             OverskriftBrevData overskriftBrevData = lagOverskriftBrevData(innhentDokumentasjonBrevSamletInfo.getBrevMetadata());
 
             return template.apply(overskriftBrevData);

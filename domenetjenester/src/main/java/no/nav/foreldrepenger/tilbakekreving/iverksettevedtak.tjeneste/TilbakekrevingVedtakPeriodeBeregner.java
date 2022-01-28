@@ -96,7 +96,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
 
     boolean manglerFEIL(KravgrunnlagPeriode432 kgPeriode) {
         return kgPeriode.getKravgrunnlagBeloper433().stream()
-            .noneMatch(kgb -> KlasseType.FEIL.equals(kgb.getKlasseType()));
+                .noneMatch(kgb -> KlasseType.FEIL.equals(kgb.getKlasseType()));
     }
 
     private TilbakekrevingPeriode lagTilbakekrevingsperiode(BeregningResultatPeriode bgPeriode,
@@ -118,11 +118,11 @@ public class TilbakekrevingVedtakPeriodeBeregner {
             BigDecimal skalertNyttBeløp = skalerMedAvrundingskorrigering(kgBeløp.getNyBelop(), kgTidligereSkalering, kgKumulativSkalering);
             if (KlasseType.FEIL.equals(kgBeløp.getKlasseType())) {
                 tp.medBeløp(new TilbakekrevingBeløp(kgBeløp.getKlasseType(), kgBeløp.getKlasseKode())
-                    .medNyttBeløp(skalertNyttBeløp)
-                    .medUtbetBeløp(BigDecimal.ZERO)
-                    .medTilbakekrevBeløp(BigDecimal.ZERO)
-                    .medUinnkrevdBeløp(BigDecimal.ZERO)
-                    .medSkattBeløp(BigDecimal.ZERO));
+                        .medNyttBeløp(skalertNyttBeløp)
+                        .medUtbetBeløp(BigDecimal.ZERO)
+                        .medTilbakekrevBeløp(BigDecimal.ZERO)
+                        .medUinnkrevdBeløp(BigDecimal.ZERO)
+                        .medSkattBeløp(BigDecimal.ZERO));
             }
             if (KlasseType.YTEL.equals(kgBeløp.getKlasseType())) {
                 BigDecimal skalertUtbet = skalerMedAvrundingskorrigering(kgBeløp.getOpprUtbetBelop(), kgTidligereSkalering, kgKumulativSkalering);
@@ -131,11 +131,11 @@ public class TilbakekrevingVedtakPeriodeBeregner {
                 BigDecimal skattBeløp = beregnSkattBeløp(skalertTilbakekreves, kgBeløp.getSkattProsent());
 
                 tp.medBeløp(new TilbakekrevingBeløp(kgBeløp.getKlasseType(), kgBeløp.getKlasseKode())
-                    .medNyttBeløp(skalertNyttBeløp)
-                    .medUtbetBeløp(skalertUtbet)
-                    .medTilbakekrevBeløp(skalertTilbakekreves)
-                    .medUinnkrevdBeløp(skalertForeslåttTilbakekreves.subtract(skalertTilbakekreves))
-                    .medSkattBeløp(skattBeløp));
+                        .medNyttBeløp(skalertNyttBeløp)
+                        .medUtbetBeløp(skalertUtbet)
+                        .medTilbakekrevBeløp(skalertTilbakekreves)
+                        .medUinnkrevdBeløp(skalertForeslåttTilbakekreves.subtract(skalertTilbakekreves))
+                        .medSkattBeløp(skattBeløp));
             }
         }
         return tp;
@@ -144,8 +144,8 @@ public class TilbakekrevingVedtakPeriodeBeregner {
     private void justerAvrunding(BeregningResultatPeriode beregningResultatPeriode, List<TilbakekrevingPeriode> perioder) {
         BigDecimal fasit = beregningResultatPeriode.getTilbakekrevingBeløpUtenRenter();
         BigDecimal sumPerioder = perioder.stream()
-            .map(TilbakekrevingVedtakPeriodeBeregner::summerTilbakekreving)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(TilbakekrevingVedtakPeriodeBeregner::summerTilbakekreving)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal diff = sumPerioder.subtract(fasit);
         if (diff.signum() == 0) {
@@ -153,9 +153,9 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         }
 
         List<TilbakekrevingBeløp> ytelBeløp = perioder.stream()
-            .flatMap(p -> p.getBeløp().stream())
-            .filter(b -> KlasseType.YTEL.equals(b.getKlasseType()))
-            .collect(Collectors.toList());
+                .flatMap(p -> p.getBeløp().stream())
+                .filter(b -> KlasseType.YTEL.equals(b.getKlasseType()))
+                .collect(Collectors.toList());
 
         if (diff.signum() < 0) {
             justerOpp(beregningResultatPeriode.getPeriode(), diff, ytelBeløp);
@@ -221,8 +221,8 @@ public class TilbakekrevingVedtakPeriodeBeregner {
     BigDecimal finnDifferanseMotForventetSkatt(BeregningResultatPeriode beregningResultatPeriode, List<TilbakekrevingPeriode> perioder) {
         BigDecimal fasit = beregningResultatPeriode.getSkattBeløp();
         BigDecimal sumSkatt = perioder.stream()
-            .map(TilbakekrevingVedtakPeriodeBeregner::summerSkatt)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(TilbakekrevingVedtakPeriodeBeregner::summerSkatt)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         return sumSkatt.subtract(fasit);
     }
 
@@ -231,8 +231,8 @@ public class TilbakekrevingVedtakPeriodeBeregner {
             return;
         }
         TekniskException feil = diff.signum() == -1
-            ? TilbakekrevingVedtakPeriodeBeregnerFeil.avrundingsfeilForLiteSkatt(bergningsperiode, diff.negate())
-            : TilbakekrevingVedtakPeriodeBeregnerFeil.avrundingsfeilForMyeSkatt(bergningsperiode, diff);
+                ? TilbakekrevingVedtakPeriodeBeregnerFeil.avrundingsfeilForLiteSkatt(bergningsperiode, diff.negate())
+                : TilbakekrevingVedtakPeriodeBeregnerFeil.avrundingsfeilForMyeSkatt(bergningsperiode, diff);
         if (diff.abs().intValue() > GRENSE_AVRUNDINGSFEIL) {
             throw feil;
         }
@@ -243,9 +243,9 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         //juster gjenstående skattetrekk
         for (TilbakekrevingPeriode tilbakekrevingPeriode : perioder) {
             Optional<BigDecimal> skattBeløp = tilbakekrevingPeriode.getBeløp().stream()
-                .filter(b -> KlasseType.YTEL.equals(b.getKlasseType()))
-                .map(TilbakekrevingBeløp::getSkattBeløp)
-                .reduce(BigDecimal::add);
+                    .filter(b -> KlasseType.YTEL.equals(b.getKlasseType()))
+                    .map(TilbakekrevingBeløp::getSkattBeløp)
+                    .reduce(BigDecimal::add);
             if (skattBeløp.isPresent()) {
                 YearMonth måned = fraPeriode(tilbakekrevingPeriode.getPeriode());
                 BigDecimal gjenstående = kgGjenståendeMuligSkattetrekk.get(måned).subtract(skattBeløp.get());
@@ -274,8 +274,8 @@ public class TilbakekrevingVedtakPeriodeBeregner {
 
     private static void leggPåKodeResultat(BeregningResultatPeriode bgPeriode, List<TilbakekrevingPeriode> tmp) {
         tmp.stream()
-            .flatMap(p -> p.getBeløp().stream())
-            .forEach(b -> b.medKodeResultat(bgPeriode.getKodeResultat()));
+                .flatMap(p -> p.getBeløp().stream())
+                .forEach(b -> b.medKodeResultat(bgPeriode.getKodeResultat()));
     }
 
     private static void leggPåRenter(BeregningResultatPeriode bgPeriode, List<TilbakekrevingPeriode> tmp) {
@@ -314,22 +314,22 @@ public class TilbakekrevingVedtakPeriodeBeregner {
     private static int virkedagerOverlapp(Periode a, Periode b, boolean gjelderEngangsstønad) {
         if (gjelderEngangsstønad) return 1;
         return a.overlap(b)
-            .map(Ukedager::beregnAntallVirkedager)
-            .orElse(0);
+                .map(Ukedager::beregnAntallVirkedager)
+                .orElse(0);
     }
 
     private static List<KravgrunnlagPeriode432> sortertePerioder(Kravgrunnlag431 kravgrunnlag) {
         return kravgrunnlag.getPerioder()
-            .stream()
-            .sorted(Comparator.comparing(o -> o.getPeriode().getFom()))
-            .collect(Collectors.toList());
+                .stream()
+                .sorted(Comparator.comparing(o -> o.getPeriode().getFom()))
+                .collect(Collectors.toList());
     }
 
     private static List<BeregningResultatPeriode> sortertePerioder(BeregningResultat beregningResultat) {
         return beregningResultat.getBeregningResultatPerioder()
-            .stream()
-            .sorted(Comparator.comparing(p -> p.getPeriode().getFom()))
-            .collect(Collectors.toList());
+                .stream()
+                .sorted(Comparator.comparing(p -> p.getPeriode().getFom()))
+                .collect(Collectors.toList());
     }
 
 
@@ -389,7 +389,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
 
     private static YearMonth fraPeriode(Periode periode) {
         check(periode.getFom().getYear() == periode.getTom().getYear()
-            && periode.getFom().getMonthValue() == periode.getTom().getMonthValue(), "Kan ikke konvertere " + periode + " til måned, da den strekker seg over flere måneder");
+                && periode.getFom().getMonthValue() == periode.getTom().getMonthValue(), "Kan ikke konvertere " + periode + " til måned, da den strekker seg over flere måneder");
         return YearMonth.of(periode.getFom().getYear(), periode.getFom().getMonthValue());
     }
 
@@ -410,7 +410,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         logger.warn(String.format("%s: %s", e.getKode(), e.getMessage()));
     }
 
-    static class TilbakekrevingVedtakPeriodeBeregnerFeil  {
+    static class TilbakekrevingVedtakPeriodeBeregnerFeil {
 
         static TekniskException avrundingsfeilForMyeInnkrevet(Periode periode, BigDecimal diff) {
             return new TekniskException("FPT-870164", String.format("Avrundingsfeil i periode %s i vedtak. Krever inn %s for mye for perioden", periode, diff));
@@ -429,7 +429,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         }
 
         static TekniskException inputvalideringFeiletKgPerioderOverlappBrPerioder(Periode periode, int kgVirkedager, int overlappVirkedager) {
-            return new TekniskException("FPT-685113", String.format("Kravgrunnlagperiode %s har %s virkedager, forventer en-til-en, men ovelapper mot beregningsresultat med %s dager", periode , kgVirkedager, overlappVirkedager));
+            return new TekniskException("FPT-685113", String.format("Kravgrunnlagperiode %s har %s virkedager, forventer en-til-en, men ovelapper mot beregningsresultat med %s dager", periode, kgVirkedager, overlappVirkedager));
         }
 
         static TekniskException inputvalideringFeiletBrPerioderOverlappKgPerioder(Periode periode, int kgVirkedager, int overlappVirkedager) {

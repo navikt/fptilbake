@@ -20,11 +20,11 @@ public class TbkBeløp extends TilbakekrevingBeløp {
 
     public static TbkBeløp feil(int beløp, String klassekode) {
         return new TbkBeløp(KlasseType.FEIL, klassekode)
-            .medNyttBeløp(beløp)
-            .medUtbetBeløp(0)
-            .medUinnkrevdBeløp(0)
-            .medTilbakekrevBeløp(0)
-            .medSkattBeløp(0);
+                .medNyttBeløp(beløp)
+                .medUtbetBeløp(0)
+                .medUinnkrevdBeløp(0)
+                .medTilbakekrevBeløp(0)
+                .medSkattBeløp(0);
     }
 
     public static TbkBeløp ytelse(KlasseKode klasseKode) {
@@ -37,7 +37,7 @@ public class TbkBeløp extends TilbakekrevingBeløp {
 
     public static TbkBeløp trekk(int beløp, String klassekode) {
         return new TbkBeløp(KlasseType.TREK, klassekode)
-            .medNyttBeløp(beløp);
+                .medNyttBeløp(beløp);
     }
 
     public TbkBeløp medUtbetBeløp(BigDecimal utbetaltBeløp) {

@@ -46,11 +46,11 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
         Long kravgrunnlagId = kravgrunnlagDetalj.getKravgrunnlagId().longValue();
         validerKvitteringForHentGrunnlag(behandlingId, kravgrunnlagId, kvittering);
         logger.info("Hentet kravgrunnlag fra oppdragsystemet for behandlingId={} KravgrunnlagId={} Alvorlighetsgrad='{}' kodeMelding='{}' infomelding='{}'",
-            behandlingId,
-            kravgrunnlagDetalj.getKravgrunnlagId(),
-            kvittering.getAlvorlighetsgrad(),
-            kvittering.getKodeMelding(),
-            kvittering.getBeskrMelding());
+                behandlingId,
+                kravgrunnlagDetalj.getKravgrunnlagId(),
+                kvittering.getAlvorlighetsgrad(),
+                kvittering.getKodeMelding(),
+                kvittering.getBeskrMelding());
         return respons.getDetaljertkravgrunnlag();
     }
 
@@ -61,9 +61,9 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
         MmelDto kvittering = respons.getMmel();
         validerKvitteringForAnnulereGrunnlag(behandlingId, kvittering);
         logger.info("AnnulereKravgrunnlag sendt til oppdragssystemet. BehandlingId={} Alvorlighetsgrad='{}' infomelding='{}'",
-            behandlingId,
-            kvittering.getAlvorlighetsgrad(),
-            kvittering.getBeskrMelding());
+                behandlingId,
+                kvittering.getAlvorlighetsgrad(),
+                kvittering.getBeskrMelding());
         return kvittering;
     }
 

@@ -20,7 +20,7 @@ public class ØkonomiSendtXmlRepository {
     }
 
     @Inject
-    public ØkonomiSendtXmlRepository( EntityManager entityManager) {
+    public ØkonomiSendtXmlRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -41,9 +41,9 @@ public class ØkonomiSendtXmlRepository {
         query.setParameter("behandlingId", behandlingId);
         query.setParameter("meldingType", meldingType.getKode());
         return query.getResultList()
-            .stream()
-            .map(ØkonomiXmlSendt::getMelding)
-            .collect(Collectors.toList());
+                .stream()
+                .map(ØkonomiXmlSendt::getMelding)
+                .collect(Collectors.toList());
     }
 
     public void oppdatereKvittering(Long sendtXmlId, String kvitteringXml) {

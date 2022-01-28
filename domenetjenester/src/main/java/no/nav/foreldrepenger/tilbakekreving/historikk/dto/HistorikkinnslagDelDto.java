@@ -73,7 +73,7 @@ public class HistorikkinnslagDelDto {
         if (Objects.equals("-", aarsakVerdi)) {
             return Optional.empty();
         }
-        if(aarsak.getKlTilVerdi() == null) {
+        if (aarsak.getKlTilVerdi() == null) {
             return Optional.empty();
         }
 

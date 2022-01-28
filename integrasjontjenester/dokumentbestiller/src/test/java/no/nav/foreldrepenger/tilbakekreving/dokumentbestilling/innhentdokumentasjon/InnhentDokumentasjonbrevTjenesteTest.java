@@ -44,20 +44,20 @@ public class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestO
         when(mockPdfBrevTjeneste.genererForhåndsvisning(any(BrevData.class))).thenReturn(FLERE_OPPLYSNINGER.getBytes());
 
         when(mockEksternDataForBrevTjeneste.hentYtelsenavn(FagsakYtelseType.FORELDREPENGER, Språkkode.nb))
-            .thenReturn(lagYtelseNavn("foreldrepenger", "foreldrepenger"));
+                .thenReturn(lagYtelseNavn("foreldrepenger", "foreldrepenger"));
         Personinfo personinfo = byggStandardPerson("Fiona", DUMMY_FØDSELSNUMMER, Språkkode.nn);
         String aktørId = behandling.getAktørId().getId();
         when(mockEksternDataForBrevTjeneste.hentPerson(aktørId)).thenReturn(personinfo);
         when(mockEksternDataForBrevTjeneste.hentAdresse(any(Personinfo.class), any(BrevMottaker.class), any(Optional.class)))
-            .thenReturn(lagStandardNorskAdresse());
+                .thenReturn(lagStandardNorskAdresse());
         when(mockEksternDataForBrevTjeneste.getBrukersSvarfrist()).thenReturn(Period.ofWeeks(2));
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setSprakkode(Språkkode.nb);
         when(mockEksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(FPSAK_BEHANDLING_UUID))
-            .thenReturn(SamletEksternBehandlingInfo.builder()
-                .setGrunninformasjon(eksternBehandlingsinfoDto)
-                .build());
+                .thenReturn(SamletEksternBehandlingInfo.builder()
+                        .setGrunninformasjon(eksternBehandlingsinfoDto)
+                        .build());
     }
 
     @Test

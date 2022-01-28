@@ -23,11 +23,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum KlasseType implements Kodeverdi {
 
-    FEIL("FEIL","Feilkonto"),
-    JUST("JUST","Justeringskonto"),
-    SKAT("SKAT","Skatt"),
-    TREK("TREK","Trekk"),
-    YTEL("YTEL","Ytelseskonto");
+    FEIL("FEIL", "Feilkonto"),
+    JUST("JUST", "Justeringskonto"),
+    SKAT("SKAT", "Skatt"),
+    TREK("TREK", "Trekk"),
+    YTEL("YTEL", "Ytelseskonto");
 
     public static final String KODEVERK = "KLASSE_TYPE";
 

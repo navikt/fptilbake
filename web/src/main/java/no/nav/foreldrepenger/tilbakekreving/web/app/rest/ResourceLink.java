@@ -23,12 +23,16 @@ public class ResourceLink {
     @NotNull
     private URI href;
 
-    /** Link relationship type. */
+    /**
+     * Link relationship type.
+     */
     @JsonProperty("rel")
     @NotNull
     private String rel;
 
-    /** Http Method type. */
+    /**
+     * Http Method type.
+     */
     @JsonProperty("type")
     @NotNull
     private HttpMethod type;
@@ -62,7 +66,9 @@ public class ResourceLink {
         this.requestPayload = requestPayload;
     }
 
-    /** Ctor lager default GET link. */
+    /**
+     * Ctor lager default GET link.
+     */
     public ResourceLink(String href, String rel) {
         this(href, rel, HttpMethod.GET);
     }
@@ -92,8 +98,8 @@ public class ResourceLink {
         }
         ResourceLink other = (ResourceLink) obj;
         return Objects.equals(this.href, other.href)
-            && Objects.equals(this.rel, other.rel)
-            && Objects.equals(this.type, other.type);
+                && Objects.equals(this.rel, other.rel)
+                && Objects.equals(this.type, other.type);
     }
 
     @Override

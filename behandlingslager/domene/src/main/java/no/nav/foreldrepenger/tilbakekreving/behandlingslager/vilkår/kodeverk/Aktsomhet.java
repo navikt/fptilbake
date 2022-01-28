@@ -20,9 +20,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum Aktsomhet implements Vurdering {
 
-    FORSETT("FORSETT","Forsett"),
-    GROVT_UAKTSOM("GROVT_UAKTSOM","Grov uaktsomhet"),
-    SIMPEL_UAKTSOM("SIMPEL_UAKTSOM","Simpel uaktsomhet");
+    FORSETT("FORSETT", "Forsett"),
+    GROVT_UAKTSOM("GROVT_UAKTSOM", "Grov uaktsomhet"),
+    SIMPEL_UAKTSOM("SIMPEL_UAKTSOM", "Simpel uaktsomhet");
 
     private String kode;
     private String navn;

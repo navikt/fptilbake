@@ -32,36 +32,36 @@ public class AutomatiskSaksbehandlingRepository {
 
     public List<Behandling> hentAlleBehandlingerSomErKlarForAutomatiskSaksbehandling(LocalDate bestemtDato) {
         TypedQuery<Behandling> query = entityManager.createQuery("""
-            from Behandling beh where beh.id in
-            (select b.id as behandlingId from Behandling b
-            inner join Fagsak f on b.fagsak.id = f.id
-            inner join Aksjonspunkt ap on b.id = ap.behandling.id
-            inner join KravgrunnlagAggregateEntity grunn on b.id=grunn.behandlingId
-            inner join Kravgrunnlag431 kravgrunnlag on grunn.grunnlagØkonomi.id = kravgrunnlag.id
-            inner join KravgrunnlagPeriode432 periode on kravgrunnlag.id = periode.kravgrunnlag431.id
-            inner join KravgrunnlagBelop433 beløp on periode.id = beløp.kravgrunnlagPeriode432.id
-            where
-            ap.aksjonspunktDefinisjon=:aksjonspunktDefinisjon
-            and ap.status=:aksjonspunktStatus
-            and b.ansvarligSaksbehandler is null
-            and b.status=:behandlingStatus
-            and b.behandlingType in (:behandlingTyper)
-            and grunn.aktiv='J'
-            and NOT EXISTS (select id from BrevSporing brev where brev.behandlingId = b.id)
-            and to_timestamp(kravgrunnlag.kontrollFelt,'YYYY-MM-DD-HH24.mi.ss.ff') < to_timestamp(:bestemtDato)
-            and beløp.klasseType=:klasseType
-            group by b.id,f.fagsakYtelseType
-            having
-            sum(beløp.nyBelop) <= case f.fagsakYtelseType
-            when 'FP' then :halvtRettsgebyr
-            when 'SVP' then :halvtRettsgebyr
-            when 'ES' then :halvtRettsgebyr
-            when 'PSB' then :halvtRettsgebyr
-            when 'OMP' then :halvtRettsgebyr
-            when 'FRISINN' then :heltRettsgebyr
-            else -1
-            end )
-            """, Behandling.class);
+                from Behandling beh where beh.id in
+                (select b.id as behandlingId from Behandling b
+                inner join Fagsak f on b.fagsak.id = f.id
+                inner join Aksjonspunkt ap on b.id = ap.behandling.id
+                inner join KravgrunnlagAggregateEntity grunn on b.id=grunn.behandlingId
+                inner join Kravgrunnlag431 kravgrunnlag on grunn.grunnlagØkonomi.id = kravgrunnlag.id
+                inner join KravgrunnlagPeriode432 periode on kravgrunnlag.id = periode.kravgrunnlag431.id
+                inner join KravgrunnlagBelop433 beløp on periode.id = beløp.kravgrunnlagPeriode432.id
+                where
+                ap.aksjonspunktDefinisjon=:aksjonspunktDefinisjon
+                and ap.status=:aksjonspunktStatus
+                and b.ansvarligSaksbehandler is null
+                and b.status=:behandlingStatus
+                and b.behandlingType in (:behandlingTyper)
+                and grunn.aktiv='J'
+                and NOT EXISTS (select id from BrevSporing brev where brev.behandlingId = b.id)
+                and to_timestamp(kravgrunnlag.kontrollFelt,'YYYY-MM-DD-HH24.mi.ss.ff') < to_timestamp(:bestemtDato)
+                and beløp.klasseType=:klasseType
+                group by b.id,f.fagsakYtelseType
+                having
+                sum(beløp.nyBelop) <= case f.fagsakYtelseType
+                when 'FP' then :halvtRettsgebyr
+                when 'SVP' then :halvtRettsgebyr
+                when 'ES' then :halvtRettsgebyr
+                when 'PSB' then :halvtRettsgebyr
+                when 'OMP' then :halvtRettsgebyr
+                when 'FRISINN' then :heltRettsgebyr
+                else -1
+                end )
+                """, Behandling.class);
 
         query.setParameter("aksjonspunktDefinisjon", AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
         query.setParameter("aksjonspunktStatus", AksjonspunktStatus.OPPRETTET);

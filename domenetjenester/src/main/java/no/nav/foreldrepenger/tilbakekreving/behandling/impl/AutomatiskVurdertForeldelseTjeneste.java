@@ -18,7 +18,7 @@ public class AutomatiskVurdertForeldelseTjeneste {
     private VurderForeldelseAksjonspunktUtleder vurderForeldelseAksjonspunktUtleder;
     private VurdertForeldelseTjeneste vurdertForeldelseTjeneste;
 
-    AutomatiskVurdertForeldelseTjeneste(){
+    AutomatiskVurdertForeldelseTjeneste() {
         // for CDI
     }
 
@@ -29,13 +29,13 @@ public class AutomatiskVurdertForeldelseTjeneste {
         this.vurdertForeldelseTjeneste = vurdertForeldelseTjeneste;
     }
 
-    public void automatiskVurdetForeldelse(Behandling behandling,String begrunnelse){
+    public void automatiskVurdetForeldelse(Behandling behandling, String begrunnelse) {
         long behandlingId = behandling.getId();
         FeilutbetalingPerioderDto feilutbetalingPerioderDto = vurdertForeldelseTjeneste.hentFaktaPerioder(behandlingId);
         List<ForeldelsePeriodeDto> foreldelsePerioder = feilutbetalingPerioderDto.getPerioder().stream()
-            .filter(periode -> vurderForeldelseAksjonspunktUtleder.erForeldet(LocalDate.now(), periode.getFom()))
-            .map(periode -> new ForeldelsePeriodeDto(periode.getFom(), periode.getTom(), ForeldelseVurderingType.IKKE_FORELDET, begrunnelse))
-            .collect(Collectors.toList());
+                .filter(periode -> vurderForeldelseAksjonspunktUtleder.erForeldet(LocalDate.now(), periode.getFom()))
+                .map(periode -> new ForeldelsePeriodeDto(periode.getFom(), periode.getTom(), ForeldelseVurderingType.IKKE_FORELDET, begrunnelse))
+                .collect(Collectors.toList());
         if (!foreldelsePerioder.isEmpty()) {
             vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(behandlingId, foreldelsePerioder);
         }

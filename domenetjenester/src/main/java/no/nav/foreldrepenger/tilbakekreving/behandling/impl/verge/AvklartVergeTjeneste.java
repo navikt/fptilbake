@@ -49,13 +49,13 @@ public class AvklartVergeTjeneste {
     public void lagreVergeInformasjon(Long behandlingId,
                                       VergeDto vergeDto) {
         VergeEntitet.Builder builder = VergeEntitet.builder()
-            .medKilde(KildeType.FPTILBAKE.name())
-            .medGyldigPeriode(vergeDto.getFom(), vergeDto.getTom())
-            .medNavn(vergeDto.getNavn())
-            .medVergeType(vergeDto.getVergeType())
-            .medBegrunnelse(vergeDto.getBegrunnelse());
+                .medKilde(KildeType.FPTILBAKE.name())
+                .medGyldigPeriode(vergeDto.getFom(), vergeDto.getTom())
+                .medNavn(vergeDto.getNavn())
+                .medVergeType(vergeDto.getVergeType())
+                .medBegrunnelse(vergeDto.getBegrunnelse());
         if (VergeType.ADVOKAT.equals(vergeDto.getVergeType())) {
-            Asserts.check(virksomhetTjeneste.validerOrganisasjon(vergeDto.getOrganisasjonsnummer()),"OrgansisasjonNummer er ikke gyldig");
+            Asserts.check(virksomhetTjeneste.validerOrganisasjon(vergeDto.getOrganisasjonsnummer()), "OrgansisasjonNummer er ikke gyldig");
             builder.medOrganisasjonnummer(vergeDto.getOrganisasjonsnummer());
         } else {
             builder.medVergeAktørId(hentAktørId(vergeDto.getFnr()));
@@ -81,8 +81,8 @@ public class AvklartVergeTjeneste {
 
         HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
         tekstBuilder.medSkjermlenke(SkjermlenkeType.FAKTA_OM_VERGE)
-            .medHendelse(HistorikkinnslagType.REGISTRER_OM_VERGE)
-            .build(historikkinnslag);
+                .medHendelse(HistorikkinnslagType.REGISTRER_OM_VERGE)
+                .build(historikkinnslag);
 
         historikkTjenesteAdapter.lagInnslag(historikkinnslag);
     }

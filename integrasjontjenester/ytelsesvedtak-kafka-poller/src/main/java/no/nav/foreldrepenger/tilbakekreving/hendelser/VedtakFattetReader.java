@@ -32,24 +32,24 @@ public class VedtakFattetReader {
     private static final Logger logger = LoggerFactory.getLogger(VedtakFattetReader.class);
 
     private static final Map<Fagsystem, Set<YtelseType>> STØTTET_YTELSE_TYPER = Map.of(
-        Fagsystem.FPTILBAKE, Set.of(YtelseType.ENGANGSTØNAD, YtelseType.FORELDREPENGER, YtelseType.SVANGERSKAPSPENGER),
-        Fagsystem.K9TILBAKE,  Set.of(YtelseType.FRISINN, YtelseType.OMSORGSPENGER, YtelseType.PLEIEPENGER_SYKT_BARN)
+            Fagsystem.FPTILBAKE, Set.of(YtelseType.ENGANGSTØNAD, YtelseType.FORELDREPENGER, YtelseType.SVANGERSKAPSPENGER),
+            Fagsystem.K9TILBAKE, Set.of(YtelseType.FRISINN, YtelseType.OMSORGSPENGER, YtelseType.PLEIEPENGER_SYKT_BARN)
     );
 
     private static final Map<Fagsystem, Set<YtelseType>> REST_YTELSE_TYPER = Map.of(
-        Fagsystem.FPTILBAKE, Set.of(),
-        Fagsystem.K9TILBAKE,  Set.of(YtelseType.OPPLÆRINGSPENGER, YtelseType.PLEIEPENGER_NÆRSTÅENDE)
+            Fagsystem.FPTILBAKE, Set.of(),
+            Fagsystem.K9TILBAKE, Set.of(YtelseType.OPPLÆRINGSPENGER, YtelseType.PLEIEPENGER_NÆRSTÅENDE)
     );
 
     private static final Map<YtelseType, FagsakYtelseType> YTELSE_TYPE_MAP = Map.of(
-        YtelseType.ENGANGSTØNAD, FagsakYtelseType.ENGANGSTØNAD,
-        YtelseType.FORELDREPENGER, FagsakYtelseType.FORELDREPENGER,
-        YtelseType.SVANGERSKAPSPENGER, FagsakYtelseType.SVANGERSKAPSPENGER,
-        YtelseType.FRISINN, FagsakYtelseType.FRISINN,
-        YtelseType.OMSORGSPENGER, FagsakYtelseType.OMSORGSPENGER,
-        YtelseType.OPPLÆRINGSPENGER, FagsakYtelseType.OPPLÆRINGSPENGER,
-        YtelseType.PLEIEPENGER_NÆRSTÅENDE, FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE,
-        YtelseType.PLEIEPENGER_SYKT_BARN, FagsakYtelseType.PLEIEPENGER_SYKT_BARN
+            YtelseType.ENGANGSTØNAD, FagsakYtelseType.ENGANGSTØNAD,
+            YtelseType.FORELDREPENGER, FagsakYtelseType.FORELDREPENGER,
+            YtelseType.SVANGERSKAPSPENGER, FagsakYtelseType.SVANGERSKAPSPENGER,
+            YtelseType.FRISINN, FagsakYtelseType.FRISINN,
+            YtelseType.OMSORGSPENGER, FagsakYtelseType.OMSORGSPENGER,
+            YtelseType.OPPLÆRINGSPENGER, FagsakYtelseType.OPPLÆRINGSPENGER,
+            YtelseType.PLEIEPENGER_NÆRSTÅENDE, FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE,
+            YtelseType.PLEIEPENGER_SYKT_BARN, FagsakYtelseType.PLEIEPENGER_SYKT_BARN
     );
 
     private VedtakFattetMeldingConsumer meldingConsumer;
@@ -119,7 +119,7 @@ public class VedtakFattetReader {
             taskTjeneste.lagre(lagProsessTaskData(melding));
         } else if (YTELSE_TYPE_MAP.get(melding.getType()) == null || resterendeYtelser.contains(melding.getType())) {
             logger.warn("Melding om vedtak for {} for sak={} behandling={} med vedtakstidspunkt {} ble ignorert pga ikke-støttet ytelsetype",
-                melding.getType(), melding.getSaksnummer(), melding.getVedtakReferanse(), melding.getVedtattTidspunkt());
+                    melding.getType(), melding.getSaksnummer(), melding.getVedtakReferanse(), melding.getVedtattTidspunkt());
         }
     }
 

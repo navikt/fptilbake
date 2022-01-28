@@ -12,7 +12,7 @@ import java.util.Set;
 public class Helligdager {
 
     private static final Set<MonthDay> fasteStengteDager = Set.of(
-        MonthDay.of(12, 31));
+            MonthDay.of(12, 31));
 
 
     private Helligdager() {

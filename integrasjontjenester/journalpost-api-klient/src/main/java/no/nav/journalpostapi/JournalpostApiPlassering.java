@@ -12,7 +12,7 @@ class JournalpostApiPlassering {
     static final String BASE_URL = "http://dokarkiv";
     static final String OVERRIDE_URL = "journalpostapi.override.url";
 
-    private JournalpostApiPlassering(){
+    private JournalpostApiPlassering() {
 
     }
 

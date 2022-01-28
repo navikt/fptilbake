@@ -32,7 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 /**
  * Brukes for å generere tekster for særlige grunner for perioder. Resultatet er tekster med markup, som med
  * "Insert markup"-macroen kan limes inn i Confluence, og dermed bli formattert tekst.
- *
+ * <p>
  * Confluence:
  * FP/SVP/ES: https://confluence.adeo.no/display/TVF/Generert+dokumentasjon
  * FRISINN: https://confluence.adeo.no/display/MODNAV/Generert+dokumentasjon
@@ -161,60 +161,60 @@ public class DokumentasjonGeneratorPeriodeSærligeGrunner {
 
         String fritekstSærligeGrunnerAnnet = "[fritekst her]";
         return HbVedtaksbrevPeriode.builder()
-            .medPeriode(januar)
-            .medVurderinger(HbVurderinger.builder()
-                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                .medVilkårResultat(vilkårResultat)
-                .medAktsomhetResultat(aktsomhet)
-                .medSærligeGrunner(sg, null, fritekstSærligeGrunnerAnnet)
-                .build())
-            .medKravgrunnlag(HbKravgrunnlag.builder()
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
-                .build())
-            .medResultat(HbResultat.builder()
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(reduksjon ? 500 : 1000))
-                .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(reduksjon ? 400 : 800))
-                .medRenterBeløp(BigDecimal.ZERO)
-                .build())
-            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
-            .build();
+                .medPeriode(januar)
+                .medVurderinger(HbVurderinger.builder()
+                        .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                        .medVilkårResultat(vilkårResultat)
+                        .medAktsomhetResultat(aktsomhet)
+                        .medSærligeGrunner(sg, null, fritekstSærligeGrunnerAnnet)
+                        .build())
+                .medKravgrunnlag(HbKravgrunnlag.builder()
+                        .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
+                        .build())
+                .medResultat(HbResultat.builder()
+                        .medTilbakekrevesBeløp(BigDecimal.valueOf(reduksjon ? 500 : 1000))
+                        .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(reduksjon ? 400 : 800))
+                        .medRenterBeløp(BigDecimal.ZERO)
+                        .build())
+                .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
+                .build();
     }
 
     private HbVedtaksbrevFelles lagFellesdel(Språkkode språkkode) {
         return HbVedtaksbrevFelles.builder()
-            .medSak(HbSak.build()
-                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-                .medErFødsel(true)
-                .medAntallBarn(1)
-                .build())
-            .medVedtakResultat(HbTotalresultat.builder()
-                .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
-                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
-                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
-                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(900))
-                .medTotaltRentebeløp(BigDecimal.valueOf(100))
-                .build())
-            .medLovhjemmelVedtak("foo")
-            .medVarsel(HbVarsel.builder()
-                .medVarsletBeløp(BigDecimal.valueOf(1000))
-                .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .medKlagefristUker(4)
-                .build())
-            .medSøker(HbPerson.builder()
-                .medNavn("Søker Søkersen")
-                .medErGift(true)
-                .build())
-            .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
-            .build();
+                .medSak(HbSak.build()
+                        .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                        .medErFødsel(true)
+                        .medAntallBarn(1)
+                        .build())
+                .medVedtakResultat(HbTotalresultat.builder()
+                        .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+                        .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+                        .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
+                        .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(900))
+                        .medTotaltRentebeløp(BigDecimal.valueOf(100))
+                        .build())
+                .medLovhjemmelVedtak("foo")
+                .medVarsel(HbVarsel.builder()
+                        .medVarsletBeløp(BigDecimal.valueOf(1000))
+                        .medVarsletDato(LocalDate.of(2020, 4, 4))
+                        .build())
+                .medKonfigurasjon(HbKonfigurasjon.builder()
+                        .medKlagefristUker(4)
+                        .build())
+                .medSøker(HbPerson.builder()
+                        .medNavn("Søker Søkersen")
+                        .medErGift(true)
+                        .build())
+                .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
+                .build();
     }
 
     private String prettyprint(String s, String overskrift) {
         return s.replace("_Er det særlige grunner til å redusere beløpet?", overskrift)
-            .replace("_Er det særlege grunnar til å redusere beløpet?", overskrift)
-            .replace(" 500\u00A0kroner", " <kravbeløp> kroner")
-            .replaceAll("\\[", "[ ")
-            .replaceAll("]", " ]");
+                .replace("_Er det særlege grunnar til å redusere beløpet?", overskrift)
+                .replace(" 500\u00A0kroner", " <kravbeløp> kroner")
+                .replaceAll("\\[", "[ ")
+                .replaceAll("]", " ]");
     }
 }

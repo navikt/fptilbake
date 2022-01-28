@@ -22,7 +22,7 @@ public enum SivilstandType implements Kodeverdi {
     GJENLEVENDE_PARTNER("GJPA"),
     GIFT_ADSKILT("GLAD"),
     UOPPGITT("NULL"),
-    REGISTRERT_PARTNER ("REPA"),
+    REGISTRERT_PARTNER("REPA"),
     SAMBOER("SAMB"),
     SEPARERT_PARTNER("SEPA"),
     SEPARERT("SEPR"),

@@ -46,58 +46,58 @@ public class TekstformatererVedtaksbrevIBiterTest {
     @Test
     public void skal_generere_brev_delt_i_avsnitt_og_underavsnitt() {
         HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
-            .medSak(HbSak.build()
-                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-                .medErFødsel(true)
-                .medAntallBarn(2)
-                .build())
-            .medBehandling(HbBehandling.builder()
-                .medErRevurdering(false)
-                .build())
-            .medVedtakResultat(HbTotalresultat.builder()
-                .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
-                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(23002))
-                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
-                .medTotaltRentebeløp(BigDecimal.ZERO)
-                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(23002))
-                .build())
-            .medLovhjemmelVedtak("Folketrygdloven § 22-15")
-            .medVarsel(HbVarsel.builder()
-                .medVarsletBeløp(BigDecimal.valueOf(33001))
-                .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
-            .build();
+                .medSak(HbSak.build()
+                        .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                        .medErFødsel(true)
+                        .medAntallBarn(2)
+                        .build())
+                .medBehandling(HbBehandling.builder()
+                        .medErRevurdering(false)
+                        .build())
+                .medVedtakResultat(HbTotalresultat.builder()
+                        .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
+                        .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(23002))
+                        .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
+                        .medTotaltRentebeløp(BigDecimal.ZERO)
+                        .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(23002))
+                        .build())
+                .medLovhjemmelVedtak("Folketrygdloven § 22-15")
+                .medVarsel(HbVarsel.builder()
+                        .medVarsletBeløp(BigDecimal.valueOf(33001))
+                        .medVarsletDato(LocalDate.of(2020, 4, 4))
+                        .build())
+                .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
+                .build();
         List<HbVedtaksbrevPeriode> perioder = List.of(
-            HbVedtaksbrevPeriode.builder()
-                .medPeriode(januar)
-                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
-                .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
-                .medVurderinger(HbVurderinger.builder()
-                    .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                    .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
-                    .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
-                    .medFritekstVilkår("Du er heldig som slapp å betale alt!")
-                    .medSærligeGrunner(List.of(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
-                    .build())
-                .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(20002))
-                .build(),
-            HbVedtaksbrevPeriode.builder()
-                .medPeriode(februar)
-                .medVurderinger(HbVurderinger.builder()
-                    .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                    .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
-                    .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
-                    .medSærligeGrunner(List.of(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP), null, null)
-                    .build())
-                .medFakta(HendelseType.ØKONOMI_FEIL, HendelseUnderType.DOBBELTUTBETALING)
-                .medKravgrunnlag(HbKravgrunnlag.builder()
-                    .medFeilutbetaltBeløp(BigDecimal.valueOf(3000))
-                    .medRiktigBeløp(BigDecimal.valueOf(3000))
-                    .medUtbetaltBeløp(BigDecimal.valueOf(6000))
-                    .build())
-                .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(3000))
-                .build()
+                HbVedtaksbrevPeriode.builder()
+                        .medPeriode(januar)
+                        .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
+                        .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
+                        .medVurderinger(HbVurderinger.builder()
+                                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                                .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
+                                .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
+                                .medFritekstVilkår("Du er heldig som slapp å betale alt!")
+                                .medSærligeGrunner(List.of(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
+                                .build())
+                        .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(20002))
+                        .build(),
+                HbVedtaksbrevPeriode.builder()
+                        .medPeriode(februar)
+                        .medVurderinger(HbVurderinger.builder()
+                                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                                .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
+                                .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
+                                .medSærligeGrunner(List.of(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP), null, null)
+                                .build())
+                        .medFakta(HendelseType.ØKONOMI_FEIL, HendelseUnderType.DOBBELTUTBETALING)
+                        .medKravgrunnlag(HbKravgrunnlag.builder()
+                                .medFeilutbetaltBeløp(BigDecimal.valueOf(3000))
+                                .medRiktigBeløp(BigDecimal.valueOf(3000))
+                                .medUtbetaltBeløp(BigDecimal.valueOf(6000))
+                                .build())
+                        .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(3000))
+                        .build()
         );
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
@@ -108,36 +108,36 @@ public class TekstformatererVedtaksbrevIBiterTest {
     @Test
     public void skal_generere_tekst_for_faktaperiode() {
         HbVedtaksbrevFelles felles = lagTestBuilder()
-            .medSak(HbSak.build()
-                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-                .medErFødsel(true)
-                .medAntallBarn(2)
-                .build())
-            .medVedtakResultat(HbTotalresultat.builder()
-                .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
-                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(23002))
-                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
-                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(23002))
-                .medTotaltRentebeløp(BigDecimal.ZERO)
-                .build())
-            .medLovhjemmelVedtak("foo")
-            .medVarsel(HbVarsel.builder()
-                .medVarsletBeløp(BigDecimal.valueOf(33001))
-                .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .build();
+                .medSak(HbSak.build()
+                        .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                        .medErFødsel(true)
+                        .medAntallBarn(2)
+                        .build())
+                .medVedtakResultat(HbTotalresultat.builder()
+                        .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
+                        .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(23002))
+                        .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
+                        .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(23002))
+                        .medTotaltRentebeløp(BigDecimal.ZERO)
+                        .build())
+                .medLovhjemmelVedtak("foo")
+                .medVarsel(HbVarsel.builder()
+                        .medVarsletBeløp(BigDecimal.valueOf(33001))
+                        .medVarsletDato(LocalDate.of(2020, 4, 4))
+                        .build())
+                .build();
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
-            .medPeriode(januar)
-            .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
-            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
-            .medVurderinger(HbVurderinger.builder()
-                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
-                .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
-                .medSærligeGrunner(List.of(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
-                .build())
-            .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(20002))
-            .build();
+                .medPeriode(januar)
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
+                .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
+                .medVurderinger(HbVurderinger.builder()
+                        .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                        .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
+                        .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
+                        .medSærligeGrunner(List.of(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
+                        .build())
+                .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(20002))
+                .build();
         HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
 
         String generertTekst = TekstformatererVedtaksbrev.lagFaktaTekst(data);
@@ -146,49 +146,49 @@ public class TekstformatererVedtaksbrevIBiterTest {
 
     private HbVedtaksbrevFelles.Builder lagTestBuilder() {
         return HbVedtaksbrevFelles.builder()
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .medKlagefristUker(4)
-                .build())
-            .medSøker(HbPerson.builder()
-                .medNavn("Søker Søkersen")
-                .medDødsdato(LocalDate.of(2018, 3, 1))
-                .medErGift(true)
-                .build());
+                .medKonfigurasjon(HbKonfigurasjon.builder()
+                        .medKlagefristUker(4)
+                        .build())
+                .medSøker(HbPerson.builder()
+                        .medNavn("Søker Søkersen")
+                        .medDødsdato(LocalDate.of(2018, 3, 1))
+                        .medErGift(true)
+                        .build());
     }
 
     @Test
     public void skal_si_at_du_ikke_trenger_betale_tilbake_når_det_er_god_tro_og_beløp_ikke_er_i_behold() {
         HbVedtaksbrevFelles felles = lagTestBuilder()
-            .medSak(HbSak.build()
-                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-                .medErFødsel(true)
-                .medAntallBarn(1)
-                .build())
-            .medVedtakResultat(HbTotalresultat.builder()
-                .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
-                .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
-                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
-                .medTotaltRentebeløp(BigDecimal.ZERO)
-                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.ZERO)
-                .build())
-            .medLovhjemmelVedtak("foo")
-            .medVarsel(HbVarsel.builder()
-                .medVarsletBeløp(BigDecimal.valueOf(1000))
-                .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .build();
+                .medSak(HbSak.build()
+                        .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                        .medErFødsel(true)
+                        .medAntallBarn(1)
+                        .build())
+                .medVedtakResultat(HbTotalresultat.builder()
+                        .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
+                        .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
+                        .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
+                        .medTotaltRentebeløp(BigDecimal.ZERO)
+                        .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.ZERO)
+                        .build())
+                .medLovhjemmelVedtak("foo")
+                .medVarsel(HbVarsel.builder()
+                        .medVarsletBeløp(BigDecimal.valueOf(1000))
+                        .medVarsletDato(LocalDate.of(2020, 4, 4))
+                        .build())
+                .build();
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
-            .medPeriode(januar)
-            .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
-            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
-            .medVurderinger(HbVurderinger.builder()
-                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                .medVilkårResultat(VilkårResultat.GOD_TRO)
-                .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
-                .medBeløpIBehold(BigDecimal.ZERO)
-                .build())
-            .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(0))
-            .build();
+                .medPeriode(januar)
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
+                .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
+                .medVurderinger(HbVurderinger.builder()
+                        .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                        .medVilkårResultat(VilkårResultat.GOD_TRO)
+                        .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
+                        .medBeløpIBehold(BigDecimal.ZERO)
+                        .build())
+                .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(0))
+                .build();
         HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
 
         String generertTekst = TekstformatererVedtaksbrev.lagVilkårTekst(data);
@@ -198,40 +198,40 @@ public class TekstformatererVedtaksbrevIBiterTest {
     @Test
     public void skal_ha_riktig_tekst_for_særlige_grunner_når_det_ikke_er_reduksjon_av_beløp() {
         HbVedtaksbrevFelles felles = lagTestBuilder()
-            .medSak(HbSak.build()
-                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-                .medErFødsel(true)
-                .medAntallBarn(1)
-                .build())
-            .medVedtakResultat(HbTotalresultat.builder()
-                .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
-                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
-                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
-                .medTotaltRentebeløp(BigDecimal.valueOf(100))
-                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(1100))
-                .build())
-            .medLovhjemmelVedtak("foo")
-            .medVarsel(HbVarsel.builder()
-                .medVarsletBeløp(BigDecimal.valueOf(1000))
-                .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .build();
+                .medSak(HbSak.build()
+                        .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                        .medErFødsel(true)
+                        .medAntallBarn(1)
+                        .build())
+                .medVedtakResultat(HbTotalresultat.builder()
+                        .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+                        .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+                        .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
+                        .medTotaltRentebeløp(BigDecimal.valueOf(100))
+                        .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(1100))
+                        .build())
+                .medLovhjemmelVedtak("foo")
+                .medVarsel(HbVarsel.builder()
+                        .medVarsletBeløp(BigDecimal.valueOf(1000))
+                        .medVarsletDato(LocalDate.of(2020, 4, 4))
+                        .build())
+                .build();
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
-            .medPeriode(januar)
-            .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
-            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
-            .medVurderinger(HbVurderinger.builder()
-                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
-                .medAktsomhetResultat(Aktsomhet.GROVT_UAKTSOM)
-                .medSærligeGrunner(Collections.singletonList(SærligGrunn.GRAD_AV_UAKTSOMHET), null, null)
-                .build())
-            .medResultat(HbResultat.builder()
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(1000))
-                .medRenterBeløp(BigDecimal.valueOf(100))
-                .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(1000))
-                .build())
-            .build();
+                .medPeriode(januar)
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
+                .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
+                .medVurderinger(HbVurderinger.builder()
+                        .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                        .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                        .medAktsomhetResultat(Aktsomhet.GROVT_UAKTSOM)
+                        .medSærligeGrunner(Collections.singletonList(SærligGrunn.GRAD_AV_UAKTSOMHET), null, null)
+                        .build())
+                .medResultat(HbResultat.builder()
+                        .medTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+                        .medRenterBeløp(BigDecimal.valueOf(100))
+                        .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(1000))
+                        .build())
+                .build();
 
         String generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
         assertThat(generertTekst).contains("Vi har vurdert om det er grunner til å redusere beløpet. Vi har lagt vekt på at du ikke har gitt oss alle nødvendige opplysninger tidsnok til at vi kunne unngå feilutbetalingen. Derfor må du betale tilbake hele beløpet.");
@@ -240,46 +240,46 @@ public class TekstformatererVedtaksbrevIBiterTest {
     @Test
     public void skal_ha_riktig_tekst_for_særlige_grunner_når_det_er_reduksjon_av_beløp() {
         HbVedtaksbrevFelles felles = lagTestBuilder()
-            .medSpråkkode(Språkkode.nn)
-            .medSak(HbSak.build()
-                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-                .medErFødsel(true)
-                .medAntallBarn(1)
-                .build())
-            .medVedtakResultat(HbTotalresultat.builder()
-                .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
-                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
-                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
-                .medTotaltRentebeløp(BigDecimal.valueOf(100))
-                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(1100))
-                .build())
-            .medLovhjemmelVedtak("foo")
-            .medVarsel(HbVarsel.builder()
-                .medVarsletBeløp(BigDecimal.valueOf(1000))
-                .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .build();
+                .medSpråkkode(Språkkode.nn)
+                .medSak(HbSak.build()
+                        .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                        .medErFødsel(true)
+                        .medAntallBarn(1)
+                        .build())
+                .medVedtakResultat(HbTotalresultat.builder()
+                        .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+                        .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+                        .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
+                        .medTotaltRentebeløp(BigDecimal.valueOf(100))
+                        .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(1100))
+                        .build())
+                .medLovhjemmelVedtak("foo")
+                .medVarsel(HbVarsel.builder()
+                        .medVarsletBeløp(BigDecimal.valueOf(1000))
+                        .medVarsletDato(LocalDate.of(2020, 4, 4))
+                        .build())
+                .build();
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
-            .medPeriode(januar)
-            .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
-            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
-            .medVurderinger(HbVurderinger.builder()
-                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
-                .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
-                .medSærligeGrunner(Collections.singletonList(SærligGrunn.GRAD_AV_UAKTSOMHET), null, null)
-                .build())
-            .medResultat(HbResultat.builder()
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(500))
-                .medRenterBeløp(BigDecimal.valueOf(0))
-                .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(500))
-                .build())
-            .build();
+                .medPeriode(januar)
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
+                .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
+                .medVurderinger(HbVurderinger.builder()
+                        .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                        .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                        .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
+                        .medSærligeGrunner(Collections.singletonList(SærligGrunn.GRAD_AV_UAKTSOMHET), null, null)
+                        .build())
+                .medResultat(HbResultat.builder()
+                        .medTilbakekrevesBeløp(BigDecimal.valueOf(500))
+                        .medRenterBeløp(BigDecimal.valueOf(0))
+                        .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(500))
+                        .build())
+                .build();
 
         String generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
         assertThat(generertTekst)
-            .contains("Vi har lagt vekt på at du ikkje har gitt oss alle nødvendige opplysningar tidsnok til at vi kunne unngå feilutbetalinga. Vi vurderer likevel at aktløysa di har vore så lita at vi har redusert beløpet du må betale tilbake.")
-            .contains("Du må betale 500 kroner");
+                .contains("Vi har lagt vekt på at du ikkje har gitt oss alle nødvendige opplysningar tidsnok til at vi kunne unngå feilutbetalinga. Vi vurderer likevel at aktløysa di har vore så lita at vi har redusert beløpet du må betale tilbake.")
+                .contains("Du må betale 500 kroner");
     }
 
     @Test
@@ -344,8 +344,8 @@ public class TekstformatererVedtaksbrevIBiterTest {
     public void skal_parse_fritekstfelt_med_eksisterende_fritekst() {
         Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
         Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
-                + VedtaksbrevFritekst.markerValgfriFritekst("fritekst linje 1\n\nfritekst linje2")
-            , avsnittbuilder, null).build();
+                        + VedtaksbrevFritekst.markerValgfriFritekst("fritekst linje 1\n\nfritekst linje2")
+                , avsnittbuilder, null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
         List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
         //assertThat(underavsnitt).hasSize(1);
@@ -359,10 +359,10 @@ public class TekstformatererVedtaksbrevIBiterTest {
     public void skal_skille_mellom_påkrevet_og_valgfritt_fritekstfelt() {
         Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
         Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
-                + VedtaksbrevFritekst.markerPåkrevetFritekst(null, null)
-                + "\n_underoverskrift 2\n"
-                + VedtaksbrevFritekst.markerValgfriFritekst(null)
-            , avsnittbuilder, null).build();
+                        + VedtaksbrevFritekst.markerPåkrevetFritekst(null, null)
+                        + "\n_underoverskrift 2\n"
+                        + VedtaksbrevFritekst.markerValgfriFritekst(null)
+                , avsnittbuilder, null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
         List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
         assertThat(underavsnitt).hasSize(2);
@@ -383,11 +383,11 @@ public class TekstformatererVedtaksbrevIBiterTest {
     public void skal_utlede_underavsnittstype_fra_fritekstmarkering_slik_at_det_er_mulig_å_skille_mellom_særlige_grunner_og_andre_særlige_grunner() {
         Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
         Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
-                + VedtaksbrevFritekst.markerValgfriFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER)
-                + "\n_underoverskrift 2\n"
-                + "brødtekst " + VedtaksbrevFritekst.markerValgfriFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET)
-                + "\n_underoverskrift 3\n"
-            , avsnittbuilder, null).build();
+                        + VedtaksbrevFritekst.markerValgfriFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER)
+                        + "\n_underoverskrift 2\n"
+                        + "brødtekst " + VedtaksbrevFritekst.markerValgfriFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET)
+                        + "\n_underoverskrift 3\n"
+                , avsnittbuilder, null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
         List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
         assertThat(underavsnitt).hasSize(3);

@@ -52,7 +52,7 @@ public class SftpKonfig {
         if (keyFileUrl != null) {
             if (keyFilePassphrase != null) {
                 jSch.addIdentity(keyFileUrl, keyFilePassphrase);
-            }  else {
+            } else {
                 jSch.addIdentity(keyFileUrl);
             }
         } else if (isKeyFileByParams) {

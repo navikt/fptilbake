@@ -58,7 +58,7 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, null);
         dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, taskTjeneste, historikkinnslagTjeneste,
-            mockManueltVarselBrevTjeneste, mockInnhentDokumentasjonbrevTjeneste);
+                mockManueltVarselBrevTjeneste, mockInnhentDokumentasjonbrevTjeneste);
     }
 
     @Test
@@ -125,7 +125,7 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
     @Test
     public void skal_ikke_kunne_bestille_varselbrev_når_grunnlag_ikke_finnes() {
         assertThatThrownBy(() -> dokumentBehandlingTjeneste.bestillBrev(behandling.getId(), DokumentMalType.VARSEL_DOK, "Bestilt varselbrev"))
-            .hasMessageContaining("FPT-612900");
+                .hasMessageContaining("FPT-612900");
     }
 
     @Test
@@ -148,40 +148,40 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
     @Test
     public void skal_ikke_kunne_bestille_innhent_dokumentasjonbrev_når_grunnlag_ikke_finnes() {
         assertThatThrownBy(() -> dokumentBehandlingTjeneste.bestillBrev(behandling.getId(), DokumentMalType.INNHENT_DOK, "Bestilt innhent dokumentasjon"))
-            .hasMessageContaining("FPT-612901");
+                .hasMessageContaining("FPT-612901");
     }
 
     private Long opprettOgLagreKravgrunnlagPåBehandling() {
         Kravgrunnlag431 kravgrunnlag431 = Kravgrunnlag431.builder().medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
-            .medVedtakId(12342l)
-            .medEksternKravgrunnlagId("1234")
-            .medKravStatusKode(KravStatusKode.NYTT)
-            .medFagSystemId("1234")
-            .medUtbetalesTilId("11323432111")
-            .medUtbetIdType(GjelderType.PERSON)
-            .medGjelderVedtakId("11323432111")
-            .medGjelderType(GjelderType.PERSON)
-            .medAnsvarligEnhet("enhet")
-            .medBostedEnhet("enhet")
-            .medBehandlendeEnhet("enhet")
-            .medFeltKontroll("132323")
-            .medSaksBehId("23454334").build();
+                .medVedtakId(12342l)
+                .medEksternKravgrunnlagId("1234")
+                .medKravStatusKode(KravStatusKode.NYTT)
+                .medFagSystemId("1234")
+                .medUtbetalesTilId("11323432111")
+                .medUtbetIdType(GjelderType.PERSON)
+                .medGjelderVedtakId("11323432111")
+                .medGjelderType(GjelderType.PERSON)
+                .medAnsvarligEnhet("enhet")
+                .medBostedEnhet("enhet")
+                .medBehandlendeEnhet("enhet")
+                .medFeltKontroll("132323")
+                .medSaksBehId("23454334").build();
         KravgrunnlagPeriode432 periode = KravgrunnlagPeriode432.builder()
-            .medPeriode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 31))
-            .medKravgrunnlag431(kravgrunnlag431).build();
+                .medPeriode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 31))
+                .medKravgrunnlag431(kravgrunnlag431).build();
         KravgrunnlagBelop433 ytelBeløp = KravgrunnlagBelop433.builder().medKlasseType(KlasseType.YTEL)
-            .medKlasseKode(KlasseKode.FPADATORD)
-            .medNyBelop(BigDecimal.ZERO)
-            .medTilbakekrevesBelop(BigDecimal.valueOf(1000))
-            .medOpprUtbetBelop(BigDecimal.valueOf(1000))
-            .medKravgrunnlagPeriode432(periode).build();
+                .medKlasseKode(KlasseKode.FPADATORD)
+                .medNyBelop(BigDecimal.ZERO)
+                .medTilbakekrevesBelop(BigDecimal.valueOf(1000))
+                .medOpprUtbetBelop(BigDecimal.valueOf(1000))
+                .medKravgrunnlagPeriode432(periode).build();
 
         KravgrunnlagBelop433 feilBeløp = KravgrunnlagBelop433.builder().medKlasseType(KlasseType.FEIL)
-            .medKlasseKode(KlasseKode.FPADATORD)
-            .medNyBelop(BigDecimal.valueOf(1000))
-            .medTilbakekrevesBelop(BigDecimal.ZERO)
-            .medOpprUtbetBelop(BigDecimal.ZERO)
-            .medKravgrunnlagPeriode432(periode).build();
+                .medKlasseKode(KlasseKode.FPADATORD)
+                .medNyBelop(BigDecimal.valueOf(1000))
+                .medTilbakekrevesBelop(BigDecimal.ZERO)
+                .medOpprUtbetBelop(BigDecimal.ZERO)
+                .medKravgrunnlagPeriode432(periode).build();
         periode.leggTilBeløp(ytelBeløp);
         periode.leggTilBeløp(feilBeløp);
         kravgrunnlag431.leggTilPeriode(periode);
@@ -197,11 +197,11 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
 
     private void lagreInfoOmVarselbrev(Long behandlingId, String journalpostId, String dokumentId) {
         BrevSporing brevSporing = new BrevSporing.Builder()
-            .medBehandlingId(behandlingId)
-            .medDokumentId(dokumentId)
-            .medJournalpostId(new JournalpostId(journalpostId))
-            .medBrevType(BrevType.VARSEL_BREV)
-            .build();
+                .medBehandlingId(behandlingId)
+                .medDokumentId(dokumentId)
+                .medJournalpostId(new JournalpostId(journalpostId))
+                .medBrevType(BrevType.VARSEL_BREV)
+                .build();
         brevSporingRepository.lagre(brevSporing);
         entityManager.flush();
     }

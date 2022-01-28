@@ -40,16 +40,16 @@ public class HistorikkRepository {
 
     public List<Historikkinnslag> hentHistorikkForSaksnummer(Saksnummer saksnummer) {
         return entityManager.createQuery(
-            "select h from Historikkinnslag h inner join Fagsak f On f.id = h.fagsakId where f.saksnummer= :saksnummer",
-            Historikkinnslag.class)
-            .setParameter("saksnummer", saksnummer)
-            .getResultList();
+                        "select h from Historikkinnslag h inner join Fagsak f On f.id = h.fagsakId where f.saksnummer= :saksnummer",
+                        Historikkinnslag.class)
+                .setParameter("saksnummer", saksnummer)
+                .getResultList();
     }
 
     private Long getFagsakId(long behandlingId) {
         return entityManager.createQuery("select b.fagsak.id from Behandling b where b.id = :behandlingId", Long.class) //$NON-NLS-1$
-            .setParameter("behandlingId", behandlingId) // NOSONAR
-            .getSingleResult();
+                .setParameter("behandlingId", behandlingId) // NOSONAR
+                .getSingleResult();
     }
 
     public List<Historikkinnslag> hentHistorikk(Long behandlingId) {
@@ -57,11 +57,11 @@ public class HistorikkRepository {
         Long fagsakId = getFagsakId(behandlingId);
 
         return entityManager.createQuery(
-            "select h from Historikkinnslag h where (h.behandlingId = :behandlingId OR h.behandlingId = NULL) AND h.fagsakId = :fagsakId ", //$NON-NLS-1$
-            Historikkinnslag.class)
-            .setParameter("fagsakId", fagsakId)// NOSONAR //$NON-NLS-1$
-            .setParameter("behandlingId", behandlingId) //$NON-NLS-1$
-            .getResultList();
+                        "select h from Historikkinnslag h where (h.behandlingId = :behandlingId OR h.behandlingId = NULL) AND h.fagsakId = :fagsakId ", //$NON-NLS-1$
+                        Historikkinnslag.class)
+                .setParameter("fagsakId", fagsakId)// NOSONAR //$NON-NLS-1$
+                .setParameter("behandlingId", behandlingId) //$NON-NLS-1$
+                .getResultList();
     }
 
 

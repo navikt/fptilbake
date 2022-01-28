@@ -77,17 +77,17 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
 
         BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager,
-            new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
+                new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
 
         automatiskSaksbehandlingProsessTask = new AutomatiskSaksbehandlingProsessTask(behandlingRepository,
-            behandlingskontrollTjeneste);
+                behandlingskontrollTjeneste);
         entityManager.setFlushMode(FlushModeType.AUTO);
         behandling = scenarioSimple.medBehandlingType(BehandlingType.TILBAKEKREVING)
-            .medDefaultKravgrunnlag()
-            .lagre(repositoryProvider);
+                .medDefaultKravgrunnlag()
+                .lagre(repositoryProvider);
         behandlingId = behandling.getId();
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING,
-            BehandlingStegStatus.UTGANG, BehandlingStegStatus.UTGANG);
+                BehandlingStegStatus.UTGANG, BehandlingStegStatus.UTGANG);
 
     }
 
@@ -103,69 +103,69 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
         var prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker.size()).isEqualTo(3);
         List<TaskType> prosessTaskNavn = prosessTasker.stream()
-            .map(ProsessTaskData::taskType)
-            .collect(Collectors.toList());
+                .map(ProsessTaskData::taskType)
+                .collect(Collectors.toList());
         assertThat(prosessTaskNavn.contains(TaskType.forProsessTask(SendVedtaksbrevTask.class))).isFalse();
         assertThat(prosessTaskNavn.contains(TaskType.forProsessTask(AvsluttBehandlingTask.class))).isTrue();
         assertThat(prosessTaskNavn.contains(TaskType.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class))).isTrue();
         assertThat(prosessTaskNavn.contains(TaskType.forProsessTask(SendVedtakHendelserTilDvhTask.class))).isTrue();
 
         Optional<FaktaFeilutbetaling> faktaFeilutbetalingData = repositoryProvider.getFaktaFeilutbetalingRepository()
-            .finnFaktaOmFeilutbetaling(behandlingId);
+                .finnFaktaOmFeilutbetaling(behandlingId);
         assertThat(faktaFeilutbetalingData).isPresent();
         FaktaFeilutbetaling faktaFeilutbetaling = faktaFeilutbetalingData.get();
         assertThat(faktaFeilutbetaling.getBegrunnelse()).isEqualTo(
-            AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE);
+                AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE);
         assertThat(faktaFeilutbetaling.getFeilutbetaltPerioder()
-            .stream()
-            .allMatch(faktaFeilutbetalingPeriode -> HendelseType.FP_ANNET_HENDELSE_TYPE.equals(
-                faktaFeilutbetalingPeriode.getHendelseType()))).isTrue();
+                .stream()
+                .allMatch(faktaFeilutbetalingPeriode -> HendelseType.FP_ANNET_HENDELSE_TYPE.equals(
+                        faktaFeilutbetalingPeriode.getHendelseType()))).isTrue();
         assertThat(faktaFeilutbetaling.getFeilutbetaltPerioder()
-            .stream()
-            .allMatch(faktaFeilutbetalingPeriode -> HendelseUnderType.ANNET_FRITEKST.equals(
-                faktaFeilutbetalingPeriode.getHendelseUndertype()))).isTrue();
+                .stream()
+                .allMatch(faktaFeilutbetalingPeriode -> HendelseUnderType.ANNET_FRITEKST.equals(
+                        faktaFeilutbetalingPeriode.getHendelseUndertype()))).isTrue();
 
         Optional<VurdertForeldelse> vurdertForeldelseData = repositoryProvider.getVurdertForeldelseRepository()
-            .finnVurdertForeldelse(behandlingId);
+                .finnVurdertForeldelse(behandlingId);
         assertThat(vurdertForeldelseData).isPresent();
         VurdertForeldelse vurdertForeldelse = vurdertForeldelseData.get();
         assertThat(vurdertForeldelse.getVurdertForeldelsePerioder()
-            .stream()
-            .allMatch(vurdertForeldelsePeriode -> ForeldelseVurderingType.IKKE_FORELDET.equals(
-                vurdertForeldelsePeriode.getForeldelseVurderingType()))).isTrue();
+                .stream()
+                .allMatch(vurdertForeldelsePeriode -> ForeldelseVurderingType.IKKE_FORELDET.equals(
+                        vurdertForeldelsePeriode.getForeldelseVurderingType()))).isTrue();
         assertThat(vurdertForeldelse.getVurdertForeldelsePerioder()
-            .stream()
-            .allMatch(
-                vurdertForeldelsePeriode -> AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE.equals(
-                    vurdertForeldelsePeriode.getBegrunnelse()))).isTrue();
+                .stream()
+                .allMatch(
+                        vurdertForeldelsePeriode -> AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE.equals(
+                                vurdertForeldelsePeriode.getBegrunnelse()))).isTrue();
 
         Optional<VilkårVurderingEntitet> vilkårsVurderingData = repositoryProvider.getVilkårsvurderingRepository()
-            .finnVilkårsvurdering(behandlingId);
+                .finnVilkårsvurdering(behandlingId);
         assertThat(vilkårsVurderingData).isPresent();
         VilkårVurderingEntitet vilkårVurderingEntitet = vilkårsVurderingData.get();
         assertThat(vilkårVurderingEntitet.getPerioder()
-            .stream()
-            .allMatch(periode -> VilkårResultat.FORSTO_BURDE_FORSTÅTT.equals(periode.getVilkårResultat()))).isTrue();
+                .stream()
+                .allMatch(periode -> VilkårResultat.FORSTO_BURDE_FORSTÅTT.equals(periode.getVilkårResultat()))).isTrue();
         assertThat(vilkårVurderingEntitet.getPerioder()
-            .stream()
-            .allMatch(periode -> Aktsomhet.SIMPEL_UAKTSOM.equals(periode.getAktsomhetResultat()))).isTrue();
+                .stream()
+                .allMatch(periode -> Aktsomhet.SIMPEL_UAKTSOM.equals(periode.getAktsomhetResultat()))).isTrue();
         assertThat(vilkårVurderingEntitet.getPerioder()
-            .stream()
-            .allMatch(periode -> AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE.equals(
-                periode.getBegrunnelseAktsomhet()))).isTrue();
+                .stream()
+                .allMatch(periode -> AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE.equals(
+                        periode.getBegrunnelseAktsomhet()))).isTrue();
         assertThat(vilkårVurderingEntitet.getPerioder()
-            .stream()
-            .allMatch(periode -> AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE.equals(
-                periode.getBegrunnelse()))).isTrue();
+                .stream()
+                .allMatch(periode -> AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE.equals(
+                        periode.getBegrunnelse()))).isTrue();
         assertThat(vilkårVurderingEntitet.getPerioder()
-            .stream()
-            .allMatch(VilkårVurderingPeriodeEntitet::tilbakekrevesSmåbeløp)).isFalse();
+                .stream()
+                .allMatch(VilkårVurderingPeriodeEntitet::tilbakekrevesSmåbeløp)).isFalse();
 
         List<Historikkinnslag> historikkinnslager = repositoryProvider.getHistorikkRepository()
-            .hentHistorikk(behandlingId);
+                .hentHistorikk(behandlingId);
         assertThat(historikkinnslager.stream()
-            .allMatch(
-                historikkinnslag -> HistorikkAktør.VEDTAKSLØSNINGEN.equals(historikkinnslag.getAktør()))).isTrue();
+                .allMatch(
+                        historikkinnslag -> HistorikkAktør.VEDTAKSLØSNINGEN.equals(historikkinnslag.getAktør()))).isTrue();
 
         assertThat(totrinnRepository.hentTotrinngrunnlag(behandling)).isEmpty();
     }
@@ -173,8 +173,8 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
     @Test
     public void skal_ikke_saksbehandle_automatisk_når_behandling_er_på_vent() {
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling,
-            AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.FAKTA_FEILUTBETALING,
-            LocalDateTime.now().plusDays(2), Venteårsak.AVVENTER_DOKUMENTASJON);
+                AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.FAKTA_FEILUTBETALING,
+                LocalDateTime.now().plusDays(2), Venteårsak.AVVENTER_DOKUMENTASJON);
         automatiskSaksbehandlingProsessTask.doTask(lagProsesTaskData());
         assertThat(behandling.isAutomatiskSaksbehandlet()).isFalse();
         assertThat(behandling.getStatus()).isEqualByComparingTo(BehandlingStatus.UTREDES);

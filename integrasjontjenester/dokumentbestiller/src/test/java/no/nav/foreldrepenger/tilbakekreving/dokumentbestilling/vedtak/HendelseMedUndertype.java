@@ -32,7 +32,7 @@ public class HendelseMedUndertype {
         }
         HendelseMedUndertype that = (HendelseMedUndertype) o;
         return Objects.equals(hendelseType, that.hendelseType) &&
-            Objects.equals(hendelseUnderType, that.hendelseUnderType);
+                Objects.equals(hendelseUnderType, that.hendelseUnderType);
     }
 
     @Override
@@ -43,8 +43,8 @@ public class HendelseMedUndertype {
     @Override
     public String toString() {
         return "HendelseMedUndertype{" +
-            "type=" + hendelseType.getKode() +
-            ", underType=" + hendelseUnderType.getKode() +
-            '}';
+                "type=" + hendelseType.getKode() +
+                ", underType=" + hendelseUnderType.getKode() +
+                '}';
     }
 }

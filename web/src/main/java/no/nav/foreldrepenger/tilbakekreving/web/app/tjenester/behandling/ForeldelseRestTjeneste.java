@@ -3,9 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,7 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeMedB
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
@@ -82,9 +78,9 @@ public class ForeldelseRestTjeneste {
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     public FeilutbetalingPerioderDto beregnBeløp(@TilpassetAbacAttributt(supplierClass = AbacDataPerioder.class) @NotNull @Valid FeilutbetalingPerioderDto perioderDto) {
         var perioderFraDto = perioderDto.getPerioder()
-            .stream()
-            .map(ForeldelsePeriodeMedBeløpDto::tilPeriode)
-            .collect(Collectors.toList());
+                .stream()
+                .map(ForeldelsePeriodeMedBeløpDto::tilPeriode)
+                .collect(Collectors.toList());
         var behandlingId = perioderDto.getBehandlingId() != null ? perioderDto.getBehandlingId()
                 : behandlingTjeneste.hentBehandlingId(perioderDto.getBehandlingUuid());
         var feilutbetalinger = kravgrunnlagBeregningTjeneste.beregnFeilutbetaltBeløp(behandlingId, perioderFraDto);
@@ -96,7 +92,7 @@ public class ForeldelseRestTjeneste {
 
     private Long hentBehandlingId(BehandlingReferanse behandlingReferanse) {
         return behandlingReferanse.erInternBehandlingId() ? behandlingReferanse.getBehandlingId() : behandlingTjeneste.hentBehandlingId(
-            behandlingReferanse.getBehandlingUuid());
+                behandlingReferanse.getBehandlingUuid());
     }
 
     public static class AbacDataPerioder implements Function<Object, AbacDataAttributter> {

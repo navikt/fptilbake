@@ -23,15 +23,15 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum KravStatusKode implements Kodeverdi {
 
-    ANNULERT("ANNU","Kravgrunnlag annullert"),
-    ANNULLERT_OMG("ANOM","Kravgrunnlag annullert ved omg"),
-    AVSLUTTET("AVSL","Avsluttet kravgrunnlag"),
-    BEHANDLET("BEHA","Kravgrunnlag ferdigbehandlet"),
-    ENDRET("ENDR","Endret kravgrunnlag"),
-    FEIL("FEIL","Feil på kravgrunnlag"),
-    MANUELL("MANU","Manuell behandling"),
-    NYTT("NY","Nytt kravgrunnlag"),
-    SPERRET("SPER","Kravgrunnlag sperret");
+    ANNULERT("ANNU", "Kravgrunnlag annullert"),
+    ANNULLERT_OMG("ANOM", "Kravgrunnlag annullert ved omg"),
+    AVSLUTTET("AVSL", "Avsluttet kravgrunnlag"),
+    BEHANDLET("BEHA", "Kravgrunnlag ferdigbehandlet"),
+    ENDRET("ENDR", "Endret kravgrunnlag"),
+    FEIL("FEIL", "Feil på kravgrunnlag"),
+    MANUELL("MANU", "Manuell behandling"),
+    NYTT("NY", "Nytt kravgrunnlag"),
+    SPERRET("SPER", "Kravgrunnlag sperret");
 
     public static final String KODEVERK = "KRAV_STATUS_KODE";
 
@@ -55,7 +55,7 @@ public enum KravStatusKode implements Kodeverdi {
         this.kode = kode;
     }
 
-    private KravStatusKode(String kode, String navn){
+    private KravStatusKode(String kode, String navn) {
         this.kode = kode;
         this.navn = navn;
     }

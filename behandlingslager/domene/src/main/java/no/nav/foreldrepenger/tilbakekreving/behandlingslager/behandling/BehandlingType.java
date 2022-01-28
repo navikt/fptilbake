@@ -27,8 +27,8 @@ public enum BehandlingType implements Kodeverdi {
 
     public static final String KODEVERK = "BEHANDLING_TYPE";
     private static final Map<String, BehandlingType> TILGJENGELIGE = Map.of(
-        REVURDERING_TILBAKEKREVING.getKode(), REVURDERING_TILBAKEKREVING,
-        TILBAKEKREVING.getKode(), TILBAKEKREVING
+            REVURDERING_TILBAKEKREVING.getKode(), REVURDERING_TILBAKEKREVING,
+            TILBAKEKREVING.getKode(), TILBAKEKREVING
     );
     private static final Map<String, BehandlingType> KODER = new LinkedHashMap<>();
 

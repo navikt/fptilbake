@@ -44,7 +44,7 @@ public class AksjonspunktKontrollRepository {
         } else {
             // nytt aksjonspunkt
             aksjonspunkt = this.leggTilAksjonspunkt(behandling, aksjonspunktDefinisjon, Optional.empty(),
-                Optional.ofNullable(fristTid), Optional.ofNullable(venteårsak), Optional.empty());
+                    Optional.ofNullable(fristTid), Optional.ofNullable(venteårsak), Optional.empty());
         }
         aksjonspunkt.setBehandlingSteg(stegType);
         return aksjonspunkt;
@@ -85,12 +85,12 @@ public class AksjonspunktKontrollRepository {
                                             BehandlingStegType behandlingStegType) {
         Objects.requireNonNull(behandlingStegType, "behandlingStegType");
         return leggTilAksjonspunkt(behandling, aksjonspunktDefinisjon, Optional.ofNullable(behandlingStegType), Optional.empty(), Optional.empty(),
-            Optional.empty());
+                Optional.empty());
     }
 
     public Aksjonspunkt leggTilAksjonspunkt(Behandling behandling, AksjonspunktDefinisjon aksjonspunktDefinisjon) {
         return leggTilAksjonspunkt(behandling, aksjonspunktDefinisjon, Optional.empty(), Optional.empty(), Optional.empty(),
-            Optional.empty());
+                Optional.empty());
     }
 
     public void setReåpnet(Aksjonspunkt aksjonspunkt) {

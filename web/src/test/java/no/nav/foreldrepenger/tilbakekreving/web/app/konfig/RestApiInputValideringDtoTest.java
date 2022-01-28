@@ -90,7 +90,7 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
     }
 
     private static final Set<Class<? extends Object>> ALLOWED_ENUM_ANNOTATIONS = Set.of(JsonProperty.class, JsonValue.class, JsonIgnore.class,
-        Valid.class, Null.class, NotNull.class);
+            Valid.class, Null.class, NotNull.class);
 
     @SuppressWarnings("rawtypes")
     private static final Map<Class, List<List<Class<? extends Annotation>>>> UNNTATT_FRA_VALIDERING = new HashMap<Class, List<List<Class<? extends Annotation>>>>() {
@@ -114,22 +114,22 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
     private static final Map<Class, List<List<Class<? extends Annotation>>>> VALIDERINGSALTERNATIVER = new HashMap<Class, List<List<Class<? extends Annotation>>>>() {
         {
             put(String.class, asList(
-                asList(Pattern.class, Size.class),
-                asList(Pattern.class),
-                singletonList(Digits.class)));
+                    asList(Pattern.class, Size.class),
+                    asList(Pattern.class),
+                    singletonList(Digits.class)));
             put(Long.class, asList(
-                asList(Min.class, Max.class),
-                asList(Digits.class)));
+                    asList(Min.class, Max.class),
+                    asList(Digits.class)));
             put(long.class, asList(
-                asList(Min.class, Max.class),
-                asList(Digits.class)));
+                    asList(Min.class, Max.class),
+                    asList(Digits.class)));
             put(Integer.class, singletonList(
-                asList(Min.class, Max.class)));
+                    asList(Min.class, Max.class)));
             put(int.class, singletonList(
-                asList(Min.class, Max.class)));
+                    asList(Min.class, Max.class)));
             put(BigDecimal.class, asList(
-                asList(Min.class, Max.class, Digits.class),
-                asList(DecimalMin.class, DecimalMax.class, Digits.class)));
+                    asList(Min.class, Max.class, Digits.class),
+                    asList(DecimalMin.class, DecimalMax.class, Digits.class)));
 
             putAll(UNNTATT_FRA_VALIDERING);
         }
@@ -224,7 +224,7 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
                 validerRiktigAnnotert(field); // har konfigurert opp spesifikk validering
             } else if (field.getType().getName().startsWith("java")) {
                 throw new AssertionError(
-                    "Feltet " + field + " har ikke påkrevde annoteringer. Trenger evt. utvidelse av denne testen for å akseptere denne typen.");
+                        "Feltet " + field + " har ikke påkrevde annoteringer. Trenger evt. utvidelse av denne testen for å akseptere denne typen.");
             } else {
                 validerHarValidAnnotering(field);
                 validerRekursivt(besøkteKlasser, field.getType(), forrigeKlasse);
@@ -241,7 +241,7 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
     private static void validerEnum(Field field) {
         validerRiktigAnnotert(field);
         List<Annotation> illegal = List.of(field.getAnnotations()).stream().filter(a -> !ALLOWED_ENUM_ANNOTATIONS.contains(a.annotationType()))
-            .collect(Collectors.toList());
+                .collect(Collectors.toList());
         if (!illegal.isEmpty()) {
             throw new AssertionError("Ugyldige annotasjoner funnet på [" + field + "]: " + illegal);
         }
@@ -309,14 +309,14 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
 
     private static void validerRiktigAnnotertForCollectionsAndMaps(Field field) {
         if (!Properties.class.isAssignableFrom(field.getType())
-            && (Collection.class.isAssignableFrom(field.getType()) || Map.class.isAssignableFrom(field.getType()))) {
+                && (Collection.class.isAssignableFrom(field.getType()) || Map.class.isAssignableFrom(field.getType()))) {
             AnnotatedParameterizedType annType = (AnnotatedParameterizedType) field.getAnnotatedType();
             AnnotatedType[] annotatedTypes = annType.getAnnotatedActualTypeArguments();
             for (AnnotatedType at : List.of(annotatedTypes)) {
                 if (erKodeverk(at.getType())) {
                     if (!at.isAnnotationPresent(ValidKodeverk.class) && !at.isAnnotationPresent(IgnoreKodeverk.class)) {
                         throw new IllegalArgumentException(
-                            "Feltet " + field + " har ikke påkrevd annotering for kodeverk: @" + ValidKodeverk.class.getSimpleName());
+                                "Feltet " + field + " har ikke påkrevd annotering for kodeverk: @" + ValidKodeverk.class.getSimpleName());
                     }
                 }
             }

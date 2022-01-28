@@ -60,7 +60,9 @@ class BehandlingStegModellImpl implements BehandlingStegModell {
         this.behandlingStegType = stegType;
     }
 
-    /** Direkte injisering av {@link BehandlingSteg}. For testing. */
+    /**
+     * Direkte injisering av {@link BehandlingSteg}. For testing.
+     */
     BehandlingStegModellImpl(BehandlingModellImpl behandlingModell, BehandlingSteg steg, BehandlingStegType stegType) {
         Objects.requireNonNull(behandlingModell, "behandlingModell"); //$NON-NLS-1$
         Objects.requireNonNull(steg, "steg"); //$NON-NLS-1$ // NOSONAR
@@ -86,10 +88,10 @@ class BehandlingStegModellImpl implements BehandlingStegModell {
     protected void initSteg() {
         if (steg == null) {
             steg = BehandlingTypeRef.Lookup
-                .find(BehandlingSteg.class, stegInstances, behandlingModell.getBehandlingType())
-                .orElseThrow(() ->  new IllegalStateException(
-                        "Mangler steg definert for stegKode=" + behandlingStegType + " [behandlingType=" //$NON-NLS-1$ //$NON-NLS-2$
-                            + behandlingModell.getBehandlingType() + "]"));
+                    .find(BehandlingSteg.class, stegInstances, behandlingModell.getBehandlingType())
+                    .orElseThrow(() -> new IllegalStateException(
+                            "Mangler steg definert for stegKode=" + behandlingStegType + " [behandlingType=" //$NON-NLS-1$ //$NON-NLS-2$
+                                    + behandlingModell.getBehandlingType() + "]"));
         }
     }
 
@@ -144,9 +146,9 @@ class BehandlingStegModellImpl implements BehandlingStegModell {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "<" + behandlingStegType.getKode() + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "inngangAksjonspunkter=" + inngangAksjonpunkt + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "utgangAksjonspunkter=" + utgangAksjonpunkt + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "impl=" + steg //$NON-NLS-1$
-            + ">"; //$NON-NLS-1$
+                + "inngangAksjonspunkter=" + inngangAksjonpunkt + ", " //$NON-NLS-1$ //$NON-NLS-2$
+                + "utgangAksjonspunkter=" + utgangAksjonpunkt + ", " //$NON-NLS-1$ //$NON-NLS-2$
+                + "impl=" + steg //$NON-NLS-1$
+                + ">"; //$NON-NLS-1$
     }
 }

@@ -50,7 +50,7 @@ public class BehandlingTilstandTjenesteTest {
     private static final UUID EKSTERN_UUID = UUID.randomUUID();
 
     @BeforeEach
-    public void setup(){
+    public void setup() {
         behandling = ScenarioSimple.simple().lagre(behandlingRepositoryProvider);
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), EKSTERN_UUID);
         behandlingRepositoryProvider.getEksternBehandlingRepository().lagre(eksternBehandling);
@@ -80,8 +80,8 @@ public class BehandlingTilstandTjenesteTest {
     @Test
     public void skal_utlede_behandlingtilstand_for_fattet_behandling() {
         behandlingresultatRepository.lagre(Behandlingsresultat.builder()
-            .medBehandling(behandling)
-            .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING).build());
+                .medBehandling(behandling)
+                .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING).build());
 
         behandling.setBehandlendeOrganisasjonsEnhet(new OrganisasjonsEnhet("1234", "foo bar"));
         behandling.setAnsvarligSaksbehandler("Z111111");

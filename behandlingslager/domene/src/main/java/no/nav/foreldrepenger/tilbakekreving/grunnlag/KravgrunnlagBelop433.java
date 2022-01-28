@@ -68,7 +68,7 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
         return KlasseKode.fraKode(klasseKode);
     }
 
-    public String getKlasseKode(){
+    public String getKlasseKode() {
         return klasseKode;
     }
 
@@ -123,9 +123,9 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
 
         KravgrunnlagBelop433 that = (KravgrunnlagBelop433) o;
         return Objects.equals(id, that.id) &&
-            Objects.equals(klasseKode, that.klasseKode) &&
-            Objects.equals(klasseType, that.klasseType) &&
-            Objects.equals(nyBelop, that.nyBelop);
+                Objects.equals(klasseKode, that.klasseKode) &&
+                Objects.equals(klasseType, that.klasseType) &&
+                Objects.equals(nyBelop, that.nyBelop);
     }
 
     @Override
@@ -212,17 +212,17 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "<" + //$NON-NLS-1$
-            (id != null ? "id=" + id + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$
-            + "klasseKode=" + klasseKode + "," //$NON-NLS-1$ //$NON-NLS-2$
-            + "klasseType=" + klasseType + "," //$NON-NLS-1$ //$NON-NLS-2$
-            + "opprUtbetBelop=" + opprUtbetBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
-            + "nyBelop=" + nyBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
-            + "tilbakekrevesBelop=" + tilbakekrevesBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
-            + "uinnkrevdBelop=" + uinnkrevdBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
-            + "skattProsent=" + skattProsent + "," //$NON-NLS-1$ //$NON-NLS-2$
-            + "resultatKode=" + resultatKode + "," //$NON-NLS-1$ //$NON-NLS-2$
-            + "årsakKode=" + årsakKode + "," //$NON-NLS-1$ //$NON-NLS-2$
-            + "skyldKode=" + skyldKode + "," //$NON-NLS-1$ //$NON-NLS-2$
-            + ">";
+                (id != null ? "id=" + id + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$
+                + "klasseKode=" + klasseKode + "," //$NON-NLS-1$ //$NON-NLS-2$
+                + "klasseType=" + klasseType + "," //$NON-NLS-1$ //$NON-NLS-2$
+                + "opprUtbetBelop=" + opprUtbetBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
+                + "nyBelop=" + nyBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
+                + "tilbakekrevesBelop=" + tilbakekrevesBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
+                + "uinnkrevdBelop=" + uinnkrevdBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
+                + "skattProsent=" + skattProsent + "," //$NON-NLS-1$ //$NON-NLS-2$
+                + "resultatKode=" + resultatKode + "," //$NON-NLS-1$ //$NON-NLS-2$
+                + "årsakKode=" + årsakKode + "," //$NON-NLS-1$ //$NON-NLS-2$
+                + "skyldKode=" + skyldKode + "," //$NON-NLS-1$ //$NON-NLS-2$
+                + ">";
     }
 }

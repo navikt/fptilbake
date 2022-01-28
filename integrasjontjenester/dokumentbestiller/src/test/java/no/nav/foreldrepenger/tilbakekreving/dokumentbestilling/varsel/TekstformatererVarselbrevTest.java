@@ -34,21 +34,21 @@ public class TekstformatererVarselbrevTest {
     @Test
     public void skal_generere_varseltekst_for_flere_perioder() throws Exception {
         BrevMetadata metadata = new BrevMetadata.Builder()
-            .medFagsaktype(svangerskapspengerkode)
-            .medSprakkode(Språkkode.nn)
-            .medFagsaktypenavnPåSpråk("svangerskapspengar")
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .build();
+                .medFagsaktype(svangerskapspengerkode)
+                .medSprakkode(Språkkode.nn)
+                .medFagsaktypenavnPåSpråk("svangerskapspengar")
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
-            .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
-            .medSumFeilutbetaling(595959L)
-            .medFeilutbetaltePerioder(mockFeilutbetalingerMedFlerePerioder())
-            .medFristdato(FRIST_DATO)
-            .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
-            .medMetadata(metadata)
-            .build();
+                .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
+                .medSumFeilutbetaling(595959L)
+                .medFeilutbetaltePerioder(mockFeilutbetalingerMedFlerePerioder())
+                .medFristdato(FRIST_DATO)
+                .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
+                .medMetadata(metadata)
+                .build();
 
         String generertBrev = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
 
@@ -59,21 +59,21 @@ public class TekstformatererVarselbrevTest {
     @Test
     public void skal_generere_varseltekst_for_engangsstønad() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
-            .medFagsaktype(engangsstønadkode)
-            .medSprakkode(Språkkode.nb)
-            .medFagsaktypenavnPåSpråk("eingongsstønad")
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .build();
+                .medFagsaktype(engangsstønadkode)
+                .medSprakkode(Språkkode.nb)
+                .medFagsaktypenavnPåSpråk("eingongsstønad")
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
-            .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
-            .medSumFeilutbetaling(595959L)
-            .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
-            .medFristdato(FRIST_DATO)
-            .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
-            .medMetadata(metadata)
-            .build();
+                .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
+                .medSumFeilutbetaling(595959L)
+                .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
+                .medFristdato(FRIST_DATO)
+                .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
+                .medMetadata(metadata)
+                .build();
 
         String generertBrev = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
 
@@ -84,21 +84,21 @@ public class TekstformatererVarselbrevTest {
     @Test
     public void skal_generere_varseltekst_for_foreldrepenger_med_enkelt_periode() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
-            .medFagsaktype(foreldrepengerkode)
-            .medSprakkode(Språkkode.nb)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .build();
+                .medFagsaktype(foreldrepengerkode)
+                .medSprakkode(Språkkode.nb)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
-            .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
-            .medSumFeilutbetaling(595959L)
-            .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
-            .medFristdato(FRIST_DATO)
-            .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
-            .medMetadata(metadata)
-            .build();
+                .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
+                .medSumFeilutbetaling(595959L)
+                .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
+                .medFristdato(FRIST_DATO)
+                .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
+                .medMetadata(metadata)
+                .build();
 
         String generertBrev = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
 
@@ -109,21 +109,21 @@ public class TekstformatererVarselbrevTest {
     @Test
     public void skal_generere_varseltekst_for_frisinn_med_enkelt_periode() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FRISINN)
-            .medSprakkode(Språkkode.nb)
-            .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .build();
+                .medFagsaktype(FagsakYtelseType.FRISINN)
+                .medSprakkode(Språkkode.nb)
+                .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
-            .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
-            .medSumFeilutbetaling(595959L)
-            .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
-            .medFristdato(FRIST_DATO)
-            .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
-            .medMetadata(metadata)
-            .build();
+                .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
+                .medSumFeilutbetaling(595959L)
+                .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
+                .medFristdato(FRIST_DATO)
+                .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
+                .medMetadata(metadata)
+                .build();
 
         String generertBrev = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
 
@@ -134,21 +134,21 @@ public class TekstformatererVarselbrevTest {
     @Test
     public void skal_mappe_verdier_fra_dtoer_til_komplett_tilbakekrevingsvarsel() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medSprakkode(Språkkode.nn)
-            .medFagsaktype(foreldrepengerkode)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .build();
+                .medSprakkode(Språkkode.nn)
+                .medFagsaktype(foreldrepengerkode)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
-            .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
-            .medSumFeilutbetaling(595959L)
-            .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
-            .medFristdato(LocalDate.of(2018, 5, 27))
-            .medRevurderingVedtakDato(LocalDate.of(2018, 5, 6))
-            .medMetadata(brevMetadata)
-            .build();
+                .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
+                .medSumFeilutbetaling(595959L)
+                .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
+                .medFristdato(LocalDate.of(2018, 5, 27))
+                .medRevurderingVedtakDato(LocalDate.of(2018, 5, 6))
+                .medMetadata(brevMetadata)
+                .build();
 
         VarselbrevDokument varselbrev = TekstformatererVarselbrev.mapTilVarselbrevDokument(varselbrevSamletInfo);
 
@@ -165,20 +165,20 @@ public class TekstformatererVarselbrevTest {
     @Test
     public void skal_ikke_sette_tidligste_og_seneste_dato_når_det_foreligger_flere_perioder() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(foreldrepengerkode)
-            .medSprakkode(Språkkode.en)
-            .medFagsaktypenavnPåSpråk("foreldrepengar")
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .build();
+                .medFagsaktype(foreldrepengerkode)
+                .medSprakkode(Språkkode.en)
+                .medFagsaktypenavnPåSpråk("foreldrepengar")
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
-            .medFeilutbetaltePerioder(mockFeilutbetalingerMedFlerePerioder())
-            .medSumFeilutbetaling(595959L)
-            .medFristdato(LocalDate.of(2020, 5, 5))
-            .medRevurderingVedtakDato(LocalDate.now())
-            .medMetadata(brevMetadata)
-            .build();
+                .medFeilutbetaltePerioder(mockFeilutbetalingerMedFlerePerioder())
+                .medSumFeilutbetaling(595959L)
+                .medFristdato(LocalDate.of(2020, 5, 5))
+                .medRevurderingVedtakDato(LocalDate.now())
+                .medMetadata(brevMetadata)
+                .build();
 
         VarselbrevDokument varselbrev = TekstformatererVarselbrev.mapTilVarselbrevDokument(varselbrevSamletInfo);
         assertThat(varselbrev.getDatoerHvisSammenhengendePeriode()).isNull();
@@ -186,7 +186,7 @@ public class TekstformatererVarselbrevTest {
 
     public List<HbPeriode> mockFeilutbetalingerMedKunEnPeriode() {
         return List.of(HbPeriode.of(LocalDate.of(2019, 3, 3),
-            LocalDate.of(2020, 3, 3)));
+                LocalDate.of(2020, 3, 3)));
     }
 
     @Test
@@ -222,9 +222,9 @@ public class TekstformatererVarselbrevTest {
     @Test
     public void skal_generere_varselbrev_overskrift() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nb)
-            .build();
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nb)
+                .build();
 
         String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(brevMetadata);
         String fasit = "NAV vurderer om du må betale tilbake foreldrepenger";
@@ -234,9 +234,9 @@ public class TekstformatererVarselbrevTest {
     @Test
     public void skal_generere_varselbrev_overskrift_nynorsk() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktypenavnPåSpråk("foreldrepengar")
-            .medSprakkode(Språkkode.nb)
-            .build();
+                .medFagsaktypenavnPåSpråk("foreldrepengar")
+                .medSprakkode(Språkkode.nb)
+                .build();
 
         String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(brevMetadata);
         String fasit = "NAV vurderer om du må betale tilbake foreldrepengar";
@@ -246,9 +246,9 @@ public class TekstformatererVarselbrevTest {
     @Test
     public void skal_generere_korrigert_varselbrev_overskrift() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nb)
-            .build();
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nb)
+                .build();
 
         String overskrift = TekstformatererVarselbrev.lagKorrigertVarselbrevOverskrift(brevMetadata);
         String fasit = "Korrigert varsel om feilutbetalte foreldrepenger";
@@ -258,9 +258,9 @@ public class TekstformatererVarselbrevTest {
     @Test
     public void skal_generere_korrigert_varselbrev_overskrift_nynorsk() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktypenavnPåSpråk("foreldrepengar")
-            .medSprakkode(Språkkode.nn)
-            .build();
+                .medFagsaktypenavnPåSpråk("foreldrepengar")
+                .medSprakkode(Språkkode.nn)
+                .build();
 
         String overskrift = TekstformatererVarselbrev.lagKorrigertVarselbrevOverskrift(brevMetadata);
         String fasit = "Korrigert varsel om feilutbetalte foreldrepengar";
@@ -270,10 +270,10 @@ public class TekstformatererVarselbrevTest {
     @Test
     public void skal_generere_korrigert_varselbrev_overskrift_engangstønad() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.ENGANGSTØNAD)
-            .medFagsaktypenavnPåSpråk("engangstønad")
-            .medSprakkode(Språkkode.nb)
-            .build();
+                .medFagsaktype(FagsakYtelseType.ENGANGSTØNAD)
+                .medFagsaktypenavnPåSpråk("engangstønad")
+                .medSprakkode(Språkkode.nb)
+                .build();
 
         String overskrift = TekstformatererVarselbrev.lagKorrigertVarselbrevOverskrift(brevMetadata);
         String fasit = "Korrigert varsel om feilutbetalt engangstønad";
@@ -283,10 +283,10 @@ public class TekstformatererVarselbrevTest {
     @Test
     public void skal_generere_korrigert_varselbrev_overskrift_engangstønad_nynorsk() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.ENGANGSTØNAD)
-            .medFagsaktypenavnPåSpråk("eingongstønad")
-            .medSprakkode(Språkkode.nn)
-            .build();
+                .medFagsaktype(FagsakYtelseType.ENGANGSTØNAD)
+                .medFagsaktypenavnPåSpråk("eingongstønad")
+                .medSprakkode(Språkkode.nn)
+                .build();
 
         String overskrift = TekstformatererVarselbrev.lagKorrigertVarselbrevOverskrift(brevMetadata);
         String fasit = "Korrigert varsel om feilutbetalt eingongstønad";
@@ -296,23 +296,23 @@ public class TekstformatererVarselbrevTest {
     @Test
     public void skal_generere_varselbrev_for_verge() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
-            .medFagsaktype(foreldrepengerkode)
-            .medSprakkode(Språkkode.nb)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .medVergeNavn("John Doe")
-            .medFinnesVerge(true)
-            .build();
+                .medFagsaktype(foreldrepengerkode)
+                .medSprakkode(Språkkode.nb)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .medVergeNavn("John Doe")
+                .medFinnesVerge(true)
+                .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
-            .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
-            .medSumFeilutbetaling(595959L)
-            .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
-            .medFristdato(FRIST_DATO)
-            .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
-            .medMetadata(metadata)
-            .build();
+                .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
+                .medSumFeilutbetaling(595959L)
+                .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
+                .medFristdato(FRIST_DATO)
+                .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
+                .medMetadata(metadata)
+                .build();
 
         String generertBrev = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
 

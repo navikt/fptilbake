@@ -122,11 +122,11 @@ public class KravgrunnlagTestBuilder {
             }
             KgBeløp kgBeløp = (KgBeløp) o;
             return beløpNytt == kgBeløp.beløpNytt &&
-                utbetaltBeløp == kgBeløp.utbetaltBeløp &&
-                tilbakekrevBeløp == kgBeløp.tilbakekrevBeløp &&
-                skattProsent == kgBeløp.skattProsent &&
-                Objects.equals(klasseType, kgBeløp.klasseType) &&
-                Objects.equals(klassekode, kgBeløp.klassekode);
+                    utbetaltBeløp == kgBeløp.utbetaltBeløp &&
+                    tilbakekrevBeløp == kgBeløp.tilbakekrevBeløp &&
+                    skattProsent == kgBeløp.skattProsent &&
+                    Objects.equals(klasseType, kgBeløp.klasseType) &&
+                    Objects.equals(klassekode, kgBeløp.klassekode);
         }
 
         @Override
@@ -139,10 +139,10 @@ public class KravgrunnlagTestBuilder {
         Kravgrunnlag431 kg = lagKravgrunnlag(false);
         for (KgPeriode p : perioder) {
             KravgrunnlagPeriode432 kgPeriode = new KravgrunnlagPeriode432.Builder()
-                .medPeriode(p.getPeriode())
-                .medBeløpSkattMnd(p.getSkatteprosent())
-                .medKravgrunnlag431(kg)
-                .build();
+                    .medPeriode(p.getPeriode())
+                    .medBeløpSkattMnd(p.getSkatteprosent())
+                    .medKravgrunnlag431(kg)
+                    .build();
             for (KgBeløp kgBeløp : p.getBeløpene()) {
                 kgPeriode.leggTilBeløp(kgBeløp.mapTilØkonomi(kgPeriode));
             }
@@ -172,10 +172,10 @@ public class KravgrunnlagTestBuilder {
         Kravgrunnlag431 kg = lagKravgrunnlag(forEngangsstønad);
         for (Map.Entry<Periode, List<KgBeløp>> entry : beløp.entrySet()) {
             KravgrunnlagPeriode432 kgPeriode = new KravgrunnlagPeriode432.Builder()
-                .medPeriode(entry.getKey())
-                .medBeløpSkattMnd(BigDecimal.valueOf(skattBeløpMnd.apply(entry.getKey())))
-                .medKravgrunnlag431(kg)
-                .build();
+                    .medPeriode(entry.getKey())
+                    .medBeløpSkattMnd(BigDecimal.valueOf(skattBeløpMnd.apply(entry.getKey())))
+                    .medKravgrunnlag431(kg)
+                    .build();
             for (KgBeløp kgBeløp : entry.getValue()) {
                 kgPeriode.leggTilBeløp(kgBeløp.mapTilØkonomi(kgPeriode));
             }
@@ -187,22 +187,22 @@ public class KravgrunnlagTestBuilder {
     private static Kravgrunnlag431 lagKravgrunnlag(final boolean forEngangsstønad) {
         Long eksternBehandlingId = 1000000L;
         return new Kravgrunnlag431.Builder()
-            .medEksternKravgrunnlagId("12341")
-            .medFagSystemId("GSAKNR-12312")
-            .medFagomraadeKode(forEngangsstønad ? FagOmrådeKode.ENGANGSSTØNAD : FagOmrådeKode.FORELDREPENGER)
-            .medKravStatusKode(KravStatusKode.NYTT)
-            .medVedtakId(1412L)
-            .medAnsvarligEnhet("8020")
-            .medBehandlendeEnhet("8020")
-            .medBostedEnhet("8020")
-            .medFeltKontroll("kontrollfelt-123")
-            .medGjelderType(GjelderType.PERSON)
-            .medGjelderVedtakId("???")
-            .medSaksBehId("Z111111")
-            .medReferanse(Henvisning.fraEksternBehandlingId(eksternBehandlingId))
-            .medUtbetalesTilId("99999999999")
-            .medUtbetIdType(GjelderType.PERSON)
-            .build();
+                .medEksternKravgrunnlagId("12341")
+                .medFagSystemId("GSAKNR-12312")
+                .medFagomraadeKode(forEngangsstønad ? FagOmrådeKode.ENGANGSSTØNAD : FagOmrådeKode.FORELDREPENGER)
+                .medKravStatusKode(KravStatusKode.NYTT)
+                .medVedtakId(1412L)
+                .medAnsvarligEnhet("8020")
+                .medBehandlendeEnhet("8020")
+                .medBostedEnhet("8020")
+                .medFeltKontroll("kontrollfelt-123")
+                .medGjelderType(GjelderType.PERSON)
+                .medGjelderVedtakId("???")
+                .medSaksBehId("Z111111")
+                .medReferanse(Henvisning.fraEksternBehandlingId(eksternBehandlingId))
+                .medUtbetalesTilId("99999999999")
+                .medUtbetIdType(GjelderType.PERSON)
+                .build();
     }
 
     public static class KgPeriode {

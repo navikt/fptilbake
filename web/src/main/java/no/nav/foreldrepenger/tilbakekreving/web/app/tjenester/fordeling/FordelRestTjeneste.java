@@ -84,8 +84,8 @@ public class FordelRestTjeneste {
         List<Behandling> behandlinger = behandlingRepository.hentAlleBehandlingerForSaksnummer(saksnummer);
         if (!behandlinger.isEmpty()) {
             return behandlinger.stream()
-                .filter(beh -> !beh.erAvsluttet())
-                .filter(beh -> beh.isBehandlingPåVent()).findAny();
+                    .filter(beh -> !beh.erAvsluttet())
+                    .filter(beh -> beh.isBehandlingPåVent()).findAny();
         }
         return Optional.empty();
     }

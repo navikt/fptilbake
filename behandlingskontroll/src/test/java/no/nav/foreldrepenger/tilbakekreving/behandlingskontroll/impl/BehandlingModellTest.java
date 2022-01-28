@@ -31,9 +31,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class BehandlingModellTest {
 
     private static final LocalDateTime FRIST_TID = LocalDateTime.now().plusWeeks(4);
@@ -54,9 +54,9 @@ public class BehandlingModellTest {
     private final DummySteg nullSteg = new DummySteg();
     private final DummyVenterSteg nullVenterSteg = new DummyVenterSteg();
     private final DummySteg aksjonspunktSteg = new DummySteg(
-        opprettForAksjonspunkt(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
+            opprettForAksjonspunkt(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
     private final DummySteg aksjonspunktModifisererSteg = new DummySteg(
-        AksjonspunktResultat.opprettForAksjonspunktMedFrist(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, Venteårsak.AVVENTER_DOKUMENTASJON, FRIST_TID));
+            AksjonspunktResultat.opprettForAksjonspunktMedFrist(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, Venteårsak.AVVENTER_DOKUMENTASJON, FRIST_TID));
 
     @BeforeEach
     public void setup(EntityManager em) {
@@ -80,10 +80,10 @@ public class BehandlingModellTest {
         var steg2 = new DummySteg();
 
         var modellData = List.of(
-            new TestStegKonfig(STEG_1, behandlingType, steg, ap(), ap()),
-            new TestStegKonfig(STEG_2, behandlingType, steg0, ap(a0_0), ap(a0_1)),
-            new TestStegKonfig(STEG_3, behandlingType, steg1, ap(a1_0), ap(a1_1)),
-            new TestStegKonfig(STEG_4, behandlingType, steg2, ap(a2_0), ap()));
+                new TestStegKonfig(STEG_1, behandlingType, steg, ap(), ap()),
+                new TestStegKonfig(STEG_2, behandlingType, steg0, ap(a0_0), ap(a0_1)),
+                new TestStegKonfig(STEG_3, behandlingType, steg1, ap(a1_0), ap(a1_1)),
+                new TestStegKonfig(STEG_4, behandlingType, steg2, ap(a2_0), ap()));
 
         var modell = setupModell(modellData);
 
@@ -91,25 +91,25 @@ public class BehandlingModellTest {
 
         assertThat(ads).
 
-            containsOnly(a0_0, a0_1, a1_0, a1_1, a2_0);
+                containsOnly(a0_0, a0_1, a1_0, a1_1, a2_0);
 
         ads = modell.finnAksjonspunktDefinisjonerEtter(STEG_2);
 
         assertThat(ads).
 
-            containsOnly(a1_0, a1_1, a2_0);
+                containsOnly(a1_0, a1_1, a2_0);
 
         ads = modell.finnAksjonspunktDefinisjonerEtter(STEG_3);
 
         assertThat(ads).
 
-            containsOnly(a2_0);
+                containsOnly(a2_0);
 
         ads = modell.finnAksjonspunktDefinisjonerEtter(STEG_4);
 
         assertThat(ads).
 
-            isEmpty();
+                isEmpty();
 
     }
 
@@ -125,9 +125,9 @@ public class BehandlingModellTest {
         var steg1 = new DummySteg();
 
         var modellData = List.of(
-            new TestStegKonfig(STEG_1, behandlingType, steg, ap(), ap()),
-            new TestStegKonfig(STEG_2, behandlingType, steg0, ap(a0_0), ap(a0_1)),
-            new TestStegKonfig(STEG_3, behandlingType, steg1, ap(a1_0), ap(a1_1)));
+                new TestStegKonfig(STEG_1, behandlingType, steg, ap(), ap()),
+                new TestStegKonfig(STEG_2, behandlingType, steg0, ap(a0_0), ap(a0_1)),
+                new TestStegKonfig(STEG_3, behandlingType, steg1, ap(a1_0), ap(a1_1)));
 
         var modell = setupModell(modellData);
 
@@ -146,11 +146,11 @@ public class BehandlingModellTest {
     public void skal_stoppe_på_steg_2_når_får_aksjonspunkt() throws Exception {
         // Arrange
         var modellData = List.of(
-            new TestStegKonfig(STEG_1, behandlingType, nullSteg, ap(), ap()),
-            new TestStegKonfig(STEG_2, behandlingType, aksjonspunktSteg, ap(), ap()),
-            new TestStegKonfig(STEG_3, behandlingType, nullSteg,
-                ap(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING), ap()),
-            new TestStegKonfig(STEG_4, behandlingType, nullSteg, ap(), ap()));
+                new TestStegKonfig(STEG_1, behandlingType, nullSteg, ap(), ap()),
+                new TestStegKonfig(STEG_2, behandlingType, aksjonspunktSteg, ap(), ap()),
+                new TestStegKonfig(STEG_3, behandlingType, nullSteg,
+                        ap(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING), ap()),
+                new TestStegKonfig(STEG_4, behandlingType, nullSteg, ap(), ap()));
         var modell = setupModell(modellData);
 
         ScenarioSimple scenario = ScenarioSimple.simple();
@@ -244,7 +244,7 @@ public class BehandlingModellTest {
 
     @Test
     public void tilbakefører_til_tidligste_steg_med_åpent_aksjonspunkt() {
-        AksjonspunktDefinisjon aksjonspunktDefinisjon = AksjonspunktDefinisjon.AVKLAR_VERGE ;
+        AksjonspunktDefinisjon aksjonspunktDefinisjon = AksjonspunktDefinisjon.AVKLAR_VERGE;
         DummySteg tilbakeføringssteg = new DummySteg(true, opprettForAksjonspunkt(aksjonspunktDefinisjon));
         // Arrange
         List<TestStegKonfig> modellData = List.of(
@@ -259,7 +259,7 @@ public class BehandlingModellTest {
         BehandlingStegVisitorUtenLagring visitor = lagVisitor(behandling);
 
         var aksjonspunkt = serviceProvider.getAksjonspunktKontrollRepository()
-            .leggTilAksjonspunkt(behandling, aksjonspunktDefinisjon, STEG_1);
+                .leggTilAksjonspunkt(behandling, aksjonspunktDefinisjon, STEG_1);
         serviceProvider.getAksjonspunktKontrollRepository().setReåpnet(aksjonspunkt);
 
         BehandlingStegUtfall siste = modell.prosesserFra(STEG_3, visitor);

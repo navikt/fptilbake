@@ -19,10 +19,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class BehandlingRepositoryTest {
 
     private final NavBruker bruker = TestFagsakUtil.genererBruker();
@@ -92,7 +92,7 @@ public class BehandlingRepositoryTest {
         lagreBehandling(builder);
 
         Optional<Behandling> sisteBehandling = behandlingRepository.hentSisteBehandlingForFagsakId(fagsak.getId(),
-            BehandlingType.TILBAKEKREVING);
+                BehandlingType.TILBAKEKREVING);
 
         assertThat(sisteBehandling).isPresent();
         assertThat(sisteBehandling.get().getFagsakId()).isEqualTo(fagsak.getId());
@@ -137,7 +137,7 @@ public class BehandlingRepositoryTest {
         lagreBehandling(behandling);
 
         Behandling nyBehandling = behandlingRepository.opprettNyBehandlingBasertPåTidligere(behandling,
-            BehandlingType.REVURDERING_TILBAKEKREVING);
+                BehandlingType.REVURDERING_TILBAKEKREVING);
 
         assertThat(nyBehandling).isNotNull();
         assertThat(nyBehandling.getType()).isEqualByComparingTo(BehandlingType.REVURDERING_TILBAKEKREVING);

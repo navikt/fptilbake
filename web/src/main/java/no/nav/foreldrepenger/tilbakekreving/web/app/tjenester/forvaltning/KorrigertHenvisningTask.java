@@ -32,13 +32,13 @@ public class KorrigertHenvisningTask implements ProsessTaskHandler {
     private EksternBehandlingRepository eksternBehandlingRepository;
     private FagsystemKlient fagsystemKlient;
 
-    KorrigertHenvisningTask(){
+    KorrigertHenvisningTask() {
         // for CDI
     }
 
     @Inject
     public KorrigertHenvisningTask(BehandlingRepositoryProvider repositoryProvider,
-                                   FagsystemKlient fagsystemKlient){
+                                   FagsystemKlient fagsystemKlient) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.fagsystemKlient = fagsystemKlient;
@@ -52,12 +52,12 @@ public class KorrigertHenvisningTask implements ProsessTaskHandler {
 
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         Optional<SamletEksternBehandlingInfo> samletEksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfoOpt(eksternBehandlingUuid, Tillegsinformasjon.FAGSAK);
-        if(samletEksternBehandlingInfo.isEmpty()){
+        if (samletEksternBehandlingInfo.isEmpty()) {
             throw new TekniskException("FPT-7728492", String.format("Fant ikke eksternBehandlingUuid %s i fagsystemet. Kan ikke korrigere henvisningen for behandling %s", eksternUuid, behandlingId));
         }
         SamletEksternBehandlingInfo eksternBehandlingInfo = samletEksternBehandlingInfo.get();
         Saksnummer eksternBehandlingSaksnummer = eksternBehandlingInfo.getSaksnummer();
-        if(!eksternBehandlingSaksnummer.equals(behandling.getFagsak().getSaksnummer())){
+        if (!eksternBehandlingSaksnummer.equals(behandling.getFagsak().getSaksnummer())) {
             throw new TekniskException("FPT-7728493", String.format("EksternBehandlingUuid %s har ikke samme saksnummer %s som behandling. Kan ikke korrigere henvisningen for behandling %s", eksternUuid, eksternBehandlingSaksnummer, behandlingId));
         }
 

@@ -39,7 +39,7 @@ public class DatabaseHealthCheck {
 
     public boolean isOK() {
 
-        DataSource dataSource ;
+        DataSource dataSource;
         try {
             dataSource = (DataSource) new InitialContext().lookup(jndiName);
         } catch (NamingException e) {

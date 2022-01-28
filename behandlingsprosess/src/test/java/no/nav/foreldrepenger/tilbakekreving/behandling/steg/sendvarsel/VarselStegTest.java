@@ -64,7 +64,7 @@ public class VarselStegTest {
     public void setup() {
         fagsak = TestFagsakUtil.opprettFagsak();
         fagsakRepository.lagre(fagsak);
-        behandling = lagBehandling(fagsak,false);
+        behandling = lagBehandling(fagsak, false);
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), UUID.randomUUID());
         repositoryProvider.getEksternBehandlingRepository().lagre(eksternBehandling);
     }
@@ -102,7 +102,7 @@ public class VarselStegTest {
 
     @Test
     public void skal_ikke_sette_behandling_på_vent_når_behandling_er_manuelt_opprettet() {
-        Behandling behandling = lagBehandling(fagsak,true);
+        Behandling behandling = lagBehandling(fagsak, true);
         varselRepository.lagre(behandling.getId(), "hello", 23000l);
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
@@ -112,7 +112,7 @@ public class VarselStegTest {
         assertThat(behandling.isBehandlingPåVent()).isFalse();
     }
 
-    private Behandling lagBehandling(Fagsak fagsak,boolean manueltOpprettet) {
+    private Behandling lagBehandling(Fagsak fagsak, boolean manueltOpprettet) {
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).medManueltOpprettet(manueltOpprettet).build();
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         Long behandlingId = behandlingRepository.lagre(behandling, lås);
@@ -121,10 +121,10 @@ public class VarselStegTest {
 
     private VarselSteg steg() {
         return new VarselSteg(
-            repositoryProvider,
-            behandlingskontrollTjeneste,
-            varselresponsTjeneste,
-            taskTjeneste,
-            Period.ofWeeks(4));
+                repositoryProvider,
+                behandlingskontrollTjeneste,
+                varselresponsTjeneste,
+                taskTjeneste,
+                Period.ofWeeks(4));
     }
 }

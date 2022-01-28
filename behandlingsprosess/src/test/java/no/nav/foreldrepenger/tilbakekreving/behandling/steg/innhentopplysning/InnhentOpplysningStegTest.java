@@ -24,7 +24,7 @@ public class InnhentOpplysningStegTest extends FellesTestOppsett {
     private VarselRepository varselRepository;
 
     @BeforeEach
-    public void setup(){
+    public void setup() {
         innhentOpplysningSteg = new InnhentOpplysningSteg(repositoryProvider, fagsystemKlientMock);
         varselRepository = repositoryProvider.getVarselRepository();
 
@@ -36,8 +36,8 @@ public class InnhentOpplysningStegTest extends FellesTestOppsett {
     public void skal_hente_varseltekst_fra_fpsak_og_lagre() {
         final String varselTekst = "Dette er varselTekst";
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = SamletEksternBehandlingInfo
-            .builder(Tillegsinformasjon.VARSELTEKST)
-            .setVarseltekst(varselTekst).build();
+                .builder(Tillegsinformasjon.VARSELTEKST)
+                .setVarseltekst(varselTekst).build();
         when(fagsystemKlientMock.hentBehandlingsinfo(FPSAK_BEHANDLING_UUID, Tillegsinformasjon.VARSELTEKST)).thenReturn(samletEksternBehandlingInfo);
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
 
@@ -52,8 +52,8 @@ public class InnhentOpplysningStegTest extends FellesTestOppsett {
     @Test
     public void skal_forsøke_å_hente_varseltekst_fra_fpsak_og_ikke_lagre_varsel_når_varseltekst_ikke_finnes() {
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = SamletEksternBehandlingInfo
-            .builder(Tillegsinformasjon.VARSELTEKST)
-            .setVarseltekst("").build();
+                .builder(Tillegsinformasjon.VARSELTEKST)
+                .setVarseltekst("").build();
         when(fagsystemKlientMock.hentBehandlingsinfo(FPSAK_BEHANDLING_UUID, Tillegsinformasjon.VARSELTEKST)).thenReturn(samletEksternBehandlingInfo);
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
 

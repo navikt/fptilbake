@@ -41,7 +41,7 @@ public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
     private HentKravgrunnlagMapper mapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
 
     @Test
-    public void skal_mapTilDomene_fraHentgrunnlagrespons(){
+    public void skal_mapTilDomene_fraHentgrunnlagrespons() {
         Mockito.when(personinfoAdapterMock.hentAktørForFnr(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
 
         Kravgrunnlag431 kravgrunnlag431 = mapper.mapTilDomene(hentGrunnlag());
@@ -57,19 +57,19 @@ public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
         List<KravgrunnlagPeriode432> perioder = kravgrunnlag431.getPerioder();
 
         KravgrunnlagPeriode432 førstePeriode = perioder.get(0);
-        førstePeriode.getPeriode().equals(Periode.of(LocalDate.of(2016, 3, 16),LocalDate.of(2016, 3, 31)));
+        førstePeriode.getPeriode().equals(Periode.of(LocalDate.of(2016, 3, 16), LocalDate.of(2016, 3, 31)));
         assertThat(førstePeriode.getBeløpSkattMnd()).isEqualByComparingTo(BigDecimal.valueOf(600.00));
         assertThat(førstePeriode.getKravgrunnlagBeloper433()).isNotEmpty();
         assertThat(førstePeriode.getKravgrunnlagBeloper433().size()).isEqualTo(2);
 
         KravgrunnlagPeriode432 andrePeriode = perioder.get(1);
-        andrePeriode.getPeriode().equals(Periode.of(LocalDate.of(2016, 4, 1),LocalDate.of(2016, 4, 30)));
+        andrePeriode.getPeriode().equals(Periode.of(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30)));
         assertThat(andrePeriode.getBeløpSkattMnd()).isEqualByComparingTo(BigDecimal.valueOf(300.00));
         assertThat(andrePeriode.getKravgrunnlagBeloper433()).isNotEmpty();
         assertThat(andrePeriode.getKravgrunnlagBeloper433().size()).isEqualTo(2);
 
         KravgrunnlagPeriode432 tredjePeriode = perioder.get(2);
-        tredjePeriode.getPeriode().equals(Periode.of(LocalDate.of(2016, 5, 1),LocalDate.of(2016, 5, 26)));
+        tredjePeriode.getPeriode().equals(Periode.of(LocalDate.of(2016, 5, 1), LocalDate.of(2016, 5, 26)));
         assertThat(tredjePeriode.getBeløpSkattMnd()).isEqualByComparingTo(BigDecimal.valueOf(2100.00));
         assertThat(tredjePeriode.getKravgrunnlagBeloper433()).isNotEmpty();
         assertThat(tredjePeriode.getKravgrunnlagBeloper433().size()).isEqualTo(2);
@@ -81,9 +81,9 @@ public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
 
         DetaljertKravgrunnlagBelopDto feilPostering = hentBeløp(BigDecimal.valueOf(1794), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TypeKlasseDto.FEIL);
         DetaljertKravgrunnlagBelopDto ytelPostering = hentBeløp(BigDecimal.ZERO, BigDecimal.valueOf(1794), BigDecimal.valueOf(3270),
-            BigDecimal.ZERO, TypeKlasseDto.YTEL);
+                BigDecimal.ZERO, TypeKlasseDto.YTEL);
         DetaljertKravgrunnlagBelopDto positivYtelPostering = hentBeløp(BigDecimal.valueOf(3930), BigDecimal.ZERO, BigDecimal.valueOf(2454),
-            BigDecimal.ZERO, TypeKlasseDto.YTEL);
+                BigDecimal.ZERO, TypeKlasseDto.YTEL);
 
         DetaljertKravgrunnlagPeriodeDto kravgrunnlagPeriode = new DetaljertKravgrunnlagPeriodeDto();
         PeriodeDto periode = new PeriodeDto();

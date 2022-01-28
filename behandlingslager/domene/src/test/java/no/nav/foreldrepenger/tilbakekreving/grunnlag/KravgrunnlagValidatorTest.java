@@ -49,7 +49,7 @@ public class KravgrunnlagValidatorTest {
         leggTilFeilutbetaling(kgPeriode1, 1000);
         leggTilFeilutbetaling(kgPeriode2, 1000);
 
-        var e= assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class,() -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
+        var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
         assertThat(e.getMessage()).isEqualTo("FPT-936521:Ugyldig kravgrunnlag for kravgrunnlagId 12341. Overlappende perioder 01.01.2020-10.01.2020 og 06.01.2020-31.01.2020.");
     }
 
@@ -93,7 +93,7 @@ public class KravgrunnlagValidatorTest {
         leggTilYtel(kgPeriode, KlasseKode.FPATORD, 0, skattOrd);
         leggTilYtel(kgPeriode, KlasseKode.FPADSND_OP, 0, skattNæringsdrivende);
 
-        var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class,() -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
+        var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
         assertThat(e.getMessage()).isEqualTo("FPT-727260:Ugyldig kravgrunnlag for kravgrunnlagId 12341. Perioden 01.01.2020-15.01.2020 mangler postering med klasseType=FEIL.");
     }
 
@@ -118,7 +118,7 @@ public class KravgrunnlagValidatorTest {
         leggTilFeil(kgPeriode, -1000, skattOrd);
         leggTilYtel(kgPeriode, KlasseKode.FPATORD, -1000, skattOrd);
 
-        var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class,() -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
+        var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
         assertThat(e.getMessage()).isEqualTo("FPT-930247:Ugyldig kravgrunnlag for kravgrunnlagId 12341. Perioden 01.01.2020-15.01.2020 har FEIL postering med negativ beløp");
     }
 
@@ -128,16 +128,16 @@ public class KravgrunnlagValidatorTest {
         KravgrunnlagPeriode432 kgPeriode = leggTilKravgrunnlagPeriode(kravgrunnlag, periode, BigDecimal.ZERO);
         leggTilFeil(kgPeriode, 1000, BigDecimal.ZERO);
         kgPeriode.leggTilBeløp(KravgrunnlagBelop433.builder()
-            .medKravgrunnlagPeriode432(kgPeriode)
-            .medKlasseType(KlasseType.YTEL)
-            .medKlasseKode(KlasseKode.FPATORD)
-            .medTilbakekrevesBelop(BigDecimal.valueOf(1000))
-            .medOpprUtbetBelop(BigDecimal.valueOf(1000))
-            .medNyBelop(BigDecimal.valueOf(200))
-            .medSkattProsent(BigDecimal.valueOf(0))
-            .build());
+                .medKravgrunnlagPeriode432(kgPeriode)
+                .medKlasseType(KlasseType.YTEL)
+                .medKlasseKode(KlasseKode.FPATORD)
+                .medTilbakekrevesBelop(BigDecimal.valueOf(1000))
+                .medOpprUtbetBelop(BigDecimal.valueOf(1000))
+                .medNyBelop(BigDecimal.valueOf(200))
+                .medSkattProsent(BigDecimal.valueOf(0))
+                .build());
 
-        var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class,() -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
+        var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
         assertThat(e.getMessage()).isEqualTo("FPT-615761:Ugyldig kravgrunnlag for kravgrunnlagId 12341. For perioden 01.01.2020-10.01.2020 finnes YTEL-postering med tilbakekrevesBeløp 1000 som er større enn differanse mellom nyttBeløp 200 og opprinneligBeløp 1000");
     }
 
@@ -152,52 +152,52 @@ public class KravgrunnlagValidatorTest {
 
     private void leggTilFeil(KravgrunnlagPeriode432 kgPeriode, int feilutbetaltBeløp, BigDecimal skatt) {
         kgPeriode.leggTilBeløp(KravgrunnlagBelop433.builder()
-            .medKravgrunnlagPeriode432(kgPeriode)
-            .medKlasseType(KlasseType.FEIL)
-            .medKlasseKode("foo")
-            .medNyBelop(BigDecimal.valueOf(feilutbetaltBeløp))
-            .medSkattProsent(skatt)
-            .build());
+                .medKravgrunnlagPeriode432(kgPeriode)
+                .medKlasseType(KlasseType.FEIL)
+                .medKlasseKode("foo")
+                .medNyBelop(BigDecimal.valueOf(feilutbetaltBeløp))
+                .medSkattProsent(skatt)
+                .build());
     }
 
     private void leggTilYtel(KravgrunnlagPeriode432 kgPeriode, KlasseKode klasseKode, int feilutbetaltBeløp, BigDecimal skatt) {
         kgPeriode.leggTilBeløp(KravgrunnlagBelop433.builder()
-            .medKravgrunnlagPeriode432(kgPeriode)
-            .medKlasseType(KlasseType.YTEL)
-            .medKlasseKode(klasseKode)
-            .medTilbakekrevesBelop(BigDecimal.valueOf(feilutbetaltBeløp))
-            .medOpprUtbetBelop(BigDecimal.valueOf(feilutbetaltBeløp))
-            .medSkattProsent(skatt)
-            .build());
+                .medKravgrunnlagPeriode432(kgPeriode)
+                .medKlasseType(KlasseType.YTEL)
+                .medKlasseKode(klasseKode)
+                .medTilbakekrevesBelop(BigDecimal.valueOf(feilutbetaltBeløp))
+                .medOpprUtbetBelop(BigDecimal.valueOf(feilutbetaltBeløp))
+                .medSkattProsent(skatt)
+                .build());
     }
 
     private KravgrunnlagPeriode432 leggTilKravgrunnlagPeriode(Kravgrunnlag431 kravgrunnlag, Periode periode, BigDecimal maxSkattMnd) {
         KravgrunnlagPeriode432 kgPeriode = new KravgrunnlagPeriode432.Builder().medKravgrunnlag431(kravgrunnlag)
-            .medPeriode(periode)
-            .medBeløpSkattMnd(maxSkattMnd)
-            .build();
+                .medPeriode(periode)
+                .medBeløpSkattMnd(maxSkattMnd)
+                .build();
         kravgrunnlag.leggTilPeriode(kgPeriode);
         return kgPeriode;
     }
 
     private static Kravgrunnlag431 lagKravgrunnlag(Henvisning henvisning) {
         return new Kravgrunnlag431.Builder()
-            .medEksternKravgrunnlagId("12341")
-            .medFagSystemId("GSAKNR-12312")
-            .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
-            .medKravStatusKode(KravStatusKode.NYTT)
-            .medVedtakId(1412L)
-            .medAnsvarligEnhet("8020")
-            .medBehandlendeEnhet("8020")
-            .medBostedEnhet("8020")
-            .medFeltKontroll("kontrollfelt-123")
-            .medGjelderType(GjelderType.PERSON)
-            .medGjelderVedtakId("???")
-            .medSaksBehId("Z111111")
-            .medReferanse(henvisning)
-            .medUtbetalesTilId("99999999999")
-            .medUtbetIdType(GjelderType.PERSON)
-            .build();
+                .medEksternKravgrunnlagId("12341")
+                .medFagSystemId("GSAKNR-12312")
+                .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
+                .medKravStatusKode(KravStatusKode.NYTT)
+                .medVedtakId(1412L)
+                .medAnsvarligEnhet("8020")
+                .medBehandlendeEnhet("8020")
+                .medBostedEnhet("8020")
+                .medFeltKontroll("kontrollfelt-123")
+                .medGjelderType(GjelderType.PERSON)
+                .medGjelderVedtakId("???")
+                .medSaksBehId("Z111111")
+                .medReferanse(henvisning)
+                .medUtbetalesTilId("99999999999")
+                .medUtbetIdType(GjelderType.PERSON)
+                .build();
     }
 
 }

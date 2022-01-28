@@ -83,12 +83,12 @@ public class BehandlingRestTjenesteTest {
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjenesteMock = mock(BehandlingskontrollAsynkTjeneste.class);
     private BehandlendeEnhetTjeneste behandlendeEnhetTjenesteMock = mock(BehandlendeEnhetTjeneste.class);
     private BehandlingsTjenesteProvider behandlingsTjenesteProvider = new BehandlingsTjenesteProvider(behandlingTjenesteMock, gjenopptaBehandlingTjenesteMock,
-        revurderingTjenesteMock, behandlendeEnhetTjenesteMock);
+            revurderingTjenesteMock, behandlendeEnhetTjenesteMock);
     private BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer = mock(BehandlingManglerKravgrunnlagFristenEndretEventPubliserer.class);
     private VergeTjeneste vergeTjenesteMock = mock(VergeTjeneste.class);
 
     private BehandlingRestTjeneste behandlingRestTjeneste = new BehandlingRestTjeneste(behandlingsTjenesteProvider, behandlingDtoTjenesteMock, taskTjeneste, vergeTjenesteMock,
-        mock(TotrinnTjeneste.class), henleggBehandlingTjenesteMock, behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock,fristenEndretEventPubliserer);
+            mock(TotrinnTjeneste.class), henleggBehandlingTjenesteMock, behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock, fristenEndretEventPubliserer);
 
     private static SaksnummerDto saksnummerDto = new SaksnummerDto(GYLDIG_SAKSNR);
     private static FpsakUuidDto fpsakUuidDto = new FpsakUuidDto(EKSTERN_BEHANDLING_UUID);
@@ -100,8 +100,8 @@ public class BehandlingRestTjenesteTest {
         OpprettBehandlingDto dto = opprettBehandlingDto(UGYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE);
 
         assertThatThrownBy(() -> behandlingRestTjeneste.opprettBehandling(mock(HttpServletRequest.class), dto)) // ved rest-kall vil jax validering slå inn og resultere i en FeltFeil
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Ugyldig saksnummer");
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Ugyldig saksnummer");
     }
 
     @Test
@@ -120,7 +120,7 @@ public class BehandlingRestTjenesteTest {
         when(behandlingskontrollAsynkTjenesteMock.asynkProsesserBehandling(any(Behandling.class))).thenReturn("1");
         when(behandlingTjenesteMock.hentEnhetForEksternBehandling(any())).thenReturn(new OrganisasjonsEnhet("9999", "Generisk"));
         when(revurderingTjenesteMock.opprettRevurdering(any(Long.class), any(BehandlingÅrsakType.class), any(OrganisasjonsEnhet.class)))
-            .thenReturn(mockBehandling());
+                .thenReturn(mockBehandling());
 
         OpprettBehandlingDto opprettBehandlingDto = opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE);
         opprettBehandlingDto.setBehandlingType(BehandlingType.REVURDERING_TILBAKEKREVING);
@@ -140,7 +140,7 @@ public class BehandlingRestTjenesteTest {
         String begrunnelse = "begrunnelse";
         String fritekst = "fritekst";
 
-        behandlingRestTjeneste.henleggBehandling(opprettHenleggBehandlingDto(1234l, versjon, årsak, begrunnelse,fritekst));
+        behandlingRestTjeneste.henleggBehandling(opprettHenleggBehandlingDto(1234l, versjon, årsak, begrunnelse, fritekst));
 
         verify(henleggBehandlingTjenesteMock).henleggBehandlingManuelt(1234l, årsak, begrunnelse, fritekst);
     }
@@ -200,12 +200,12 @@ public class BehandlingRestTjenesteTest {
 
         var sakResponse = behandlingRestTjeneste.hentRettigheterSak(saksnummerDto);
         assertThat(sakResponse.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
-            .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isFalse());
+                .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isFalse());
         assertThat(sakResponse.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.REVURDERING_TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
-            .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isFalse());
+                .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isFalse());
 
         when(vergeTjenesteMock.hentVergeInformasjon(anyLong())).thenReturn(Optional.of(VergeEntitet.builder()
-            .medBegrunnelse("bla").medKilde("bla").medOrganisasjonnummer("999999999").medNavn("Vegard Verge").medVergeType(VergeType.ADVOKAT).build()));
+                .medBegrunnelse("bla").medKilde("bla").medOrganisasjonnummer("999999999").medNavn("Vegard Verge").medVergeType(VergeType.ADVOKAT).build()));
         response = behandlingRestTjeneste.hentMenyOpsjoner(behandlingUuid);
         assertThat(response.getVergeBehandlingsmeny()).isEqualTo(VergeBehandlingsmenyEnum.FJERN);
 
@@ -215,18 +215,18 @@ public class BehandlingRestTjenesteTest {
 
         sakResponse = behandlingRestTjeneste.hentRettigheterSak(saksnummerDto);
         assertThat(sakResponse.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
-            .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isTrue());
+                .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isTrue());
         assertThat(sakResponse.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.REVURDERING_TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
-            .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isFalse());
+                .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isFalse());
 
         when(revurderingTjenesteMock.kanRevurderingOpprettes(any(Behandling.class))).thenReturn(true);
         response = behandlingRestTjeneste.hentMenyOpsjoner(behandlingUuid);
         assertThat(response.isBehandlingKanHenlegges()).isFalse();
         sakResponse = behandlingRestTjeneste.hentRettigheterSak(saksnummerDto);
         assertThat(sakResponse.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
-            .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isTrue());
+                .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isTrue());
         assertThat(sakResponse.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.REVURDERING_TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
-            .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isTrue());
+                .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isTrue());
     }
 
     @Test
@@ -250,14 +250,14 @@ public class BehandlingRestTjenesteTest {
     public void skal_returnere_vedtak_info_hvis_tilbakekreving_er_avsluttet_og_vedtak_info_finnes() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
-            .medBehandling(behandling)
-            .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING).build();
+                .medBehandling(behandling)
+                .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING).build();
         var vedtakDato = LocalDate.now();
         BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder()
-            .medBehandlingsresultat(behandlingsresultat)
-            .medVedtaksdato(vedtakDato)
-            .medIverksettingStatus(IverksettingStatus.IVERKSATT)
-            .medAnsvarligSaksbehandler("VL").build();
+                .medBehandlingsresultat(behandlingsresultat)
+                .medVedtaksdato(vedtakDato)
+                .medIverksettingStatus(IverksettingStatus.IVERKSATT)
+                .medAnsvarligSaksbehandler("VL").build();
         behandling.avsluttBehandling();
 
         when(behandlingTjenesteMock.hentBehandling(any(UUID.class))).thenReturn(behandling);

@@ -56,7 +56,7 @@ public class HbVedtaksbrevDatoer {
             return this;
         }
 
-        public  HbVedtaksbrevDatoer.Builder medDatoer(LocalDate opphørsdatoDødSøker, LocalDate opphørsdatoDødtBarn, LocalDate opphørsdatoIkkeGravid, LocalDate opphørsdatoIkkeOmsorg) {
+        public HbVedtaksbrevDatoer.Builder medDatoer(LocalDate opphørsdatoDødSøker, LocalDate opphørsdatoDødtBarn, LocalDate opphørsdatoIkkeGravid, LocalDate opphørsdatoIkkeOmsorg) {
             kladd.opphørsdatoDødSøker = opphørsdatoDødSøker;
             kladd.opphørsdatoDødtBarn = opphørsdatoDødtBarn;
             kladd.opphørsdatoIkkeGravid = opphørsdatoIkkeGravid;
@@ -71,10 +71,10 @@ public class HbVedtaksbrevDatoer {
 
         private LocalDate getFørsteDagForHendelseUnderType(List<HendelseUnderType> hendelseUnderTyper) {
             return perioder.stream()
-                .filter(per -> hendelseUnderTyper.contains(per.getFakta().getHendelseundertype()))
-                .findFirst()
-                .map(per -> per.getPeriode().getFom())
-                .orElse(null);
+                    .filter(per -> hendelseUnderTyper.contains(per.getFakta().getHendelseundertype()))
+                    .findFirst()
+                    .map(per -> per.getPeriode().getFom())
+                    .orElse(null);
         }
 
         public HbVedtaksbrevDatoer build() {

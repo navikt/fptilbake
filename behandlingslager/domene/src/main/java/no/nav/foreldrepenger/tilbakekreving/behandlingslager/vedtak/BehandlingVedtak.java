@@ -74,7 +74,7 @@ public class BehandlingVedtak extends BaseEntitet {
         }
         BehandlingVedtak vedtak = (BehandlingVedtak) object;
         return Objects.equals(vedtaksdato, vedtak.getVedtaksdato())
-            && Objects.equals(ansvarligSaksbehandler, vedtak.getAnsvarligSaksbehandler());
+                && Objects.equals(ansvarligSaksbehandler, vedtak.getAnsvarligSaksbehandler());
     }
 
     @Override

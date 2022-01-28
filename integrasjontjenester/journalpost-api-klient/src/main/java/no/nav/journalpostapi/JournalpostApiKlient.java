@@ -31,9 +31,9 @@ public class JournalpostApiKlient {
 
     public OpprettJournalpostResponse opprettJournalpost(OpprettJournalpostRequest request, boolean forsøkFerdigstill) {
         URI uri = UriBuilder.fromUri(JournalpostApiPlassering.getBaseUrl())
-            .path("/rest/journalpostapi/v1/journalpost")
-            .queryParam("forsoekFerdigstill", forsøkFerdigstill)
-            .build();
+                .path("/rest/journalpostapi/v1/journalpost")
+                .queryParam("forsoekFerdigstill", forsøkFerdigstill)
+                .build();
         return oidcRestClient.post(uri, request, OpprettJournalpostResponse.class);
     }
 }

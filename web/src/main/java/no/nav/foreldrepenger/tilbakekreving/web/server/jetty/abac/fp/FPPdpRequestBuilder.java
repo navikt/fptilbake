@@ -90,8 +90,8 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         attributter.leggTil(utlededeAttributter);
 
         return behandlingData != null
-            ? lagPdpRequest(attributter, aktørIder, aksjonspunkttype, behandlingData)
-            : lagPdpRequest(attributter, aktørIder, aksjonspunkttype);
+                ? lagPdpRequest(attributter, aktørIder, aksjonspunkttype, behandlingData)
+                : lagPdpRequest(attributter, aktørIder, aksjonspunkttype);
     }
 
     private PipBehandlingData hentFpsakBehandlingData(UUID fpsakBehandlingUuid) {
@@ -139,11 +139,11 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         PdpRequest pdpRequest = lagPdpRequest(attributter, aktørId, aksjonspunktType);
 
         oversettFagstatus(behandlingData.getFagsakstatus())
-            .ifPresent(it -> pdpRequest.put(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS, it.getEksternKode()));
+                .ifPresent(it -> pdpRequest.put(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS, it.getEksternKode()));
         oversettBehandlingStatus(behandlingData.getStatusForBehandling())
-            .ifPresent(it -> pdpRequest.put(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS, it.getEksternKode()));
+                .ifPresent(it -> pdpRequest.put(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS, it.getEksternKode()));
         behandlingData.getAnsvarligSaksbehandler()
-            .ifPresent(it -> pdpRequest.put(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER, it));
+                .ifPresent(it -> pdpRequest.put(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER, it));
 
         return pdpRequest;
     }

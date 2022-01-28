@@ -75,18 +75,18 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
 
     private VedtaksbrevFritekstPeriode lagFritekstPeriode(Long behandlingId, VedtaksbrevFritekstType fritekstType, Periode periode, String fritekst) {
         return new VedtaksbrevFritekstPeriode.Builder()
-            .medPeriode(periode)
-            .medBehandlingId(behandlingId)
-            .medFritekstType(fritekstType)
-            .medFritekst(fritekst)
-            .build();
+                .medPeriode(periode)
+                .medBehandlingId(behandlingId)
+                .medFritekstType(fritekstType)
+                .medFritekst(fritekst)
+                .build();
     }
 
     private VedtaksbrevFritekstOppsummering lagOppsummeringstekst(Long behandlingId, ForeslåVedtakDto dto) {
         if (dto.getOppsummeringstekst() != null) {
             return new VedtaksbrevFritekstOppsummering.Builder()
-                .medOppsummeringFritekst(dto.getOppsummeringstekst())
-                .medBehandlingId(behandlingId).build();
+                    .medOppsummeringFritekst(dto.getOppsummeringstekst())
+                    .medBehandlingId(behandlingId).build();
         } else {
             return null;
         }

@@ -35,7 +35,7 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 /**
  * Brukes for å generere tekster for slutten av vedtaksbrevet. Resultatet er tekster med markup, som med "Insert markup"-macroen
  * kan limes inn i Confluence, og dermed bli formattert tekst.
- *
+ * <p>
  * Confluence:
  * FP/SVP/ES: https://confluence.adeo.no/display/TVF/Generert+dokumentasjon
  * FRISINN: https://confluence.adeo.no/display/MODNAV/Generert+dokumentasjon
@@ -46,7 +46,7 @@ public class DokumentasjonGeneratorVedtakSlutt {
     private static final Periode PERIODE1 = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 16));
     private static final Periode PERIODE2 = Periode.of(LocalDate.of(2019, 1, 17), LocalDate.of(2019, 1, 31));
 
-    private static final boolean[] trueFalse = new boolean[] { true, false};
+    private static final boolean[] trueFalse = new boolean[]{true, false};
 
     @Test
     public void list_ut_vedtak_slutt() {
@@ -131,43 +131,43 @@ public class DokumentasjonGeneratorVedtakSlutt {
                                              boolean feilutbetaltBeløpBortfalt,
                                              boolean erRevurdering) {
         HbVedtaksbrevFelles.Builder builder = HbVedtaksbrevFelles.builder()
-            .medSak(HbSak.build()
-                .medYtelsetype(ytelsetype)
-                .medErFødsel(true)
-                .medAntallBarn(1)
-                .build())
-            .medVedtakResultat(HbTotalresultat.builder()
-                .medHovedresultat(vedtakResultatType)
-                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
-                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
-                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(medSkattetrekk ? 900 : 1100))
-                .medTotaltRentebeløp(BigDecimal.valueOf(100))
-                .build())
-            .medLovhjemmelVedtak(flereLovhjemler ? "lovhjemmel1 og lovhjemmel2" : "[lovhjemmel]")
-            .medVarsel(HbVarsel.builder()
-                .medVarsletBeløp(BigDecimal.valueOf(1000))
-                .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .medKlagefristUker(4)
-                .build())
-            .medSøker(HbPerson.builder()
-                .medNavn("Søker Søkersen")
-                .medErGift(true)
-                .build())
-            .medVedtaksbrevType(feilutbetaltBeløpBortfalt ? VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT : VedtaksbrevType.ORDINÆR)
-            .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb);
+                .medSak(HbSak.build()
+                        .medYtelsetype(ytelsetype)
+                        .medErFødsel(true)
+                        .medAntallBarn(1)
+                        .build())
+                .medVedtakResultat(HbTotalresultat.builder()
+                        .medHovedresultat(vedtakResultatType)
+                        .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+                        .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
+                        .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(medSkattetrekk ? 900 : 1100))
+                        .medTotaltRentebeløp(BigDecimal.valueOf(100))
+                        .build())
+                .medLovhjemmelVedtak(flereLovhjemler ? "lovhjemmel1 og lovhjemmel2" : "[lovhjemmel]")
+                .medVarsel(HbVarsel.builder()
+                        .medVarsletBeløp(BigDecimal.valueOf(1000))
+                        .medVarsletDato(LocalDate.of(2020, 4, 4))
+                        .build())
+                .medKonfigurasjon(HbKonfigurasjon.builder()
+                        .medKlagefristUker(4)
+                        .build())
+                .medSøker(HbPerson.builder()
+                        .medNavn("Søker Søkersen")
+                        .medErGift(true)
+                        .build())
+                .medVedtaksbrevType(feilutbetaltBeløpBortfalt ? VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT : VedtaksbrevType.ORDINÆR)
+                .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb);
         if (erRevurdering) {
             builder
-                .medBehandling(HbBehandling.builder()
-                    .medErRevurdering(true)
-                    .medOriginalBehandlingDatoFagsakvedtak(PERIODE1.getFom())
-                    .build());
+                    .medBehandling(HbBehandling.builder()
+                            .medErRevurdering(true)
+                            .medOriginalBehandlingDatoFagsakvedtak(PERIODE1.getFom())
+                            .build());
         }
         if (medVerge) {
             builder
-                .medFinnesVerge(medVerge)
-                .medAnnenMottakerNavn("[annen mottaker]");
+                    .medFinnesVerge(medVerge)
+                    .medAnnenMottakerNavn("[annen mottaker]");
         }
         return builder.build();
     }
@@ -185,23 +185,23 @@ public class DokumentasjonGeneratorVedtakSlutt {
 
     private HbVedtaksbrevPeriode lagPeriode(Periode periode) {
         return HbVedtaksbrevPeriode.builder()
-            .medPeriode(periode)
-            .medVurderinger(HbVurderinger.builder()
-                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
-                .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
-                .medSærligeGrunner(Collections.emptyList(), null, null)
-                .build())
-            .medKravgrunnlag(HbKravgrunnlag.builder()
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
-                .build())
-            .medResultat(HbResultat.builder()
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(1000))
-                .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(800))
-                .medRenterBeløp(BigDecimal.ZERO)
-                .build())
-            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
-            .build();
+                .medPeriode(periode)
+                .medVurderinger(HbVurderinger.builder()
+                        .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                        .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
+                        .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
+                        .medSærligeGrunner(Collections.emptyList(), null, null)
+                        .build())
+                .medKravgrunnlag(HbKravgrunnlag.builder()
+                        .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
+                        .build())
+                .medResultat(HbResultat.builder()
+                        .medTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+                        .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(800))
+                        .medRenterBeløp(BigDecimal.ZERO)
+                        .build())
+                .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
+                .build();
     }
 
     private String overskrift(boolean flerePerioder,
@@ -211,30 +211,30 @@ public class DokumentasjonGeneratorVedtakSlutt {
                               boolean feilutbetaltBeløpBortfalt,
                               boolean erRevurdering) {
         return "*[ " + (flerePerioder ? "flere perioder" : "en periode")
-            + " - " + (medSkattetrekk ? "med skattetrekk" : "uten skattetrekk")
-            + " - " + (flereLovhjemler ? "flere lovhjemmel" : "en lovhjemmel")
-            + " - " + (medVerge ? "med verge" : "uten verge")
-            + " - " + (feilutbetaltBeløpBortfalt ? "feilutbetalt beløp bortfalt" : "ordinær")
-            + (erRevurdering ? " - revurdering" : "")
-            + " ]*";
+                + " - " + (medSkattetrekk ? "med skattetrekk" : "uten skattetrekk")
+                + " - " + (flereLovhjemler ? "flere lovhjemmel" : "en lovhjemmel")
+                + " - " + (medVerge ? "med verge" : "uten verge")
+                + " - " + (feilutbetaltBeløpBortfalt ? "feilutbetalt beløp bortfalt" : "ordinær")
+                + (erRevurdering ? " - revurdering" : "")
+                + " ]*";
     }
 
     private String prettyprint(String s) {
         return s.replace("_Lovhjemlene vi har brukt", "*_Lovhjemlene vi har brukt_*")
-            .replace("_Lovhjemmelen vi har brukt", "*_Lovhjemmelen vi har brukt_*")
-            .replace("_Skatt", "\n*_Skatt_*")
-            .replace("_Hvordan betale tilbake pengene du skylder", "\n*_Hvordan betale tilbake pengene du skylder_*")
-            .replace("_Du har rett til å klage", "\n*_Du har rett til å klage_*")
-            .replace("_Du har rett til innsyn", "\n*_Du har rett til innsyn_*")
-            .replace("_Har du spørsmål?", "\n*_Har du spørsmål?_*")
-            .replace("_Lovhjemler vi har brukt", "*_Lovhjemler vi har brukt_*")
-            .replace("_Korleis betale tilbake pengane du skuldar", "\n*_Korleis betale tilbake pengane du skuldar_*")
-            .replace("lovhjemmel1 og lovhjemmel2", "<lovhjemler her>")
-            .replace("[lovhjemmel]", "<lovhjemmel her>")
-            .replace("[annen mottaker]", "<annen mottaker>")
-            .replace("4 uker", "<klagefrist> uker")
-            .replace("4 veker", "<klagefrist> veker")
-            .replaceAll("\\[", "[ ")
-            .replaceAll("]", " ]");
+                .replace("_Lovhjemmelen vi har brukt", "*_Lovhjemmelen vi har brukt_*")
+                .replace("_Skatt", "\n*_Skatt_*")
+                .replace("_Hvordan betale tilbake pengene du skylder", "\n*_Hvordan betale tilbake pengene du skylder_*")
+                .replace("_Du har rett til å klage", "\n*_Du har rett til å klage_*")
+                .replace("_Du har rett til innsyn", "\n*_Du har rett til innsyn_*")
+                .replace("_Har du spørsmål?", "\n*_Har du spørsmål?_*")
+                .replace("_Lovhjemler vi har brukt", "*_Lovhjemler vi har brukt_*")
+                .replace("_Korleis betale tilbake pengane du skuldar", "\n*_Korleis betale tilbake pengane du skuldar_*")
+                .replace("lovhjemmel1 og lovhjemmel2", "<lovhjemler her>")
+                .replace("[lovhjemmel]", "<lovhjemmel her>")
+                .replace("[annen mottaker]", "<annen mottaker>")
+                .replace("4 uker", "<klagefrist> uker")
+                .replace("4 veker", "<klagefrist> veker")
+                .replaceAll("\\[", "[ ")
+                .replaceAll("]", " ]");
     }
 }

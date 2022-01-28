@@ -12,7 +12,7 @@ class FpoppdragFelles {
     static final String FPOPPDRAG_BASE_URL = "http://fpoppdrag/fpoppdrag/api";
     static final String FPOPPDRAG_OVERRIDE_URL = "fpoppdrag.override.url";
 
-    private FpoppdragFelles(){
+    private FpoppdragFelles() {
 
     }
 

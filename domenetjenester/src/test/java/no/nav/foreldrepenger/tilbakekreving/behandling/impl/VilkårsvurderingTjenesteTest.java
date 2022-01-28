@@ -57,12 +57,12 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         lagreFaktaTestdata();
 
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
-            new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDET_PERIODE,
-                ForeldelseVurderingType.FORELDET, FORELDELSESFRIST, null, "ABC"),
-            new ForeldelsePeriodeDto(FØRSTE_DAG_I_TILLEGGSFRIST_PERIODE, SISTE_DAG_I_TILLEGGSFRIST_PERIODE,
-                ForeldelseVurderingType.TILLEGGSFRIST, FORELDELSESFRIST, OPPDAGELSES_DATO, "ABC"),
-            new ForeldelsePeriodeDto(FØRSTE_DAG_I_IKKE_FORELDET_PERIODE, TOM,
-                ForeldelseVurderingType.IKKE_FORELDET, null, null, "CDE")));
+                new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDET_PERIODE,
+                        ForeldelseVurderingType.FORELDET, FORELDELSESFRIST, null, "ABC"),
+                new ForeldelsePeriodeDto(FØRSTE_DAG_I_TILLEGGSFRIST_PERIODE, SISTE_DAG_I_TILLEGGSFRIST_PERIODE,
+                        ForeldelseVurderingType.TILLEGGSFRIST, FORELDELSESFRIST, OPPDAGELSES_DATO, "ABC"),
+                new ForeldelsePeriodeDto(FØRSTE_DAG_I_IKKE_FORELDET_PERIODE, TOM,
+                        ForeldelseVurderingType.IKKE_FORELDET, null, null, "CDE")));
 
         List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
@@ -150,25 +150,25 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     @Test
     public void hentDetaljertFeilutbetalingPerioder_nårPerioderErIkkeVurderesForForeldet_medRedusertBeløp() {
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31), KlasseType.FEIL,
-            BigDecimal.valueOf(11000), BigDecimal.ZERO);
+                BigDecimal.valueOf(11000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
-            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
+                KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
         mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
         KravgrunnlagMock mockMedJustPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
-            KlasseType.JUST, BigDecimal.valueOf(5000), BigDecimal.ZERO);
+                KlasseType.JUST, BigDecimal.valueOf(5000), BigDecimal.ZERO);
         mockMedJustPostering.setKlasseKode(KlasseKode.FPADATAL);
 
         KravgrunnlagMock mockMedFeilPostering1 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30), KlasseType.FEIL,
-            BigDecimal.valueOf(21000), BigDecimal.ZERO);
+                BigDecimal.valueOf(21000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering1 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30),
-            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(21000));
+                KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(21000));
         mockMedYtelPostering1.setKlasseKode(KlasseKode.FPADSNDFI);
         KravgrunnlagMock mockMedYtelPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30),
-            KlasseType.YTEL, BigDecimal.valueOf(3000), BigDecimal.ZERO);
+                KlasseType.YTEL, BigDecimal.valueOf(3000), BigDecimal.ZERO);
         mockMedYtelPostering2.setKlasseKode(KlasseKode.FPADSNDFI);
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering1,
-            mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2, mockMedJustPostering));
+                mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2, mockMedJustPostering));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
         lagreFaktaTestdata();
@@ -193,22 +193,22 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     @Test
     public void hentDetaljertFeilutbetalingPerioder_medFlereYtelserMedSammeInntekstKategori() {
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31), KlasseType.FEIL,
-            BigDecimal.valueOf(11000), BigDecimal.ZERO);
+                BigDecimal.valueOf(11000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
-            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
+                KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
         mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
 
         KravgrunnlagMock mockMedFeilPostering1 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30), KlasseType.FEIL,
-            BigDecimal.valueOf(21000), BigDecimal.ZERO);
+                BigDecimal.valueOf(21000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering1 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30),
-            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(21000));
+                KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(21000));
         mockMedYtelPostering1.setKlasseKode(KlasseKode.FPADATAL);
         KravgrunnlagMock mockMedYtelPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30),
-            KlasseType.YTEL, BigDecimal.valueOf(3000), BigDecimal.ZERO);
+                KlasseType.YTEL, BigDecimal.valueOf(3000), BigDecimal.ZERO);
         mockMedYtelPostering2.setKlasseKode(KlasseKode.FPADATAL);
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering1,
-            mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2));
+                mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
         lagreFaktaTestdata();
@@ -227,8 +227,8 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     @Test
     public void lagreVilkårsvurdering_medGodTroOgForsettAktsomhet() {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
-            formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
-            formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
+                formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
+                formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
         Optional<VilkårVurderingEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurdering(internBehandlingId);
@@ -253,16 +253,16 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     @Test
     public void lagreVilkårsvurdering_medSimpelOgGrøvtAktsomhet() {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
-            formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, LocalDate.of(2016, 3, 31), Aktsomhet.SIMPEL_UAKTSOM),
-            formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.GROVT_UAKTSOM));
+                formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, LocalDate.of(2016, 3, 31), Aktsomhet.SIMPEL_UAKTSOM),
+                formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.GROVT_UAKTSOM));
 
         vilkårPerioder.stream()
-            .filter(perioderDto -> VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER.equals(perioderDto.getVilkårResultat()))
-            .map(perioderDto -> (VilkårResultatAnnetDto) perioderDto.getVilkarResultatInfo())
-            .map(VilkårResultatAnnetDto::getAktsomhetInfo).forEach(aktsomhetDto -> {
-            aktsomhetDto.setHarGrunnerTilReduksjon(true);
-            aktsomhetDto.setAndelTilbakekreves(BigDecimal.TEN);
-        });
+                .filter(perioderDto -> VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER.equals(perioderDto.getVilkårResultat()))
+                .map(perioderDto -> (VilkårResultatAnnetDto) perioderDto.getVilkarResultatInfo())
+                .map(VilkårResultatAnnetDto::getAktsomhetInfo).forEach(aktsomhetDto -> {
+                    aktsomhetDto.setHarGrunnerTilReduksjon(true);
+                    aktsomhetDto.setAndelTilbakekreves(BigDecimal.TEN);
+                });
 
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
@@ -300,14 +300,14 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         lagreFaktaTestdata();
 
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
-            new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDET_PERIODE,
-                ForeldelseVurderingType.FORELDET, FORELDELSESFRIST, null, "ABC"),
-            new ForeldelsePeriodeDto(FØRSTE_DAG_I_IKKE_FORELDET_PERIODE, TOM,
-                ForeldelseVurderingType.IKKE_FORELDET, null, null, "CDE")));
+                new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDET_PERIODE,
+                        ForeldelseVurderingType.FORELDET, FORELDELSESFRIST, null, "ABC"),
+                new ForeldelsePeriodeDto(FØRSTE_DAG_I_IKKE_FORELDET_PERIODE, TOM,
+                        ForeldelseVurderingType.IKKE_FORELDET, null, null, "CDE")));
 
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
-            formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, SISTE_DAG_I_FORELDET_PERIODE, Aktsomhet.SIMPEL_UAKTSOM),
-            formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, FØRSTE_DAG_I_IKKE_FORELDET_PERIODE, TOM, Aktsomhet.GROVT_UAKTSOM));
+                formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, SISTE_DAG_I_FORELDET_PERIODE, Aktsomhet.SIMPEL_UAKTSOM),
+                formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, FØRSTE_DAG_I_IKKE_FORELDET_PERIODE, TOM, Aktsomhet.GROVT_UAKTSOM));
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
         Optional<VilkårVurderingEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurdering(internBehandlingId);
@@ -329,8 +329,8 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     @Test
     public void hentVilkårsvurdering_medGodTroOgForsettAktsomhet() {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
-            formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
-            formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
+                formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
+                formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
         formGrunnlag();
@@ -367,8 +367,8 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     @Test
     public void hentVilkårsvurdering_medSimpelOgGrøvtAktsomhet() {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
-            formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, LocalDate.of(2016, 3, 31), Aktsomhet.SIMPEL_UAKTSOM),
-            formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.GROVT_UAKTSOM));
+                formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, LocalDate.of(2016, 3, 31), Aktsomhet.SIMPEL_UAKTSOM),
+                formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.GROVT_UAKTSOM));
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
         formGrunnlag();
@@ -459,36 +459,36 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
     private void formGrunnlag() {
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31), KlasseType.FEIL,
-            BigDecimal.valueOf(11000), BigDecimal.ZERO);
+                BigDecimal.valueOf(11000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
-            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
+                KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
         mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
 
         KravgrunnlagMock mockMedFeilPostering1 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30), KlasseType.FEIL,
-            BigDecimal.valueOf(21000), BigDecimal.ZERO);
+                BigDecimal.valueOf(21000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering1 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30),
-            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(21000));
+                KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(21000));
         mockMedYtelPostering1.setKlasseKode(KlasseKode.FPADSNDFI);
 
         KravgrunnlagMock mockMedFeilPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 5, 1), TOM, KlasseType.FEIL,
-            BigDecimal.valueOf(19000), BigDecimal.ZERO);
+                BigDecimal.valueOf(19000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 5, 1), TOM,
-            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(19000));
+                KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(19000));
         mockMedYtelPostering2.setKlasseKode(KlasseKode.FPADATSJO);
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering1, mockMedFeilPostering2,
-            mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2));
+                mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
     }
 
     private void lagreFaktaTestdata() {
         FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
         FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode = FaktaFeilutbetalingPeriode.builder()
-            .medPeriode(FOM, TOM)
-            .medHendelseType(HendelseType.FP_UTTAK_UTSETTELSE_TYPE)
-            .medHendelseUndertype(HendelseUnderType.ARBEID_HELTID)
-            .medFeilutbetalinger(faktaFeilutbetaling)
-            .build();
+                .medPeriode(FOM, TOM)
+                .medHendelseType(HendelseType.FP_UTTAK_UTSETTELSE_TYPE)
+                .medHendelseUndertype(HendelseUnderType.ARBEID_HELTID)
+                .medFeilutbetalinger(faktaFeilutbetaling)
+                .build();
         faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);
         faktaFeilutbetaling.setBegrunnelse("begrunnelse");
 

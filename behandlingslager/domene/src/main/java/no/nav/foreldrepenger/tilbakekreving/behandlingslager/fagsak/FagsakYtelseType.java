@@ -23,23 +23,23 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 public enum FagsakYtelseType implements Kodeverdi {
 
 
-    ENGANGSTØNAD("ES", "Engangsstønad","Eingongsstønad"),
-    FORELDREPENGER("FP", "Foreldrepenger","Foreldrepengar"),
-    SVANGERSKAPSPENGER("SVP", "Svangerskapspenger","Svangerskapspengar"),
+    ENGANGSTØNAD("ES", "Engangsstønad", "Eingongsstønad"),
+    FORELDREPENGER("FP", "Foreldrepenger", "Foreldrepengar"),
+    SVANGERSKAPSPENGER("SVP", "Svangerskapspenger", "Svangerskapspengar"),
 
     //K9
-    FRISINN("FRISINN", "Kompensasjonsytelse for selvstendig næringsdrivende og frilansere","Kompensasjonsytelse for selvstendig næringsdrivende og frilansere"),
-    PLEIEPENGER_SYKT_BARN("PSB", "Pleiepenger","Pleiepengar"), //TODO: Heter egentlig Pleiepenger sykt barn, men brukes direkte i varselbrev - og der skal det stå "Pleiepenger"
-    PLEIEPENGER_NÆRSTÅENDE("PPN", "Pleiepenger nærstående",""),
-    OMSORGSPENGER("OMP", "Omsorgspenger","Omsorgspengar"),
-    OPPLÆRINGSPENGER("OLP", "Opplæringspenger",""),
+    FRISINN("FRISINN", "Kompensasjonsytelse for selvstendig næringsdrivende og frilansere", "Kompensasjonsytelse for selvstendig næringsdrivende og frilansere"),
+    PLEIEPENGER_SYKT_BARN("PSB", "Pleiepenger", "Pleiepengar"), //TODO: Heter egentlig Pleiepenger sykt barn, men brukes direkte i varselbrev - og der skal det stå "Pleiepenger"
+    PLEIEPENGER_NÆRSTÅENDE("PPN", "Pleiepenger nærstående", ""),
+    OMSORGSPENGER("OMP", "Omsorgspenger", "Omsorgspengar"),
+    OPPLÆRINGSPENGER("OLP", "Opplæringspenger", ""),
 
     //K9-rammevedtak (kan ignoreres for tilbakekreving, men må være i listen for at VedtakHendelse skal parse alle vedtak)
     OMSORGSPENGER_KS("OMP_KS", "Ekstra omsorgsdager kronisk syk", ""),
     OMSORGSPENGER_MA("OMP_MA", "Ekstra omsorgsdager midlertidig alene", ""),
 
 
-    UDEFINERT("-", "Ikke definert","Ikke Definert"); //$NON-NLS-1$
+    UDEFINERT("-", "Ikke definert", "Ikke Definert"); //$NON-NLS-1$
 
     private String kode;
     private String navn; //på bøkmål som standard
@@ -115,7 +115,7 @@ public enum FagsakYtelseType implements Kodeverdi {
         }
     }
 
-    public static String finnFagsaktypenavnPåAngittSpråk(FagsakYtelseType fagsakYtelseType, Språkkode språkkode){
+    public static String finnFagsaktypenavnPåAngittSpråk(FagsakYtelseType fagsakYtelseType, Språkkode språkkode) {
         return Språkkode.nn.equals(språkkode) ? fagsakYtelseType.getNavnPåNynorsk() : fagsakYtelseType.getNavn();
     }
 

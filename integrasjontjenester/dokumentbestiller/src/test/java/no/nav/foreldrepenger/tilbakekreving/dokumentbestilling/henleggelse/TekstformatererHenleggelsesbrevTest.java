@@ -25,12 +25,12 @@ public class TekstformatererHenleggelsesbrevTest {
     @Test
     public void skal_generere_henleggelsesbrev() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nb)
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nb)
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
@@ -43,12 +43,12 @@ public class TekstformatererHenleggelsesbrevTest {
     @Test
     public void skal_generere_henleggelsesbrev_frisinn() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
-            .medFagsaktype(FagsakYtelseType.FRISINN)
-            .medSprakkode(Språkkode.nb)
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .build();
+                .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
+                .medFagsaktype(FagsakYtelseType.FRISINN)
+                .medSprakkode(Språkkode.nb)
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
@@ -61,13 +61,13 @@ public class TekstformatererHenleggelsesbrevTest {
     @Test
     public void skal_generere_henleggelsesbrev_for_tilbakekreving_revurdering() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nb)
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nb)
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
+                .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
@@ -80,13 +80,13 @@ public class TekstformatererHenleggelsesbrevTest {
     @Test
     public void skal_generere_henleggelsesbrev_for_tilbakekreving_revurdering_frisinn() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
-            .medFagsaktype(FagsakYtelseType.FRISINN)
-            .medSprakkode(Språkkode.nb)
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
-            .build();
+                .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
+                .medFagsaktype(FagsakYtelseType.FRISINN)
+                .medSprakkode(Språkkode.nb)
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
+                .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
@@ -99,14 +99,14 @@ public class TekstformatererHenleggelsesbrevTest {
     @Test
     public void skal_generere_henleggelsesbrev_med_verge() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nb)
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .medVergeNavn("John Doe")
-            .medFinnesVerge(true)
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nb)
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .medVergeNavn("John Doe")
+                .medFinnesVerge(true)
+                .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
@@ -120,15 +120,15 @@ public class TekstformatererHenleggelsesbrevTest {
     @Test
     public void skal_generere_henleggelsesbrev_for_tilbakekreving_revurdering_med_verge() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nb)
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .medVergeNavn("John Doe")
-            .medFinnesVerge(true)
-            .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nb)
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .medVergeNavn("John Doe")
+                .medFinnesVerge(true)
+                .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
+                .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
@@ -142,12 +142,12 @@ public class TekstformatererHenleggelsesbrevTest {
     @Test
     public void skal_generere_henleggelsesbrev_nynorsk() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepengar")
-            .medSprakkode(Språkkode.nn)
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepengar")
+                .medSprakkode(Språkkode.nn)
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
@@ -160,13 +160,13 @@ public class TekstformatererHenleggelsesbrevTest {
     @Test
     public void skal_generere_henleggelsesbrev_nynorsk_for_tilbakekreving_revurderning() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepengar")
-            .medSprakkode(Språkkode.nn)
-            .medMottakerAdresse(lagAdresseInfo())
-            .medSakspartNavn("Test")
-            .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepengar")
+                .medSprakkode(Språkkode.nn)
+                .medMottakerAdresse(lagAdresseInfo())
+                .medSakspartNavn("Test")
+                .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
+                .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
@@ -179,10 +179,10 @@ public class TekstformatererHenleggelsesbrevTest {
     @Test
     public void skal_generere_henleggelsesbrev_overskrift() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nb)
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nb)
+                .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
@@ -195,11 +195,11 @@ public class TekstformatererHenleggelsesbrevTest {
     @Test
     public void skal_generere_henleggelsesbrev_overskrift_for_tilbakekreving_revurdering() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nb)
-            .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nb)
+                .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
+                .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
@@ -212,10 +212,10 @@ public class TekstformatererHenleggelsesbrevTest {
     @Test
     public void skal_generere_henleggelsesbrev_overskrift_nynorsk() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nn)
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nn)
+                .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);

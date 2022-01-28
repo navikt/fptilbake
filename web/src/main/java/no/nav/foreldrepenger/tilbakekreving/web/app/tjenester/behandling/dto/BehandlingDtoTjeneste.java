@@ -101,8 +101,8 @@ public class BehandlingDtoTjeneste {
         List<Behandling> behandlinger = behandlingTjeneste.hentBehandlinger(saksnummer);
 
         return behandlinger.stream()
-            .map(this::lagBehandlingDto)
-            .collect(Collectors.toList());
+                .map(this::lagBehandlingDto)
+                .collect(Collectors.toList());
     }
 
     private BehandlingDto lagBehandlingDto(Behandling behandling) {
@@ -198,9 +198,9 @@ public class BehandlingDtoTjeneste {
 
     private Optional<BehandlingÅrsakDto> førsteÅrsak(Behandling behandling) {
         return behandling.getBehandlingÅrsaker().stream()
-            .sorted(Comparator.comparing(BaseEntitet::getOpprettetTidspunkt))
-            .map(this::lagBehandlingÅrsakDto)
-            .findFirst();
+                .sorted(Comparator.comparing(BaseEntitet::getOpprettetTidspunkt))
+                .map(this::lagBehandlingÅrsakDto)
+                .findFirst();
     }
 
     private BehandlingÅrsakDto lagBehandlingÅrsakDto(BehandlingÅrsak behandlingÅrsak) {
@@ -211,12 +211,12 @@ public class BehandlingDtoTjeneste {
 
     private boolean kanHenleggeBehandling(Behandling behandling) {
         return !behandling.erAvsluttet() && (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) ||
-            (erBehandlingOpprettetAutomatiskFørBestemteDager(behandling) && !grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())));
+                (erBehandlingOpprettetAutomatiskFørBestemteDager(behandling) && !grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())));
     }
 
     private boolean erBehandlingOpprettetAutomatiskFørBestemteDager(Behandling behandling) {
         return !behandling.isManueltOpprettet() && behandling.getOpprettetTidspunkt().isBefore(
-            LocalDate.now().atStartOfDay().minusDays(OPPRETTELSE_DAGER_BEGRENSNING));
+                LocalDate.now().atStartOfDay().minusDays(OPPRETTELSE_DAGER_BEGRENSNING));
     }
 
     private void leggTilLenkerForBehandlingsoperasjoner(BehandlingDto dto) {

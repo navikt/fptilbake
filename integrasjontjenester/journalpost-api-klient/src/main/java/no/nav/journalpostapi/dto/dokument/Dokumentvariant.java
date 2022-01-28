@@ -13,7 +13,7 @@ public class Dokumentvariant {
     private String filnavn;
     @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     private Filtype filtype;
-    @JsonSerialize (using = ByteArraySomBase64StringSerializer.class)
+    @JsonSerialize(using = ByteArraySomBase64StringSerializer.class)
     private byte[] fysiskDokument;
     @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     private Variantformat variantformat;

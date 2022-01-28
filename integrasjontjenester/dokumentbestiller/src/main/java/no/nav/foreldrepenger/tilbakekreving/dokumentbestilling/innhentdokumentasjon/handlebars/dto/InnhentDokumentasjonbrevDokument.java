@@ -53,7 +53,7 @@ public class InnhentDokumentasjonbrevDokument extends BaseDokument {
         Objects.requireNonNull(getFagsaktypeNavn(), "fagsaktypeNavn kan ikke være null");
         Objects.requireNonNull(getFritekstFraSaksbehandler(), "fritekst kan ikke være null");
         Objects.requireNonNull(getFristDato(), "fristDato kan ikke være null");
-        if(isFinnesVerge()){
+        if (isFinnesVerge()) {
             Objects.requireNonNull(getAnnenMottakerNavn(), "annenMottakerNavn kan ikke være null");
         }
     }

@@ -127,28 +127,28 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
             aksjonspunktKoderMedStatusListe.put(AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG, kravgrunnlagManglerAksjonspunktStatusKode);
         } else {
             behandling.getAksjonspunkter().forEach(aksjonspunkt ->
-                aksjonspunktKoderMedStatusListe.put(aksjonspunkt.getAksjonspunktDefinisjon().getKode(), aksjonspunkt.getStatus().getKode()));
+                    aksjonspunktKoderMedStatusListe.put(aksjonspunkt.getAksjonspunktDefinisjon().getKode(), aksjonspunkt.getStatus().getKode()));
         }
 
         return TilbakebetalingBehandlingProsessEventDto.builder()
-            .medBehandlingStatus(behandling.getStatus().getKode())
-            .medEksternId(behandling.getUuid())
-            .medFagsystem(fagsystem)
-            .medSaksnummer(saksnummer)
-            .medAktørId(behandling.getAktørId().getId())
-            .medBehandlingSteg(behandling.getAktivtBehandlingSteg() == null ? null : behandling.getAktivtBehandlingSteg().getKode())
-            .medBehandlingTypeKode(behandling.getType().getKode())
-            .medBehandlendeEnhet(behandling.getBehandlendeEnhetId())
-            .medEventHendelse(EventHendelse.valueOf(eventName))
-            .medEventTid(LocalDateTime.now())
-            .medOpprettetBehandling(behandling.getOpprettetTidspunkt())
-            .medYtelseTypeKode(fagsak.getFagsakYtelseType().getKode())
-            .medAksjonspunktKoderMedStatusListe(aksjonspunktKoderMedStatusListe)
-            .medHref(String.format(defaultHRef, saksnummer, behandling.getId()))
-            .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligSaksbehandler())
-            .medFørsteFeilutbetaling(hentFørsteFeilutbetalingDato(kravgrunnlag431, kravgrunnlagManglerFristTid))
-            .medFeilutbetaltBeløp(kravgrunnlag431 != null ? hentFeilutbetaltBeløp(behandling.getId()) : BigDecimal.ZERO)
-            .build();
+                .medBehandlingStatus(behandling.getStatus().getKode())
+                .medEksternId(behandling.getUuid())
+                .medFagsystem(fagsystem)
+                .medSaksnummer(saksnummer)
+                .medAktørId(behandling.getAktørId().getId())
+                .medBehandlingSteg(behandling.getAktivtBehandlingSteg() == null ? null : behandling.getAktivtBehandlingSteg().getKode())
+                .medBehandlingTypeKode(behandling.getType().getKode())
+                .medBehandlendeEnhet(behandling.getBehandlendeEnhetId())
+                .medEventHendelse(EventHendelse.valueOf(eventName))
+                .medEventTid(LocalDateTime.now())
+                .medOpprettetBehandling(behandling.getOpprettetTidspunkt())
+                .medYtelseTypeKode(fagsak.getFagsakYtelseType().getKode())
+                .medAksjonspunktKoderMedStatusListe(aksjonspunktKoderMedStatusListe)
+                .medHref(String.format(defaultHRef, saksnummer, behandling.getId()))
+                .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligSaksbehandler())
+                .medFørsteFeilutbetaling(hentFørsteFeilutbetalingDato(kravgrunnlag431, kravgrunnlagManglerFristTid))
+                .medFeilutbetaltBeløp(kravgrunnlag431 != null ? hentFeilutbetaltBeløp(behandling.getId()) : BigDecimal.ZERO)
+                .build();
     }
 
     private LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431, LocalDateTime kravgrunnlagManglerFristTid) {
@@ -159,9 +159,9 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
             return null;
         }
         return kravgrunnlag431.getPerioder().stream()
-            .map(KravgrunnlagPeriode432::getFom)
-            .min(LocalDate::compareTo)
-            .orElse(null);
+                .map(KravgrunnlagPeriode432::getFom)
+                .min(LocalDate::compareTo)
+                .orElse(null);
     }
 
     private BigDecimal hentFeilutbetaltBeløp(Long behandlingId) {

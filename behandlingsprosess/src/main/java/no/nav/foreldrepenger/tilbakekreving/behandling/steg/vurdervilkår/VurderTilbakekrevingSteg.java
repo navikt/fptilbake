@@ -77,13 +77,13 @@ public class VurderTilbakekrevingSteg implements BehandlingSteg {
 
     private BehandleStegResultat hoppFremoverTilVedtak() {
         return BehandleStegResultat.fremoverførtMedAksjonspunkter(FellesTransisjoner.FREMHOPP_TIL_FORESLÅ_VEDTAK,
-            Collections.singletonList(AksjonspunktDefinisjon.FORESLÅ_VEDTAK));
+                Collections.singletonList(AksjonspunktDefinisjon.FORESLÅ_VEDTAK));
     }
 
     private boolean allePerioderErForeldet(Long behandlingId) {
         Optional<VurdertForeldelse> vurdertForeldelseOpt = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId);
         return vurdertForeldelseOpt.map(vurdertForeldelse -> vurdertForeldelse.getVurdertForeldelsePerioder().stream()
-            .allMatch(foreldelsePeriodeDto -> ForeldelseVurderingType.FORELDET.equals(foreldelsePeriodeDto.getForeldelseVurderingType()))).orElse(false);
+                .allMatch(foreldelsePeriodeDto -> ForeldelseVurderingType.FORELDET.equals(foreldelsePeriodeDto.getForeldelseVurderingType()))).orElse(false);
     }
 
     private void deaktiverForrigeVilkårsvurdering(Long behandlingId) {

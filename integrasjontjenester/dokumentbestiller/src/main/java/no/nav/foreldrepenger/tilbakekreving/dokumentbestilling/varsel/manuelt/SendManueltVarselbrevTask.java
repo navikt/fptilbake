@@ -68,6 +68,6 @@ public class SendManueltVarselbrevTask implements ProsessTaskHandler {
         LocalDateTime fristTid = LocalDateTime.now().plus(ventefrist).plusDays(1);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
-            fristTid, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+                fristTid, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
     }
 }

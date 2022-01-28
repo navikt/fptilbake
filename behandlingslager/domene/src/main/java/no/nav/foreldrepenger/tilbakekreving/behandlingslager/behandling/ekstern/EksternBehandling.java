@@ -100,7 +100,7 @@ public class EksternBehandling extends BaseEntitet {
         }
         EksternBehandling that = (EksternBehandling) object;
         return Objects.equals(internId, that.internId) &&
-            Objects.equals(getHenvisning(), that.getHenvisning());
+                Objects.equals(getHenvisning(), that.getHenvisning());
     }
 
     @Override

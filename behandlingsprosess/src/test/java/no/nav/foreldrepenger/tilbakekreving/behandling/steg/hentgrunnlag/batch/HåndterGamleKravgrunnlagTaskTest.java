@@ -54,7 +54,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakReposi
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -86,7 +86,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.xmlutils.DateUtil;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class HåndterGamleKravgrunnlagTaskTest {
 
     private final PersoninfoAdapter tpsTjenesteMock = mock(PersoninfoAdapter.class);
@@ -118,19 +118,19 @@ public class HåndterGamleKravgrunnlagTaskTest {
         ProsessTaskTjeneste taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         NavBrukerRepository navBrukerRepository = new NavBrukerRepository(entityManager);
         BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(
-            entityManager, new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
+                entityManager, new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
         hentKravgrunnlagMapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
         KravgrunnlagMapper lesKravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
         BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(
-            behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
+                behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(
-            repositoryProvider.getHistorikkRepository(), null);
+                repositoryProvider.getHistorikkRepository(), null);
         FagsakTjeneste fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repositoryProvider,
                 behandlingskontrollProvider, fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock, Period.ofWeeks(4));
         HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(
-            mottattXmlRepository, grunnlagRepository, hentKravgrunnlagMapper, lesKravgrunnlagMapper, behandlingTjeneste,
-            økonomiConsumerMock, fagsystemKlientMock);
+                mottattXmlRepository, grunnlagRepository, hentKravgrunnlagMapper, lesKravgrunnlagMapper, behandlingTjeneste,
+                økonomiConsumerMock, fagsystemKlientMock);
         håndterGamleKravgrunnlagTask = new HåndterGamleKravgrunnlagTask(håndterGamleKravgrunnlagTjeneste);
 
         behandling = ScenarioSimple.simple().lagMocked();
@@ -163,7 +163,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
     @Test
     public void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_grunnlaget_ikke_finnes_i_økonomi() {
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
-            .thenThrow(ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(behandling.getId(), 100000001L, "kravgrunnlag ikke finnes"));
+                .thenThrow(ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(behandling.getId(), 100000001L, "kravgrunnlag ikke finnes"));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNotNull();
         assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNull();
@@ -173,7 +173,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
     @Test
     public void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_økonomi_svarer_ukjent_feil() {
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
-            .thenThrow(ØkonomiConsumerFeil.fikkUkjentFeilkodeVedHentingAvKravgrunnlag(behandling.getId(), 100000001L, "ukjent feil"));
+                .thenThrow(ØkonomiConsumerFeil.fikkUkjentFeilkodeVedHentingAvKravgrunnlag(behandling.getId(), 100000001L, "ukjent feil"));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
         assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNotNull();
@@ -183,7 +183,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
     @Test
     public void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_grunnlaget_er_sperret() {
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
-            .thenThrow(ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandling.getId(), 100000001L, "sperret"));
+                .thenThrow(ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandling.getId(), 100000001L, "sperret"));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
         ØkonomiXmlMottatt økonomiXmlMottatt = mottattXmlRepository.finnMottattXml(mottattXmlId);
@@ -260,7 +260,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
-            .thenThrow(ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandling.getId(), 100000001L, "sperret"));
+                .thenThrow(ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandling.getId(), 100000001L, "sperret"));
 
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
@@ -340,9 +340,9 @@ public class HåndterGamleKravgrunnlagTaskTest {
         PersonopplysningDto personopplysningDto = new PersonopplysningDto();
         personopplysningDto.setAktoerId(behandling.getAktørId().getId());
         return SamletEksternBehandlingInfo.builder(Tillegsinformasjon.FAGSAK, Tillegsinformasjon.PERSONOPPLYSNINGER)
-            .setGrunninformasjon(eksternBehandlingsinfoDto)
-            .setFagsak(fagsakDto)
-            .setPersonopplysninger(personopplysningDto).build();
+                .setGrunninformasjon(eksternBehandlingsinfoDto)
+                .setFagsak(fagsakDto)
+                .setPersonopplysninger(personopplysningDto).build();
     }
 
     private String getInputXML() {
@@ -363,11 +363,11 @@ public class HåndterGamleKravgrunnlagTaskTest {
 
     private Optional<Personinfo> lagPersonInfo(AktørId aktørId) {
         Personinfo personinfo = Personinfo.builder()
-            .medAktørId(aktørId)
-            .medFødselsdato(LocalDate.now().minusYears(20))
-            .medPersonIdent(new PersonIdent(aktørId.getId()))
-            .medNavn("testnavn")
-            .build();
+                .medAktørId(aktørId)
+                .medFødselsdato(LocalDate.now().minusYears(20))
+                .medPersonIdent(new PersonIdent(aktørId.getId()))
+                .medNavn("testnavn")
+                .build();
         return Optional.of(personinfo);
     }
 }

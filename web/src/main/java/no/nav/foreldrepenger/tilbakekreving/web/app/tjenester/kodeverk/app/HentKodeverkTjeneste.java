@@ -64,8 +64,8 @@ public class HentKodeverkTjeneste {
         Map<String, Collection<? extends Kodeverdi>> mapFiltered = new LinkedHashMap<>();
 
         map.entrySet().forEach(e -> mapFiltered.put(e.getKey(), e.getValue().stream()
-            .filter(f -> !"-".equals(f.getKode()))
-            .collect(Collectors.toList())));
+                .filter(f -> !"-".equals(f.getKode()))
+                .collect(Collectors.toList())));
 
         KODEVERDIER_SOM_BRUKES_PÅ_KLIENT = Collections.unmodifiableMap(mapFiltered);
     }

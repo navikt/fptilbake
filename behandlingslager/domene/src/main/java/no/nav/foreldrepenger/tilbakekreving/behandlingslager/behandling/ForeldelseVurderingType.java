@@ -21,11 +21,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum ForeldelseVurderingType implements Kodeverdi {
 
-    IKKE_VURDERT("IKKE_VURDERT","Perioden er ikke vurdert"),
-    FORELDET("FORELDET","Perioden er foreldet"),
-    IKKE_FORELDET("IKKE_FORELDET","Perioden er ikke foreldet"),
-    TILLEGGSFRIST("TILLEGGSFRIST","Perioden er ikke foreldet, regel om tilleggsfrist (10 år) benyttes"),
-    UDEFINERT("-","Ikke Definert");
+    IKKE_VURDERT("IKKE_VURDERT", "Perioden er ikke vurdert"),
+    FORELDET("FORELDET", "Perioden er foreldet"),
+    IKKE_FORELDET("IKKE_FORELDET", "Perioden er ikke foreldet"),
+    TILLEGGSFRIST("TILLEGGSFRIST", "Perioden er ikke foreldet, regel om tilleggsfrist (10 år) benyttes"),
+    UDEFINERT("-", "Ikke Definert");
 
     private String kode;
     private String navn;

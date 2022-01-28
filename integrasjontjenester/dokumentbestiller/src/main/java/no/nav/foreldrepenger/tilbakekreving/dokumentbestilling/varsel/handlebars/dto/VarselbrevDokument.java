@@ -156,13 +156,13 @@ public class VarselbrevDokument extends BaseDokument {
             }
         }
 
-        if(isKorrigert()){
+        if (isKorrigert()) {
             Objects.requireNonNull(varsletDato, "varsletDato");
             Objects.requireNonNull(varsletBeløp, "varsletBelop");
         }
 
-        if(finnesVerge){
-            Objects.requireNonNull(annenMottakerNavn,"annenMottakerNavn");
+        if (finnesVerge) {
+            Objects.requireNonNull(annenMottakerNavn, "annenMottakerNavn");
         }
     }
 

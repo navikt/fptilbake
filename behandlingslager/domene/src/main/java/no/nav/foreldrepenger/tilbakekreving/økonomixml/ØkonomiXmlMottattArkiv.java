@@ -19,13 +19,13 @@ public class ØkonomiXmlMottattArkiv extends BaseEntitet {
     @Column(name = "melding", nullable = false)
     private String mottattXml;
 
-     ØkonomiXmlMottattArkiv() {
-         // for hibernate
+    ØkonomiXmlMottattArkiv() {
+        // for hibernate
     }
 
-    public ØkonomiXmlMottattArkiv(Long id, String mottattXml){
-         this.id = id;
-         this.mottattXml = mottattXml;
+    public ØkonomiXmlMottattArkiv(Long id, String mottattXml) {
+        this.id = id;
+        this.mottattXml = mottattXml;
     }
 
     public Long getId() {

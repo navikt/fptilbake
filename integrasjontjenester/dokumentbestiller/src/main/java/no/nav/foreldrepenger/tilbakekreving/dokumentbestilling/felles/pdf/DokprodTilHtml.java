@@ -84,7 +84,7 @@ public class DokprodTilHtml {
 
     static String ekstraLinjeskiftFørHilsing(String s) {
         return s
-            .replace("<p>Med vennlig hilsen", "<p class=\"hilsen\">Med vennlig hilsen")
-            .replace("<p>Med vennleg helsing", "<p class=\"hilsen\">Med vennleg helsing");
+                .replace("<p>Med vennlig hilsen", "<p class=\"hilsen\">Med vennlig hilsen")
+                .replace("<p>Med vennleg helsing", "<p class=\"hilsen\">Med vennleg helsing");
     }
 }

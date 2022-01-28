@@ -68,7 +68,7 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
         when(mockPdfBrevTjeneste.genererForhåndsvisning(any(BrevData.class))).thenReturn(varselTekst.getBytes());
 
         when(mockEksternDataForBrevTjeneste.hentYtelsenavn(FagsakYtelseType.FORELDREPENGER, Språkkode.nb))
-            .thenReturn(lagYtelseNavn("foreldrepenger", "foreldrepenger"));
+                .thenReturn(lagYtelseNavn("foreldrepenger", "foreldrepenger"));
         Personinfo personinfo = byggStandardPerson("Fiona", DUMMY_FØDSELSNUMMER, Språkkode.nn);
         String aktørId = behandling.getAktørId().getId();
         when(mockEksternDataForBrevTjeneste.hentPerson(aktørId)).thenReturn(personinfo);
@@ -77,9 +77,9 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setSprakkode(Språkkode.nb);
         when(mockEksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(FPSAK_BEHANDLING_UUID))
-            .thenReturn(SamletEksternBehandlingInfo.builder()
-                .setGrunninformasjon(eksternBehandlingsinfoDto)
-                .build());
+                .thenReturn(SamletEksternBehandlingInfo.builder()
+                        .setGrunninformasjon(eksternBehandlingsinfoDto)
+                        .build());
 
         OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet("1234", "NAV-TESTENHET");
         behandling.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
@@ -108,7 +108,7 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     @Test
     public void skal_ikke_sende_henleggelsesbrev_hvis_varselbrev_ikke_sendt() {
         var e = assertThrows(FunksjonellException.class, () ->
-            henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, null, BrevMottaker.BRUKER));
+                henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, null, BrevMottaker.BRUKER));
         assertThat(e.getMessage()).contains("FPT-110801");
     }
 
@@ -116,16 +116,16 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     public void skal_ikke_sende_henleggelsesbrev_for_tilbakekreving_revurdering_uten_fritekst() {
         Long revurderingBehandlingId = opprettOgForberedTilbakekrevingRevurdering();
         var e = assertThrows(FunksjonellException.class, () ->
-            henleggelsesbrevTjeneste.sendHenleggelsebrev(revurderingBehandlingId, null, BrevMottaker.BRUKER));
+                henleggelsesbrevTjeneste.sendHenleggelsebrev(revurderingBehandlingId, null, BrevMottaker.BRUKER));
         assertThat(e.getMessage()).contains("FPT-110802");
     }
 
     private void lagreVarselBrevSporing() {
         BrevSporing brevSporing = new BrevSporing.Builder()
-            .medJournalpostId(new JournalpostId("1213214234"))
-            .medBrevType(BrevType.VARSEL_BREV)
-            .medDokumentId("12312423432423")
-            .medBehandlingId(behandlingId).build();
+                .medJournalpostId(new JournalpostId("1213214234"))
+                .medBrevType(BrevType.VARSEL_BREV)
+                .medDokumentId("12312423432423")
+                .medBehandlingId(behandlingId).build();
         brevSporingRepository.lagre(brevSporing);
     }
 

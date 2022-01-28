@@ -1,11 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.felles;
 
+import static java.lang.Math.toIntExact;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
-
-import static java.lang.Math.toIntExact;
 
 public class Ukedager {
 

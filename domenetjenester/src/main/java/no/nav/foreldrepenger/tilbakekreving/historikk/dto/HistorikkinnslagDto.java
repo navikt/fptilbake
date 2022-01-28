@@ -9,7 +9,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personop
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 
-public class HistorikkinnslagDto implements  Comparable<HistorikkinnslagDto> {
+public class HistorikkinnslagDto implements Comparable<HistorikkinnslagDto> {
     private Long behandlingId;
     private UUID behandlingUuid;
     private HistorikkinnslagType type;
@@ -95,7 +95,7 @@ public class HistorikkinnslagDto implements  Comparable<HistorikkinnslagDto> {
     @Override
     public int compareTo(HistorikkinnslagDto that) {
         int comparatorValue = that.getOpprettetTidspunkt().compareTo(this.getOpprettetTidspunkt());
-        if(comparatorValue == 0 && that.getType().equals(HistorikkinnslagType.REVURD_OPPR)) {
+        if (comparatorValue == 0 && that.getType().equals(HistorikkinnslagType.REVURD_OPPR)) {
             return -1;
         }
         return comparatorValue;
@@ -110,18 +110,18 @@ public class HistorikkinnslagDto implements  Comparable<HistorikkinnslagDto> {
             return false;
         }
         return Objects.equals(getBehandlingId(), that.getBehandlingId()) &&
-            Objects.equals(getBehandlingUuid(), that.getBehandlingUuid()) &&
-            Objects.equals(getType(), that.getType()) &&
-            Objects.equals(getAktoer(), that.getAktoer()) &&
-            Objects.equals(getKjoenn(), that.getKjoenn()) &&
-            Objects.equals(getOpprettetAv(), that.getOpprettetAv()) &&
-            Objects.equals(getOpprettetTidspunkt(), that.getOpprettetTidspunkt()) &&
-            Objects.equals(getDokumentLinks(), that.getDokumentLinks());
+                Objects.equals(getBehandlingUuid(), that.getBehandlingUuid()) &&
+                Objects.equals(getType(), that.getType()) &&
+                Objects.equals(getAktoer(), that.getAktoer()) &&
+                Objects.equals(getKjoenn(), that.getKjoenn()) &&
+                Objects.equals(getOpprettetAv(), that.getOpprettetAv()) &&
+                Objects.equals(getOpprettetTidspunkt(), that.getOpprettetTidspunkt()) &&
+                Objects.equals(getDokumentLinks(), that.getDokumentLinks());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getBehandlingId(), getBehandlingUuid(), getType(), getAktoer(), getKjoenn(),
-            getOpprettetAv(), getOpprettetTidspunkt(), getDokumentLinks());
+                getOpprettetAv(), getOpprettetTidspunkt(), getDokumentLinks());
     }
 }

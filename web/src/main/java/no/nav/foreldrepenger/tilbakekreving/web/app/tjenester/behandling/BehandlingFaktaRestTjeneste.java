@@ -49,13 +49,13 @@ public class BehandlingFaktaRestTjeneste {
 
     @GET
     @Operation(
-        tags = "behandlingfakta",
-        description = "Hent fakta om feilutbetaling"
+            tags = "behandlingfakta",
+            description = "Hent fakta om feilutbetaling"
     )
     @Path("/hent-fakta/feilutbetaling")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     public BehandlingFeilutbetalingFaktaDto hentFeilutbetalingFakta(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                                                        @QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+                                                                    @QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         BehandlingFeilutbetalingFakta fakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(hentBehandlingId(behandlingReferanse));
         BehandlingFeilutbetalingFaktaDto dto = new BehandlingFeilutbetalingFaktaDto();
         dto.setBehandlingFakta(fakta);
@@ -64,7 +64,7 @@ public class BehandlingFaktaRestTjeneste {
 
     private Long hentBehandlingId(BehandlingReferanse behandlingReferanse) {
         return behandlingReferanse.erInternBehandlingId()
-            ? behandlingReferanse.getBehandlingId()
-            : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
+                ? behandlingReferanse.getBehandlingId()
+                : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
     }
 }

@@ -13,7 +13,9 @@ public class UtvidetBehandlingDto extends BehandlingDto {
     @JsonProperty("originalBehandlingId")
     private Long originalBehandlingId;
 
-    /** Eventuelt async status på tasks. */
+    /**
+     * Eventuelt async status på tasks.
+     */
     @JsonProperty("taskStatus")
     private AsyncPollingStatus taskStatus;
 

@@ -63,8 +63,8 @@ public class PipBehandlingData {
 
     public Set<String> getAktørIdSomStrenger() {
         return aktørId.stream()
-            .map(AktørId::getId)
-            .collect(Collectors.toSet());
+                .map(AktørId::getId)
+                .collect(Collectors.toSet());
     }
 
     public void leggTilAktørId(Set<AktørId> aktørId) {
@@ -77,11 +77,11 @@ public class PipBehandlingData {
 
     public Boolean isEmpty() {
         return Objects.isNull(behandlingId) &&
-            Objects.isNull(statusForBehandling) &&
-            Objects.isNull(ansvarligSaksbehandler) &&
-            Objects.isNull(saksnummer) &&
-            Objects.isNull(fagsakstatus) &&
-            aktørId.isEmpty();
+                Objects.isNull(statusForBehandling) &&
+                Objects.isNull(ansvarligSaksbehandler) &&
+                Objects.isNull(saksnummer) &&
+                Objects.isNull(fagsakstatus) &&
+                aktørId.isEmpty();
     }
 
 }

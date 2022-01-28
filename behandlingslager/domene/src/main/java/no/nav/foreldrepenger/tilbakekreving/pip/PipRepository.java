@@ -63,16 +63,16 @@ public class PipRepository {
 
     private Optional<BehandlingInfo> hentInternBehandlingData(long behandlingId) {
         String sql = """
-            select b.id as behandlingId
-            , f.saksnummer as saksnummer
-            , u.aktoer_id as aktørId
-            , b.behandling_status as behandlingstatus
-            , b.ansvarlig_saksbehandler as ansvarligSaksbehandler
-             from behandling b
-             left join fagsak f on f.id = b.fagsak_id
-             left join bruker u on u.id = f.bruker_id
-             where b.id = :behandlingId
-             """;
+                select b.id as behandlingId
+                , f.saksnummer as saksnummer
+                , u.aktoer_id as aktørId
+                , b.behandling_status as behandlingstatus
+                , b.ansvarlig_saksbehandler as ansvarligSaksbehandler
+                 from behandling b
+                 left join fagsak f on f.id = b.fagsak_id
+                 left join bruker u on u.id = f.bruker_id
+                 where b.id = :behandlingId
+                 """;
 
         // PipBehandlingInfo-mappingen er definert i Behandling entiteten
         Query query = entityManager.createNativeQuery(sql, "PipBehandlingInfo");
@@ -85,22 +85,22 @@ public class PipRepository {
             return Optional.of((BehandlingInfo) resultater.get(0));
         } else {
             throw new IllegalStateException("Utvikler feil: Forventet 0 eller 1 treff etter søk på behandlingId, fikk "
-                + resultater.size() + " [behandlingId: " + behandlingId);
+                    + resultater.size() + " [behandlingId: " + behandlingId);
         }
     }
 
     private Optional<BehandlingInfo> hentInternBehandlingData(UUID behandlingUuid) {
         String sql = """
-            select b.id as behandlingId
-            , f.saksnummer as saksnummer
-            , u.aktoer_id as aktørId
-            , b.behandling_status as behandlingstatus
-            , b.ansvarlig_saksbehandler as ansvarligSaksbehandler
-             from behandling b
-             left join fagsak f on f.id = b.fagsak_id
-             left join bruker u on u.id = f.bruker_id
-             where b.uuid = :behandlingUuid
-             """;
+                select b.id as behandlingId
+                , f.saksnummer as saksnummer
+                , u.aktoer_id as aktørId
+                , b.behandling_status as behandlingstatus
+                , b.ansvarlig_saksbehandler as ansvarligSaksbehandler
+                 from behandling b
+                 left join fagsak f on f.id = b.fagsak_id
+                 left join bruker u on u.id = f.bruker_id
+                 where b.uuid = :behandlingUuid
+                 """;
 
         // PipBehandlingInfo-mappingen er definert i Behandling entiteten
         Query query = entityManager.createNativeQuery(sql, "PipBehandlingInfo");
@@ -113,22 +113,22 @@ public class PipRepository {
             return Optional.of((BehandlingInfo) resultater.get(0));
         } else {
             throw new IllegalStateException("Utvikler feil: Forventet 0 eller 1 treff etter søk på behandlingId, fikk "
-                + resultater.size() + " [behandlingUuid: " + behandlingUuid);
+                    + resultater.size() + " [behandlingUuid: " + behandlingUuid);
         }
     }
 
     private static final Map<AksjonspunktType, String> AKSJONSPUNKT_TYPE_TIL_ABAC_KODE = Map.of(
-        AksjonspunktType.AUTOPUNKT, "Auto",
-        AksjonspunktType.MANUELL, "Manuell",
-        AksjonspunktType.OVERSTYRING, "Overstyring",
-        AksjonspunktType.SAKSBEHANDLEROVERSTYRING, "Saksbehandleroverstyring");
+            AksjonspunktType.AUTOPUNKT, "Auto",
+            AksjonspunktType.MANUELL, "Manuell",
+            AksjonspunktType.OVERSTYRING, "Overstyring",
+            AksjonspunktType.SAKSBEHANDLEROVERSTYRING, "Saksbehandleroverstyring");
 
     public Set<String> hentAksjonspunktTypeForAksjonspunktKoder(Collection<AksjonspunktDefinisjon> aksjonspunktKoder) {
         return aksjonspunktKoder.stream()
-            .map(ak -> ak.getAksjonspunktType())
-            .map(AKSJONSPUNKT_TYPE_TIL_ABAC_KODE::get)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
+                .map(ak -> ak.getAksjonspunktType())
+                .map(AKSJONSPUNKT_TYPE_TIL_ABAC_KODE::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 
 }

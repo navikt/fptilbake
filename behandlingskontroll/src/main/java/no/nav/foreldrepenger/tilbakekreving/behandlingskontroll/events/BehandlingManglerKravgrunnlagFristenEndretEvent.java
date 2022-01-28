@@ -12,7 +12,7 @@ public class BehandlingManglerKravgrunnlagFristenEndretEvent implements Behandli
     private AktørId aktørId;
     private LocalDateTime fristDato;
 
-    public BehandlingManglerKravgrunnlagFristenEndretEvent(Behandling behandling, LocalDateTime fristDato){
+    public BehandlingManglerKravgrunnlagFristenEndretEvent(Behandling behandling, LocalDateTime fristDato) {
         this.fagsakId = behandling.getFagsakId();
         this.behandlingId = behandling.getId();
         this.aktørId = behandling.getAktørId();

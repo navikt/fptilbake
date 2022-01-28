@@ -25,7 +25,7 @@ public class FagsakStatusEvent implements FagsakEvent {
     public AktørId getAktørId() {
         return aktørId;
     }
-    
+
     @Override
     public Long getFagsakId() {
         return fagsakId;

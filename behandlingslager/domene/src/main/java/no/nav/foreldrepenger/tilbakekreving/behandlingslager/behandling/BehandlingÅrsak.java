@@ -37,7 +37,7 @@ public class BehandlingÅrsak extends BaseEntitet {
     private Behandling behandling;
 
     @Convert(converter = BehandlingÅrsakType.KodeverdiConverter.class)
-    @Column(name="behandling_arsak_type",nullable = false)
+    @Column(name = "behandling_arsak_type", nullable = false)
     private BehandlingÅrsakType behandlingÅrsakType = BehandlingÅrsakType.UDEFINERT;
 
     @OneToOne

@@ -51,7 +51,7 @@ public class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
         HistorikkinnslagDel historikkinnslagDel = historikkinnslagDeler.get(0);
         assertThat(historikkinnslagDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.VEDTAK.getKode());
         assertThat(historikkinnslagDel.getResultat().get())
-            .isEqualTo(beregningResultat.getVedtakResultatType().getKode());
+                .isEqualTo(beregningResultat.getVedtakResultatType().getKode());
     }
 
 }

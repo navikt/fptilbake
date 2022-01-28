@@ -1,10 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
-import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
-import no.nav.vedtak.sikkerhet.abac.AbacDto;
-
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
+import no.nav.vedtak.sikkerhet.abac.AbacDto;
 
 public class ProsessTaskGruppeIdDto implements AbacDto {
 
@@ -32,7 +32,7 @@ public class ProsessTaskGruppeIdDto implements AbacDto {
     @Override
     public String toString() {
         return "BehandlingIdDto{" +
-            "behandlingId=" + gruppe +
-            '}';
+                "behandlingId=" + gruppe +
+                '}';
     }
 }

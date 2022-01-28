@@ -27,5 +27,4 @@ class Historikkendring<T> {
     }
 
 
-
 }

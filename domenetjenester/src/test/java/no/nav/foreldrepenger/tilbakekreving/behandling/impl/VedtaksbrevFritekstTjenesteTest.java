@@ -73,31 +73,31 @@ public class VedtaksbrevFritekstTjenesteTest {
         FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
         fakta.setBegrunnelse("foo");
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
-            .medFeilutbetalinger(fakta)
-            .medHendelseType(HendelseType.FP_ANNET_HENDELSE_TYPE)
-            .medHendelseUndertype(HendelseUnderType.ANNET_FRITEKST)
-            .medPeriode(jan1, jan24)
-            .build());
+                .medFeilutbetalinger(fakta)
+                .medHendelseType(HendelseType.FP_ANNET_HENDELSE_TYPE)
+                .medHendelseUndertype(HendelseUnderType.ANNET_FRITEKST)
+                .medPeriode(jan1, jan24)
+                .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
 
         VedtaksbrevFritekstOppsummering oppsummering = new VedtaksbrevFritekstOppsummering.Builder().medBehandlingId(
-            behandlingId).build();
+                behandlingId).build();
         List<VedtaksbrevFritekstPeriode> fritekstperioder = List.of(
-            new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId)
-                .medFritekst("foo")
-                .medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT)
-                .medPeriode(Periode.of(jan1, jan2))
-                .build(), new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId)
-                .medFritekst("foo")
-                .medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT)
-                .medPeriode(Periode.of(jan3, jan24))
-                .build());
+                new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId)
+                        .medFritekst("foo")
+                        .medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT)
+                        .medPeriode(Periode.of(jan1, jan2))
+                        .build(), new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId)
+                        .medFritekst("foo")
+                        .medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT)
+                        .medPeriode(Periode.of(jan3, jan24))
+                        .build());
 
         tjeneste.lagreFriteksterFraSaksbehandler(behandlingId, oppsummering, fritekstperioder, VedtaksbrevType.ORDINÆR);
         entityManager.flush();
 
         List<VedtaksbrevFritekstPeriode> fritekster = vedtaksbrevFritekstRepository.hentVedtaksbrevPerioderMedTekst(
-            behandlingId);
+                behandlingId);
         assertThat(fritekster).hasSize(2);
         assertThat(fritekster.get(0).getFritekst()).isEqualTo("foo");
         assertThat(fritekster.get(1).getFritekst()).isEqualTo("foo");
@@ -108,19 +108,19 @@ public class VedtaksbrevFritekstTjenesteTest {
         FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
         fakta.setBegrunnelse("foo");
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
-            .medFeilutbetalinger(fakta)
-            .medHendelseType(HendelseType.FP_ANNET_HENDELSE_TYPE)
-            .medHendelseUndertype(HendelseUnderType.ANNET_FRITEKST)
-            .medPeriode(jan1, jan24)
-            .build());
+                .medFeilutbetalinger(fakta)
+                .medHendelseType(HendelseType.FP_ANNET_HENDELSE_TYPE)
+                .medHendelseUndertype(HendelseUnderType.ANNET_FRITEKST)
+                .medPeriode(jan1, jan24)
+                .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
 
         VedtaksbrevFritekstOppsummering oppsummering = new VedtaksbrevFritekstOppsummering.Builder().medBehandlingId(
-            behandlingId).build();
+                behandlingId).build();
         List<VedtaksbrevFritekstPeriode> fritekstperioder = Collections.emptyList();
 
         assertThatThrownBy(() -> tjeneste.lagreFriteksterFraSaksbehandler(behandlingId, oppsummering, fritekstperioder,
-            VedtaksbrevType.ORDINÆR)).hasMessageContaining("Det mangler fritekst");
+                VedtaksbrevType.ORDINÆR)).hasMessageContaining("Det mangler fritekst");
     }
 
 

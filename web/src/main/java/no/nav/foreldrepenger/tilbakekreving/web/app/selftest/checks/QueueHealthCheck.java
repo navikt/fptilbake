@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.vedtak.felles.integrasjon.jms.QueueSelftest;
-import no.nav.vedtak.felles.integrasjon.jms.pausing.MQExceptionUtil;
 
 public abstract class QueueHealthCheck {
 

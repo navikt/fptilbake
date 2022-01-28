@@ -20,7 +20,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Organisasjon
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -60,27 +59,27 @@ public class VarselbrevUtilTest {
         personopplysningDto.setFødselsnummer(PERSONNUMMER);
 
         Personinfo personinfo = Personinfo.builder().medAktørId(new AktørId("1234567890011")).medPersonIdent(new PersonIdent(PERSONNUMMER))
-            .medNavn("Fiona").medFødselsdato(LocalDate.now().minusDays(1)).build();
+                .medNavn("Fiona").medFødselsdato(LocalDate.now().minusDays(1)).build();
 
         YtelseNavn ytelseNavn = lagYtelseNavn("eingongsstønad", "engangsstønad");
 
         SamletEksternBehandlingInfo behandingsinfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER)
-            .setGrunninformasjon(eksternBehandlingsinfoDto)
-            .setPersonopplysninger(personopplysningDto)
-            .build();
+                .setGrunninformasjon(eksternBehandlingsinfoDto)
+                .setPersonopplysninger(personopplysningDto)
+                .build();
 
         VarselbrevSamletInfo varselbrev = VarselbrevUtil.sammenstillInfoFraFagsystemerForhåndvisningVarselbrev(
-            saksnummer,
-            VARSEL_TEKST,
-            adresseinfo,
-            behandingsinfo,
-            personinfo,
-            feilutbetaltePerioderDto,
-            Period.ofWeeks(3),
-            FagsakYtelseType.ENGANGSTØNAD,
-            ytelseNavn,
-            false,
-            null);
+                saksnummer,
+                VARSEL_TEKST,
+                adresseinfo,
+                behandingsinfo,
+                personinfo,
+                feilutbetaltePerioderDto,
+                Period.ofWeeks(3),
+                FagsakYtelseType.ENGANGSTØNAD,
+                ytelseNavn,
+                false,
+                null);
 
         assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetId()).isEqualTo(eksternBehandlingsinfoDto.getBehandlendeEnhetId());
         assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetNavn()).isEqualTo(eksternBehandlingsinfoDto.getBehandlendeEnhetNavn());
@@ -121,19 +120,19 @@ public class VarselbrevUtilTest {
         personopplysninger.setAntallBarn(1);
 
         SamletEksternBehandlingInfo behandingsinfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER)
-            .setGrunninformasjon(eksternBehandlingsinfoDto)
-            .setPersonopplysninger(personopplysninger)
-            .build();
+                .setGrunninformasjon(eksternBehandlingsinfoDto)
+                .setPersonopplysninger(personopplysninger)
+                .build();
 
         VarselbrevSamletInfo varselbrev = VarselbrevUtil.sammenstillInfoFraFagsystemerForSending(
-            behandingsinfo,
-            Saksnummer.infotrygd("11111111"),
-            adresseinfo,
-            personinfo,
-            feilutbetaltePerioderDto,
-            Period.ofWeeks(3),
-            FagsakYtelseType.SVANGERSKAPSPENGER,
-            ytelseNavn, VARSEL_TEKST, false, null);
+                behandingsinfo,
+                Saksnummer.infotrygd("11111111"),
+                adresseinfo,
+                personinfo,
+                feilutbetaltePerioderDto,
+                Period.ofWeeks(3),
+                FagsakYtelseType.SVANGERSKAPSPENGER,
+                ytelseNavn, VARSEL_TEKST, false, null);
 
         assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetId()).isEqualTo(BEHANDLENDE_ENHET_ID);
         assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetNavn()).isEqualTo(BEHANDLENDE_ENHET_NAVN);
@@ -164,12 +163,12 @@ public class VarselbrevUtilTest {
     @Test
     public void skal_sammenstille_data_fra_grunnlag_og_tps_for_åsende_manuelt_varselbrev() {
         LogiskPeriodeMedFaktaDto logiskPeriodeMedFaktaDto = LogiskPeriodeMedFaktaDto.lagPeriode(LocalDate.of(2019, 10, 1),
-            LocalDate.of(2019, 10, 30),
-            BigDecimal.valueOf(9000));
+                LocalDate.of(2019, 10, 30),
+                BigDecimal.valueOf(9000));
         BehandlingFeilutbetalingFakta feilutbetalingFakta = BehandlingFeilutbetalingFakta.builder()
-            .medAktuellFeilUtbetaltBeløp(BigDecimal.valueOf(9000))
-            .medPerioder(Lists.newArrayList(logiskPeriodeMedFaktaDto))
-            .build();
+                .medAktuellFeilUtbetaltBeløp(BigDecimal.valueOf(9000))
+                .medPerioder(Lists.newArrayList(logiskPeriodeMedFaktaDto))
+                .build();
 
         Saksnummer saksnummer = new Saksnummer("11111111");
         NavBruker navBruker = NavBruker.opprettNy(new AktørId("1232132423"), Språkkode.nb);
@@ -183,17 +182,17 @@ public class VarselbrevUtilTest {
         YtelseNavn ytelseNavn = lagYtelseNavn("foreldrepenger", "foreldrepenger");
 
         VarselbrevSamletInfo varselbrev = VarselbrevUtil.sammenstillInfoFraFagsystemerForSendingManueltVarselBrev(behandling,
-            personinfo,
-            adresseinfo,
-            FagsakYtelseType.FORELDREPENGER,
-            Språkkode.nb,
-            ytelseNavn,
-            Period.ofWeeks(3),
-            VARSEL_TEKST,
-            feilutbetalingFakta,
-            false,
-            null,
-            false);
+                personinfo,
+                adresseinfo,
+                FagsakYtelseType.FORELDREPENGER,
+                Språkkode.nb,
+                ytelseNavn,
+                Period.ofWeeks(3),
+                VARSEL_TEKST,
+                feilutbetalingFakta,
+                false,
+                null,
+                false);
 
         assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetId()).isEqualTo(BEHANDLENDE_ENHET_ID);
         assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetNavn()).isEqualTo(BEHANDLENDE_ENHET_NAVN);
@@ -221,16 +220,16 @@ public class VarselbrevUtilTest {
 
     private Personinfo byggStandardPerson(String navn, String personnummer) {
         return new Personinfo.Builder()
-            .medPersonIdent(PersonIdent.fra(personnummer))
-            .medNavn(navn)
-            .medAktørId(new AktørId(9000000030014L))
-            .medFødselsdato(LocalDate.of(1990, 2, 2))
-            .build();
+                .medPersonIdent(PersonIdent.fra(personnummer))
+                .medNavn(navn)
+                .medAktørId(new AktørId(9000000030014L))
+                .medFødselsdato(LocalDate.of(1990, 2, 2))
+                .build();
     }
 
     private Adresseinfo lagStandardNorskAdresse() {
         return new Adresseinfo.Builder(new PersonIdent("12345678901"), "Test Person")
-            .build();
+                .build();
     }
 
     private List<PeriodeDto> lagPerioderDtoMock() {

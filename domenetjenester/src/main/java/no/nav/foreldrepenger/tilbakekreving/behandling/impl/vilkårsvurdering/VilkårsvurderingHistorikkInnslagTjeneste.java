@@ -97,8 +97,8 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
                 finnEndring(gammel, ny, ANDEL_TILBAKEKREVES, VilkårVurderingPeriodeEntitet::finnAndelTilbakekreves),
                 finnEndring(gammel, ny, ILEGG_RENTER, r -> fraBoolean(r.manueltSattIleggRenter())),
                 finnEndring(gammel, ny, TILBAKEKREV_SMÅBELOEP, r -> fraBoolean(r.tilbakekrevesSmåbeløp())),
-                ! (ny.getAktsomhet()!=null && ny.getAktsomhet().getSærligGrunner().isEmpty())?
-                   finnEndring(gammel, ny, ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON, this::lagSærligeGrunnerTekst) :null
+                !(ny.getAktsomhet() != null && ny.getAktsomhet().getSærligGrunner().isEmpty()) ?
+                        finnEndring(gammel, ny, ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON, this::lagSærligeGrunnerTekst) : null
         );
         return endringer
                 .stream()
@@ -129,7 +129,7 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
             }
             builder.medSkjermlenke(SkjermlenkeType.TILBAKEKREVING);
             builder.medBegrunnelse(vilkårsendring.getBegrunnelseAktsomhet());
-            builder.medOpplysning(HistorikkOpplysningType.SÆRLIG_GRUNNER_BEGRUNNELSE,vilkårsendring.getBegrunnelseSærligGrunner());
+            builder.medOpplysning(HistorikkOpplysningType.SÆRLIG_GRUNNER_BEGRUNNELSE, vilkårsendring.getBegrunnelseSærligGrunner());
             builder.build(historikkinnslag);
         }
         historikkTjenesteAdapter.lagInnslag(historikkinnslag);
@@ -179,7 +179,7 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
     }
 
     private String getNavn(Kodeverdi kode) {
-        if(kode == null) {
+        if (kode == null) {
             return null;
         }
         return kode.getNavn();

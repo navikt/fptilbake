@@ -10,8 +10,8 @@ public class FagsystemId implements Comparable<FagsystemId> {
 
     public static FagsystemId parse(String kode) {
         return kode.contains("-")
-            ? parseNyttFormat(kode)
-            : parseGammeltFormat(kode);
+                ? parseNyttFormat(kode)
+                : parseGammeltFormat(kode);
     }
 
     private static FagsystemId parseNyttFormat(String kode) {
@@ -53,7 +53,7 @@ public class FagsystemId implements Comparable<FagsystemId> {
         }
         FagsystemId that = (FagsystemId) annen;
         return løpenummer == that.løpenummer &&
-            saksnummer.equals(that.saksnummer);
+                saksnummer.equals(that.saksnummer);
     }
 
     @Override
@@ -64,8 +64,8 @@ public class FagsystemId implements Comparable<FagsystemId> {
     @Override
     public String toString() {
         return gammeltFormat
-            ? String.format("%s%03d", saksnummer, løpenummer)
-            : String.format("%s-%d", saksnummer, løpenummer);
+                ? String.format("%s%03d", saksnummer, løpenummer)
+                : String.format("%s-%d", saksnummer, løpenummer);
     }
 
     @Override

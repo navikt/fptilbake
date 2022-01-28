@@ -21,12 +21,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum HistorikkAktør implements Kodeverdi {
 
-    BESLUTTER("BESL","Beslutter"),
-    SAKSBEHANDLER("SBH","Saksbehandler"),
-    SØKER("SOKER","Søker"),
-    ARBEIDSGIVER("ARBEIDSGIVER","Arbeidsgiver"),
-    VEDTAKSLØSNINGEN("VL","Vedtaksløsningen"),
-    UDEFINERT("-","Ikke definert");
+    BESLUTTER("BESL", "Beslutter"),
+    SAKSBEHANDLER("SBH", "Saksbehandler"),
+    SØKER("SOKER", "Søker"),
+    ARBEIDSGIVER("ARBEIDSGIVER", "Arbeidsgiver"),
+    VEDTAKSLØSNINGEN("VL", "Vedtaksløsningen"),
+    UDEFINERT("-", "Ikke definert");
 
     private String kode;
     private String navn;

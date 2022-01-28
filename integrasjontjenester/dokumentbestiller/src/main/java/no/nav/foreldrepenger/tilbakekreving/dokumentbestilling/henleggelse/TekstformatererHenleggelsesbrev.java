@@ -22,9 +22,9 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
     static String lagHenleggelsebrevFritekst(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {
         try {
             Template template = opprettHandlebarsTemplate("henleggelse/henleggelse",
-                henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode());
+                    henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode());
             HenleggelsesbrevDokument henleggelsesbrevDokument = mapTilHenleggelsebrevDokument(
-                henleggelsesbrevSamletInfo);
+                    henleggelsesbrevSamletInfo);
 
             return applyTemplate(template, henleggelsesbrevDokument);
         } catch (IOException e) {
@@ -35,7 +35,7 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
     static String lagHenleggelsebrevOverskrift(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {
         try {
             Template template = opprettHandlebarsTemplate("henleggelse/henleggelse_overskrift",
-                henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode());
+                    henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode());
             OverskriftBrevData overskriftBrevData = lagOverskriftBrevData(henleggelsesbrevSamletInfo.getBrevMetadata());
 
             return template.apply(overskriftBrevData);
@@ -47,9 +47,9 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
     static String lagRevurderingHenleggelsebrevFritekst(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {
         try {
             Template template = opprettHandlebarsTemplate("henleggelse/henleggelse_revurdering",
-                henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode());
+                    henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode());
             HenleggelsesbrevDokument henleggelsesbrevDokument = mapTilHenleggelsebrevDokument(
-                henleggelsesbrevSamletInfo);
+                    henleggelsesbrevSamletInfo);
 
             return applyTemplate(template, henleggelsesbrevDokument);
         } catch (IOException e) {
@@ -60,7 +60,7 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
     static String lagRevurderingHenleggelsebrevOverskrift(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {
         try {
             Template template = opprettHandlebarsTemplate("henleggelse/henleggelse_revurdering_overskrift",
-                henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode());
+                    henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode());
             OverskriftBrevData overskriftBrevData = lagOverskriftBrevData(henleggelsesbrevSamletInfo.getBrevMetadata());
 
             return template.apply(overskriftBrevData);
@@ -82,7 +82,7 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
         henleggelsesbrevDokument.setFinnesVerge(henleggelsesbrevSamletInfo.getBrevMetadata().isFinnesVerge());
         henleggelsesbrevDokument.setAnnenMottakerNavn(BrevMottakerUtil.getAnnenMottakerNavn(henleggelsesbrevSamletInfo.getBrevMetadata()));
         henleggelsesbrevDokument.setTilbakekrevingRevurdering(BehandlingType.REVURDERING_TILBAKEKREVING
-            .equals(henleggelsesbrevSamletInfo.getBrevMetadata().getBehandlingType()));
+                .equals(henleggelsesbrevSamletInfo.getBrevMetadata().getBehandlingType()));
         henleggelsesbrevDokument.setFritekstFraSaksbehandler(henleggelsesbrevSamletInfo.getFritekstFraSaksbehandler());
         henleggelsesbrevDokument.valider();
         return henleggelsesbrevDokument;

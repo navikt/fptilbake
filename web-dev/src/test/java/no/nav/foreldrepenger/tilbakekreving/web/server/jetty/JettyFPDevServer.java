@@ -107,8 +107,8 @@ public class JettyFPDevServer extends JettyServer {
         File storeFile = new File(storePath);
         if (!storeFile.exists()) {
             throw new IllegalStateException("Finner ikke " + storeName + " i " + storePath
-                + "\n\tKonfigurer enten som System property \'" + storeProperty + "\' eller environment variabel \'"
-                + storeProperty.toUpperCase().replace('.', '_') + "\'");
+                    + "\n\tKonfigurer enten som System property \'" + storeProperty + "\' eller environment variabel \'"
+                    + storeProperty.toUpperCase().replace('.', '_') + "\'");
         }
         String password = ENV.getProperty(storePasswordProperty, defaultPassword);
         if (password == null) {
@@ -140,8 +140,8 @@ public class JettyFPDevServer extends JettyServer {
         https.addCustomizer(new SecureRequestCustomizer());
 
         ServerConnector sslConnector = new ServerConnector(server,
-            new SslConnectionFactory(new SslContextFactory.Server(), "http/1.1"),
-            new HttpConnectionFactory(https));
+                new SslConnectionFactory(new SslContextFactory.Server(), "http/1.1"),
+                new HttpConnectionFactory(https));
         sslConnector.setPort(appKonfigurasjon.getSslPort());
         connectors.add(sslConnector);
 
@@ -159,8 +159,8 @@ public class JettyFPDevServer extends JettyServer {
     @Override
     protected ResourceCollection createResourceCollection() throws IOException {
         return new ResourceCollection(
-            Resource.newClassPathResource("/META-INF/resources/webjars/"),
-            Resource.newClassPathResource("/web")
+                Resource.newClassPathResource("/META-INF/resources/webjars/"),
+                Resource.newClassPathResource("/web")
         );
     }
 }

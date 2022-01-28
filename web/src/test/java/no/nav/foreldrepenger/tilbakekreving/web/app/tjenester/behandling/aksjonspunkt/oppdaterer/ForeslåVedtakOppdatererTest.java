@@ -41,12 +41,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.ForeslåVedtakDto;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class ForeslåVedtakOppdatererTest {
 
     private EntityManager entityManager;
@@ -131,8 +131,8 @@ public class ForeslåVedtakOppdatererTest {
     private void fellesAssert(Behandling behandling) {
         assertThat(behandling.getAksjonspunkter()).isNotEmpty();
         assertThat(behandling.getAksjonspunkter().stream()
-            .filter(aksjonspunkt -> aksjonspunkt.getAksjonspunktDefinisjon().equals(AksjonspunktDefinisjon.FATTE_VEDTAK))
-            .findFirst()).isNotEmpty();
+                .filter(aksjonspunkt -> aksjonspunkt.getAksjonspunktDefinisjon().equals(AksjonspunktDefinisjon.FATTE_VEDTAK))
+                .findFirst()).isNotEmpty();
     }
 
     private Behandling lagMockBehandling() {

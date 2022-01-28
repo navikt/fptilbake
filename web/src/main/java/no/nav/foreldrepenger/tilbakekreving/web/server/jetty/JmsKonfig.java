@@ -8,7 +8,6 @@ import org.eclipse.jetty.plus.jndi.EnvEntry;
 import com.ibm.mq.jms.MQConnectionFactory;
 import com.ibm.mq.jms.MQQueue;
 import com.ibm.msg.client.jms.JmsConstants;
-import com.ibm.msg.client.wmq.WMQConstants;
 import com.ibm.msg.client.wmq.compat.jms.internal.JMSC;
 
 import no.nav.foreldrepenger.konfig.Environment;
@@ -22,10 +21,10 @@ class JmsKonfig {
 
     static void settOppJndiConnectionfactory(String jndiName) throws JMSException, NamingException {
         MQConnectionFactory mqConnectionFactory = createConnectionFactory(
-            ENV.getProperty("mqGateway02.hostname"),
-            ENV.getProperty("mqGateway02.port", Integer.class),
-            ENV.getProperty("mqGateway02.channel"),
-            ENV.getProperty("mqGateway02.name"));
+                ENV.getProperty("mqGateway02.hostname"),
+                ENV.getProperty("mqGateway02.port", Integer.class),
+                ENV.getProperty("mqGateway02.channel"),
+                ENV.getProperty("mqGateway02.name"));
 
         new EnvEntry(jndiName, mqConnectionFactory);
     }

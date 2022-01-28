@@ -76,39 +76,39 @@ public class VarselbrevTjeneste {
         String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(varselbrevSamletInfo.getBrevMetadata());
         String brevtekst = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
         FritekstbrevData data = new FritekstbrevData.Builder()
-            .medOverskrift(overskrift)
-            .medBrevtekst(brevtekst)
-            .medMetadata(varselbrevSamletInfo.getBrevMetadata())
-            .build();
+                .medOverskrift(overskrift)
+                .medBrevtekst(brevtekst)
+                .medMetadata(varselbrevSamletInfo.getBrevMetadata())
+                .build();
         Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
         String fritekst = varselbrevSamletInfo.getFritekstFraSaksbehandler();
         pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VARSEL, varsletFeilutbetaling, fritekst, BrevData.builder()
-            .setMottaker(brevMottaker)
-            .setMetadata(data.getBrevMetadata())
-            .setOverskrift(data.getOverskrift())
-            .setBrevtekst(data.getBrevtekst())
-            .build());
+                .setMottaker(brevMottaker)
+                .setMetadata(data.getBrevMetadata())
+                .setOverskrift(data.getOverskrift())
+                .setBrevtekst(data.getBrevtekst())
+                .build());
     }
 
     public byte[] hentForhåndsvisningVarselbrev(HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) {
         VarselbrevSamletInfo varselbrevSamletInfo = lagVarselbrevForForhåndsvisning(
-            hentForhåndsvisningVarselbrevDto.getBehandlingUuid(),
-            hentForhåndsvisningVarselbrevDto.getVarseltekst(),
-            hentForhåndsvisningVarselbrevDto.getFagsakYtelseType());
+                hentForhåndsvisningVarselbrevDto.getBehandlingUuid(),
+                hentForhåndsvisningVarselbrevDto.getVarseltekst(),
+                hentForhåndsvisningVarselbrevDto.getFagsakYtelseType());
 
         String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(varselbrevSamletInfo.getBrevMetadata());
         String brevtekst = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
         FritekstbrevData data = new FritekstbrevData.Builder()
-            .medOverskrift(overskrift)
-            .medBrevtekst(brevtekst)
-            .medMetadata(varselbrevSamletInfo.getBrevMetadata())
-            .build();
+                .medOverskrift(overskrift)
+                .medBrevtekst(brevtekst)
+                .medMetadata(varselbrevSamletInfo.getBrevMetadata())
+                .build();
         return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
-            .setMottaker(varselbrevSamletInfo.getBrevMetadata().isFinnesVerge() ? BrevMottaker.VERGE : BrevMottaker.BRUKER)
-            .setMetadata(data.getBrevMetadata())
-            .setOverskrift(data.getOverskrift())
-            .setBrevtekst(data.getBrevtekst())
-            .build());
+                .setMottaker(varselbrevSamletInfo.getBrevMetadata().isFinnesVerge() ? BrevMottaker.VERGE : BrevMottaker.BRUKER)
+                .setMetadata(data.getBrevMetadata())
+                .setOverskrift(data.getOverskrift())
+                .setBrevtekst(data.getBrevtekst())
+                .build());
     }
 
     private VarselbrevSamletInfo lagVarselbrevForSending(Long behandlingId, BrevMottaker brevMottaker) {
@@ -145,17 +145,17 @@ public class VarselbrevTjeneste {
         String varselTekst = varselInfo.getVarselTekst();
 
         return VarselbrevUtil.sammenstillInfoFraFagsystemerForSending(
-            eksternBehandlingsinfoDto,
-            saksnummer,
-            adresseinfo,
-            personinfo,
-            feilutbetaltePerioderDto,
-            eksternDataForBrevTjeneste.getBrukersSvarfrist(),
-            fagsakYtelseType,
-            ytelseNavn,
-            varselTekst,
-            finnesVerge,
-            vergeNavn);
+                eksternBehandlingsinfoDto,
+                saksnummer,
+                adresseinfo,
+                personinfo,
+                feilutbetaltePerioderDto,
+                eksternDataForBrevTjeneste.getBrukersSvarfrist(),
+                fagsakYtelseType,
+                ytelseNavn,
+                varselTekst,
+                finnesVerge,
+                vergeNavn);
     }
 
     public VarselbrevSamletInfo lagVarselbrevForForhåndsvisning(UUID behandlingUuId, String varseltekst, FagsakYtelseType fagsakYtleseType) {
@@ -175,16 +175,16 @@ public class VarselbrevTjeneste {
         Språkkode mottakersSpråkkode = grunninformasjon.getSpråkkodeEllerDefault();
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtleseType, mottakersSpråkkode);
         return VarselbrevUtil.sammenstillInfoFraFagsystemerForhåndvisningVarselbrev(
-            eksternBehandlingsinfo.getSaksnummer(),
-            varseltekst,
-            adresseinfo,
-            eksternBehandlingsinfo,
-            personinfo,
-            feilutbetaltePerioderDto,
-            eksternDataForBrevTjeneste.getBrukersSvarfrist(),
-            fagsakYtleseType,
-            ytelseNavn,
-            finnesVerge,
-            vergeNavn);
+                eksternBehandlingsinfo.getSaksnummer(),
+                varseltekst,
+                adresseinfo,
+                eksternBehandlingsinfo,
+                personinfo,
+                feilutbetaltePerioderDto,
+                eksternDataForBrevTjeneste.getBrukersSvarfrist(),
+                fagsakYtleseType,
+                ytelseNavn,
+                finnesVerge,
+                vergeNavn);
     }
 }

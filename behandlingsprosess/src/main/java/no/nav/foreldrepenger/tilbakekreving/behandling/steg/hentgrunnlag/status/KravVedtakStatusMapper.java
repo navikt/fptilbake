@@ -28,13 +28,13 @@ public class KravVedtakStatusMapper {
     public KravVedtakStatus437 mapTilDomene(KravOgVedtakstatus kravOgVedtakstatus) {
         GjelderType gjelderType = GjelderType.fraKode(kravOgVedtakstatus.getTypeGjelderId().value());
         return KravVedtakStatus437.builder()
-            .medKravStatusKode(KravStatusKode.fraKode(kravOgVedtakstatus.getKodeStatusKrav()))
-            .medFagomraadeKode(FagOmrådeKode.fraKode(kravOgVedtakstatus.getKodeFagomraade()))
-            .medVedtakId(kravOgVedtakstatus.getVedtakId().longValue())
-            .medFagSystemId(kravOgVedtakstatus.getFagsystemId())
-            .medReferanse(new Henvisning(kravOgVedtakstatus.getReferanse()))
-            .medGjelderType(gjelderType)
-            .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(kravOgVedtakstatus.getVedtakGjelderId(), gjelderType))
-            .build();
+                .medKravStatusKode(KravStatusKode.fraKode(kravOgVedtakstatus.getKodeStatusKrav()))
+                .medFagomraadeKode(FagOmrådeKode.fraKode(kravOgVedtakstatus.getKodeFagomraade()))
+                .medVedtakId(kravOgVedtakstatus.getVedtakId().longValue())
+                .medFagSystemId(kravOgVedtakstatus.getFagsystemId())
+                .medReferanse(new Henvisning(kravOgVedtakstatus.getReferanse()))
+                .medGjelderType(gjelderType)
+                .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(kravOgVedtakstatus.getVedtakGjelderId(), gjelderType))
+                .build();
     }
 }

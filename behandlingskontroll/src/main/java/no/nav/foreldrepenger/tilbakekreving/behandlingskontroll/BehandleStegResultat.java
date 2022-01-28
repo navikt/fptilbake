@@ -77,15 +77,17 @@ public class BehandleStegResultat {
 
     private static List<AksjonspunktResultat> konverterTilAksjonspunktResultat(List<AksjonspunktDefinisjon> aksjonspunktListe) {
         return aksjonspunktListe.stream()
-            .map(apDef -> AksjonspunktResultat.opprettForAksjonspunkt(apDef))
-            .collect(toList());
+                .map(apDef -> AksjonspunktResultat.opprettForAksjonspunkt(apDef))
+                .collect(toList());
     }
 
     public static BehandleStegResultat startet() {
         return new BehandleStegResultat(FellesTransisjoner.STARTET, Collections.emptyList());
     }
 
-    /** sett nytt aksjonspunkt spesifikt. returner kopi av denne instansen. */
+    /**
+     * sett nytt aksjonspunkt spesifikt. returner kopi av denne instansen.
+     */
     public BehandleStegResultat medAksjonspunktResultat(AksjonspunktResultat aksResultat) {
         List<AksjonspunktResultat> liste = new ArrayList<>(this.aksjonspunktListe);
         liste.remove(aksResultat);

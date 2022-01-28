@@ -31,8 +31,8 @@ public final class Databaseskjemainitialisering {
     }
 
     public static void migrer() {
-            migrer(DBA);
-            migrer(UNIT_TEST);
+        migrer(DBA);
+        migrer(UNIT_TEST);
     }
 
     public static void settJdniOppslag() {
@@ -58,11 +58,11 @@ public final class Databaseskjemainitialisering {
     private static void migrer(DataSource ds, DBProperties props) {
         LOG.info("Migrerer {}", props.getSchema());
         var flyway = new Flyway(Flyway.configure()
-            .dataSource(ds)
-            .locations(scriptLocation(props))
-            .table(FLYWAY_SCHEMA_TABLE)
-            .baselineOnMigrate(true)
-            .cleanOnValidationError(true)
+                .dataSource(ds)
+                .locations(scriptLocation(props))
+                .table(FLYWAY_SCHEMA_TABLE)
+                .baselineOnMigrate(true)
+                .cleanOnValidationError(true)
         );
 
         if (!ENV.isLocal()) {

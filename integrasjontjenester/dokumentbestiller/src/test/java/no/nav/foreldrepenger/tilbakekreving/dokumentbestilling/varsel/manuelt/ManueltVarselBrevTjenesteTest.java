@@ -61,7 +61,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         when(mockFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandlingId)).thenReturn(lagFeilutbetalingFakta());
 
         when(mockEksternDataForBrevTjeneste.hentYtelsenavn(FagsakYtelseType.FORELDREPENGER, Språkkode.nb))
-            .thenReturn(lagYtelseNavn("foreldrepenger", "foreldrepenger"));
+                .thenReturn(lagYtelseNavn("foreldrepenger", "foreldrepenger"));
         Personinfo personinfo = byggStandardPerson("Fiona", DUMMY_FØDSELSNUMMER, Språkkode.nn);
         String aktørId = behandling.getAktørId().getId();
         when(mockEksternDataForBrevTjeneste.hentPerson(aktørId)).thenReturn(personinfo);
@@ -71,9 +71,9 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setSprakkode(Språkkode.nb);
         when(mockEksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(FPSAK_BEHANDLING_UUID))
-            .thenReturn(SamletEksternBehandlingInfo.builder()
-                .setGrunninformasjon(eksternBehandlingsinfoDto)
-                .build());
+                .thenReturn(SamletEksternBehandlingInfo.builder()
+                        .setGrunninformasjon(eksternBehandlingsinfoDto)
+                        .build());
     }
 
     @Test
@@ -131,10 +131,10 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
 
     private BehandlingFeilutbetalingFakta lagFeilutbetalingFakta() {
         LogiskPeriodeMedFaktaDto logiskPeriodeMedFaktaDto = LogiskPeriodeMedFaktaDto.lagPeriode(LocalDate.of(2019, 10, 1),
-            LocalDate.of(2019, 10, 30),
-            BigDecimal.valueOf(9000));
+                LocalDate.of(2019, 10, 30),
+                BigDecimal.valueOf(9000));
         return BehandlingFeilutbetalingFakta.builder().medAktuellFeilUtbetaltBeløp(BigDecimal.valueOf(9000))
-            .medPerioder(Lists.newArrayList(logiskPeriodeMedFaktaDto))
-            .medDatoForRevurderingsvedtak(LocalDate.now()).build();
+                .medPerioder(Lists.newArrayList(logiskPeriodeMedFaktaDto))
+                .medDatoForRevurderingsvedtak(LocalDate.now()).build();
     }
 }

@@ -27,7 +27,7 @@ public class ForeldelseRestTjenesteTest {
     private static final BehandlingReferanse idDto = new BehandlingReferanse(behandlingId);
 
     private VurdertForeldelseTjeneste vurdertForeldelseTjenesteMock = mock(VurdertForeldelseTjeneste.class);
-    private KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjenesteMock =mock(KravgrunnlagBeregningTjeneste.class);
+    private KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjenesteMock = mock(KravgrunnlagBeregningTjeneste.class);
     private BehandlingTjeneste behandlingTjeneste = mock(BehandlingTjeneste.class);
 
     private ForeldelseRestTjeneste restTjeneste = new ForeldelseRestTjeneste(vurdertForeldelseTjenesteMock, kravgrunnlagBeregningTjenesteMock, behandlingTjeneste);

@@ -21,12 +21,12 @@ public class LdapUtil {
 
     public static Collection<String> filtrerGrupper(Collection<String> grupper) {
         return grupper.stream()
-            .map(LdapUtil::filterDNtoCNvalue)
-            .collect(Collectors.toList());
+                .map(LdapUtil::filterDNtoCNvalue)
+                .collect(Collectors.toList());
     }
 
     private static String filterDNtoCNvalue(String value) {
-        if(value.toLowerCase(Locale.ROOT).contains("cn=")) {
+        if (value.toLowerCase(Locale.ROOT).contains("cn=")) {
             try {
                 LdapName ldapname = new LdapName(value); //NOSONAR, only used locally
                 for (Rdn rdn : ldapname.getRdns()) {

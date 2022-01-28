@@ -2,7 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.util;
 
 public class StringUtils {
 
-    private StringUtils() {}
+    private StringUtils() {
+    }
 
     public static boolean erIkkeTom(String str) {
         return (str != null) && (str.length() > 0);

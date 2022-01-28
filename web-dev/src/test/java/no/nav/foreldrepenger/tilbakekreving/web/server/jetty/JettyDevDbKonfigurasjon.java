@@ -14,7 +14,6 @@ import javax.sql.DataSource;
 import org.eclipse.jetty.plus.jndi.EnvEntry;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
-import org.flywaydb.core.api.configuration.FluentConfiguration;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -121,9 +120,9 @@ public class JettyDevDbKonfigurasjon {
             }
         }
         var flywayConfiguration = Flyway.configure()
-            .dataSource(dataSource)
-            .table(FLYWAY_SCHEMA_TABLE)
-            .baselineOnMigrate(true);
+                .dataSource(dataSource)
+                .table(FLYWAY_SCHEMA_TABLE)
+                .baselineOnMigrate(true);
 
         FlywayKonfig flywayKonfig = new FlywayKonfig();
         final String scriptLocation = flywayKonfig.getMigrationScriptLocation(connectionProperties);
@@ -147,7 +146,9 @@ public class JettyDevDbKonfigurasjon {
         }
     }
 
-    /** Håndter oppsett av datasource. */
+    /**
+     * Håndter oppsett av datasource.
+     */
     static class ConnectionHandler {
 
         private static Map<String, DataSource> cache = new ConcurrentHashMap<>();

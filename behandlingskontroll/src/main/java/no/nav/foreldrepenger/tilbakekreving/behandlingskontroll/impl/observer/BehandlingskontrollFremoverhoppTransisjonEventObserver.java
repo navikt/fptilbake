@@ -21,7 +21,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 
-/** Håndtere opprydding i Aksjonspunkt og Vilkår ved overhopp framover */
+/**
+ * Håndtere opprydding i Aksjonspunkt og Vilkår ved overhopp framover
+ */
 @ApplicationScoped
 public class BehandlingskontrollFremoverhoppTransisjonEventObserver {
 
@@ -58,12 +60,12 @@ public class BehandlingskontrollFremoverhoppTransisjonEventObserver {
 
         List<Aksjonspunkt> avbrutte = new ArrayList<>();
         behandling.getAksjonspunkter().stream()
-            .filter(a -> mellomliggende.contains(a.getAksjonspunktDefinisjon()))
-            .filter(Aksjonspunkt::erÅpentAksjonspunkt)
-            .forEach(a -> {
-                avbrytAksjonspunkt(a);
-                avbrutte.add(a);
-            });
+                .filter(a -> mellomliggende.contains(a.getAksjonspunktDefinisjon()))
+                .filter(Aksjonspunkt::erÅpentAksjonspunkt)
+                .forEach(a -> {
+                    avbrytAksjonspunkt(a);
+                    avbrutte.add(a);
+                });
 
         if (!medInngangFørsteSteg) {
             // juster til neste steg dersom vi står ved utgang av steget.
@@ -72,7 +74,7 @@ public class BehandlingskontrollFremoverhoppTransisjonEventObserver {
 
         final var finalFørsteSteg = førsteSteg;
         modell.hvertStegFraOgMedTil(førsteSteg, sisteSteg, false)
-            .forEach(s -> hoppFramover(s, transisjonEvent, sisteSteg, finalFørsteSteg));
+                .forEach(s -> hoppFramover(s, transisjonEvent, sisteSteg, finalFørsteSteg));
 
         // Lagre oppdateringer; eventhåndteringen skal være autonom og selv ferdigstille oppdateringer på behandlingen
         lagre(transisjonEvent, behandling);

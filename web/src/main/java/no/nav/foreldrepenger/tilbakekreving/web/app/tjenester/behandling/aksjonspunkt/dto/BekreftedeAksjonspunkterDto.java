@@ -81,7 +81,7 @@ public class BekreftedeAksjonspunkterDto implements AbacDto {
     @Override
     public AbacDataAttributter abacAttributter() {
         AbacDataAttributter abac = AbacDataAttributter.opprett()
-            .leggTil(BehandlingReferanseAbacAttributter.fraBehandlingReferanse(behandlingReferanse));
+                .leggTil(BehandlingReferanseAbacAttributter.fraBehandlingReferanse(behandlingReferanse));
         bekreftedeAksjonspunktDtoer.forEach(apDto -> abac.leggTil(apDto.abacAttributter()));
         return abac;
     }

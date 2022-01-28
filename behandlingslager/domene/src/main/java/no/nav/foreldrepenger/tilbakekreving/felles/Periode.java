@@ -100,7 +100,7 @@ public class Periode {
 
     public boolean isEqual(Periode other) {
         return Objects.equals(getFom(), other.getFom())
-            && Objects.equals(getTom(), other.getTom());
+                && Objects.equals(getTom(), other.getTom());
     }
 
     @Override

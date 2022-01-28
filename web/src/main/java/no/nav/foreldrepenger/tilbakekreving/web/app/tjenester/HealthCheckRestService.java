@@ -37,14 +37,14 @@ public class HealthCheckRestService {
     public Response isAlive() {
         if (isContextStartupReady) {
             return Response
-                .ok(RESPONSE_OK, MediaType.TEXT_PLAIN_TYPE)
-                .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
-                .build();
+                    .ok(RESPONSE_OK, MediaType.TEXT_PLAIN_TYPE)
+                    .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
+                    .build();
         }
         return Response
-            .serverError()
-            .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
-            .build();
+                .serverError()
+                .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
+                .build();
     }
 
     @GET
@@ -53,12 +53,12 @@ public class HealthCheckRestService {
     public Response isReady() {
         if (isContextStartupReady && selftests.isReady()) {
             return Response.ok(RESPONSE_OK)
-                .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
-                .build();
+                    .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
+                    .build();
         } else {
             return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
-                .build();
+                    .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
+                    .build();
         }
     }
 

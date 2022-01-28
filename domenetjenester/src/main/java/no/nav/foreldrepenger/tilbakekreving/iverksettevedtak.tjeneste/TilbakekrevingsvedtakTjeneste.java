@@ -40,10 +40,10 @@ public class TilbakekrevingsvedtakTjeneste {
 
     private void validerSkattBeløp(final List<TilbakekrevingPeriode> tilbakekrevingPerioder) {
         var sumSkattPåIkkeSkattepliktigeYtelser = tilbakekrevingPerioder.stream()
-            .flatMap(periode -> periode.getBeløp().stream())
-            .filter(TilbakekrevingBeløp::erIkkeSkattepliktig)
-            .map(TilbakekrevingBeløp::getSkattBeløp)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .flatMap(periode -> periode.getBeløp().stream())
+                .filter(TilbakekrevingBeløp::erIkkeSkattepliktig)
+                .map(TilbakekrevingBeløp::getSkattBeløp)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         if (sumSkattPåIkkeSkattepliktigeYtelser.compareTo(BigDecimal.ZERO) != 0) {
             throw new IllegalStateException("Skattebeløp for ikke skattepliktige ytelser skal være 0, men var ikke dette!");

@@ -55,7 +55,7 @@ public class AksjonspunktDtoMapper {
         }
         Optional<BehandlingStegType> aktivtBehandlingSteg = Optional.ofNullable(behandling.getAktivtBehandlingSteg());
         return aktivtBehandlingSteg.map(steg ->
-                skalLøsesIStegKode(def, behandling.getBehandlingStegStatus().getKode(), steg))
+                        skalLøsesIStegKode(def, behandling.getBehandlingStegStatus().getKode(), steg))
                 .orElse(false);
     }
 

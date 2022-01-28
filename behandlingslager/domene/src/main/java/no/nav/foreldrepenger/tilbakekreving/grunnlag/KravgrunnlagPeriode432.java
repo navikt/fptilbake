@@ -34,8 +34,8 @@ public class KravgrunnlagPeriode432 extends BaseEntitet {
 
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false)),
-        @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
+            @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false)),
+            @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
     })
     private Periode periode;
 
@@ -115,9 +115,9 @@ public class KravgrunnlagPeriode432 extends BaseEntitet {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "<" + //$NON-NLS-1$
-            (id != null ? "id=" + id + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$
-            + "periode=" + periode + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "beløpSkattMnd=" + beløpSkattMnd + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + ">";//$NON-NLS-1$
+                (id != null ? "id=" + id + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$
+                + "periode=" + periode + ", " //$NON-NLS-1$ //$NON-NLS-2$
+                + "beløpSkattMnd=" + beløpSkattMnd + ", " //$NON-NLS-1$ //$NON-NLS-2$
+                + ">";//$NON-NLS-1$
     }
 }

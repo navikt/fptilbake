@@ -47,10 +47,10 @@ public class DokdistKlient {
 
     public void distribuerJournalpost(JournalpostId journalpostId, BrevMottaker mottaker) {
         DistribuerJournalpostRequest request = DistribuerJournalpostRequest.builder()
-            .medJournalpostId(journalpostId.getVerdi())
-            .medBestillendeFagsystem(getBestillendeFagsystem().getKode())
-            .medDokumentProdApp(getDokumentProdAppKode())
-            .build();
+                .medJournalpostId(journalpostId.getVerdi())
+                .medBestillendeFagsystem(getBestillendeFagsystem().getKode())
+                .medDokumentProdApp(getDokumentProdAppKode())
+                .build();
         DistribuerJournalpostResponse response = distribuerJournalpost(request);
         logger.info("Bestilt distribusjon av journalpost til {}, bestillingId ble {}", mottaker, response.getBestillingsId());
     }

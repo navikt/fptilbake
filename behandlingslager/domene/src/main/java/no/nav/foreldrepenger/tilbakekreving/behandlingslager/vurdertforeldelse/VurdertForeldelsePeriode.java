@@ -34,13 +34,13 @@ public class VurdertForeldelsePeriode extends BaseEntitet {
 
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false)),
-        @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
+            @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false)),
+            @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
     })
     private Periode periode;
 
     @Convert(converter = ForeldelseVurderingType.KodeverdiConverter.class)
-    @Column(name = "foreldelse_vurdering_type",nullable = false)
+    @Column(name = "foreldelse_vurdering_type", nullable = false)
     private ForeldelseVurderingType foreldelseVurderingType;
 
     @Column(name = "foreldelsesfrist")
@@ -150,9 +150,9 @@ public class VurdertForeldelsePeriode extends BaseEntitet {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "<id=" + id //$NON-NLS-1$
-            + ", periode=" + periode //$NON-NLS-1$
-            + ", foreldelseVurderingType=" + foreldelseVurderingType //$NON-NLS-1$
-            + ">"; //$NON-NLS-1$
+                + ", periode=" + periode //$NON-NLS-1$
+                + ", foreldelseVurderingType=" + foreldelseVurderingType //$NON-NLS-1$
+                + ">"; //$NON-NLS-1$
 
     }
 }

@@ -45,7 +45,7 @@ public class VedtakHjemmelTest {
     @Test
     public void skal_gi_riktig_hjemmel_når_det_er_feilaktig_opplysninger_og_forsett() {
         List<VilkårVurderingPeriodeEntitet> vurderingPerioder = aktsomhet(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
-            periode, a -> a.medAktsomhet(Aktsomhet.FORSETT));
+                periode, a -> a.medAktsomhet(Aktsomhet.FORSETT));
 
         assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true)).isEqualTo("folketrygdloven §§ 22-15 og 22-17 a");
     }
@@ -53,7 +53,7 @@ public class VedtakHjemmelTest {
     @Test
     public void skal_gi_riktig_hjemmel_når_det_er_feilaktig_opplysninger_og_forsett_men_frisinn_og_dermed_ikke_renter() {
         List<VilkårVurderingPeriodeEntitet> vurderingPerioder = aktsomhet(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
-            periode, a -> a.medAktsomhet(Aktsomhet.FORSETT));
+                periode, a -> a.medAktsomhet(Aktsomhet.FORSETT));
 
         assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, false)).isEqualTo("folketrygdloven § 22-15");
     }
@@ -121,7 +121,7 @@ public class VedtakHjemmelTest {
         List<VilkårVurderingPeriodeEntitet> vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.GROVT_UAKTSOM).medIleggRenter(true));
 
         assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true))
-            .isEqualTo("folketrygdloven §§ 22-15 og 22-17 a og foreldelsesloven §§ 2, 3 og 10");
+                .isEqualTo("folketrygdloven §§ 22-15 og 22-17 a og foreldelsesloven §§ 2, 3 og 10");
     }
 
     @Test
@@ -129,7 +129,7 @@ public class VedtakHjemmelTest {
         List<VilkårVurderingPeriodeEntitet> vurderingPerioder = aktsomhet(periode, Function.identity());
 
         assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.ENDRET_TIL_UGUNST_FOR_BRUKER, Språkkode.nb, true))
-            .isEqualTo("folketrygdloven § 22-15 og forvaltningsloven § 35 c)");
+                .isEqualTo("folketrygdloven § 22-15 og forvaltningsloven § 35 c)");
     }
 
     @Test
@@ -143,15 +143,15 @@ public class VedtakHjemmelTest {
         List<VilkårVurderingPeriodeEntitet> vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.GROVT_UAKTSOM).medIleggRenter(true));
 
         assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.ENDRET_TIL_GUNST_FOR_BRUKER, Språkkode.nb, true))
-            .isEqualTo("folketrygdloven §§ 22-15 og 22-17 a, foreldelsesloven §§ 2, 3 og 10 og forvaltningsloven § 35 a)");
+                .isEqualTo("folketrygdloven §§ 22-15 og 22-17 a, foreldelsesloven §§ 2, 3 og 10 og forvaltningsloven § 35 a)");
     }
 
     private VurdertForeldelse lagForeldelseperiode(Periode periode, Function<VurdertForeldelsePeriode.Builder, VurdertForeldelsePeriode.Builder> oppsett) {
         VurdertForeldelse vurdertForeldelse = new VurdertForeldelse();
         VurdertForeldelsePeriode.Builder periodeBuilder = new VurdertForeldelsePeriode.Builder()
-            .medVurdertForeldelse(vurdertForeldelse)
-            .medPeriode(periode)
-            .medForeldelseVurderingType(ForeldelseVurderingType.UDEFINERT);
+                .medVurdertForeldelse(vurdertForeldelse)
+                .medPeriode(periode)
+                .medForeldelseVurderingType(ForeldelseVurderingType.UDEFINERT);
         vurdertForeldelse.leggTilVurderForeldelsePerioder(oppsett.apply(periodeBuilder).build());
         return vurdertForeldelse;
     }
@@ -166,15 +166,15 @@ public class VedtakHjemmelTest {
                                                           Function<VilkårVurderingAktsomhetEntitet.Builder, VilkårVurderingAktsomhetEntitet.Builder> oppsett) {
         VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet vurderingPeriode = new VilkårVurderingPeriodeEntitet.Builder()
-            .medVurderinger(vurdering)
-            .medPeriode(periode)
-            .medVilkårResultat(resultat)
-            .medBegrunnelse("foo")
-            .build();
+                .medVurderinger(vurdering)
+                .medPeriode(periode)
+                .medVilkårResultat(resultat)
+                .medBegrunnelse("foo")
+                .build();
         VilkårVurderingAktsomhetEntitet.Builder builder = VilkårVurderingAktsomhetEntitet.builder()
-            .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
-            .medPeriode(vurderingPeriode)
-            .medBegrunnelse("foo");
+                .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
+                .medPeriode(vurderingPeriode)
+                .medBegrunnelse("foo");
 
         VilkårVurderingAktsomhetEntitet aktsomhet = oppsett.apply(builder).build();
         vurderingPeriode.setAktsomhet(aktsomhet);

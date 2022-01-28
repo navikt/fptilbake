@@ -61,7 +61,7 @@ public class MottattGrunnlagSteg implements BehandlingSteg {
         }
         LocalDateTime fristTid = LocalDateTime.now().plus(ventefrist);
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
-            BehandlingStegType.TBKGSTEG, fristTid, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+                BehandlingStegType.TBKGSTEG, fristTid, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
         return BehandleStegResultat.settPåVent();
     }
@@ -76,7 +76,7 @@ public class MottattGrunnlagSteg implements BehandlingSteg {
 
         LocalDateTime fristTid = hentFrist(behandling);
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG,
-            fristTid, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+                fristTid, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
         if (gåttOverFristen(fristTid)) {
             /* Hvis fristen har gått ut, og grunnlag fra økonomi ikke har blitt mottatt, publiserer BehandlingFristenUtløptEvent for å sende data til FPLOS .
@@ -90,9 +90,9 @@ public class MottattGrunnlagSteg implements BehandlingSteg {
     private LocalDateTime hentFrist(Behandling behandling) {
         Set<Aksjonspunkt> aksjonspunkter = behandling.getAksjonspunkter();
         return aksjonspunkter.stream()
-            .filter(o -> AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(o.getAksjonspunktDefinisjon()))
-            .map(Aksjonspunkt::getFristTid)
-            .findFirst().orElse(null);
+                .filter(o -> AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(o.getAksjonspunktDefinisjon()))
+                .map(Aksjonspunkt::getFristTid)
+                .findFirst().orElse(null);
     }
 
     private boolean gåttOverFristen(LocalDateTime fristTid) {
