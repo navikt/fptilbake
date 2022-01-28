@@ -47,6 +47,7 @@ public class JettyFPDevServer extends JettyServer {
         for (String arg : args) {
             if (arg.equals(VTP_ARGUMENT)) {
                 vtp = true;
+                break;
             }
         }
 

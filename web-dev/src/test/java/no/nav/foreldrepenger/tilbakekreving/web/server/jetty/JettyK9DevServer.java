@@ -48,6 +48,7 @@ public class JettyK9DevServer extends JettyServer {
         for (String arg : args) {
             if (arg.equals(VTP_ARGUMENT)) {
                 vtp = true;
+                break;
             }
         }
 
