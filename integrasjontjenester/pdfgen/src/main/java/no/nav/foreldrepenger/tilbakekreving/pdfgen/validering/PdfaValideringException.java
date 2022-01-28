@@ -22,10 +22,10 @@ public class PdfaValideringException extends RuntimeException {
 
     private static String formater(ValidationResult result) {
         List<String> feilmeldinger = result.getTestAssertions().stream()
-            .filter(ta -> ta.getStatus() != TestAssertion.Status.PASSED)
-            .map(ta -> ta.getStatus() + ":" + ta.getMessage())
-            .collect(Collectors.toList());
+                .filter(ta -> ta.getStatus() != TestAssertion.Status.PASSED)
+                .map(ta -> ta.getStatus() + ":" + ta.getMessage())
+                .collect(Collectors.toList());
 
-        return "Validering av pdf feilet. Validerer versjon " + result.getPDFAFlavour()  + " feil er: " + String.join(", ", feilmeldinger);
+        return "Validering av pdf feilet. Validerer versjon " + result.getPDFAFlavour() + " feil er: " + String.join(", ", feilmeldinger);
     }
 }

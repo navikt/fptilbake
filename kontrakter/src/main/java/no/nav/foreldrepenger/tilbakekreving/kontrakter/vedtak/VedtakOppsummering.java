@@ -12,7 +12,7 @@ import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.YtelseType;
 
 public class VedtakOppsummering {
     @NotNull
-    @Size(min=1, max = 20)
+    @Size(min = 1, max = 20)
     private String saksnummer;
     @NotNull
     private YtelseType ytelseType;

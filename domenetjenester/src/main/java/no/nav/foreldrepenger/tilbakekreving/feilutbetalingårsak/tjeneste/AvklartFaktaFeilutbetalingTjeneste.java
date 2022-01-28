@@ -60,11 +60,11 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         boolean behovForHistorikkInnslag = false;
         for (FaktaFeilutbetalingDto faktaFeilutbetalingDto : feilutbetalingFaktas) {
             FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode = FaktaFeilutbetalingPeriode.builder()
-                .medPeriode(faktaFeilutbetalingDto.getFom(), faktaFeilutbetalingDto.getTom())
-                .medHendelseType(faktaFeilutbetalingDto.getHendelseType())
-                .medHendelseUndertype(faktaFeilutbetalingDto.getHendelseUndertype())
-                .medFeilutbetalinger(faktaFeilutbetaling)
-                .build();
+                    .medPeriode(faktaFeilutbetalingDto.getFom(), faktaFeilutbetalingDto.getTom())
+                    .medHendelseType(faktaFeilutbetalingDto.getHendelseType())
+                    .medHendelseUndertype(faktaFeilutbetalingDto.getHendelseUndertype())
+                    .medFeilutbetalinger(faktaFeilutbetaling)
+                    .build();
             faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);
 
             // lag historikkinnslagDeler
@@ -93,11 +93,11 @@ public class AvklartFaktaFeilutbetalingTjeneste {
             List<FaktaFeilutbetalingPeriode> feilutbetalingPerioder = forrigeFakta.get().getFeilutbetaltPerioder();
             String forrigeBegrunnelse = forrigeFakta.get().getBegrunnelse();
             Optional<FaktaFeilutbetalingPeriode> forrigeFeilutbetalingPeriodeÅrsak = feilutbetalingPerioder.stream()
-                .filter(fpå -> fpå.getPeriode().equals(faktaFeilutbetalingDto.tilPeriode()))
-                .findFirst();
+                    .filter(fpå -> fpå.getPeriode().equals(faktaFeilutbetalingDto.tilPeriode()))
+                    .findFirst();
             if (forrigeFeilutbetalingPeriodeÅrsak.isPresent()) {
                 harEndret = håndtereEndretÅrsak(forrigeFeilutbetalingPeriodeÅrsak.get(), faktaFeilutbetalingDto, begrunnelse, forrigeBegrunnelse,
-                    tekstBuilder, historikkinnslagDelDto);
+                        tekstBuilder, historikkinnslagDelDto);
             } else { // det betyr perioder har endret
                 opprettNyHistorikkinnslagDel(begrunnelse, faktaFeilutbetalingDto, tekstBuilder);
                 harEndret = true;
@@ -121,9 +121,9 @@ public class AvklartFaktaFeilutbetalingTjeneste {
 
     private void mapFellesVerdier(HistorikkInnslagTekstBuilder tekstBuilder, String begrunnelse, FaktaFeilutbetalingDto faktaFeilutbetalingDto) {
         tekstBuilder.medSkjermlenke(SkjermlenkeType.FAKTA_OM_FEILUTBETALING)
-            .medBegrunnelse(begrunnelse)
-            .medOpplysning(HistorikkOpplysningType.PERIODE_FOM, faktaFeilutbetalingDto.getFom())
-            .medOpplysning(HistorikkOpplysningType.PERIODE_TOM, faktaFeilutbetalingDto.getTom());
+                .medBegrunnelse(begrunnelse)
+                .medOpplysning(HistorikkOpplysningType.PERIODE_FOM, faktaFeilutbetalingDto.getFom())
+                .medOpplysning(HistorikkOpplysningType.PERIODE_TOM, faktaFeilutbetalingDto.getTom());
     }
 
     private boolean håndtereEndretÅrsak(FaktaFeilutbetalingPeriode forrigePeiodeÅrsak, FaktaFeilutbetalingDto faktaFeilutbetalingDto,
@@ -137,7 +137,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
             return true;
         } else if (historikkinnslagDelDto.getBegrunnelseFritekst() == null && harBegrunnelseEndret(forrigeBegrunnelse, begrunnelse)) {
             tekstBuilder.medSkjermlenke(SkjermlenkeType.FAKTA_OM_FEILUTBETALING)
-                .medBegrunnelse(begrunnelse);
+                    .medBegrunnelse(begrunnelse);
             historikkinnslagDelDto.setBegrunnelseFritekst(begrunnelse);
             return true;
 
@@ -153,7 +153,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
 
         if (faktaFeilutbetalingDto.tilPeriode().isEqual(forrigePeriodeÅrsak.getPeriode())) {
             erEndret = !Objects.equals(forrigePeriodeÅrsak.getHendelseType(), nyHendelseType) ||
-                !Objects.equals(forrigePeriodeÅrsak.getHendelseUndertype(), nyHendelseUndertype);
+                    !Objects.equals(forrigePeriodeÅrsak.getHendelseUndertype(), nyHendelseUndertype);
         }
         return erEndret;
     }

@@ -38,7 +38,7 @@ public enum NavOppfulgt implements Kodeverdi {
     }
 
     NavOppfulgt(String kode) {
-       this.kode = kode;
+        this.kode = kode;
     }
 
     public static NavOppfulgt fraKode(@JsonProperty(value = "kode") Object node) {

@@ -43,7 +43,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -57,7 +57,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public abstract class FellesTestOppsett {
 
     protected static final Long FPSAK_BEHANDLING_ID = 100000001L;
@@ -65,13 +65,13 @@ public abstract class FellesTestOppsett {
     protected static final UUID FPSAK_BEHANDLING_UUID = UUID.randomUUID();
 
     private final BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(
-        BehandlingskontrollEventPubliserer.class);
+            BehandlingskontrollEventPubliserer.class);
     protected PersoninfoAdapter personinfoAdapterMock = mock(PersoninfoAdapter.class);
     protected final FagsystemKlient fagsystemKlientMock = mock(FagsystemKlient.class);
     protected final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(personinfoAdapterMock);
     private final VarselresponsTjeneste varselresponsTjenesteMock = mock(VarselresponsTjeneste.class);
     private final SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(
-        SlettGrunnlagEventPubliserer.class);
+            SlettGrunnlagEventPubliserer.class);
 
     protected BehandlingRepositoryProvider repositoryProvider;
     protected BehandlingRepository behandlingRepository;
@@ -109,20 +109,20 @@ public abstract class FellesTestOppsett {
         mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
         eksternBehandlingRepository = new EksternBehandlingRepository(entityManager);
         FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
-            entityManager);
+                entityManager);
         behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
         behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
         gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskTjeneste,
-            behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjenesteMock);
+                behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjenesteMock);
         historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(),
-            personinfoAdapterMock);
+                personinfoAdapterMock);
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager,
-            new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
+                new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste,
-            behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
+                behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
         kravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
         lesKravgrunnlagTask = new LesKravgrunnlagTask(mottattXmlRepository, kravgrunnlagTjeneste, kravgrunnlagMapper,
-            repositoryProvider, fagsystemKlientMock);
+                repositoryProvider, fagsystemKlientMock);
 
         entityManager.setFlushMode(FlushModeType.AUTO);
         fagsak = TestFagsakUtil.opprettFagsak();
@@ -131,7 +131,7 @@ public abstract class FellesTestOppsett {
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.HENTGRUNNLAGSTEG);
 
         when(personinfoAdapterMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(
-            Optional.of(fagsak.getAktørId()));
+                Optional.of(fagsak.getAktørId()));
 
     }
 
@@ -146,8 +146,8 @@ public abstract class FellesTestOppsett {
 
     public Behandling lagBehandling(BehandlingÅrsak.Builder builder) {
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.REVURDERING_TILBAKEKREVING)
-            .medBehandlingÅrsak(builder)
-            .build();
+                .medBehandlingÅrsak(builder)
+                .build();
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         Long behandlingId = behandlingRepository.lagre(behandling, lås);
         return behandlingRepository.hentBehandling(behandlingId);

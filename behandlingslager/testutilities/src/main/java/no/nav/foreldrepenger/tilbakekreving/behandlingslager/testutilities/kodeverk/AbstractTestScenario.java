@@ -110,8 +110,8 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
     public S medDefaultKravgrunnlag() {
         Periode april2019 = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
         return medKravgrunnlag(Map.of(april2019, List.of(
-            KravgrunnlagTestBuilder.KgBeløp.feil(23000),
-            KravgrunnlagTestBuilder.KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(23000).medTilbakekrevBeløp(23000)
+                KravgrunnlagTestBuilder.KgBeløp.feil(23000),
+                KravgrunnlagTestBuilder.KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(23000).medTilbakekrevBeløp(23000)
         )));
     }
 
@@ -124,18 +124,18 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         Periode april2019 = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
         VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet periode = VilkårVurderingPeriodeEntitet.builder()
-            .medVurderinger(vurdering)
-            .medPeriode(april2019)
-            .medBegrunnelse("foo")
-            .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
-            .build();
+                .medVurderinger(vurdering)
+                .medPeriode(april2019)
+                .medBegrunnelse("foo")
+                .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
+                .build();
         VilkårVurderingAktsomhetEntitet aktsomhet = VilkårVurderingAktsomhetEntitet.builder()
-            .medPeriode(periode)
-            .medSærligGrunnerTilReduksjon(false)
-            .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
-            .medProsenterSomTilbakekreves(BigDecimal.valueOf(100))
-            .medBegrunnelse("foo")
-            .build();
+                .medPeriode(periode)
+                .medSærligGrunnerTilReduksjon(false)
+                .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
+                .medProsenterSomTilbakekreves(BigDecimal.valueOf(100))
+                .medBegrunnelse("foo")
+                .build();
         periode.setAktsomhet(aktsomhet);
         vurdering.leggTilPeriode(periode);
         return medVilkårsvurdering(vurdering);
@@ -145,16 +145,16 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         Periode april2019 = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
         VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet periode = VilkårVurderingPeriodeEntitet.builder()
-            .medVurderinger(vurdering)
-            .medPeriode(april2019)
-            .medBegrunnelse("foo")
-            .medVilkårResultat(VilkårResultat.GOD_TRO)
-            .build();
+                .medVurderinger(vurdering)
+                .medPeriode(april2019)
+                .medBegrunnelse("foo")
+                .medVilkårResultat(VilkårResultat.GOD_TRO)
+                .build();
         VilkårVurderingGodTroEntitet godTro = VilkårVurderingGodTroEntitet.builder()
-            .medPeriode(periode)
-            .medBeløpErIBehold(false)
-            .medBegrunnelse("foo")
-            .build();
+                .medPeriode(periode)
+                .medBeløpErIBehold(false)
+                .medBegrunnelse("foo")
+                .build();
         periode.setGodTro(godTro);
         vurdering.leggTilPeriode(periode);
         return medVilkårsvurdering(vurdering);
@@ -215,7 +215,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
             return behandling;
         });
         when(behandlingRepository.hentSisteBehandlingForFagsakId(Mockito.any(), Mockito.any(BehandlingType.class)))
-            .thenAnswer(a -> Optional.of(behandling));
+                .thenAnswer(a -> Optional.of(behandling));
         when(behandlingRepository.taSkriveLås(behandlingCaptor.capture())).thenAnswer((Answer<BehandlingLås>) invocation -> {
             Behandling beh = invocation.getArgument(0);
             return new BehandlingLås(beh.getId()) {
@@ -223,18 +223,18 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         });
 
         when(behandlingRepository.lagre(behandlingCaptor.capture(), Mockito.any()))
-            .thenAnswer((Answer<Long>) invocation -> {
-                Behandling beh = invocation.getArgument(0);
-                Long id = beh.getId();
-                if (id == null) {
-                    id = nyId();
-                    behandling.setId(id);
-                }
+                .thenAnswer((Answer<Long>) invocation -> {
+                    Behandling beh = invocation.getArgument(0);
+                    Long id = beh.getId();
+                    if (id == null) {
+                        id = nyId();
+                        behandling.setId(id);
+                    }
 
-                beh.getAksjonspunkter().forEach(punkt -> punkt.setId(nyId()));
+                    beh.getAksjonspunkter().forEach(punkt -> punkt.setId(nyId()));
 
-                return id;
-            });
+                    return id;
+                });
 
         mockBehandlingRepository = behandlingRepository;
         return behandlingRepository;
@@ -264,11 +264,11 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
 
         // oppdater fagsakstatus
         Mockito.doAnswer(invocation -> {
-            FagsakStatus status = invocation.getArgument(1);
-            fagsak.setFagsakStatus(status);
-            return null;
-        }).when(fagsakRepository)
-            .oppdaterFagsakStatus(eq(fagsakId), Mockito.any(FagsakStatus.class));
+                    FagsakStatus status = invocation.getArgument(1);
+                    fagsak.setFagsakStatus(status);
+                    return null;
+                }).when(fagsakRepository)
+                .oppdaterFagsakStatus(eq(fagsakId), Mockito.any(FagsakStatus.class));
 
         return fagsakRepository;
     }
@@ -326,18 +326,18 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         }
         if (behandlingResultatType != null) {
             Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
-                .medBehandling(behandling)
-                .medBehandlingResultatType(behandlingResultatType)
-                .build();
+                    .medBehandling(behandling)
+                    .medBehandlingResultatType(behandlingResultatType)
+                    .build();
             repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
 
             if (vedtaksdato != null) {
                 BehandlingVedtak vedtak = BehandlingVedtak.builder()
-                    .medBehandlingsresultat(behandlingsresultat)
-                    .medVedtaksdato(vedtaksdato)
-                    .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
-                    .medAnsvarligSaksbehandler("Z111111")
-                    .build();
+                        .medBehandlingsresultat(behandlingsresultat)
+                        .medVedtaksdato(vedtaksdato)
+                        .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
+                        .medAnsvarligSaksbehandler("Z111111")
+                        .build();
                 repositoryProvider.getBehandlingVedtakRepository().lagre(vedtak);
             }
         }
@@ -376,13 +376,13 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
 
     private void leggTilAksjonspunkter(Behandling behandling, BehandlingRepositoryProvider repositoryProvider) {
         aksjonspunktDefinisjoner.forEach(
-            (apDef, stegType) -> {
-                if (stegType != null) {
-                    AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, apDef, stegType);
-                } else {
-                    AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, apDef);
-                }
-            });
+                (apDef, stegType) -> {
+                    if (stegType != null) {
+                        AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, apDef, stegType);
+                    } else {
+                        AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, apDef);
+                    }
+                });
     }
 
 

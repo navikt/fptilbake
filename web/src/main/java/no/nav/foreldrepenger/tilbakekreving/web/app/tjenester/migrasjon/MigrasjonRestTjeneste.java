@@ -80,10 +80,10 @@ public class MigrasjonRestTjeneste {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     @Operation(tags = "migrasjon", description = "Tjeneste for å migrere saksnummer i OKO_XML_MOTTATT",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Migrasjon er ferdig"),
-            @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
-        })
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Migrasjon er ferdig"),
+                    @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
+            })
     @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
     public Response migrereSaksnummerIOkoXmlMottatt() {
         List<ØkonomiXmlMottatt> xmlMeldinger = økonomiMottattXmlRepository.hentAlleMeldingerUtenSaksnummer();
@@ -111,10 +111,10 @@ public class MigrasjonRestTjeneste {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     @Operation(tags = "migrasjon", description = "Tjeneste for å sende sakshendelser til Dvh for alle eksisterende behandlinger",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Migrasjon er ferdig"),
-            @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
-        })
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Migrasjon er ferdig"),
+                    @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
+            })
     @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
     public Response sendSakshendelserTilDvhForAlleEksisterendeBehandlinger(@QueryParam("hendelse") @NotNull @Valid EventHendelseDto hendelse) {
         DvhEventHendelse eventHendelse = DvhEventHendelse.valueOf(hendelse.getHendelse());

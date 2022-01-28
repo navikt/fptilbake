@@ -18,12 +18,12 @@ public class PersonOrganisasjonWrapper {
 
     private PersoninfoAdapter pdl;
 
-    PersonOrganisasjonWrapper(){
+    PersonOrganisasjonWrapper() {
         // for CDI proxy
     }
 
     @Inject
-    public PersonOrganisasjonWrapper(PersoninfoAdapter pdl){
+    public PersonOrganisasjonWrapper(PersoninfoAdapter pdl) {
         this.pdl = pdl;
     }
 
@@ -33,7 +33,7 @@ public class PersonOrganisasjonWrapper {
         } else {
             Optional<AktørId> aktørId = pdl.hentAktørForFnr(PersonIdent.fra(fnrEllerOrgNo));
             return aktørId.map(AktørId::getId)
-                .orElseThrow(() -> new TekniskException( "FPT-107926", "Klarte ikke mappe - Fant ikke person med fnr"));
+                    .orElseThrow(() -> new TekniskException("FPT-107926", "Klarte ikke mappe - Fant ikke person med fnr"));
         }
     }
 

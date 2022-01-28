@@ -35,8 +35,8 @@ public class FaktaFeilutbetalingPeriode extends BaseEntitet {
 
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false)),
-        @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
+            @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false)),
+            @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
     })
     private Periode periode;
 
@@ -107,11 +107,11 @@ public class FaktaFeilutbetalingPeriode extends BaseEntitet {
     @Override
     public String toString() {
         return getClass().getSimpleName() +
-            "<" //$NON-NLS-1$
-            + "periode=" + periode //$NON-NLS-1$
-            + ", hendelseType=" + hendelseType.getKode() //$NON-NLS-1$
-            + ", hendelseUndertype=" + hendelseUndertype.getKode() //$NON-NLS-1$
-            + ">"; //$NON-NLS-1$
+                "<" //$NON-NLS-1$
+                + "periode=" + periode //$NON-NLS-1$
+                + ", hendelseType=" + hendelseType.getKode() //$NON-NLS-1$
+                + ", hendelseUndertype=" + hendelseUndertype.getKode() //$NON-NLS-1$
+                + ">"; //$NON-NLS-1$
 
     }
 }

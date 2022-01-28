@@ -71,14 +71,14 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
 
         VilkårVurderingEntitet gammelVurdering = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet forrigePeriodeEntitet = VilkårVurderingPeriodeEntitet.builder().medBegrunnelse(ANDRE_PERIODE_BEGRUNNELSE)
-            .medPeriode(Periode.of(FOM, TOM))
-            .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER).build();
+                .medPeriode(Periode.of(FOM, TOM))
+                .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER).build();
         VilkårVurderingAktsomhetEntitet forrigeAktsomhetEntitet = VilkårVurderingAktsomhetEntitet.builder().medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
-            .medBegrunnelse("Gammel Aktsomhet Begrunnelse")
-            .medPeriode(forrigePeriodeEntitet)
-            .medSærligGrunnerTilReduksjon(true)
-            .medIleggRenter(false)
-            .medSærligGrunnerBegrunnelse(SÆRLIG_GRUNNER_BEGRUNNELSE).build();
+                .medBegrunnelse("Gammel Aktsomhet Begrunnelse")
+                .medPeriode(forrigePeriodeEntitet)
+                .medSærligGrunnerTilReduksjon(true)
+                .medIleggRenter(false)
+                .medSærligGrunnerBegrunnelse(SÆRLIG_GRUNNER_BEGRUNNELSE).build();
         forrigeAktsomhetEntitet.leggTilSærligGrunn(formSærligGrunn(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, forrigeAktsomhetEntitet));
         forrigeAktsomhetEntitet.leggTilSærligGrunn(formSærligGrunn(SærligGrunn.TID_FRA_UTBETALING, forrigeAktsomhetEntitet));
         forrigePeriodeEntitet.setAktsomhet(forrigeAktsomhetEntitet);
@@ -93,13 +93,13 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
         HistorikkinnslagDel førsteDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
         fellesHistorikkinnslagDelAssert(førsteDel, FOM, TOM, AKTSOMHET_BEGRUNNELSE, ANDRE_PERIODE_BEGRUNNELSE);
         assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
-            .isEqualTo(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn());
+                .isEqualTo(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn());
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
-            .isEqualTo(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER.getNavn());
+                .isEqualTo(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER.getNavn());
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-            .isEqualTo( Aktsomhet.SIMPEL_UAKTSOM.getNavn());
+                .isEqualTo(Aktsomhet.SIMPEL_UAKTSOM.getNavn());
         assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-            .isEqualTo(Aktsomhet.GROVT_UAKTSOM.getNavn());
+                .isEqualTo(Aktsomhet.GROVT_UAKTSOM.getNavn());
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON))).isEqualTo(formGrunnTekst(forrigeAktsomhetEntitet));
         assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON))).isEqualTo(formGrunnTekst(nyVurdering.getPerioder().get(0).getAktsomhet()));
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES))).isNull();
@@ -145,17 +145,17 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
         fellesHistorikkinnslagDelAssert(historikkinnslagDel, FOM, TOM, AKTSOMHET_BEGRUNNELSE, ANDRE_PERIODE_BEGRUNNELSE);
 
         assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
-            .isEqualTo(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn());
+                .isEqualTo(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn());
         assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
-            .isEqualTo(VilkårResultat.GOD_TRO.getNavn());
+                .isEqualTo(VilkårResultat.GOD_TRO.getNavn());
         assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-            .isEqualTo(Aktsomhet.GROVT_UAKTSOM.getNavn());
+                .isEqualTo(Aktsomhet.GROVT_UAKTSOM.getNavn());
         assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-            .isEqualTo(null);
+                .isEqualTo(null);
         assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
-            .isEqualTo(BELØP_TILBAKEKREVES);
+                .isEqualTo(BELØP_TILBAKEKREVES);
         assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
-            .isEqualTo("1000");
+                .isEqualTo("1000");
     }
 
     @Test
@@ -176,9 +176,9 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
         fellesHistorikkinnslagDelAssert(historikkinnslagDel, FOM, TOM, GOD_TRO_BEGRUNNELSE, FØRSTE_PERIODE_BEGRUNNELSE);
 
         assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
-            .isEqualTo(VilkårResultat.GOD_TRO.getNavn());
+                .isEqualTo(VilkårResultat.GOD_TRO.getNavn());
         assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
-            .isEqualTo(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn());
+                .isEqualTo(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn());
 
         assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES))).isEqualTo(String.valueOf(SUM_INNTREKK));
         assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES))).isEqualTo("2000");
@@ -198,23 +198,23 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
 
     private VilkårVurderingSærligGrunnEntitet formSærligGrunn(SærligGrunn grunn, VilkårVurderingAktsomhetEntitet aktsomhetEntitet) {
         return VilkårVurderingSærligGrunnEntitet.builder().medBegrunnelse("Annet begrunnelse")
-            .medGrunn(grunn)
-            .medVurdertAktsomhet(aktsomhetEntitet).build();
+                .medGrunn(grunn)
+                .medVurdertAktsomhet(aktsomhetEntitet).build();
     }
 
     private VilkårVurderingPeriodeEntitet formAktsomhetPeriode(VilkårVurderingEntitet vurderingEntitet, LocalDate fom, LocalDate tom) {
         VilkårVurderingPeriodeEntitet andrePeriode = VilkårVurderingPeriodeEntitet.builder()
-            .medPeriode(Periode.of(fom, tom))
-            .medBegrunnelse(ANDRE_PERIODE_BEGRUNNELSE)
-            .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
-            .medVurderinger(vurderingEntitet).build();
+                .medPeriode(Periode.of(fom, tom))
+                .medBegrunnelse(ANDRE_PERIODE_BEGRUNNELSE)
+                .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                .medVurderinger(vurderingEntitet).build();
         VilkårVurderingAktsomhetEntitet aktsomhetEntitet = VilkårVurderingAktsomhetEntitet.builder()
-            .medBegrunnelse(AKTSOMHET_BEGRUNNELSE)
-            .medBeløpTilbakekreves(BigDecimal.valueOf(SUM_INNTREKK).add(BigDecimal.valueOf(1000l)))
-            .medPeriode(andrePeriode)
-            .medAktsomhet(Aktsomhet.GROVT_UAKTSOM)
-            .medSærligGrunnerTilReduksjon(false)
-            .medSærligGrunnerBegrunnelse(SÆRLIG_GRUNNER_BEGRUNNELSE).build();
+                .medBegrunnelse(AKTSOMHET_BEGRUNNELSE)
+                .medBeløpTilbakekreves(BigDecimal.valueOf(SUM_INNTREKK).add(BigDecimal.valueOf(1000l)))
+                .medPeriode(andrePeriode)
+                .medAktsomhet(Aktsomhet.GROVT_UAKTSOM)
+                .medSærligGrunnerTilReduksjon(false)
+                .medSærligGrunnerBegrunnelse(SÆRLIG_GRUNNER_BEGRUNNELSE).build();
         aktsomhetEntitet.leggTilSærligGrunn(formSærligGrunn(SærligGrunn.STØRRELSE_BELØP, aktsomhetEntitet));
         aktsomhetEntitet.leggTilSærligGrunn(formSærligGrunn(SærligGrunn.ANNET, aktsomhetEntitet));
         andrePeriode.setAktsomhet(aktsomhetEntitet);
@@ -223,15 +223,15 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
 
     private VilkårVurderingPeriodeEntitet formGodTroPeriode(VilkårVurderingEntitet vurderingEntitet, LocalDate fom, LocalDate tom) {
         VilkårVurderingPeriodeEntitet førstePeriode = VilkårVurderingPeriodeEntitet.builder()
-            .medPeriode(Periode.of(fom, tom))
-            .medBegrunnelse(FØRSTE_PERIODE_BEGRUNNELSE)
-            .medVilkårResultat(VilkårResultat.GOD_TRO)
-            .medVurderinger(vurderingEntitet).build();
+                .medPeriode(Periode.of(fom, tom))
+                .medBegrunnelse(FØRSTE_PERIODE_BEGRUNNELSE)
+                .medVilkårResultat(VilkårResultat.GOD_TRO)
+                .medVurderinger(vurderingEntitet).build();
         VilkårVurderingGodTroEntitet godTroEntitet = VilkårVurderingGodTroEntitet.builder()
-            .medBeløpTilbakekreves(BigDecimal.valueOf(SUM_INNTREKK))
-            .medBeløpErIBehold(true)
-            .medBegrunnelse(GOD_TRO_BEGRUNNELSE)
-            .medPeriode(førstePeriode).build();
+                .medBeløpTilbakekreves(BigDecimal.valueOf(SUM_INNTREKK))
+                .medBeløpErIBehold(true)
+                .medBegrunnelse(GOD_TRO_BEGRUNNELSE)
+                .medPeriode(førstePeriode).build();
         førstePeriode.setGodTro(godTroEntitet);
         return førstePeriode;
     }
@@ -241,11 +241,11 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
         assertThat(historikkinnslagDel.getBegrunnelse().get()).isEqualTo(vilkårBegrunnelse);
 
         assertThat(historikkinnslagDel.getOpplysning(HistorikkOpplysningType.TILBAKEKREVING_OPPFYLT_BEGRUNNELSE).get()
-            .getTilVerdi()).isEqualTo(periodeBegrunnelse);
+                .getTilVerdi()).isEqualTo(periodeBegrunnelse);
         assertThat(historikkinnslagDel.getOpplysning(HistorikkOpplysningType.PERIODE_FOM).get().getTilVerdi())
-            .isEqualTo(formatDate(fom));
+                .isEqualTo(formatDate(fom));
         assertThat(historikkinnslagDel.getOpplysning(HistorikkOpplysningType.PERIODE_TOM).get().getTilVerdi())
-            .isEqualTo(formatDate(tom));
+                .isEqualTo(formatDate(tom));
     }
 
     private String formGrunnTekst(VilkårVurderingAktsomhetEntitet aktsomhetEntitet) {
@@ -273,27 +273,27 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
         fellesHistorikkinnslagDelAssert(førsteDel, FOM, PERIOD_FØRSTE_SISTE_DATO, GOD_TRO_BEGRUNNELSE, FØRSTE_PERIODE_BEGRUNNELSE);
 
         assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
-            .isEqualTo(VilkårResultat.GOD_TRO.getNavn());
+                .isEqualTo(VilkårResultat.GOD_TRO.getNavn());
         assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_BELØPET_BEHOLD)))
-            .isEqualTo(JA);
+                .isEqualTo(JA);
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_BELØPET_BEHOLD)))
-            .isNull();
+                .isNull();
         assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
-            .isEqualTo(BigDecimal.valueOf(SUM_INNTREKK).toString());
+                .isEqualTo(BigDecimal.valueOf(SUM_INNTREKK).toString());
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
-            .isNull();
+                .isNull();
 
         HistorikkinnslagDel andreDel = historikkinnslag.getHistorikkinnslagDeler().get(1);
         fellesHistorikkinnslagDelAssert(andreDel, PERIODE_ANDRE_FØRSTE_DATO, TOM, AKTSOMHET_BEGRUNNELSE, ANDRE_PERIODE_BEGRUNNELSE);
 
         assertThat(getTilVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-            .isEqualTo(Aktsomhet.GROVT_UAKTSOM.getNavn());
+                .isEqualTo(Aktsomhet.GROVT_UAKTSOM.getNavn());
         assertThat(getFraVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-            .isNull();
+                .isNull();
         assertThat(getTilVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
-            .isEqualTo(BELØP_TILBAKEKREVES);
+                .isEqualTo(BELØP_TILBAKEKREVES);
         assertThat(getFraVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
-            .isNull();
+                .isNull();
         assertThat(getTilVerdi(andreDel.getOpplysning(HistorikkOpplysningType.SÆRLIG_GRUNNER_BEGRUNNELSE))).isEqualTo(SÆRLIG_GRUNNER_BEGRUNNELSE);
     }
 

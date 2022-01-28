@@ -85,15 +85,15 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
     private void validerHenvisning(Henvisning henvisning) {
         if (!Henvisning.erGyldig(henvisning)) {
             throw new TekniskException("FPT-675364",
-                String.format("Mottok et kravOgVedtakStatus fra Økonomi med henvisning i ikke-støttet format, henvisning=%s. KravOgVedtakStatus skulle kanskje til et annet system. Si i fra til Økonomi!",
-                henvisning));
+                    String.format("Mottok et kravOgVedtakStatus fra Økonomi med henvisning i ikke-støttet format, henvisning=%s. KravOgVedtakStatus skulle kanskje til et annet system. Si i fra til Økonomi!",
+                            henvisning));
         }
     }
 
     private void validerBehandlingsEksistens(Henvisning henvisning, String saksnummer) {
         if (!finnesYtelsesbehandling(saksnummer, henvisning)) {
             throw new TekniskException("FPT-587196",
-                String.format("Mottok et kravOgVedtakStatus fra Økonomi for en behandling som ikke finnes i fpsak. henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!", henvisning));
+                    String.format("Mottok et kravOgVedtakStatus fra Økonomi for en behandling som ikke finnes i fpsak. henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!", henvisning));
         }
     }
 

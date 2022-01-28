@@ -48,8 +48,8 @@ public enum SøknadType {
             // [JACKSON-620] Empty String can become null...
 
             if (p.hasToken(JsonToken.VALUE_STRING)
-                && ctxt.isEnabled(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
-                && p.getText().length() == 0) {
+                    && ctxt.isEnabled(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+                    && p.getText().length() == 0) {
                 return null;
             }
 

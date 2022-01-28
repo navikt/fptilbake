@@ -134,17 +134,17 @@ public class HbVurderinger {
 
         public HbVurderinger.Builder medSærligeGrunner(Collection<SærligGrunn> særligeGrunner, String fritekstSærligeGrunner, String fritekstSærligeGrunnerAnnet) {
             kladd.særligeGrunner = HbSærligeGrunner.builder()
-                .medSærligeGrunner(særligeGrunner)
-                .medFritekstSærligeGrunner(fritekstSærligeGrunner)
-                .medFritekstSærligeGrunnerAnnet(fritekstSærligeGrunnerAnnet)
-                .build();
+                    .medSærligeGrunner(særligeGrunner)
+                    .medFritekstSærligeGrunner(fritekstSærligeGrunner)
+                    .medFritekstSærligeGrunnerAnnet(fritekstSærligeGrunnerAnnet)
+                    .build();
             return this;
         }
 
         public HbVurderinger build() {
             Objects.requireNonNull(kladd.foreldelsevurdering, "foreldelsevurdering er ikke satt");
             if (ForeldelseVurderingType.IKKE_VURDERT.equals(kladd.foreldelsevurdering) ||
-                ForeldelseVurderingType.IKKE_FORELDET.equals(kladd.foreldelsevurdering)) {
+                    ForeldelseVurderingType.IKKE_FORELDET.equals(kladd.foreldelsevurdering)) {
                 Objects.requireNonNull(kladd.vilkårResultat, "vilkårResultat er ikke satt");
             } else if (ForeldelseVurderingType.FORELDET.equals(kladd.foreldelsevurdering)) {
                 Objects.requireNonNull(kladd.foreldelsesfrist, "foreldelsesfrist er ikke satt");

@@ -8,11 +8,11 @@ public class YtelseDto {
 
     private BigDecimal belop;
 
-    public YtelseDto(){
+    public YtelseDto() {
 
     }
 
-    public YtelseDto(String aktivitet, BigDecimal belop){
+    public YtelseDto(String aktivitet, BigDecimal belop) {
         this.aktivitet = aktivitet;
         this.belop = belop;
     }

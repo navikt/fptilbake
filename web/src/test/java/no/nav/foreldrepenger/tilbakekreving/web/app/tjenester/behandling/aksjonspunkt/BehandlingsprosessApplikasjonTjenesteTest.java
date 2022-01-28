@@ -89,7 +89,7 @@ public class BehandlingsprosessApplikasjonTjenesteTest {
 
     private void markerFeilet(ProsessTaskData pt) {
         pt.setStatus(ProsessTaskStatus.FEILET);
-        pt.setAntallFeiledeForsøk(pt.getAntallFeiledeForsøk()+ 1);
+        pt.setAntallFeiledeForsøk(pt.getAntallFeiledeForsøk() + 1);
         pt.setNesteKjøringEtter(null);
         pt.setSistKjørt(LocalDateTime.now());
     }

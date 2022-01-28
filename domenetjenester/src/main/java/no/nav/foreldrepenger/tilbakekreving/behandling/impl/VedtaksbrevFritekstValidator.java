@@ -59,7 +59,7 @@ public class VedtaksbrevFritekstValidator {
                                                   VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering,
                                                   VedtaksbrevType brevType) {
         vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId)
-            .ifPresent(vilkårVurderingEntitet -> validerSærligeGrunnerAnnet(vilkårVurderingEntitet, vedtaksbrevFritekstPerioder));
+                .ifPresent(vilkårVurderingEntitet -> validerSærligeGrunnerAnnet(vilkårVurderingEntitet, vedtaksbrevFritekstPerioder));
 
         FaktaFeilutbetaling faktaFeilutbetaling = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
         if (brevType == VedtaksbrevType.ORDINÆR) {
@@ -72,8 +72,8 @@ public class VedtaksbrevFritekstValidator {
 
     private void validerFritekstLengde(VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering, VedtaksbrevType brevType) {
         if (vedtaksbrevFritekstOppsummering != null
-            && vedtaksbrevFritekstOppsummering.getOppsummeringFritekst() != null
-            && vedtaksbrevFritekstOppsummering.getOppsummeringFritekst().length() >= maxFritekstLengde(brevType)) {
+                && vedtaksbrevFritekstOppsummering.getOppsummeringFritekst() != null
+                && vedtaksbrevFritekstOppsummering.getOppsummeringFritekst().length() >= maxFritekstLengde(brevType)) {
             throw fritekstOppsumeringForLang();
         }
     }
@@ -81,9 +81,9 @@ public class VedtaksbrevFritekstValidator {
     private void validerAtPåkrevdOppsummeringErSatt(Long behandlingId, VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         boolean erRevurderingEtterKlage = behandling.getBehandlingÅrsaker().stream()
-            .anyMatch(ba -> ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_KA || ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_NFP);
+                .anyMatch(ba -> ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_KA || ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_NFP);
         if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) && !erRevurderingEtterKlage &&
-            (vedtaksbrevFritekstOppsummering == null || vedtaksbrevFritekstOppsummering.getOppsummeringFritekst() == null || vedtaksbrevFritekstOppsummering.getOppsummeringFritekst().isEmpty())) {
+                (vedtaksbrevFritekstOppsummering == null || vedtaksbrevFritekstOppsummering.getOppsummeringFritekst() == null || vedtaksbrevFritekstOppsummering.getOppsummeringFritekst().isEmpty())) {
             throw manglerPåkrevetOppsumering();
         }
     }
@@ -98,8 +98,8 @@ public class VedtaksbrevFritekstValidator {
 
     private static void validerSærligeGrunnerAnnetOneByOneImpl(VilkårVurderingEntitet vilkårVurdering, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
         vilkårVurdering.getPerioder().stream()
-            .filter(p -> p.getAktsomhet() != null && p.getAktsomhet().getSærligGrunner().stream().map(VilkårVurderingSærligGrunnEntitet::getGrunn).anyMatch(SærligGrunn.ANNET::equals))
-            .forEach(p -> validerFritekstSatt(vedtaksbrevFritekstPerioder, p.getPeriode(), "særlige grunner - annet", VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT));
+                .filter(p -> p.getAktsomhet() != null && p.getAktsomhet().getSærligGrunner().stream().map(VilkårVurderingSærligGrunnEntitet::getGrunn).anyMatch(SærligGrunn.ANNET::equals))
+                .forEach(p -> validerFritekstSatt(vedtaksbrevFritekstPerioder, p.getPeriode(), "særlige grunner - annet", VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT));
     }
 
     private void validerFritekstFakta(FaktaFeilutbetaling fakta, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
@@ -118,8 +118,8 @@ public class VedtaksbrevFritekstValidator {
 
     private static void validerFritekstFakta(FaktaFeilutbetaling fakta, HendelseUnderType hendelseUnderType, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
         fakta.getFeilutbetaltPerioder().stream()
-            .filter(p -> hendelseUnderType.equals(p.getHendelseUndertype()))
-            .forEach(p -> validerFritekstSatt(vedtaksbrevFritekstPerioder, p.getPeriode(), hendelseUnderType.getKode(), VedtaksbrevFritekstType.FAKTA_AVSNITT));
+                .filter(p -> hendelseUnderType.equals(p.getHendelseUndertype()))
+                .forEach(p -> validerFritekstSatt(vedtaksbrevFritekstPerioder, p.getPeriode(), hendelseUnderType.getKode(), VedtaksbrevFritekstType.FAKTA_AVSNITT));
     }
 
     private static void validerFritekstSatt(List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder, Periode periodeSomMåHaFritekst, String hva, VedtaksbrevFritekstType fritekstType) {
@@ -146,12 +146,12 @@ public class VedtaksbrevFritekstValidator {
 
     private static List<Periode> finnFritekstPerioder(List<VedtaksbrevFritekstPeriode> perioder, Periode periodeSomMåHaFritekst, VedtaksbrevFritekstType fritekstType) {
         return perioder.stream()
-            .filter(p -> fritekstType.equals(p.getFritekstType()))
-            .filter(p -> !p.getFritekst().isBlank())
-            .map(VedtaksbrevFritekstPeriode::getPeriode)
-            .filter(periodeSomMåHaFritekst::omslutter)
-            .sorted(Comparator.comparing(Periode::getFom))
-            .collect(Collectors.toList());
+                .filter(p -> fritekstType.equals(p.getFritekstType()))
+                .filter(p -> !p.getFritekst().isBlank())
+                .map(VedtaksbrevFritekstPeriode::getPeriode)
+                .filter(periodeSomMåHaFritekst::omslutter)
+                .sorted(Comparator.comparing(Periode::getFom))
+                .collect(Collectors.toList());
     }
 
 
@@ -170,10 +170,10 @@ public class VedtaksbrevFritekstValidator {
 
     private static void validerFritekstFaktaTimelineImpl(FaktaFeilutbetaling fakta, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
         LocalDateTimeline<HendelseUnderType> perioderSomSkalHaFritekst = new LocalDateTimeline<>(
-            fakta.getFeilutbetaltPerioder().stream()
-                .filter(f -> VedtaksbrevFritekstKonfigurasjon.UNDERTYPER_MED_PÅKREVD_FRITEKST.contains(f.getHendelseUndertype()))
-                .map(f -> new LocalDateSegment<HendelseUnderType>(f.getPeriode().getFom(), f.getPeriode().getTom(), f.getHendelseUndertype()))
-                .toList()
+                fakta.getFeilutbetaltPerioder().stream()
+                        .filter(f -> VedtaksbrevFritekstKonfigurasjon.UNDERTYPER_MED_PÅKREVD_FRITEKST.contains(f.getHendelseUndertype()))
+                        .map(f -> new LocalDateSegment<HendelseUnderType>(f.getPeriode().getFom(), f.getPeriode().getTom(), f.getHendelseUndertype()))
+                        .toList()
         );
         LocalDateTimeline<?> perioderSomHarFritekst = perioderSomHarFritekst(vedtaksbrevFritekstPerioder, VedtaksbrevFritekstType.FAKTA_AVSNITT);
         LocalDateTimeline<?> perioderSomManglerFritekst = perioderSomSkalHaFritekst.disjoint(perioderSomHarFritekst);
@@ -185,10 +185,10 @@ public class VedtaksbrevFritekstValidator {
 
     private static void validerSærligeGrunnerAnnetTimelineImpl(VilkårVurderingEntitet vilkårVurdering, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
         LocalDateTimeline<?> perioderSomSkalHaFritekst = new LocalDateTimeline<>(vilkårVurdering.getPerioder().stream()
-            .filter(p -> p.getAktsomhet() != null && p.getAktsomhet().getSærligGrunner().stream().map(VilkårVurderingSærligGrunnEntitet::getGrunn).anyMatch(SærligGrunn.ANNET::equals))
-            .map(VilkårVurderingPeriodeEntitet::getPeriode)
-            .map(VedtaksbrevFritekstValidator::toSegment)
-            .toList());
+                .filter(p -> p.getAktsomhet() != null && p.getAktsomhet().getSærligGrunner().stream().map(VilkårVurderingSærligGrunnEntitet::getGrunn).anyMatch(SærligGrunn.ANNET::equals))
+                .map(VilkårVurderingPeriodeEntitet::getPeriode)
+                .map(VedtaksbrevFritekstValidator::toSegment)
+                .toList());
         LocalDateTimeline<?> perioderSomHarFritekst = perioderSomHarFritekst(vedtaksbrevFritekstPerioder, VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT);
         LocalDateTimeline<?> perioderSomManglerFritekst = perioderSomSkalHaFritekst.disjoint(perioderSomHarFritekst);
         if (!perioderSomManglerFritekst.isEmpty()) {
@@ -199,10 +199,10 @@ public class VedtaksbrevFritekstValidator {
 
     private static LocalDateTimeline<?> perioderSomHarFritekst(List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder, VedtaksbrevFritekstType fritekstType) {
         return new LocalDateTimeline<>(vedtaksbrevFritekstPerioder.stream()
-            .filter(f -> f.getFritekstType() == fritekstType && f.getFritekst() != null && !f.getFritekst().isBlank())
-            .map(VedtaksbrevFritekstPeriode::getPeriode)
-            .map(VedtaksbrevFritekstValidator::toSegment)
-            .toList());
+                .filter(f -> f.getFritekstType() == fritekstType && f.getFritekst() != null && !f.getFritekst().isBlank())
+                .map(VedtaksbrevFritekstPeriode::getPeriode)
+                .map(VedtaksbrevFritekstValidator::toSegment)
+                .toList());
     }
 
     private static LocalDateSegment<Void> toSegment(Periode p) {

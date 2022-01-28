@@ -55,8 +55,8 @@ public class FortsettBehandlingTask implements ProsessTaskHandler {
             var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
             var behandling = behandlingRepository.hentBehandling(behandlingId);
             var manuellFortsettelse = Optional.ofNullable(data.getPropertyValue(MANUELL_FORTSETTELSE))
-                .map(Boolean::valueOf)
-                .orElse(Boolean.FALSE);
+                    .map(Boolean::valueOf)
+                    .orElse(Boolean.FALSE);
             var gjenoppta = data.getPropertyValue(GJENOPPTA_STEG);
 
             var stegtype = getBehandlingStegType(gjenoppta);
@@ -77,7 +77,7 @@ public class FortsettBehandlingTask implements ProsessTaskHandler {
             // Sjekke om kan prosesserere, samt feilhåndtering vs savepoint: Ved retry av feilet task som har passert gjenopptak må man fortsette.
             Optional<BehandlingStegTilstand> tilstand = behandling.getBehandlingStegTilstand();
             if (gjenoppta != null && tilstand.isPresent() && tilstand.get().getBehandlingSteg().equals(stegtype)
-                && BehandlingStegStatus.VENTER.equals(tilstand.get().getBehandlingStegStatus())) {
+                    && BehandlingStegStatus.VENTER.equals(tilstand.get().getBehandlingStegStatus())) {
                 behandlingskontrollTjeneste.prosesserBehandlingGjenopptaHvisStegVenter(kontekst, stegtype);
             } else if (!behandling.erAvsluttet()) {
                 behandlingskontrollTjeneste.prosesserBehandling(kontekst);

@@ -73,11 +73,11 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         behandlingresultatRepository = new BehandlingresultatRepository(entityManager);
         henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, taskTjeneste, behandlingskontrollTjeneste, historikkinnslagTjeneste);
         KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
-            taskTjeneste, repositoryProvider, henleggBehandlingTjeneste,
-            behandlingskontrollTjeneste);
+                taskTjeneste, repositoryProvider, henleggBehandlingTjeneste,
+                behandlingskontrollTjeneste);
         KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
         lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider,
-            kravVedtakStatusTjeneste, kravVedtakStatusMapper, fagsystemKlientMock);
+                kravVedtakStatusTjeneste, kravVedtakStatusMapper, fagsystemKlientMock);
 
         behandling = lagBehandling();
         lagEksternBehandling(behandling);
@@ -138,7 +138,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldigstatus.xml")); // den xml-en har ugyldig status kode
 
         assertThatThrownBy(() -> lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LES_KRAV_STATUS_TASK)))
-            .hasMessageContaining("FPT-107928");
+                .hasMessageContaining("FPT-107928");
     }
 
     @Test
@@ -148,7 +148,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         when(fagsystemKlientMock.finnesBehandlingIFagsystem(anyString(), any(Henvisning.class))).thenReturn(false);
 
         assertThatThrownBy(() -> lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LES_KRAV_STATUS_TASK)))
-            .hasMessageContaining("FPT-587196");
+                .hasMessageContaining("FPT-587196");
     }
 
     @Test
@@ -168,8 +168,8 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldigreferanse.xml"));
 
         assertThatThrownBy(() -> lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LES_KRAV_STATUS_TASK)))
-            .hasMessageContaining("Mottok et kravOgVedtakStatus fra Økonomi med henvisning i ikke-støttet format, henvisning=ABC. KravOgVedtakStatus "
-                + "skulle kanskje til et annet system. Si i fra til Økonomi!");
+                .hasMessageContaining("Mottok et kravOgVedtakStatus fra Økonomi med henvisning i ikke-støttet format, henvisning=ABC. KravOgVedtakStatus "
+                        + "skulle kanskje til et annet system. Si i fra til Økonomi!");
     }
 
     @Test
@@ -242,8 +242,8 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     public void skal_ikke_utføre_leskravvedtakststatustask_for_mottatt_endr_melding_når_grunnlag_ikke_sperret() {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR_samme_referanse.xml"));
         assertThatThrownBy(() -> lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LES_KRAV_STATUS_TASK)))
-            .isInstanceOf(TekniskException.class)
-            .hasMessageContaining("FPT-107929");
+                .isInstanceOf(TekniskException.class)
+                .hasMessageContaining("FPT-107929");
     }
 
     @Test
@@ -257,8 +257,8 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR_samme_referanse.xml"));
 
         assertThatThrownBy(() -> lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LES_KRAV_STATUS_TASK)))
-            .isInstanceOf(KravgrunnlagValidator.UgyldigKravgrunnlagException.class)
-            .hasMessageContaining("FPT-930235");
+                .isInstanceOf(KravgrunnlagValidator.UgyldigKravgrunnlagException.class)
+                .hasMessageContaining("FPT-930235");
     }
 
     @Test
@@ -294,12 +294,12 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         return behandling;
     }
 
-    private void lagEksternBehandling(Behandling behandling){
+    private void lagEksternBehandling(Behandling behandling) {
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(REFERANSE), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 
-    private List<EksternBehandlingsinfoDto> lagResponsFraFagsystemKlient(){
+    private List<EksternBehandlingsinfoDto> lagResponsFraFagsystemKlient() {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setUuid(UUID.randomUUID());
         eksternBehandlingsinfoDto.setHenvisning(Henvisning.fraEksternBehandlingId(REFERANSE));

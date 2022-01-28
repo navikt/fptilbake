@@ -52,7 +52,7 @@ public class Fagsak extends BaseEntitet {
     private long versjon;
 
     @Convert(converter = FagsakYtelseType.KodeverdiConverter.class)
-    @Column(name="ytelse_type",nullable = false)
+    @Column(name = "ytelse_type", nullable = false)
     private FagsakYtelseType fagsakYtelseType = FagsakYtelseType.FORELDREPENGER;
 
     Fagsak() {

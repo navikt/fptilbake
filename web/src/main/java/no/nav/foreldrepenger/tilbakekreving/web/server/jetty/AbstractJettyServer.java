@@ -45,12 +45,12 @@ abstract class AbstractJettyServer {
      * nedstrippet sett med Jetty configurations for raskere startup.
      */
     protected static final Configuration[] CONFIGURATIONS = new Configuration[]{
-        new WebAppConfiguration(),
-        new WebInfConfiguration(),
-        new WebXmlConfiguration(),
-        new AnnotationConfiguration(),
-        new EnvConfiguration(),
-        new PlusConfiguration(),
+            new WebAppConfiguration(),
+            new WebInfConfiguration(),
+            new WebXmlConfiguration(),
+            new AnnotationConfiguration(),
+            new EnvConfiguration(),
+            new PlusConfiguration(),
     };
     private AppKonfigurasjon appKonfigurasjon;
 

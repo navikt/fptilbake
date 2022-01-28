@@ -143,7 +143,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
             if (kladd.varsel == null && !kladd.sak.harDatoForFagsakvedtak()) {
                 throw new IllegalArgumentException("dato for fagsakvedtak/revurdering er ikke satt");
             }
-            if (kladd.finnesVerge){
+            if (kladd.finnesVerge) {
                 Objects.requireNonNull(kladd.annenMottakerNavn, "annenMottakerNavn kan ikke være null");
             }
             return kladd;
@@ -186,8 +186,8 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
         public Builder medLovhjemmelVedtak(String lovhjemmelVedtak) {
             kladd.hjemmel = HbHjemmel.builder()
-                .medLovhjemmelVedtak(lovhjemmelVedtak)
-                .build();
+                    .medLovhjemmelVedtak(lovhjemmelVedtak)
+                    .build();
             return this;
         }
 

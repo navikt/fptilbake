@@ -19,9 +19,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakReposi
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepository;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class VarselresponsTjenesteTest {
 
     private static Long BEHANDLING_ID;

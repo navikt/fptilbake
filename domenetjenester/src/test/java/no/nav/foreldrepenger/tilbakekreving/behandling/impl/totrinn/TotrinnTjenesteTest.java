@@ -41,9 +41,9 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
     public void settNyttTotrinnsgrunnlag() {
 
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM, TOM, KlasseType.FEIL,
-            BigDecimal.valueOf(11000), BigDecimal.ZERO);
+                BigDecimal.valueOf(11000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM, TOM,
-            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
+                KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
         mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
@@ -51,10 +51,10 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
 
         repoProvider.getFaktaFeilutbetalingRepository().lagre(internBehandlingId, lagFaktaFeilutbetaling());
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Collections.singletonList(
-            new ForeldelsePeriodeDto(FOM, TOM,
-                ForeldelseVurderingType.FORELDET, FOM.plusYears(3), null, "ABC")));
+                new ForeldelsePeriodeDto(FOM, TOM,
+                        ForeldelseVurderingType.FORELDET, FOM.plusYears(3), null, "ABC")));
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
-            formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, TOM, Aktsomhet.FORSETT));
+                formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, TOM, Aktsomhet.FORSETT));
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
         totrinnTjeneste.settNyttTotrinnsgrunnlag(behandling);
@@ -71,9 +71,9 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
     @Test
     public void settNyeTotrinnaksjonspunktvurderinger() {
         Totrinnsvurdering totrinnsvurdering = Totrinnsvurdering.builder().medGodkjent(true)
-            .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING)
-            .medBehandling(behandling)
-            .build();
+                .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING)
+                .medBehandling(behandling)
+                .build();
         totrinnTjeneste.settNyeTotrinnaksjonspunktvurderinger(behandling, Collections.singletonList(totrinnsvurdering));
 
         List<Totrinnsvurdering> totrinnsvurderinger = (List<Totrinnsvurdering>) totrinnTjeneste.hentTotrinnsvurderinger(behandling);
@@ -90,9 +90,9 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
     @Test
     public void slettGammelTotrinndata() {
         Totrinnsvurdering totrinnsvurdering = Totrinnsvurdering.builder().medGodkjent(true)
-            .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING)
-            .medBehandling(behandling)
-            .build();
+                .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING)
+                .medBehandling(behandling)
+                .build();
         totrinnTjeneste.settNyeTotrinnaksjonspunktvurderinger(behandling, Collections.singletonList(totrinnsvurdering));
 
         List<Totrinnsvurdering> totrinnsvurderinger = (List<Totrinnsvurdering>) totrinnTjeneste.hentTotrinnsvurderinger(behandling);

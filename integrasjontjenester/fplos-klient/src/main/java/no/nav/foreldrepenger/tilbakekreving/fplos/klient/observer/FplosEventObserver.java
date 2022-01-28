@@ -85,16 +85,16 @@ public class FplosEventObserver {
 
     public void observerBehandlingFristenUtløptEvent(@Observes BehandlingManglerKravgrunnlagFristenUtløptEvent utløptEvent) {
         logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_OPPRETTET,
-            AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG);
+                AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG);
         opprettProsessTask(utløptEvent.getFagsakId(), utløptEvent.getBehandlingId(), utløptEvent.getAktørId(),
-            EventHendelse.AKSJONSPUNKT_OPPRETTET, AksjonspunktStatus.OPPRETTET, utløptEvent.getFristDato());
+                EventHendelse.AKSJONSPUNKT_OPPRETTET, AksjonspunktStatus.OPPRETTET, utløptEvent.getFristDato());
     }
 
     public void observerBehandlingFristenEndretEvent(@Observes BehandlingManglerKravgrunnlagFristenEndretEvent fristenEndretEvent) {
         logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_AVBRUTT,
-            AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG);
+                AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG);
         opprettProsessTask(fristenEndretEvent.getFagsakId(), fristenEndretEvent.getBehandlingId(), fristenEndretEvent.getAktørId(),
-            EventHendelse.AKSJONSPUNKT_AVBRUTT, AksjonspunktStatus.AVBRUTT, fristenEndretEvent.getFristDato());
+                EventHendelse.AKSJONSPUNKT_AVBRUTT, AksjonspunktStatus.AVBRUTT, fristenEndretEvent.getFristDato());
     }
 
     private void opprettProsessTask(long fagsakId, long behandlingId, AktørId aktørId, EventHendelse eventHendelse) {

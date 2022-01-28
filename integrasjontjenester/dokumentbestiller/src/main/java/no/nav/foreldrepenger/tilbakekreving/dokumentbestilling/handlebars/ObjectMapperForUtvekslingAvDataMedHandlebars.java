@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 public class ObjectMapperForUtvekslingAvDataMedHandlebars {
 
     public static final ObjectMapper INSTANCE;
+
     static {
         INSTANCE = new ObjectMapper();
         INSTANCE.registerModule(new JavaTimeModule());

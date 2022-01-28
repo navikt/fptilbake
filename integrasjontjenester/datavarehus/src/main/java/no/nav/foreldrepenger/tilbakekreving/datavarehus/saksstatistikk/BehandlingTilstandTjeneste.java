@@ -46,17 +46,17 @@ public class BehandlingTilstandTjeneste {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         EksternBehandling eksternBehandling = getEksternBehandling(behandlingId);
         BehandlingResultatType behandlingResultatType = behandlingresultatRepository.hent(behandling)
-            .map(Behandlingsresultat::getBehandlingResultatType)
-            .orElse(BehandlingResultatType.IKKE_FASTSATT);
+                .map(Behandlingsresultat::getBehandlingResultatType)
+                .orElse(BehandlingResultatType.IKKE_FASTSATT);
 
         boolean venterPåBruker = behandling.getÅpneAksjonspunkter().stream().anyMatch(aksjonspunkt -> Venteårsak.venterPåBruker(aksjonspunkt.getVenteårsak()));
         boolean venterPåØkonomi = behandling.getÅpneAksjonspunkter().stream().anyMatch(aksjonspunkt -> Venteårsak.venterPåØkonomi(aksjonspunkt.getVenteårsak()));
 
         Optional<BehandlingÅrsak> behandlingsårsak = behandling.getBehandlingÅrsaker().stream().findFirst();
         Optional<Behandling> forrigeBehandling = behandlingsårsak
-            .map(BehandlingÅrsak::getOriginalBehandling)
-            .filter(Optional::isPresent)
-            .map(Optional::get);
+                .map(BehandlingÅrsak::getOriginalBehandling)
+                .filter(Optional::isPresent)
+                .map(Optional::get);
 
         BehandlingTilstand tilstand = new BehandlingTilstand();
         tilstand.setYtelseType(YtelseTypeMapper.getYtelseType(behandling.getFagsak().getFagsakYtelseType()));

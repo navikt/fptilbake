@@ -61,8 +61,8 @@ public class TilbakekrevingPeriode {
         if (o instanceof TilbakekrevingPeriode) {
             TilbakekrevingPeriode that = (TilbakekrevingPeriode) o;
             return Objects.equals(periode, that.periode) &&
-                Objects.compare(renter, that.renter, BigDecimal::compareTo) == 0 &&
-                Objects.equals(beløp, that.beløp);
+                    Objects.compare(renter, that.renter, BigDecimal::compareTo) == 0 &&
+                    Objects.equals(beløp, that.beløp);
         }
         return false;
     }
@@ -81,9 +81,9 @@ public class TilbakekrevingPeriode {
         }
 
         return "TilbakekrevingPeriode{" +
-            "periode=" + periode +
-            ", renter=" + renter +
-            ", beløp=" + beløpBuilder +
-            '}';
+                "periode=" + periode +
+                ", renter=" + renter +
+                ", beløp=" + beløpBuilder +
+                '}';
     }
 }

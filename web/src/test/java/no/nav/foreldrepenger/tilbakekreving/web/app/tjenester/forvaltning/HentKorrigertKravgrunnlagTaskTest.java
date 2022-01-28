@@ -35,7 +35,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -57,7 +57,7 @@ import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.xmlutils.DateUtil;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class HentKorrigertKravgrunnlagTaskTest {
 
     private final PersoninfoAdapter tpsAdapterMock = mock(PersoninfoAdapter.class);
@@ -106,7 +106,7 @@ public class HentKorrigertKravgrunnlagTaskTest {
     public void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_hentet_grunnlaget_er_ugyldig() {
         when(økonomiConsumerMock.hentKravgrunnlag(anyLong(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(false));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
-        var e= assertThrows(IntegrasjonException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
+        var e = assertThrows(IntegrasjonException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
         assertThat(e.getMessage()).contains("FPT-734548");
     }
 
@@ -115,8 +115,8 @@ public class HentKorrigertKravgrunnlagTaskTest {
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(2l), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
         when(fagsystemKlient.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(
-            lagEksternBehandlingsInfo(1l),
-            lagEksternBehandlingsInfo(2l)));
+                lagEksternBehandlingsInfo(1l),
+                lagEksternBehandlingsInfo(2l)));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
         assertThat(kravgrunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).isFalse();
         assertThat(eksternBehandling.getHenvisning().toLong()).isEqualTo(2l);
@@ -136,7 +136,7 @@ public class HentKorrigertKravgrunnlagTaskTest {
         eksternBehandlingRepository.lagre(eksternBehandling);
         when(fagsystemKlient.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(lagEksternBehandlingsInfo(2l)));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
-        var e= assertThrows(TekniskException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
+        var e = assertThrows(TekniskException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
         assertThat(e.getMessage()).contains("FPT-587197");
     }
 

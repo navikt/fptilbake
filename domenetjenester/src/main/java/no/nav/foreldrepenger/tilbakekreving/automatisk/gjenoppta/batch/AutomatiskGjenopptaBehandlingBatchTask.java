@@ -46,7 +46,7 @@ public class AutomatiskGjenopptaBehandlingBatchTask implements ProsessTaskHandle
         LocalDate iDag = LocalDate.now(clock);
         if (Helligdager.erHelligdagEllerHelg(iDag)) {
             logger.info("I dag er helg/helligdag, kan ikke kjøre batch-en {}", this.getClass().getSimpleName());
-        }else {
+        } else {
             gjenopptaBehandlingTjeneste.automatiskGjenopptaBehandlinger();
         }
     }

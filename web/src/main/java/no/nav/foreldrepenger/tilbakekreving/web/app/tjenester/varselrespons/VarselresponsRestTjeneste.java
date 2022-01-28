@@ -53,16 +53,16 @@ public class VarselresponsRestTjeneste {
 
     @GET
     @Operation(
-        tags = "brukerrespons",
-        description = "Henter respons for behandling",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Respons lagret", content = @Content(mediaType = "application/json", schema = @Schema(implementation = VarselresponsDto.class))),
-            @ApiResponse(responseCode = "404", description = "Response finnes ikke")
-        })
+            tags = "brukerrespons",
+            description = "Henter respons for behandling",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Respons lagret", content = @Content(mediaType = "application/json", schema = @Schema(implementation = VarselresponsDto.class))),
+                    @ApiResponse(responseCode = "404", description = "Response finnes ikke")
+            })
     @Path(value = "/hent-respons")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     public Response finnRespons(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                    @Valid @NotNull @QueryParam("behandlingId") BehandlingReferanse behandlingReferanse) {
+                                @Valid @NotNull @QueryParam("behandlingId") BehandlingReferanse behandlingReferanse) {
         Optional<VarselresponsDto> responsDto = responsTjeneste.hentRespons(behandlingReferanse.getBehandlingId()).map(VarselresponsDto::fraDomene);
         if (responsDto.isPresent()) {
             return Response.ok(responsDto.get()).build();
@@ -72,11 +72,11 @@ public class VarselresponsRestTjeneste {
 
     @POST
     @Operation(
-        tags = "brukerrespons",
-        description = "Lagrer respons fra bruker",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Respons registrert")
-        })
+            tags = "brukerrespons",
+            description = "Lagrer respons fra bruker",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Respons registrert")
+            })
     @Path(value = "/registrer")
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     public Response registrerBrukerrespons(@Valid @NotNull VarselresponsDto brukerRespons) {

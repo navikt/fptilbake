@@ -21,18 +21,18 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     @Test
     public void skal_generere_innhentdokumentasjonbrev() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nb)
-            .medMottakerAdresse(lagStandardNorskAdresse())
-            .medSakspartNavn("Test")
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nb)
+                .medMottakerAdresse(lagStandardNorskAdresse())
+                .medSakspartNavn("Test")
+                .build();
 
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()
-            .medBrevMetaData(brevMetadata)
-            .medFritekstFraSaksbehandler("Dette er ein fritekst.")
-            .medFristDato(LocalDate.of(2020, 3, 2))
-            .build();
+                .medBrevMetaData(brevMetadata)
+                .medFritekstFraSaksbehandler("Dette er ein fritekst.")
+                .medFristDato(LocalDate.of(2020, 3, 2))
+                .build();
         String generertBrev = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(innhentDokumentasjonBrevSamletInfo);
         String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev.txt");
         ;
@@ -42,18 +42,18 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     @Test
     public void skal_generere_innhentdokumentasjonbrev_frisinn() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
-            .medFagsaktype(FagsakYtelseType.FRISINN)
-            .medSprakkode(Språkkode.nb)
-            .medMottakerAdresse(lagStandardNorskAdresse())
-            .medSakspartNavn("Test")
-            .build();
+                .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
+                .medFagsaktype(FagsakYtelseType.FRISINN)
+                .medSprakkode(Språkkode.nb)
+                .medMottakerAdresse(lagStandardNorskAdresse())
+                .medSakspartNavn("Test")
+                .build();
 
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()
-            .medBrevMetaData(brevMetadata)
-            .medFritekstFraSaksbehandler("Dette er ein fritekst.")
-            .medFristDato(LocalDate.of(2020, 3, 2))
-            .build();
+                .medBrevMetaData(brevMetadata)
+                .medFritekstFraSaksbehandler("Dette er ein fritekst.")
+                .medFristDato(LocalDate.of(2020, 3, 2))
+                .build();
         String generertBrev = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(innhentDokumentasjonBrevSamletInfo);
         String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev_frisinn.txt");
         ;
@@ -63,20 +63,20 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     @Test
     public void skal_generere_innhentdokumentasjonbrev_for_verge() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nb)
-            .medMottakerAdresse(lagStandardNorskAdresse())
-            .medSakspartNavn("Test")
-            .medVergeNavn("John Doe")
-            .medFinnesVerge(true)
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nb)
+                .medMottakerAdresse(lagStandardNorskAdresse())
+                .medSakspartNavn("Test")
+                .medVergeNavn("John Doe")
+                .medFinnesVerge(true)
+                .build();
 
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()
-            .medBrevMetaData(brevMetadata)
-            .medFritekstFraSaksbehandler("Dette er ein fritekst.")
-            .medFristDato(LocalDate.of(2020, 3, 2))
-            .build();
+                .medBrevMetaData(brevMetadata)
+                .medFritekstFraSaksbehandler("Dette er ein fritekst.")
+                .medFristDato(LocalDate.of(2020, 3, 2))
+                .build();
         String generertBrev = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(innhentDokumentasjonBrevSamletInfo);
         String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev.txt");
         ;
@@ -87,22 +87,22 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     @Test
     public void skal_generere_innhentdokumentasjonbrev_for_verge_organisasjon() throws Exception {
         Adresseinfo orgAdresse = new Adresseinfo.Builder(new PersonIdent("12345678901"), "Semba AS c/o John Doe")
-            .build();
+                .build();
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nb)
-            .medMottakerAdresse(orgAdresse)
-            .medSakspartNavn("Test")
-            .medVergeNavn("John Doe")
-            .medFinnesVerge(true)
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nb)
+                .medMottakerAdresse(orgAdresse)
+                .medSakspartNavn("Test")
+                .medVergeNavn("John Doe")
+                .medFinnesVerge(true)
+                .build();
 
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()
-            .medBrevMetaData(brevMetadata)
-            .medFritekstFraSaksbehandler("Dette er ein fritekst.")
-            .medFristDato(LocalDate.of(2020, 3, 2))
-            .build();
+                .medBrevMetaData(brevMetadata)
+                .medFritekstFraSaksbehandler("Dette er ein fritekst.")
+                .medFristDato(LocalDate.of(2020, 3, 2))
+                .build();
         String generertBrev = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(innhentDokumentasjonBrevSamletInfo);
         String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev.txt");
         ;
@@ -113,18 +113,18 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     @Test
     public void skal_generere_innhentdokumentasjonbrev_nynorsk() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nn)
-            .medMottakerAdresse(lagStandardNorskAdresse())
-            .medSakspartNavn("Test")
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nn)
+                .medMottakerAdresse(lagStandardNorskAdresse())
+                .medSakspartNavn("Test")
+                .build();
 
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()
-            .medBrevMetaData(brevMetadata)
-            .medFritekstFraSaksbehandler("Dette er ein fritekst.")
-            .medFristDato(LocalDate.of(2020, 3, 2))
-            .build();
+                .medBrevMetaData(brevMetadata)
+                .medFritekstFraSaksbehandler("Dette er ein fritekst.")
+                .medFristDato(LocalDate.of(2020, 3, 2))
+                .build();
         String generertBrev = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(innhentDokumentasjonBrevSamletInfo);
         String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev_nn.txt");
         ;
@@ -134,14 +134,14 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     @Test
     public void skal_generere_innhentdokumentasjonbrev_overskrift() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nb)
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nb)
+                .build();
 
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()
-            .medBrevMetaData(brevMetadata)
-            .build();
+                .medBrevMetaData(brevMetadata)
+                .build();
         String overskrift = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevOverskrift(innhentDokumentasjonBrevSamletInfo);
         String fasit = "Vi trenger flere opplysninger";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
@@ -150,14 +150,14 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     @Test
     public void skal_generere_innhentdokumentasjonbrev_overskrift_nynorsk() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
-            .medFagsaktypenavnPåSpråk("foreldrepenger")
-            .medSprakkode(Språkkode.nn)
-            .build();
+                .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
+                .medFagsaktypenavnPåSpråk("foreldrepenger")
+                .medSprakkode(Språkkode.nn)
+                .build();
 
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()
-            .medBrevMetaData(brevMetadata)
-            .build();
+                .medBrevMetaData(brevMetadata)
+                .build();
         String overskrift = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevOverskrift(innhentDokumentasjonBrevSamletInfo);
         String fasit = "Vi trenger fleire opplysningar";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
@@ -173,6 +173,6 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
 
     private Adresseinfo lagStandardNorskAdresse() {
         return new Adresseinfo.Builder(new PersonIdent("12345678901"), "Test")
-            .build();
+                .build();
     }
 }

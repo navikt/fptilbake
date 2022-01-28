@@ -1,10 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import java.net.URI;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  * Asynk status returnert fra server ved long-polling jobs. Typisk flyt:
@@ -97,7 +97,7 @@ public class AsyncPollingStatus {
 
         private int httpStatus;
 
-        Status(int httpStatus){
+        Status(int httpStatus) {
             this.httpStatus = httpStatus;
         }
 

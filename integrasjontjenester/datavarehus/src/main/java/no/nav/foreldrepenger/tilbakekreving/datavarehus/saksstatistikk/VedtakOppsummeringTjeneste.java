@@ -78,9 +78,9 @@ public class VedtakOppsummeringTjeneste {
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
         Optional<BehandlingÅrsak> behandlingsårsak = behandling.getBehandlingÅrsaker().stream().findFirst();
         Optional<Behandling> forrigeBehandling = behandlingsårsak
-            .map(BehandlingÅrsak::getOriginalBehandling)
-            .filter(Optional::isPresent)
-            .map(Optional::get);
+                .map(BehandlingÅrsak::getOriginalBehandling)
+                .filter(Optional::isPresent)
+                .map(Optional::get);
 
         if (behandlingVedtak.isEmpty()) {
             throw new TekniskException("FPT-131275", String.format("Fant ikke vedtak for behandling med behandlingId=%s.Kan ikke sende data til DVH", behandlingId));
@@ -156,7 +156,7 @@ public class VedtakOppsummeringTjeneste {
             List<SærligGrunn> særligGrunnListe = new ArrayList<>();
             særligeGrunner.setErSærligeGrunnerTilReduksjon(periodeEntitet.getAktsomhet().getSærligGrunnerTilReduksjon());
             periodeEntitet.getAktsomhet().getSærligGrunner().forEach(særligeGrunnEntitet ->
-                særligGrunnListe.add(SærligGrunn.valueOf(særligeGrunnEntitet.getGrunn().getKode())));
+                    særligGrunnListe.add(SærligGrunn.valueOf(særligeGrunnEntitet.getGrunn().getKode())));
             særligeGrunner.setSærligeGrunner(særligGrunnListe);
             return særligeGrunner;
         }
@@ -166,7 +166,7 @@ public class VedtakOppsummeringTjeneste {
     private void settBeløp(BeregningResultat beregningResultat, VedtakPeriode vedtakPeriode) {
         Periode periode = new Periode(vedtakPeriode.getFom(), vedtakPeriode.getTom());
         Optional<BeregningResultatPeriode> resultatPeriode = beregningResultat.getBeregningResultatPerioder().stream()
-            .filter(perioder -> perioder.getPeriode().equals(periode)).findAny();
+                .filter(perioder -> perioder.getPeriode().equals(periode)).findAny();
         if (resultatPeriode.isPresent()) {
             BeregningResultatPeriode beregningResultatPeriode = resultatPeriode.get();
             vedtakPeriode.setFeilutbetaltBeløp(beregningResultatPeriode.getFeilutbetaltBeløp());
@@ -180,7 +180,7 @@ public class VedtakOppsummeringTjeneste {
         Periode periode = new Periode(vedtakPeriode.getFom(), vedtakPeriode.getTom());
         if (faktaFeilutbetalingEntitet.isPresent()) {
             Optional<FaktaFeilutbetalingPeriode> faktaFeilutbetalingPeriode = faktaFeilutbetalingEntitet.get().getFeilutbetaltPerioder().stream()
-                .filter(faktaPeriode -> faktaPeriode.getPeriode().overlapper(periode)).findFirst();
+                    .filter(faktaPeriode -> faktaPeriode.getPeriode().overlapper(periode)).findFirst();
             if (faktaFeilutbetalingPeriode.isPresent()) {
                 FaktaFeilutbetalingPeriode faktaPeriode = faktaFeilutbetalingPeriode.get();
                 vedtakPeriode.setHendelseTypeTekst(faktaPeriode.getHendelseType().getNavn());

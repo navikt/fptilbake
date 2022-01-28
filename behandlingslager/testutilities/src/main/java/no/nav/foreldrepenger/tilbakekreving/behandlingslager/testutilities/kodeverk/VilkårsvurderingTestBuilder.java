@@ -28,12 +28,12 @@ public class VilkårsvurderingTestBuilder {
         VilkårVurderingEntitet vurderingEntitet = new VilkårVurderingEntitet();
         for (Map.Entry<Periode, VVurdering> entry : vurderinger.entrySet()) {
             VilkårVurderingPeriodeEntitet periodeEntitet = VilkårVurderingPeriodeEntitet.builder()
-                .medPeriode(entry.getKey())
-                .medNavOppfulgt(NavOppfulgt.UDEFINERT)
-                .medVilkårResultat(entry.getValue().getVilkårResultat())
-                .medVurderinger(vurderingEntitet)
-                .medBegrunnelse("foo")
-                .build();
+                    .medPeriode(entry.getKey())
+                    .medNavOppfulgt(NavOppfulgt.UDEFINERT)
+                    .medVilkårResultat(entry.getValue().getVilkårResultat())
+                    .medVurderinger(vurderingEntitet)
+                    .medBegrunnelse("foo")
+                    .build();
             entry.getValue().leggPåVurdering(periodeEntitet);
             vurderingEntitet.leggTilPeriode(periodeEntitet);
         }
@@ -53,36 +53,36 @@ public class VilkårsvurderingTestBuilder {
             VVurdering vurdering = new VVurdering();
             vurdering.vilkårResultat = VilkårResultat.GOD_TRO;
             vurdering.godTro = VilkårVurderingGodTroEntitet.builder()
-                .medBegrunnelse("foo");
+                    .medBegrunnelse("foo");
             return vurdering;
         }
 
         public static VVurdering simpelUaktsom() {
             VVurdering vurdering = new VVurdering();
             vurdering.aktsomhet = VilkårVurderingAktsomhetEntitet.builder()
-                .medBegrunnelse("foo")
-                .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
-                .medIleggRenter(false)
-                .medSærligGrunnerTilReduksjon(false);
+                    .medBegrunnelse("foo")
+                    .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
+                    .medIleggRenter(false)
+                    .medSærligGrunnerTilReduksjon(false);
             return vurdering;
         }
 
         public static VVurdering grovtUaktsom(int andel) {
             VVurdering vurdering = new VVurdering();
             vurdering.aktsomhet = VilkårVurderingAktsomhetEntitet.builder()
-                .medBegrunnelse("foo")
-                .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
-                .medIleggRenter(false)
-                .medSærligGrunnerTilReduksjon(true)
-                .medProsenterSomTilbakekreves(BigDecimal.valueOf(andel));
+                    .medBegrunnelse("foo")
+                    .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
+                    .medIleggRenter(false)
+                    .medSærligGrunnerTilReduksjon(true)
+                    .medProsenterSomTilbakekreves(BigDecimal.valueOf(andel));
             return vurdering;
         }
 
         public static VVurdering forsett() {
             VVurdering vurdering = new VVurdering();
             vurdering.aktsomhet = VilkårVurderingAktsomhetEntitet.builder()
-                .medBegrunnelse("foo")
-                .medAktsomhet(Aktsomhet.FORSETT);
+                    .medBegrunnelse("foo")
+                    .medAktsomhet(Aktsomhet.FORSETT);
             return vurdering;
         }
 

@@ -70,8 +70,8 @@ public class Behandlingsresultat extends BaseEntitet {
     @Override
     public String toString() {
         return getClass().getSimpleName()
-            + "<behandling: " + behandling.getId()
-            + " resultatType: " + behandlingResultatType.getKode() + ">";
+                + "<behandling: " + behandling.getId()
+                + " resultatType: " + behandlingResultatType.getKode() + ">";
     }
 
     @Override

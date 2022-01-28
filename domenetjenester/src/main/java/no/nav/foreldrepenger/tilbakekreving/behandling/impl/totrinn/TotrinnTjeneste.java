@@ -42,10 +42,10 @@ public class TotrinnTjeneste {
         Long vilkårId = vilkårAggregateId.orElse(null);
 
         Totrinnresultatgrunnlag totrinnresultatgrunnlag = Totrinnresultatgrunnlag.builder()
-            .medBehandling(behandling)
-            .medFeilutbetalingId(feilUtbetalingId)
-            .medForeldelseId(foreldelseId)
-            .medVilkårId(vilkårId).build();
+                .medBehandling(behandling)
+                .medFeilutbetalingId(feilUtbetalingId)
+                .medForeldelseId(foreldelseId)
+                .medVilkårId(vilkårId).build();
         totrinnRepository.lagreOgFlush(behandling, totrinnresultatgrunnlag);
     }
 
@@ -61,7 +61,7 @@ public class TotrinnTjeneste {
         return totrinnRepository.hentTotrinngrunnlag(behandling);
     }
 
-    public void slettGammelTotrinnData(@Observes KravgrunnlagEndretEvent event){
+    public void slettGammelTotrinnData(@Observes KravgrunnlagEndretEvent event) {
         totrinnRepository.slettGammelTotrinnData(event.getBehandlingId());
     }
 }

@@ -75,11 +75,11 @@ public class ManueltVarselBrevTjeneste {
 
         Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
         pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VARSEL, varsletFeilutbetaling, fritekst, BrevData.builder()
-            .setMottaker(brevMottaker)
-            .setMetadata(data.getBrevMetadata())
-            .setOverskrift(data.getOverskrift())
-            .setBrevtekst(data.getBrevtekst())
-            .build());
+                .setMottaker(brevMottaker)
+                .setMetadata(data.getBrevMetadata())
+                .setOverskrift(data.getOverskrift())
+                .setBrevtekst(data.getBrevtekst())
+                .build());
     }
 
     public byte[] hentForhåndsvisningManueltVarselbrev(Long behandlingId, DokumentMalType malType, String fritekst) {
@@ -98,11 +98,11 @@ public class ManueltVarselBrevTjeneste {
             throw new IllegalArgumentException("Ikke-støttet DokumentMalType: " + malType);
         }
         return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
-            .setMottaker(brevMottaker)
-            .setOverskrift(data.getOverskrift())
-            .setBrevtekst(data.getBrevtekst())
-            .setMetadata(data.getBrevMetadata())
-            .build());
+                .setMottaker(brevMottaker)
+                .setOverskrift(data.getOverskrift())
+                .setBrevtekst(data.getBrevtekst())
+                .setMetadata(data.getBrevMetadata())
+                .build());
     }
 
     public void sendKorrigertVarselBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
@@ -114,31 +114,31 @@ public class ManueltVarselBrevTjeneste {
 
         Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
         pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.KORRIGERT_VARSEL, varsletFeilutbetaling, fritekst, BrevData.builder()
-            .setMottaker(brevMottaker)
-            .setOverskrift(data.getOverskrift())
-            .setBrevtekst(data.getBrevtekst())
-            .setMetadata(data.getBrevMetadata())
-            .build());
+                .setMottaker(brevMottaker)
+                .setOverskrift(data.getOverskrift())
+                .setBrevtekst(data.getBrevtekst())
+                .setMetadata(data.getBrevMetadata())
+                .build());
     }
 
     private FritekstbrevData lagManueltVarselBrev(VarselbrevSamletInfo varselbrevSamletInfo) {
         String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(varselbrevSamletInfo.getBrevMetadata());
         String brevtekst = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
         return new FritekstbrevData.Builder()
-            .medOverskrift(overskrift)
-            .medBrevtekst(brevtekst)
-            .medMetadata(varselbrevSamletInfo.getBrevMetadata())
-            .build();
+                .medOverskrift(overskrift)
+                .medBrevtekst(brevtekst)
+                .medMetadata(varselbrevSamletInfo.getBrevMetadata())
+                .build();
     }
 
     private FritekstbrevData lagKorrigertVarselBrev(VarselbrevSamletInfo varselbrevSamletInfo, VarselInfo varselInfo) {
         String overskrift = TekstformatererVarselbrev.lagKorrigertVarselbrevOverskrift(varselbrevSamletInfo.getBrevMetadata());
         String brevtekst = TekstformatererVarselbrev.lagKorrigertVarselbrevFritekst(varselbrevSamletInfo, varselInfo);
         return new FritekstbrevData.Builder()
-            .medOverskrift(overskrift)
-            .medBrevtekst(brevtekst)
-            .medMetadata(varselbrevSamletInfo.getBrevMetadata())
-            .build();
+                .medOverskrift(overskrift)
+                .medBrevtekst(brevtekst)
+                .medMetadata(varselbrevSamletInfo.getBrevMetadata())
+                .build();
     }
 
     private VarselbrevSamletInfo lagVarselBeløpForSending(String fritekst, Behandling behandling, BrevMottaker brevMottaker, boolean erKorrigert) {
@@ -162,18 +162,18 @@ public class ManueltVarselBrevTjeneste {
         BehandlingFeilutbetalingFakta feilutbetalingFakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandling.getId());
 
         return VarselbrevUtil.sammenstillInfoFraFagsystemerForSendingManueltVarselBrev(
-            behandling,
-            personinfo,
-            adresseinfo,
-            fagsakYtelseType,
-            mottakersSpråkkode,
-            ytelseNavn,
-            ventetid,
-            fritekst,
-            feilutbetalingFakta,
-            finnesVerge,
-            vergeNavn,
-            erKorrigert);
+                behandling,
+                personinfo,
+                adresseinfo,
+                fagsakYtelseType,
+                mottakersSpråkkode,
+                ytelseNavn,
+                ventetid,
+                fritekst,
+                feilutbetalingFakta,
+                finnesVerge,
+                vergeNavn,
+                erKorrigert);
     }
 
     private Språkkode hentSpråkkode(Long behandlingId) {

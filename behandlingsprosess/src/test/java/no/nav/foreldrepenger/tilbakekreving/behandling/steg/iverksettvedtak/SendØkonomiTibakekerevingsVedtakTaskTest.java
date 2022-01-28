@@ -41,8 +41,8 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
     private SendØkonomiTibakekerevingsVedtakTask task;
 
     @BeforeEach
-    public void setup(){
-         task = new SendØkonomiTibakekerevingsVedtakTask(tilbakekrevingsvedtakTjeneste, økonomiConsumer, økonomiSendtXmlRepository);
+    public void setup() {
+        task = new SendØkonomiTibakekerevingsVedtakTask(tilbakekrevingsvedtakTjeneste, økonomiConsumer, økonomiSendtXmlRepository);
     }
 
     @Test
@@ -50,9 +50,9 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
         when(økonomiConsumer.iverksettTilbakekrevingsvedtak(any(), any())).thenReturn(responseMedPositivKvittering());
 
         ScenarioSimple scenario = ScenarioSimple
-            .simple()
-            .medDefaultKravgrunnlag()
-            .medFullInnkreving();
+                .simple()
+                .medDefaultKravgrunnlag()
+                .medFullInnkreving();
         Behandling behandling = scenario.lagre(behandlingRepositoryProvider);
         ProsessTaskData data = lagProsessTaskKonfigurasjon(behandling);
 
@@ -67,14 +67,14 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
         when(økonomiConsumer.iverksettTilbakekrevingsvedtak(any(), any())).thenReturn(responseMedNegativKvittering());
 
         ScenarioSimple scenario = ScenarioSimple
-            .simple()
-            .medDefaultKravgrunnlag()
-            .medFullInnkreving();
+                .simple()
+                .medDefaultKravgrunnlag()
+                .medFullInnkreving();
         Behandling behandling = scenario.lagre(behandlingRepositoryProvider);
         ProsessTaskData data = lagProsessTaskKonfigurasjon(behandling);
 
         assertThatThrownBy(() -> task.doTask(data))
-            .hasMessageContaining("Fikk feil fra OS ved iverksetting av behandling");
+                .hasMessageContaining("Fikk feil fra OS ved iverksetting av behandling");
     }
 
     private ProsessTaskData lagProsessTaskKonfigurasjon(Behandling behandling) {

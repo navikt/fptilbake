@@ -127,7 +127,7 @@ public class BehandlingTjeneste {
     }
 
     public Behandling opprettKunBehandlingManuell(Saksnummer saksnummer, UUID eksternUuid,
-                                         FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
+                                                  FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
 
         return opprettFørstegangsbehandling(saksnummer, eksternUuid, null, null, fagsakYtelseType, behandlingType);
     }
@@ -162,9 +162,9 @@ public class BehandlingTjeneste {
             throw BehandlingFeil.fantIngenTilbakekrevingBehandlingForSaksnummer(saksnummer);
         }
         Optional<Behandling> åpenTilbakekrevingBehandling = behandlinger.stream()
-            .filter(behandling -> !behandling.erAvsluttet())
-            .filter(behandling -> BehandlingType.TILBAKEKREVING.equals(behandling.getType()))
-            .findAny();
+                .filter(behandling -> !behandling.erAvsluttet())
+                .filter(behandling -> BehandlingType.TILBAKEKREVING.equals(behandling.getType()))
+                .findAny();
 
         if (åpenTilbakekrevingBehandling.isPresent()) {
             Behandling behandling = åpenTilbakekrevingBehandling.get();
@@ -183,8 +183,8 @@ public class BehandlingTjeneste {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
 
         BehandlingStegType behandlingStegFunnet = behandling.getAksjonspunktMedDefinisjonOptional(apDef)
-            .map(Aksjonspunkt::getBehandlingStegFunnet)
-            .orElse(null); // Dersom autopunkt ikke allerede er opprettet, så er det ikke tilknyttet steg
+                .map(Aksjonspunkt::getBehandlingStegFunnet)
+                .orElse(null); // Dersom autopunkt ikke allerede er opprettet, så er det ikke tilknyttet steg
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, apDef, behandlingStegFunnet, fristTid, venteårsak);
 
     }
@@ -213,7 +213,7 @@ public class BehandlingTjeneste {
         Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, fagsakYtelseType, eksternBehandlingsinfoDto.getSpråkkodeEllerDefault());
 
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, behandlingType)
-            .medManueltOpprettet(manueltOpprettet).build();
+                .medManueltOpprettet(manueltOpprettet).build();
         OrganisasjonsEnhet organisasjonsEnhet = hentEnhetFraEksternBehandling(eksternBehandlingsinfoDto);
         behandling.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
 
@@ -254,7 +254,7 @@ public class BehandlingTjeneste {
             return false;
         }
         return behandlinger.stream()
-            .anyMatch(behandling -> !behandling.erAvsluttet() && BehandlingType.TILBAKEKREVING.equals(behandling.getType()));
+                .anyMatch(behandling -> !behandling.erAvsluttet() && BehandlingType.TILBAKEKREVING.equals(behandling.getType()));
     }
 
     private boolean finnesTilbakekrevingsbehandlingForYtelsesbehandlingen(UUID eksternUuid) {
@@ -291,10 +291,10 @@ public class BehandlingTjeneste {
             logger.info("Verge informasjon er utløpt.Så kopierer ikke fra fpsak");
         } else {
             VergeEntitet.Builder builder = VergeEntitet.builder().medVergeType(vergeDto.getVergeType())
-                .medKilde(KildeType.FPSAK.name())
-                .medGyldigPeriode(vergeDto.getGyldigFom(), vergeDto.getGyldigTom())
-                .medNavn(vergeDto.getNavn())
-                .medBegrunnelse("");
+                    .medKilde(KildeType.FPSAK.name())
+                    .medGyldigPeriode(vergeDto.getGyldigFom(), vergeDto.getGyldigTom())
+                    .medNavn(vergeDto.getNavn())
+                    .medBegrunnelse("");
             if (vergeDto.getOrganisasjonsnummer() != null && !vergeDto.getOrganisasjonsnummer().isEmpty()) {
                 builder.medOrganisasjonnummer(vergeDto.getOrganisasjonsnummer());
             } else if (vergeDto.getFnr() != null && !vergeDto.getFnr().isEmpty()) {

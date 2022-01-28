@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import ch.qos.logback.classic.Level;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.vedtak.felles.testutilities.cdi.CdiAwareExtension;
 import no.nav.vedtak.log.util.MemoryAppender;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(CdiAwareExtension.class)
 public class PollerTest {
 
     public MemoryAppender logSniffer;

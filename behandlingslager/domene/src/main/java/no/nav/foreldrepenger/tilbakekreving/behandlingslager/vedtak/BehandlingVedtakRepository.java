@@ -20,7 +20,7 @@ public class BehandlingVedtakRepository {
     }
 
     @Inject
-    public BehandlingVedtakRepository( EntityManager entityManager) {
+    public BehandlingVedtakRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -38,7 +38,7 @@ public class BehandlingVedtakRepository {
         return hentUniktResultat(query);
     }
 
-    public List<BehandlingVedtak> hentAlleBehandlingVedtak(){
+    public List<BehandlingVedtak> hentAlleBehandlingVedtak() {
         TypedQuery<BehandlingVedtak> query = entityManager.createQuery("select vedtak FROM BehandlingVedtak vedtak join fetch vedtak.behandlingsresultat", BehandlingVedtak.class); //$NON-NLS-1$
         return query.getResultList();
     }

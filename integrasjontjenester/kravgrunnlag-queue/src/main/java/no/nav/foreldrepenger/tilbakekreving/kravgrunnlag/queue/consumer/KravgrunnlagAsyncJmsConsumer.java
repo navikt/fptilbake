@@ -45,7 +45,7 @@ public class KravgrunnlagAsyncJmsConsumer extends InternalQueueConsumer {
 
     @Override
     public void handle(Message message) throws JMSException {
-        logger.info("Mottok en melding over MQ av type {}" , message.getClass().getName());
+        logger.info("Mottok en melding over MQ av type {}", message.getClass().getName());
         if (message instanceof TextMessage) {
             håndterMelding((TextMessage) message);
         } else {

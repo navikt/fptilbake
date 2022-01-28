@@ -28,13 +28,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class HåndterGamleKravgrunnlagBatchTaskTest {
 
     private ProsessTaskTjeneste taskTjeneste;
@@ -50,14 +50,14 @@ public class HåndterGamleKravgrunnlagBatchTaskTest {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML());
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
-            taskTjeneste, clock, Period.ofWeeks(-1));
+                taskTjeneste, clock, Period.ofWeeks(-1));
     }
 
     @Test
     public void skal_ikke_kjøre_batch_i_helgen() {
         Clock clock = Clock.fixed(Instant.parse("2020-05-03T12:00:00.00Z"), ZoneId.systemDefault());
         HåndterGamleKravgrunnlagBatchTask gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
-            taskTjeneste, clock, Period.ofWeeks(-1));
+                taskTjeneste, clock, Period.ofWeeks(-1));
         gamleKravgrunnlagBatchTjeneste.doTask(lagProsessTaskData());
         verifyNoInteractions(taskTjeneste);
     }
@@ -66,13 +66,13 @@ public class HåndterGamleKravgrunnlagBatchTaskTest {
     public void skal_ikke_kjøre_batch_på_helligdager() {
         Clock clock = Clock.fixed(Instant.parse("2020-12-25T12:00:00.00Z"), ZoneId.systemDefault());
         HåndterGamleKravgrunnlagBatchTask gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
-            taskTjeneste, clock, Period.ofWeeks(-1));
+                taskTjeneste, clock, Period.ofWeeks(-1));
         gamleKravgrunnlagBatchTjeneste.doTask(lagProsessTaskData());
         verifyNoInteractions(taskTjeneste);
     }
 
     @Test
-    public void skal_kjøre_batch_og_opprette_prosess_task_for_grunnlag(){
+    public void skal_kjøre_batch_og_opprette_prosess_task_for_grunnlag() {
         gamleKravgrunnlagBatchTjeneste.doTask(lagProsessTaskData());
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
         verify(taskTjeneste, times(1)).lagre(captor.capture());
@@ -95,8 +95,8 @@ public class HåndterGamleKravgrunnlagBatchTaskTest {
 
     private String getDateString() {
         return (LocalDate.now().getDayOfWeek() == DayOfWeek.SUNDAY || LocalDate.now().getDayOfWeek() == DayOfWeek.SATURDAY) ?
-            Instant.now().plus(2, ChronoUnit.DAYS).toString() :
-            Instant.now().toString();
+                Instant.now().plus(2, ChronoUnit.DAYS).toString() :
+                Instant.now().toString();
     }
 
     private ProsessTaskData lagProsessTaskData() {

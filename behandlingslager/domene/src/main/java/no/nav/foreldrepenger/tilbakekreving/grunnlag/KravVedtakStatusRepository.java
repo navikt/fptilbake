@@ -21,7 +21,7 @@ public class KravVedtakStatusRepository {
     }
 
     @Inject
-    public KravVedtakStatusRepository( EntityManager entityManager) {
+    public KravVedtakStatusRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -32,10 +32,10 @@ public class KravVedtakStatusRepository {
             entityManager.persist(forrigeGrunnlagStatus.get());
         }
         KravVedtakStatusAggregate aggregate = new KravVedtakStatusAggregate.Builder()
-            .medKravVedtakStatus(kravVedtakStatus)
-            .medBehandlingId(behandlingId)
-            .medAktiv(true)
-            .build();
+                .medKravVedtakStatus(kravVedtakStatus)
+                .medBehandlingId(behandlingId)
+                .medAktiv(true)
+                .build();
         entityManager.persist(kravVedtakStatus);
         entityManager.persist(aggregate);
         entityManager.flush();
@@ -44,12 +44,12 @@ public class KravVedtakStatusRepository {
 
     public Optional<KravStatusKode> finnKravstatus(Long behandlingId) {
         return finnKravStatusForBehaandlingId(behandlingId)
-            .map(ks -> ks.getKravVedtakStatus().getKravStatusKode());
+                .map(ks -> ks.getKravVedtakStatus().getKravStatusKode());
     }
 
     private Optional<KravVedtakStatusAggregate> finnKravStatusForBehaandlingId(Long behandlingId) {
         TypedQuery<KravVedtakStatusAggregate> query = entityManager.createQuery("from KravVedtakStatusAggregate aggr " +
-            "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", KravVedtakStatusAggregate.class);
+                "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", KravVedtakStatusAggregate.class);
         query.setParameter("behandlingId", behandlingId);
         query.setParameter("aktiv", true);
         return hentUniktResultat(query);

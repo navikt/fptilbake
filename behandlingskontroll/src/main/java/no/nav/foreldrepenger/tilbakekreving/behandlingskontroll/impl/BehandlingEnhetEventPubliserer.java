@@ -26,6 +26,6 @@ public class BehandlingEnhetEventPubliserer {
 
     public void fireEvent(Behandling behandling) {
         BehandlingEnhetEvent event = new BehandlingEnhetEvent(behandling);
-        beanManager.fireEvent(event, new Annotation[] {});
+        beanManager.fireEvent(event, new Annotation[]{});
     }
 }

@@ -22,7 +22,7 @@ public class BehandlingStegStatusEvent implements BehandlingEvent {
     private BehandlingStegStatus forrigeStatus;
 
     public BehandlingStegStatusEvent(BehandlingskontrollKontekst kontekst, BehandlingStegType stegType, BehandlingStegStatus forrigeStatus,
-            BehandlingStegStatus nyStatus) {
+                                     BehandlingStegStatus nyStatus) {
         super();
         this.kontekst = kontekst;
         this.stegType = stegType;

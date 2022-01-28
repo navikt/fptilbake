@@ -70,13 +70,13 @@ public class HenleggelsesbrevTjeneste {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = BehandlingType.TILBAKEKREVING.equals(behandling.getType()) ?
-            lagHenleggelsebrev(henleggelsesbrevSamletInfo) : lagRevurderingHenleggelsebrev(henleggelsesbrevSamletInfo);
+                lagHenleggelsebrev(henleggelsesbrevSamletInfo) : lagRevurderingHenleggelsebrev(henleggelsesbrevSamletInfo);
         pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.HENLEGGELSE, BrevData.builder()
-            .setMottaker(brevMottaker)
-            .setMetadata(fritekstbrevData.getBrevMetadata())
-            .setOverskrift(fritekstbrevData.getOverskrift())
-            .setBrevtekst(fritekstbrevData.getBrevtekst())
-            .build());
+                .setMottaker(brevMottaker)
+                .setMetadata(fritekstbrevData.getBrevMetadata())
+                .setOverskrift(fritekstbrevData.getOverskrift())
+                .setBrevtekst(fritekstbrevData.getBrevtekst())
+                .build());
     }
 
     public byte[] hentForhåndsvisningHenleggelsebrev(UUID behandlingUuid, String fritekst) {
@@ -94,14 +94,14 @@ public class HenleggelsesbrevTjeneste {
         BrevMottaker brevMottaker = finnesVerge ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = BehandlingType.TILBAKEKREVING.equals(behandling.getType()) ?
-            lagHenleggelsebrev(henleggelsesbrevSamletInfo) : lagRevurderingHenleggelsebrev(henleggelsesbrevSamletInfo);
+                lagHenleggelsebrev(henleggelsesbrevSamletInfo) : lagRevurderingHenleggelsebrev(henleggelsesbrevSamletInfo);
 
         return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
-            .setMottaker(brevMottaker)
-            .setMetadata(fritekstbrevData.getBrevMetadata())
-            .setOverskrift(fritekstbrevData.getOverskrift())
-            .setBrevtekst(fritekstbrevData.getBrevtekst())
-            .build());
+                .setMottaker(brevMottaker)
+                .setMetadata(fritekstbrevData.getBrevMetadata())
+                .setOverskrift(fritekstbrevData.getOverskrift())
+                .setBrevtekst(fritekstbrevData.getBrevtekst())
+                .build());
     }
 
     private HenleggelsesbrevSamletInfo lagHenleggelsebrevForSending(Behandling behandling, String fritekst, BrevMottaker brevMottaker) {
@@ -112,7 +112,7 @@ public class HenleggelsesbrevTjeneste {
             throw new FunksjonellException("FPT-110801", String.format("Varselbrev er ikke sendt. Kan ikke forhåndsvise/sende henleggelsesbrev for behandlingId=%s.", behandlingId), "");
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType) && (fritekst == null || fritekst.isEmpty())) {
             throw new FunksjonellException("FPT-110802",
-                String.format("Kan ikke forhåndsvise/sende henleggelsesbrev uten fritekst for Tilbakekreving Revurdering med behandlingId=%s.", behandlingId), "");
+                    String.format("Kan ikke forhåndsvise/sende henleggelsesbrev uten fritekst for Tilbakekreving Revurdering med behandlingId=%s.", behandlingId), "");
         }
         FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
         Språkkode språkkode = hentSpråkkode(behandlingId);
@@ -126,21 +126,21 @@ public class HenleggelsesbrevTjeneste {
         String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet, adresseinfo);
 
         BrevMetadata metadata = new BrevMetadata.Builder()
-            .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
-            .medBehandlendeEnhetNavn(behandling.getBehandlendeEnhetNavn())
-            .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
-            .medFagsaktype(behandling.getFagsak().getFagsakYtelseType())
-            .medSprakkode(språkkode)
-            .medAnsvarligSaksbehandler("VL")
-            .medSakspartId(personinfo.getPersonIdent().getIdent())
-            .medMottakerAdresse(adresseinfo)
-            .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
-            .medSakspartNavn(personinfo.getNavn())
-            .medVergeNavn(vergeNavn)
-            .medFinnesVerge(finnesVerge)
-            .medTittel(TITTEL_HENLEGGELSESBREV)
-            .medBehandlingtype(behandlingType)
-            .build();
+                .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
+                .medBehandlendeEnhetNavn(behandling.getBehandlendeEnhetNavn())
+                .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
+                .medFagsaktype(behandling.getFagsak().getFagsakYtelseType())
+                .medSprakkode(språkkode)
+                .medAnsvarligSaksbehandler("VL")
+                .medSakspartId(personinfo.getPersonIdent().getIdent())
+                .medMottakerAdresse(adresseinfo)
+                .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
+                .medSakspartNavn(personinfo.getNavn())
+                .medVergeNavn(vergeNavn)
+                .medFinnesVerge(finnesVerge)
+                .medTittel(TITTEL_HENLEGGELSESBREV)
+                .medBehandlingtype(behandlingType)
+                .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(metadata);
@@ -157,18 +157,18 @@ public class HenleggelsesbrevTjeneste {
 
     private FritekstbrevData lagHenleggelsebrev(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {
         return new FritekstbrevData.Builder()
-            .medOverskrift(TekstformatererHenleggelsesbrev.lagHenleggelsebrevOverskrift(henleggelsesbrevSamletInfo))
-            .medMetadata(henleggelsesbrevSamletInfo.getBrevMetadata())
-            .medBrevtekst(TekstformatererHenleggelsesbrev.lagHenleggelsebrevFritekst(henleggelsesbrevSamletInfo))
-            .build();
+                .medOverskrift(TekstformatererHenleggelsesbrev.lagHenleggelsebrevOverskrift(henleggelsesbrevSamletInfo))
+                .medMetadata(henleggelsesbrevSamletInfo.getBrevMetadata())
+                .medBrevtekst(TekstformatererHenleggelsesbrev.lagHenleggelsebrevFritekst(henleggelsesbrevSamletInfo))
+                .build();
     }
 
     private FritekstbrevData lagRevurderingHenleggelsebrev(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {
         return new FritekstbrevData.Builder()
-            .medOverskrift(TekstformatererHenleggelsesbrev.lagRevurderingHenleggelsebrevOverskrift(henleggelsesbrevSamletInfo))
-            .medMetadata(henleggelsesbrevSamletInfo.getBrevMetadata())
-            .medBrevtekst(TekstformatererHenleggelsesbrev.lagRevurderingHenleggelsebrevFritekst(henleggelsesbrevSamletInfo))
-            .build();
+                .medOverskrift(TekstformatererHenleggelsesbrev.lagRevurderingHenleggelsebrevOverskrift(henleggelsesbrevSamletInfo))
+                .medMetadata(henleggelsesbrevSamletInfo.getBrevMetadata())
+                .medBrevtekst(TekstformatererHenleggelsesbrev.lagRevurderingHenleggelsebrevFritekst(henleggelsesbrevSamletInfo))
+                .build();
     }
 
 }

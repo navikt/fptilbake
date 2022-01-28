@@ -37,11 +37,11 @@ public class SjekkDtoStrukturTest {
         IndexClasses indexClasses;
         indexClasses = IndexClasses.getIndexFor(IndexClasses.class.getProtectionDomain().getCodeSource().getLocation().toURI());
         List<Class<?>> classes = indexClasses.getClasses(
-            ci -> ci.name().toString().endsWith("Dto"),
-            c -> !c.isInterface());
+                ci -> ci.name().toString().endsWith("Dto"),
+                c -> !c.isInterface());
 
         for (int i = 0; i < classes.size(); i++) {
-            params.add(new Object[] { classes.get(i) });
+            params.add(new Object[]{classes.get(i)});
         }
         return params;
     }
@@ -49,11 +49,11 @@ public class SjekkDtoStrukturTest {
     private void sjekkJsonProperties(Class<?> c) throws IntrospectionException {
         List<Field> fields = List.of(c.getDeclaredFields());
         Set<String> fieldNames = fields.stream()
-            .filter(f -> !f.isSynthetic() && !Modifier.isStatic(f.getModifiers()))
-            .filter(f -> f.getAnnotation(JsonProperty.class) == null)
-            .filter(f -> f.getAnnotation(JsonValue.class) == null)
-            .filter(f -> f.getAnnotation(JsonIgnore.class) == null)
-            .map(f -> f.getName()).collect(Collectors.toSet());
+                .filter(f -> !f.isSynthetic() && !Modifier.isStatic(f.getModifiers()))
+                .filter(f -> f.getAnnotation(JsonProperty.class) == null)
+                .filter(f -> f.getAnnotation(JsonValue.class) == null)
+                .filter(f -> f.getAnnotation(JsonIgnore.class) == null)
+                .map(f -> f.getName()).collect(Collectors.toSet());
 
         if (!fieldNames.isEmpty()) {
             for (PropertyDescriptor prop : Introspector.getBeanInfo(c, c.getSuperclass()).getPropertyDescriptors()) {
@@ -62,11 +62,11 @@ public class SjekkDtoStrukturTest {
                     String propName = prop.getName();
                     if (!SKIPPED.contains(propName)) {
                         if (readName.getAnnotation(JsonIgnore.class) == null
-                            && readName.getAnnotation(JsonProperty.class) == null) {
+                                && readName.getAnnotation(JsonProperty.class) == null) {
                             Assertions.assertThat(propName)
-                                .as("Gettere er ikke samstemt med felt i klasse, sørg for matchende bean navn og return type eller bruk @JsonProperty/@JsonIgnore/@JsonValue til å sette navn for json struktur: "
-                                    + c.getName())
-                                .isIn(fieldNames);
+                                    .as("Gettere er ikke samstemt med felt i klasse, sørg for matchende bean navn og return type eller bruk @JsonProperty/@JsonIgnore/@JsonValue til å sette navn for json struktur: "
+                                            + c.getName())
+                                    .isIn(fieldNames);
                         }
                     }
                 }
@@ -76,11 +76,11 @@ public class SjekkDtoStrukturTest {
                     String propName = prop.getName();
                     if (!SKIPPED.contains(propName)) {
                         if (readName.getAnnotation(JsonIgnore.class) == null
-                            && readName.getAnnotation(JsonProperty.class) == null) {
+                                && readName.getAnnotation(JsonProperty.class) == null) {
                             Assertions.assertThat(propName)
-                                .as("Settere er ikke samstemt med felt i klasse, sørg for matchende bean navn og return type eller bruk @JsonProperty/@JsonIgnore/@JsonValue til å sette navn for json struktur: "
-                                    + c.getName())
-                                .isIn(fieldNames);
+                                    .as("Settere er ikke samstemt med felt i klasse, sørg for matchende bean navn og return type eller bruk @JsonProperty/@JsonIgnore/@JsonValue til å sette navn for json struktur: "
+                                            + c.getName())
+                                    .isIn(fieldNames);
                         }
                     }
                 }

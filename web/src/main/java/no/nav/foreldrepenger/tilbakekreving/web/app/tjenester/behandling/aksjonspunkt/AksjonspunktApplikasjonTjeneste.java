@@ -109,7 +109,7 @@ public class AksjonspunktApplikasjonTjeneste {
         }
 
         if (!aksjonspunkt.erBehandletAksjonspunkt() && !aksjonspunkt.erAvbrutt()) {
-                utførteAksjonspunkter.add(aksjonspunkt);
+            utførteAksjonspunkter.add(aksjonspunkt);
         }
     }
 

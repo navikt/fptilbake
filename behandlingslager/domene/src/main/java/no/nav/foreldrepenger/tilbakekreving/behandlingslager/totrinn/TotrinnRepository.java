@@ -24,7 +24,7 @@ public class TotrinnRepository {
     }
 
     @Inject
-    public TotrinnRepository( EntityManager entityManager) {
+    public TotrinnRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -69,16 +69,16 @@ public class TotrinnRepository {
         return getAktivtTotrinnresultatgrunnlag(behandling);
     }
 
-    public void slettGammelTotrinnData(Long behandlingId){
+    public void slettGammelTotrinnData(Long behandlingId) {
         List<Totrinnsvurdering> totrinnsvurderinger = (List<Totrinnsvurdering>) getAktiveTotrinnaksjonspunktvurderinger(behandlingId);
-        if(!totrinnsvurderinger.isEmpty()){
+        if (!totrinnsvurderinger.isEmpty()) {
             totrinnsvurderinger.forEach(totrinnsvurdering -> {
                 totrinnsvurdering.disable();
                 entityManager.persist(totrinnsvurdering);
             });
         }
         Optional<Totrinnresultatgrunnlag> totrinnresultatgrunnlag = getAktivtTotrinnresultatgrunnlag(behandlingId);
-        if(totrinnresultatgrunnlag.isPresent()){
+        if (totrinnresultatgrunnlag.isPresent()) {
             Totrinnresultatgrunnlag aktivTotrinnresultatgrunnlag = totrinnresultatgrunnlag.get();
             aktivTotrinnresultatgrunnlag.disable();
             entityManager.persist(aktivTotrinnresultatgrunnlag);

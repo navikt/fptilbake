@@ -18,10 +18,10 @@ public class JsonParseExceptionMapper implements ExceptionMapper<JsonParseExcept
         var feil = String.format("FPT-299955 JSON-parsing feil: %s", exception.getMessage());
         LOG.warn(feil, exception);
         return Response
-            .status(Response.Status.BAD_REQUEST)
-            .entity(new FeilDto(feil))
-            .type(MediaType.APPLICATION_JSON)
-            .build();
+                .status(Response.Status.BAD_REQUEST)
+                .entity(new FeilDto(feil))
+                .type(MediaType.APPLICATION_JSON)
+                .build();
     }
 
 }

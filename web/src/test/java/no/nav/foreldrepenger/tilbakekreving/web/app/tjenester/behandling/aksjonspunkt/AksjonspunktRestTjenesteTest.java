@@ -93,8 +93,8 @@ public class AksjonspunktRestTjenesteTest {
         when(behandlingRepositoryMock.hentBehandling(anyLong())).thenReturn(behandling);
 
         Totrinnsvurdering ttv = Totrinnsvurdering.builder()
-                                .medBehandling(behandling)
-                                .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING).build();
+                .medBehandling(behandling)
+                .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING).build();
         when(totrinnRepositoryMock.hentTotrinnsvurderinger(any(Behandling.class))).thenReturn(Collections.singleton(ttv));
 
         Response result = aksjonspunktRestTjeneste.getAksjonspunkter(new BehandlingReferanse("1234"));

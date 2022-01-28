@@ -66,8 +66,8 @@ public class FaktaFeilutbetalingTjeneste {
 
         if (fakta != null) {
             Optional<FaktaFeilutbetalingPeriode> feilutbetalingPeriodeÅrsak = fakta.getFeilutbetaltPerioder().stream()
-                .filter(periodeÅrsak -> logiskPeriode.getPeriode().equals(periodeÅrsak.getPeriode()))
-                .findFirst();
+                    .filter(periodeÅrsak -> logiskPeriode.getPeriode().equals(periodeÅrsak.getPeriode()))
+                    .findFirst();
             resultat.setFeilutbetalingÅrsakDto(mapFra(feilutbetalingPeriodeÅrsak));
         }
         return resultat;
@@ -83,33 +83,33 @@ public class FaktaFeilutbetalingTjeneste {
         List<LogiskPeriode> logiskePerioder = kravgrunnlagTjeneste.utledLogiskPeriode(behandlingId);
         FaktaFeilutbetaling fakta = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId).orElse(null);
         List<LogiskPeriodeMedFaktaDto> logiskePerioderMedFakta = logiskePerioder.stream()
-            .map(logiskPeriode -> leggPåFakta(logiskPeriode, fakta))
-            .collect(Collectors.toList());
+                .map(logiskPeriode -> leggPåFakta(logiskPeriode, fakta))
+                .collect(Collectors.toList());
 
         String begrunnelse = hentFaktaBegrunnelse(behandlingId);
         Long tidligereVarseltBeløp = resultat.map(VarselInfo::getVarselBeløp).orElse(null);
         return BehandlingFeilutbetalingFakta.builder()
-            .medPerioder(logiskePerioderMedFakta)
-            .medAktuellFeilUtbetaltBeløp(sumFeilutbetaltBeløp(logiskePerioder))
-            .medTidligereVarsletBeløp(tidligereVarseltBeløp)
-            .medTotalPeriode(omkringliggendePeriode(logiskePerioder))
-            .medDatoForRevurderingsvedtak(eksternBehandlingsinfoDto.getVedtakDato())
-            .medTilbakekrevingValg(tilbakekrevingValg)
-            .medBegrunnelse(begrunnelse)
-            .build();
+                .medPerioder(logiskePerioderMedFakta)
+                .medAktuellFeilUtbetaltBeløp(sumFeilutbetaltBeløp(logiskePerioder))
+                .medTidligereVarsletBeløp(tidligereVarseltBeløp)
+                .medTotalPeriode(omkringliggendePeriode(logiskePerioder))
+                .medDatoForRevurderingsvedtak(eksternBehandlingsinfoDto.getVedtakDato())
+                .medTilbakekrevingValg(tilbakekrevingValg)
+                .medBegrunnelse(begrunnelse)
+                .build();
     }
 
     private UUID hentEksternUuid(Long behandlingId) {
         Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentOptionalFraInternId(behandlingId);
         UUID eksternUuid;
-        if(eksternBehandling.isPresent()){
+        if (eksternBehandling.isPresent()) {
             eksternUuid = eksternBehandling.get().getEksternUuid();
-        }else { // Når behandlinger er avsluttet p.g.a henleggelse, finner ikke aktive Henvisning.
+        } else { // Når behandlinger er avsluttet p.g.a henleggelse, finner ikke aktive Henvisning.
             // Så henter referanse fra koblede grunnlag som ikke kan endres.
             Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.finnKravgrunnlag(behandlingId);
             Henvisning henvisning = kravgrunnlag431.getReferanse();
             eksternBehandling = eksternBehandlingRepository.hentEksisterendeDeaktivert(behandlingId, henvisning);
-            if(eksternBehandling.isEmpty()){ // Teknisk Feil: referansen til grunnlaget må finne i EksternBehandling
+            if (eksternBehandling.isEmpty()) { // Teknisk Feil: referansen til grunnlaget må finne i EksternBehandling
                 throw BehandlingFeil.fantIkkeBehandlingMedHenvisning(behandlingId, henvisning);
             }
             eksternUuid = eksternBehandling.get().getEksternUuid();
@@ -129,9 +129,9 @@ public class FaktaFeilutbetalingTjeneste {
 
     private BigDecimal sumFeilutbetaltBeløp(List<LogiskPeriode> perioder) {
         return perioder.stream()
-            .map(LogiskPeriode::getFeilutbetaltBeløp)
-            .reduce(BigDecimal::add)
-            .orElse(BigDecimal.ZERO);
+                .map(LogiskPeriode::getFeilutbetaltBeløp)
+                .reduce(BigDecimal::add)
+                .orElse(BigDecimal.ZERO);
 
     }
 

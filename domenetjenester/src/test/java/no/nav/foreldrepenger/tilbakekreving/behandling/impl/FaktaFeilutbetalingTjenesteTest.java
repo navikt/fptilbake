@@ -48,9 +48,9 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         entityManager.setFlushMode(FlushModeType.AUTO);
         EksternBehandlingsinfoDto behandlingsinfoDto = lagEksternBehandlingsInfo();
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = new SamletEksternBehandlingInfo.Builder(Set.of(Tillegsinformasjon.TILBAKEKREVINGSVALG))
-            .setGrunninformasjon(behandlingsinfoDto)
-            .setTilbakekrevingvalg(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD))
-            .build();
+                .setGrunninformasjon(behandlingsinfoDto)
+                .setTilbakekrevingvalg(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD))
+                .build();
         when(mockFagsystemKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG)).thenReturn(samletEksternBehandlingInfo);
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
     }
@@ -93,22 +93,22 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(10000));
         //TODO
         Kravgrunnlag431 kravgrunnlag431 = Kravgrunnlag431.builder()
-            .medVedtakId(100000l)
-            .medEksternKravgrunnlagId("12123")
-            .medKravStatusKode(KravStatusKode.NYTT)
-            .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
-            .medFagSystemId(saksnummer+"100")
-            .medGjelderVedtakId("100000000")
-            .medGjelderType(GjelderType.ORGANISASJON)
-            .medUtbetalesTilId("100000000")
-            .medUtbetIdType(GjelderType.ORGANISASJON)
-            .medAnsvarligEnhet("8020")
-            .medBehandlendeEnhet("8020")
-            .medBostedEnhet("8020")
-            .medFeltKontroll("00")
-            .medSaksBehId("Z991035")
-            .medReferanse(henvisning)
-            .build();
+                .medVedtakId(100000l)
+                .medEksternKravgrunnlagId("12123")
+                .medKravStatusKode(KravStatusKode.NYTT)
+                .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
+                .medFagSystemId(saksnummer + "100")
+                .medGjelderVedtakId("100000000")
+                .medGjelderType(GjelderType.ORGANISASJON)
+                .medUtbetalesTilId("100000000")
+                .medUtbetIdType(GjelderType.ORGANISASJON)
+                .medAnsvarligEnhet("8020")
+                .medBehandlendeEnhet("8020")
+                .medBostedEnhet("8020")
+                .medFeltKontroll("00")
+                .medSaksBehId("Z991035")
+                .medReferanse(henvisning)
+                .build();
         KravgrunnlagPeriode432 feilPeriode = KravgrunnlagMockUtil.lagMockPeriode(mockMedFeilPostering, kravgrunnlag431);
         KravgrunnlagPeriode432 ytelPeriode = KravgrunnlagMockUtil.lagMockPeriode(mockMedYtelPostering, kravgrunnlag431);
         kravgrunnlag431.leggTilPeriode(feilPeriode);
@@ -118,7 +118,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         varselRepository.lagre(internBehandlingId, "hello", 23000l);
 
         doHenleggBehandling(internBehandlingId, BehandlingResultatType.HENLAGT_FEILOPPRETTET);
-        Optional<EksternBehandling> eksternBehandling = repoProvider.getEksternBehandlingRepository().hentEksisterendeDeaktivert(behandling.getId(),henvisning);
+        Optional<EksternBehandling> eksternBehandling = repoProvider.getEksternBehandlingRepository().hentEksisterendeDeaktivert(behandling.getId(), henvisning);
         assertThat(eksternBehandling).isPresent();
         assertThat(eksternBehandling.get().getAktiv()).isFalse();
 
@@ -146,15 +146,15 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     @Test
     public void skal_hente_feilutbetalingFakta_med_flere_perioder() {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, LocalDate.of(2016, 03, 31), KlasseType.FEIL,
-            BigDecimal.valueOf(10000), BigDecimal.ZERO);
+                BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering2 = lagKravgrunnlag(LocalDate.of(2016, 04, 01), LocalDate.of(2016, 04, 15),
-            KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
+                KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering3 = lagKravgrunnlag(LocalDate.of(2016, 04, 22), TOM,
-            KlasseType.FEIL, BigDecimal.valueOf(15000), BigDecimal.ZERO);
+                KlasseType.FEIL, BigDecimal.valueOf(15000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(37000));
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2,
-            mockMedFeilPostering3, mockMedYtelPostering));
+                mockMedFeilPostering3, mockMedYtelPostering));
 
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
         varselRepository.lagre(internBehandlingId, "hello", 23000l);
@@ -176,15 +176,15 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     @Test
     public void skal_hente_feilutbetalingFakta_med_flere_perioder_og_sistedag_i_helgen() {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, LocalDate.of(2016, 03, 26), KlasseType.FEIL,
-            BigDecimal.valueOf(10000), BigDecimal.ZERO);
+                BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering2 = lagKravgrunnlag(LocalDate.of(2016, 03, 28), LocalDate.of(2016, 04, 15),
-            KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
+                KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering3 = lagKravgrunnlag(LocalDate.of(2016, 04, 19), TOM,
-            KlasseType.FEIL, BigDecimal.valueOf(15000), BigDecimal.ZERO);
+                KlasseType.FEIL, BigDecimal.valueOf(15000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(37000));
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2,
-            mockMedFeilPostering3, mockMedYtelPostering));
+                mockMedFeilPostering3, mockMedYtelPostering));
 
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
         BehandlingFeilutbetalingFakta fakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);

@@ -21,8 +21,8 @@ class FremoverhoppTransisjon implements StegTransisjon {
     @Override
     public BehandlingStegModell nesteSteg(BehandlingStegModell nåværendeSteg) {
         var funnetMålsteg = nåværendeSteg.getBehandlingModell().hvertStegEtter(nåværendeSteg.getBehandlingStegType())
-            .filter(s -> s.getBehandlingStegType().equals(målsteg))
-            .findFirst();
+                .filter(s -> s.getBehandlingStegType().equals(målsteg))
+                .findFirst();
         if (funnetMålsteg.isPresent()) {
             return funnetMålsteg.get();
         }
@@ -47,7 +47,7 @@ class FremoverhoppTransisjon implements StegTransisjon {
     @Override
     public String toString() {
         return "FremoverhoppTransisjon{" +
-            "id='" + id + '\'' +
-            '}';
+                "id='" + id + '\'' +
+                '}';
     }
 }

@@ -39,7 +39,7 @@ public class BehandlingReferanse {
     @NotNull
     @Size(min = 1, max = 100)
     @Pattern(regexp = "^(" + NUM_REGEXP + ")|(" + IsUUID.UUID_REGEXP
-        + ")$", message = "Behandling Id ${validatedValue} matcher ikke tillatt pattern '{regexp}'")
+            + ")$", message = "Behandling Id ${validatedValue} matcher ikke tillatt pattern '{regexp}'")
     private String id;
 
     public BehandlingReferanse(Integer id) {

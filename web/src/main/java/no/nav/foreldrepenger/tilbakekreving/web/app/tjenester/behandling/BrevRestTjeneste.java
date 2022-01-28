@@ -66,7 +66,7 @@ public class BrevRestTjeneste {
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<BrevmalDto> hentMaler(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                          @Valid @QueryParam("uuid") BehandlingReferanse behandlingReferanse) {
+                                      @Valid @QueryParam("uuid") BehandlingReferanse behandlingReferanse) {
         long behandlingId = hentBehandlingId(behandlingReferanse);
         return dokumentBehandlingTjeneste.hentBrevmalerFor(behandlingId);
     }
@@ -106,8 +106,8 @@ public class BrevRestTjeneste {
 
     private long hentBehandlingId(BehandlingReferanse behandlingReferanse) {
         return behandlingReferanse.erInternBehandlingId()
-            ? behandlingReferanse.getBehandlingId()
-            : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
+                ? behandlingReferanse.getBehandlingId()
+                : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
     }
 
 }

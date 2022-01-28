@@ -23,7 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 public class MottattGrunnlagStegTest extends FellesTestOppsett {
 
     private BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer utløptEventPublisererMock =
-        Mockito.mock(BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer.class);
+            Mockito.mock(BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer.class);
 
     @Test
     public void skal_sette_behandling_på_vent() {

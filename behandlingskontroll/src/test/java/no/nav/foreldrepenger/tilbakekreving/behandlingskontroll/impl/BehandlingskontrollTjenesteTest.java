@@ -31,14 +31,15 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class BehandlingskontrollTjenesteTest {
 
     private final class BehandlingskontrollEventPublisererForTest extends BehandlingskontrollEventPubliserer {
 
         private List<BehandlingEvent> events = new ArrayList<>();
+
         @Override
         protected void doFireEvent(BehandlingEvent event) {
             events.add(event);
@@ -77,7 +78,7 @@ public class BehandlingskontrollTjenesteTest {
         steg2Aksjonspunkt = modell.finnAksjonspunktDefinisjonerUtgang(steg2).iterator().next();
 
         ScenarioSimple scenario = ScenarioSimple.simple()
-            .medBehandlingType(BehandlingType.TILBAKEKREVING);
+                .medBehandlingType(BehandlingType.TILBAKEKREVING);
         behandling = scenario.lagre(repositoryProvider);
 
         forceOppdaterBehandlingSteg(behandling, steg3);
@@ -234,10 +235,10 @@ public class BehandlingskontrollTjenesteTest {
     private void sjekkBehandlingStegTilstandHistorikk(Behandling behandling, BehandlingStegType stegType,
                                                       BehandlingStegStatus... stegStatuser) {
         Assertions.assertThat(
-            behandling.getBehandlingStegTilstandHistorikk()
-                .filter(bst -> stegType == null || Objects.equals(bst.getBehandlingSteg(), stegType))
-                .map(bst -> bst.getBehandlingStegStatus()))
-            .containsExactly(stegStatuser);
+                        behandling.getBehandlingStegTilstandHistorikk()
+                                .filter(bst -> stegType == null || Objects.equals(bst.getBehandlingSteg(), stegType))
+                                .map(bst -> bst.getBehandlingStegStatus()))
+                .containsExactly(stegStatuser);
     }
 
 }

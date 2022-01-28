@@ -21,10 +21,10 @@ public class DatabaseScript {
 
     public void migrate() {
         Flyway flyway = new Flyway(Flyway.configure()
-            .dataSource(dataSource)
-            .locations(locations)
-            .table(FLYWAY_SCHEMA_TABLE)
-            .baselineOnMigrate(true));
+                .dataSource(dataSource)
+                .locations(locations)
+                .table(FLYWAY_SCHEMA_TABLE)
+                .baselineOnMigrate(true));
 
         try {
             flyway.migrate();

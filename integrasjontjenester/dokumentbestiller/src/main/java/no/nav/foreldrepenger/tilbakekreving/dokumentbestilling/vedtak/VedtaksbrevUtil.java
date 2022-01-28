@@ -50,7 +50,7 @@ public class VedtaksbrevUtil {
 
     private static Optional<PeriodeMedTekstDto> finnOpprettetPeriode(List<PeriodeMedTekstDto> perioderMedTekster, Periode periode) {
         return perioderMedTekster.stream()
-            .filter(p -> p.getFom().equals(periode.getFom()) && p.getTom().equals(periode.getTom()))
-            .findAny();
+                .filter(p -> p.getFom().equals(periode.getFom()) && p.getTom().equals(periode.getTom()))
+                .findAny();
     }
 }

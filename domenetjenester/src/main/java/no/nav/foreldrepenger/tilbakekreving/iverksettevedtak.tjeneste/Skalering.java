@@ -56,7 +56,6 @@ class Skalering<T> {
     }
 
 
-
     public static BigDecimal skaler(BigDecimal verdi, Skalering skalering) {
         if (skalering == null) {
             return verdi;

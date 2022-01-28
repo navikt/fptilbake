@@ -22,7 +22,7 @@ public final class TextFormater {
     public static void write004(Writer writer, Enumeration<Collector.MetricFamilySamples> mfs) throws IOException {
         /* See http://prometheus.io/docs/instrumenting/exposition_formats/
          * for the output format specification. */
-        while(mfs.hasMoreElements()) {
+        while (mfs.hasMoreElements()) {
             Collector.MetricFamilySamples metricFamilySamples = mfs.nextElement();
             writer.write("# HELP ");
             writer.write(metricFamilySamples.name);
@@ -36,7 +36,7 @@ public final class TextFormater {
             writer.write(typeString(metricFamilySamples.type));
             writer.write('\n');
 
-            for (Collector.MetricFamilySamples.Sample sample: metricFamilySamples.samples) {
+            for (Collector.MetricFamilySamples.Sample sample : metricFamilySamples.samples) {
                 writer.write(sample.name);
                 if (sample.labelNames.size() > 0) {
                     writer.write('{');
@@ -50,7 +50,7 @@ public final class TextFormater {
                 }
                 writer.write(' ');
                 writer.write(Collector.doubleToGoString(sample.value));
-                if (sample.timestampMs != null){
+                if (sample.timestampMs != null) {
                     writer.write(' ');
                     writer.write(sample.timestampMs.toString());
                 }

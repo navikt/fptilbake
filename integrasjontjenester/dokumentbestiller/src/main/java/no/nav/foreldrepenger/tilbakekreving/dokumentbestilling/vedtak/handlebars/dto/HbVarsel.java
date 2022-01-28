@@ -26,9 +26,9 @@ public class HbVarsel {
             return null;
         }
         return HbVarsel.builder()
-            .medVarsletDato(varsletDato)
-            .medVarsletBeløp(varsletBeløp)
-            .build();
+                .medVarsletDato(varsletDato)
+                .medVarsletBeløp(varsletBeløp)
+                .build();
     }
 
     public static Builder builder() {

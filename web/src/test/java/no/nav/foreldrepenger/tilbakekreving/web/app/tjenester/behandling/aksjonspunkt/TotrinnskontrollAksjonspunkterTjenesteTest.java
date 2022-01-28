@@ -92,7 +92,7 @@ public class TotrinnskontrollAksjonspunkterTjenesteTest {
     }
 
     @Test
-    public void hentTotrinnsvurderingSkjermlenkeContext(){
+    public void hentTotrinnsvurderingSkjermlenkeContext() {
         Totrinnsvurdering totrinnsvurdering = Totrinnsvurdering.builder().medBehandling(behandling)
                 .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING)
                 .medGodkjent(true)

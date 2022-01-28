@@ -28,12 +28,12 @@ public class TilbakekrevingsvedtakOppsummering {
         }
 
         TilbakekrevingsvedtakOppsummering tilbakekrevingsvedtakOppsummering = new TilbakekrevingsvedtakOppsummering.Builder()
-            .medRenter(renter)
-            .medSkatt(skatt)
-            .medTilbakekrevesBruttoUtenRenter(bruttoUtenRenter)
-            .medTilbakekrevesNettoUtenRenter(bruttoUtenRenter.subtract(skatt))
-            .medØkonomiVedtakId(tilbakekrevingsvedtak.getVedtakId())
-            .build();
+                .medRenter(renter)
+                .medSkatt(skatt)
+                .medTilbakekrevesBruttoUtenRenter(bruttoUtenRenter)
+                .medTilbakekrevesNettoUtenRenter(bruttoUtenRenter.subtract(skatt))
+                .medØkonomiVedtakId(tilbakekrevingsvedtak.getVedtakId())
+                .build();
         return tilbakekrevingsvedtakOppsummering;
     }
 

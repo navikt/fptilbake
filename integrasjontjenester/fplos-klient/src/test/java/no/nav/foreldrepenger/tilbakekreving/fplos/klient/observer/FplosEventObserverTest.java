@@ -35,14 +35,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.task.FplosPubliserEventTask;
 import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class FplosEventObserverTest {
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
@@ -59,9 +59,9 @@ public class FplosEventObserverTest {
         BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager,
-            new BehandlingModellRepository(), mock(BehandlingskontrollEventPubliserer.class)));
+                new BehandlingModellRepository(), mock(BehandlingskontrollEventPubliserer.class)));
         fplosEventObserver = new FplosEventObserver(repositoryProvider.getBehandlingRepository(),
-            taskTjeneste, behandlingskontrollTjeneste);
+                taskTjeneste, behandlingskontrollTjeneste);
 
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
         behandlingskontrollKontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
@@ -70,7 +70,7 @@ public class FplosEventObserverTest {
     @Test
     public void skal_publisere_data_når_manuell_aksjonspunkt_er_opprettet() {
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(behandlingskontrollKontekst, BehandlingStegType.FAKTA_FEILUTBETALING, List.of(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
-        var aksjonspunkterFunnetEvent = new AksjonspunktStatusEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(),BehandlingStegType.FAKTA_FEILUTBETALING);
+        var aksjonspunkterFunnetEvent = new AksjonspunktStatusEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(), BehandlingStegType.FAKTA_FEILUTBETALING);
 
         fplosEventObserver.observerAksjonpunktStatusEvent(aksjonspunkterFunnetEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_OPPRETTET);
@@ -80,7 +80,7 @@ public class FplosEventObserverTest {
     public void skal_publisere_data_for_autopunkter_når_behandling_er_i_fakta_steg() {
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(behandlingskontrollKontekst, BehandlingStegType.VARSEL, List.of(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING));
         var aksjonspunkterFunnetEvent = new AksjonspunktStatusEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(),
-            BehandlingStegType.FAKTA_FEILUTBETALING);
+                BehandlingStegType.FAKTA_FEILUTBETALING);
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING);
 
         fplosEventObserver.observerAksjonpunktStatusEvent(aksjonspunkterFunnetEvent);
@@ -192,7 +192,7 @@ public class FplosEventObserverTest {
     @Test
     public void skal_publisere_data_når_behandling_sett_på_vent_og_fristen_er_endret() {
         LocalDateTime fristTid = LocalDateTime.now();
-        BehandlingManglerKravgrunnlagFristenEndretEvent fristenEndretEvent = new BehandlingManglerKravgrunnlagFristenEndretEvent(behandling,fristTid);
+        BehandlingManglerKravgrunnlagFristenEndretEvent fristenEndretEvent = new BehandlingManglerKravgrunnlagFristenEndretEvent(behandling, fristTid);
 
         fplosEventObserver.observerBehandlingFristenEndretEvent(fristenEndretEvent);
         ProsessTaskData publisherEventProsessTask = fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_AVBRUTT);

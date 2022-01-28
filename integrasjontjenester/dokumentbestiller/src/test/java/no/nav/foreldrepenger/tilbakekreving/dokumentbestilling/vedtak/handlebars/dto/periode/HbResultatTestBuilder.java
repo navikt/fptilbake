@@ -9,9 +9,9 @@ public class HbResultatTestBuilder {
 
     public static HbResultat forTilbakekrevesBeløpOgRenter(int tilbakekrevesBeløp, int renter) {
         return HbResultat.builder()
-            .medTilbakekrevesBeløp(BigDecimal.valueOf(tilbakekrevesBeløp))
-            .medRenterBeløp(BigDecimal.valueOf(renter))
-            .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(tilbakekrevesBeløp))
-            .build();
+                .medTilbakekrevesBeløp(BigDecimal.valueOf(tilbakekrevesBeløp))
+                .medRenterBeløp(BigDecimal.valueOf(renter))
+                .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(tilbakekrevesBeløp))
+                .build();
     }
 }

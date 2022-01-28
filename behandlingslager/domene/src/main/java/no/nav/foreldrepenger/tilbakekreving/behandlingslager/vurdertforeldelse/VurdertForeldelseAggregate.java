@@ -96,9 +96,9 @@ class VurdertForeldelseAggregate extends BaseEntitet {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "<id=" + id //$NON-NLS-1$
-            + ", behandlingId=" + behandlingId //$NON-NLS-1$
-            + ", aktiv=" + aktiv //$NON-NLS-1$
-            + ">"; //$NON-NLS-1$
+                + ", behandlingId=" + behandlingId //$NON-NLS-1$
+                + ", aktiv=" + aktiv //$NON-NLS-1$
+                + ">"; //$NON-NLS-1$
 
     }
 }

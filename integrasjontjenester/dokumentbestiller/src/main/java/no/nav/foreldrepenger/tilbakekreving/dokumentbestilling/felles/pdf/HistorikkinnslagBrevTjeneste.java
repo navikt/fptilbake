@@ -36,10 +36,10 @@ public class HistorikkinnslagBrevTjeneste {
 
     private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse, String tittel) {
         historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(
-            behandling,
-            dokumentreferanse.getJournalpostId(),
-            dokumentreferanse.getDokumentId(),
-            tittel);
+                behandling,
+                dokumentreferanse.getJournalpostId(),
+                dokumentreferanse.getDokumentId(),
+                tittel);
     }
 
     private String finnHistorikkinnslagTittel(DetaljertBrevType detaljertBrevType, BrevMottaker brevMottaker, String tittel) {

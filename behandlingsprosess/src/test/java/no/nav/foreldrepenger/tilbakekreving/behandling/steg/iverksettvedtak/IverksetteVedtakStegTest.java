@@ -42,7 +42,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtakFattetTilSelvbetjeningTask;
 import no.nav.vedtak.exception.TekniskException;
@@ -50,7 +50,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class IverksetteVedtakStegTest {
 
     private BehandlingRepositoryProvider repoProvider;
@@ -73,7 +73,7 @@ public class IverksetteVedtakStegTest {
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         brevSporingRepository = new BrevSporingRepository(entityManager);
         var prosessTaskIverksett = new ProsessTaskIverksett(taskTjeneste,
-            brevSporingRepository);
+                brevSporingRepository);
         iverksetteVedtakSteg = new IverksetteVedtakSteg(repoProvider, prosessTaskIverksett);
         behandlingVedtakRepository = repoProvider.getBehandlingVedtakRepository();
         behandlingRepository = repoProvider.getBehandlingRepository();
@@ -88,13 +88,13 @@ public class IverksetteVedtakStegTest {
 
     @Test
     public void skal_ikke_utføre_iverksette_vedtak_steg_hvis_vedtak_ikke_finnes() {
-        var e= assertThrows(TekniskException.class, () -> iverksetteVedtakSteg.utførSteg(behandlingskontrollKontekst));
+        var e = assertThrows(TekniskException.class, () -> iverksetteVedtakSteg.utførSteg(behandlingskontrollKontekst));
         assertThat(e.getMessage()).contains("FPT-131240");
     }
 
     @Test
     public void skal_utføre_iverksette_vedtak_steg_uten_aksjonpunkter_hvis_behandling_er_allerede_iverksett() {
-        opprettBehandlingVedtak(behandling,IverksettingStatus.IVERKSATT);
+        opprettBehandlingVedtak(behandling, IverksettingStatus.IVERKSATT);
         BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(behandlingskontrollKontekst);
         assertThat(stegResultat.getAksjonspunktListe()).isEmpty();
     }
@@ -121,14 +121,14 @@ public class IverksetteVedtakStegTest {
     public void skal_utføre_iverksette_vedtak_steg_uten_å_sende_vedtaksbrev_for_tilbakekreving_revurdering_hvis_behandling_opprettet_for_klage() {
         Behandling revurdering = Behandling.nyBehandlingFor(behandling.getFagsak(), BehandlingType.REVURDERING_TILBAKEKREVING).build();
         List<BehandlingÅrsak> behandlingÅrsaker = BehandlingÅrsak.builder(BehandlingÅrsakType.RE_KLAGE_NFP)
-            .medOriginalBehandling(behandling)
-            .buildFor(revurdering);
+                .medOriginalBehandling(behandling)
+                .buildFor(revurdering);
         revurdering.getBehandlingÅrsaker().addAll(behandlingÅrsaker);
         BehandlingLås revurderingBehandlingLås = behandlingRepository.taSkriveLås(revurdering);
-        behandlingRepository.lagre(revurdering,revurderingBehandlingLås);
+        behandlingRepository.lagre(revurdering, revurderingBehandlingLås);
         opprettEksternBehandling(revurdering);
 
-        opprettBehandlingVedtak(revurdering,IverksettingStatus.IKKE_IVERKSATT);
+        opprettBehandlingVedtak(revurdering, IverksettingStatus.IKKE_IVERKSATT);
 
         BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(new BehandlingskontrollKontekst(revurdering.getFagsakId(), revurdering.getAktørId(), revurderingBehandlingLås));
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
@@ -147,13 +147,13 @@ public class IverksetteVedtakStegTest {
     public void skal_utføre_iverksette_vedtak_steg_med_å_sende_vedtaksbrev_for_tilbakekreving_revurdering_hvis_behandling_ikke_opprettet_for_klage() {
         Behandling revurdering = Behandling.nyBehandlingFor(behandling.getFagsak(), BehandlingType.REVURDERING_TILBAKEKREVING).build();
         List<BehandlingÅrsak> behandlingÅrsaker = BehandlingÅrsak.builder(BehandlingÅrsakType.RE_OPPLYSNINGER_OM_FORELDELSE)
-            .medOriginalBehandling(behandling)
-            .buildFor(revurdering);
+                .medOriginalBehandling(behandling)
+                .buildFor(revurdering);
         revurdering.getBehandlingÅrsaker().addAll(behandlingÅrsaker);
         BehandlingLås revurderingBehandlingLås = behandlingRepository.taSkriveLås(revurdering);
-        behandlingRepository.lagre(revurdering,revurderingBehandlingLås);
+        behandlingRepository.lagre(revurdering, revurderingBehandlingLås);
         opprettEksternBehandling(revurdering);
-        opprettBehandlingVedtak(revurdering,IverksettingStatus.IKKE_IVERKSATT);
+        opprettBehandlingVedtak(revurdering, IverksettingStatus.IKKE_IVERKSATT);
 
         BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(new BehandlingskontrollKontekst(revurdering.getFagsakId(), revurdering.getAktørId(), revurderingBehandlingLås));
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
@@ -171,15 +171,15 @@ public class IverksetteVedtakStegTest {
 
     private void opprettBehandlingVedtak(Behandling behandling, IverksettingStatus iverksettingStatus) {
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
-            .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
-            .medBehandling(behandling).build();
+                .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
+                .medBehandling(behandling).build();
         repoProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
 
         BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder()
-            .medAnsvarligSaksbehandler("VL")
-            .medIverksettingStatus(iverksettingStatus)
-            .medVedtaksdato(LocalDate.now())
-            .medBehandlingsresultat(behandlingsresultat).build();
+                .medAnsvarligSaksbehandler("VL")
+                .medIverksettingStatus(iverksettingStatus)
+                .medVedtaksdato(LocalDate.now())
+                .medBehandlingsresultat(behandlingsresultat).build();
         behandlingVedtakRepository.lagre(behandlingVedtak);
     }
 
@@ -188,17 +188,17 @@ public class IverksetteVedtakStegTest {
         assertThat(vedtak).isPresent();
         BehandlingVedtak behandlingVedtak = vedtak.get();
         assertThat(behandlingVedtak.getBehandlingsresultat().getBehandlingResultatType())
-            .isEqualByComparingTo(BehandlingResultatType.FULL_TILBAKEBETALING);
+                .isEqualByComparingTo(BehandlingResultatType.FULL_TILBAKEBETALING);
         assertThat(behandlingVedtak.getIverksettingStatus()).isEqualByComparingTo(IverksettingStatus.UNDER_IVERKSETTING);
     }
 
     private void lagreInfoOmVarselbrev(Long behandlingId, String journalpostId, String dokumentId) {
         BrevSporing brevSporing = new BrevSporing.Builder()
-            .medBehandlingId(behandlingId)
-            .medDokumentId(dokumentId)
-            .medJournalpostId(new JournalpostId(journalpostId))
-            .medBrevType(BrevType.VARSEL_BREV)
-            .build();
+                .medBehandlingId(behandlingId)
+                .medDokumentId(dokumentId)
+                .medJournalpostId(new JournalpostId(journalpostId))
+                .medBrevType(BrevType.VARSEL_BREV)
+                .build();
         brevSporingRepository.lagre(brevSporing);
         entityManager.flush();
     }

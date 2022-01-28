@@ -38,8 +38,8 @@ public class VilkårVurderingPeriodeEntitet extends BaseEntitet {
 
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false)),
-        @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
+            @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false)),
+            @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
     })
     private Periode periode;
 
@@ -76,7 +76,7 @@ public class VilkårVurderingPeriodeEntitet extends BaseEntitet {
         return periode;
     }
 
-    public LocalDate getFom(){
+    public LocalDate getFom() {
         return periode.getFom();
     }
 
@@ -161,7 +161,7 @@ public class VilkårVurderingPeriodeEntitet extends BaseEntitet {
     }
 
     public String getBegrunnelseSærligGrunner() {
-        if(aktsomhet != null && !aktsomhet.getSærligGrunner().isEmpty()) {
+        if (aktsomhet != null && !aktsomhet.getSærligGrunner().isEmpty()) {
             return aktsomhet.getSærligGrunnerBegrunnelse();
         }
         return null;

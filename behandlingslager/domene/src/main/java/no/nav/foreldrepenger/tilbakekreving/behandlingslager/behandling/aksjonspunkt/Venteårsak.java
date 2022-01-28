@@ -21,13 +21,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 public enum Venteårsak implements Kodeverdi {
 
 
-    VENT_PÅ_BRUKERTILBAKEMELDING("VENT_PÅ_BRUKERTILBAKEMELDING","Venter på tilbakemelding fra bruker"),
-    VENT_PÅ_TILBAKEKREVINGSGRUNNLAG("VENT_PÅ_TILBAKEKREVINGSGRUNNLAG","Venter på tilbakekrevingsgrunnlag fra økonomi"),
-    AVVENTER_DOKUMENTASJON("AVV_DOK","Avventer dokumentasjon"),
-    UTVIDET_TILSVAR_FRIST("UTV_TIL_FRIST","Utvidet tilsvarsfrist"),
-    ENDRE_TILKJENT_YTELSE("ENDRE_TILKJENT_YTELSE","Mulig endring i tilkjent ytelse"),
-    VENT_PÅ_MULIG_MOTREGNING("VENT_PÅ_MULIG_MOTREGNING","Mulig motregning med annen ytelse"),
-    UDEFINERT("-","");
+    VENT_PÅ_BRUKERTILBAKEMELDING("VENT_PÅ_BRUKERTILBAKEMELDING", "Venter på tilbakemelding fra bruker"),
+    VENT_PÅ_TILBAKEKREVINGSGRUNNLAG("VENT_PÅ_TILBAKEKREVINGSGRUNNLAG", "Venter på tilbakekrevingsgrunnlag fra økonomi"),
+    AVVENTER_DOKUMENTASJON("AVV_DOK", "Avventer dokumentasjon"),
+    UTVIDET_TILSVAR_FRIST("UTV_TIL_FRIST", "Utvidet tilsvarsfrist"),
+    ENDRE_TILKJENT_YTELSE("ENDRE_TILKJENT_YTELSE", "Mulig endring i tilkjent ytelse"),
+    VENT_PÅ_MULIG_MOTREGNING("VENT_PÅ_MULIG_MOTREGNING", "Mulig motregning med annen ytelse"),
+    UDEFINERT("-", "");
 
     public static final String KODEVERK = "VENT_AARSAK";
 

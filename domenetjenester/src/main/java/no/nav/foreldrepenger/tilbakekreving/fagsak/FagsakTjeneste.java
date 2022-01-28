@@ -56,16 +56,16 @@ public class FagsakTjeneste {
         return fagsak;
     }
 
-    public AktørId hentAktørForFnr(String fnr){
+    public AktørId hentAktørForFnr(String fnr) {
         PersonIdent personIdent = new PersonIdent(fnr);
         Optional<AktørId> aktørId = tpsTjeneste.hentAktørForFnr(personIdent);
-        if(aktørId.isEmpty()){
+        if (aktørId.isEmpty()) {
             throw BehandlingFeil.fantIkkePersonIdentMedFnr();
         }
         return aktørId.get();
     }
 
-    public String hentNavnForAktør(AktørId aktørId){
+    public String hentNavnForAktør(AktørId aktørId) {
         return tpsTjeneste.hentBrukerForAktør(aktørId).map(Personinfo::getNavn).orElseThrow(() -> new TekniskException("FPT-7428492", "Fant ikke person med aktørId"));
     }
 

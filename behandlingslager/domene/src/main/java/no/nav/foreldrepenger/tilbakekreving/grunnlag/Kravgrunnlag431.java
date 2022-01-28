@@ -93,7 +93,7 @@ public class Kravgrunnlag431 extends BaseEntitet {
     private String saksBehId;
 
     @AttributeOverrides({
-        @AttributeOverride(name = "henvisning", column = @Column(name = "referanse"))
+            @AttributeOverride(name = "henvisning", column = @Column(name = "referanse"))
     })
     private Henvisning referanse;
 
@@ -207,7 +207,7 @@ public class Kravgrunnlag431 extends BaseEntitet {
         }
         Kravgrunnlag431 that = (Kravgrunnlag431) o;
         return Objects.equals(eksternKravgrunnlagId, that.eksternKravgrunnlagId) &&
-            Objects.equals(vedtakId, that.vedtakId);
+                Objects.equals(vedtakId, that.vedtakId);
     }
 
     @Override
@@ -335,10 +335,10 @@ public class Kravgrunnlag431 extends BaseEntitet {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "<" + //$NON-NLS-1$
-            (id != null ? "id=" + id + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$
-            + "vedtakId=" + vedtakId + "," //$NON-NLS-1$ //$NON-NLS-2$
-            + "kravStatusKode='" + kravStatusKode //$NON-NLS-1$ //$NON-NLS-2$
-            + ">"; //$NON-NLS-1$
+                (id != null ? "id=" + id + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$
+                + "vedtakId=" + vedtakId + "," //$NON-NLS-1$ //$NON-NLS-2$
+                + "kravStatusKode='" + kravStatusKode //$NON-NLS-1$ //$NON-NLS-2$
+                + ">"; //$NON-NLS-1$
     }
 
 }

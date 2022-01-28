@@ -33,7 +33,7 @@ public class FaktaFeilutbetalingRepository {
 
     private Optional<FaktaFeilutbetalingAggregate> finnFeilutbetaling(Long behandlingId) {
         TypedQuery<FaktaFeilutbetalingAggregate> query = entityManager.createQuery(
-            "from FaktaFeilutbetalingAggregate where behandlingId=:behandlingId and aktiv=:aktiv", FaktaFeilutbetalingAggregate.class);
+                "from FaktaFeilutbetalingAggregate where behandlingId=:behandlingId and aktiv=:aktiv", FaktaFeilutbetalingAggregate.class);
         query.setParameter("behandlingId", behandlingId);
         query.setParameter("aktiv", true);
         return hentUniktResultat(query);
@@ -41,7 +41,7 @@ public class FaktaFeilutbetalingRepository {
 
     public boolean harDataForFaktaFeilutbetaling(Long behandlingId) {
         TypedQuery<Long> query = entityManager.createQuery("select count(1) from FaktaFeilutbetalingAggregate aggr where aggr.behandlingId=:behandlingId " +
-            "and aggr.aktiv=:aktiv", Long.class);
+                "and aggr.aktiv=:aktiv", Long.class);
         query.setParameter("behandlingId", behandlingId);
         query.setParameter("aktiv", true);
         return query.getSingleResult() > 0;
@@ -51,9 +51,9 @@ public class FaktaFeilutbetalingRepository {
         Optional<FaktaFeilutbetalingAggregate> forrigeAggregate = finnFeilutbetaling(behandlingId);
         disableFaktaAggregate(forrigeAggregate);
         FaktaFeilutbetalingAggregate aggregate = new FaktaFeilutbetalingAggregate.Builder()
-            .medBehandlingId(behandlingId)
-            .medFeilutbetaling(faktaFeilutbetaling)
-            .build();
+                .medBehandlingId(behandlingId)
+                .medFeilutbetaling(faktaFeilutbetaling)
+                .build();
         entityManager.persist(faktaFeilutbetaling);
         for (FaktaFeilutbetalingPeriode faktaPeriode : faktaFeilutbetaling.getFeilutbetaltPerioder()) {
             entityManager.persist(faktaPeriode);

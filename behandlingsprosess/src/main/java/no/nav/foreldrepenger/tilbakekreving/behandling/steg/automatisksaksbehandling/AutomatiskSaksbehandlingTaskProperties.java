@@ -4,7 +4,7 @@ public final class AutomatiskSaksbehandlingTaskProperties {
 
     public static final String AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE = "Automatisk satt verdi";
 
-    private AutomatiskSaksbehandlingTaskProperties(){
+    private AutomatiskSaksbehandlingTaskProperties() {
         // sonar
     }
 }

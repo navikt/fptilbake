@@ -210,7 +210,7 @@ public class Aksjonspunkt extends BaseEntitet {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getAksjonspunktDefinisjon(), getBehandling(), getStatus(),  getFristTid());
+        return Objects.hash(getAksjonspunktDefinisjon(), getBehandling(), getStatus(), getFristTid());
     }
 
     public boolean isToTrinnsBehandling() {

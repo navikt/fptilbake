@@ -25,18 +25,18 @@ public class HistorikkinnslagDokumentLink extends BaseEntitet implements IndexKe
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_HISTORIKKINNSLAG_DOK_LINK")
     private Long id;
 
-    @Column(name = "link_tekst", updatable=false, nullable = false)
+    @Column(name = "link_tekst", updatable = false, nullable = false)
     private String linkTekst;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "historikkinnslag_id", nullable = false, updatable=false)
+    @JoinColumn(name = "historikkinnslag_id", nullable = false, updatable = false)
     private Historikkinnslag historikkinnslag;
 
     @Embedded
-    @AttributeOverrides(@AttributeOverride(name = "journalpostId", column = @Column(name = "journalpost_id", updatable=false)))
+    @AttributeOverrides(@AttributeOverride(name = "journalpostId", column = @Column(name = "journalpost_id", updatable = false)))
     private JournalpostId journalpostId;
 
-    @Column(name = "dokument_id", updatable=false)
+    @Column(name = "dokument_id", updatable = false)
     private String dokumentId;
 
     @Override

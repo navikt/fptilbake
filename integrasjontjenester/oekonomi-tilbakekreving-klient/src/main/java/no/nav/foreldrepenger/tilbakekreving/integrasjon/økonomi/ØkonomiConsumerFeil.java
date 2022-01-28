@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi;
 import no.nav.tilbakekreving.typer.v1.MmelDto;
 import no.nav.vedtak.exception.IntegrasjonException;
 
-public class ØkonomiConsumerFeil  {
+public class ØkonomiConsumerFeil {
 
     public static IntegrasjonException fikkFeilkodeVedHentingAvKravgrunnlag(Long behandlingId, String infoFraKvittering) {
         return new IntegrasjonException("FPT-539078", String.format("Fikk feil fra OS ved henting av kravgrunnlag for behandlingId=%s.%s", behandlingId, infoFraKvittering));
@@ -47,10 +47,10 @@ public class ØkonomiConsumerFeil  {
     private static void addToBuilder(StringBuilder builder, String name, String value) {
         if (value != null) {
             builder.append(" ")
-                .append(name)
-                .append("='")
-                .append(value)
-                .append("'");
+                    .append(name)
+                    .append("='")
+                    .append(value)
+                    .append("'");
         }
     }
 

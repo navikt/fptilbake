@@ -63,12 +63,12 @@ public class FritekstbrevTjeneste {
         FritekstbrevSamletInfo fritekstbrevSamletInfo = lagFritekstbrevForSending(behandling, tittel, overskrift, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = lagFritekstbrev(fritekstbrevSamletInfo);
         pdfBrevTjeneste.sendBrev(behandling.getId(), DetaljertBrevType.FRITEKST, BrevData.builder()
-            .setMottaker(brevMottaker)
-            .setMetadata(fritekstbrevData.getBrevMetadata())
-            .setTittel(fritekstbrevData.getTittel())
-            .setOverskrift(fritekstbrevData.getOverskrift())
-            .setBrevtekst(fritekstbrevData.getBrevtekst())
-            .build());
+                .setMottaker(brevMottaker)
+                .setMetadata(fritekstbrevData.getBrevMetadata())
+                .setTittel(fritekstbrevData.getTittel())
+                .setOverskrift(fritekstbrevData.getOverskrift())
+                .setBrevtekst(fritekstbrevData.getBrevtekst())
+                .build());
     }
 
     public byte[] hentForhåndsvisningFritekstbrev(Behandling behandling, String tittel, String overskrift, String fritekst) {
@@ -78,11 +78,11 @@ public class FritekstbrevTjeneste {
         FritekstbrevData fritekstbrevData = lagFritekstbrev(fritekstbrevSamletInfo);
 
         return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
-            .setMottaker(brevMottaker)
-            .setMetadata(fritekstbrevData.getBrevMetadata())
-            .setOverskrift(fritekstbrevData.getOverskrift())
-            .setBrevtekst(fritekstbrevData.getBrevtekst())
-            .build());
+                .setMottaker(brevMottaker)
+                .setMetadata(fritekstbrevData.getBrevMetadata())
+                .setOverskrift(fritekstbrevData.getOverskrift())
+                .setBrevtekst(fritekstbrevData.getBrevtekst())
+                .build());
     }
 
     private FritekstbrevSamletInfo lagFritekstbrevForSending(Behandling behandling, String tittel, String overskrift, String fritekst, BrevMottaker brevMottaker) {
@@ -103,21 +103,21 @@ public class FritekstbrevTjeneste {
         String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet, adresseinfo);
 
         BrevMetadata metadata = new BrevMetadata.Builder()
-            .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
-            .medBehandlendeEnhetNavn(behandling.getBehandlendeEnhetNavn())
-            .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
-            .medFagsaktype(behandling.getFagsak().getFagsakYtelseType())
-            .medSprakkode(språkkode)
-            .medAnsvarligSaksbehandler("VL")
-            .medSakspartId(personinfo.getPersonIdent().getIdent())
-            .medMottakerAdresse(adresseinfo)
-            .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
-            .medSakspartNavn(personinfo.getNavn())
-            .medVergeNavn(vergeNavn)
-            .medFinnesVerge(finnesVerge)
-            .medTittel(tittel)
-            .medBehandlingtype(behandling.getType())
-            .build();
+                .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
+                .medBehandlendeEnhetNavn(behandling.getBehandlendeEnhetNavn())
+                .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
+                .medFagsaktype(behandling.getFagsak().getFagsakYtelseType())
+                .medSprakkode(språkkode)
+                .medAnsvarligSaksbehandler("VL")
+                .medSakspartId(personinfo.getPersonIdent().getIdent())
+                .medMottakerAdresse(adresseinfo)
+                .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
+                .medSakspartNavn(personinfo.getNavn())
+                .medVergeNavn(vergeNavn)
+                .medFinnesVerge(finnesVerge)
+                .medTittel(tittel)
+                .medBehandlingtype(behandling.getType())
+                .build();
 
         FritekstbrevSamletInfo fritekstbrevSamletInfo = new FritekstbrevSamletInfo();
         fritekstbrevSamletInfo.setBrevMetadata(metadata);
@@ -134,11 +134,11 @@ public class FritekstbrevTjeneste {
 
     private FritekstbrevData lagFritekstbrev(FritekstbrevSamletInfo fritekstbrevSamletInfo) {
         return new FritekstbrevData.Builder()
-            .medTittel(fritekstbrevSamletInfo.getBrevMetadata().getTittel())
-            .medOverskrift(fritekstbrevSamletInfo.getOverskrift())
-            .medBrevtekst(fritekstbrevSamletInfo.getFritekstFraSaksbehandler())
-            .medMetadata(fritekstbrevSamletInfo.getBrevMetadata())
-            .build();
+                .medTittel(fritekstbrevSamletInfo.getBrevMetadata().getTittel())
+                .medOverskrift(fritekstbrevSamletInfo.getOverskrift())
+                .medBrevtekst(fritekstbrevSamletInfo.getFritekstFraSaksbehandler())
+                .medMetadata(fritekstbrevSamletInfo.getBrevMetadata())
+                .build();
     }
 
 }

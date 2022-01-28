@@ -24,8 +24,8 @@ public final class Redirect {
 
     public static Response tilBehandlingPollStatus(HttpServletRequest request, UUID uuid, Optional<String> gruppeOpt) throws URISyntaxException {
         var uriBuilder = getUriBuilder(request)
-            .path(BehandlingRestTjeneste.STATUS_PATH)
-            .queryParam("uuid", uuid);
+                .path(BehandlingRestTjeneste.STATUS_PATH)
+                .queryParam("uuid", uuid);
         gruppeOpt.ifPresent(s -> uriBuilder.queryParam("gruppe", s));
         return Response.accepted().location(honorXForwardedProto(request, uriBuilder.build())).build();
     }
@@ -36,8 +36,8 @@ public final class Redirect {
 
     public static Response tilBehandlingEllerPollStatus(HttpServletRequest request, UUID uuid, AsyncPollingStatus status) throws URISyntaxException {
         var uriBuilder = getUriBuilder(request)
-            .path(BehandlingRestTjeneste.PATH_FRAGMENT)
-            .queryParam("uuid", uuid);
+                .path(BehandlingRestTjeneste.PATH_FRAGMENT)
+                .queryParam("uuid", uuid);
         return buildResponse(request, status, uriBuilder.build());
     }
 
@@ -71,7 +71,7 @@ public final class Redirect {
                 URI baseUri = new URI(request.getRequestURI());
                 try {
                     URI rewritten = new URI(xForwardedProto, baseUri.getSchemeSpecificPart(), baseUri.getFragment())
-                        .resolve(path);
+                            .resolve(path);
                     LOG.info("Rewrote URI from '{}' to '{}'", location, rewritten);
                     newLocation = rewritten;
                 } catch (URISyntaxException e) {
@@ -92,7 +92,7 @@ public final class Redirect {
     private static String getXForwardedProtoHeader(HttpServletRequest httpRequest) {
         String xForwardedProto = httpRequest.getHeader("X-Forwarded-Proto");
         if ("https".equalsIgnoreCase(xForwardedProto) ||
-            "http".equalsIgnoreCase(xForwardedProto)) {
+                "http".equalsIgnoreCase(xForwardedProto)) {
             return xForwardedProto;
         }
         return null;
@@ -100,7 +100,7 @@ public final class Redirect {
 
     private static boolean mismatchedScheme(String xForwardedProto, HttpServletRequest httpRequest) {
         return xForwardedProto != null &&
-            !xForwardedProto.equalsIgnoreCase(httpRequest.getScheme());
+                !xForwardedProto.equalsIgnoreCase(httpRequest.getScheme());
     }
 
     private static URI leggTilBaseUri(URI resultatUri) {

@@ -40,8 +40,8 @@ public class K9sakPipKlient {
 
     public K9PipDto hentPipdataForK9sakBehandling(UUID behandlingUUid) {
         URI uri = UriBuilder.fromUri(endpointK9sakBehandlingPip)
-            .queryParam("behandlingUuid", behandlingUUid.toString())
-            .build();
+                .queryParam("behandlingUuid", behandlingUUid.toString())
+                .build();
         return restClient.get(uri, K9PipDto.class);
     }
 

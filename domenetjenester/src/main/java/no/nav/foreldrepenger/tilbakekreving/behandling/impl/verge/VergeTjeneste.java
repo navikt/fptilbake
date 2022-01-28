@@ -57,19 +57,19 @@ public class VergeTjeneste {
     public void fjernVergeGrunnlagOgAksjonspunkt(Behandling behandling) {
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.AVKLAR_VERGE)
-            .ifPresent(aksjonspunkt -> behandlingskontrollTjeneste.lagreAksjonspunkterAvbrutt(kontekst, behandling.getAktivtBehandlingSteg(), List.of(aksjonspunkt)));
+                .ifPresent(aksjonspunkt -> behandlingskontrollTjeneste.lagreAksjonspunkterAvbrutt(kontekst, behandling.getAktivtBehandlingSteg(), List.of(aksjonspunkt)));
         vergeRepository.fjernVergeInformasjon(behandling.getId());
         opprettHistorikkinnslagForFjernetVerge(behandling);
         behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
     }
 
-    public Optional<VergeEntitet> hentVergeInformasjon(Long behandlingId){
+    public Optional<VergeEntitet> hentVergeInformasjon(Long behandlingId) {
         return vergeRepository.finnVergeInformasjon(behandlingId);
     }
 
     private void opprettHistorikkinnslagForFjernetVerge(Behandling behandling) {
         HistorikkInnslagTekstBuilder historikkInnslagTekstBuilder = new HistorikkInnslagTekstBuilder()
-            .medHendelse(HistorikkinnslagType.FJERNET_VERGE);
+                .medHendelse(HistorikkinnslagType.FJERNET_VERGE);
         Historikkinnslag historikkinnslag = new Historikkinnslag();
         historikkinnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
         historikkinnslag.setType(HistorikkinnslagType.FJERNET_VERGE);

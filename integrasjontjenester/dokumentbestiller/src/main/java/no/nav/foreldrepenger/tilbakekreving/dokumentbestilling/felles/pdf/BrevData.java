@@ -54,11 +54,11 @@ public class BrevData {
         }
         BrevData brevData = (BrevData) o;
         return metadata.equals(brevData.metadata) &&
-            Objects.equals(tittel, brevData.tittel) &&
-            overskrift.equals(brevData.overskrift) &&
-            mottaker == brevData.mottaker &&
-            brevtekst.equals(brevData.brevtekst) &&
-            Objects.equals(vedleggHtml, brevData.vedleggHtml);
+                Objects.equals(tittel, brevData.tittel) &&
+                overskrift.equals(brevData.overskrift) &&
+                mottaker == brevData.mottaker &&
+                brevtekst.equals(brevData.brevtekst) &&
+                Objects.equals(vedleggHtml, brevData.vedleggHtml);
     }
 
     @Override

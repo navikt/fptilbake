@@ -30,8 +30,8 @@ public class VedtaksbrevFritekstPeriode extends BaseEntitet {
 
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false)),
-        @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
+            @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false)),
+            @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
     })
     private Periode periode;
 

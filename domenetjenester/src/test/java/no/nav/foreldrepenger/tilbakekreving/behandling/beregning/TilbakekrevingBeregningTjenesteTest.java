@@ -299,28 +299,28 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
 
         VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet vurdering0 = VilkårVurderingPeriodeEntitet.builder()
-            .medPeriode(vurderingPeriode0)
-            .medBegrunnelse("foo")
-            .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
-            .medVurderinger(vurdering)
-            .build();
+                .medPeriode(vurderingPeriode0)
+                .medBegrunnelse("foo")
+                .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                .medVurderinger(vurdering)
+                .build();
         vurdering0.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
-            .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
-            .medProsenterSomTilbakekreves(BigDecimal.valueOf(70))
-            .medBegrunnelse("foo")
-            .medPeriode(vurdering0)
-            .build());
+                .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
+                .medProsenterSomTilbakekreves(BigDecimal.valueOf(70))
+                .medBegrunnelse("foo")
+                .medPeriode(vurdering0)
+                .build());
         VilkårVurderingPeriodeEntitet vurdering1 = VilkårVurderingPeriodeEntitet.builder()
-            .medPeriode(vurderingPeriode1)
-            .medBegrunnelse("foo")
-            .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
-            .medVurderinger(vurdering)
-            .build();
+                .medPeriode(vurderingPeriode1)
+                .medBegrunnelse("foo")
+                .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                .medVurderinger(vurdering)
+                .build();
         vurdering1.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
-            .medAktsomhet(Aktsomhet.FORSETT)
-            .medBegrunnelse("foo")
-            .medPeriode(vurdering1)
-            .build());
+                .medAktsomhet(Aktsomhet.FORSETT)
+                .medBegrunnelse("foo")
+                .medPeriode(vurdering1)
+                .build());
         vurdering.leggTilPeriode(vurdering0);
         vurdering.leggTilPeriode(vurdering1);
         vilkårsvurderingRepository.lagre(internBehandlingId, vurdering);
@@ -348,16 +348,16 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
         for (Periode periode : perioder) {
             VilkårVurderingPeriodeEntitet p = VilkårVurderingPeriodeEntitet.builder()
-                .medPeriode(periode.getFom(), periode.getTom())
-                .medBegrunnelse("foo")
-                .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
-                .medVurderinger(vurdering)
-                .build();
+                    .medPeriode(periode.getFom(), periode.getTom())
+                    .medBegrunnelse("foo")
+                    .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                    .medVurderinger(vurdering)
+                    .build();
             p.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
-                .medAktsomhet(Aktsomhet.FORSETT)
-                .medBegrunnelse("foo")
-                .medPeriode(p)
-                .build());
+                    .medAktsomhet(Aktsomhet.FORSETT)
+                    .medBegrunnelse("foo")
+                    .medPeriode(p)
+                    .build());
             vurdering.leggTilPeriode(p);
         }
         vilkårsvurderingRepository.lagre(behandlingId, vurdering);
@@ -366,12 +366,12 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     private void lagForeldelse(Long behandlingId, Periode periode, ForeldelseVurderingType resultat, LocalDate foreldelsesFrist) {
         VurdertForeldelse vurdertForeldelse = new VurdertForeldelse();
         vurdertForeldelse.leggTilVurderForeldelsePerioder(VurdertForeldelsePeriode.builder()
-            .medPeriode(periode)
-            .medBegrunnelse("foo")
-            .medForeldelseVurderingType(resultat)
-            .medVurdertForeldelse(vurdertForeldelse)
-            .medForeldelsesFrist(foreldelsesFrist)
-            .build());
+                .medPeriode(periode)
+                .medBegrunnelse("foo")
+                .medForeldelseVurderingType(resultat)
+                .medVurdertForeldelse(vurdertForeldelse)
+                .medForeldelsesFrist(foreldelsesFrist)
+                .build());
         vurdertForeldelseRepository.lagre(behandlingId, vurdertForeldelse);
     }
 
@@ -387,11 +387,11 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
 
     private KravgrunnlagBelop433 lagFeilBeløp(KravgrunnlagPeriode432 p, BigDecimal feilutbetaling) {
         return KravgrunnlagBelop433.builder()
-            .medKlasseKode(KlasseKode.FPATORD)
-            .medKlasseType(KlasseType.FEIL)
-            .medNyBelop(feilutbetaling)
-            .medKravgrunnlagPeriode432(p)
-            .build();
+                .medKlasseKode(KlasseKode.FPATORD)
+                .medKlasseType(KlasseType.FEIL)
+                .medNyBelop(feilutbetaling)
+                .medKravgrunnlagPeriode432(p)
+                .build();
     }
 
 
@@ -401,14 +401,14 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
 
     private KravgrunnlagBelop433 lagYtelBeløp(KravgrunnlagPeriode432 p, BigDecimal utbetalt, BigDecimal nyttBeløp, BigDecimal skattProsent) {
         return KravgrunnlagBelop433.builder()
-            .medKlasseKode(KlasseKode.FPATORD)
-            .medKlasseType(KlasseType.YTEL)
-            .medNyBelop(nyttBeløp)
-            .medOpprUtbetBelop(utbetalt)
-            .medTilbakekrevesBelop(utbetalt.subtract(nyttBeløp))
-            .medUinnkrevdBelop(BigDecimal.ZERO)
-            .medSkattProsent(skattProsent)
-            .medKravgrunnlagPeriode432(p).build();
+                .medKlasseKode(KlasseKode.FPATORD)
+                .medKlasseType(KlasseType.YTEL)
+                .medNyBelop(nyttBeløp)
+                .medOpprUtbetBelop(utbetalt)
+                .medTilbakekrevesBelop(utbetalt.subtract(nyttBeløp))
+                .medUinnkrevdBelop(BigDecimal.ZERO)
+                .medSkattProsent(skattProsent)
+                .medKravgrunnlagPeriode432(p).build();
     }
 
     private KravgrunnlagPeriode432 lagGrunnlagPeriode(Periode periode, Kravgrunnlag431 grunnlag) {
@@ -417,32 +417,32 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
 
     private KravgrunnlagPeriode432 lagGrunnlagPeriode(Periode periode, Kravgrunnlag431 grunnlag, int skattMnd) {
         return KravgrunnlagPeriode432.builder()
-            .medPeriode(periode)
-            .medKravgrunnlag431(grunnlag)
-            .medBeløpSkattMnd(BigDecimal.valueOf(skattMnd))
-            .build();
+                .medPeriode(periode)
+                .medKravgrunnlag431(grunnlag)
+                .medBeløpSkattMnd(BigDecimal.valueOf(skattMnd))
+                .build();
     }
 
     private Kravgrunnlag431 lagGrunnlag() {
         return Kravgrunnlag431.builder()
-            .medVedtakId(1111L)
-            .medEksternKravgrunnlagId("123")
-            .medKravStatusKode(KravStatusKode.NYTT)
+                .medVedtakId(1111L)
+                .medEksternKravgrunnlagId("123")
+                .medKravStatusKode(KravStatusKode.NYTT)
 
-            //TODO feltene under skal valideres at finnes i builder, siden de er påkrevd i databasen
-            //TODO vurder om alle feltene skal lagres i fptilbake, der er mye her som ikke brukes av fptilbake
-            .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
-            .medFagSystemId(Fagsystem.FPTILBAKE.getKode())
-            .medGjelderVedtakId("vedtakid-123")
-            .medGjelderType(GjelderType.PERSON)
-            .medUtbetalesTilId("12345678901")
-            .medUtbetIdType(GjelderType.PERSON)
-            .medAnsvarligEnhet("8020")
-            .medBostedEnhet("8020")
-            .medBehandlendeEnhet("8020")
-            .medFeltKontroll("kontroll-123")
-            .medSaksBehId("VL")
-            .build();
+                //TODO feltene under skal valideres at finnes i builder, siden de er påkrevd i databasen
+                //TODO vurder om alle feltene skal lagres i fptilbake, der er mye her som ikke brukes av fptilbake
+                .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
+                .medFagSystemId(Fagsystem.FPTILBAKE.getKode())
+                .medGjelderVedtakId("vedtakid-123")
+                .medGjelderType(GjelderType.PERSON)
+                .medUtbetalesTilId("12345678901")
+                .medUtbetIdType(GjelderType.PERSON)
+                .medAnsvarligEnhet("8020")
+                .medBostedEnhet("8020")
+                .medBehandlendeEnhet("8020")
+                .medFeltKontroll("kontroll-123")
+                .medSaksBehId("VL")
+                .build();
     }
 
 }

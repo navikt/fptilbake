@@ -57,14 +57,14 @@ public class VedtaksbrevFritekst {
 
     static String markerFritekst(FritekstType fritekstType, String fritekst, Underavsnitt.Underavsnittstype underavsnittstype) {
         String fritekstTypeMarkør = fritekstType == FritekstType.PÅKREVET
-            ? FRITEKST_PÅKREVET_MARKERING_START
-            : FRITEKST_MARKERING_START;
+                ? FRITEKST_PÅKREVET_MARKERING_START
+                : FRITEKST_MARKERING_START;
         String startmarkør = underavsnittstype == null
-            ? fritekstTypeMarkør
-            : fritekstTypeMarkør + underavsnittstype;
+                ? fritekstTypeMarkør
+                : fritekstTypeMarkør + underavsnittstype;
         String markertFritekst = fritekst == null
-            ? startmarkør + "\n" + FRITEKST_MARKERING_SLUTT
-            : startmarkør + "\n" + fritekst + "\n" + FRITEKST_MARKERING_SLUTT;
+                ? startmarkør + "\n" + FRITEKST_MARKERING_SLUTT
+                : startmarkør + "\n" + fritekst + "\n" + FRITEKST_MARKERING_SLUTT;
         return "\n" + markertFritekst;
     }
 

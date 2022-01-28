@@ -24,7 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 
 /**
  * Marker type som implementerer interface {@link BehandlingSteg} for å skille ulike implementasjoner av samme steg for ulike behandlingtyper.<br>
- *
+ * <p>
  * NB: Settes kun dersom det er flere implementasjoner av med samme {@link BehandlingStegRef}.
  */
 @Repeatable(BehandlingTypeRef.ContainerOfBehandlingTypeRef.class)
@@ -32,7 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 @Stereotype
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD })
+@Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
 @Documented
 public @interface BehandlingTypeRef {
 
@@ -46,7 +46,9 @@ public @interface BehandlingTypeRef {
      */
     String value() default "*";
 
-    /** AnnotationLiteral som kan brukes ved CDI søk. */
+    /**
+     * AnnotationLiteral som kan brukes ved CDI søk.
+     */
     public static class BehandlingTypeRefLiteral extends AnnotationLiteral<BehandlingTypeRef> implements BehandlingTypeRef {
 
         private String navn;
@@ -85,7 +87,7 @@ public @interface BehandlingTypeRef {
 
         public static <I> Optional<I> find(Class<I> cls, Instance<I> instances, BehandlingType behandlingType) {
             return find(cls, instances,
-                behandlingType == null ? null : behandlingType.getKode());
+                    behandlingType == null ? null : behandlingType.getKode());
         }
 
         public static <I> Optional<I> find(Class<I> cls, Instance<I> instances, String behandlingType) { // NOSONAR
@@ -107,7 +109,7 @@ public @interface BehandlingTypeRef {
             var i = inst.get();
             if (i.getClass().isAnnotationPresent(Dependent.class)) {
                 throw new IllegalStateException(
-                    "Kan ikke ha @Dependent scope bean ved Instance lookup dersom en ikke også håndtere lifecycle selv: " + i.getClass());
+                        "Kan ikke ha @Dependent scope bean ved Instance lookup dersom en ikke også håndtere lifecycle selv: " + i.getClass());
             }
             return i;
         }
@@ -118,8 +120,8 @@ public @interface BehandlingTypeRef {
 
         private static <I> Instance<I> select(Class<I> cls, Instance<I> instances, Annotation anno) {
             return cls != null
-                ? instances.select(cls, anno)
-                : instances.select(anno);
+                    ? instances.select(cls, anno)
+                    : instances.select(anno);
         }
 
     }
@@ -131,7 +133,7 @@ public @interface BehandlingTypeRef {
      */
     @Inherited
     @Retention(RetentionPolicy.RUNTIME)
-    @Target({ ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER })
+    @Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER})
     @Documented
     public @interface ContainerOfBehandlingTypeRef {
         BehandlingTypeRef[] value();

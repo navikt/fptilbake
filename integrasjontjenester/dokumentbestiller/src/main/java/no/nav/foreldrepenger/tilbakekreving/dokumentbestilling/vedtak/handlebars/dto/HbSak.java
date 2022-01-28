@@ -84,6 +84,6 @@ public class HbSak {
 
     private static boolean trengerSkilleFødselOgAdopsjon(FagsakYtelseType fagsakYtelseType) {
         return Set.of(FagsakYtelseType.FORELDREPENGER, FagsakYtelseType.SVANGERSKAPSPENGER, FagsakYtelseType.ENGANGSTØNAD)
-            .contains(fagsakYtelseType);
+                .contains(fagsakYtelseType);
     }
 }

@@ -9,7 +9,7 @@ public class TaskProperties {
     public static final String FAGSAK_YTELSE_TYPE = "fagYtelseType";
     public static final String BEHANDLING_TYPE = "behandlingType";
 
-    private TaskProperties(){
+    private TaskProperties() {
 
     }
 }

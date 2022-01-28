@@ -68,7 +68,7 @@ public class TestEventObserver {
     }
 
     public static void containsExactly(AksjonspunktDefinisjon[]... ads) {
-        List<AksjonspunktStatusEvent>  aksjonspunkterEvents = getEvents(AksjonspunktStatusEvent.class);
+        List<AksjonspunktStatusEvent> aksjonspunkterEvents = getEvents(AksjonspunktStatusEvent.class);
         Assertions.assertThat(aksjonspunkterEvents).hasSize(ads.length);
         for (int i = 0; i < ads.length; i++) {
             List<Aksjonspunkt> aps = aksjonspunkterEvents.get(i).getAksjonspunkter();
@@ -81,7 +81,7 @@ public class TestEventObserver {
     }
 
     @SuppressWarnings("unchecked")
-    private static<V> List<V> getEvents(Class<?> cls) {
+    private static <V> List<V> getEvents(Class<?> cls) {
         return (List<V>) allEvents.stream().filter(p -> cls.isAssignableFrom(p.getClass()))
                 .collect(Collectors.toList());
     }
@@ -103,10 +103,10 @@ public class TestEventObserver {
             BehandlingStegOvergangEvent minEvent = bsoe[i];
             assertThat(overgangEvents.get(i).getFraStegType()).as("%s", i).isEqualTo(minEvent.getFraStegType());
             Assertions.assertThat(hentKode(overgangEvents.get(i).getFraTilstand())).as("%s", i)
-                .isEqualTo(hentKode(minEvent.getFraTilstand()));
+                    .isEqualTo(hentKode(minEvent.getFraTilstand()));
             assertThat(overgangEvents.get(i).getTilStegType()).as("%s", i).isEqualTo(minEvent.getTilStegType());
             Assertions.assertThat(hentKode(overgangEvents.get(i).getTilTilstand())).as("%s", i)
-                .isEqualTo(hentKode(minEvent.getTilTilstand()));
+                    .isEqualTo(hentKode(minEvent.getTilTilstand()));
         }
     }
 
@@ -122,9 +122,9 @@ public class TestEventObserver {
 
     private static String hentKode(Optional<BehandlingStegTilstandSnapshot> behandlingStegTilstand) {
         return behandlingStegTilstand
-            .map(BehandlingStegTilstandSnapshot::getStatus)
-            .map(Kodeverdi::getKode)
-            .orElse("");
+                .map(BehandlingStegTilstandSnapshot::getStatus)
+                .map(Kodeverdi::getKode)
+                .orElse("");
     }
 
 }

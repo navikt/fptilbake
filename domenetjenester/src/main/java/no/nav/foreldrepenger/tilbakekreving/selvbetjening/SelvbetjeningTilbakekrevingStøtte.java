@@ -8,9 +8,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 public class SelvbetjeningTilbakekrevingStøtte {
 
     private static final Set<FagsakYtelseType> YTELSETYPER_STØTTET_I_SELVBETJENING = Set.of(
-        FagsakYtelseType.FORELDREPENGER,
-        FagsakYtelseType.SVANGERSKAPSPENGER,
-        FagsakYtelseType.ENGANGSTØNAD);
+            FagsakYtelseType.FORELDREPENGER,
+            FagsakYtelseType.SVANGERSKAPSPENGER,
+            FagsakYtelseType.ENGANGSTØNAD);
 
     public static boolean harStøtteFor(Behandling behandling) {
         return harStøtteFor(behandling.getFagsak().getFagsakYtelseType());

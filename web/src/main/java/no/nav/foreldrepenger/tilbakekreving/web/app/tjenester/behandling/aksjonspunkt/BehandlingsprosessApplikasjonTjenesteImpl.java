@@ -23,7 +23,9 @@ public class BehandlingsprosessApplikasjonTjenesteImpl implements Behandlingspro
         // CDI
     }
 
-    /** test only */
+    /**
+     * test only
+     */
     BehandlingsprosessApplikasjonTjenesteImpl(BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste) {
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollAsynkTjeneste;
     }

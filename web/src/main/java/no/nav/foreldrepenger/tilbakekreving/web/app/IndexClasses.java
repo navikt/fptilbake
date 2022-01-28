@@ -29,8 +29,6 @@ import org.jboss.jandex.IndexReader;
 import org.jboss.jandex.Indexer;
 import org.slf4j.Logger;
 
-import jdk.jshell.spi.ExecutionControl;
-
 /**
  * Henter persistert index (hvis generert) eller genererer index for angitt location (typisk matcher en jar/war fil).
  */

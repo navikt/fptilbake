@@ -20,7 +20,7 @@ public class VarselRepository {
     }
 
     @Inject
-    public VarselRepository(  EntityManager entityManager) {
+    public VarselRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -32,8 +32,8 @@ public class VarselRepository {
             entityManager.persist(forrigeVarselInfo);
         }
         VarselInfo varselInfo = VarselInfo.builder().medBehandlingId(behandlingId)
-            .medVarselTekst(varselTekst)
-            .medVarselBeløp(varselBeløp).build();
+                .medVarselTekst(varselTekst)
+                .medVarselBeløp(varselBeløp).build();
         entityManager.persist(varselInfo);
         entityManager.flush();
     }
@@ -50,7 +50,7 @@ public class VarselRepository {
 
     private TypedQuery<VarselInfo> lagFinnVarselQuery(Long behandlingId) {
         TypedQuery<VarselInfo> query = entityManager.createQuery("from VarselInfo vars where vars.behandlingId=:behandlingId " +
-            "and vars.aktiv=:aktiv", VarselInfo.class);
+                "and vars.aktiv=:aktiv", VarselInfo.class);
         query.setParameter("behandlingId", behandlingId);
         query.setParameter("aktiv", true);
         return query;

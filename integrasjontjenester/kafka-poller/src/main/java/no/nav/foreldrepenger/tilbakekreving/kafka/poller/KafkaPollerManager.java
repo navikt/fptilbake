@@ -113,5 +113,6 @@ public class KafkaPollerManager implements AppServiceHandler {
         return Math.max(systemPropertyValue, lowerBoundry);
     }
 
-    private static record PollerExecutor(KafkaPoller kafkaPoller, ScheduledExecutorService scheduledExecutorService) {}
+    private static record PollerExecutor(KafkaPoller kafkaPoller, ScheduledExecutorService scheduledExecutorService) {
+    }
 }

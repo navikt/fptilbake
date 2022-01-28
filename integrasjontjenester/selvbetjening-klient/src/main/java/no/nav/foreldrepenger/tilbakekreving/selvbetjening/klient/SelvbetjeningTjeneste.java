@@ -75,19 +75,19 @@ public class SelvbetjeningTjeneste {
 
         LocalDateTime nå = LocalDateTime.now();
         SelvbetjeningMelding.Builder meldingsBuilder = SelvbetjeningMelding.builder()
-            .medAktørId(aktørId)
-            .medNorskIdent(personIdent)
-            .medSaksnummer(saksnummer)
-            .medDialogId(saksnummer.getVerdi()) // unik referanse, saksnummer er akkurat unikt nok
-            .medYtelseType(fagsak.getFagsakYtelseType())
-            .medDokumentId(varselSporing.getDokumentId())
-            .medHendelse(hendelse)
-            .medOpprettet(nå);
+                .medAktørId(aktørId)
+                .medNorskIdent(personIdent)
+                .medSaksnummer(saksnummer)
+                .medDialogId(saksnummer.getVerdi()) // unik referanse, saksnummer er akkurat unikt nok
+                .medYtelseType(fagsak.getFagsakYtelseType())
+                .medDokumentId(varselSporing.getDokumentId())
+                .medHendelse(hendelse)
+                .medOpprettet(nå);
 
         if (Hendelse.TILBAKEKREVING_SPM.equals(hendelse)) {
             meldingsBuilder
-                .medJournalpostId(varselSporing.getJournalpostId())
-                .medGyldigTil(nå.plusWeeks(3).toLocalDate());
+                    .medJournalpostId(varselSporing.getJournalpostId())
+                    .medGyldigTil(nå.plusWeeks(3).toLocalDate());
         }
 
         return meldingsBuilder.build();

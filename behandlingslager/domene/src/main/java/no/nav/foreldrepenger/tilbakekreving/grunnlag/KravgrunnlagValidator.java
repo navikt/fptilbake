@@ -20,16 +20,16 @@ import no.nav.vedtak.exception.IntegrasjonException;
 public class KravgrunnlagValidator {
 
     private static final List<Consumer<Kravgrunnlag431>> VALIDATORER = List.of(
-        KravgrunnlagValidator::validerPeriodeInnenforMåned,
-        KravgrunnlagValidator::validerOverlappendePerioder,
-        KravgrunnlagValidator::validerSkatt,
-        KravgrunnlagValidator::validerPerioderHarFeilutbetalingPostering,
-        KravgrunnlagValidator::validerPerioderHarYtelPostering,
-        KravgrunnlagValidator::validerPerioderHarFeilPosteringMedNegativFeilutbetaltBeløp,
-        KravgrunnlagValidator::validerYtelseMotFeilutbetaling,
-        KravgrunnlagValidator::validerYtelPosteringTilbakekrevesMotNyttOgOpprinneligUtbetalt,
-        KravgrunnlagValidator::validerReferanse
-        );
+            KravgrunnlagValidator::validerPeriodeInnenforMåned,
+            KravgrunnlagValidator::validerOverlappendePerioder,
+            KravgrunnlagValidator::validerSkatt,
+            KravgrunnlagValidator::validerPerioderHarFeilutbetalingPostering,
+            KravgrunnlagValidator::validerPerioderHarYtelPostering,
+            KravgrunnlagValidator::validerPerioderHarFeilPosteringMedNegativFeilutbetaltBeløp,
+            KravgrunnlagValidator::validerYtelseMotFeilutbetaling,
+            KravgrunnlagValidator::validerYtelPosteringTilbakekrevesMotNyttOgOpprinneligUtbetalt,
+            KravgrunnlagValidator::validerReferanse
+    );
 
     public static void validerGrunnlag(Kravgrunnlag431 kravgrunnlag) throws UgyldigKravgrunnlagException {
         for (var validator : VALIDATORER) {
@@ -75,9 +75,9 @@ public class KravgrunnlagValidator {
 
     private static void validerOverlappendePerioder(Kravgrunnlag431 kravgrunnlag) {
         List<Periode> sortertePerioder = kravgrunnlag.getPerioder().stream()
-            .map(KravgrunnlagPeriode432::getPeriode)
-            .sorted(Comparator.comparing(Periode::getFom))
-            .collect(Collectors.toList());
+                .map(KravgrunnlagPeriode432::getPeriode)
+                .sorted(Comparator.comparing(Periode::getFom))
+                .collect(Collectors.toList());
         for (int i = 1; i < sortertePerioder.size(); i++) {
             Periode forrige = sortertePerioder.get(i - 1);
             Periode denne = sortertePerioder.get(i);
@@ -89,8 +89,8 @@ public class KravgrunnlagValidator {
 
     private static void validerSkatt(Kravgrunnlag431 kravgrunnlag) {
         Map<YearMonth, List<KravgrunnlagPeriode432>> grupppertPåMåned = kravgrunnlag.getPerioder()
-            .stream()
-            .collect(Collectors.groupingBy(p -> tilMåned(p.getPeriode())));
+                .stream()
+                .collect(Collectors.groupingBy(p -> tilMåned(p.getPeriode())));
 
         for (Map.Entry<YearMonth, List<KravgrunnlagPeriode432>> entry : grupppertPåMåned.entrySet()) {
             validerSkattForPeriode(entry.getKey(), entry.getValue());
@@ -137,15 +137,15 @@ public class KravgrunnlagValidator {
     private static void validerYtelseMotFeilutbetaling(Kravgrunnlag431 kravgrunnlag) {
         for (KravgrunnlagPeriode432 periode : kravgrunnlag.getPerioder()) {
             BigDecimal sumTilbakekrevesFraYtelsePosteringer = periode.getKravgrunnlagBeloper433().stream()
-                .filter(b -> KlasseType.YTEL.equals(b.getKlasseType()))
-                .map(KravgrunnlagBelop433::getTilbakekrevesBelop)
-                .reduce(BigDecimal::add)
-                .orElse(BigDecimal.ZERO);
+                    .filter(b -> KlasseType.YTEL.equals(b.getKlasseType()))
+                    .map(KravgrunnlagBelop433::getTilbakekrevesBelop)
+                    .reduce(BigDecimal::add)
+                    .orElse(BigDecimal.ZERO);
             BigDecimal sumNyttBelopFraFeilposteringer = periode.getKravgrunnlagBeloper433().stream()
-                .filter(b -> KlasseType.FEIL.equals(b.getKlasseType()))
-                .map(KravgrunnlagBelop433::getNyBelop)
-                .reduce(BigDecimal::add)
-                .orElse(BigDecimal.ZERO);
+                    .filter(b -> KlasseType.FEIL.equals(b.getKlasseType()))
+                    .map(KravgrunnlagBelop433::getNyBelop)
+                    .reduce(BigDecimal::add)
+                    .orElse(BigDecimal.ZERO);
             if (sumNyttBelopFraFeilposteringer.compareTo(sumTilbakekrevesFraYtelsePosteringer) != 0) {
                 throw KravgrunnlagFeil.feilYtelseEllerFeilutbetaling(kravgrunnlag.getEksternKravgrunnlagId(), periode.getPeriode(), sumTilbakekrevesFraYtelsePosteringer, sumNyttBelopFraFeilposteringer);
             }
@@ -159,11 +159,11 @@ public class KravgrunnlagValidator {
                     BigDecimal diff = kgBeløp.getOpprUtbetBelop().subtract(kgBeløp.getNyBelop());
                     if (kgBeløp.getTilbakekrevesBelop().compareTo(diff) > 0) {
                         throw KravgrunnlagFeil.ytelPosteringHvorTilbakekrevesIkkeStemmerMedNyttOgOpprinneligBeløp(
-                            kravgrunnlag.getEksternKravgrunnlagId(),
-                            periode.getPeriode(),
-                            kgBeløp.getTilbakekrevesBelop(),
-                            kgBeløp.getNyBelop(),
-                            kgBeløp.getOpprUtbetBelop());
+                                kravgrunnlag.getEksternKravgrunnlagId(),
+                                periode.getPeriode(),
+                                kgBeløp.getTilbakekrevesBelop(),
+                                kgBeløp.getNyBelop(),
+                                kgBeløp.getOpprUtbetBelop());
                     }
                 }
             }

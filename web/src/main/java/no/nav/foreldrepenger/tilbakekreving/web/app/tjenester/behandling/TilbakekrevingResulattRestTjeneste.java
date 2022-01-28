@@ -54,7 +54,7 @@ public class TilbakekrevingResulattRestTjeneste {
 
     private Long hentBehandlingId(BehandlingReferanse behandlingReferanse) {
         return behandlingReferanse.erInternBehandlingId()
-            ? behandlingReferanse.getBehandlingId()
-            : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
+                ? behandlingReferanse.getBehandlingId()
+                : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
     }
 }

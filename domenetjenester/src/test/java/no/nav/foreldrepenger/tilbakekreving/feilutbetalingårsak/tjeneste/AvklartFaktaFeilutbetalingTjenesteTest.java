@@ -79,8 +79,8 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto = new HendelseTypeMedUndertypeDto(HENDELSE_TYPE, HENDELSE_UNDERTYPE);
 
         avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling,
-            List.of(faktaFeilutbetalingDto,
-                new FaktaFeilutbetalingDto(TOM, sisteDagIPeriode, feilutbetalingÅrsakDto)), BEGRUNNELSE);
+                List.of(faktaFeilutbetalingDto,
+                        new FaktaFeilutbetalingDto(TOM, sisteDagIPeriode, feilutbetalingÅrsakDto)), BEGRUNNELSE);
 
         Optional<FaktaFeilutbetaling> feilutbetalingAggregate = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(nyBehandling.getId());
         assertThat(feilutbetalingAggregate).isNotEmpty();
@@ -112,7 +112,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto = new HendelseTypeMedUndertypeDto(HENDELSE_TYPE, HENDELSE_UNDERTYPE);
 
         avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling,
-            Arrays.asList(new FaktaFeilutbetalingDto(FOM, TOM, feilutbetalingÅrsakDto)), BEGRUNNELSE);
+                Arrays.asList(new FaktaFeilutbetalingDto(FOM, TOM, feilutbetalingÅrsakDto)), BEGRUNNELSE);
 
         Optional<FaktaFeilutbetaling> aggregate = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(nyBehandling.getId());
         assertThat(aggregate).isNotEmpty();

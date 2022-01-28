@@ -77,7 +77,7 @@ public class SelvbetjeningMeldingProducer {
 
     private void setUsernameAndPassword(String username, String password, Properties properties) {
         if ((username != null && !username.isEmpty())
-            && (password != null && !password.isEmpty())) {
+                && (password != null && !password.isEmpty())) {
             String jaasTemplate = "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"%s\" password=\"%s\";";
             String jaasCfg = String.format(jaasTemplate, username, password);
             properties.setProperty("sasl.jaas.config", jaasCfg);
@@ -118,9 +118,9 @@ public class SelvbetjeningMeldingProducer {
         }
     }
 
-     private static TekniskException uventetFeilKafka(String topic, Exception cause) {
-         return new TekniskException("FPT-151561", String.format("Uventet feil ved sending til Kafka for topic %s", topic), cause);
-     }
+    private static TekniskException uventetFeilKafka(String topic, Exception cause) {
+        return new TekniskException("FPT-151561", String.format("Uventet feil ved sending til Kafka for topic %s", topic), cause);
+    }
 
     private static ManglerTilgangException påloggingsfeilKafka(String topic, Exception cause) {
         return new ManglerTilgangException("FPT-732111", String.format("Feil med pålogging mot Kafka for topic %s", topic), cause);

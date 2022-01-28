@@ -10,7 +10,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -38,6 +37,7 @@ public class TestUtility {
 
     /**
      * Oppretter behandling med genererte data
+     *
      * @return Klasse med genererte detaljer om saken
      */
     public SakDetaljer opprettFørstegangsBehandling(AktørId aktørId) {
@@ -48,7 +48,7 @@ public class TestUtility {
         Saksnummer saksnummer = genererSaksnummer();
         UUID eksternUuid = genererEksternUuid();
 
-        long intBehId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternUuid, henvisning, aktørId,FagsakYtelseType.FORELDREPENGER,BEHANDLING_TYPE);
+        long intBehId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternUuid, henvisning, aktørId, FagsakYtelseType.FORELDREPENGER, BEHANDLING_TYPE);
 
         Behandling behandling = behandlingTjeneste.hentBehandling(intBehId);
 
@@ -101,7 +101,7 @@ public class TestUtility {
             this.fagsakId = fagsakId;
             this.saksnummer = saksnummer;
             this.internBehandlingId = internBehandlingId;
-            this.henvisning=henvisning;
+            this.henvisning = henvisning;
             this.eksternUuid = eksternUuid;
             this.aktørId = aktørId;
             this.behandlingType = behandlingType;

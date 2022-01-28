@@ -105,15 +105,15 @@ public class AvstemmingCsvFormatter {
 
         public static String buildeHeader() {
             return "avsender" + SKILLETEGN_KOLONNER +
-                "vedtakId" + SKILLETEGN_KOLONNER +
-                "fnr" + SKILLETEGN_KOLONNER +
-                "vedtaksdato" + SKILLETEGN_KOLONNER +
-                "fagsakYtelseType" + SKILLETEGN_KOLONNER +
-                "tilbakekrevesBruttoUtenRenter" + SKILLETEGN_KOLONNER +
-                "skatt" + SKILLETEGN_KOLONNER +
-                "tilbakekrevesNettoUtenRenter" + SKILLETEGN_KOLONNER +
-                "renter" + SKILLETEGN_KOLONNER +
-                "erOmgjøringTilIngenTilbakekreving";
+                    "vedtakId" + SKILLETEGN_KOLONNER +
+                    "fnr" + SKILLETEGN_KOLONNER +
+                    "vedtaksdato" + SKILLETEGN_KOLONNER +
+                    "fagsakYtelseType" + SKILLETEGN_KOLONNER +
+                    "tilbakekrevesBruttoUtenRenter" + SKILLETEGN_KOLONNER +
+                    "skatt" + SKILLETEGN_KOLONNER +
+                    "tilbakekrevesNettoUtenRenter" + SKILLETEGN_KOLONNER +
+                    "renter" + SKILLETEGN_KOLONNER +
+                    "erOmgjøringTilIngenTilbakekreving";
         }
 
         public String build() {
@@ -128,16 +128,16 @@ public class AvstemmingCsvFormatter {
             Objects.requireNonNull(skatt, "skatt mangler");
 
             return format(avsender)
-                + SKILLETEGN_KOLONNER + format(vedtakId)
-                + SKILLETEGN_KOLONNER + format(fnr)
-                + SKILLETEGN_KOLONNER + format(vedtaksdato)
-                + SKILLETEGN_KOLONNER + format(fagsakYtelseType)
-                + SKILLETEGN_KOLONNER + format(tilbakekrevesBruttoUtenRenter)
-                + SKILLETEGN_KOLONNER + format(skatt)
-                + SKILLETEGN_KOLONNER + format(tilbakekrevesNettoUtenRenter)
-                + SKILLETEGN_KOLONNER + format(renter)
-                + SKILLETEGN_KOLONNER + formatOmgjøring(erOmgjøringTilIngenTilbakekreving)
-                ;
+                    + SKILLETEGN_KOLONNER + format(vedtakId)
+                    + SKILLETEGN_KOLONNER + format(fnr)
+                    + SKILLETEGN_KOLONNER + format(vedtaksdato)
+                    + SKILLETEGN_KOLONNER + format(fagsakYtelseType)
+                    + SKILLETEGN_KOLONNER + format(tilbakekrevesBruttoUtenRenter)
+                    + SKILLETEGN_KOLONNER + format(skatt)
+                    + SKILLETEGN_KOLONNER + format(tilbakekrevesNettoUtenRenter)
+                    + SKILLETEGN_KOLONNER + format(renter)
+                    + SKILLETEGN_KOLONNER + formatOmgjøring(erOmgjøringTilIngenTilbakekreving)
+                    ;
         }
 
         private String format(String verdi) {

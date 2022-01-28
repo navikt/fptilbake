@@ -51,10 +51,10 @@ public class FagsakLåsRepository {
 
     private Long låsFagsak(final Long fagsakId, LockModeType lockModeType) {
         Object[] resultFs = (Object[]) entityManager
-            .createQuery("select fs.id, fs.versjon from Fagsak fs where fs.id=:id") //$NON-NLS-1$
-            .setParameter("id", fagsakId) //$NON-NLS-1$
-            .setLockMode(lockModeType)
-            .getSingleResult();
+                .createQuery("select fs.id, fs.versjon from Fagsak fs where fs.id=:id") //$NON-NLS-1$
+                .setParameter("id", fagsakId) //$NON-NLS-1$
+                .setLockMode(lockModeType)
+                .getSingleResult();
         return (Long) resultFs[0];
     }
 
@@ -73,16 +73,16 @@ public class FagsakLåsRepository {
         Long id = lås.getFagsakId();
         // NB - Oracle syntax
         Object versjon = entityManager.createNativeQuery("select versjon from FAGSAK where id =:fagsakId for update nowait")
-            .setParameter("fagsakId", id)
-            .getSingleResult();
+                .setParameter("fagsakId", id)
+                .getSingleResult();
 
         if (versjon == null) {
             throw BehandlingRepositoryFeil.fantIkkeEntitetForLåsing(Fagsak.class.getSimpleName(), id);
         } else {
             int updated = entityManager.createNativeQuery("update FAGSAK set versjon=versjon+1 where id=:fagsakId and versjon=:versjon")
-                .setParameter("fagsakId", id)
-                .setParameter("versjon", versjon)
-                .executeUpdate();
+                    .setParameter("fagsakId", id)
+                    .setParameter("versjon", versjon)
+                    .executeUpdate();
             if (updated != 1) {
                 throw new IllegalStateException("Kunne ikke verifisere lås på Fagsak: " + id + ", fikk ikke oppdatert versjon " + versjon);
             }

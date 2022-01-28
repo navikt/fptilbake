@@ -12,7 +12,7 @@ public class YtelseTypeMapper {
 
 
     private static final Map<FagsakYtelseType, YtelseType> MAPPING = Arrays.stream(YtelseType.values())
-        .collect(Collectors.toMap(yt -> FagsakYtelseType.fraKode(yt.name()), Function.identity()));
+            .collect(Collectors.toMap(yt -> FagsakYtelseType.fraKode(yt.name()), Function.identity()));
 
     public static YtelseType getYtelseType(FagsakYtelseType fagsakYtelseType) {
         var verdi = MAPPING.get(fagsakYtelseType);

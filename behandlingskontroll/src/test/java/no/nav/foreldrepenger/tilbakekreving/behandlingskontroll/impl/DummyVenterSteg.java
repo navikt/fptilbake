@@ -18,7 +18,8 @@ class DummyVenterSteg extends DummySteg {
 
     @Override
     public BehandleStegResultat gjenopptaSteg(BehandlingskontrollKontekst kontekst) {
-        BehandleStegResultat resultat = BehandleStegResultat.utførtUtenAksjonspunkter();;
+        BehandleStegResultat resultat = BehandleStegResultat.utførtUtenAksjonspunkter();
+        ;
         sisteUtførStegResultat.set(resultat);
         return resultat;
     }

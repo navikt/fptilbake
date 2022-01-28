@@ -5,7 +5,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermle
 
 public class SkjermlenkeTjeneste {
 
-    private SkjermlenkeTjeneste(){
+    private SkjermlenkeTjeneste() {
     }
 
     public static SkjermlenkeType finnSkjermlenkeType(AksjonspunktDefinisjon aksjonspunktDefinisjon) {

@@ -49,9 +49,9 @@ public class FeilutbetalingÅrsakTjeneste {
         }
 
         return kodelistene
-            .stream()
-            .sorted(Comparator.comparing(HendelseUnderType::getSortering))
-            .collect(Collectors.toList());
+                .stream()
+                .sorted(Comparator.comparing(HendelseUnderType::getSortering))
+                .collect(Collectors.toList());
     }
 
     private static List<HendelseType> sortereHendelseTypeBasertPåEkstradata2(Set<HendelseType> kodelistene) {
@@ -59,9 +59,9 @@ public class FeilutbetalingÅrsakTjeneste {
             throw new IllegalStateException("Fins null i HendelseType: " + kodelistene);
         }
         return kodelistene
-            .stream()
-            .sorted(Comparator.comparing(HendelseType::getSortering))
-            .collect(Collectors.toList());
+                .stream()
+                .sorted(Comparator.comparing(HendelseType::getSortering))
+                .collect(Collectors.toList());
     }
 
 }

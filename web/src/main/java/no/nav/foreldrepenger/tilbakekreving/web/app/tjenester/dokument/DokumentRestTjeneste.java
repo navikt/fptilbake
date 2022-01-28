@@ -73,7 +73,7 @@ public class DokumentRestTjeneste {
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentForhåndsvisningVarselbrev(@TilpassetAbacAttributt(supplierClass = ForhåndsvisningVarselbrev.class)
-        @Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @Valid HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) { // NOSONAR
+                                                  @Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @Valid HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) { // NOSONAR
         byte[] dokument = varselbrevTjeneste.hentForhåndsvisningVarselbrev(hentForhåndsvisningVarselbrevDto);
         Response.ResponseBuilder responseBuilder = lagRespons(dokument);
         return responseBuilder.build();
@@ -87,7 +87,7 @@ public class DokumentRestTjeneste {
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public ForhåndvisningVedtaksbrevTekstDto hentVedtaksbrevForRedigering(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                                                              @NotNull @QueryParam ("uuid") @Valid BehandlingReferanse behandlingReferanse) { // NOSONAR
+                                                                          @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) { // NOSONAR
         Long behandlingId = hentBehandlingId(behandlingReferanse);
         List<Avsnitt> avsnittene = vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevSomTekst(behandlingId);
         return new ForhåndvisningVedtaksbrevTekstDto(avsnittene);
@@ -95,8 +95,8 @@ public class DokumentRestTjeneste {
 
     private Long hentBehandlingId(@QueryParam("behandlingUuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         return behandlingReferanse.erInternBehandlingId()
-            ? behandlingReferanse.getBehandlingId()
-            : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
+                ? behandlingReferanse.getBehandlingId()
+                : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
     }
 
     @POST
@@ -165,7 +165,6 @@ public class DokumentRestTjeneste {
             return BehandlingReferanseAbacAttributter.fraBehandlingReferanse(req.getBehandlingReferanse());
         }
     }
-
 
 
 }

@@ -68,22 +68,22 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, List.of(
-                KgBeløp.feil(9000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medTilbakekrevBeløp(9000),
-                KgBeløp.trekk(2000))
-            ),
-            false);
+                        uke1, List.of(
+                                KgBeløp.feil(9000),
+                                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medTilbakekrevBeløp(9000),
+                                KgBeløp.trekk(2000))
+                ),
+                false);
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            uke1, VilkårsvurderingTestBuilder.VVurdering.forsett()
+                uke1, VilkårsvurderingTestBuilder.VVurdering.forsett()
         ));
 
         flushAndClear();
 
         List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         assertThat(resultat).containsOnly(TilbakekrevingPeriode.med(uke1).medRenter(900)
-            .medBeløp(TbkBeløp.feil(9000))
-            .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(11000).medTilbakekrevBeløp(9000).medUinnkrevdBeløp(0).medSkattBeløp(0)));
+                .medBeløp(TbkBeløp.feil(9000))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(11000).medTilbakekrevBeløp(9000).medUinnkrevdBeløp(0).medSkattBeløp(0)));
     }
 
     @Test
@@ -92,29 +92,29 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, List.of(
-                KgBeløp.feil(9000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medTilbakekrevBeløp(9000),
-                KgBeløp.trekk(2000))
-            ),
-            false);
+                        uke1, List.of(
+                                KgBeløp.feil(9000),
+                                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medTilbakekrevBeløp(9000),
+                                KgBeløp.trekk(2000))
+                ),
+                false);
 
         VurdertForeldelse foreldelse = new VurdertForeldelse();
         foreldelse.leggTilVurderForeldelsePerioder(VurdertForeldelsePeriode.builder()
-            .medVurdertForeldelse(foreldelse)
-            .medPeriode(uke1)
-            .medForeldelseVurderingType(ForeldelseVurderingType.FORELDET)
-            .medBegrunnelse("foo")
-            .medForeldelsesFrist(uke1.getFom().plusMonths(8))
-            .build());
+                .medVurdertForeldelse(foreldelse)
+                .medPeriode(uke1)
+                .medForeldelseVurderingType(ForeldelseVurderingType.FORELDET)
+                .medBegrunnelse("foo")
+                .medForeldelsesFrist(uke1.getFom().plusMonths(8))
+                .build());
         foreldelseRepository.lagre(behandlingId, foreldelse);
 
         flushAndClear();
 
         List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         assertThat(resultat).containsOnly(TilbakekrevingPeriode.med(uke1).medRenter(0)
-            .medBeløp(TbkBeløp.feil(9000))
-            .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(11000).medTilbakekrevBeløp(0).medUinnkrevdBeløp(9000).medSkattBeløp(0)));
+                .medBeløp(TbkBeløp.feil(9000))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(11000).medTilbakekrevBeløp(0).medUinnkrevdBeløp(9000).medSkattBeløp(0)));
     }
 
     @Test
@@ -123,31 +123,31 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, List.of(
-                KgBeløp.feil(1000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000))
-            ,
-            uke2, List.of(
-                KgBeløp.feil(2000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(2000).medTilbakekrevBeløp(2000))
-            ),
-            false);
+                        uke1, List.of(
+                                KgBeløp.feil(1000),
+                                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000))
+                        ,
+                        uke2, List.of(
+                                KgBeløp.feil(2000),
+                                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(2000).medTilbakekrevBeløp(2000))
+                ),
+                false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            uke1og2, VilkårsvurderingTestBuilder.VVurdering.forsett()
+                uke1og2, VilkårsvurderingTestBuilder.VVurdering.forsett()
         ));
 
         flushAndClear();
 
         List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         assertThat(resultat).containsOnly(
-            TilbakekrevingPeriode.med(uke1).medRenter(100)
-                .medBeløp(TbkBeløp.feil(1000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medUinnkrevdBeløp(0).medSkattBeløp(0)),
+                TilbakekrevingPeriode.med(uke1).medRenter(100)
+                        .medBeløp(TbkBeløp.feil(1000))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medUinnkrevdBeløp(0).medSkattBeløp(0)),
 
-            TilbakekrevingPeriode.med(uke2).medRenter(200)
-                .medBeløp(TbkBeløp.feil(2000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2000).medTilbakekrevBeløp(2000).medUinnkrevdBeløp(0).medSkattBeløp(0))
+                TilbakekrevingPeriode.med(uke2).medRenter(200)
+                        .medBeløp(TbkBeløp.feil(2000))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2000).medTilbakekrevBeløp(2000).medUinnkrevdBeløp(0).medSkattBeløp(0))
         );
     }
 
@@ -159,27 +159,27 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Periode uke1til3 = Periode.omsluttende(uke1, uke3);
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1til3, List.of(
-                KgBeløp.feil(3000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(3000).medTilbakekrevBeløp(3000).medSkattProsent(0))
+                uke1til3, List.of(
+                        KgBeløp.feil(3000),
+                        KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(3000).medTilbakekrevBeløp(3000).medSkattProsent(0))
         ), false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            uke1og2, VilkårsvurderingTestBuilder.VVurdering.forsett(),
-            uke3, VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(300)
+                uke1og2, VilkårsvurderingTestBuilder.VVurdering.forsett(),
+                uke3, VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(300)
         ));
 
         flushAndClear();
 
         List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         assertThat(resultat).containsOnly(
-            TilbakekrevingPeriode.med(uke1og2).medRenter(200)
-                .medBeløp(TbkBeløp.feil(2000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2000).medTilbakekrevBeløp(2000).medUinnkrevdBeløp(0).medSkattBeløp(0)),
+                TilbakekrevingPeriode.med(uke1og2).medRenter(200)
+                        .medBeløp(TbkBeløp.feil(2000))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2000).medTilbakekrevBeløp(2000).medUinnkrevdBeløp(0).medSkattBeløp(0)),
 
-            TilbakekrevingPeriode.med(uke3).medRenter(0)
-                .medBeløp(TbkBeløp.feil(1000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(300).medUinnkrevdBeløp(700).medSkattBeløp(0))
+                TilbakekrevingPeriode.med(uke3).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(1000))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(300).medUinnkrevdBeløp(700).medSkattBeløp(0))
 
         );
     }
@@ -189,24 +189,24 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, List.of(
-                KgBeløp.feil(2500),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(25),
-                KgBeløp.ytelse(KlasseKode.FPSNDFI).medUtbetBeløp(1500).medTilbakekrevBeløp(1500).medSkattProsent(0))
+                uke1, List.of(
+                        KgBeløp.feil(2500),
+                        KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(25),
+                        KgBeløp.ytelse(KlasseKode.FPSNDFI).medUtbetBeløp(1500).medTilbakekrevBeløp(1500).medSkattProsent(0))
         ), false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            uke1, VilkårsvurderingTestBuilder.VVurdering.forsett()
+                uke1, VilkårsvurderingTestBuilder.VVurdering.forsett()
         ));
 
         flushAndClear();
 
         List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         assertThat(resultat).containsOnly(
-            TilbakekrevingPeriode.med(uke1).medRenter(250)
-                .medBeløp(TbkBeløp.feil(2500))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medUinnkrevdBeløp(0).medSkattBeløp(250))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPSNDFI).medNyttBeløp(0).medUtbetBeløp(1500).medTilbakekrevBeløp(1500).medUinnkrevdBeløp(0).medSkattBeløp(0))
+                TilbakekrevingPeriode.med(uke1).medRenter(250)
+                        .medBeløp(TbkBeløp.feil(2500))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medUinnkrevdBeløp(0).medSkattBeløp(250))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPSNDFI).medNyttBeløp(0).medUtbetBeløp(1500).medTilbakekrevBeløp(1500).medUinnkrevdBeløp(0).medSkattBeløp(0))
         );
     }
 
@@ -216,22 +216,22 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, List.of(
-                KgBeløp.feil(1000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0)
-            ),
-            uke2, List.of(
-                KgBeløp.feil(1000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0)
-            ),
-            uke3, List.of(
-                KgBeløp.feil(1000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0)
-            )
+                uke1, List.of(
+                        KgBeløp.feil(1000),
+                        KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0)
+                ),
+                uke2, List.of(
+                        KgBeløp.feil(1000),
+                        KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0)
+                ),
+                uke3, List.of(
+                        KgBeløp.feil(1000),
+                        KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0)
+                )
         ), false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            Periode.omsluttende(uke1, uke3), VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(1000)
+                Periode.omsluttende(uke1, uke3), VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(1000)
         ));
 
         flushAndClear();
@@ -243,15 +243,15 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         //resterende asserts i testen definerer i hvilken periode den ekstra kronen legges. Det er sannsynligvis ikke viktig.
         assertThat(resultat).containsOnly(
-            TilbakekrevingPeriode.med(uke1).medRenter(0)
-                .medBeløp(TbkBeløp.feil(1000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(334).medUinnkrevdBeløp(666).medSkattBeløp(0)),
-            TilbakekrevingPeriode.med(uke2).medRenter(0)
-                .medBeløp(TbkBeløp.feil(1000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(333).medUinnkrevdBeløp(667).medSkattBeløp(0)),
-            TilbakekrevingPeriode.med(uke3).medRenter(0)
-                .medBeløp(TbkBeløp.feil(1000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(333).medUinnkrevdBeløp(667).medSkattBeløp(0))
+                TilbakekrevingPeriode.med(uke1).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(1000))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(334).medUinnkrevdBeløp(666).medSkattBeløp(0)),
+                TilbakekrevingPeriode.med(uke2).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(1000))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(333).medUinnkrevdBeløp(667).medSkattBeløp(0)),
+                TilbakekrevingPeriode.med(uke3).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(1000))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(333).medUinnkrevdBeløp(667).medSkattBeløp(0))
         );
     }
 
@@ -261,16 +261,16 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            Periode.omsluttende(uke1, uke3), List.of(
-                KgBeløp.feil(1000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000)
-            )
+                Periode.omsluttende(uke1, uke3), List.of(
+                        KgBeløp.feil(1000),
+                        KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000)
+                )
         ), false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            uke1, VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(333),
-            uke2, VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(100),
-            uke3, VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(333)
+                uke1, VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(333),
+                uke2, VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(100),
+                uke3, VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(333)
         ));
 
         flushAndClear();
@@ -282,15 +282,15 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         //resterende asserts i testen definerer i hvilken periode den ekstra kronen legges. Det er sannsynligvis ikke viktig.
         assertThat(resultat).containsOnly(
-            TilbakekrevingPeriode.med(uke1).medRenter(0)
-                .medBeløp(TbkBeløp.feil(333))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(333).medTilbakekrevBeløp(333).medUinnkrevdBeløp(0).medSkattBeløp(0)),
-            TilbakekrevingPeriode.med(uke2).medRenter(0)
-                .medBeløp(TbkBeløp.feil(334))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(334).medTilbakekrevBeløp(100).medUinnkrevdBeløp(234).medSkattBeløp(0)),
-            TilbakekrevingPeriode.med(uke3).medRenter(0)
-                .medBeløp(TbkBeløp.feil(333))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(333).medTilbakekrevBeløp(333).medUinnkrevdBeløp(0).medSkattBeløp(0))
+                TilbakekrevingPeriode.med(uke1).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(333))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(333).medTilbakekrevBeløp(333).medUinnkrevdBeløp(0).medSkattBeløp(0)),
+                TilbakekrevingPeriode.med(uke2).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(334))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(334).medTilbakekrevBeløp(100).medUinnkrevdBeløp(234).medSkattBeløp(0)),
+                TilbakekrevingPeriode.med(uke3).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(333))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(333).medTilbakekrevBeløp(333).medUinnkrevdBeløp(0).medSkattBeløp(0))
         );
     }
 
@@ -300,14 +300,14 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, List.of(
-                KgBeløp.feil(1000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
-            )
+                uke1, List.of(
+                        KgBeløp.feil(1000),
+                        KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
+                )
         ), 100, false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            uke1, VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom()
+                uke1, VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom()
         ));
 
         flushAndClear();
@@ -319,9 +319,9 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         //resterende asserts i testen definerer i hvilken periode den ekstra kronen legges. Det er sannsynligvis ikke viktig.
         assertThat(resultat).containsOnly(
-            TilbakekrevingPeriode.med(uke1).medRenter(0)
-                .medBeløp(TbkBeløp.feil(1000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medUinnkrevdBeløp(0).medSkattBeløp(100)));
+                TilbakekrevingPeriode.med(uke1).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(1000))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medUinnkrevdBeløp(0).medSkattBeløp(100)));
 
     }
 
@@ -331,14 +331,14 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, List.of(
-                KgBeløp.feil(1000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
-            )
+                uke1, List.of(
+                        KgBeløp.feil(1000),
+                        KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
+                )
         ), 100, false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            uke1, VilkårsvurderingTestBuilder.VVurdering.godTro()
+                uke1, VilkårsvurderingTestBuilder.VVurdering.godTro()
         ));
 
         flushAndClear();
@@ -350,9 +350,9 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         //resterende asserts i testen definerer i hvilken periode den ekstra kronen legges. Det er sannsynligvis ikke viktig.
         assertThat(resultat).containsOnly(
-            TilbakekrevingPeriode.med(uke1).medRenter(0)
-                .medBeløp(TbkBeløp.feil(1000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(0).medUinnkrevdBeløp(1000).medSkattBeløp(0)));
+                TilbakekrevingPeriode.med(uke1).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(1000))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(0).medUinnkrevdBeløp(1000).medSkattBeløp(0)));
 
     }
 
@@ -362,14 +362,14 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, List.of(
-                KgBeløp.feil(1000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
-            )
+                uke1, List.of(
+                        KgBeløp.feil(1000),
+                        KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
+                )
         ), 100, false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            uke1, VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(500)
+                uke1, VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(500)
         ));
 
         flushAndClear();
@@ -381,9 +381,9 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         //resterende asserts i testen definerer i hvilken periode den ekstra kronen legges. Det er sannsynligvis ikke viktig.
         assertThat(resultat).containsOnly(
-            TilbakekrevingPeriode.med(uke1).medRenter(0)
-                .medBeløp(TbkBeløp.feil(1000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(500).medUinnkrevdBeløp(500).medSkattBeløp(50)));
+                TilbakekrevingPeriode.med(uke1).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(1000))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(500).medUinnkrevdBeløp(500).medSkattBeløp(50)));
 
     }
 
@@ -396,16 +396,16 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Periode uke3 = Periode.of(LocalDate.of(2019, 8, 24), LocalDate.of(2019, 8, 31));
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            Periode.omsluttende(uke1, uke2, uke3), List.of(
-                KgBeløp.feil(3180).medSkattProsent(BigDecimal.valueOf(9.5041)),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(6380).medTilbakekrevBeløp(3180).medNyttBeløp(3200).medSkattProsent(BigDecimal.valueOf(9.5041))
-            )
+                Periode.omsluttende(uke1, uke2, uke3), List.of(
+                        KgBeløp.feil(3180).medSkattProsent(BigDecimal.valueOf(9.5041)),
+                        KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(6380).medTilbakekrevBeløp(3180).medNyttBeløp(3200).medSkattProsent(BigDecimal.valueOf(9.5041))
+                )
         ), 302, false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            uke1, VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom(),
-            uke2, VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom(),
-            uke3, VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom()
+                uke1, VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom(),
+                uke2, VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom(),
+                uke3, VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom()
         ));
 
         flushAndClear();
@@ -417,15 +417,15 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         //resterende asserts i testen definerer i hvilken periode den ekstra kronen legges. Det er sannsynligvis ikke viktig.
         assertThat(resultat).containsOnly(
-            TilbakekrevingPeriode.med(uke1).medRenter(0)
-                .medBeløp(TbkBeløp.feil(795))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(800).medUtbetBeløp(1595).medTilbakekrevBeløp(795).medUinnkrevdBeløp(0).medSkattBeløp(75)),
-            TilbakekrevingPeriode.med(uke2).medRenter(0)
-                .medBeløp(TbkBeløp.feil(1590))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(1600).medUtbetBeløp(3190).medTilbakekrevBeløp(1590).medUinnkrevdBeløp(0).medSkattBeløp(151)),
-            TilbakekrevingPeriode.med(uke3).medRenter(0)
-                .medBeløp(TbkBeløp.feil(795))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(800).medUtbetBeløp(1595).medTilbakekrevBeløp(795).medUinnkrevdBeløp(0).medSkattBeløp(75)));
+                TilbakekrevingPeriode.med(uke1).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(795))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(800).medUtbetBeløp(1595).medTilbakekrevBeløp(795).medUinnkrevdBeløp(0).medSkattBeløp(75)),
+                TilbakekrevingPeriode.med(uke2).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(1590))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(1600).medUtbetBeløp(3190).medTilbakekrevBeløp(1590).medUinnkrevdBeløp(0).medSkattBeløp(151)),
+                TilbakekrevingPeriode.med(uke3).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(795))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(800).medUtbetBeløp(1595).medTilbakekrevBeløp(795).medUinnkrevdBeløp(0).medSkattBeløp(75)));
     }
 
     @Test
@@ -438,31 +438,31 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Periode mars = Periode.of(LocalDate.of(2019, 3, 1), LocalDate.of(2019, 3, 31));
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            janDel1, List.of(
-                KgBeløp.feil(2).medSkattProsent(BigDecimal.valueOf(50)),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(2).medTilbakekrevBeløp(2).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
-            ),
-            janDel2, List.of(
-                KgBeløp.feil(2).medSkattProsent(BigDecimal.valueOf(50)),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(2).medTilbakekrevBeløp(2).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
-            ),
-            feb, List.of(
-                KgBeløp.feil(1).medSkattProsent(BigDecimal.valueOf(50)),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1).medTilbakekrevBeløp(1).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
-            ),
-            mars, List.of(
-                KgBeløp.feil(1).medSkattProsent(BigDecimal.valueOf(50)),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1).medTilbakekrevBeløp(1).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
-            )),
-            Map.of(
-                janDel1, 2,
-                janDel2, 2,
-                feb, 1,
-                mars, 1
-            ));
+                        janDel1, List.of(
+                                KgBeløp.feil(2).medSkattProsent(BigDecimal.valueOf(50)),
+                                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(2).medTilbakekrevBeløp(2).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
+                        ),
+                        janDel2, List.of(
+                                KgBeløp.feil(2).medSkattProsent(BigDecimal.valueOf(50)),
+                                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(2).medTilbakekrevBeløp(2).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
+                        ),
+                        feb, List.of(
+                                KgBeløp.feil(1).medSkattProsent(BigDecimal.valueOf(50)),
+                                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1).medTilbakekrevBeløp(1).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
+                        ),
+                        mars, List.of(
+                                KgBeløp.feil(1).medSkattProsent(BigDecimal.valueOf(50)),
+                                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1).medTilbakekrevBeløp(1).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
+                        )),
+                Map.of(
+                        janDel1, 2,
+                        janDel2, 2,
+                        feb, 1,
+                        mars, 1
+                ));
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            Periode.omsluttende(janDel1, mars), VilkårsvurderingTestBuilder.VVurdering.forsett()
+                Periode.omsluttende(janDel1, mars), VilkårsvurderingTestBuilder.VVurdering.forsett()
         ));
 
         flushAndClear();
@@ -473,26 +473,26 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         //det er viktig at det kommer 1 kr skatt pr periode i januar,
         //og 1 krone i februar eller i mars.
         assertThat(resultat).containsOnly(
-            TilbakekrevingPeriode.med(janDel1).medRenter(0)
-                .medBeløp(TbkBeløp.feil(2))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2).medTilbakekrevBeløp(2).medUinnkrevdBeløp(0).medSkattBeløp(1)),
-            TilbakekrevingPeriode.med(janDel2).medRenter(0)
-                .medBeløp(TbkBeløp.feil(2))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2).medTilbakekrevBeløp(2).medUinnkrevdBeløp(0).medSkattBeløp(1)),
-            TilbakekrevingPeriode.med(feb).medRenter(0)
-                .medBeløp(TbkBeløp.feil(1))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1).medTilbakekrevBeløp(1).medUinnkrevdBeløp(0).medSkattBeløp(1)),
-            TilbakekrevingPeriode.med(mars).medRenter(0)
-                .medBeløp(TbkBeløp.feil(1))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1).medTilbakekrevBeløp(1).medUinnkrevdBeløp(0).medSkattBeløp(0)));
+                TilbakekrevingPeriode.med(janDel1).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(2))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2).medTilbakekrevBeløp(2).medUinnkrevdBeløp(0).medSkattBeløp(1)),
+                TilbakekrevingPeriode.med(janDel2).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(2))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2).medTilbakekrevBeløp(2).medUinnkrevdBeløp(0).medSkattBeløp(1)),
+                TilbakekrevingPeriode.med(feb).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(1))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1).medTilbakekrevBeløp(1).medUinnkrevdBeløp(0).medSkattBeløp(1)),
+                TilbakekrevingPeriode.med(mars).medRenter(0)
+                        .medBeløp(TbkBeløp.feil(1))
+                        .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1).medTilbakekrevBeløp(1).medUinnkrevdBeløp(0).medSkattBeløp(0)));
     }
 
 
     static KravgrunnlagTestBuilder.KgPeriode grunnlagPeriode(String periodeTekst, int utbetalt, int nytt, int tilbakekreves, String skatteprosent, int maxSkattMnd) {
         Periode periode = parsePeriode(periodeTekst);
         List<KgBeløp> kgBeløp = List.of(
-            KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(utbetalt).medNyttBeløp(nytt).medTilbakekrevBeløp(tilbakekreves).medSkattProsent(new BigDecimal(skatteprosent)),
-            KgBeløp.feil(tilbakekreves).medSkattProsent(new BigDecimal(skatteprosent)));
+                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(utbetalt).medNyttBeløp(nytt).medTilbakekrevBeløp(tilbakekreves).medSkattProsent(new BigDecimal(skatteprosent)),
+                KgBeløp.feil(tilbakekreves).medSkattProsent(new BigDecimal(skatteprosent)));
         return new KravgrunnlagTestBuilder.KgPeriode(periode, kgBeløp, BigDecimal.valueOf(maxSkattMnd));
     }
 
@@ -510,24 +510,24 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
         List<KravgrunnlagTestBuilder.KgPeriode> kgData = Arrays.asList(
-            grunnlagPeriode("2019-04-23,2019-04-30", 5526, 3690, 1836, "21.9869", 404),
-            grunnlagPeriode("2019-05-01,2019-05-15", 10131, 6765, 3366, "21.9987", 1548),
-            grunnlagPeriode("2019-05-16,2019-05-31", 11052, 7380, 3672, "21.9987", 1548),
-            grunnlagPeriode("2019-06-01,2019-06-26", 16578, 11070, 5508, "21.9978", 1346),
-            grunnlagPeriode("2019-06-27,2019-06-30", 1842, 1230, 612, "21.9978", 1346),
-            grunnlagPeriode("2019-07-01,2019-07-31", 21183, 14145, 7038, "21.9987", 1548),
-            grunnlagPeriode("2019-08-01,2019-08-31", 20262, 13530, 6732, "21.9968", 1481),
-            grunnlagPeriode("2019-09-01,2019-09-25", 16578, 11070, 5508, "21.9998", 1414),
-            grunnlagPeriode("2019-09-26,2019-09-30", 2763, 1845, 918, "21.9998", 1414),
-            grunnlagPeriode("2019-10-01,2019-10-31", 21183, 14145, 7038, "21.9987", 1548),
-            grunnlagPeriode("2019-11-01,2019-11-30", 19341, 12915, 6426, "21.9998", 1414),
-            grunnlagPeriode("2019-12-01,2019-12-31", 20262, 13530, 6732, "10.9959", 740));
+                grunnlagPeriode("2019-04-23,2019-04-30", 5526, 3690, 1836, "21.9869", 404),
+                grunnlagPeriode("2019-05-01,2019-05-15", 10131, 6765, 3366, "21.9987", 1548),
+                grunnlagPeriode("2019-05-16,2019-05-31", 11052, 7380, 3672, "21.9987", 1548),
+                grunnlagPeriode("2019-06-01,2019-06-26", 16578, 11070, 5508, "21.9978", 1346),
+                grunnlagPeriode("2019-06-27,2019-06-30", 1842, 1230, 612, "21.9978", 1346),
+                grunnlagPeriode("2019-07-01,2019-07-31", 21183, 14145, 7038, "21.9987", 1548),
+                grunnlagPeriode("2019-08-01,2019-08-31", 20262, 13530, 6732, "21.9968", 1481),
+                grunnlagPeriode("2019-09-01,2019-09-25", 16578, 11070, 5508, "21.9998", 1414),
+                grunnlagPeriode("2019-09-26,2019-09-30", 2763, 1845, 918, "21.9998", 1414),
+                grunnlagPeriode("2019-10-01,2019-10-31", 21183, 14145, 7038, "21.9987", 1548),
+                grunnlagPeriode("2019-11-01,2019-11-30", 19341, 12915, 6426, "21.9998", 1414),
+                grunnlagPeriode("2019-12-01,2019-12-31", 20262, 13530, 6732, "10.9959", 740));
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, kgData);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            parsePeriode("2019-04-23,2019-05-08"), VilkårsvurderingTestBuilder.VVurdering.grovtUaktsom(77),
-            parsePeriode("2019-05-09,2019-12-31"), VilkårsvurderingTestBuilder.VVurdering.forsett())
+                parsePeriode("2019-04-23,2019-05-08"), VilkårsvurderingTestBuilder.VVurdering.grovtUaktsom(77),
+                parsePeriode("2019-05-09,2019-12-31"), VilkårsvurderingTestBuilder.VVurdering.forsett())
         );
 
         flushAndClear();
@@ -536,26 +536,26 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         //fordeling av skatt mellom perioder er ikke kritisk, men sum pr måned MÅ være under grensen for måneden
         assertThat(resultat).containsOnly(
-            tilbakekrevingPeriode("2019-04-23,2019-04-30", 5526, 3690, 1413, 0, 310),
-            tilbakekrevingPeriode("2019-05-01,2019-05-08", 5526, 3690, 1414, 0, 311),
-            tilbakekrevingPeriode("2019-05-09,2019-05-15", 4605, 3075, 1530, 153, 337),
-            tilbakekrevingPeriode("2019-05-16,2019-05-31", 11052, 7380, 3672, 367, 808),
-            tilbakekrevingPeriode("2019-06-01,2019-06-26", 16578, 11070, 5508, 551, 1212),
-            tilbakekrevingPeriode("2019-06-27,2019-06-30", 1842, 1230, 612, 61, 134),
-            tilbakekrevingPeriode("2019-07-01,2019-07-31", 21183, 14145, 7038, 704, 1548),
-            tilbakekrevingPeriode("2019-08-01,2019-08-31", 20262, 13530, 6732, 673, 1481),
-            tilbakekrevingPeriode("2019-09-01,2019-09-25", 16578, 11070, 5508, 551, 1212),
-            tilbakekrevingPeriode("2019-09-26,2019-09-30", 2763, 1845, 918, 92, 202),
-            tilbakekrevingPeriode("2019-10-01,2019-10-31", 21183, 14145, 7038, 704, 1548),
-            tilbakekrevingPeriode("2019-11-01,2019-11-30", 19341, 12915, 6426, 643, 1413),
-            tilbakekrevingPeriode("2019-12-01,2019-12-31", 20262, 13530, 6732, 673, 740));
+                tilbakekrevingPeriode("2019-04-23,2019-04-30", 5526, 3690, 1413, 0, 310),
+                tilbakekrevingPeriode("2019-05-01,2019-05-08", 5526, 3690, 1414, 0, 311),
+                tilbakekrevingPeriode("2019-05-09,2019-05-15", 4605, 3075, 1530, 153, 337),
+                tilbakekrevingPeriode("2019-05-16,2019-05-31", 11052, 7380, 3672, 367, 808),
+                tilbakekrevingPeriode("2019-06-01,2019-06-26", 16578, 11070, 5508, 551, 1212),
+                tilbakekrevingPeriode("2019-06-27,2019-06-30", 1842, 1230, 612, 61, 134),
+                tilbakekrevingPeriode("2019-07-01,2019-07-31", 21183, 14145, 7038, 704, 1548),
+                tilbakekrevingPeriode("2019-08-01,2019-08-31", 20262, 13530, 6732, 673, 1481),
+                tilbakekrevingPeriode("2019-09-01,2019-09-25", 16578, 11070, 5508, 551, 1212),
+                tilbakekrevingPeriode("2019-09-26,2019-09-30", 2763, 1845, 918, 92, 202),
+                tilbakekrevingPeriode("2019-10-01,2019-10-31", 21183, 14145, 7038, 704, 1548),
+                tilbakekrevingPeriode("2019-11-01,2019-11-30", 19341, 12915, 6426, 643, 1413),
+                tilbakekrevingPeriode("2019-12-01,2019-12-31", 20262, 13530, 6732, 673, 740));
     }
 
     static TilbakekrevingPeriode tilbakekrevingPeriode(String periode, int utbetalt, int nytt, int tilbakekreves, int renter, int skattbeløp) {
         Periode p = parsePeriode(periode);
         return TilbakekrevingPeriode.med(p).medRenter(renter)
-            .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(utbetalt).medNyttBeløp(nytt).medTilbakekrevBeløp(tilbakekreves).medUinnkrevdBeløp(utbetalt - nytt - tilbakekreves).medSkattBeløp(skattbeløp))
-            .medBeløp(TbkBeløp.feil(utbetalt - nytt));
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(utbetalt).medNyttBeløp(nytt).medTilbakekrevBeløp(tilbakekreves).medUinnkrevdBeløp(utbetalt - nytt - tilbakekreves).medSkattBeløp(skattbeløp))
+                .medBeløp(TbkBeløp.feil(utbetalt - nytt));
     }
 
     @Test
@@ -564,13 +564,13 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1og2, List.of(
-                KgBeløp.feil(2500),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000))
+                uke1og2, List.of(
+                        KgBeløp.feil(2500),
+                        KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000))
         ), false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            uke1, VilkårsvurderingTestBuilder.VVurdering.forsett()
+                uke1, VilkårsvurderingTestBuilder.VVurdering.forsett()
         ));
 
         flushAndClear();
@@ -578,8 +578,8 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         //TODO det bør helt klart feile tidligere i løypa istedet for på dette punktet. Legger validering her nå for å
         // ha ekstra sikring mot feil
         assertThatThrownBy(() -> beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag))
-            .isInstanceOf(TekniskException.class)
-            .hasMessageContaining("har 10 virkedager, forventer en-til-en, men ovelapper mot beregningsresultat med 5 dager");
+                .isInstanceOf(TekniskException.class)
+                .hasMessageContaining("har 10 virkedager, forventer en-til-en, men ovelapper mot beregningsresultat med 5 dager");
     }
 
     @Test
@@ -588,13 +588,13 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, List.of(
-                KgBeløp.feil(2500),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000))
+                uke1, List.of(
+                        KgBeløp.feil(2500),
+                        KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000))
         ), false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            uke1og2, VilkårsvurderingTestBuilder.VVurdering.forsett()
+                uke1og2, VilkårsvurderingTestBuilder.VVurdering.forsett()
         ));
 
         flushAndClear();
@@ -602,8 +602,8 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         //TODO det bør helt klart feile tidligere i løypa istedet for på dette punktet. Legger validering her nå for å
         // ha ekstra sikring mot feil
         assertThatThrownBy(() -> beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag))
-            .isInstanceOf(TekniskException.class)
-            .hasMessageContaining("har 10 virkedager, forventer en-til-en, men ovelapper mot kravgrunnlag med 5 dager");
+                .isInstanceOf(TekniskException.class)
+                .hasMessageContaining("har 10 virkedager, forventer en-til-en, men ovelapper mot kravgrunnlag med 5 dager");
     }
 
     @Test
@@ -614,29 +614,29 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         var dagsPeriodeHelg = Periode.of(dag, dag);
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            dagsPeriodeHelg, List.of(
-                KgBeløp.feil(84720),
-                KgBeløp.ytelse(KlasseKode.FPENFOD_OP).medUtbetBeløp(84720).medTilbakekrevBeløp(84720))
-            ),
-            true);
+                        dagsPeriodeHelg, List.of(
+                                KgBeløp.feil(84720),
+                                KgBeløp.ytelse(KlasseKode.FPENFOD_OP).medUtbetBeløp(84720).medTilbakekrevBeløp(84720))
+                ),
+                true);
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            dagsPeriodeHelg, VilkårsvurderingTestBuilder.VVurdering.forsett()
+                dagsPeriodeHelg, VilkårsvurderingTestBuilder.VVurdering.forsett()
         ));
 
         flushAndClear();
 
         List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         assertThat(resultat).containsOnly(TilbakekrevingPeriode.med(dagsPeriodeHelg).medRenter(8472)
-            .medBeløp(TbkBeløp.feil(84720))
-            .medBeløp(TbkBeløp.ytelse(KlasseKode.FPENFOD_OP).medNyttBeløp(0).medUtbetBeløp(84720).medTilbakekrevBeløp(84720).medUinnkrevdBeløp(0).medSkattBeløp(0)));
+                .medBeløp(TbkBeløp.feil(84720))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPENFOD_OP).medNyttBeløp(0).medUtbetBeløp(84720).medTilbakekrevBeløp(84720).medUinnkrevdBeløp(0).medSkattBeløp(0)));
     }
 
     private static BigDecimal finSumAv(Collection<TilbakekrevingPeriode> perioder, Function<TilbakekrevingBeløp, BigDecimal> hva, KlasseType klasseType) {
         return perioder.stream()
-            .flatMap(p -> p.getBeløp().stream())
-            .filter(b -> b.getKlasseType() == klasseType)
-            .map(hva)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .flatMap(p -> p.getBeløp().stream())
+                .filter(b -> b.getKlasseType() == klasseType)
+                .map(hva)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private void flushAndClear() {

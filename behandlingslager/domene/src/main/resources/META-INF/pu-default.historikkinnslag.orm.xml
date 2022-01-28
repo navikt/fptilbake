@@ -7,8 +7,10 @@
 
     <sequence-generator name="SEQ_HISTORIKKINNSLAG" allocation-size="50" sequence-name="SEQ_HISTORIKKINNSLAG"/>
     <sequence-generator name="SEQ_HISTORIKKINNSLAG_DEL" allocation-size="50" sequence-name="SEQ_HISTORIKKINNSLAG_DEL"/>
-    <sequence-generator name="SEQ_HISTORIKKINNSLAG_DOK_LINK" allocation-size="50" sequence-name="SEQ_HISTORIKKINNSLAG_DOK_LINK"/>
-    <sequence-generator name="SEQ_HISTORIKKINNSLAG_FELT" allocation-size="50" sequence-name="SEQ_HISTORIKKINNSLAG_FELT"/>
+    <sequence-generator name="SEQ_HISTORIKKINNSLAG_DOK_LINK" allocation-size="50"
+                        sequence-name="SEQ_HISTORIKKINNSLAG_DOK_LINK"/>
+    <sequence-generator name="SEQ_HISTORIKKINNSLAG_FELT" allocation-size="50"
+                        sequence-name="SEQ_HISTORIKKINNSLAG_FELT"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel"/>

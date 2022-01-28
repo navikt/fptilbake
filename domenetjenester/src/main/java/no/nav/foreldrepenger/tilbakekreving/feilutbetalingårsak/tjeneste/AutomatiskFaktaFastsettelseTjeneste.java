@@ -36,8 +36,8 @@ public class AutomatiskFaktaFastsettelseTjeneste {
         HendelseTypeMedUndertypeDto hendelseTypeMedUndertypeDto = setHendelseTypeOgHendelseUndertype(behandling);
 
         List<FaktaFeilutbetalingDto> faktaFeilutbetalinger = logiskePerioder.stream()
-            .map(periode -> new FaktaFeilutbetalingDto(periode.getFom(), periode.getTom(), hendelseTypeMedUndertypeDto))
-            .collect(Collectors.toList());
+                .map(periode -> new FaktaFeilutbetalingDto(periode.getFom(), periode.getTom(), hendelseTypeMedUndertypeDto))
+                .collect(Collectors.toList());
         faktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(behandling, faktaFeilutbetalinger, begrunnelse);
     }
 

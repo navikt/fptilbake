@@ -10,10 +10,10 @@ public class DokprodTilHtmlTest {
     @Test
     public void skal_konvertere_overskrift_og_avsnitt() {
         String resultat = DokprodTilHtml.dokprodInnholdTilHtml(
-            "_Overskrift\nFørste avsnitt\n\nAndre avsnitt\n\nTredje avsnitt"
+                "_Overskrift\nFørste avsnitt\n\nAndre avsnitt\n\nTredje avsnitt"
         );
         Assertions.assertThat(resultat).isEqualTo(
-            "<div class=\"samepage\"><h2>Overskrift</h2><p>Første avsnitt</p></div><p>Andre avsnitt</p><p>Tredje avsnitt</p>"
+                "<div class=\"samepage\"><h2>Overskrift</h2><p>Første avsnitt</p></div><p>Andre avsnitt</p><p>Tredje avsnitt</p>"
         );
     }
 
@@ -41,10 +41,10 @@ public class DokprodTilHtmlTest {
     public void skal_konvertere_halvhjertede_avsnitt() {
         //halvhjertet avsnitt er hvor det er tatt kun ett linjeskift.
         String resultat = DokprodTilHtml.dokprodInnholdTilHtml(
-            "Foo\nBar"
+                "Foo\nBar"
         );
         Assertions.assertThat(resultat).isEqualTo(
-            "<p>Foo<br/>Bar</p>"
+                "<p>Foo<br/>Bar</p>"
         );
     }
 
@@ -52,10 +52,10 @@ public class DokprodTilHtmlTest {
     public void skal_spesialbehandle_hilsen() {
         //halvhjertet avsnitt er hvor det er tatt kun ett linjeskift.
         String resultat = DokprodTilHtml.dokprodInnholdTilHtml(
-            "Med vennlig hilsen\nNAV Familie- og pensjonsytelser"
+                "Med vennlig hilsen\nNAV Familie- og pensjonsytelser"
         );
         Assertions.assertThat(resultat).isEqualTo(
-            "<p class=\"hilsen\">Med vennlig hilsen<br/>NAV Familie- og pensjonsytelser</p>"
+                "<p class=\"hilsen\">Med vennlig hilsen<br/>NAV Familie- og pensjonsytelser</p>"
         );
     }
 }

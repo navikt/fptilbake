@@ -81,8 +81,8 @@ public class FagsakProsessTask extends BaseEntitet {
         }
         FagsakProsessTask other = (FagsakProsessTask) obj;
         return Objects.equals(prosessTaskId, other.prosessTaskId)
-            && Objects.equals(fagsakId, other.fagsakId)
-            && Objects.equals(behandlingId, other.behandlingId);
+                && Objects.equals(fagsakId, other.fagsakId)
+                && Objects.equals(behandlingId, other.behandlingId);
     }
 
     @Override
@@ -93,10 +93,10 @@ public class FagsakProsessTask extends BaseEntitet {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "<" //$NON-NLS-1$
-            + "prosessTask=" + prosessTaskId //$NON-NLS-1$
-            + ", fagsak=" + fagsakId //$NON-NLS-1$
-            + (behandlingId == null ? "" : ", behandling=" + behandlingId) //$NON-NLS-1$ //$NON-NLS-2$
-            + (gruppeSekvensNr == null ? "" : ", gruppeSekvensNr=" + gruppeSekvensNr)//$NON-NLS-1$ //$NON-NLS-2$
-            + ">"; //$NON-NLS-1$
+                + "prosessTask=" + prosessTaskId //$NON-NLS-1$
+                + ", fagsak=" + fagsakId //$NON-NLS-1$
+                + (behandlingId == null ? "" : ", behandling=" + behandlingId) //$NON-NLS-1$ //$NON-NLS-2$
+                + (gruppeSekvensNr == null ? "" : ", gruppeSekvensNr=" + gruppeSekvensNr)//$NON-NLS-1$ //$NON-NLS-2$
+                + ">"; //$NON-NLS-1$
     }
 }

@@ -62,26 +62,27 @@ public class HenleggBehandlingTjeneste {
     }
 
     public boolean kanHenleggeBehandlingManuelt(Behandling behandling) {
-        if(BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType())){
+        if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType())) {
             return true;
-        }else return !erBehandlingOpprettetAutomatiskEtterBestemteDager(behandling) && !grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId());
+        } else
+            return !erBehandlingOpprettetAutomatiskEtterBestemteDager(behandling) && !grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId());
     }
 
     private boolean erBehandlingOpprettetAutomatiskEtterBestemteDager(Behandling behandling) {
         return !behandling.isManueltOpprettet() && behandling.getOpprettetTidspunkt().isAfter(
-            LocalDate.now().atStartOfDay().minusDays(OPPRETTELSE_DAGER_BEGRENSNING));
+                LocalDate.now().atStartOfDay().minusDays(OPPRETTELSE_DAGER_BEGRENSNING));
     }
 
     private boolean erBehandlingOpprettetAutomatiskFørBestemteDager(Behandling behandling) {
         return !behandling.isManueltOpprettet() && behandling.getOpprettetTidspunkt().isBefore(
-            LocalDate.now().atStartOfDay().minusDays(OPPRETTELSE_DAGER_BEGRENSNING));
+                LocalDate.now().atStartOfDay().minusDays(OPPRETTELSE_DAGER_BEGRENSNING));
     }
 
     public void henleggBehandlingManuelt(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse, String fritekst) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         if (BehandlingType.TILBAKEKREVING.equals(behandling.getType()) &&
-            (grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId()) &&
-            !erBehandlingOpprettetAutomatiskFørBestemteDager(behandling))) {
+                (grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId()) &&
+                        !erBehandlingOpprettetAutomatiskFørBestemteDager(behandling))) {
             throw BehandlingFeil.kanIkkeHenleggeBehandling(behandlingId);
         }
         doHenleggBehandling(behandlingId, årsakKode, begrunnelse, fritekst);

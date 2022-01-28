@@ -45,8 +45,8 @@ class TilbakekrevingBeregnerVilkår {
         resulat.setManueltSattTilbakekrevingsbeløp(manueltBeløp);
 
         BigDecimal beløpUtenRenter = ignoreresPgaLavtBeløp
-            ? BigDecimal.ZERO
-            : finnBeløpUtenRenter(delresultat.getFeilutbetaltBeløp(), andel, manueltBeløp);
+                ? BigDecimal.ZERO
+                : finnBeløpUtenRenter(delresultat.getFeilutbetaltBeløp(), andel, manueltBeløp);
         BigDecimal rentebeløp = beregnRentebeløp(beløpUtenRenter, renter);
         BigDecimal tilbakekrevingBeløp = beløpUtenRenter.add(rentebeløp);
         BigDecimal skattBeløp = beregnSkattBeløp(periode, beløpUtenRenter, perioderMedSkattProsent).setScale(0, RoundingMode.DOWN); //skatt beregnet alltid uten renter
@@ -92,7 +92,7 @@ class TilbakekrevingBeregnerVilkår {
         if (aktsomhet != null) {
             boolean erForsett = Aktsomhet.FORSETT.equals(aktsomhet.getAktsomhet());
             return (erForsett && (aktsomhet.getIleggRenter() == null || aktsomhet.getIleggRenter())) ||
-                (aktsomhet.getIleggRenter() != null && aktsomhet.getIleggRenter());
+                    (aktsomhet.getIleggRenter() != null && aktsomhet.getIleggRenter());
         }
         return false;
     }

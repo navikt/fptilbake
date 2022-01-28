@@ -52,9 +52,9 @@ public interface CustomHelpers {
             Object condition_variable = model.get("__condition_variable");
 
             int antallTreff = konstanter.stream()
-                .mapToInt(k -> k.equals(condition_variable) ? 1 : 0)
-                .reduce(Integer::sum)
-                .orElseThrow();
+                    .mapToInt(k -> k.equals(condition_variable) ? 1 : 0)
+                    .reduce(Integer::sum)
+                    .orElseThrow();
 
             if (antallTreff > 0) {
                 Integer kumulativtAntallTreff = (Integer) model.get("__condition_fulfilled");

@@ -18,9 +18,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum HistorikkBegrunnelseType implements Kodeverdi {
 
-    SAKSBEH_START_PA_NYTT("SAKSBEH_START_PA_NYTT","Saksbehandling starter på nytt"),
-    BEH_STARTET_PA_NYTT("BEH_STARTET_PA_NYTT","Behandling startet på nytt"),
-    UDEFINIERT("-","Ikke definert");
+    SAKSBEH_START_PA_NYTT("SAKSBEH_START_PA_NYTT", "Saksbehandling starter på nytt"),
+    BEH_STARTET_PA_NYTT("BEH_STARTET_PA_NYTT", "Behandling startet på nytt"),
+    UDEFINIERT("-", "Ikke definert");
 
     public static final String KODEVERK = "HISTORIKK_BEGRUNNELSE_TYPE"; //$NON-NLS-1$
     private static final Map<String, HistorikkBegrunnelseType> KODER = new LinkedHashMap<>();

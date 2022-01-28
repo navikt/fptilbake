@@ -104,11 +104,11 @@ public class RestApiAbacTest {
             fail(klasse.getSimpleName() + "." + metode.getName() + " Tom property @" + annotation.getClass().getSimpleName());
         }
         List<String> godkjenteProperties = List.of(
-            AbacProperty.APPLIKASJON,
-            AbacProperty.BATCH,
-            AbacProperty.DRIFT,
-            AbacProperty.FAGSAK,
-            AbacProperty.VENTEFRIST
+                AbacProperty.APPLIKASJON,
+                AbacProperty.BATCH,
+                AbacProperty.DRIFT,
+                AbacProperty.FAGSAK,
+                AbacProperty.VENTEFRIST
         );
         if (!annotation.resource().equals(FPTilbakeBeskyttetRessursAttributt.DUMMY)) {
             fail(klasse.getSimpleName() + "." + metode.getName() + " Skal ikke bruke ressurs, bruk property i @" + annotation.getClass().getSimpleName());
@@ -121,7 +121,7 @@ public class RestApiAbacTest {
         }
         if (annotation.action() == BeskyttetRessursActionAttributt.DUMMY) {
             fail(klasse.getSimpleName() + "." + metode.getName() + " Ikke bruk DUMMY-verdi for "
-                + BeskyttetRessursActionAttributt.class.getSimpleName());
+                    + BeskyttetRessursActionAttributt.class.getSimpleName());
         }
     }
 
@@ -137,6 +137,7 @@ public class RestApiAbacTest {
         IgnorerteInputTyper(String className) {
             this.className = className;
         }
+
         static boolean ignore(Class<?> klasse) {
             return Arrays.stream(IgnorerteInputTyper.values()).anyMatch(e -> e.className.equals(klasse.getName()));
         }

@@ -17,8 +17,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 public class VedtakHjemmel {
 
     private static List<VilkårResultat> VILKÅRRESULTAT_MED_FORSETT_ALLTID_RENTER = Arrays.asList(
-        VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
-        VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER
+            VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
+            VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER
     );
 
     private VedtakHjemmel() {
@@ -54,7 +54,7 @@ public class VedtakHjemmel {
         if (EffektForBruker.ENDRET_TIL_GUNST_FOR_BRUKER.equals(effektForBruker)) {
             hjemler.add(Hjemler.FORVALTNING_35_A);
         }
-        if (EffektForBruker.ENDRET_TIL_UGUNST_FOR_BRUKER.equals(effektForBruker)){
+        if (EffektForBruker.ENDRET_TIL_UGUNST_FOR_BRUKER.equals(effektForBruker)) {
             hjemler.add(Hjemler.FORVALTNING_35_C);
         }
 
@@ -63,7 +63,7 @@ public class VedtakHjemmel {
 
     private static boolean erRenterBenyttet(List<VilkårVurderingPeriodeEntitet> vilkårPerioder) {
         return vilkårPerioder.stream().anyMatch(v -> (v.getAktsomhet() != null && Boolean.TRUE.equals(v.getAktsomhet().getIleggRenter()))
-            || erForsettOgAlltidRenter(v));
+                || erForsettOgAlltidRenter(v));
     }
 
     private static boolean erForsettOgAlltidRenter(VilkårVurderingPeriodeEntitet v) {
@@ -87,7 +87,7 @@ public class VedtakHjemmel {
                                Språkkode lokale) {
         StringBuilder builder = new StringBuilder();
         boolean første = true;
-        for (int i = 0 ; i < elementer.size() ; i++) {
+        for (int i = 0; i < elementer.size(); i++) {
             Hjemler element = elementer.get(i);
             boolean siste = i == (elementer.size() - 1);
             if (!første) {

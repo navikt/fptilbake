@@ -31,7 +31,7 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 /**
  * Brukes for å generere vilkårtekster for perioder. Resultatet er tekster med markup, som med "Insert markup"-macroen
  * kan limes inn i Confluence, og dermed bli formattert tekst.
- *
+ * <p>
  * Confluence:
  * FP/SVP/ES: https://confluence.adeo.no/display/TVF/Generert+dokumentasjon
  * FRISINN: https://confluence.adeo.no/display/MODNAV/Generert+dokumentasjon
@@ -43,22 +43,22 @@ public class DokumentasjonGeneratorPeriodeVilkår {
     private final LocalDate FORELDELSESFRIST = LocalDate.of(2019, 12, 1);
     private final LocalDate OPPDAGELSES_DATO = LocalDate.of(2019, 3, 1);
 
-    private static VilkårResultat[] vilkårResultat = new VilkårResultat[] {
-        VilkårResultat.FORSTO_BURDE_FORSTÅTT,
-        VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
-        VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+    private static VilkårResultat[] vilkårResultat = new VilkårResultat[]{
+            VilkårResultat.FORSTO_BURDE_FORSTÅTT,
+            VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
+            VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
     };
-    private static ForeldelseVurderingType[] foreldelseVurderinger = new ForeldelseVurderingType[] {
-        ForeldelseVurderingType.IKKE_VURDERT,
-        ForeldelseVurderingType.IKKE_FORELDET,
-        ForeldelseVurderingType.TILLEGGSFRIST
+    private static ForeldelseVurderingType[] foreldelseVurderinger = new ForeldelseVurderingType[]{
+            ForeldelseVurderingType.IKKE_VURDERT,
+            ForeldelseVurderingType.IKKE_FORELDET,
+            ForeldelseVurderingType.TILLEGGSFRIST
     };
-    private static Aktsomhet[] aktsomheter = new Aktsomhet[] {
-        Aktsomhet.SIMPEL_UAKTSOM,
-        Aktsomhet.GROVT_UAKTSOM,
-        Aktsomhet.FORSETT
+    private static Aktsomhet[] aktsomheter = new Aktsomhet[]{
+            Aktsomhet.SIMPEL_UAKTSOM,
+            Aktsomhet.GROVT_UAKTSOM,
+            Aktsomhet.FORSETT
     };
-    private static boolean[] trueFalse = new boolean[] { true, false};
+    private static boolean[] trueFalse = new boolean[]{true, false};
 
     @Test
     public void generer_vilkår_for_fp() {
@@ -128,7 +128,7 @@ public class DokumentasjonGeneratorPeriodeVilkår {
 
     private void lagResultatOgVurderingTekster(FagsakYtelseType ytelsetype, Språkkode språkkode, VilkårResultat resultat, Vurdering vurdering, ForeldelseVurderingType foreldelsevurdering, boolean fritekst, boolean pengerIBehold, boolean lavtBeløp) {
         HbVedtaksbrevPeriodeOgFelles periodeOgFelles = lagPeriodeOgFelles(ytelsetype, språkkode, resultat,
-            vurdering, lavtBeløp, foreldelsevurdering, fritekst, pengerIBehold);
+                vurdering, lavtBeløp, foreldelsevurdering, fritekst, pengerIBehold);
         String vilkårTekst = TekstformatererVedtaksbrev.lagVilkårTekst(periodeOgFelles);
         String overskrift = overskrift(resultat, vurdering, lavtBeløp, fritekst, pengerIBehold, foreldelsevurdering);
         String prettyprint = prettyprint(vilkårTekst, overskrift);
@@ -146,45 +146,45 @@ public class DokumentasjonGeneratorPeriodeVilkår {
                                                             boolean fritekst,
                                                             boolean pengerIBehold) {
         HbVedtaksbrevFelles.Builder fellesBuilder = HbVedtaksbrevFelles.builder()
-            .medSak(HbSak.build()
-                .medYtelsetype(ytelsetype)
-                .medAntallBarn(1)
-                .medErFødsel(true)
-                .medDatoFagsakvedtak(LocalDate.now())
-                .build())
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .medFireRettsgebyr(BigDecimal.valueOf(4321))
-                .medKlagefristUker(4)
-                .medHalvtGrunnbeløp(BigDecimal.ZERO)
-                .build())
-            .medVedtakResultat(HbTotalresultat.builder()
-                .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
-                .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
-                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.ZERO)
-                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
-                .medTotaltRentebeløp(BigDecimal.ZERO)
-                .build())
-            .medLovhjemmelVedtak("ikke relevant for testen")
-            .medSøker(HbPerson.builder()
-                .medNavn("Ikke relevant")
-                .build())
-            .medSpråkkode(språkkode);
+                .medSak(HbSak.build()
+                        .medYtelsetype(ytelsetype)
+                        .medAntallBarn(1)
+                        .medErFødsel(true)
+                        .medDatoFagsakvedtak(LocalDate.now())
+                        .build())
+                .medKonfigurasjon(HbKonfigurasjon.builder()
+                        .medFireRettsgebyr(BigDecimal.valueOf(4321))
+                        .medKlagefristUker(4)
+                        .medHalvtGrunnbeløp(BigDecimal.ZERO)
+                        .build())
+                .medVedtakResultat(HbTotalresultat.builder()
+                        .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+                        .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
+                        .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.ZERO)
+                        .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
+                        .medTotaltRentebeløp(BigDecimal.ZERO)
+                        .build())
+                .medLovhjemmelVedtak("ikke relevant for testen")
+                .medSøker(HbPerson.builder()
+                        .medNavn("Ikke relevant")
+                        .build())
+                .medSpråkkode(språkkode);
 
         HbVurderinger.Builder vurderingerBuilder = HbVurderinger.builder()
-            .medForeldelsevurdering(foreldelsevurdering)
-            .medAktsomhetResultat(vurdering)
-            .medUnntasInnkrevingPgaLavtBeløp(lavtBeløp);
+                .medForeldelsevurdering(foreldelsevurdering)
+                .medAktsomhetResultat(vurdering)
+                .medUnntasInnkrevingPgaLavtBeløp(lavtBeløp);
         if (fritekst) {
             vurderingerBuilder
-                .medFritekstVilkår("[fritekst her]");
+                    .medFritekstVilkår("[fritekst her]");
         }
         if (vilkårResultat != null) {
             vurderingerBuilder
-                .medVilkårResultat(vilkårResultat);
+                    .medVilkårResultat(vilkårResultat);
         }
         if (AnnenVurdering.GOD_TRO == vurdering) {
             vurderingerBuilder
-                .medBeløpIBehold(pengerIBehold ? BigDecimal.valueOf(3999) : BigDecimal.ZERO);
+                    .medBeløpIBehold(pengerIBehold ? BigDecimal.valueOf(3999) : BigDecimal.ZERO);
         }
         if (ForeldelseVurderingType.FORELDET.equals(foreldelsevurdering)) {
             vurderingerBuilder.medForeldelsesfrist(FORELDELSESFRIST);
@@ -200,31 +200,30 @@ public class DokumentasjonGeneratorPeriodeVilkår {
         }
         HbVurderinger vurderinger = vurderingerBuilder.build();
         HbVedtaksbrevPeriode.Builder periodeBuilder = HbVedtaksbrevPeriode.builder()
-            .medPeriode(JANUAR)
-            .medResultat(HbResultat.builder()
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(9999))
-                .medRenterBeløp(BigDecimal.ZERO)
-                .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(9999))
-                .medForeldetBeløp(BigDecimal.valueOf(2999))
-                .build())
-            .medVurderinger(vurderinger)
-            .medKravgrunnlag(HbKravgrunnlag.builder()
-                .medFeilutbetaltBeløp(BigDecimal.ZERO)
-                .build())
-            .medFakta(HendelseType.MEDLEMSKAP_TYPE, HendelseUnderType.IKKE_BOSATT)
-            ;
+                .medPeriode(JANUAR)
+                .medResultat(HbResultat.builder()
+                        .medTilbakekrevesBeløp(BigDecimal.valueOf(9999))
+                        .medRenterBeløp(BigDecimal.ZERO)
+                        .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(9999))
+                        .medForeldetBeløp(BigDecimal.valueOf(2999))
+                        .build())
+                .medVurderinger(vurderinger)
+                .medKravgrunnlag(HbKravgrunnlag.builder()
+                        .medFeilutbetaltBeløp(BigDecimal.ZERO)
+                        .build())
+                .medFakta(HendelseType.MEDLEMSKAP_TYPE, HendelseUnderType.IKKE_BOSATT);
 
         return new HbVedtaksbrevPeriodeOgFelles(fellesBuilder.build(), periodeBuilder.build());
     }
 
     private String overskrift(VilkårResultat resultat, Vurdering vurdering, boolean lavtBeløp, boolean fritekst, boolean pengerIBehold, ForeldelseVurderingType foreldelsevurdering) {
         return "*[ " + hentVilkårresultatOverskriftDel(resultat)
-            + (vurdering != null ? " - " + vurdering.getNavn() : "")
-            + (fritekst ? " - med fritekst" : " - uten fritekst")
-            + hentVIlkårsvurderingOverskriftDel(foreldelsevurdering)
-            + (pengerIBehold ? " - penger i behold" : "")
-            + (lavtBeløp ? " - lavt beløp" : "")
-            + " ]*";
+                + (vurdering != null ? " - " + vurdering.getNavn() : "")
+                + (fritekst ? " - med fritekst" : " - uten fritekst")
+                + hentVIlkårsvurderingOverskriftDel(foreldelsevurdering)
+                + (pengerIBehold ? " - penger i behold" : "")
+                + (lavtBeløp ? " - lavt beløp" : "")
+                + " ]*";
     }
 
     private String hentVilkårresultatOverskriftDel(VilkårResultat resultat) {
@@ -251,19 +250,19 @@ public class DokumentasjonGeneratorPeriodeVilkår {
 
     private String prettyprint(String vilkårTekst, String overskrift) {
         return vilkårTekst
-            .replace("_Hvordan har vi kommet fram til at du må betale tilbake?", overskrift)
-            .replace("_Hvordan har vi kommet fram til at du ikke må betale tilbake?", overskrift)
-            .replace("_Korleis har vi kome fram til at du må betale tilbake?", overskrift)
-            .replace("_Korleis har vi kome fram til at du ikkje må betale tilbake?", overskrift)
-            .replaceAll(" 4\u00A0321\u00A0kroner", " <4 rettsgebyr> kroner")
-            .replaceAll(" 2\u00A0999\u00A0kroner", " <foreldet beløp> kroner")
-            .replaceAll(" 3\u00A0999\u00A0kroner", " <beløp i behold> kroner")
-            .replaceAll("1. januar 2019", "<periode start>")
-            .replaceAll("16. januar 2019", "<periode slutt>")
-            .replaceAll("1. mars 2019", "<oppdagelsesdato>")
-            .replaceAll("1. desember 2019", "<foreldelsesfrist>")
+                .replace("_Hvordan har vi kommet fram til at du må betale tilbake?", overskrift)
+                .replace("_Hvordan har vi kommet fram til at du ikke må betale tilbake?", overskrift)
+                .replace("_Korleis har vi kome fram til at du må betale tilbake?", overskrift)
+                .replace("_Korleis har vi kome fram til at du ikkje må betale tilbake?", overskrift)
+                .replaceAll(" 4\u00A0321\u00A0kroner", " <4 rettsgebyr> kroner")
+                .replaceAll(" 2\u00A0999\u00A0kroner", " <foreldet beløp> kroner")
+                .replaceAll(" 3\u00A0999\u00A0kroner", " <beløp i behold> kroner")
+                .replaceAll("1. januar 2019", "<periode start>")
+                .replaceAll("16. januar 2019", "<periode slutt>")
+                .replaceAll("1. mars 2019", "<oppdagelsesdato>")
+                .replaceAll("1. desember 2019", "<foreldelsesfrist>")
 
-            .replaceAll("\\[", "[ ")
-            .replaceAll("]", " ]");
+                .replaceAll("\\[", "[ ")
+                .replaceAll("]", " ]");
     }
 }

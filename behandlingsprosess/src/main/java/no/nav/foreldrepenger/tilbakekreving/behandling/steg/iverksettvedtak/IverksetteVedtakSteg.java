@@ -79,7 +79,7 @@ public class IverksetteVedtakSteg implements BehandlingSteg {
 
     private boolean erRevurderingOpprettetForKlage(Behandling behandling) {
         return BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) &&
-            behandling.getBehandlingÅrsaker().stream()
-                .anyMatch(årsak -> BehandlingÅrsakType.KLAGE_ÅRSAKER.contains(årsak.getBehandlingÅrsakType()));
+                behandling.getBehandlingÅrsaker().stream()
+                        .anyMatch(årsak -> BehandlingÅrsakType.KLAGE_ÅRSAKER.contains(årsak.getBehandlingÅrsakType()));
     }
 }

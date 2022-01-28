@@ -39,9 +39,9 @@ public class HistorikkTjenesteAdapter {
     public List<HistorikkinnslagDto> hentAlleHistorikkInnslagForSak(Saksnummer saksnummer) {
         List<Historikkinnslag> historikkinnslagList = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         return historikkinnslagList.stream()
-            .map(historikkinnslag -> historikkinnslagKonverter.mapFra(historikkinnslag))
-            .sorted()
-            .collect(Collectors.toList());
+                .map(historikkinnslag -> historikkinnslagKonverter.mapFra(historikkinnslag))
+                .sorted()
+                .collect(Collectors.toList());
     }
 
 
@@ -58,7 +58,7 @@ public class HistorikkTjenesteAdapter {
 
     public void opprettHistorikkInnslag(Behandling behandling, HistorikkinnslagType hisType) {
         if (!builder.getHistorikkinnslagDeler().isEmpty() || builder.antallEndredeFelter() > 0 ||
-            builder.getErBegrunnelseEndret() || builder.getErGjeldendeFraSatt()) {
+                builder.getErBegrunnelseEndret() || builder.getErGjeldendeFraSatt()) {
 
             Historikkinnslag innslag = new Historikkinnslag();
 

@@ -11,7 +11,7 @@ public class ØkonomiKvitteringTolk {
     private static final String KODE_MELDING_KRAVGRUNNLAG_IKKE_FINNES = "B420010I";
     public static final String KODE_MELDING_KRAVGRUNNLAG_ER_SPERRET = "B420012I";
 
-    ØkonomiKvitteringTolk(){
+    ØkonomiKvitteringTolk() {
         // privat construktor
     }
 

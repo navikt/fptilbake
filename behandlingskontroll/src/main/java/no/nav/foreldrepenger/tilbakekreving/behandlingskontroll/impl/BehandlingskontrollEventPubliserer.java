@@ -52,7 +52,7 @@ public class BehandlingskontrollEventPubliserer {
         doFireEvent(event);
     }
 
-    public void fireEvent(BehandlingTransisjonEvent event){
+    public void fireEvent(BehandlingTransisjonEvent event) {
         doFireEvent(event);
     }
 
@@ -81,12 +81,14 @@ public class BehandlingskontrollEventPubliserer {
         doFireEvent(event);
     }
 
-    /** Fyrer event via BeanManager slik at håndtering av events som subklasser andre events blir korrekt. */
+    /**
+     * Fyrer event via BeanManager slik at håndtering av events som subklasser andre events blir korrekt.
+     */
     protected void doFireEvent(BehandlingEvent event) {
         if (beanManager == null) {
             return;
         }
-        beanManager.fireEvent(event, new Annotation[] {});
+        beanManager.fireEvent(event, new Annotation[]{});
     }
 
     public void fireEvent(BehandlingStegTilstandEndringEvent event) {

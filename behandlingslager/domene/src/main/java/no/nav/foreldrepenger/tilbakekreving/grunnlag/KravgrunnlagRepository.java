@@ -55,10 +55,10 @@ public class KravgrunnlagRepository {
 
     private void lagreNyttKravgrunnlag(Long behandlingId, Kravgrunnlag431 kravgrunnlag) {
         KravgrunnlagAggregateEntity aggregate = new KravgrunnlagAggregateEntity.Builder()
-            .medGrunnlagØkonomi(kravgrunnlag)
-            .medBehandlingId(behandlingId)
-            .medAktiv(true)
-            .build();
+                .medGrunnlagØkonomi(kravgrunnlag)
+                .medBehandlingId(behandlingId)
+                .medAktiv(true)
+                .build();
         entityManager.persist(kravgrunnlag);
         for (KravgrunnlagPeriode432 periode432 : kravgrunnlag.getPerioder()) {
             entityManager.persist(periode432);
@@ -78,7 +78,7 @@ public class KravgrunnlagRepository {
 
     public boolean harGrunnlagForBehandlingId(Long behandlingId) {
         TypedQuery<Long> query = entityManager.createQuery("select count(1) from KravgrunnlagAggregateEntity aggr " +
-            "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", Long.class);
+                "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", Long.class);
         query.setParameter(BEHANDLING_ID, behandlingId);
         query.setParameter(AKTIV, true);
         return query.getSingleResult() > 0;
@@ -105,7 +105,7 @@ public class KravgrunnlagRepository {
 
     public Optional<KravgrunnlagAggregate> finnGrunnlagForVedtakId(Long vedtakId) {
         TypedQuery<KravgrunnlagAggregateEntity> query = entityManager.createQuery("from KravgrunnlagAggregateEntity aggr " +
-            "where aggr.grunnlagØkonomi.vedtakId=:vedtakId and aggr.aktiv=:aktiv", KravgrunnlagAggregateEntity.class);
+                "where aggr.grunnlagØkonomi.vedtakId=:vedtakId and aggr.aktiv=:aktiv", KravgrunnlagAggregateEntity.class);
         query.setParameter("vedtakId", vedtakId);
         query.setParameter(AKTIV, true);
         Optional<KravgrunnlagAggregateEntity> resultat = hentUniktResultat(query);
@@ -144,7 +144,7 @@ public class KravgrunnlagRepository {
 
     private TypedQuery<KravgrunnlagAggregateEntity> lagFinnKravgrunnlagQuery(Long behandlingId) {
         TypedQuery<KravgrunnlagAggregateEntity> query = entityManager.createQuery("from KravgrunnlagAggregateEntity aggr " +
-            "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", KravgrunnlagAggregateEntity.class);
+                "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", KravgrunnlagAggregateEntity.class);
         query.setParameter(BEHANDLING_ID, behandlingId);
         query.setParameter(AKTIV, true);
         return query;

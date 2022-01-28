@@ -62,10 +62,10 @@ public class GjenopptaBehandlingTjenesteTest {
     @BeforeEach
     public void setup() {
         gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(mockTaskTjeneste,
-            behandlingKandidaterRepository,
-            behandlingVenterRepository,
-            repositoryProvider,
-            mockVarselResponsTjeneste);
+                behandlingKandidaterRepository,
+                behandlingVenterRepository,
+                repositoryProvider,
+                mockVarselResponsTjeneste);
     }
 
     @Test

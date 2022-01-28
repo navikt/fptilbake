@@ -24,11 +24,11 @@ public class BrevSporingTjeneste {
 
     public void lagreInfoOmUtsendtBrev(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse, DetaljertBrevType detaljertBrevType) {
         BrevSporing brevSporing = new BrevSporing.Builder()
-            .medBehandlingId(behandlingId)
-            .medDokumentId(dokumentreferanse.getDokumentId())
-            .medJournalpostId(dokumentreferanse.getJournalpostId())
-            .medBrevType(detaljertBrevType.getBrevType())
-            .build();
+                .medBehandlingId(behandlingId)
+                .medDokumentId(dokumentreferanse.getDokumentId())
+                .medJournalpostId(dokumentreferanse.getJournalpostId())
+                .medBrevType(detaljertBrevType.getBrevType())
+                .build();
         brevSporingRepository.lagre(brevSporing);
     }
 }

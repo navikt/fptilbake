@@ -38,7 +38,7 @@ public class FaktaVergeSteg implements BehandlingSteg {
     public BehandleStegResultat utførSteg(BehandlingskontrollKontekst kontekst) {
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
         Optional<Aksjonspunkt> aktivVergeAksjonspunkt = behandling.getÅpneAksjonspunkter().stream()
-            .filter(aksjonspunkt -> aksjonspunkt.getAksjonspunktDefinisjon().equals(AVKLAR_VERGE)).findFirst();
+                .filter(aksjonspunkt -> aksjonspunkt.getAksjonspunktDefinisjon().equals(AVKLAR_VERGE)).findFirst();
         if (aktivVergeAksjonspunkt.isEmpty()) {
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }

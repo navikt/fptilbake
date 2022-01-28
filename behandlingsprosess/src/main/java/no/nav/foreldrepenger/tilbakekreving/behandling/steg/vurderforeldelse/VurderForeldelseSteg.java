@@ -58,14 +58,14 @@ public class VurderForeldelseSteg implements BehandlingSteg {
         } else {
             Optional<AksjonspunktDefinisjon> aksjonspunktDefinisjon = vurderForeldelseAksjonspunktUtleder.utledAksjonspunkt(kontekst.getBehandlingId());
             return aksjonspunktDefinisjon.map(ap -> BehandleStegResultat.utførtMedAksjonspunkter(singletonList(ap)))
-                .orElseGet(BehandleStegResultat::utførtUtenAksjonspunkter);
+                    .orElseGet(BehandleStegResultat::utførtUtenAksjonspunkter);
         }
     }
 
     protected void utførStegAutomatisk(Behandling behandling) {
         logger.info("utfører foreldelse steg automatisk for behandling={}", behandling.getId());
         automatiskVurdertForeldelseTjeneste.automatiskVurdetForeldelse(behandling,
-            AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE);
+                AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE);
     }
 
 }

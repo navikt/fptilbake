@@ -85,7 +85,7 @@ public class HendelseHåndtererTjenesteTest {
 
     private boolean erTaskFinnes(TaskType taskType, List<ProsessTaskData> prosesser) {
         return prosesser.stream()
-            .anyMatch(prosess -> taskType.equals(prosess.taskType()));
+                .anyMatch(prosess -> taskType.equals(prosess.taskType()));
     }
 
     private static HendelseTaskDataWrapper lagHendelseTask() {

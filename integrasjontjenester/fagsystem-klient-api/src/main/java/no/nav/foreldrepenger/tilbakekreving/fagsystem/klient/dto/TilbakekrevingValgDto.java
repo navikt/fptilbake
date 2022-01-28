@@ -6,7 +6,8 @@ public class TilbakekrevingValgDto {
 
     private VidereBehandling videreBehandling;
 
-    public TilbakekrevingValgDto() {}
+    public TilbakekrevingValgDto() {
+    }
 
     public TilbakekrevingValgDto(VidereBehandling videreBehandling) {
         this.videreBehandling = videreBehandling;

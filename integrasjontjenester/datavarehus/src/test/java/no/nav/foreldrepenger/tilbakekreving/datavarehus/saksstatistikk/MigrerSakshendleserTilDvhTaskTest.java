@@ -19,14 +19,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.DvhEventHendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class MigrerSakshendleserTilDvhTaskTest {
 
     private SakshendelserKafkaProducer kafkaProducerMock;
@@ -38,13 +38,13 @@ public class MigrerSakshendleserTilDvhTaskTest {
     @BeforeEach
     public void setup(EntityManager entityManager) {
         BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(
-            entityManager);
+                entityManager);
         BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
         ProsessTaskTjeneste taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         BehandlingTilstandTjeneste tilstandTjeneste = new BehandlingTilstandTjeneste(repositoryProvider);
         kafkaProducerMock = Mockito.mock(SakshendelserKafkaProducer.class);
         manueltSendSakshendleserTilDvhTask = new MigrerSakshendleserTilDvhTask(kafkaProducerMock, tilstandTjeneste,
-            behandlingRepository, taskTjeneste);
+                behandlingRepository, taskTjeneste);
 
         entityManager.setFlushMode(FlushModeType.AUTO);
         ScenarioSimple scenarioSimple = ScenarioSimple.simple();
@@ -52,7 +52,7 @@ public class MigrerSakshendleserTilDvhTaskTest {
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), UUID.randomUUID());
         repositoryProvider.getEksternBehandlingRepository().lagre(eksternBehandling);
         prosessTaskData = ProsessTaskData.forProsessTask(MigrerSakshendleserTilDvhTask.class);
-        prosessTaskData.setProperty("behandlingId",String.valueOf(behandling.getId()));
+        prosessTaskData.setProperty("behandlingId", String.valueOf(behandling.getId()));
     }
 
     @Test

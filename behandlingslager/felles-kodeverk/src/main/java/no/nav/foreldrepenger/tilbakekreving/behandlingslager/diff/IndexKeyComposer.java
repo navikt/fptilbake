@@ -15,7 +15,9 @@ final class IndexKeyComposer {
         // hidden
     }
 
-    /** Hjelpe metode for å effektivt generere keys. */
+    /**
+     * Hjelpe metode for å effektivt generere keys.
+     */
     static String createKey(Object... keyParts) {
         StringBuilder sb = new StringBuilder(keyParts.length * 10);
         int max = keyParts.length;

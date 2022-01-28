@@ -60,7 +60,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -70,7 +70,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class BehandlingDtoTjenesteTest {
 
     private BehandlingRepositoryProvider repositoryProvider;
@@ -99,7 +99,7 @@ public class BehandlingDtoTjenesteTest {
         grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository();
         behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, foreldelseTjeneste, repositoryProvider,
-            behandlingModellRepository, Fagsystem.FPTILBAKE);
+                behandlingModellRepository, Fagsystem.FPTILBAKE);
 
         entityManager.setFlushMode(FlushModeType.AUTO);
     }
@@ -114,19 +114,19 @@ public class BehandlingDtoTjenesteTest {
 
         List<String> lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList());
         assertTrue(lenker.containsAll(Lists.newArrayList(
-            "bytt-behandlende-enhet",
-            "opne-for-endringer",
-            "henlegg-behandling",
-            "gjenoppta-behandling",
-            "sett-behandling-pa-vent",
-            "endre-pa-vent",
-            "lagre-aksjonspunkter",
-            "beregne-feilutbetalt-belop",
-            "aksjonspunkter",
-            "feilutbetalingFakta",
-            "feilutbetalingAarsak",
-            "opprett-verge",
-            "fjern-verge")));
+                "bytt-behandlende-enhet",
+                "opne-for-endringer",
+                "henlegg-behandling",
+                "gjenoppta-behandling",
+                "sett-behandling-pa-vent",
+                "endre-pa-vent",
+                "lagre-aksjonspunkter",
+                "beregne-feilutbetalt-belop",
+                "aksjonspunkter",
+                "feilutbetalingFakta",
+                "feilutbetalingAarsak",
+                "opprett-verge",
+                "fjern-verge")));
     }
 
     @Test
@@ -140,21 +140,21 @@ public class BehandlingDtoTjenesteTest {
 
         List<String> lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList());
         assertTrue(lenker.containsAll(Lists.newArrayList(
-            "bytt-behandlende-enhet",
-            "opne-for-endringer",
-            "henlegg-behandling",
-            "gjenoppta-behandling",
-            "sett-behandling-pa-vent",
-            "endre-pa-vent",
-            "lagre-aksjonspunkter",
-            "beregne-feilutbetalt-belop",
-            "aksjonspunkter",
-            "feilutbetalingFakta",
-            "feilutbetalingAarsak",
-            "perioderForeldelse",
-            "vilkarvurderingsperioder",
-            "opprett-verge",
-            "fjern-verge"
+                "bytt-behandlende-enhet",
+                "opne-for-endringer",
+                "henlegg-behandling",
+                "gjenoppta-behandling",
+                "sett-behandling-pa-vent",
+                "endre-pa-vent",
+                "lagre-aksjonspunkter",
+                "beregne-feilutbetalt-belop",
+                "aksjonspunkter",
+                "feilutbetalingFakta",
+                "feilutbetalingAarsak",
+                "perioderForeldelse",
+                "vilkarvurderingsperioder",
+                "opprett-verge",
+                "fjern-verge"
         )));
     }
 
@@ -169,22 +169,22 @@ public class BehandlingDtoTjenesteTest {
 
         List<String> lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList());
         assertTrue(lenker.containsAll(Lists.newArrayList(
-            "bytt-behandlende-enhet",
-            "opne-for-endringer",
-            "henlegg-behandling",
-            "gjenoppta-behandling",
-            "sett-behandling-pa-vent",
-            "endre-pa-vent",
-            "lagre-aksjonspunkter",
-            "beregne-feilutbetalt-belop",
-            "aksjonspunkter",
-            "feilutbetalingFakta",
-            "feilutbetalingAarsak",
-            "perioderForeldelse",
-            "vilkarvurdering",
-            "vilkarvurderingsperioder",
-            "opprett-verge",
-            "fjern-verge"
+                "bytt-behandlende-enhet",
+                "opne-for-endringer",
+                "henlegg-behandling",
+                "gjenoppta-behandling",
+                "sett-behandling-pa-vent",
+                "endre-pa-vent",
+                "lagre-aksjonspunkter",
+                "beregne-feilutbetalt-belop",
+                "aksjonspunkter",
+                "feilutbetalingFakta",
+                "feilutbetalingAarsak",
+                "perioderForeldelse",
+                "vilkarvurdering",
+                "vilkarvurderingsperioder",
+                "opprett-verge",
+                "fjern-verge"
         )));
     }
 
@@ -200,22 +200,22 @@ public class BehandlingDtoTjenesteTest {
 
         List<String> lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList());
         assertTrue(lenker.containsAll(Lists.newArrayList(
-            "bytt-behandlende-enhet",
-            "opne-for-endringer",
-            "henlegg-behandling",
-            "gjenoppta-behandling",
-            "sett-behandling-pa-vent",
-            "endre-pa-vent",
-            "lagre-aksjonspunkter",
-            "beregne-feilutbetalt-belop",
-            "aksjonspunkter",
-            "feilutbetalingFakta",
-            "feilutbetalingAarsak",
-            "perioderForeldelse",
-            "vilkarvurderingsperioder",
-            "vilkarvurdering",
-            "opprett-verge",
-            "fjern-verge"
+                "bytt-behandlende-enhet",
+                "opne-for-endringer",
+                "henlegg-behandling",
+                "gjenoppta-behandling",
+                "sett-behandling-pa-vent",
+                "endre-pa-vent",
+                "lagre-aksjonspunkter",
+                "beregne-feilutbetalt-belop",
+                "aksjonspunkter",
+                "feilutbetalingFakta",
+                "feilutbetalingAarsak",
+                "perioderForeldelse",
+                "vilkarvurderingsperioder",
+                "vilkarvurdering",
+                "opprett-verge",
+                "fjern-verge"
         )));
     }
 
@@ -231,24 +231,24 @@ public class BehandlingDtoTjenesteTest {
 
         List<String> lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList());
         assertTrue(lenker.containsAll(Lists.newArrayList(
-            "bytt-behandlende-enhet",
-            "opne-for-endringer",
-            "henlegg-behandling",
-            "gjenoppta-behandling",
-            "sett-behandling-pa-vent",
-            "endre-pa-vent",
-            "lagre-aksjonspunkter",
-            "beregne-feilutbetalt-belop",
-            "aksjonspunkter",
-            "feilutbetalingFakta",
-            "feilutbetalingAarsak",
-            "perioderForeldelse",
-            "vilkarvurdering",
-            "vilkarvurderingsperioder",
-            "beregningsresultat",
-            "vedtaksbrev",
-            "opprett-verge",
-            "fjern-verge"
+                "bytt-behandlende-enhet",
+                "opne-for-endringer",
+                "henlegg-behandling",
+                "gjenoppta-behandling",
+                "sett-behandling-pa-vent",
+                "endre-pa-vent",
+                "lagre-aksjonspunkter",
+                "beregne-feilutbetalt-belop",
+                "aksjonspunkter",
+                "feilutbetalingFakta",
+                "feilutbetalingAarsak",
+                "perioderForeldelse",
+                "vilkarvurdering",
+                "vilkarvurderingsperioder",
+                "beregningsresultat",
+                "vedtaksbrev",
+                "opprett-verge",
+                "fjern-verge"
         )));
     }
 
@@ -263,15 +263,15 @@ public class BehandlingDtoTjenesteTest {
 
         List<String> lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList());
         assertTrue(lenker.containsAll(Lists.newArrayList(
-            "bytt-behandlende-enhet",
-            "opne-for-endringer",
-            "henlegg-behandling",
-            "gjenoppta-behandling",
-            "sett-behandling-pa-vent",
-            "endre-pa-vent",
-            "lagre-aksjonspunkter",
-            "beregne-feilutbetalt-belop",
-            "aksjonspunkter"
+                "bytt-behandlende-enhet",
+                "opne-for-endringer",
+                "henlegg-behandling",
+                "gjenoppta-behandling",
+                "sett-behandling-pa-vent",
+                "endre-pa-vent",
+                "lagre-aksjonspunkter",
+                "beregne-feilutbetalt-belop",
+                "aksjonspunkter"
         )));
         assertFalse(utvidetBehandlingDto.isKanHenleggeBehandling());
     }
@@ -287,20 +287,20 @@ public class BehandlingDtoTjenesteTest {
 
         List<String> lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList());
         assertTrue(lenker.containsAll(Lists.newArrayList(
-            "bytt-behandlende-enhet",
-            "opne-for-endringer",
-            "henlegg-behandling",
-            "gjenoppta-behandling",
-            "sett-behandling-pa-vent",
-            "endre-pa-vent",
-            "lagre-aksjonspunkter",
-            "beregne-feilutbetalt-belop",
-            "aksjonspunkter",
-            "feilutbetalingFakta",
-            "feilutbetalingAarsak",
-            "opprett-verge",
-            "fjern-verge",
-            "soeker-verge")));
+                "bytt-behandlende-enhet",
+                "opne-for-endringer",
+                "henlegg-behandling",
+                "gjenoppta-behandling",
+                "sett-behandling-pa-vent",
+                "endre-pa-vent",
+                "lagre-aksjonspunkter",
+                "beregne-feilutbetalt-belop",
+                "aksjonspunkter",
+                "feilutbetalingFakta",
+                "feilutbetalingAarsak",
+                "opprett-verge",
+                "fjern-verge",
+                "soeker-verge")));
     }
 
     @Test
@@ -313,13 +313,13 @@ public class BehandlingDtoTjenesteTest {
 
         List<String> lenker = behandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList());
         assertTrue(lenker.containsAll(Lists.newArrayList(
-            "totrinnskontroll-arsaker-readOnly",
-            "brev-maler",
-            "brev-bestill",
-            "brev-forhandvis",
-            "handling-rettigheter",
-            "behandling-rettigheter",
-            "finn-menyvalg-for-verge")));
+                "totrinnskontroll-arsaker-readOnly",
+                "brev-maler",
+                "brev-bestill",
+                "brev-forhandvis",
+                "handling-rettigheter",
+                "behandling-rettigheter",
+                "finn-menyvalg-for-verge")));
     }
 
     @Test
@@ -332,14 +332,14 @@ public class BehandlingDtoTjenesteTest {
 
         List<String> lenker = behandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList());
         assertTrue(lenker.containsAll(Lists.newArrayList(
-            "totrinnskontroll-arsaker",
-            "bekreft-totrinnsaksjonspunkt",
-            "brev-maler",
-            "brev-bestill",
-            "brev-forhandvis",
-            "handling-rettigheter",
-            "behandling-rettigheter",
-            "finn-menyvalg-for-verge")));
+                "totrinnskontroll-arsaker",
+                "bekreft-totrinnsaksjonspunkt",
+                "brev-maler",
+                "brev-bestill",
+                "brev-forhandvis",
+                "handling-rettigheter",
+                "behandling-rettigheter",
+                "finn-menyvalg-for-verge")));
     }
 
     @Test
@@ -359,13 +359,13 @@ public class BehandlingDtoTjenesteTest {
 
         List<String> lenker = behandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList());
         assertTrue(lenker.containsAll(Lists.newArrayList(
-            "totrinnskontroll-arsaker-readOnly",
-            "brev-maler",
-            "brev-bestill",
-            "brev-forhandvis",
-            "handling-rettigheter",
-            "behandling-rettigheter",
-            "finn-menyvalg-for-verge")));
+                "totrinnskontroll-arsaker-readOnly",
+                "brev-maler",
+                "brev-bestill",
+                "brev-forhandvis",
+                "handling-rettigheter",
+                "behandling-rettigheter",
+                "finn-menyvalg-for-verge")));
 
         assertFalse(behandlingDto.isKanHenleggeBehandling());
     }
@@ -391,13 +391,13 @@ public class BehandlingDtoTjenesteTest {
 
         List<String> lenker = behandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList());
         assertTrue(lenker.containsAll(Lists.newArrayList(
-            "totrinnskontroll-arsaker-readOnly",
-            "brev-maler",
-            "brev-bestill",
-            "brev-forhandvis",
-            "handling-rettigheter",
-            "behandling-rettigheter",
-            "finn-menyvalg-for-verge")));
+                "totrinnskontroll-arsaker-readOnly",
+                "brev-maler",
+                "brev-bestill",
+                "brev-forhandvis",
+                "handling-rettigheter",
+                "behandling-rettigheter",
+                "finn-menyvalg-for-verge")));
 
         assertTrue(behandlingDto.isKanHenleggeBehandling());
     }
@@ -406,9 +406,9 @@ public class BehandlingDtoTjenesteTest {
     public void skal_hentAlleBehandlinger_når_behandling_er_henlagt() {
         Behandling behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
-            .medBehandling(behandling)
-            .medBehandlingResultatType(no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType.HENLAGT_TEKNISK_VEDLIKEHOLD)
-            .build();
+                .medBehandling(behandling)
+                .medBehandlingResultatType(no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType.HENLAGT_TEKNISK_VEDLIKEHOLD)
+                .build();
         repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
         behandling.avsluttBehandling();
         when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(Lists.newArrayList(behandling));
@@ -420,15 +420,15 @@ public class BehandlingDtoTjenesteTest {
     public void skal_hentAlleBehandlinger_når_behandling_er_avsluttet() {
         Behandling behandling = lagBehandling(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingStatus.IVERKSETTER_VEDTAK);
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
-            .medBehandling(behandling)
-            .medBehandlingResultatType(BehandlingResultatType.DELVIS_TILBAKEBETALING)
-            .build();
+                .medBehandling(behandling)
+                .medBehandlingResultatType(BehandlingResultatType.DELVIS_TILBAKEBETALING)
+                .build();
         repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
         BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder()
-            .medAnsvarligSaksbehandler("VL")
-            .medBehandlingsresultat(behandlingsresultat)
-            .medVedtaksdato(LocalDate.now())
-            .medIverksettingStatus(IverksettingStatus.IVERKSATT).build();
+                .medAnsvarligSaksbehandler("VL")
+                .medBehandlingsresultat(behandlingsresultat)
+                .medVedtaksdato(LocalDate.now())
+                .medIverksettingStatus(IverksettingStatus.IVERKSATT).build();
         repositoryProvider.getBehandlingVedtakRepository().lagre(behandlingVedtak);
         behandling.avsluttBehandling();
         when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(Lists.newArrayList(behandling));
@@ -439,7 +439,7 @@ public class BehandlingDtoTjenesteTest {
 
     private Behandling lagBehandling(BehandlingStegType behandlingStegType, BehandlingStatus behandlingStatus) {
         Long fagsakId = fagsakRepository.lagre(Fagsak.opprettNy(saksnummer,
-            NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.nb)));
+                NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.nb)));
         Fagsak fagsak = fagsakRepository.finnEksaktFagsak(fagsakId);
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         behandling.setAnsvarligSaksbehandler("Z991136");
@@ -478,11 +478,11 @@ public class BehandlingDtoTjenesteTest {
     private void lagFaktaFeilutbetaling(long behandlingId) {
         FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
         FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode = FaktaFeilutbetalingPeriode.builder()
-            .medPeriode(FOM, TOM)
-            .medHendelseType(HendelseType.FP_UTTAK_UTSETTELSE_TYPE)
-            .medHendelseUndertype(HendelseUnderType.ARBEID_HELTID)
-            .medFeilutbetalinger(faktaFeilutbetaling)
-            .build();
+                .medPeriode(FOM, TOM)
+                .medHendelseType(HendelseType.FP_UTTAK_UTSETTELSE_TYPE)
+                .medHendelseUndertype(HendelseUnderType.ARBEID_HELTID)
+                .medFeilutbetalinger(faktaFeilutbetaling)
+                .build();
         faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);
         faktaFeilutbetaling.setBegrunnelse("begrunnelse");
         faktaFeilutbetalingRepository.lagre(behandlingId, faktaFeilutbetaling);
@@ -491,16 +491,16 @@ public class BehandlingDtoTjenesteTest {
     private void lagVilkårsVurdering(long behandlingId) {
         VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet p = VilkårVurderingPeriodeEntitet.builder()
-            .medPeriode(FOM, TOM)
-            .medBegrunnelse("foo")
-            .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
-            .medVurderinger(vurdering)
-            .build();
+                .medPeriode(FOM, TOM)
+                .medBegrunnelse("foo")
+                .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                .medVurderinger(vurdering)
+                .build();
         p.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
-            .medAktsomhet(Aktsomhet.FORSETT)
-            .medBegrunnelse("foo")
-            .medPeriode(p)
-            .build());
+                .medAktsomhet(Aktsomhet.FORSETT)
+                .medBegrunnelse("foo")
+                .medPeriode(p)
+                .build());
         vurdering.leggTilPeriode(p);
         vilkårsvurderingRepository.lagre(behandlingId, vurdering);
     }

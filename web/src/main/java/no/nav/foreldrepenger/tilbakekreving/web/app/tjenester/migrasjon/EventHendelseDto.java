@@ -11,7 +11,7 @@ import no.nav.vedtak.util.InputValideringRegex;
 public class EventHendelseDto implements AbacDto {
 
     @NotNull
-    @Size(min = 1, max =150)
+    @Size(min = 1, max = 150)
     @Pattern(regexp = InputValideringRegex.KODEVERK)
     private String hendelse;
 

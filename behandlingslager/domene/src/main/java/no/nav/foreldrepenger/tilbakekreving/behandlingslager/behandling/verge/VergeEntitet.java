@@ -33,8 +33,8 @@ public class VergeEntitet extends BaseEntitet {
 
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "fom", column = @Column(name = "gyldig_fom", nullable = false)),
-        @AttributeOverride(name = "tom", column = @Column(name = "gyldig_tom", nullable = false))
+            @AttributeOverride(name = "fom", column = @Column(name = "gyldig_fom", nullable = false)),
+            @AttributeOverride(name = "tom", column = @Column(name = "gyldig_tom", nullable = false))
     })
     private Periode gyldigPeriode; //NOSONAR
 
@@ -64,11 +64,11 @@ public class VergeEntitet extends BaseEntitet {
         if (o == null || getClass() != o.getClass()) return false;
         VergeEntitet that = (VergeEntitet) o;
         return
-            Objects.equals(vergeAktørId, that.vergeAktørId) &&
-                Objects.equals(gyldigPeriode, that.gyldigPeriode) &&
-                Objects.equals(vergeType, that.vergeType) &&
-                Objects.equals(navn, that.navn) &&
-                Objects.equals(kilde, that.kilde);
+                Objects.equals(vergeAktørId, that.vergeAktørId) &&
+                        Objects.equals(gyldigPeriode, that.gyldigPeriode) &&
+                        Objects.equals(vergeType, that.vergeType) &&
+                        Objects.equals(navn, that.navn) &&
+                        Objects.equals(kilde, that.kilde);
     }
 
     @Override

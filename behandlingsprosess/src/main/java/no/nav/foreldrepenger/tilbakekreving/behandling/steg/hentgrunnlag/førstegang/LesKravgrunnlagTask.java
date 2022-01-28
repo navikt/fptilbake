@@ -100,7 +100,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         }
     }
 
-    private static void validerHenvisning(Henvisning henvisning){
+    private static void validerHenvisning(Henvisning henvisning) {
         if (!Henvisning.erGyldig(henvisning)) {
             throw LesKravgrunnlagTaskFeil.ugyldigHenvisning(henvisning);
         }
@@ -115,7 +115,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
     private void oppdaterHenvisningFraGrunnlag(Behandling behandling, String saksnummer, Henvisning grunnlagHenvisning) {
         List<EksternBehandlingsinfoDto> eksternBehandlinger = hentBehandlingerFraFagsystem(saksnummer);
         Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDto = eksternBehandlinger.stream()
-            .filter(eksternBehandling -> grunnlagHenvisning.equals(eksternBehandling.getHenvisning())).findFirst();
+                .filter(eksternBehandling -> grunnlagHenvisning.equals(eksternBehandling.getHenvisning())).findFirst();
         if (eksternBehandlingsinfoDto.isPresent()) {
             logger.info("Oppdaterer EksternBehandling henvisning={} for behandlingId={}", grunnlagHenvisning, behandling.getId());
             EksternBehandlingsinfoDto eksternBehandlingDto = eksternBehandlingsinfoDto.get();
@@ -126,7 +126,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         }
     }
 
-    private static class LesKravgrunnlagTaskFeil  {
+    private static class LesKravgrunnlagTaskFeil {
 
         static TekniskException behandlingFinnesIkkeIFagsaksystemet(String saksnummer, Henvisning henvisning) {
             return new TekniskException("FPT-587195", String.format("Mottok et tilbakekrevingsgrunnlag fra Økonomi for en behandling som ikke finnes i Fagsaksystemet for saksnummer=%s, henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!", saksnummer, henvisning));

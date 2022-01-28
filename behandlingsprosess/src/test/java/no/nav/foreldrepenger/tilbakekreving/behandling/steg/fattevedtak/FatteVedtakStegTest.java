@@ -38,11 +38,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class FatteVedtakStegTest {
 
     private BehandlingRepositoryProvider repositoryProvider;
@@ -64,10 +64,10 @@ public class FatteVedtakStegTest {
         totrinnRepository = new TotrinnRepository(em);
         HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(behandlingRepository);
         HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(
-            repositoryProvider.getHistorikkRepository(), historikkInnslagKonverter);
+                repositoryProvider.getHistorikkRepository(), historikkInnslagKonverter);
         TilbakekrevingBeregningTjeneste beregningTjeneste = Mockito.mock(TilbakekrevingBeregningTjeneste.class);
         fatteVedtakSteg = new FatteVedtakSteg(repositoryProvider, totrinnRepository, beregningTjeneste,
-            historikkTjenesteAdapter);
+                historikkTjenesteAdapter);
 
         Fagsak fagsak = TestFagsakUtil.opprettFagsak();
         repositoryProvider.getFagsakRepository().lagre(fagsak);
@@ -90,12 +90,12 @@ public class FatteVedtakStegTest {
         assertThat(behandleStegResultat).isNotNull();
         assertThat(behandleStegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.UTFØRT);
         Optional<BehandlingVedtak> vedtak = repositoryProvider.getBehandlingVedtakRepository()
-            .hentBehandlingvedtakForBehandlingId(behandling.getId());
+                .hentBehandlingvedtakForBehandlingId(behandling.getId());
         assertThat(vedtak).isPresent();
         BehandlingVedtak behandlingVedtak = vedtak.get();
         assertThat(behandlingVedtak.getIverksettingStatus()).isEqualByComparingTo(IverksettingStatus.IKKE_IVERKSATT);
         assertThat(behandlingVedtak.getBehandlingsresultat().getBehandlingResultatType())
-            .isEqualByComparingTo(BehandlingResultatType.DELVIS_TILBAKEBETALING);
+                .isEqualByComparingTo(BehandlingResultatType.DELVIS_TILBAKEBETALING);
     }
 
     @Test
@@ -110,7 +110,7 @@ public class FatteVedtakStegTest {
         assertThat(behandleStegResultat).isNotNull();
         assertThat(behandleStegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.TILBAKEFØRT_TIL_AKSJONSPUNKT);
         Optional<BehandlingVedtak> vedtak = repositoryProvider.getBehandlingVedtakRepository()
-            .hentBehandlingvedtakForBehandlingId(behandling.getId());
+                .hentBehandlingvedtakForBehandlingId(behandling.getId());
         assertThat(vedtak).isEmpty();
     }
 
@@ -123,20 +123,20 @@ public class FatteVedtakStegTest {
 
     private void lagTotrinnsVurderinger(Map<AksjonspunktDefinisjon, Boolean> aksjonspunktMedGodkjentMap) {
         Totrinnsvurdering avklartTotrinnsvurdering = Totrinnsvurdering.builder()
-            .medBehandling(behandling)
-            .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING)
-            .medGodkjent(aksjonspunktMedGodkjentMap.get(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING))
-            .build();
+                .medBehandling(behandling)
+                .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING)
+                .medGodkjent(aksjonspunktMedGodkjentMap.get(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING))
+                .build();
         Totrinnsvurdering foreldelseTotrinnsvurdering = Totrinnsvurdering.builder()
-            .medBehandling(behandling)
-            .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.VURDER_FORELDELSE)
-            .medGodkjent(aksjonspunktMedGodkjentMap.get(AksjonspunktDefinisjon.VURDER_FORELDELSE))
-            .build();
+                .medBehandling(behandling)
+                .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.VURDER_FORELDELSE)
+                .medGodkjent(aksjonspunktMedGodkjentMap.get(AksjonspunktDefinisjon.VURDER_FORELDELSE))
+                .build();
         Totrinnsvurdering vilkårTotrinnsvurdering = Totrinnsvurdering.builder()
-            .medBehandling(behandling)
-            .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING)
-            .medGodkjent(aksjonspunktMedGodkjentMap.get(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING))
-            .build();
+                .medBehandling(behandling)
+                .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING)
+                .medGodkjent(aksjonspunktMedGodkjentMap.get(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING))
+                .build();
         totrinnRepository.lagreOgFlush(behandling, Lists.newArrayList(avklartTotrinnsvurdering, foreldelseTotrinnsvurdering, vilkårTotrinnsvurdering));
     }
 

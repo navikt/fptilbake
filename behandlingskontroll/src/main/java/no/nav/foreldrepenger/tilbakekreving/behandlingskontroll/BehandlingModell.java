@@ -15,12 +15,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 
 /**
  * Definerer metoder for å inspisere state-machine for en gitt behandling type.
- *
+ * <p>
  * Hver behandling type er knyttet til en egen BehandlingModell.
  */
 public interface BehandlingModell {
 
-    /** Gjelder kun steg ETTER angitt steg (eksklusv angitt steg). */
+    /**
+     * Gjelder kun steg ETTER angitt steg (eksklusv angitt steg).
+     */
     Set<AksjonspunktDefinisjon> finnAksjonspunktDefinisjonerEtter(BehandlingStegType steg);
 
     /**
@@ -51,7 +53,9 @@ public interface BehandlingModell {
 
     BehandlingStegModell finnTidligsteStegForAksjonspunktDefinisjon(Collection<AksjonspunktDefinisjon> aksjonspunktDefinisjoner);
 
-    /** Behandling type modellen gjelder for. */
+    /**
+     * Behandling type modellen gjelder for.
+     */
     BehandlingType getBehandlingType();
 
     Stream<BehandlingStegModell> hvertSteg();
@@ -75,9 +79,9 @@ public interface BehandlingModell {
 
     /**
      * Kjør behandling fra angitt steg, med angitt visitor. Stopper når visitor ikke kan kjøre lenger.
+     *
      * @param startFraBehandlingStegType
      * @param visitor
-     *
      * @return
      */
     BehandlingStegUtfall prosesserFra(BehandlingStegType startFraBehandlingStegType, BehandlingModellVisitor visitor);

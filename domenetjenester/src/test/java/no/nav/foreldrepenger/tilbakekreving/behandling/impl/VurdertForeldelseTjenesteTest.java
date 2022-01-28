@@ -46,8 +46,8 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
     public void skal_lagreVurdertForeldelseGrunnlag() {
         LocalDate sisteDato = LocalDate.of(2019, 2, 19);
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Collections.singletonList(
-            new ForeldelsePeriodeDto(FØRSTE_DATO, sisteDato,
-                ForeldelseVurderingType.FORELDET, FØRSTE_DATO.plusMonths(6), null, "ABC")));
+                new ForeldelsePeriodeDto(FØRSTE_DATO, sisteDato,
+                        ForeldelseVurderingType.FORELDET, FØRSTE_DATO.plusMonths(6), null, "ABC")));
 
         Optional<VurdertForeldelse> vurdertForeldelseOptional = vurdertForeldelseRepository.finnVurdertForeldelse(internBehandlingId);
         assertThat(vurdertForeldelseOptional).isPresent();
@@ -67,9 +67,9 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         assertThat(historikkinnslagDel.getBegrunnelse().get()).isEqualTo("ABC");
         assertThat(historikkinnslagDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.FORELDELSE.getKode());
         assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-            .isEqualTo(ForeldelseVurderingType.FORELDET.getNavn());
+                .isEqualTo(ForeldelseVurderingType.FORELDET.getNavn());
         assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-            .isEqualTo(null);
+                .isEqualTo(null);
     }
 
     @Test
@@ -79,10 +79,10 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         LocalDate andrePeriodeSisteDato = LocalDate.of(2019, 2, 11);
 
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
-            new ForeldelsePeriodeDto(FØRSTE_DATO, førstePeriodeSisteDato,
-                ForeldelseVurderingType.FORELDET, FØRSTE_DATO.plusMonths(8), null, "ABC"),
-            new ForeldelsePeriodeDto(andrePeriodeFørsteDato, andrePeriodeSisteDato,
-                ForeldelseVurderingType.TILLEGGSFRIST, andrePeriodeFørsteDato.plusMonths(8), andrePeriodeFørsteDato.plusMonths(5), "CDE")));
+                new ForeldelsePeriodeDto(FØRSTE_DATO, førstePeriodeSisteDato,
+                        ForeldelseVurderingType.FORELDET, FØRSTE_DATO.plusMonths(8), null, "ABC"),
+                new ForeldelsePeriodeDto(andrePeriodeFørsteDato, andrePeriodeSisteDato,
+                        ForeldelseVurderingType.TILLEGGSFRIST, andrePeriodeFørsteDato.plusMonths(8), andrePeriodeFørsteDato.plusMonths(5), "CDE")));
 
         Optional<VurdertForeldelse> vurdertForeldelseOptional = vurdertForeldelseRepository.finnVurdertForeldelse(internBehandlingId);
         assertThat(vurdertForeldelseOptional).isPresent();
@@ -108,9 +108,9 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         assertThat(førsteDel.getBegrunnelse().get()).isEqualTo("ABC");
         assertThat(førsteDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.FORELDELSE.getKode());
         assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-            .isEqualTo(ForeldelseVurderingType.FORELDET.getNavn());
+                .isEqualTo(ForeldelseVurderingType.FORELDET.getNavn());
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-            .isEqualTo(null);
+                .isEqualTo(null);
 
         HistorikkinnslagDel andreDel = historikkinnslag.getHistorikkinnslagDeler().get(1);
         assertThat(getTilVerdi(andreDel.getOpplysning(HistorikkOpplysningType.PERIODE_FOM))).isEqualTo(formatDate(andrePeriodeFørsteDato));
@@ -118,26 +118,26 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         assertThat(andreDel.getBegrunnelse().get()).isEqualTo("CDE");
         assertThat(andreDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.FORELDELSE.getKode());
         assertThat(getTilVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-            .isEqualTo(ForeldelseVurderingType.TILLEGGSFRIST.getNavn());
+                .isEqualTo(ForeldelseVurderingType.TILLEGGSFRIST.getNavn());
         assertThat(getFraVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-            .isEqualTo(null);
+                .isEqualTo(null);
     }
 
     @Test
     public void henteVurdertForeldelse_nårForeldretPeriode_dekkerMellomToGrunnlagPeriode() {
 
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM_1, LocalDate.of(2016, 3, 23), KlasseType.FEIL,
-            BigDecimal.valueOf(10000), BigDecimal.ZERO);
+                BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 3, 24),
-            TOM_1, KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
+                TOM_1, KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(22000));
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering));
 
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
-            new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 28),
-                ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3), null, "ABC")));
+                new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 28),
+                        ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3), null, "ABC")));
 
         FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(internBehandlingId);
 
@@ -152,16 +152,16 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
     @Test
     public void henteVurdertForeldelse_nårForeldretPeriode_dekkerMellomEnGrunnlagPeriode() {
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM_1, LocalDate.of(2016, 3, 23), KlasseType.FEIL,
-            BigDecimal.valueOf(10000), BigDecimal.ZERO);
+                BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 3, 24),
-            TOM_1, KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
+                TOM_1, KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(22000));
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag);
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
-            new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 20),
-                ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3), null, "ABC")));
+                new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 20),
+                        ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3), null, "ABC")));
 
         FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(internBehandlingId);
 
@@ -176,28 +176,28 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
     @Test
     public void henteVurdertForeldelse_medFlereForeldretPeriode() {
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM_1, LocalDate.of(2016, 3, 15), KlasseType.FEIL,
-            BigDecimal.valueOf(4000), BigDecimal.ZERO);
+                BigDecimal.valueOf(4000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 3, 16),
-            LocalDate.of(2016, 3, 24), KlasseType.FEIL, BigDecimal.valueOf(14000), BigDecimal.ZERO);
+                LocalDate.of(2016, 3, 24), KlasseType.FEIL, BigDecimal.valueOf(14000), BigDecimal.ZERO);
 
         KravgrunnlagMock mockMedFeilPostering3 = new KravgrunnlagMock(LocalDate.of(2016, 3, 26),
-            LocalDate.of(2016, 4, 03), KlasseType.FEIL, BigDecimal.valueOf(5000), BigDecimal.ZERO);
+                LocalDate.of(2016, 4, 03), KlasseType.FEIL, BigDecimal.valueOf(5000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering4 = new KravgrunnlagMock(LocalDate.of(2016, 4, 4),
-            TOM_1, KlasseType.FEIL, BigDecimal.valueOf(6000), BigDecimal.ZERO);
+                TOM_1, KlasseType.FEIL, BigDecimal.valueOf(6000), BigDecimal.ZERO);
 
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(29000));
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2,
-            mockMedFeilPostering3, mockMedFeilPostering4, mockMedYtelPostering));
+                mockMedFeilPostering3, mockMedFeilPostering4, mockMedYtelPostering));
 
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
-            new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 20),
-                ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3), null, "ABC"),
-            new ForeldelsePeriodeDto(LocalDate.of(2016, 3, 21), LocalDate.of(2016, 3, 24),
-                ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3).plusMonths(2), null, "CDE"),
-            new ForeldelsePeriodeDto(LocalDate.of(2016, 3, 26), TOM_1,
-                ForeldelseVurderingType.TILLEGGSFRIST, FOM_1.plusYears(3).plusMonths(3), FOM_1.plusYears(2), "EFG")));
+                new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 20),
+                        ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3), null, "ABC"),
+                new ForeldelsePeriodeDto(LocalDate.of(2016, 3, 21), LocalDate.of(2016, 3, 24),
+                        ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3).plusMonths(2), null, "CDE"),
+                new ForeldelsePeriodeDto(LocalDate.of(2016, 3, 26), TOM_1,
+                        ForeldelseVurderingType.TILLEGGSFRIST, FOM_1.plusYears(3).plusMonths(3), FOM_1.plusYears(2), "EFG")));
 
         FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(internBehandlingId);
 
@@ -226,11 +226,11 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         LocalDate førsteDagAndrePeriode = LocalDate.of(2016, 3, 30);
 
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM_1, LocalDate.of(2016, 3, 23), KlasseType.FEIL,
-            BigDecimal.valueOf(10000), BigDecimal.ZERO);
+                BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 3, 24),
-            sisteDagFørstePeriode, KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
+                sisteDagFørstePeriode, KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering3 = new KravgrunnlagMock(førsteDagAndrePeriode,
-            TOM_1, KlasseType.FEIL, BigDecimal.valueOf(15000), BigDecimal.ZERO);
+                TOM_1, KlasseType.FEIL, BigDecimal.valueOf(15000), BigDecimal.ZERO);
 
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(37000));
 
@@ -262,10 +262,10 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
 
     private FaktaFeilutbetalingPeriode lagPeriode(LocalDate fom, LocalDate tom, HendelseType årsak, HendelseUnderType underårsak, FaktaFeilutbetaling faktaFeilutbetaling) {
         return FaktaFeilutbetalingPeriode.builder()
-            .medPeriode(fom, tom)
-            .medHendelseType(årsak)
-            .medHendelseUndertype(underårsak)
-            .medFeilutbetalinger(faktaFeilutbetaling).build();
+                .medPeriode(fom, tom)
+                .medHendelseType(årsak)
+                .medHendelseUndertype(underårsak)
+                .medFeilutbetalinger(faktaFeilutbetaling).build();
     }
 
     private Historikkinnslag fellesHistorikkInnslagAssert() {

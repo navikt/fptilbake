@@ -47,29 +47,29 @@ public class VarselbrevUtil {
 
         EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfoDto.getGrunninformasjon();
         BrevMetadata metadata = new BrevMetadata.Builder()
-            .medBehandlendeEnhetId(grunninformasjon.getBehandlendeEnhetId())
-            .medBehandlendeEnhetNavn(grunninformasjon.getBehandlendeEnhetNavn())
-            .medSakspartId(personinfo.getPersonIdent().getIdent())
-            .medMottakerAdresse(adresseinfo)
-            .medSaksnummer(saksnummer.getVerdi())
-            .medSakspartNavn(personinfo.getNavn())
-            .medFinnesVerge(finnesVerge)
-            .medVergeNavn(vergeNavn)
-            .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
-            .medFagsaktype(fagsakYtelseType)
-            .medSprakkode(eksternBehandlingsinfoDto.getGrunninformasjon().getSpråkkodeEllerDefault())
-            .medAnsvarligSaksbehandler("VL")
-            .medTittel(getTittelForVarselbrev(ytelseNavn, false))
-            .build();
+                .medBehandlendeEnhetId(grunninformasjon.getBehandlendeEnhetId())
+                .medBehandlendeEnhetNavn(grunninformasjon.getBehandlendeEnhetNavn())
+                .medSakspartId(personinfo.getPersonIdent().getIdent())
+                .medMottakerAdresse(adresseinfo)
+                .medSaksnummer(saksnummer.getVerdi())
+                .medSakspartNavn(personinfo.getNavn())
+                .medFinnesVerge(finnesVerge)
+                .medVergeNavn(vergeNavn)
+                .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
+                .medFagsaktype(fagsakYtelseType)
+                .medSprakkode(eksternBehandlingsinfoDto.getGrunninformasjon().getSpråkkodeEllerDefault())
+                .medAnsvarligSaksbehandler("VL")
+                .medTittel(getTittelForVarselbrev(ytelseNavn, false))
+                .build();
 
         return new VarselbrevSamletInfo.Builder()
-            .medMetadata(metadata)
-            .medFritekstFraSaksbehandler(varselTekst)
-            .medSumFeilutbetaling(feilutbetaltePerioderDto.getSumFeilutbetaling())
-            .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
-            .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
-            .medRevurderingVedtakDato(grunninformasjon.getVedtakDato())
-            .build();
+                .medMetadata(metadata)
+                .medFritekstFraSaksbehandler(varselTekst)
+                .medSumFeilutbetaling(feilutbetaltePerioderDto.getSumFeilutbetaling())
+                .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
+                .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
+                .medRevurderingVedtakDato(grunninformasjon.getVedtakDato())
+                .build();
     }
 
     public static VarselbrevSamletInfo sammenstillInfoFraFagsystemerForhåndvisningVarselbrev( //NOSONAR
@@ -87,75 +87,75 @@ public class VarselbrevUtil {
 
         EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfo.getGrunninformasjon();
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medBehandlendeEnhetId(grunninformasjon.getBehandlendeEnhetId())
-            .medBehandlendeEnhetNavn(grunninformasjon.getBehandlendeEnhetNavn())
-            .medSakspartId(personinfo.getPersonIdent().getIdent())
-            .medMottakerAdresse(adresseinfo)
-            .medSaksnummer(saksnummer.getVerdi())
-            .medSakspartNavn(personinfo.getNavn())
-            .medFinnesVerge(finnesVerge)
-            .medVergeNavn(vergeNavn)
-            .medFagsaktype(fagsakYtelseType)
-            .medSprakkode(grunninformasjon.getSpråkkodeEllerDefault())
-            .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
-            .medAnsvarligSaksbehandler(SubjectHandler.getSubjectHandler().getUid())
-            .medTittel(getTittelForVarselbrev(ytelseNavn, false))
-            .build();
+                .medBehandlendeEnhetId(grunninformasjon.getBehandlendeEnhetId())
+                .medBehandlendeEnhetNavn(grunninformasjon.getBehandlendeEnhetNavn())
+                .medSakspartId(personinfo.getPersonIdent().getIdent())
+                .medMottakerAdresse(adresseinfo)
+                .medSaksnummer(saksnummer.getVerdi())
+                .medSakspartNavn(personinfo.getNavn())
+                .medFinnesVerge(finnesVerge)
+                .medVergeNavn(vergeNavn)
+                .medFagsaktype(fagsakYtelseType)
+                .medSprakkode(grunninformasjon.getSpråkkodeEllerDefault())
+                .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
+                .medAnsvarligSaksbehandler(SubjectHandler.getSubjectHandler().getUid())
+                .medTittel(getTittelForVarselbrev(ytelseNavn, false))
+                .build();
 
         return new VarselbrevSamletInfo.Builder()
-            .medMetadata(brevMetadata)
-            .medFritekstFraSaksbehandler(varseltekst)
-            .medSumFeilutbetaling(feilutbetaltePerioderDto.getSumFeilutbetaling())
-            .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
-            .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
-            .medRevurderingVedtakDato(grunninformasjon.getVedtakDato())
-            .build();
+                .medMetadata(brevMetadata)
+                .medFritekstFraSaksbehandler(varseltekst)
+                .medSumFeilutbetaling(feilutbetaltePerioderDto.getSumFeilutbetaling())
+                .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
+                .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
+                .medRevurderingVedtakDato(grunninformasjon.getVedtakDato())
+                .build();
     }
 
     public static VarselbrevSamletInfo sammenstillInfoFraFagsystemerForSendingManueltVarselBrev(//NOSONAR
-        Behandling behandling,
-        Personinfo personinfo,
-        Adresseinfo adresseinfo,
-        FagsakYtelseType fagsakYtelseType,
-        Språkkode språkkode,
-        YtelseNavn ytelseNavn,
-        Period ventetid,
-        String friTekst,
-        BehandlingFeilutbetalingFakta feilutbetalingFakta,
-        boolean finnesVerge,
-        String vergeNavn,
-        boolean erKorrigert) {
+                                                                                                Behandling behandling,
+                                                                                                Personinfo personinfo,
+                                                                                                Adresseinfo adresseinfo,
+                                                                                                FagsakYtelseType fagsakYtelseType,
+                                                                                                Språkkode språkkode,
+                                                                                                YtelseNavn ytelseNavn,
+                                                                                                Period ventetid,
+                                                                                                String friTekst,
+                                                                                                BehandlingFeilutbetalingFakta feilutbetalingFakta,
+                                                                                                boolean finnesVerge,
+                                                                                                String vergeNavn,
+                                                                                                boolean erKorrigert) {
 
         BrevMetadata metadata = new BrevMetadata.Builder()
-            .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
-            .medBehandlendeEnhetNavn(behandling.getBehandlendeEnhetNavn())
-            .medSakspartId(personinfo.getPersonIdent().getIdent())
-            .medMottakerAdresse(adresseinfo)
-            .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
-            .medSakspartNavn(personinfo.getNavn())
-            .medFinnesVerge(finnesVerge)
-            .medVergeNavn(vergeNavn)
-            .medFagsaktype(fagsakYtelseType)
-            .medSprakkode(språkkode)
-            .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
-            .medAnsvarligSaksbehandler("VL")
-            .medTittel(getTittelForVarselbrev(ytelseNavn, erKorrigert))
-            .build();
+                .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
+                .medBehandlendeEnhetNavn(behandling.getBehandlendeEnhetNavn())
+                .medSakspartId(personinfo.getPersonIdent().getIdent())
+                .medMottakerAdresse(adresseinfo)
+                .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
+                .medSakspartNavn(personinfo.getNavn())
+                .medFinnesVerge(finnesVerge)
+                .medVergeNavn(vergeNavn)
+                .medFagsaktype(fagsakYtelseType)
+                .medSprakkode(språkkode)
+                .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
+                .medAnsvarligSaksbehandler("VL")
+                .medTittel(getTittelForVarselbrev(ytelseNavn, erKorrigert))
+                .build();
 
         return new VarselbrevSamletInfo.Builder()
-            .medMetadata(metadata)
-            .medFritekstFraSaksbehandler(friTekst)
-            .medSumFeilutbetaling(feilutbetalingFakta.getAktuellFeilUtbetaltBeløp().longValue())
-            .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetalingFakta))
-            .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
-            .medRevurderingVedtakDato(feilutbetalingFakta.getDatoForRevurderingsvedtak())
-            .build();
+                .medMetadata(metadata)
+                .medFritekstFraSaksbehandler(friTekst)
+                .medSumFeilutbetaling(feilutbetalingFakta.getAktuellFeilUtbetaltBeløp().longValue())
+                .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetalingFakta))
+                .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
+                .medRevurderingVedtakDato(feilutbetalingFakta.getDatoForRevurderingsvedtak())
+                .build();
     }
 
     private static String getTittelForVarselbrev(YtelseNavn ytelseNavn, boolean erKorrigert) {
         return erKorrigert ?
-            TITTEL_KORRIGERT_VARSEL_TILBAKEBETALING + ytelseNavn.getNavnPåBokmål() :
-            TITTEL_VARSEL_TILBAKEBETALING + ytelseNavn.getNavnPåBokmål();
+                TITTEL_KORRIGERT_VARSEL_TILBAKEBETALING + ytelseNavn.getNavnPåBokmål() :
+                TITTEL_VARSEL_TILBAKEBETALING + ytelseNavn.getNavnPåBokmål();
     }
 
     private static List<HbPeriode> mapFeilutbetaltePerioder(FeilutbetaltePerioderDto feilutbetaltePerioderDto) {
@@ -168,8 +168,8 @@ public class VarselbrevUtil {
 
     private static List<HbPeriode> mapFeilutbetaltePerioder(BehandlingFeilutbetalingFakta feilutbetalingFakta) {
         return feilutbetalingFakta.getPerioder().stream()
-            .map(utbetaltPeriode -> HbPeriode.of(utbetaltPeriode.getFom(), utbetaltPeriode.getTom()))
-            .collect(Collectors.toList());
+                .map(utbetaltPeriode -> HbPeriode.of(utbetaltPeriode.getFom(), utbetaltPeriode.getTom()))
+                .collect(Collectors.toList());
     }
 
     static LocalDate finnFristForTilbakemeldingFraBruker(LocalDateTime dagensDato, Period ventetid) {

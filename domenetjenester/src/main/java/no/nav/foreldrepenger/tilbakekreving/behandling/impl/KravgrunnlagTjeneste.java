@@ -82,10 +82,10 @@ public class KravgrunnlagTjeneste {
         SortedMap<Periode, BigDecimal> feilutbetalingPrPeriode = new TreeMap<>(Periode.COMPARATOR);
         for (KravgrunnlagPeriode432 kravgrunnlagPeriode432 : kravgrunnlag.getPerioder()) {
             BigDecimal feilutbetalt = kravgrunnlagPeriode432.getKravgrunnlagBeloper433().stream()
-                .filter(beløp433 -> beløp433.getKlasseType() == KlasseType.FEIL)
-                .map(KravgrunnlagBelop433::getNyBelop)
-                .reduce(BigDecimal::add)
-                .orElse(BigDecimal.ZERO);
+                    .filter(beløp433 -> beløp433.getKlasseType() == KlasseType.FEIL)
+                    .map(KravgrunnlagBelop433::getNyBelop)
+                    .reduce(BigDecimal::add)
+                    .orElse(BigDecimal.ZERO);
 
             if (feilutbetalt.compareTo(BigDecimal.ZERO) != 0) {
                 feilutbetalingPrPeriode.put(kravgrunnlagPeriode432.getPeriode(), feilutbetalt);
@@ -118,7 +118,7 @@ public class KravgrunnlagTjeneste {
         }
     }
 
-    public void tilbakeførBehandlingTilFaktaSteg(Behandling behandling){
+    public void tilbakeførBehandlingTilFaktaSteg(Behandling behandling) {
         long behandlingId = behandling.getId();
         boolean erForbiFaktaSteg = behandlingskontrollTjeneste.erStegPassert(behandling, FAKTA_FEILUTBETALING);
         //forutsatt at FPTILBAKE allrede har fått SPER melding for den behandlingen og sett behandling på vent med VenteÅrsak VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
@@ -152,8 +152,8 @@ public class KravgrunnlagTjeneste {
         historikkinnslag.setType(HistorikkinnslagType.BEH_STARTET_FORFRA);
         historikkinnslag.setAktør(HistorikkAktør.VEDTAKSLØSNINGEN);
         HistorikkInnslagTekstBuilder historikkInnslagTekstBuilder = new HistorikkInnslagTekstBuilder()
-            .medHendelse(HistorikkinnslagType.BEH_STARTET_FORFRA)
-            .medBegrunnelse(BEGRUNNELSE_BEHANDLING_STARTET_FORFRA);
+                .medHendelse(HistorikkinnslagType.BEH_STARTET_FORFRA)
+                .medBegrunnelse(BEGRUNNELSE_BEHANDLING_STARTET_FORFRA);
         historikkInnslagTekstBuilder.build(historikkinnslag);
         historikkinnslag.setBehandling(behandling);
         historikkRepository.lagre(historikkinnslag);

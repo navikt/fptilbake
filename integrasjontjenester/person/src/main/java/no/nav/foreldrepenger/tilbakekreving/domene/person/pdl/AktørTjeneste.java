@@ -55,16 +55,16 @@ public class AktørTjeneste {
     private static final long DEFAULT_CACHE_TIMEOUT = TimeUnit.MILLISECONDS.convert(8, TimeUnit.HOURS);
 
     private static final Map<Sivilstandstype, SivilstandType> SIVSTAND_FRA_FREG = Map.ofEntries(
-        Map.entry(Sivilstandstype.UOPPGITT, SivilstandType.UOPPGITT),
-        Map.entry(Sivilstandstype.UGIFT, SivilstandType.UGIFT),
-        Map.entry(Sivilstandstype.GIFT, SivilstandType.GIFT),
-        Map.entry(Sivilstandstype.ENKE_ELLER_ENKEMANN, SivilstandType.ETTERLATT),
-        Map.entry(Sivilstandstype.SKILT, SivilstandType.SKILT),
-        Map.entry(Sivilstandstype.SEPARERT, SivilstandType.SEPARERT),
-        Map.entry(Sivilstandstype.REGISTRERT_PARTNER, SivilstandType.REGISTRERT_PARTNER),
-        Map.entry(Sivilstandstype.SEPARERT_PARTNER, SivilstandType.SEPARERT_PARTNER),
-        Map.entry(Sivilstandstype.SKILT_PARTNER, SivilstandType.SKILT_PARTNER),
-        Map.entry(Sivilstandstype.GJENLEVENDE_PARTNER, SivilstandType.GJENLEVENDE_PARTNER)
+            Map.entry(Sivilstandstype.UOPPGITT, SivilstandType.UOPPGITT),
+            Map.entry(Sivilstandstype.UGIFT, SivilstandType.UGIFT),
+            Map.entry(Sivilstandstype.GIFT, SivilstandType.GIFT),
+            Map.entry(Sivilstandstype.ENKE_ELLER_ENKEMANN, SivilstandType.ETTERLATT),
+            Map.entry(Sivilstandstype.SKILT, SivilstandType.SKILT),
+            Map.entry(Sivilstandstype.SEPARERT, SivilstandType.SEPARERT),
+            Map.entry(Sivilstandstype.REGISTRERT_PARTNER, SivilstandType.REGISTRERT_PARTNER),
+            Map.entry(Sivilstandstype.SEPARERT_PARTNER, SivilstandType.SEPARERT_PARTNER),
+            Map.entry(Sivilstandstype.SKILT_PARTNER, SivilstandType.SKILT_PARTNER),
+            Map.entry(Sivilstandstype.GJENLEVENDE_PARTNER, SivilstandType.GJENLEVENDE_PARTNER)
     );
 
     private LRUCache<AktørId, PersonIdent> cacheAktørIdTilIdent;
@@ -97,7 +97,7 @@ public class AktørTjeneste {
         request.setGrupper(List.of(IdentGruppe.AKTORID));
         request.setHistorikk(Boolean.FALSE);
         var projection = new IdentlisteResponseProjection()
-            .identer(new IdentInformasjonResponseProjection().ident());
+                .identer(new IdentInformasjonResponseProjection().ident());
 
         final Identliste identliste;
 
@@ -125,7 +125,7 @@ public class AktørTjeneste {
         request.setGrupper(List.of(IdentGruppe.FOLKEREGISTERIDENT));
         request.setHistorikk(Boolean.FALSE);
         var projection = new IdentlisteResponseProjection()
-            .identer(new IdentInformasjonResponseProjection().ident());
+                .identer(new IdentInformasjonResponseProjection().ident());
 
         final Identliste identliste;
 
@@ -150,7 +150,7 @@ public class AktørTjeneste {
         var query = new HentPersonQueryRequest();
         query.setIdent(aktørId.getId());
         var projection = new PersonResponseProjection()
-            .kjoenn(new KjoennResponseProjection().kjoenn());
+                .kjoenn(new KjoennResponseProjection().kjoenn());
 
         var person = pdlKlient.hentPerson(query, projection);
 
@@ -161,33 +161,33 @@ public class AktørTjeneste {
         var query = new HentPersonQueryRequest();
         query.setIdent(aktørId.getId());
         var projection = new PersonResponseProjection()
-            .navn(new NavnResponseProjection().forkortetNavn().fornavn().mellomnavn().etternavn())
-            .foedsel(new FoedselResponseProjection().foedselsdato())
-            .doedsfall(new DoedsfallResponseProjection().doedsdato())
-            .sivilstand(new SivilstandResponseProjection().type());
+                .navn(new NavnResponseProjection().forkortetNavn().fornavn().mellomnavn().etternavn())
+                .foedsel(new FoedselResponseProjection().foedselsdato())
+                .doedsfall(new DoedsfallResponseProjection().doedsdato())
+                .sivilstand(new SivilstandResponseProjection().type());
 
         var person = pdlKlient.hentPerson(query, projection);
 
         var fødselsdato = person.getFoedsel().stream()
-            .map(Foedsel::getFoedselsdato)
-            .filter(Objects::nonNull)
-            .findFirst().map(d -> LocalDate.parse(d, DateTimeFormatter.ISO_LOCAL_DATE)).orElse(null);
+                .map(Foedsel::getFoedselsdato)
+                .filter(Objects::nonNull)
+                .findFirst().map(d -> LocalDate.parse(d, DateTimeFormatter.ISO_LOCAL_DATE)).orElse(null);
         var dødsdato = person.getDoedsfall().stream()
-            .map(Doedsfall::getDoedsdato)
-            .filter(Objects::nonNull)
-            .findFirst().map(d -> LocalDate.parse(d, DateTimeFormatter.ISO_LOCAL_DATE)).orElse(null);
+                .map(Doedsfall::getDoedsdato)
+                .filter(Objects::nonNull)
+                .findFirst().map(d -> LocalDate.parse(d, DateTimeFormatter.ISO_LOCAL_DATE)).orElse(null);
         var sivilstand = person.getSivilstand().stream()
-            .map(Sivilstand::getType)
-            .findFirst()
-            .map(st -> SIVSTAND_FRA_FREG.getOrDefault(st, SivilstandType.UOPPGITT)).orElse(SivilstandType.UOPPGITT);
+                .map(Sivilstand::getType)
+                .findFirst()
+                .map(st -> SIVSTAND_FRA_FREG.getOrDefault(st, SivilstandType.UOPPGITT)).orElse(SivilstandType.UOPPGITT);
 
         return new Personinfo.Builder()
-            .medAktørId(aktørId).medPersonIdent(personIdent)
-            .medNavn(person.getNavn().stream().map(AktørTjeneste::mapNavn).filter(Objects::nonNull).findFirst().orElse("MANGLER NAVN"))
-            .medFødselsdato(fødselsdato)
-            .medDødsdato(dødsdato)
-            .medSivilstandType(sivilstand)
-            .build();
+                .medAktørId(aktørId).medPersonIdent(personIdent)
+                .medNavn(person.getNavn().stream().map(AktørTjeneste::mapNavn).filter(Objects::nonNull).findFirst().orElse("MANGLER NAVN"))
+                .medFødselsdato(fødselsdato)
+                .medDødsdato(dødsdato)
+                .medSivilstandType(sivilstand)
+                .build();
     }
 
     // Mulighet - skriv om til nullsafe fornavn + mellomnavn + etternavn. Forkortet = TPS
@@ -199,9 +199,9 @@ public class AktørTjeneste {
 
     private static NavBrukerKjønn mapKjønn(Person person) {
         var kode = person.getKjoenn().stream()
-            .map(Kjoenn::getKjoenn)
-            .filter(Objects::nonNull)
-            .findFirst().orElse(KjoennType.UKJENT);
+                .map(Kjoenn::getKjoenn)
+                .filter(Objects::nonNull)
+                .findFirst().orElse(KjoennType.UKJENT);
         if (KjoennType.MANN.equals(kode))
             return NavBrukerKjønn.MANN;
         return KjoennType.KVINNE.equals(kode) ? NavBrukerKjønn.KVINNE : NavBrukerKjønn.UDEFINERT;

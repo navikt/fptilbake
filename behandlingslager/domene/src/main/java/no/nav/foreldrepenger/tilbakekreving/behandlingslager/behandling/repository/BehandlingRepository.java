@@ -42,7 +42,7 @@ public class BehandlingRepository {
     EntityManager getEntityManager() {
         return entityManager;
     }
-    
+
     /**
      * Hent Behandling med angitt id.
      */
@@ -63,8 +63,8 @@ public class BehandlingRepository {
         Objects.requireNonNull(saksnummer, "saksnummer"); //$NON-NLS-1$
 
         TypedQuery<Behandling> query = getEntityManager().createQuery(
-            "SELECT beh from Behandling beh, Fagsak fagsak WHERE beh.fagsak.id=fagsak.id AND fagsak.saksnummer=:saksnummer", //$NON-NLS-1$
-            Behandling.class);
+                "SELECT beh from Behandling beh, Fagsak fagsak WHERE beh.fagsak.id=fagsak.id AND fagsak.saksnummer=:saksnummer", //$NON-NLS-1$
+                Behandling.class);
         query.setParameter("saksnummer", saksnummer); //$NON-NLS-1$
         return query.getResultList();
     }
@@ -100,8 +100,8 @@ public class BehandlingRepository {
         Objects.requireNonNull(fagsakId, KEY_FAGSAK_ID); //$NON-NLS-1$
 
         TypedQuery<Behandling> query = getEntityManager().createQuery(
-            "SELECT beh from Behandling beh WHERE beh.fagsak.id = :fagsakId AND beh.status <> :status", //$NON-NLS-1$
-            Behandling.class);
+                "SELECT beh from Behandling beh WHERE beh.fagsak.id = :fagsakId AND beh.status <> :status", //$NON-NLS-1$
+                Behandling.class);
         query.setParameter(KEY_FAGSAK_ID, fagsakId); //$NON-NLS-1$
         query.setParameter("status", BehandlingStatus.AVSLUTTET); //$NON-NLS-1$
         query.setHint(QueryHints.HINT_READONLY, "true"); //$NON-NLS-1$
@@ -168,10 +168,10 @@ public class BehandlingRepository {
      */
     public Boolean erVersjonUendret(Long behandlingId, Long versjon) {
         Query query = getEntityManager().createNativeQuery(
-            "select count(*) from dual " +
-                "where exists (select 1 from behandling " +
-                "where (behandling.id = ?) " +
-                "and (behandling.versjon = ?))");
+                "select count(*) from dual " +
+                        "where exists (select 1 from behandling " +
+                        "where (behandling.id = ?) " +
+                        "and (behandling.versjon = ?))");
         query.setParameter(1, behandlingId);
         query.setParameter(2, versjon);
         return ((BigDecimal) query.getSingleResult()).intValue() == 1;
@@ -194,8 +194,8 @@ public class BehandlingRepository {
         Objects.requireNonNull(behandlingType, KEY_BEHANDLING_TYPE); // NOSONAR //$NON-NLS-1$
 
         TypedQuery<Behandling> query = getEntityManager().createQuery(
-            "from Behandling where fagsak.id=:fagsakId and behandlingType=:behandlingType order by opprettetTidspunkt desc", //$NON-NLS-1$
-            Behandling.class);
+                "from Behandling where fagsak.id=:fagsakId and behandlingType=:behandlingType order by opprettetTidspunkt desc", //$NON-NLS-1$
+                Behandling.class);
         query.setParameter(KEY_FAGSAK_ID, fagsakId); //$NON-NLS-1$
         query.setParameter(KEY_BEHANDLING_TYPE, behandlingType); //$NON-NLS-1$
         if (readOnly) {

@@ -71,7 +71,7 @@ public class VilkårVurderingSærligGrunnEntitet extends BaseEntitet {
         }
         VilkårVurderingSærligGrunnEntitet that = (VilkårVurderingSærligGrunnEntitet) o;
         return grunn == that.grunn
-            && Objects.equals(begrunnelse, that.begrunnelse);
+                && Objects.equals(begrunnelse, that.begrunnelse);
     }
 
     @Override

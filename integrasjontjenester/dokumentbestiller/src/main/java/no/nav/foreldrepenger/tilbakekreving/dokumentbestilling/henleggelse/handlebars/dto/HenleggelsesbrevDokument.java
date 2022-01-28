@@ -59,12 +59,12 @@ public class HenleggelsesbrevDokument extends BaseDokument {
 
     public void valider() {
         Objects.requireNonNull(getFagsaktypeNavn(), "fagsaktypeNavn kan ikke være null");
-        if(isTilbakekrevingRevurdering()){
+        if (isTilbakekrevingRevurdering()) {
             Objects.requireNonNull(getFritekstFraSaksbehandler(), "fritekst kan ikke være null");
-        }else {
+        } else {
             Objects.requireNonNull(getVarsletDato(), "varsletDato kan ikke være null");
         }
-        if(isFinnesVerge()){
+        if (isFinnesVerge()) {
             Objects.requireNonNull(getAnnenMottakerNavn(), "annenMottakerNavn kan ikke være null");
         }
     }

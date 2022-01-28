@@ -127,9 +127,9 @@ public class HåndterGamleKravgrunnlagTjeneste {
             }
         } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
             LOG.warn("Kravgrunnlag for saksnummer{} med id={} er ugyldig og feiler med følgende exception:{}",
-                kravgrunnlag431.getSaksnummer(),
-                kravgrunnlag431.getEksternKravgrunnlagId(),
-                e.getMessage());
+                    kravgrunnlag431.getSaksnummer(),
+                    kravgrunnlag431.getEksternKravgrunnlagId(),
+                    e.getMessage());
         }
         return Optional.empty();
     }
@@ -148,7 +148,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
             grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
             if (kravgrunnlagMedStatus.erKravgrunnlagSperret()) {
                 LOG.info("Mottatt Kravgrunnlaget med kravgrunnlagId={} for behandling med behandlingId={} er sperret hos økonomi. Derfor sperrer det i fptilbake også.",
-                    kravgrunnlag431.getEksternKravgrunnlagId(), behandlingId);
+                        kravgrunnlag431.getEksternKravgrunnlagId(), behandlingId);
                 sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
             }
         });
@@ -177,7 +177,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
         List<EksternBehandlingsinfoDto> eksternBehandlinger = fagsystemKlient.hentBehandlingForSaksnummer(saksnummer);
         if (!eksternBehandlinger.isEmpty()) {
             return eksternBehandlinger.stream()
-                .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getHenvisning().equals(henvisning)).findAny();
+                    .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getHenvisning().equals(henvisning)).findAny();
         }
         //FIXME k9-tilbake Må tilpasse for å støtte også k9
         LOG.warn("Saksnummer={} finnes ikke i fpsak", saksnummer);
@@ -192,7 +192,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
         UUID eksternBehandlingUuid = eksternBehandlingData.getUuid();
         Henvisning henvisning = eksternBehandlingData.getHenvisning();
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.FAGSAK,
-            Tillegsinformasjon.PERSONOPPLYSNINGER);
+                Tillegsinformasjon.PERSONOPPLYSNINGER);
         FagsakYtelseType fagsakYtelseType = samletEksternBehandlingInfo.getFagsak().getSakstype();
         Saksnummer saksnummer = samletEksternBehandlingInfo.getSaksnummer();
         AktørId aktørId = samletEksternBehandlingInfo.getAktørId();

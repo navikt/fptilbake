@@ -24,10 +24,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 public enum GjelderType implements Kodeverdi {
 
 
-    PERSON("PERSON","Person"),
-    ORGANISASJON("ORGANISASJON","Organisasjon"),
-    SAMHANDLER("SAMHANDLER","Samhandler"),
-    APPBRUKER("APPBRUKER","App bruker");
+    PERSON("PERSON", "Person"),
+    ORGANISASJON("ORGANISASJON", "Organisasjon"),
+    SAMHANDLER("SAMHANDLER", "Samhandler"),
+    APPBRUKER("APPBRUKER", "App bruker");
 
     public static final String KODEVERK = "GJELDER_TYPE";
 

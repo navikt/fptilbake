@@ -68,7 +68,7 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
             try {
                 sftpBatchTjeneste.put(resultat.get(), filnavn);
                 logger.info("Filen {} er overført til avstemming sftp", filnavn);
-            } catch (JSchException | SftpException e ) {
+            } catch (JSchException | SftpException e) {
                 throw new IntegrasjonException("FPT-614386", String.format("Overføring av fil [%s] til avstemming feilet.", filnavn), e);
             }
         }

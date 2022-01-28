@@ -85,12 +85,12 @@ public class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
     @SafeVarargs
     private void lagTeksterOgValider(FagsakYtelseType ytelsetype, Språkkode språkkode, Set<HendelseMedUndertype>... unntak) {
         HbVedtaksbrevFelles felles = lagFellesBuilder(språkkode)
-            .medSak(HbSak.build()
-                .medYtelsetype(ytelsetype)
-                .medErFødsel(true)
-                .medAntallBarn(1)
-                .build())
-            .build();
+                .medSak(HbSak.build()
+                        .medYtelsetype(ytelsetype)
+                        .medErFødsel(true)
+                        .medAntallBarn(1)
+                        .build())
+                .build();
         Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
         sjekkVerdier(resultat, unntak);
     }
@@ -134,8 +134,8 @@ public class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
         Map<HendelseMedUndertype, String> resultat = new LinkedHashMap<>();
         for (HendelseMedUndertype undertype : getFeilutbetalingsårsaker(felles.getYtelsetype())) {
             HbVedtaksbrevPeriode periode = lagPeriodeBuilder()
-                .medFakta(undertype.getHendelseType(), undertype.getHendelseUnderType())
-                .build();
+                    .medFakta(undertype.getHendelseType(), undertype.getHendelseUnderType())
+                    .build();
             HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
             String tekst = TekstformatererVedtaksbrev.lagFaktaTekst(data);
             resultat.put(undertype, tekst);
@@ -145,49 +145,49 @@ public class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
 
     private HbVedtaksbrevPeriode.Builder lagPeriodeBuilder() {
         return HbVedtaksbrevPeriode.builder()
-            .medPeriode(januar)
-            .medKravgrunnlag(HbKravgrunnlag.builder()
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(10000))
-                .medUtbetaltBeløp(BigDecimal.valueOf(33333))
-                .medRiktigBeløp(BigDecimal.valueOf(23333))
-                .build())
-            .medVurderinger(HbVurderinger.builder()
-                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
-                .medVilkårResultat(VilkårResultat.GOD_TRO)
-                .medBeløpIBehold(BigDecimal.valueOf(10000))
-                .build())
-            .medResultat(HbResultat.builder()
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(10000))
-                .medRenterBeløp(BigDecimal.valueOf(1000))
-                .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(9000))
-                .build());
+                .medPeriode(januar)
+                .medKravgrunnlag(HbKravgrunnlag.builder()
+                        .medFeilutbetaltBeløp(BigDecimal.valueOf(10000))
+                        .medUtbetaltBeløp(BigDecimal.valueOf(33333))
+                        .medRiktigBeløp(BigDecimal.valueOf(23333))
+                        .build())
+                .medVurderinger(HbVurderinger.builder()
+                        .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                        .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
+                        .medVilkårResultat(VilkårResultat.GOD_TRO)
+                        .medBeløpIBehold(BigDecimal.valueOf(10000))
+                        .build())
+                .medResultat(HbResultat.builder()
+                        .medTilbakekrevesBeløp(BigDecimal.valueOf(10000))
+                        .medRenterBeløp(BigDecimal.valueOf(1000))
+                        .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(9000))
+                        .build());
     }
 
     private HbVedtaksbrevFelles.Builder lagFellesBuilder(Språkkode språkkode) {
         return builder()
-            .medLovhjemmelVedtak("Folketrygdloven")
-            .medVedtakResultat(HbTotalresultat.builder()
-                .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
-                .medTotaltRentebeløp(BigDecimal.valueOf(1000))
-                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(10000))
-                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(11000))
-                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(11000))
-                .build())
-            .medVarsel(HbVarsel.builder()
-                .medVarsletBeløp(BigDecimal.valueOf(10000))
-                .medVarsletDato(LocalDate.now().minusDays(100))
-                .build())
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .medKlagefristUker(6)
-                .build())
-            .medSpråkkode(språkkode)
-            .medSøker(HbPerson.builder()
-                .medNavn("Søker Søkersen")
-                .medDødsdato(LocalDate.of(2018, 3, 1))
-                .medErGift(true)
-                .build())
-            ;
+                .medLovhjemmelVedtak("Folketrygdloven")
+                .medVedtakResultat(HbTotalresultat.builder()
+                        .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+                        .medTotaltRentebeløp(BigDecimal.valueOf(1000))
+                        .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(10000))
+                        .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(11000))
+                        .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(11000))
+                        .build())
+                .medVarsel(HbVarsel.builder()
+                        .medVarsletBeløp(BigDecimal.valueOf(10000))
+                        .medVarsletDato(LocalDate.now().minusDays(100))
+                        .build())
+                .medKonfigurasjon(HbKonfigurasjon.builder()
+                        .medKlagefristUker(6)
+                        .build())
+                .medSpråkkode(språkkode)
+                .medSøker(HbPerson.builder()
+                        .medNavn("Søker Søkersen")
+                        .medDødsdato(LocalDate.of(2018, 3, 1))
+                        .medErGift(true)
+                        .build())
+                ;
     }
 
     private List<HendelseMedUndertype> getFeilutbetalingsårsaker(FagsakYtelseType ytelseType) {

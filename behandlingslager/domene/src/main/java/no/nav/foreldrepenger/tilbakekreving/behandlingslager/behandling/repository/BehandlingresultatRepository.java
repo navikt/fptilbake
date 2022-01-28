@@ -35,9 +35,9 @@ public class BehandlingresultatRepository {
 
     public void henlegg(Behandling behandling, BehandlingResultatType behandlingResultatType) {
         var builder = hent(behandling)
-            .map(Behandlingsresultat::builderEndreEksisterende)
-            .orElseGet(() -> Behandlingsresultat.builder().medBehandling(behandling))
-            .medBehandlingResultatType(behandlingResultatType);
+                .map(Behandlingsresultat::builderEndreEksisterende)
+                .orElseGet(() -> Behandlingsresultat.builder().medBehandling(behandling))
+                .medBehandlingResultatType(behandlingResultatType);
         lagre(builder.build());
     }
 

@@ -21,7 +21,7 @@ public abstract class BehandlingskontrollEvent implements BehandlingEvent {
     private BehandlingskontrollKontekst kontekst;
 
     public BehandlingskontrollEvent(BehandlingskontrollKontekst kontekst, BehandlingModell behandlingModell, BehandlingStegType stegType,
-            BehandlingStegStatus stegStatus) {
+                                    BehandlingStegStatus stegStatus) {
         this.kontekst = kontekst;
         this.behandlingModell = behandlingModell;
         this.stegType = stegType;

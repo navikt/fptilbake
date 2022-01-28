@@ -53,19 +53,19 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     public void setup() {
         kravVedtakStatusRepository = new KravVedtakStatusRepository(entityManager);
         HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider,
-            taskTjeneste, behandlingskontrollTjeneste, historikkinnslagTjeneste);
+                taskTjeneste, behandlingskontrollTjeneste, historikkinnslagTjeneste);
         KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
-            taskTjeneste, repositoryProvider, henleggBehandlingTjeneste,
-            behandlingskontrollTjeneste);
+                taskTjeneste, repositoryProvider, henleggBehandlingTjeneste,
+                behandlingskontrollTjeneste);
         KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
         finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository,
-            kravVedtakStatusTjeneste, behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper, fagsystemKlientMock);
+                kravVedtakStatusTjeneste, behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper, fagsystemKlientMock);
 
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, HENVISNING, FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
         saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.HENTGRUNNLAGSTEG,
-            LocalDateTime.now().plusDays(10), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+                LocalDateTime.now().plusDays(10), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
     }
 
     @Test
@@ -216,7 +216,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(ANNEN_HENVISNING, saksnummer, mottattXmlId);
 
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
-        var e= assertThrows(TekniskException.class, () -> finnGrunnlagTask.doTask(prosessTaskData));
+        var e = assertThrows(TekniskException.class, () -> finnGrunnlagTask.doTask(prosessTaskData));
         assertThat(e.getMessage()).contains("FPT-783524");
     }
 
@@ -288,8 +288,8 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
 
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         assertThatThrownBy(() -> finnGrunnlagTask.doTask(prosessTaskData))
-            .isInstanceOf(TekniskException.class)
-            .hasMessageContaining("FPT-107929");
+                .isInstanceOf(TekniskException.class)
+                .hasMessageContaining("FPT-107929");
     }
 
     @Test

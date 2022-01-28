@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll;
 
 /**
  * Visitor som kan benyttes til å traversere en sekvens av {@link BehandlingSteg}.
- *
  */
 public interface BehandlingModellVisitor {
 

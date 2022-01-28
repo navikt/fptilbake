@@ -73,7 +73,7 @@ public class BehandlingskontrollEventPublisererTest {
         var stegType = BehandlingStegType.FAKTA_FEILUTBETALING;
 
         var aksjonspunkt = serviceProvider.getAksjonspunktKontrollRepository().leggTilAksjonspunkt(behandling,
-            AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, stegType);
+                AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, stegType);
         kontrollTjeneste.aksjonspunkterEndretStatus(kontekst, stegType, List.of(aksjonspunkt));
 
         var ads = new AksjonspunktDefinisjon[]{AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING};
@@ -123,9 +123,9 @@ public class BehandlingskontrollEventPublisererTest {
         BehandlingStegStatusEvent steg4StatusEvent0 = new BehandlingStegStatusEvent(kontekst, STEG_4, null, BehandlingStegStatus.STARTET);
         BehandlingStegStatusEvent steg4StatusEvent = new BehandlingStegStatusEvent(kontekst, STEG_3, BehandlingStegStatus.STARTET, BehandlingStegStatus.UTGANG);
         TestEventObserver.containsExactly(steg1StatusEvent0, steg1StatusEvent1 //
-            , steg2StatusEvent0, steg2StatusEvent//
-            , steg3StatusEvent0, steg3StatusEvent//
-            , steg4StatusEvent0, steg4StatusEvent//
+                , steg2StatusEvent0, steg2StatusEvent//
+                , steg3StatusEvent0, steg3StatusEvent//
+                , steg4StatusEvent0, steg4StatusEvent//
         );
     }
 
@@ -178,7 +178,7 @@ public class BehandlingskontrollEventPublisererTest {
     private BehandlingStegOvergangEvent nyOvergangEvent(BehandlingskontrollKontekst kontekst,
                                                         BehandlingStegType steg1, BehandlingStegStatus steg1Status, BehandlingStegType steg2, BehandlingStegStatus steg2Status) {
         return new BehandlingStegOvergangEvent(kontekst, lagTilstand(steg1, steg1Status),
-            lagTilstand(steg2, steg2Status));
+                lagTilstand(steg2, steg2Status));
     }
 
     private BehandlingStegTilstandSnapshot lagTilstand(BehandlingStegType stegType,
@@ -199,10 +199,10 @@ public class BehandlingskontrollEventPublisererTest {
         DummySteg steg2 = new DummySteg();
 
         List<TestStegKonfig> modellData = List.of(
-            new TestStegKonfig(STEG_1, behandlingType, steg, ap(), ap()),
-            new TestStegKonfig(STEG_2, behandlingType, steg0, ap(a0_0), ap(a0_1)),
-            new TestStegKonfig(STEG_3, behandlingType, steg1, ap(), ap(a1_1)),
-            new TestStegKonfig(STEG_4, behandlingType, steg2, ap(), ap(a2_1))
+                new TestStegKonfig(STEG_1, behandlingType, steg, ap(), ap()),
+                new TestStegKonfig(STEG_2, behandlingType, steg0, ap(a0_0), ap(a0_1)),
+                new TestStegKonfig(STEG_3, behandlingType, steg1, ap(), ap(a1_1)),
+                new TestStegKonfig(STEG_4, behandlingType, steg2, ap(), ap(a2_1))
         );
 
         return ModifiserbarBehandlingModell.setupModell(behandlingType, modellData);

@@ -32,7 +32,7 @@ public class VurderPåNyttÅrsak extends BaseEntitet implements IndexKey {
     private VurderÅrsak årsaksType;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "aksjonspunkt_id", nullable = false, updatable=false)
+    @JoinColumn(name = "aksjonspunkt_id", nullable = false, updatable = false)
     private Aksjonspunkt aksjonspunkt;
 
     VurderPåNyttÅrsak() {
@@ -63,7 +63,7 @@ public class VurderPåNyttÅrsak extends BaseEntitet implements IndexKey {
         }
         VurderPåNyttÅrsak that = (VurderPåNyttÅrsak) o;
         return Objects.equals(getÅrsaksType(), that.getÅrsaksType()) &&
-            Objects.equals(aksjonspunkt, that.aksjonspunkt);
+                Objects.equals(aksjonspunkt, that.aksjonspunkt);
     }
 
     @Override

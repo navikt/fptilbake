@@ -22,7 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
@@ -33,7 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 class KorrigertHenvisningTaskTest {
 
     private BehandlingRepositoryProvider repositoryProvider;
@@ -45,7 +45,7 @@ class KorrigertHenvisningTaskTest {
     private UUID uuid = UUID.randomUUID();
 
     @BeforeEach
-    void setUp(EntityManager entityManager){
+    void setUp(EntityManager entityManager) {
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
@@ -53,9 +53,9 @@ class KorrigertHenvisningTaskTest {
     }
 
     @Test
-    void skal_utføre_korrigert_henvisning_task(){
+    void skal_utføre_korrigert_henvisning_task() {
         when(mockFagsystemKlient.hentBehandlingsinfoOpt(any(UUID.class), any(Tillegsinformasjon.class)))
-            .thenReturn(Optional.of(lagEksternBehandlingInfo(behandling.getFagsak().getSaksnummer())));
+                .thenReturn(Optional.of(lagEksternBehandlingInfo(behandling.getFagsak().getSaksnummer())));
         korrigertHenvisningTask.doTask(lagProsessTaskData());
 
         assertTrue(eksternBehandlingRepository.finnesAktivtEksternBehandling(behandling.getId()));
@@ -64,31 +64,31 @@ class KorrigertHenvisningTaskTest {
     }
 
     @Test
-     void skal_ikke_utføre_korrigert_henvisning_task_når_ekstern_behandling_uuid_ikke_finnes(){
+    void skal_ikke_utføre_korrigert_henvisning_task_når_ekstern_behandling_uuid_ikke_finnes() {
         when(mockFagsystemKlient.hentBehandlingsinfoOpt(any(UUID.class), any(Tillegsinformasjon.class)))
-            .thenReturn(Optional.empty());
+                .thenReturn(Optional.empty());
         ProsessTaskData prosessTaskData = lagProsessTaskData();
         var e = assertThrows(TekniskException.class, () -> korrigertHenvisningTask.doTask(prosessTaskData));
         assertThat(e.getMessage()).contains("FPT-7728492");
     }
 
     @Test
-    void skal_ikke_utføre_korrigert_henvisning_task_når_ekstern_behandling_uuid_ikke_har_samme_saksnummer(){
+    void skal_ikke_utføre_korrigert_henvisning_task_når_ekstern_behandling_uuid_ikke_har_samme_saksnummer() {
         when(mockFagsystemKlient.hentBehandlingsinfoOpt(any(UUID.class), any(Tillegsinformasjon.class)))
-            .thenReturn(Optional.of(lagEksternBehandlingInfo(new Saksnummer("1245454"))));
+                .thenReturn(Optional.of(lagEksternBehandlingInfo(new Saksnummer("1245454"))));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
         var e = assertThrows(TekniskException.class, () -> korrigertHenvisningTask.doTask(prosessTaskData));
         assertThat(e.getMessage()).contains("FPT-7728493");
     }
 
-    private ProsessTaskData lagProsessTaskData(){
+    private ProsessTaskData lagProsessTaskData() {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(KorrigertHenvisningTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setProperty(KorrigertHenvisningTask.PROPERTY_EKSTERN_UUID, uuid.toString());
         return prosessTaskData;
     }
 
-    private SamletEksternBehandlingInfo lagEksternBehandlingInfo(Saksnummer saksnummer){
+    private SamletEksternBehandlingInfo lagEksternBehandlingInfo(Saksnummer saksnummer) {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setHenvisning(Henvisning.fraEksternBehandlingId(123l));
         eksternBehandlingsinfoDto.setUuid(uuid);
@@ -97,8 +97,8 @@ class KorrigertHenvisningTaskTest {
         fagsakDto.setSaksnummer(saksnummer.getVerdi());
         fagsakDto.setSakstype(FagsakYtelseType.FORELDREPENGER);
         SamletEksternBehandlingInfo eksternBehandlingInfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.FAGSAK)
-            .setGrunninformasjon(eksternBehandlingsinfoDto)
-            .setFagsak(fagsakDto).build();
+                .setGrunninformasjon(eksternBehandlingsinfoDto)
+                .setFagsak(fagsakDto).build();
         return eksternBehandlingInfo;
     }
 }

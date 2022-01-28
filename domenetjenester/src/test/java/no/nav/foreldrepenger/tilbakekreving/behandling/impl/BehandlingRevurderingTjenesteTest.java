@@ -43,8 +43,8 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
     @Test
     public void opprettRevurdering_nårTbkBehandlingErIkkeAvsluttet() {
         assertThatThrownBy(() -> revurderingTjeneste.opprettRevurdering(behandling.getId(), BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR))
-            .isInstanceOf(FunksjonellException.class)
-            .hasMessageContaining("FPT-663487");
+                .isInstanceOf(FunksjonellException.class)
+                .hasMessageContaining("FPT-663487");
 
     }
 
@@ -82,13 +82,13 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void opprettRevurdering_nårTbkBehandlingErAvsluttet_medverge() {
-        VergeEntitet vergeEntitet = VergeEntitet.builder().medGyldigPeriode(FOM,TOM)
-            .medNavn("John Doe")
-            .medKilde(KildeType.FPTILBAKE.name())
-            .medVergeAktørId(behandling.getAktørId())
-            .medBegrunnelse("test")
-            .medVergeType(VergeType.ANNEN_F).build();
-        vergeRepository.lagreVergeInformasjon(behandling.getId(),vergeEntitet);
+        VergeEntitet vergeEntitet = VergeEntitet.builder().medGyldigPeriode(FOM, TOM)
+                .medNavn("John Doe")
+                .medKilde(KildeType.FPTILBAKE.name())
+                .medVergeAktørId(behandling.getAktørId())
+                .medBegrunnelse("test")
+                .medVergeType(VergeType.ANNEN_F).build();
+        vergeRepository.lagreVergeInformasjon(behandling.getId(), vergeEntitet);
         behandling.avsluttBehandling();
         BehandlingLås behandlingLås = repoProvider.getBehandlingRepository().taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);

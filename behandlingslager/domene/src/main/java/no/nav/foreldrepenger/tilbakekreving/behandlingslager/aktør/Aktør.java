@@ -15,7 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 public abstract class Aktør extends BaseEntitet {
 
     @Embedded
-    @AttributeOverrides(@AttributeOverride(name = "aktørId", column = @Column(name = "aktoer_id", unique=true, nullable = false, updatable = false)))
+    @AttributeOverrides(@AttributeOverride(name = "aktørId", column = @Column(name = "aktoer_id", unique = true, nullable = false, updatable = false)))
     private AktørId aktørId;
 
     @SuppressWarnings("unused")

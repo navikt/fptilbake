@@ -32,7 +32,7 @@ public class VedtakAksjonspunktData {
     public AksjonspunktDefinisjon getAksjonspunktDefinisjon() {
         return aksjonspunktDefinisjon;
     }
-    
+
     public String getBegrunnelse() {
         return begrunnelse;
     }

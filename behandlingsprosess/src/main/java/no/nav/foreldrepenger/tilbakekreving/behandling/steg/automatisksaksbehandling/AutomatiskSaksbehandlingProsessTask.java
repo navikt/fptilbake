@@ -43,16 +43,16 @@ public class AutomatiskSaksbehandlingProsessTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
-        logger.info("Startet automatisk saksbehandling for behandling={}",behandlingId);
+        logger.info("Startet automatisk saksbehandling for behandling={}", behandlingId);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
 
-        if(behandling.isBehandlingPåVent()){
-            logger.warn("Behandling={} er på vent, kan ikke saksbehandle automatisk",behandlingId);
-        }else if(behandling.erAvsluttet()){
-            logger.warn("Behandling={} er allerede avsluttet, kan ikke saksbehandle automatisk",behandlingId);
-        }else if(behandling.getAnsvarligSaksbehandler() != null && !behandling.getAnsvarligSaksbehandler().isEmpty()){
-            logger.warn("Behandling={} er allerede saksbehandlet, kan ikke saksbehandle automatisk",behandlingId);
-        }else {
+        if (behandling.isBehandlingPåVent()) {
+            logger.warn("Behandling={} er på vent, kan ikke saksbehandle automatisk", behandlingId);
+        } else if (behandling.erAvsluttet()) {
+            logger.warn("Behandling={} er allerede avsluttet, kan ikke saksbehandle automatisk", behandlingId);
+        } else if (behandling.getAnsvarligSaksbehandler() != null && !behandling.getAnsvarligSaksbehandler().isEmpty()) {
+            logger.warn("Behandling={} er allerede saksbehandlet, kan ikke saksbehandle automatisk", behandlingId);
+        } else {
             skruPåAutomatiskSaksbehandling(behandling);
             startAutomatiskSaksbehandling(behandling);
         }

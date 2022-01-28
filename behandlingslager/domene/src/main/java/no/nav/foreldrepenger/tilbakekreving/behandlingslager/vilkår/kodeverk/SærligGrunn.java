@@ -23,11 +23,11 @@ import no.nav.vedtak.util.InputValideringRegex;
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum SærligGrunn implements Kodeverdi {
 
-    GRAD_AV_UAKTSOMHET("GRAD_UAKTSOMHET","Graden av uaktsomhet hos den kravet retter seg mot"),
-    HELT_ELLER_DELVIS_NAVS_FEIL("HELT_ELLER_DELVIS_NAVS_FEIL","Om feilen helt eller delvis kan tilskrives NAV"),
-    STØRRELSE_BELØP("STOERRELSE_BELOEP","Størrelsen på feilutbetalt beløp"),
-    TID_FRA_UTBETALING("TID_FRA_UTBETALING","Hvor lang tid siden utbetalingen fant sted"),
-    ANNET("ANNET","Annet");
+    GRAD_AV_UAKTSOMHET("GRAD_UAKTSOMHET", "Graden av uaktsomhet hos den kravet retter seg mot"),
+    HELT_ELLER_DELVIS_NAVS_FEIL("HELT_ELLER_DELVIS_NAVS_FEIL", "Om feilen helt eller delvis kan tilskrives NAV"),
+    STØRRELSE_BELØP("STOERRELSE_BELOEP", "Størrelsen på feilutbetalt beløp"),
+    TID_FRA_UTBETALING("TID_FRA_UTBETALING", "Hvor lang tid siden utbetalingen fant sted"),
+    ANNET("ANNET", "Annet");
 
     @Pattern(regexp = InputValideringRegex.KODEVERK)
     private String kode;

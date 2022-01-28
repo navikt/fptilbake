@@ -10,7 +10,8 @@
     <sequence-generator name="SEQ_VILKAAR_PERIODE" allocation-size="50" sequence-name="SEQ_VILKAAR_PERIODE"/>
     <sequence-generator name="SEQ_VILKAAR_AKTSOMHET" allocation-size="50" sequence-name="SEQ_VILKAAR_AKTSOMHET"/>
     <sequence-generator name="SEQ_VILKAAR_GOD_TRO" allocation-size="50" sequence-name="SEQ_VILKAAR_GOD_TRO"/>
-    <sequence-generator name="SEQ_VILKAAR_SAERLIG_GRUNN" allocation-size="50" sequence-name="SEQ_VILKAAR_SAERLIG_GRUNN"/>
+    <sequence-generator name="SEQ_VILKAAR_SAERLIG_GRUNN" allocation-size="50"
+                        sequence-name="SEQ_VILKAAR_SAERLIG_GRUNN"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet"/>

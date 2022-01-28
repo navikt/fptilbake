@@ -48,14 +48,14 @@ public class TilbakekrevingsvedtakTjenesteTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke, List.of(
-                KravgrunnlagTestBuilder.KgBeløp.feil(9000),
-                KravgrunnlagTestBuilder.KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medTilbakekrevBeløp(9000),
-                KravgrunnlagTestBuilder.KgBeløp.trekk(2000))
-            ),
+                        uke, List.of(
+                                KravgrunnlagTestBuilder.KgBeløp.feil(9000),
+                                KravgrunnlagTestBuilder.KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medTilbakekrevBeløp(9000),
+                                KravgrunnlagTestBuilder.KgBeløp.trekk(2000))
+                ),
                 false);
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            uke, VilkårsvurderingTestBuilder.VVurdering.forsett()
+                uke, VilkårsvurderingTestBuilder.VVurdering.forsett()
         ));
 
         flushAndClear();

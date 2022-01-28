@@ -10,14 +10,19 @@
     <sequence-generator name="SEQ_FAGSAK_PROSESS_TASK" allocation-size="50" sequence-name="SEQ_FAGSAK_PROSESS_TASK"/>
     <sequence-generator name="SEQ_BEHANDLING" allocation-size="50" sequence-name="SEQ_BEHANDLING"/>
     <sequence-generator name="SEQ_EKSTERN_BEHANDLING" allocation-size="50" sequence-name="SEQ_EKSTERN_BEHANDLING"/>
-    <sequence-generator name="SEQ_BEHANDLING_STEG_TILSTAND" allocation-size="50" sequence-name="SEQ_BEHANDLING_STEG_TILSTAND"/>
-    <sequence-generator name="SEQ_BEHANDLING_TYPE_STEG_SEKV" allocation-size="50" sequence-name="SEQ_BEHANDLING_STEG_TYPE_SEKV"/>
+    <sequence-generator name="SEQ_BEHANDLING_STEG_TILSTAND" allocation-size="50"
+                        sequence-name="SEQ_BEHANDLING_STEG_TILSTAND"/>
+    <sequence-generator name="SEQ_BEHANDLING_TYPE_STEG_SEKV" allocation-size="50"
+                        sequence-name="SEQ_BEHANDLING_STEG_TYPE_SEKV"/>
     <sequence-generator name="SEQ_BEHANDLING_ARSAK" allocation-size="50" sequence-name="SEQ_BEHANDLING_ARSAK"/>
     <sequence-generator name="SEQ_AKSJONSPUNKT" allocation-size="50" sequence-name="SEQ_AKSJONSPUNKT"/>
-    <sequence-generator name="SEQ_VURDER_PAA_NYTT_AARSAK" allocation-size="50" sequence-name="SEQ_VURDER_PAA_NYTT_AARSAK"/>
+    <sequence-generator name="SEQ_VURDER_PAA_NYTT_AARSAK" allocation-size="50"
+                        sequence-name="SEQ_VURDER_PAA_NYTT_AARSAK"/>
     <sequence-generator name="SEQ_TOTRINNSVURDERING" allocation-size="50" sequence-name="SEQ_TOTRINNSVURDERING"/>
-    <sequence-generator name="SEQ_TOTRINNRESULTATGRUNNLAG" allocation-size="50" sequence-name="SEQ_TOTRINNRESULTATGRUNNLAG"/>
-    <sequence-generator name="SEQ_VURDER_AARSAK_TTVURDERING" allocation-size="50" sequence-name="SEQ_VURDER_AARSAK_TTVURDERING"/>
+    <sequence-generator name="SEQ_TOTRINNRESULTATGRUNNLAG" allocation-size="50"
+                        sequence-name="SEQ_TOTRINNRESULTATGRUNNLAG"/>
+    <sequence-generator name="SEQ_VURDER_AARSAK_TTVURDERING" allocation-size="50"
+                        sequence-name="SEQ_VURDER_AARSAK_TTVURDERING"/>
     <sequence-generator name="SEQ_VERGE" allocation-size="50" sequence-name="SEQ_VERGE"/>
     <sequence-generator name="SEQ_GR_VERGE" allocation-size="50" sequence-name="SEQ_GR_VERGE"/>
 

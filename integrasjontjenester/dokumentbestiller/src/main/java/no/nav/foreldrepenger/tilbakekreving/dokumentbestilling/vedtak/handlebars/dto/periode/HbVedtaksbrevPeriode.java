@@ -89,10 +89,10 @@ public class HbVedtaksbrevPeriode {
 
         public Builder medFakta(HendelseType hendelseType, HendelseUnderType hendelseUnderType, String fritekstFakta) {
             kladd.fakta = HbFakta.builder()
-                .medHendelsetype(hendelseType)
-                .medHendelseUndertype(hendelseUnderType)
-                .medFritekstFakta(fritekstFakta)
-                .build();
+                    .medHendelsetype(hendelseType)
+                    .medHendelseUndertype(hendelseUnderType)
+                    .medFritekstFakta(fritekstFakta)
+                    .build();
             return this;
         }
 
@@ -104,7 +104,7 @@ public class HbVedtaksbrevPeriode {
             Objects.requireNonNull(kladd.resultat, "resultat er ikke satt");
 
             if ((HendelseType.ØKONOMI_FEIL.equals(kladd.fakta.getHendelsetype()) || HendelseType.ES_FEIL_UTBETALING_TYPE.equals(kladd.fakta.getHendelsetype()))
-                && !kladd.kravgrunnlag.harRiktigOgUtbetaltBeløp()) {
+                    && !kladd.kravgrunnlag.harRiktigOgUtbetaltBeløp()) {
                 throw new IllegalArgumentException("har ikke satt riktig beløp og/eller utbetalt beløp");
             }
 

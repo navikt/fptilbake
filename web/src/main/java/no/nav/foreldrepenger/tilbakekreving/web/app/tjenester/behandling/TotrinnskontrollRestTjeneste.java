@@ -52,7 +52,7 @@ public class TotrinnskontrollRestTjeneste {
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<TotrinnskontrollSkjermlenkeContextDto> hentTotrinnskontrollSkjermlenkeContext(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                                                                                  @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
+                                                                                              @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
         return totrinnskontrollTjeneste.hentTotrinnsSkjermlenkeContext(behandling);
     }
@@ -64,8 +64,8 @@ public class TotrinnskontrollRestTjeneste {
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<TotrinnskontrollSkjermlenkeContextDto> hentTotrinnskontrollvurderingSkjermlenkeContext(
-        @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-        @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
+            @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+            @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
         return totrinnskontrollTjeneste.hentTotrinnsvurderingSkjermlenkeContext(behandling);
     }

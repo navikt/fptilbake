@@ -25,7 +25,8 @@ public class VarselresponsDto implements AbacDto {
     @Valid
     private ResponsKanal kildeKanal;
 
-    VarselresponsDto() {}
+    VarselresponsDto() {
+    }
 
     public VarselresponsDto(Long behandlingId, ResponsKanal kildeKanal, Boolean akseptertFaktagrunnlag) {
         this.behandlingId = new BehandlingReferanse(behandlingId);

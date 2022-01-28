@@ -22,12 +22,12 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars
 
 public class TekstformatererVarselbrev extends FellesTekstformaterer {
     private static Set<FagsakYtelseType> støttetTyper = Set.of(
-        FagsakYtelseType.FORELDREPENGER,
-        FagsakYtelseType.ENGANGSTØNAD,
-        FagsakYtelseType.SVANGERSKAPSPENGER,
-        FagsakYtelseType.OMSORGSPENGER,
-        FagsakYtelseType.PLEIEPENGER_SYKT_BARN,
-        FagsakYtelseType.FRISINN);
+            FagsakYtelseType.FORELDREPENGER,
+            FagsakYtelseType.ENGANGSTØNAD,
+            FagsakYtelseType.SVANGERSKAPSPENGER,
+            FagsakYtelseType.OMSORGSPENGER,
+            FagsakYtelseType.PLEIEPENGER_SYKT_BARN,
+            FagsakYtelseType.FRISINN);
 
     private TekstformatererVarselbrev() {
         // for static access
@@ -37,7 +37,7 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
         try {
             Template template = opprettHandlebarsTemplate("varsel/varsel", varselbrevSamletInfo.getBrevMetadata().getSpråkkode());
             VarselbrevDokument varselbrevDokument = mapTilVarselbrevDokument(
-                varselbrevSamletInfo);
+                    varselbrevSamletInfo);
 
             return applyTemplate(template, varselbrevDokument);
         } catch (IOException e) {
@@ -60,8 +60,8 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
         try {
             Template template = opprettHandlebarsTemplate("varsel/korrigert_varsel", varselbrevSamletInfo.getBrevMetadata().getSpråkkode());
             VarselbrevDokument varselbrevDokument = mapTilKorrigertVarselbrevDokument(
-                varselbrevSamletInfo,
-                varselInfo);
+                    varselbrevSamletInfo,
+                    varselInfo);
 
             return applyTemplate(template, varselbrevDokument);
         } catch (IOException e) {

@@ -75,7 +75,7 @@ public class VedtakFattetMeldingConsumer {
         return topic;
     }
 
-    private Properties lagFellesProperty(String bootstrapServers, String applikasjonNavn){
+    private Properties lagFellesProperty(String bootstrapServers, String applikasjonNavn) {
         Properties properties = new Properties();
         properties.setProperty("key.deserializer", StringDeserializer.class.getName());
         properties.setProperty("value.deserializer", StringDeserializer.class.getName());

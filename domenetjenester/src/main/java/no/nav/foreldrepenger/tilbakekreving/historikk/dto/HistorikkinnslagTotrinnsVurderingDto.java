@@ -9,15 +9,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagTotrinnsvurdering;
 
-@JsonAutoDetect(getterVisibility=Visibility.NONE, setterVisibility=Visibility.NONE, fieldVisibility=Visibility.ANY)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public class HistorikkinnslagTotrinnsVurderingDto {
 
     @JsonProperty("aksjonspunktBegrunnelse")
     private String aksjonspunktBegrunnelse;
-    
+
     @JsonProperty("godkjent")
     private boolean godkjent;
-    
+
     @JsonProperty("aksjonspunktKode")
     private String aksjonspunktKode;
 
@@ -49,8 +49,8 @@ public class HistorikkinnslagTotrinnsVurderingDto {
 
     static List<HistorikkinnslagTotrinnsVurderingDto> mapFra(List<HistorikkinnslagTotrinnsvurdering> aksjonspunkter) {
         return aksjonspunkter.stream()
-            .map(HistorikkinnslagTotrinnsVurderingDto::mapFra)
-            .collect(Collectors.toList());
+                .map(HistorikkinnslagTotrinnsVurderingDto::mapFra)
+                .collect(Collectors.toList());
     }
 
     private static HistorikkinnslagTotrinnsVurderingDto mapFra(HistorikkinnslagTotrinnsvurdering totrinnsvurdering) {

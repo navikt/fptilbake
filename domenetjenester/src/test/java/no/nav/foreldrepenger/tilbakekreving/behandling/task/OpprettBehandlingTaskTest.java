@@ -36,7 +36,7 @@ public class OpprettBehandlingTaskTest {
     @Test
     public void test_skal_kalle_opprettBehandlingAutomatisk() {
         HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID, HENVISNING,
-            AKTØR_ID, SAKSNUMMER);
+                AKTØR_ID, SAKSNUMMER);
         taskDataWrapper.setFagsakYtelseType(FAGSAK_YTELSE_TYPE);
         taskDataWrapper.setBehandlingType(BehandlingType.TILBAKEKREVING);
 
@@ -45,13 +45,13 @@ public class OpprettBehandlingTaskTest {
 
         // verify
         verify(mockBehandlingTjeneste).opprettBehandlingAutomatisk(any(Saksnummer.class), any(UUID.class), any(Henvisning.class),
-            any(AktørId.class), any(FagsakYtelseType.class), any(BehandlingType.class));
+                any(AktørId.class), any(FagsakYtelseType.class), any(BehandlingType.class));
     }
 
     @Test
     public void test_skal_feile_på_manglende_task_property() {
         HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID, HENVISNING,
-            AKTØR_ID, SAKSNUMMER);
+                AKTØR_ID, SAKSNUMMER);
 
         // act
         assertThrows(NullPointerException.class, () -> opprettBehandlingTask.doTask(taskDataWrapper.getProsessTaskData()));

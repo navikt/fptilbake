@@ -66,10 +66,10 @@ public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void opprettHistorikkinnslagForOpprettetTilbakekreving_med_manuelt() {
-        Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer,aktørId, FagsakYtelseType.FORELDREPENGER, Språkkode.DEFAULT);
+        Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, FagsakYtelseType.FORELDREPENGER, Språkkode.DEFAULT);
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).medManueltOpprettet(true).build();
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
-        behandlingRepository.lagre(behandling,behandlingLås);
+        behandlingRepository.lagre(behandling, behandlingLås);
 
         historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling);
 

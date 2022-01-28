@@ -8,12 +8,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@ExtendWith(JpaExtension.class)
 public class ØkonomiXmlMottattRepositoryTest {
 
     private ØkonomiMottattXmlRepository repository;
@@ -53,7 +53,7 @@ public class ØkonomiXmlMottattRepositoryTest {
         String saksnummer = "1234345";
         Henvisning henvisning = Henvisning.fraEksternBehandlingId(123L);
         Long id1 = repository.lagreMottattXml(xml1);
-        repository.oppdaterMedHenvisningOgSaksnummer(henvisning,saksnummer, id1);
+        repository.oppdaterMedHenvisningOgSaksnummer(henvisning, saksnummer, id1);
         em.flush();
         em.clear();
         Long id2 = repository.lagreMottattXml(xml2);
@@ -68,8 +68,6 @@ public class ØkonomiXmlMottattRepositoryTest {
         assertThat(lagret1.getSaksnummer()).isEqualTo(saksnummer);
         assertThat(lagret2.getSaksnummer()).isEqualTo(saksnummer);
     }
-
-
 
 
 }

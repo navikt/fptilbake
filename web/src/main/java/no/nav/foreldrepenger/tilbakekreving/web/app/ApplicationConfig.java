@@ -64,24 +64,24 @@ public class ApplicationConfig extends Application {
     public ApplicationConfig() {
         OpenAPI oas = new OpenAPI();
         Info info = new Info()
-            .title("Vedtaksløsningen - Tilbakekreving")
-            .version("1.0")
-            .description("REST grensesnitt for Vedtaksløsningen.");
+                .title("Vedtaksløsningen - Tilbakekreving")
+                .version("1.0")
+                .description("REST grensesnitt for Vedtaksløsningen.");
 
         oas.info(info).addServersItem(new Server().url(getContextPath()));
 
         SwaggerConfiguration oasConfig = new SwaggerConfiguration()
-            .openAPI(oas)
-            .prettyPrint(true)
-            .scannerClass("io.swagger.v3.jaxrs2.integration.JaxrsAnnotationScanner")
-            .resourcePackages(Stream.of("no.nav.vedtak", "no.nav.foreldrepenger")
-                .collect(Collectors.toSet()));
+                .openAPI(oas)
+                .prettyPrint(true)
+                .scannerClass("io.swagger.v3.jaxrs2.integration.JaxrsAnnotationScanner")
+                .resourcePackages(Stream.of("no.nav.vedtak", "no.nav.foreldrepenger")
+                        .collect(Collectors.toSet()));
 
         try {
             new JaxrsOpenApiContextBuilder<>()
-                .openApiConfiguration(oasConfig)
-                .buildContext(true)
-                .read();
+                    .openApiConfiguration(oasConfig)
+                    .buildContext(true)
+                    .read();
         } catch (OpenApiConfigurationException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

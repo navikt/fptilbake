@@ -47,7 +47,7 @@ class BehandlingStegVisitor {
     private final BehandlingskontrollKontekst kontekst;
     private final BehandlingModell behandlingModell;
     private final BehandlingStegKonfigurasjon behandlingStegKonfigurasjon = new BehandlingStegKonfigurasjon(
-        EnumSet.allOf(BehandlingStegStatus.class));
+            EnumSet.allOf(BehandlingStegStatus.class));
 
     private final BehandlingskontrollEventPubliserer eventPubliserer;
 
@@ -136,7 +136,7 @@ class BehandlingStegVisitor {
                              StegProsesseringResultat stegResultat, List<Aksjonspunkt> funnetAksjonspunkter) {
 
         LOG.info("Avslutter steg={}, transisjon={} og funnet aksjonspunkter={}", stegType, stegResultat,
-            funnetAksjonspunkter.stream().map(Aksjonspunkt::getAksjonspunktDefinisjon).toList());
+                funnetAksjonspunkter.stream().map(Aksjonspunkt::getAksjonspunktDefinisjon).toList());
 
         Optional<BehandlingStegTilstand> stegTilstandFør = behandling.getSisteBehandlingStegTilstand();
 
@@ -157,7 +157,7 @@ class BehandlingStegVisitor {
         var fraTilstand = BehandlingModellImpl.tilBehandlingsStegSnapshot(stegTilstandFør);
         var tilTilstand = BehandlingModellImpl.tilBehandlingsStegSnapshot(behandling.getBehandlingStegTilstand());
         var behandlingStegTilstandEndringEvent = BehandlingModellImpl.nyBehandlingStegTilstandEndring(kontekst,
-            fraTilstand, tilTilstand);
+                fraTilstand, tilTilstand);
         eventPubliserer.fireEvent(behandlingStegTilstandEndringEvent);
 
         // Publiser de funnede aksjonspunktene
@@ -170,7 +170,7 @@ class BehandlingStegVisitor {
                                                    BehandlingStegTilstand fraTilstand, BehandlingStegType tilSteg) {
 
         return new BehandlingTransisjonEvent(kontekst, stegResultat.getTransisjon(), fraTilstand, tilSteg,
-            transisjon.getMålstegHvisHopp().isPresent());
+                transisjon.getMålstegHvisHopp().isPresent());
     }
 
     private BehandlingStegType finnFremoverhoppSteg(BehandlingStegType stegType, StegTransisjon transisjon) {
@@ -199,15 +199,15 @@ class BehandlingStegVisitor {
 
     private void fyrEventBehandlingStegOvergang(BehandlingStegTilstandSnapshot forrigeTilstand, BehandlingStegTilstandSnapshot nyTilstand) {
         var event = BehandlingModellImpl.nyBehandlingStegOvergangEvent(behandlingModell, forrigeTilstand,
-            nyTilstand, kontekst);
+                nyTilstand, kontekst);
 
         eventPubliserer.fireEvent(event);
     }
 
     private void fyrEventBehandlingStegTilbakeføring(Optional<BehandlingStegTilstand> forrige, Optional<BehandlingStegTilstand> ny) {
         var event = BehandlingModellImpl.nyBehandlingStegOvergangEvent(
-            behandlingModell, BehandlingModellImpl.tilBehandlingsStegSnapshot(forrige), BehandlingModellImpl.tilBehandlingsStegSnapshot(ny),
-            kontekst);
+                behandlingModell, BehandlingModellImpl.tilBehandlingsStegSnapshot(forrige), BehandlingModellImpl.tilBehandlingsStegSnapshot(ny),
+                kontekst);
 
         eventPubliserer.fireEvent(event);
     }
@@ -238,17 +238,17 @@ class BehandlingStegVisitor {
             return nåBehandlingStegStatus;
         }
         var måHåndereAksjonspunktHer = behandling.getÅpneAksjonspunkter().stream()
-            .anyMatch(ap -> skalHåndteresHer(stegType, ap, VurderingspunktType.INN));
+                .anyMatch(ap -> skalHåndteresHer(stegType, ap, VurderingspunktType.INN));
 
         var nyStatus = måHåndereAksjonspunktHer ? behandlingStegKonfigurasjon.getInngang()
-            : behandlingStegKonfigurasjon.getStartet();
+                : behandlingStegKonfigurasjon.getStartet();
 
         return nyStatus;
     }
 
     private boolean skalHåndteresHer(BehandlingStegType stegType, Aksjonspunkt ap, VurderingspunktType vurderingspunktType) {
         return ap.getAksjonspunktDefinisjon().getBehandlingSteg().equals(stegType)
-            && ap.getAksjonspunktDefinisjon().getVurderingspunktType().equals(vurderingspunktType);
+                && ap.getAksjonspunktDefinisjon().getVurderingspunktType().equals(vurderingspunktType);
     }
 
     private boolean erForbiInngang(BehandlingStegStatus nåBehandlingStegStatus) {
@@ -305,8 +305,8 @@ class BehandlingStegVisitor {
 
     private boolean harÅpneAksjonspunkter(Behandling behandling, BehandlingStegType behandlingStegType) {
         var måHåndereAksjonspunktHer = behandling.getÅpneAksjonspunkter()
-            .stream()
-            .anyMatch(ap -> skalHåndteresHer(behandlingStegType, ap, VurderingspunktType.UT));
+                .stream()
+                .anyMatch(ap -> skalHåndteresHer(behandlingStegType, ap, VurderingspunktType.UT));
 
         return måHåndereAksjonspunktHer;
     }
@@ -369,9 +369,9 @@ class BehandlingStegVisitor {
 
         // TODO (FC): Denne bør håndteres med event ved overgang
         behandlingModell.hvertStegFraOgMed(aktivtBehandlingSteg)
-            .forEach(bsm -> {
-                filterVekkAksjonspunktHåndtertAvFremtidigVurderingspunkt(bsm, gjenværendeÅpneAksjonspunkt);
-            });
+                .forEach(bsm -> {
+                    filterVekkAksjonspunktHåndtertAvFremtidigVurderingspunkt(bsm, gjenværendeÅpneAksjonspunkt);
+                });
 
         if (!gjenværendeÅpneAksjonspunkt.isEmpty()) {
             /*
@@ -381,10 +381,10 @@ class BehandlingStegVisitor {
              * definert for et identifisert abstraktpunkt.
              */
             throw new IllegalStateException(
-                "Utvikler-feil: Det er definert aksjonspunkt [" + //$NON-NLS-1$
-                    Aksjonspunkt.getKoder(gjenværendeÅpneAksjonspunkt)
-                    + "] som ikke er håndtert av noe steg" //$NON-NLS-1$
-                    + (aktivtBehandlingSteg == null ? " i sekvensen " : " fra og med: " + aktivtBehandlingSteg)); //$NON-NLS-1$
+                    "Utvikler-feil: Det er definert aksjonspunkt [" + //$NON-NLS-1$
+                            Aksjonspunkt.getKoder(gjenværendeÅpneAksjonspunkt)
+                            + "] som ikke er håndtert av noe steg" //$NON-NLS-1$
+                            + (aktivtBehandlingSteg == null ? " i sekvensen " : " fra og med: " + aktivtBehandlingSteg)); //$NON-NLS-1$
         }
     }
 

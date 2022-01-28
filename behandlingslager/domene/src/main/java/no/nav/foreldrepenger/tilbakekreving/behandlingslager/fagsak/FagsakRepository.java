@@ -52,7 +52,7 @@ public class FagsakRepository {
 
     public List<Fagsak> hentForBrukerAktørId(AktørId aktørId) {
         TypedQuery<Fagsak> query = entityManager
-            .createQuery("select fagsak from Fagsak fagsak join fagsak.navBruker bruk where bruk.aktørId=:aktoerId", Fagsak.class);
+                .createQuery("select fagsak from Fagsak fagsak join fagsak.navBruker bruk where bruk.aktørId=:aktoerId", Fagsak.class);
         query.setParameter("aktoerId", aktørId);
         return query.getResultList();
     }

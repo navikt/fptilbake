@@ -9,7 +9,7 @@ public class BehandlingInfo {
     private String ansvarligSaksbehandler;
 
     /**
-     *  denne brukes fra {@link no.nav.foreldrepenger.tilbakekreving.pip.PipRepository}
+     * denne brukes fra {@link no.nav.foreldrepenger.tilbakekreving.pip.PipRepository}
      */
     public BehandlingInfo(Long behandlingId, String saksnummer, String aktørId, String behandlingstatus, String ansvarligSaksbehandler) {
         this(behandlingId, saksnummer, new AktørId(aktørId), behandlingstatus, ansvarligSaksbehandler);

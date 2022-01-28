@@ -171,7 +171,7 @@ public abstract class FellesTestOppsett {
         faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repoProvider, kravgrunnlagTjeneste, mockFagsystemKlient);
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollProvider,
-            fagsakTjeneste, mockHistorikkTjeneste, mockFagsystemKlient, defaultVentetid);
+                fagsakTjeneste, mockHistorikkTjeneste, mockFagsystemKlient, defaultVentetid);
         testUtility = new TestUtility(behandlingTjeneste);
         aktørId = testUtility.genererAktørId();
         when(mockTpsTjeneste.hentBrukerForAktør(aktørId)).thenReturn(testUtility.lagPersonInfo(aktørId));
@@ -180,7 +180,7 @@ public abstract class FellesTestOppsett {
         when(mockFagsystemKlient.hentBehandlingOptional(any(UUID.class))).thenReturn(optBehandlingsinfo);
         when(mockFagsystemKlient.hentBehandling(any(UUID.class))).thenReturn(behandlingsinfoDto);
         when(mockFagsystemKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(
-            lagSamletEksternBehandlingInfo(behandlingsinfoDto));
+                lagSamletEksternBehandlingInfo(behandlingsinfoDto));
 
         TestUtility.SakDetaljer sakDetaljer = testUtility.opprettFørstegangsBehandling(aktørId);
         mapSakDetaljer(sakDetaljer);
@@ -207,11 +207,11 @@ public abstract class FellesTestOppsett {
     protected FaktaFeilutbetaling lagFaktaFeilutbetaling() {
         FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
         FaktaFeilutbetalingPeriode periodeÅrsak = FaktaFeilutbetalingPeriode.builder()
-            .medHendelseType(HENDELSE_TYPE)
-            .medHendelseUndertype(HENDELSE_UNDERTYPE)
-            .medPeriode(FOM, TOM)
-            .medFeilutbetalinger(faktaFeilutbetaling)
-            .build();
+                .medHendelseType(HENDELSE_TYPE)
+                .medHendelseUndertype(HENDELSE_UNDERTYPE)
+                .medPeriode(FOM, TOM)
+                .medFeilutbetalinger(faktaFeilutbetaling)
+                .build();
         faktaFeilutbetaling.leggTilFeilutbetaltPeriode(periodeÅrsak);
         faktaFeilutbetaling.setBegrunnelse("begrunnelse");
         return faktaFeilutbetaling;
@@ -228,17 +228,17 @@ public abstract class FellesTestOppsett {
         perioderDto.setBegrunnelse("begrunnelse");
         if (resultat == VilkårResultat.GOD_TRO) {
             perioderDto.setVilkarResultatInfo(
-                new VilkårResultatGodTroDto("godTro begrunnelse", true, BigDecimal.valueOf(1000.00)));
+                    new VilkårResultatGodTroDto("godTro begrunnelse", true, BigDecimal.valueOf(1000.00)));
         } else {
             VilkårResultatAktsomhetDto aktsomhetDto = new VilkårResultatAktsomhetDto();
             aktsomhetDto.setSærligeGrunner(
-                Lists.newArrayList(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL));
+                    Lists.newArrayList(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL));
             aktsomhetDto.setSærligGrunnerBegrunnelse(SÆRLIG_GRUNNER_BEGRUNNELSE);
             if (aktsomhet == Aktsomhet.GROVT_UAKTSOM) {
                 aktsomhetDto.setHarGrunnerTilReduksjon(false);
                 aktsomhetDto.setIleggRenter(true);
                 aktsomhetDto.setAndelTilbakekreves(BigDecimal.valueOf(
-                    100)); //feil verdi, andelTilbakekreves alltid være null når harGrunnerTilReduksjon er true
+                        100)); //feil verdi, andelTilbakekreves alltid være null når harGrunnerTilReduksjon er true
             } else if (aktsomhet == Aktsomhet.SIMPEL_UAKTSOM) {
                 aktsomhetDto.setHarGrunnerTilReduksjon(true);
                 aktsomhetDto.setTilbakekrevesBelop(BigDecimal.valueOf(2000.00));
@@ -274,8 +274,8 @@ public abstract class FellesTestOppsett {
 
     private SamletEksternBehandlingInfo lagSamletEksternBehandlingInfo(EksternBehandlingsinfoDto behandlingsinfoDto) {
         return SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER)
-            .setGrunninformasjon(behandlingsinfoDto)
-            .setPersonopplysninger(lagPersonOpplysningDto())
-            .build();
+                .setGrunninformasjon(behandlingsinfoDto)
+                .setPersonopplysninger(lagPersonOpplysningDto())
+                .build();
     }
 }

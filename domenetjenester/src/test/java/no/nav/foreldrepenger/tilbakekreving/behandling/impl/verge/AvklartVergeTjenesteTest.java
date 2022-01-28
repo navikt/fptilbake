@@ -72,7 +72,7 @@ public class AvklartVergeTjenesteTest extends FellesTestOppsett {
         VergeDto vergeDto = lagVergeDto(VergeType.ADVOKAT);
         when(virksomhetTjenesteMock.validerOrganisasjon(anyString())).thenReturn(false);
         var e = assertThrows(IllegalStateException.class,
-            () -> avklartVergeTjeneste.lagreVergeInformasjon(internBehandlingId, vergeDto));
+                () -> avklartVergeTjeneste.lagreVergeInformasjon(internBehandlingId, vergeDto));
         assertThat(e.getMessage()).contains("OrgansisasjonNummer er ikke gyldig");
     }
 

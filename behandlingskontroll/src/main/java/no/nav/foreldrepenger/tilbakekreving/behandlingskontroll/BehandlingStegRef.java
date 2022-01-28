@@ -32,7 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 @Stereotype
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD })
+@Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
 @Documented
 public @interface BehandlingStegRef {
 
@@ -94,8 +94,8 @@ public @interface BehandlingStegRef {
         public static <I> Optional<I> find(Class<I> cls, Instance<I> instances, BehandlingType behandlingType,
                                            BehandlingStegType behandlingStegRef) {
             return find(cls, instances,
-                behandlingType == null ? null : behandlingType.getKode(),
-                behandlingStegRef == null ? null : behandlingStegRef.getKode());
+                    behandlingType == null ? null : behandlingType.getKode(),
+                    behandlingStegRef == null ? null : behandlingStegRef.getKode());
         }
 
         public static <I> Optional<I> find(Class<I> cls, Instance<I> instances, String behandlingType,
@@ -114,7 +114,7 @@ public @interface BehandlingStegRef {
                     }
                     if (cinst.isAmbiguous()) {
                         throw new IllegalStateException("Har flere matchende instanser for klasse : " + cls.getName() +
-                            ", behandlingType=" + behandlingLiteral + ", behandlingStegRef=" + stegRef);
+                                ", behandlingType=" + behandlingLiteral + ", behandlingStegRef=" + stegRef);
                     }
                 }
             }
@@ -124,15 +124,15 @@ public @interface BehandlingStegRef {
 
         private static <I> Instance<I> select(Class<I> cls, Instance<I> instances, Annotation anno) {
             return cls != null
-                ? instances.select(cls, anno)
-                : instances.select(anno);
+                    ? instances.select(cls, anno)
+                    : instances.select(anno);
         }
 
         private static <I> I getInstance(Instance<I> inst) {
             var i = inst.get();
             if (i.getClass().isAnnotationPresent(Dependent.class)) {
                 throw new IllegalStateException(
-                    "Kan ikke ha @Dependent scope bean ved Instance lookup dersom en ikke også håndtere lifecycle selv: " + i.getClass());
+                        "Kan ikke ha @Dependent scope bean ved Instance lookup dersom en ikke også håndtere lifecycle selv: " + i.getClass());
             }
             return i;
         }
@@ -150,7 +150,7 @@ public @interface BehandlingStegRef {
      */
     @Inherited
     @Retention(RetentionPolicy.RUNTIME)
-    @Target({ ElementType.TYPE })
+    @Target({ElementType.TYPE})
     @Documented
     public @interface ContainerOfBehandlingStegRef {
         BehandlingStegRef[] value();

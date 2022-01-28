@@ -59,8 +59,8 @@ public abstract class FellesTekstformaterer {
             //3. unngår at template feiler når variable endrer navn
             JsonNode jsonNode = OM.valueToTree(data);
             Context context = Context.newBuilder(jsonNode)
-                .resolver(JsonNodeValueResolver.INSTANCE, JavaBeanValueResolver.INSTANCE, MapValueResolver.INSTANCE)
-                .build();
+                    .resolver(JsonNodeValueResolver.INSTANCE, JavaBeanValueResolver.INSTANCE, MapValueResolver.INSTANCE)
+                    .build();
             return template.apply(context).stripLeading().stripTrailing();
         } catch (IOException e) {
             throw TekstformatererBrevFeil.feilVedTekstgenerering(e);

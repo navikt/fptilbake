@@ -45,8 +45,8 @@ public enum BehandlingResultatType implements Kodeverdi {
     public static final String KODEVERK = "BEHANDLING_RESULTAT_TYPE";
     private static final Map<String, BehandlingResultatType> KODER = new LinkedHashMap<>();
     private static final Set<BehandlingResultatType> ALLE_HENLEGGELSESKODER = Collections.unmodifiableSet(new LinkedHashSet<>(
-        List.of(HENLAGT_KRAVGRUNNLAG_NULLSTILT, HENLAGT_FEILOPPRETTET, HENLAGT_FEILOPPRETTET_MED_BREV,
-            HENLAGT_FEILOPPRETTET_UTEN_BREV, HENLAGT_TEKNISK_VEDLIKEHOLD)));
+            List.of(HENLAGT_KRAVGRUNNLAG_NULLSTILT, HENLAGT_FEILOPPRETTET, HENLAGT_FEILOPPRETTET_MED_BREV,
+                    HENLAGT_FEILOPPRETTET_UTEN_BREV, HENLAGT_TEKNISK_VEDLIKEHOLD)));
 
     static {
         for (var v : values()) {
@@ -82,7 +82,7 @@ public enum BehandlingResultatType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    public static BehandlingResultatType fraVedtakResultatType(VedtakResultatType vedtakResultatType){
+    public static BehandlingResultatType fraVedtakResultatType(VedtakResultatType vedtakResultatType) {
         return switch (vedtakResultatType) {
             case INGEN_TILBAKEBETALING -> BehandlingResultatType.INGEN_TILBAKEBETALING;
             case FULL_TILBAKEBETALING -> BehandlingResultatType.FULL_TILBAKEBETALING;

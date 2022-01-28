@@ -80,7 +80,7 @@ public class Totrinnsvurdering extends BaseEntitet {
         return aktiv;
     }
 
-    public void disable(){
+    public void disable() {
         this.aktiv = false;
     }
 

@@ -95,12 +95,12 @@ public class TilbakekrevingBeløp {
         if (o instanceof TilbakekrevingBeløp) {
             TilbakekrevingBeløp annen = (TilbakekrevingBeløp) o;
             return Objects.equals(klasseType, annen.klasseType) &&
-                Objects.equals(klassekode, annen.klassekode) &&
-                equals(nyttBeløp, annen.nyttBeløp) &&
-                equals(utbetaltBeløp, annen.utbetaltBeløp) &&
-                equals(tilbakekrevBeløp, annen.tilbakekrevBeløp) &&
-                equals(uinnkrevdBeløp, annen.uinnkrevdBeløp) &&
-                equals(skattBeløp, annen.skattBeløp);
+                    Objects.equals(klassekode, annen.klassekode) &&
+                    equals(nyttBeløp, annen.nyttBeløp) &&
+                    equals(utbetaltBeløp, annen.utbetaltBeløp) &&
+                    equals(tilbakekrevBeløp, annen.tilbakekrevBeløp) &&
+                    equals(uinnkrevdBeløp, annen.uinnkrevdBeløp) &&
+                    equals(skattBeløp, annen.skattBeløp);
         }
         return false;
     }
@@ -117,13 +117,13 @@ public class TilbakekrevingBeløp {
     @Override
     public String toString() {
         return "TilbakekrevingBeløp{" +
-            "type=" + (klasseType != null ? klasseType.getKode() : "null") +
-            ", kode='" + klassekode + '\'' +
-            ", nytt=" + nyttBeløp +
-            ", utbetalt=" + utbetaltBeløp +
-            ", tilbakekrev=" + tilbakekrevBeløp +
-            ", uinnkrevd=" + uinnkrevdBeløp +
-            ", skattBeløp=" + skattBeløp +
-            '}';
+                "type=" + (klasseType != null ? klasseType.getKode() : "null") +
+                ", kode='" + klassekode + '\'' +
+                ", nytt=" + nyttBeløp +
+                ", utbetalt=" + utbetaltBeløp +
+                ", tilbakekrev=" + tilbakekrevBeløp +
+                ", uinnkrevd=" + uinnkrevdBeløp +
+                ", skattBeløp=" + skattBeløp +
+                '}';
     }
 }

@@ -34,9 +34,9 @@ public class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppse
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
 
         innhentDokumentasjonBrevTask = new InnhentDokumentasjonbrevTask(repositoryProvider,
-            mockInnhentDokumentasjonbrevTjeneste,
-            behandlingskontrollTjeneste,
-            Period.ofWeeks(3));
+                mockInnhentDokumentasjonbrevTjeneste,
+                behandlingskontrollTjeneste,
+                Period.ofWeeks(3));
     }
 
     @Test

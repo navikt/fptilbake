@@ -29,7 +29,7 @@ public class Satser {
         return HALVT_RETTSGEBYR;
     }
 
-    public static BigDecimal grunnbeløp(){
+    public static BigDecimal grunnbeløp() {
         return GRUNNBELØP;
     }
 

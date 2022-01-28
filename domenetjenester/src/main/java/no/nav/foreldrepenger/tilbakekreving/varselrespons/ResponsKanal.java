@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.varselrespons;
 
-public enum  ResponsKanal {
+public enum ResponsKanal {
 
     MANUELL("MANU"), //$NON-NLS-1$
     JOURNAL("JOUR"), //$NON-NLS-1$

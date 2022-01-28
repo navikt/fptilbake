@@ -35,8 +35,8 @@ public class BrevSporingRepository {
 
     public Optional<BrevSporing> hentSistSendtVarselbrev(long behandlingId) {
         return hentBrevData(behandlingId, BrevType.VARSEL_BREV)
-            .stream()
-            .max(Comparator.comparing(BrevSporing::getOpprettetTidspunkt));
+                .stream()
+                .max(Comparator.comparing(BrevSporing::getOpprettetTidspunkt));
     }
 
     public List<BrevSporing> hentBrevData(Long behandlingId, BrevType brevType) {

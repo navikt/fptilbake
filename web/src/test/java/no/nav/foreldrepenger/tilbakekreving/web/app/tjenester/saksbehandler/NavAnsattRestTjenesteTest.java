@@ -110,7 +110,7 @@ public class NavAnsattRestTjenesteTest {
         assertThat(innloggetBrukerMedKode7Rettighet.getKanBehandleKode7()).isTrue();
     }
 
-    private static LdapBruker getTestBruker(String...grupper) {
+    private static LdapBruker getTestBruker(String... grupper) {
         return new LdapBruker("Testbruker", List.of(grupper));
     }
 }

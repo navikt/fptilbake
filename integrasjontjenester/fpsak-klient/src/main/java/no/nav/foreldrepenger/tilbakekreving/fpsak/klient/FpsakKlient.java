@@ -74,7 +74,7 @@ public class FpsakKlient implements FagsystemKlient {
         List<EksternBehandlingsinfoDto> eksternBehandlinger = hentBehandlingForSaksnummer(saksnummer);
         if (!eksternBehandlinger.isEmpty()) {
             return eksternBehandlinger.stream()
-                .anyMatch(eksternBehandlingsinfoDto -> henvisning.equals(eksternBehandlingsinfoDto.getHenvisning()));
+                    .anyMatch(eksternBehandlingsinfoDto -> henvisning.equals(eksternBehandlingsinfoDto.getHenvisning()));
         }
         return false;
     }
@@ -82,7 +82,7 @@ public class FpsakKlient implements FagsystemKlient {
     @Override
     public SamletEksternBehandlingInfo hentBehandlingsinfo(UUID eksternUuid, Tillegsinformasjon... tillegsinformasjon) {
         return hentBehandlingsinfoOpt(eksternUuid, Arrays.asList(tillegsinformasjon))
-            .orElseThrow(() -> new IntegrasjonException("FPT-841932", String.format("Fant ikke behandling med behandingUuid %s i fpsak", eksternUuid)));
+                .orElseThrow(() -> new IntegrasjonException("FPT-841932", String.format("Fant ikke behandling med behandingUuid %s i fpsak", eksternUuid)));
     }
 
     @Override
@@ -139,7 +139,7 @@ public class FpsakKlient implements FagsystemKlient {
     @Override
     public EksternBehandlingsinfoDto hentBehandling(UUID eksternUuid) {
         return hentBehandlingOptional(eksternUuid)
-            .orElseThrow(() -> new IntegrasjonException("FPT-7428496", String.format("Fant ingen ekstern behandling i Fpsak for Uuid %s", eksternUuid.toString())));
+                .orElseThrow(() -> new IntegrasjonException("FPT-7428496", String.format("Fant ingen ekstern behandling i Fpsak for Uuid %s", eksternUuid.toString())));
     }
 
     @Override
@@ -147,7 +147,7 @@ public class FpsakKlient implements FagsystemKlient {
         Optional<FpsakBehandlingInfoDto> eksternBehandlingsinfoDtoOptional = hentFpsakBehandlingOptional(eksternUuid);
         if (eksternBehandlingsinfoDtoOptional.isPresent()) {
             Optional<BehandlingResourceLinkDto> ressursLink = eksternBehandlingsinfoDtoOptional.get().getLinks().stream()
-                .filter(resourceLink -> Tillegsinformasjon.TILBAKEKREVINGSVALG.getFpsakRelasjonNavn().equals(resourceLink.getRel())).findAny();
+                    .filter(resourceLink -> Tillegsinformasjon.TILBAKEKREVINGSVALG.getFpsakRelasjonNavn().equals(resourceLink.getRel())).findAny();
             if (ressursLink.isPresent()) {
                 return hentTilbakekrevingValg(ressursLink.get());
             }
@@ -165,7 +165,7 @@ public class FpsakKlient implements FagsystemKlient {
     public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning) {
         long fpsakBehandlingId = henvisning.toLong();
         return fpoppdragKlient.hentFeilutbetaltePerioder(fpsakBehandlingId)
-            .orElseThrow(() -> new IntegrasjonException("FPT-748279", String.format("Fant ikke behandling med behandlingId %s fpoppdrag", fpsakBehandlingId)));
+                .orElseThrow(() -> new IntegrasjonException("FPT-748279", String.format("Fant ikke behandling med behandlingId %s fpoppdrag", fpsakBehandlingId)));
     }
 
     static class ListeAvFpsakBehandlingInfoDto extends ArrayList<FpsakBehandlingInfoDto> {
@@ -198,7 +198,7 @@ public class FpsakKlient implements FagsystemKlient {
     private SoknadDto hentSøknad(BehandlingResourceLinkDto resourceLink) {
         URI endpoint = URI.create(baseUri() + resourceLink.getHref());
         return get(endpoint, SoknadDto.class)
-            .orElseThrow(() -> new IllegalArgumentException("Forventet å finne søknad på lenken: " + endpoint));
+                .orElseThrow(() -> new IllegalArgumentException("Forventet å finne søknad på lenken: " + endpoint));
     }
 
     private Optional<TilbakekrevingValgDto> hentTilbakekrevingValg(BehandlingResourceLinkDto resourceLink) {
@@ -209,7 +209,7 @@ public class FpsakKlient implements FagsystemKlient {
     private FagsakDto hentFagsak(BehandlingResourceLinkDto resourceLink) {
         URI endpoint = URI.create(baseUri() + resourceLink.getHref());
         return get(endpoint, FagsakDto.class)
-            .orElseThrow(() -> new IllegalArgumentException("Forventet å finne fagsak på lenken: " + endpoint));
+                .orElseThrow(() -> new IllegalArgumentException("Forventet å finne fagsak på lenken: " + endpoint));
     }
 
     private Optional<VergeDto> hentVergeInformasjon(BehandlingResourceLinkDto resourceLink) {
@@ -223,7 +223,7 @@ public class FpsakKlient implements FagsystemKlient {
 
     private URI createUri(String endpoint, String paramName, String paramValue) {
         UriBuilder builder = UriBuilder.fromUri(apiUri())
-            .path(endpoint);
+                .path(endpoint);
 
         if (notNullOrEmpty(paramName) && notNullOrEmpty(paramValue)) {
             builder.queryParam(paramName, paramValue);

@@ -134,6 +134,7 @@ public class BrevMetadata {
             this.metadata.saksnummer = saksnummer;
             return this;
         }
+
         public Builder medFagsaktype(FagsakYtelseType fagsaktype) {
             this.metadata.fagsaktype = fagsaktype;
             return this;
@@ -148,6 +149,7 @@ public class BrevMetadata {
             this.metadata.mottakerAdresse = mottakerAdresse;
             return this;
         }
+
         public Builder medBehandlingtype(BehandlingType behandlingType) {
             this.metadata.behandlingType = behandlingType;
             return this;

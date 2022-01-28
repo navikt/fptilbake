@@ -35,9 +35,10 @@ public class EksternBehandlingRepository {
     }
 
     /**
-         * Lagrer eksternBehandling, setter eksisterende, hvis finnes, til inaktiv
-         * @param eksternBehandling
-         */
+     * Lagrer eksternBehandling, setter eksisterende, hvis finnes, til inaktiv
+     *
+     * @param eksternBehandling
+     */
     public void lagre(EksternBehandling eksternBehandling) {
         Optional<EksternBehandling> eksisterende = hentOptionalFraInternId(eksternBehandling.getInternId());
         eksisterende.ifPresent(o -> {
@@ -53,9 +54,10 @@ public class EksternBehandlingRepository {
     }
 
     /**
-         * Henter eksternBehandling data for behandlingen
-         * @param internBehandlingId
-         */
+     * Henter eksternBehandling data for behandlingen
+     *
+     * @param internBehandlingId
+     */
     public EksternBehandling hentFraInternId(long internBehandlingId) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and aktiv='J'", EksternBehandling.class);
         query.setParameter(INTERN_ID, internBehandlingId);
@@ -69,9 +71,10 @@ public class EksternBehandlingRepository {
     }
 
     /**
-         * Finner alle behandlinger som knyttet med uuid fra ekstern system
-         * @param eksternUuid
-         */
+     * Finner alle behandlinger som knyttet med uuid fra ekstern system
+     *
+     * @param eksternUuid
+     */
     public List<EksternBehandling> hentAlleBehandlingerMedEksternUuid(UUID eksternUuid) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where eksternUuid=:eksternUuid and aktiv='J'", EksternBehandling.class);
         query.setParameter(EKSTERN_UUID, eksternUuid);
@@ -79,15 +82,16 @@ public class EksternBehandlingRepository {
     }
 
     /**
-         * Finner siste avsluttet TilbakekkrevingBehandling basert på eksternUuid
-         * @param eksternUuid
-         * @return
-         */
+     * Finner siste avsluttet TilbakekkrevingBehandling basert på eksternUuid
+     *
+     * @param eksternUuid
+     * @return
+     */
     public Optional<EksternBehandling> finnForSisteAvsluttetTbkBehandling(UUID eksternUuid) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("select eks from EksternBehandling eks , Behandling beh where eks.internId=beh.id " +
-            "and eks.eksternUuid=:eksternUuid and beh.behandlingType=:behandlingType " +
-            "and beh.status = :behandlingStatus and eks.aktiv='J' " +
-            "ORDER BY beh.opprettetTidspunkt DESC", EksternBehandling.class);
+                "and eks.eksternUuid=:eksternUuid and beh.behandlingType=:behandlingType " +
+                "and beh.status = :behandlingStatus and eks.aktiv='J' " +
+                "ORDER BY beh.opprettetTidspunkt DESC", EksternBehandling.class);
 
         query.setParameter(EKSTERN_UUID, eksternUuid);
         query.setParameter("behandlingType", BehandlingType.TILBAKEKREVING);
@@ -118,10 +122,11 @@ public class EksternBehandlingRepository {
     }
 
     /**
-         * Finner eksternbehandling for siste aktivert internId
-         * @param internBehandlingId
-         * @return eksternBehandling
-         */
+     * Finner eksternbehandling for siste aktivert internId
+     *
+     * @param internBehandlingId
+     * @return eksternBehandling
+     */
     public EksternBehandling hentForSisteAktivertInternId(long internBehandlingId) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId order by opprettetTidspunkt desc", EksternBehandling.class);
         query.setParameter(INTERN_ID, internBehandlingId);
@@ -147,8 +152,8 @@ public class EksternBehandlingRepository {
      */
     public boolean harEksternBehandlingForEksternUuid(UUID eksternUuid) {
         return entityManager.createQuery("from EksternBehandling where eksternUuid=:eksternUuid", EksternBehandling.class)
-            .setParameter(EKSTERN_UUID, eksternUuid)
-            .getResultList()
-            .size() > 0;
+                .setParameter(EKSTERN_UUID, eksternUuid)
+                .getResultList()
+                .size() > 0;
     }
 }

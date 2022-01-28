@@ -34,9 +34,9 @@ public class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett 
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
 
         varselbrevTask = new SendManueltVarselbrevTask(repositoryProvider,
-            mockManueltVarselBrevTjeneste,
-            behandlingskontrollTjeneste,
-            Period.ofWeeks(3));
+                mockManueltVarselBrevTjeneste,
+                behandlingskontrollTjeneste,
+                Period.ofWeeks(3));
     }
 
     @Test

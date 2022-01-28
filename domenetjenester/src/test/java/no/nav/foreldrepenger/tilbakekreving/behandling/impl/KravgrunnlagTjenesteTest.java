@@ -92,7 +92,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
         kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, false);
 
         assertKravgrunnlag();
-        verify(gjenopptaBehandlingTjeneste,never()).fortsettBehandlingMedGrunnlag(behandling.getId());
+        verify(gjenopptaBehandlingTjeneste, never()).fortsettBehandlingMedGrunnlag(behandling.getId());
     }
 
     @Test
@@ -124,9 +124,9 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     private VurdertForeldelse lagForeldelse() {
         VurdertForeldelse vurdertForeldelse = new VurdertForeldelse();
         VurdertForeldelsePeriode foreldelsePeriode = VurdertForeldelsePeriode.builder().medPeriode(fom, tom)
-            .medVurdertForeldelse(vurdertForeldelse)
-            .medForeldelseVurderingType(ForeldelseVurderingType.IKKE_FORELDET)
-            .medBegrunnelse("ikke foreldet").build();
+                .medVurdertForeldelse(vurdertForeldelse)
+                .medForeldelseVurderingType(ForeldelseVurderingType.IKKE_FORELDET)
+                .medBegrunnelse("ikke foreldet").build();
         vurdertForeldelse.leggTilVurderForeldelsePerioder(foreldelsePeriode);
         return vurdertForeldelse;
     }
@@ -134,13 +134,13 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     private VilkårVurderingEntitet lagVilkårsVurdering() {
         VilkårVurderingEntitet vilkårEntitet = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet periodeEntitet = VilkårVurderingPeriodeEntitet.builder().medPeriode(fom, tom)
-            .medVurderinger(vilkårEntitet)
-            .medVilkårResultat(VilkårResultat.GOD_TRO)
-            .medBegrunnelse("vurdert").build();
+                .medVurderinger(vilkårEntitet)
+                .medVilkårResultat(VilkårResultat.GOD_TRO)
+                .medBegrunnelse("vurdert").build();
         VilkårVurderingGodTroEntitet godTroEntitet = VilkårVurderingGodTroEntitet.builder().medPeriode(periodeEntitet)
-            .medBegrunnelse("vurdert")
-            .medBeløpErIBehold(true)
-            .medBeløpTilbakekreves(BigDecimal.TEN).build();
+                .medBegrunnelse("vurdert")
+                .medBeløpErIBehold(true)
+                .medBeløpTilbakekreves(BigDecimal.TEN).build();
         periodeEntitet.setGodTro(godTroEntitet);
         vilkårEntitet.leggTilPeriode(periodeEntitet);
         return vilkårEntitet;
@@ -148,29 +148,29 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
 
     private Kravgrunnlag431 lagKravgrunnlagDto(KravStatusKode kravStatusKode) {
         return Kravgrunnlag431.builder()
-            .medEksternKravgrunnlagId("123")
-            .medVedtakId(10000L)
-            .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
-            .medKravStatusKode(kravStatusKode)
-            .medGjelderVedtakId(aktørId.getId())
-            .medGjelderType(GjelderType.PERSON)
-            .medUtbetalesTilId(aktørId.getId())
-            .medUtbetIdType(GjelderType.PERSON)
-            .medFagSystemId("10000000000000000")
-            .medAnsvarligEnhet(ENHET)
-            .medBostedEnhet(ENHET)
-            .medBehandlendeEnhet(ENHET)
-            .medSaksBehId("Z991036")
-            .medFeltKontroll("42354353453454")
-            .build();
+                .medEksternKravgrunnlagId("123")
+                .medVedtakId(10000L)
+                .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
+                .medKravStatusKode(kravStatusKode)
+                .medGjelderVedtakId(aktørId.getId())
+                .medGjelderType(GjelderType.PERSON)
+                .medUtbetalesTilId(aktørId.getId())
+                .medUtbetIdType(GjelderType.PERSON)
+                .medFagSystemId("10000000000000000")
+                .medAnsvarligEnhet(ENHET)
+                .medBostedEnhet(ENHET)
+                .medBehandlendeEnhet(ENHET)
+                .medSaksBehId("Z991036")
+                .medFeltKontroll("42354353453454")
+                .build();
     }
 
     private void formPerioder(LocalDate fom, LocalDate tom, Kravgrunnlag431 kravgrunnlag) {
         IntStream.range(4, 6).forEach(j -> {
             KravgrunnlagPeriode432 periode = KravgrunnlagPeriode432.builder()
-                .medKravgrunnlag431(kravgrunnlag)
-                .medPeriode(fom.plusDays(j), tom.plusDays(j))
-                .build();
+                    .medKravgrunnlag431(kravgrunnlag)
+                    .medPeriode(fom.plusDays(j), tom.plusDays(j))
+                    .build();
             kravgrunnlag.leggTilPeriode(periode);
             formBeløper(periode);
         });
@@ -179,13 +179,13 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     private void formBeløper(KravgrunnlagPeriode432 periode) {
         IntStream.range(0, 2).forEach(i -> {
             KravgrunnlagBelop433 beløp = KravgrunnlagBelop433.builder()
-                .medKravgrunnlagPeriode432(periode)
-                .medKlasseKode(KlasseKode.FPATORD)
-                .medKlasseType(i == 0 ? KlasseType.FEIL : KlasseType.YTEL)
-                .medNyBelop(i == 0 ? BigDecimal.valueOf(11000) : BigDecimal.ZERO)
-                .medTilbakekrevesBelop(i > 0 ? BigDecimal.valueOf(11000) : BigDecimal.ZERO)
-                .medResultatKode("VED")
-                .build();
+                    .medKravgrunnlagPeriode432(periode)
+                    .medKlasseKode(KlasseKode.FPATORD)
+                    .medKlasseType(i == 0 ? KlasseType.FEIL : KlasseType.YTEL)
+                    .medNyBelop(i == 0 ? BigDecimal.valueOf(11000) : BigDecimal.ZERO)
+                    .medTilbakekrevesBelop(i > 0 ? BigDecimal.valueOf(11000) : BigDecimal.ZERO)
+                    .medResultatKode("VED")
+                    .build();
             periode.leggTilBeløp(beløp);
         });
     }

@@ -51,7 +51,7 @@ public class TilbakekrevingsvedtakMapper {
         dto.setPeriode(periodeDto);
         dto.setBelopRenter(tilbakekrevingPeriode.getRenter());
         tilbakekrevingPeriode.getBeløp().forEach(
-            b -> dto.getTilbakekrevingsbelop().add(lagDto(b)));
+                b -> dto.getTilbakekrevingsbelop().add(lagDto(b)));
         return dto;
     }
 

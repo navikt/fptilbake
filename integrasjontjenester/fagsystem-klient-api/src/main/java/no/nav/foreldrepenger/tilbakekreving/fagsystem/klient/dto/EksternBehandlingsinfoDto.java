@@ -55,8 +55,8 @@ public class EksternBehandlingsinfoDto {
 
     public Optional<Språkkode> getSpråkkode() {
         return Språkkode.UDEFINERT.equals(sprakkode)
-            ? Optional.empty()
-            : Optional.ofNullable(sprakkode);
+                ? Optional.empty()
+                : Optional.ofNullable(sprakkode);
     }
 
     public Språkkode getSpråkkodeEllerDefault() {

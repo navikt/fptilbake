@@ -75,18 +75,18 @@ public class VergeRestTjeneste {
     @Path("/opprett")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(description = "Oppretter aksjonspunkt for verge/fullmektig på behandlingen",
-        tags = "verge",
-        responses = {
-            @ApiResponse(responseCode = "200",
-                description = "Aksjonspunkt for verge/fullmektig opprettes",
-                headers = @Header(name = HttpHeaders.LOCATION)
-            )
-        })
+            tags = "verge",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Aksjonspunkt for verge/fullmektig opprettes",
+                            headers = @Header(name = HttpHeaders.LOCATION)
+                    )
+            })
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response opprettVerge(@Context HttpServletRequest request,
                                  @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                     @Parameter(description = "Behandling som skal få verge/fullmektig") @Valid BehandlingReferanse dto) throws URISyntaxException {
+                                 @Parameter(description = "Behandling som skal få verge/fullmektig") @Valid BehandlingReferanse dto) throws URISyntaxException {
         Behandling behandling = behandlingTjeneste.hentBehandling(dto.getBehandlingId());
         if (behandling.erSaksbehandlingAvsluttet() || behandling.isBehandlingPåVent()) {
             throw new TekniskException("FPT-763493", String.format("Behandlingen er allerede avsluttet eller sett på vent, kan ikke opprette verge for behandling %s", behandling.getId()));
@@ -101,18 +101,18 @@ public class VergeRestTjeneste {
     @POST
     @Path("/fjern")
     @Operation(description = "Fjerner aksjonspunkt og evt. registrert informasjon om verge/fullmektig fra behandlingen",
-        tags = "verge",
-        responses = {
-            @ApiResponse(responseCode = "200",
-                description = "Fjerning av verge/fullmektig er gjennomført",
-                headers = @Header(name = HttpHeaders.LOCATION)
-            )
-        })
+            tags = "verge",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Fjerning av verge/fullmektig er gjennomført",
+                            headers = @Header(name = HttpHeaders.LOCATION)
+                    )
+            })
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response fjernVerge(@Context HttpServletRequest request,
                                @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                   @Parameter(description = "Behandling som skal få fjernet verge/fullmektig") @Valid BehandlingReferanse dto) throws URISyntaxException {
+                               @Parameter(description = "Behandling som skal få fjernet verge/fullmektig") @Valid BehandlingReferanse dto) throws URISyntaxException {
         Behandling behandling = behandlingTjeneste.hentBehandling(dto.getBehandlingId());
         if (behandling.erSaksbehandlingAvsluttet() || behandling.isBehandlingPåVent()) {
             throw new TekniskException("FPT-763494", String.format("Behandlingen er allerede avsluttet eller sett på vent, kan ikke fjerne verge for behandling %s", behandling.getId()));
@@ -124,21 +124,21 @@ public class VergeRestTjeneste {
     @GET
     // Re-enable dersom non-empty. jersey gir warning @Path("/")
     @Operation(description = "Returnerer informasjon om verge knyttet til søker for denne behandlingen",
-        tags = "verge",
-        responses = {
-            @ApiResponse(
-                responseCode = "200",
-                description = "Returnerer Verge, null hvis ikke eksisterer (GUI støtter ikke NOT_FOUND p.t.)",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = VergeDto.class)
-                )
-            )
-        })
+            tags = "verge",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Returnerer Verge, null hvis ikke eksisterer (GUI støtter ikke NOT_FOUND p.t.)",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON,
+                                    schema = @Schema(implementation = VergeDto.class)
+                            )
+                    )
+            })
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public VergeDto getVerge(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                 @QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse dto) {
+                             @QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse dto) {
         Long behandlingId = hentBehandlingId(dto);
         Optional<VergeEntitet> vergeEntitet = vergeTjeneste.hentVergeInformasjon(behandlingId);
         return vergeEntitet.isPresent() ? map(vergeEntitet.get()) : null;
@@ -147,20 +147,20 @@ public class VergeRestTjeneste {
     @GET
     @Path("/behandlingsmeny")
     @Operation(description = "Instruerer hvilket menyvalg som skal være mulig fra behandlingsmenyen",
-        tags = "verge",
-        responses = {
-            @ApiResponse(responseCode = "200",
-                description = "Returnerer OPPRETT/FJERN",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = VergeBehandlingsmenyDto.class)
-                )
-            )
-        })
+            tags = "verge",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Returnerer OPPRETT/FJERN",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON,
+                                    schema = @Schema(implementation = VergeBehandlingsmenyDto.class)
+                            )
+                    )
+            })
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentBehandlingsmenyvalg(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                                @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
+                                            @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
         Optional<VergeEntitet> vergeEntitet = vergeTjeneste.hentVergeInformasjon(behandling.getId());
         boolean kanBehandlingEndres = !behandling.erSaksbehandlingAvsluttet() && !behandling.isBehandlingPåVent();
@@ -168,7 +168,7 @@ public class VergeRestTjeneste {
         VergeBehandlingsmenyDto dto = new VergeBehandlingsmenyDto(behandling.getId(), VergeBehandlingsmenyEnum.SKJUL);
         if (kanBehandlingEndres) {
             dto = finnesVerge ? new VergeBehandlingsmenyDto(behandling.getId(), VergeBehandlingsmenyEnum.FJERN) :
-                new VergeBehandlingsmenyDto(behandling.getId(), VergeBehandlingsmenyEnum.OPPRETT);
+                    new VergeBehandlingsmenyDto(behandling.getId(), VergeBehandlingsmenyEnum.OPPRETT);
         }
         return Response.ok(dto).build();
     }

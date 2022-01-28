@@ -55,8 +55,8 @@ public class VilkårsvurderingRestTjeneste {
     @Operation(tags = "vilkårsvurdering", description = "Henter perioder som skal vurderes for vilkårsvurdering")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     public DetaljerteFeilutbetalingsperioderDto hentDetailjertFeilutbetalingPerioder(
-        @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-        @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+            @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+            @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         DetaljerteFeilutbetalingsperioderDto perioderDto = new DetaljerteFeilutbetalingsperioderDto();
         perioderDto.setPerioder(vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(hentBehandlingId(behandlingReferanse)));
         perioderDto.setRettsgebyr(rettsgebyr);
@@ -68,7 +68,7 @@ public class VilkårsvurderingRestTjeneste {
     @Operation(tags = "vilkårsvurdering", description = "Henter allerede vurdert vilkårsvurdering")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     public VilkårsvurderteDto hentVurdertPerioder(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                                      @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+                                                  @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         VilkårsvurderteDto vilkårsvurderteDto = new VilkårsvurderteDto();
         vilkårsvurderteDto.setVilkarsVurdertePerioder(vilkårsvurderingTjeneste.hentVilkårsvurdering(hentBehandlingId(behandlingReferanse)));
         return vilkårsvurderteDto;
@@ -76,7 +76,7 @@ public class VilkårsvurderingRestTjeneste {
 
     private Long hentBehandlingId(BehandlingReferanse behandlingReferanse) {
         return behandlingReferanse.erInternBehandlingId()
-            ? behandlingReferanse.getBehandlingId()
-            : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
+                ? behandlingReferanse.getBehandlingId()
+                : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
     }
 }

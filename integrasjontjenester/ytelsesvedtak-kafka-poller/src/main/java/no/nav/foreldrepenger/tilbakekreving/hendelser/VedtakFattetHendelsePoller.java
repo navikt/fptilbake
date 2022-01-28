@@ -13,7 +13,7 @@ public class VedtakFattetHendelsePoller implements KafkaPoller {
 
     private VedtakFattetReader hendelseReader;
 
-    VedtakFattetHendelsePoller(){
+    VedtakFattetHendelsePoller() {
         // for CDI
     }
 

@@ -67,7 +67,7 @@ public class GrunnlagRestTestTjenesteLocalDev {
     @Operation(tags = "kravgrunnlag", description = "Lagre tilbakekrevingsgrunnlag fra økonomi")
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     public Response lagreUtbetalinger(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                          @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse idDto,
+                                      @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse idDto,
                                       @NotNull @Valid KravgrunnlagDto kravgrunnlagDto) {
 
         if (!Environment.current().isLocal()) {
@@ -96,49 +96,49 @@ public class GrunnlagRestTestTjenesteLocalDev {
 
     private Kravgrunnlag431 lagKravgrunnlag431(DetaljertKravgrunnlagDto kravgrunnlagDto) {
         return Kravgrunnlag431.builder()
-            .medEksternKravgrunnlagId(kravgrunnlagDto.getKravgrunnlagId().toString())
-            .medVedtakId(kravgrunnlagDto.getVedtakId())
-            .medKravStatusKode(KravStatusKode.fraKode(kravgrunnlagDto.getKravStatusKode()))
-            .medFagomraadeKode(FagOmrådeKode.fraKode(kravgrunnlagDto.getFagOmrådeKode()))
-            .medFagSystemId(kravgrunnlagDto.getFagSystemId())
-            .medVedtakFagSystemDato(kravgrunnlagDto.getVedtakFagSystemDato())
-            .medOmgjortVedtakId(kravgrunnlagDto.getOmgjortVedtakId())
-            .medGjelderVedtakId(hentAktørIdEllerOrganisajonNummer(kravgrunnlagDto.getGjelderVedtakId(), GjelderType.fraKode(kravgrunnlagDto.getGjelderType())))
-            .medGjelderType(GjelderType.fraKode(kravgrunnlagDto.getGjelderType()))
-            .medUtbetalesTilId(hentAktørIdEllerOrganisajonNummer(kravgrunnlagDto.getUtbetalesTilId(), GjelderType.fraKode(kravgrunnlagDto.getUtbetGjelderType())))
-            .medUtbetIdType(GjelderType.fraKode(kravgrunnlagDto.getUtbetGjelderType()))
-            .medHjemmelKode(kravgrunnlagDto.getHjemmelKode())
-            .medBeregnesRenter(kravgrunnlagDto.getBeregnesRenter())
-            .medAnsvarligEnhet(kravgrunnlagDto.getAnsvarligEnhet())
-            .medBostedEnhet(kravgrunnlagDto.getBostedEnhet())
-            .medBehandlendeEnhet(kravgrunnlagDto.getBehandlendeEnhet())
-            .medFeltKontroll(kravgrunnlagDto.getKontrollFelt())
-            .medSaksBehId(kravgrunnlagDto.getSaksBehId())
-            .medReferanse(new Henvisning(kravgrunnlagDto.getReferanse()))
-            .build();
+                .medEksternKravgrunnlagId(kravgrunnlagDto.getKravgrunnlagId().toString())
+                .medVedtakId(kravgrunnlagDto.getVedtakId())
+                .medKravStatusKode(KravStatusKode.fraKode(kravgrunnlagDto.getKravStatusKode()))
+                .medFagomraadeKode(FagOmrådeKode.fraKode(kravgrunnlagDto.getFagOmrådeKode()))
+                .medFagSystemId(kravgrunnlagDto.getFagSystemId())
+                .medVedtakFagSystemDato(kravgrunnlagDto.getVedtakFagSystemDato())
+                .medOmgjortVedtakId(kravgrunnlagDto.getOmgjortVedtakId())
+                .medGjelderVedtakId(hentAktørIdEllerOrganisajonNummer(kravgrunnlagDto.getGjelderVedtakId(), GjelderType.fraKode(kravgrunnlagDto.getGjelderType())))
+                .medGjelderType(GjelderType.fraKode(kravgrunnlagDto.getGjelderType()))
+                .medUtbetalesTilId(hentAktørIdEllerOrganisajonNummer(kravgrunnlagDto.getUtbetalesTilId(), GjelderType.fraKode(kravgrunnlagDto.getUtbetGjelderType())))
+                .medUtbetIdType(GjelderType.fraKode(kravgrunnlagDto.getUtbetGjelderType()))
+                .medHjemmelKode(kravgrunnlagDto.getHjemmelKode())
+                .medBeregnesRenter(kravgrunnlagDto.getBeregnesRenter())
+                .medAnsvarligEnhet(kravgrunnlagDto.getAnsvarligEnhet())
+                .medBostedEnhet(kravgrunnlagDto.getBostedEnhet())
+                .medBehandlendeEnhet(kravgrunnlagDto.getBehandlendeEnhet())
+                .medFeltKontroll(kravgrunnlagDto.getKontrollFelt())
+                .medSaksBehId(kravgrunnlagDto.getSaksBehId())
+                .medReferanse(new Henvisning(kravgrunnlagDto.getReferanse()))
+                .build();
     }
 
     private KravgrunnlagPeriode432 lagKravgrunnlagPeriode432(Kravgrunnlag431 kravgrunnlag431, DetaljertKravgrunnlagPeriodeDto periodeDto) {
         return KravgrunnlagPeriode432.builder()
-            .medPeriode(Periode.of(periodeDto.getFom(), periodeDto.getTom()))
-            .medBeløpSkattMnd(periodeDto.getBeløpSkattMnd())
-            .medKravgrunnlag431(kravgrunnlag431)
-            .build();
+                .medPeriode(Periode.of(periodeDto.getFom(), periodeDto.getTom()))
+                .medBeløpSkattMnd(periodeDto.getBeløpSkattMnd())
+                .medKravgrunnlag431(kravgrunnlag431)
+                .build();
     }
 
     private KravgrunnlagBelop433 lagKravgrunnlagBelop433(KravgrunnlagPeriode432 kravgrunnlagPeriode432, DetaljertKravgrunnlagBelopDto postering) {
         return KravgrunnlagBelop433.builder()
-            .medKlasseKode(postering.getKlasseKode())
-            .medKlasseType(KlasseType.fraKode(postering.getKlasseType()))
-            .medOpprUtbetBelop(postering.getOpprUtbetBelop())
-            .medNyBelop(postering.getNyBelop())
-            .medTilbakekrevesBelop(postering.getTilbakekrevesBelop())
-            .medUinnkrevdBelop(postering.getUinnkrevdBelop())
-            .medSkattProsent(postering.getSkattProsent())
-            .medResultatKode(postering.getResultatKode())
-            .medÅrsakKode(postering.getÅrsakKode())
-            .medSkyldKode(postering.getSkyldKode())
-            .medKravgrunnlagPeriode432(kravgrunnlagPeriode432).build();
+                .medKlasseKode(postering.getKlasseKode())
+                .medKlasseType(KlasseType.fraKode(postering.getKlasseType()))
+                .medOpprUtbetBelop(postering.getOpprUtbetBelop())
+                .medNyBelop(postering.getNyBelop())
+                .medTilbakekrevesBelop(postering.getTilbakekrevesBelop())
+                .medUinnkrevdBelop(postering.getUinnkrevdBelop())
+                .medSkattProsent(postering.getSkattProsent())
+                .medResultatKode(postering.getResultatKode())
+                .medÅrsakKode(postering.getÅrsakKode())
+                .medSkyldKode(postering.getSkyldKode())
+                .medKravgrunnlagPeriode432(kravgrunnlagPeriode432).build();
     }
 
     private String hentAktørIdEllerOrganisajonNummer(String fnrEllerOgNo, GjelderType gjelderType) {

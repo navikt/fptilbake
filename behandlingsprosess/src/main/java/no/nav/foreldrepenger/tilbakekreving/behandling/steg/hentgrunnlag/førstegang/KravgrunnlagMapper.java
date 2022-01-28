@@ -60,53 +60,53 @@ public class KravgrunnlagMapper {
         GjelderType gjelderType = GjelderType.fraKode(dto.getTypeGjelderId().value());
         GjelderType utbetalingGjelderType = GjelderType.fraKode(dto.getTypeUtbetId().value());
         return Kravgrunnlag431.builder()
-            .medVedtakId(dto.getVedtakId().longValue())
-            .medEksternKravgrunnlagId(dto.getKravgrunnlagId().toString())
-            .medKravStatusKode(KravStatusKode.fraKode(dto.getKodeStatusKrav()))
-            .medFagomraadeKode(FagOmrådeKode.fraKode(dto.getKodeFagomraade()))
-            .medFagSystemId(dto.getFagsystemId())
-            .medVedtakFagSystemDato(konverter(dto.getDatoVedtakFagsystem()))
-            .medOmgjortVedtakId(dto.getVedtakIdOmgjort() != null ? dto.getVedtakIdOmgjort().longValue() : null)
-            .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(dto.getVedtakGjelderId(), gjelderType))
-            .medGjelderType(gjelderType)
-            .medUtbetalesTilId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(dto.getUtbetalesTilId(), utbetalingGjelderType))
-            .medUtbetIdType(utbetalingGjelderType)
-            .medHjemmelKode(dto.getKodeHjemmel())
-            .medBeregnesRenter(dto.getRenterBeregnes() != null ? dto.getRenterBeregnes().value() : null)
-            .medAnsvarligEnhet(dto.getEnhetAnsvarlig())
-            .medBostedEnhet(dto.getEnhetBosted())
-            .medBehandlendeEnhet(dto.getEnhetBehandl())
-            .medFeltKontroll(dto.getKontrollfelt())
-            .medSaksBehId(dto.getSaksbehId())
-            .medReferanse(new Henvisning(dto.getReferanse()))
-            .build();
+                .medVedtakId(dto.getVedtakId().longValue())
+                .medEksternKravgrunnlagId(dto.getKravgrunnlagId().toString())
+                .medKravStatusKode(KravStatusKode.fraKode(dto.getKodeStatusKrav()))
+                .medFagomraadeKode(FagOmrådeKode.fraKode(dto.getKodeFagomraade()))
+                .medFagSystemId(dto.getFagsystemId())
+                .medVedtakFagSystemDato(konverter(dto.getDatoVedtakFagsystem()))
+                .medOmgjortVedtakId(dto.getVedtakIdOmgjort() != null ? dto.getVedtakIdOmgjort().longValue() : null)
+                .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(dto.getVedtakGjelderId(), gjelderType))
+                .medGjelderType(gjelderType)
+                .medUtbetalesTilId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(dto.getUtbetalesTilId(), utbetalingGjelderType))
+                .medUtbetIdType(utbetalingGjelderType)
+                .medHjemmelKode(dto.getKodeHjemmel())
+                .medBeregnesRenter(dto.getRenterBeregnes() != null ? dto.getRenterBeregnes().value() : null)
+                .medAnsvarligEnhet(dto.getEnhetAnsvarlig())
+                .medBostedEnhet(dto.getEnhetBosted())
+                .medBehandlendeEnhet(dto.getEnhetBehandl())
+                .medFeltKontroll(dto.getKontrollfelt())
+                .medSaksBehId(dto.getSaksbehId())
+                .medReferanse(new Henvisning(dto.getReferanse()))
+                .build();
     }
 
     private KravgrunnlagPeriode432 lagKravgrunnlagPeriode432(Kravgrunnlag431 kravgrunnlag431, DetaljertKravgrunnlagPeriode dto) {
         LocalDate fom = konverter(dto.getPeriode().getFom());
         LocalDate tom = konverter(dto.getPeriode().getTom());
         return KravgrunnlagPeriode432.builder()
-            .medPeriode(Periode.of(fom, tom))
-            .medBeløpSkattMnd(dto.getBelopSkattMnd())
-            .medKravgrunnlag431(kravgrunnlag431)
-            .build();
+                .medPeriode(Periode.of(fom, tom))
+                .medBeløpSkattMnd(dto.getBelopSkattMnd())
+                .medKravgrunnlag431(kravgrunnlag431)
+                .build();
     }
 
     private KravgrunnlagBelop433 lagKravgrunnlagBelop433(KravgrunnlagPeriode432 kravgrunnlagPeriode432, DetaljertKravgrunnlagBelop dto) {
         KlasseType type = map(dto.getTypeKlasse());
         return KravgrunnlagBelop433.builder()
-            .medKlasseType(type)
-            .medKlasseKode(finnKlasseKode(dto.getKodeKlasse(), type))
-            .medOpprUtbetBelop(dto.getBelopOpprUtbet())
-            .medNyBelop(dto.getBelopNy())
-            .medTilbakekrevesBelop(dto.getBelopTilbakekreves())
-            .medUinnkrevdBelop(dto.getBelopUinnkrevd())
-            .medSkattProsent(dto.getSkattProsent())
-            .medResultatKode(dto.getKodeResultat())
-            .medÅrsakKode(dto.getKodeAArsak())
-            .medSkyldKode(dto.getKodeSkyld())
-            .medKravgrunnlagPeriode432(kravgrunnlagPeriode432)
-            .build();
+                .medKlasseType(type)
+                .medKlasseKode(finnKlasseKode(dto.getKodeKlasse(), type))
+                .medOpprUtbetBelop(dto.getBelopOpprUtbet())
+                .medNyBelop(dto.getBelopNy())
+                .medTilbakekrevesBelop(dto.getBelopTilbakekreves())
+                .medUinnkrevdBelop(dto.getBelopUinnkrevd())
+                .medSkattProsent(dto.getSkattProsent())
+                .medResultatKode(dto.getKodeResultat())
+                .medÅrsakKode(dto.getKodeAArsak())
+                .medSkyldKode(dto.getKodeSkyld())
+                .medKravgrunnlagPeriode432(kravgrunnlagPeriode432)
+                .build();
     }
 
     private static LocalDate konverter(XMLGregorianCalendar dato) {

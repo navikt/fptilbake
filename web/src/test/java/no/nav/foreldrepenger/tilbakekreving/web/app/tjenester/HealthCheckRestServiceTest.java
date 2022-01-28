@@ -2,14 +2,12 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import javax.ws.rs.core.Response;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
 import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.Selftests;
 

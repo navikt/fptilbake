@@ -89,7 +89,7 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
         String saksnummer = kravgrunnlag431.getSaksnummer().getVerdi();
         Henvisning henvisning = kravgrunnlag431.getReferanse();
         kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(behandlingId, kravgrunnlag431, true);
-        oppdaterHenvisningFraGrunnlag(behandling,saksnummer, henvisning);
+        oppdaterHenvisningFraGrunnlag(behandling, saksnummer, henvisning);
         lagHistorikkInnslagForMotattKravgrunnlag(behandling, kravgrunnlag431);
     }
 
@@ -121,9 +121,9 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
 
         KravStatusKode grunnlagStatus = kravgrunnlag431.getKravStatusKode();
         HistorikkInnslagTekstBuilder historiebygger = new HistorikkInnslagTekstBuilder()
-            .medHendelse(HistorikkinnslagType.NY_KRAVGRUNNLAG_MOTTAT)
-            .medOpplysning(HistorikkOpplysningType.KRAVGRUNNLAG_VEDTAK_ID, kravgrunnlag431.getVedtakId())
-            .medOpplysning(HistorikkOpplysningType.KRAVGRUNNLAG_STATUS, grunnlagStatus.getNavn());
+                .medHendelse(HistorikkinnslagType.NY_KRAVGRUNNLAG_MOTTAT)
+                .medOpplysning(HistorikkOpplysningType.KRAVGRUNNLAG_VEDTAK_ID, kravgrunnlag431.getVedtakId())
+                .medOpplysning(HistorikkOpplysningType.KRAVGRUNNLAG_STATUS, grunnlagStatus.getNavn());
         historiebygger.build(grunnlagMottattInnslag);
 
         repositoryProvider.getHistorikkRepository().lagre(grunnlagMottattInnslag);
@@ -132,7 +132,7 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
     private void oppdaterHenvisningFraGrunnlag(Behandling behandling, String saksnummer, Henvisning grunnlagHenvisning) {
         List<EksternBehandlingsinfoDto> eksternBehandlinger = hentBehandlingerFraFagsystem(saksnummer);
         Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDto = eksternBehandlinger.stream()
-            .filter(eksternBehandling -> grunnlagHenvisning.equals(eksternBehandling.getHenvisning())).findFirst();
+                .filter(eksternBehandling -> grunnlagHenvisning.equals(eksternBehandling.getHenvisning())).findFirst();
         if (eksternBehandlingsinfoDto.isPresent()) {
             logger.info("Oppdaterer EksternBehandling henvisning={} for behandlingId={}", grunnlagHenvisning, behandling.getId());
             EksternBehandlingsinfoDto eksternBehandlingDto = eksternBehandlingsinfoDto.get();
@@ -140,7 +140,7 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
             eksternBehandlingRepository.lagre(eksternBehandling);
         } else {
             throw new TekniskException("FPT-587169",
-                String.format("Hentet et tilbakekrevingsgrunnlag fra Økonomi for en behandling som ikke finnes i Fagsaksystemet for saksnummer=%s, henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!", saksnummer, grunnlagHenvisning));
+                    String.format("Hentet et tilbakekrevingsgrunnlag fra Økonomi for en behandling som ikke finnes i Fagsaksystemet for saksnummer=%s, henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!", saksnummer, grunnlagHenvisning));
         }
     }
 

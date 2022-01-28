@@ -96,7 +96,7 @@ public class BehandlingRevurderingTjeneste {
 
     private Behandling opprettManuellRevurdering(Fagsak fagsak, BehandlingÅrsakType behandlingÅrsakType, UUID eksternUuid, OrganisasjonsEnhet enhet) {
         EksternBehandling eksternBehandlingForSisteTbkBehandling = eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternUuid)
-            .orElseThrow(() -> tjenesteFinnerIkkeBehandlingForRevurdering(fagsak.getId()));
+                .orElseThrow(() -> tjenesteFinnerIkkeBehandlingForRevurdering(fagsak.getId()));
 
         Behandling origBehandling = behandlingRepository.hentBehandling(eksternBehandlingForSisteTbkBehandling.getInternId());
 
@@ -123,10 +123,10 @@ public class BehandlingRevurderingTjeneste {
     private Behandling opprettRevurderingsBehandling(BehandlingÅrsakType behandlingÅrsakType, Behandling origBehandling,
                                                      BehandlingType behandlingType, OrganisasjonsEnhet enhet) {
         BehandlingÅrsak.Builder revurderingÅrsak = BehandlingÅrsak.builder(behandlingÅrsakType)
-            .medOriginalBehandling(origBehandling);
+                .medOriginalBehandling(origBehandling);
         Behandling revurdering = Behandling.fraTidligereBehandling(origBehandling, behandlingType)
-            .medOpprettetDato(LocalDateTime.now())
-            .medBehandlingÅrsak(revurderingÅrsak).build();
+                .medOpprettetDato(LocalDateTime.now())
+                .medBehandlingÅrsak(revurderingÅrsak).build();
         revurdering.setBehandlendeOrganisasjonsEnhet(enhet);
         return revurdering;
     }
@@ -147,9 +147,9 @@ public class BehandlingRevurderingTjeneste {
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 
-    private void kopierVergeInformasjon(long origBehandlingId, long behandlingId){
+    private void kopierVergeInformasjon(long origBehandlingId, long behandlingId) {
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(origBehandlingId);
-        if(vergeEntitet.isPresent()){
+        if (vergeEntitet.isPresent()) {
             vergeRepository.lagreVergeInformasjon(behandlingId, vergeEntitet.get());
         }
     }
@@ -162,13 +162,12 @@ public class BehandlingRevurderingTjeneste {
         revurderingsInnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
 
         HistorikkInnslagTekstBuilder historiebygger = new HistorikkInnslagTekstBuilder()
-            .medHendelse(HistorikkinnslagType.REVURD_OPPR)
-            .medBegrunnelse(revurderingÅrsak);
+                .medHendelse(HistorikkinnslagType.REVURD_OPPR)
+                .medBegrunnelse(revurderingÅrsak);
         historiebygger.build(revurderingsInnslag);
 
         repositoryProvider.getHistorikkRepository().lagre(revurderingsInnslag);
     }
-
 
 
     private static FunksjonellException kanIkkeOppretteRevurdering(Saksnummer saksnummer) {
