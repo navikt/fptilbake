@@ -15,9 +15,7 @@
     "https://fptilbake.dev.intern.nav.no/"
   ],
   "env": {
-    "SECURITYTOKENSERVICE_URL": "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
-    "OIDC_STS_ISSUER_URL": "https://security-token-service.nais.preprod.local",
-    "OIDC_STS_JWKS_URL": "http://security-token-service.default/rest/v1/sts/jwks",
+    "APPDYNAMICS_AGENT_ACCOUNT_NAME": "NON-PROD",
     "LDAP_URL": "ldaps://ldapgw.preprod.local",
     "LDAP_BASEDN": "dc=preprod,dc=local",
     "LDAP_DOMAIN": "PREPROD.LOCAL",
@@ -28,7 +26,6 @@
     "MQGATEWAY02_HOSTNAME": "b27apvl220.preprod.local",
     "MQGATEWAY02_PORT": "1413",
     "FPTILBAKE_KRAVGRUNNLAG_QUEUENAME": "QA.Q1_FPTILBAKE.KRAVGRUNNLAG",
-    "PDL_BASE_URL": "http://pdl-api.pdl/graphql",
     "TILBAKEKREVING_V1_URL": "https://cics-q1.adeo.no/oppdrag/K231CW80",
     "DOKUMENTPRODUKSJON_V2_URL": "https://dokprod-q1.nais.preprod.local/dokprod/ws/dokumentproduksjon/v2",
     "BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
@@ -39,7 +36,7 @@
     "KAFKA_DVH_SAKSSTATISTIKK_TOPIC": "privat-tilbakekreving-dvh-saksstatistikk-v1",
     "ORGANISASJON_RS_URL": "https://modapp-q1.adeo.no/ereg/api/v1/organisasjon",
     "JOURNALPOSTAPI_OVERRIDE_URL": "http://dokarkiv.q1",
-    "DOKDIST_REST_DISTRIBUER_JOURNALPOST" : "https://dokdistfordeling-q1.nais.preprod.local/rest/v1/distribuerjournalpost",
+    "DOKDIST_REST_DISTRIBUER_JOURNALPOST" : "http://dokdistfordeling-q1.teamdokumenthandtering/rest/v1/distribuerjournalpost",
     "KODEVERK_V2_URL": "https://kodeverk.nais.preprod.local/ws/kodeverk/v2",
     "FORELDELSE_ANTALLMAANEDER" : "P1M",
     "VEDTAKSBREV_JOIN_PERIODER" : "false"

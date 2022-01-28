@@ -1,6 +1,10 @@
 FROM navikt/java:17-appdynamics
-ENV APPD_ENABLED=true
+
 ENV TZ=Europe/Oslo
+ENV APPD_ENABLED=true
+ENV APPDYNAMICS_CONTROLLER_HOST_NAME=appdynamics.adeo.no
+ENV APPDYNAMICS_CONTROLLER_PORT=443
+ENV APPDYNAMICS_CONTROLLER_SSL_ENABLED=true
 
 RUN mkdir /app/lib
 RUN mkdir /app/conf
