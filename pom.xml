@@ -51,7 +51,7 @@
         <apache.ws.xmlschema.version>2.2.5</apache.ws.xmlschema.version>
         <javaslang.version>2.0.6</javaslang.version>
 
-        <flyway.version>8.4.2</flyway.version>
+        <flyway.version>8.4.3</flyway.version>
         <maven.compiler.source>{java.version}</maven.compiler.source>
         <maven.compiler.target>{java.version}</maven.compiler.target>
         <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
