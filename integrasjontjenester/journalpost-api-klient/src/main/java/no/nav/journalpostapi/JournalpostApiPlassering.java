@@ -9,20 +9,17 @@ class JournalpostApiPlassering {
 
     private static final Logger logger = LoggerFactory.getLogger(JournalpostApiPlassering.class);
 
-    static final String BASE_URL = "http://dokarkiv";
-    static final String OVERRIDE_URL = "journalpostapi.override.url";
-
     private JournalpostApiPlassering() {
 
     }
 
     static String getBaseUrl() {
-        String overrideUrl = Environment.current().getProperty(JournalpostApiPlassering.OVERRIDE_URL);
+        String overrideUrl = Environment.current().getProperty("journalpostapi.override.url");
         if (overrideUrl != null && !overrideUrl.isEmpty()) {
             logger.info("Overstyrte URL til dokarkiv til {}", overrideUrl);
             return overrideUrl;
         } else {
-            return JournalpostApiPlassering.BASE_URL;
+            return "http://dokarkiv";
         }
     }
 }
