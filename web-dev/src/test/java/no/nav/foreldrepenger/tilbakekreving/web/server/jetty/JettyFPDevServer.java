@@ -47,6 +47,7 @@ public class JettyFPDevServer extends JettyServer {
         for (String arg : args) {
             if (arg.equals(VTP_ARGUMENT)) {
                 vtp = true;
+                break;
             }
         }
 
@@ -94,7 +95,6 @@ public class JettyFPDevServer extends JettyServer {
     @Override
     protected void konfigurerSikkerhet() {
         System.setProperty("conf", "../web/src/main/resources/jetty/");
-        super.konfigurerSikkerhet();
 
         // truststore avgjør hva vi stoler på av sertifikater når vi gjør utadgående TLS kall
         initCryptoStoreConfig("truststore", TRUSTSTORE_PATH_PROP, TRUSTSTORE_PASSW_PROP, "changeit");

@@ -23,7 +23,7 @@ public class ØkonomiConsumerConfig {
     private String endpointUrl; // NOSONAR
 
     @Inject
-    public ØkonomiConsumerConfig(@KonfigVerdi("tilbakekreving_v1.url") String endpointUrl) {
+    public ØkonomiConsumerConfig(@KonfigVerdi("tilbakekreving.v1.url") String endpointUrl) {
         this.endpointUrl = endpointUrl;
     }
 
