@@ -6,8 +6,11 @@ import java.util.stream.Collectors;
 
 import javax.jms.JMSException;
 import javax.naming.NamingException;
+import javax.security.auth.message.config.AuthConfigFactory;
 
 import org.eclipse.jetty.plus.jndi.EnvEntry;
+import org.eclipse.jetty.security.jaspi.DefaultAuthConfigFactory;
+import org.eclipse.jetty.security.jaspi.provider.JaspiAuthConfigProvider;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceCollection;
 import org.eclipse.jetty.webapp.MetaData;
@@ -17,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.web.app.ApplicationConfig;
 import no.nav.vedtak.isso.IssoApplication;
+import no.nav.vedtak.sikkerhet.jaspic.OidcAuthModule;
 
 public class JettyServer extends AbstractJettyServer {
 
@@ -59,6 +63,13 @@ public class JettyServer extends AbstractJettyServer {
 
     @Override
     protected void konfigurerSikkerhet() throws Exception {
+        var factory = new DefaultAuthConfigFactory();
+        factory.registerConfigProvider(new JaspiAuthConfigProvider(new OidcAuthModule()),
+                "HttpServlet",
+                "server " + appKonfigurasjon.getContextPath(),
+                "OIDC Authentication");
+
+        AuthConfigFactory.setFactory(factory);
     }
 
     protected void konfigurerJms() throws JMSException, NamingException {

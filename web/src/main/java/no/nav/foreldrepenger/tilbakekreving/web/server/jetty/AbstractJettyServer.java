@@ -4,12 +4,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.security.auth.message.config.AuthConfigFactory;
+
 import org.eclipse.jetty.jaas.JAASLoginService;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.DefaultIdentityService;
 import org.eclipse.jetty.security.SecurityHandler;
+import org.eclipse.jetty.security.jaspi.DefaultAuthConfigFactory;
 import org.eclipse.jetty.security.jaspi.JaspiAuthenticatorFactory;
+import org.eclipse.jetty.security.jaspi.provider.JaspiAuthConfigProvider;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -19,9 +23,11 @@ import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import no.nav.vedtak.sikkerhet.jaspic.OidcAuthModule;
+
 abstract class AbstractJettyServer {
 
-    private AppKonfigurasjon appKonfigurasjon;
+    protected AppKonfigurasjon appKonfigurasjon;
 
     public AbstractJettyServer(AppKonfigurasjon appKonfigurasjon) {
         this.appKonfigurasjon = appKonfigurasjon;
