@@ -93,7 +93,8 @@ public class JettyFPDevServer extends JettyServer {
     }
 
     @Override
-    protected void konfigurerSikkerhet() {
+    protected void konfigurerSikkerhet() throws Exception {
+        super.konfigurerSikkerhet();
         System.setProperty("conf", "../web/src/main/resources/jetty/");
 
         // truststore avgjør hva vi stoler på av sertifikater når vi gjør utadgående TLS kall
