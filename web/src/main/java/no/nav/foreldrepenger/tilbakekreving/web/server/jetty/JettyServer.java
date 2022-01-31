@@ -57,6 +57,10 @@ public class JettyServer extends AbstractJettyServer {
         konfigurerJms();
     }
 
+    @Override
+    protected void konfigurerSikkerhet() throws Exception {
+    }
+
     protected void konfigurerJms() throws JMSException, NamingException {
         JmsKonfig.settOppJndiConnectionfactory("jms/ConnectionFactory");
         JmsKonfig.settOppJndiMessageQueue("jms/QueueFptilbakeKravgrunnlag", "fptilbake.kravgrunnlag.queueName");
