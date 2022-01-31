@@ -18,13 +18,18 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.web.app.ApplicationConfig;
 import no.nav.vedtak.isso.IssoApplication;
 import no.nav.vedtak.sikkerhet.jaspic.OidcAuthModule;
 
 public class JettyServer extends AbstractJettyServer {
 
+    private static final Environment ENV = Environment.current();
     private static final Logger LOG = LoggerFactory.getLogger(JettyServer.class);
+
+    private static final String CONTEXT_PATH = ENV.getRequiredProperty("context.path");
+
     private DataSourceKonfig dataSourceKonfig;
 
     public JettyServer() {
