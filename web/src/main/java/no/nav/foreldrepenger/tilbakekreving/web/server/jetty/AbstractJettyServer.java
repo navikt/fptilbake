@@ -37,6 +37,7 @@ abstract class AbstractJettyServer {
     protected void konfigurer() throws Exception {
         konfigurerLogging();
         konfigurerMiljø();
+        konfigurerSikkerhet();
         konfigurerJndi();
     }
 
@@ -50,6 +51,8 @@ abstract class AbstractJettyServer {
     protected abstract void konfigurerMiljø() throws Exception;
 
     protected abstract void konfigurerJndi() throws Exception;
+
+    protected abstract void konfigurerSikkerhet() throws Exception;
 
     protected abstract void migrerDatabaser() throws IOException;
 
