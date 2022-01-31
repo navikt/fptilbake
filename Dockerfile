@@ -10,7 +10,7 @@ RUN mkdir /app/lib
 RUN mkdir /app/conf
 
 # Config
-COPY web/target/classes/jetty/jaspi-conf.xml /app/conf/
+COPY web/target/classes/logback*.xml /app/conf/
 
 # Export vault properties
 COPY export-vault.sh /init-scripts/export-vault.sh
