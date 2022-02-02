@@ -23,8 +23,7 @@ public class SecurityFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        if (servletResponse instanceof HttpServletResponse) {
-            HttpServletResponse response = (HttpServletResponse) servletResponse;
+        if (servletResponse instanceof HttpServletResponse response) {
             response.setHeader("Content-Security-Policy", String.format("script-src %s", ServerInfo.instance().getSchemeHostPort()));
             response.setHeader("X-Content-Type-Options", "nosniff");
             response.setHeader("X-XSS-Protection", "1;mode=block");

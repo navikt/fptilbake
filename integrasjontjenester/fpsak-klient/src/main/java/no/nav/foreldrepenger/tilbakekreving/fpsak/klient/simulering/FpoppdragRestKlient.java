@@ -5,31 +5,38 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.core.UriBuilder;
 
+import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.FeilutbetaltePerioderDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 
 @ApplicationScoped
 public class FpoppdragRestKlient {
 
-    private static final String FPOPPDRAG_HENT_FEILUTBETALINGER = "/simulering/feilutbetalte-perioder";
-
+    private static final Environment ENV = Environment.current();
 
     private OidcRestClient restClient;
-    private URI uriHentFeilutbetalinger;
 
-    public FpoppdragRestKlient() {
+    protected FpoppdragRestKlient() {
         //for cdi proxy
     }
 
     @Inject
     public FpoppdragRestKlient(OidcRestClient restClient) {
         this.restClient = restClient;
-        String fpoppdragBaseUrl = FpoppdragFelles.getFpoppdragBaseUrl();
-        uriHentFeilutbetalinger = URI.create(fpoppdragBaseUrl + FPOPPDRAG_HENT_FEILUTBETALINGER);
     }
 
     public Optional<FeilutbetaltePerioderDto> hentFeilutbetaltePerioder(long fpsakBehandlingId) {
-        return restClient.postReturnsOptional(uriHentFeilutbetalinger, new BehandlingIdDto(fpsakBehandlingId), FeilutbetaltePerioderDto.class);
+        var uri = UriBuilder
+                .fromUri(baseUri())
+                .path("/fpoppdrag/api")
+                .path("/simulering/feilutbetalte-perioder")
+                .build();
+        return restClient.postReturnsOptional(uri, new BehandlingIdDto(fpsakBehandlingId), FeilutbetaltePerioderDto.class);
+    }
+
+    private static URI baseUri() {
+        return ENV.getProperty("fpoppdrag.base.url", URI.class);
     }
 }

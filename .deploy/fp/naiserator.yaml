@@ -78,9 +78,3 @@ spec:
      value: "fp"
    - name: AUDITLOGGER_PRODUCT
      value: "fptilbake"
-   - name: APPDYNAMICS_CONTROLLER_HOST_NAME
-     value: "appdynamics.adeo.no"
-   - name: APPDYNAMICS_CONTROLLER_PORT
-     value: "443"
-   - name: APPDYNAMICS_CONTROLLER_SSL_ENABLED
-     value: "true"

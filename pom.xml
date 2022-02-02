@@ -15,7 +15,6 @@
         <module>behandlingskontroll</module>
         <module>domenetjenester</module>
         <module>web</module>
-        <module>web-dev</module>
         <module>migreringer</module>
         <module>behandlingsprosess</module>
         <module>integrasjontjenester</module>
