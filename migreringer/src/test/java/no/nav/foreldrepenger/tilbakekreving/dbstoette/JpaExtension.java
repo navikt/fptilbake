@@ -15,9 +15,9 @@ public class JpaExtension extends EntityManagerAwareExtension {
         if (isNotRunningUnderMaven) {
             LOG.info("Kjører IKKE under maven");
             // prøver alltid migrering hvis endring, ellers funker det dårlig i IDE.
-            Databaseskjemainitialisering.migrer();
+            Databaseskjemainitialisering.migrerUnittestSkjemaer();
         }
-        Databaseskjemainitialisering.settJdniOppslag();
+        Databaseskjemainitialisering.initUnitTestDataSource();
     }
 
 }
