@@ -30,7 +30,8 @@ public class JournalpostApiKlient {
 
     public OpprettJournalpostResponse opprettJournalpost(OpprettJournalpostRequest request, boolean forsøkFerdigstill) {
         // FIXME : Rydd opp journalpostapi.override.url etter alle har tatt i bruk dokarkiv.base.url
-        URI uri = UriBuilder.fromUri(ENV.getProperty("dokarkiv.base.url", ENV.getProperty("journalpostapi.override.url")))
+        URI uri = UriBuilder
+                .fromUri(ENV.getProperty("dokarkiv.base.url", ENV.getProperty("journalpostapi.override.url")))
                 .path("/rest/journalpostapi/v1/journalpost")
                 .queryParam("forsoekFerdigstill", forsøkFerdigstill)
                 .build();

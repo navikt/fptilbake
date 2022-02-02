@@ -15,7 +15,6 @@
         <module>behandlingskontroll</module>
         <module>domenetjenester</module>
         <module>web</module>
-        <module>web-dev</module>
         <module>migreringer</module>
         <module>behandlingsprosess</module>
         <module>integrasjontjenester</module>
@@ -111,12 +110,12 @@
             <dependency>
                 <groupId>org.ehcache</groupId>
                 <artifactId>ehcache</artifactId>
-                <version>3.9.6</version>
+                <version>3.9.9</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.neethi</groupId>
                 <artifactId>neethi</artifactId>
-                <version>3.1.1</version>
+                <version>3.2.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
