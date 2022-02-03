@@ -23,7 +23,7 @@ public class ØkonomiConsumerProducer {
     }
 
     public ØkonomiConsumer økonomiConsumer() {
-        TilbakekrevingPortType port = wrapWithSts(consumerConfig.getPort(), StsClientType.SYSTEM_SAML);
+        TilbakekrevingPortType port = wrapWithSts(consumerConfig.getPort(), StsClientType.SECURITYCONTEXT_TIL_SAML);
         disableCnCheck(port);
         return new ØkonomiConsumerImpl(port);
     }
