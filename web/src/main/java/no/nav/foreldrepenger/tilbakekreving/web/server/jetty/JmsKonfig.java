@@ -31,7 +31,6 @@ class JmsKonfig {
 
     static void settOppJndiMessageQueue(String jndiName, String queueNameProp) throws NamingException, JMSException {
         MQQueue queue = new MQQueue(ENV.getProperty(queueNameProp));
-
         new EnvEntry(jndiName, queue);
     }
 

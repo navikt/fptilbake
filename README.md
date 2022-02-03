@@ -9,7 +9,7 @@ Dette er repository for applikasjonene:
 Løsningen deployes som to applikasjoner, for å understøtte de ulike områdenes behov på en god måte.
 
 Kontaktinformasjon (Foreldrepenger):
-* slack-kanal: `#fp-tilbakekreving` eller `#teamforeldrepenger` 
+* slack-kanal: `#teamforeldrepenger` 
 
 Kontaktinformasjon (Omsorgspenger, Pleiepenger, Opplæringspenger, Frisinn):
 * slack-kanal: `#sykdom-i-familien`
@@ -29,11 +29,10 @@ Følgende viser kontekstdiagrammet for fptilbake. For k9-tilbake er det ganske l
 
 # Kjør og test lokalt
 
-Lokalt startes applikasjonene ved å kjøre en av klassene JettyFPDevServer eller JettyK9DevServer.
+Lokalt startes applikasjonene ved å kjøre en av klassene JettyServer med en VM `-Dapp.name` parameter satt til `fptilbake` eller `k9-tilbake`.
 
 Nødvendig konfigurasjon:
-* working directory må settes til å peke på modulen web (\web)
-* classpath skal peke på modulen web-dev (\web-dev)
+* working directory må settes til å peke på modulen web (\webapp)
 
 # Domene
 ## Fagsak

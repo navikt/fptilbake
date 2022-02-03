@@ -13,9 +13,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
@@ -39,18 +36,6 @@ import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 @ApplicationScoped
 @Fptilbake
 public class FpsakKlient implements FagsystemKlient {
-
-    private static final Logger logger = LoggerFactory.getLogger(FpsakKlient.class);
-
-    private static final String FPSAK_BASE_URL = "http://fpsak";
-    private static final String FPSAK_OVERRIDE_URL = "fpsak.override.url";
-    private static final String FPSAK_API_PATH = "/fpsak/api";
-
-    private static final String BEHANDLING_EP = "/behandling/backend-root";
-    private static final String BEHANDLING_ALLE_EP = "/behandlinger/alle";
-
-    private static final String PARAM_NAME_BEHANDLING_UUID = "uuid";
-    private static final String PARAM_NAME_SAKSNUMMER = "saksnummer";
 
     private OidcRestClient restClient;
 
@@ -126,7 +111,7 @@ public class FpsakKlient implements FagsystemKlient {
     }
 
     private Optional<FpsakBehandlingInfoDto> hentFpsakBehandlingOptional(UUID eksternUuid) {
-        URI endpoint = createUri(BEHANDLING_EP, PARAM_NAME_BEHANDLING_UUID, eksternUuid.toString());
+        URI endpoint = createUri("/behandling/backend-root", "uuid", eksternUuid.toString());
         Optional<FpsakBehandlingInfoDto> dto = get(endpoint, FpsakBehandlingInfoDto.class);
         if (dto.isPresent()) {
             FpsakBehandlingInfoDto fpsakdto = dto.get();
@@ -172,7 +157,7 @@ public class FpsakKlient implements FagsystemKlient {
     }
 
     public List<FpsakBehandlingInfoDto> hentFpsakBehandlingForSaksnummer(String saksnummer) {
-        URI endpoint = createUri(BEHANDLING_ALLE_EP, PARAM_NAME_SAKSNUMMER, saksnummer);
+        URI endpoint = createUri("/behandlinger/alle", "saksnummer", saksnummer);
         List<FpsakBehandlingInfoDto> behandlinger = restClient.get(endpoint, ListeAvFpsakBehandlingInfoDto.class);
         for (FpsakBehandlingInfoDto dto : behandlinger) {
             dto.setHenvisning(Henvisning.fraEksternBehandlingId(dto.getId()));
@@ -222,7 +207,9 @@ public class FpsakKlient implements FagsystemKlient {
     }
 
     private URI createUri(String endpoint, String paramName, String paramValue) {
-        UriBuilder builder = UriBuilder.fromUri(apiUri())
+        var builder = UriBuilder
+                .fromUri(baseUri())
+                .path("/fpsak/api")
                 .path(endpoint);
 
         if (notNullOrEmpty(paramName) && notNullOrEmpty(paramValue)) {
@@ -231,17 +218,8 @@ public class FpsakKlient implements FagsystemKlient {
         return builder.build();
     }
 
-    private URI apiUri() {
-        return UriBuilder.fromUri(baseUri()).path(FPSAK_API_PATH).build();
-    }
-
     private URI baseUri() {
-        String override = Environment.current().getProperty(FPSAK_OVERRIDE_URL);
-        if (override != null && !override.isEmpty()) {
-            logger.info("Overstyrer fpsak base URL med {}", override);
-            return URI.create(override);
-        }
-        return URI.create(FPSAK_BASE_URL);
+        return Environment.current().getProperty("fpsak.base.url", URI.class);
     }
 
     private boolean notNullOrEmpty(String str) {
