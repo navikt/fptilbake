@@ -33,7 +33,7 @@ public class VedtakFattetMeldingConsumer {
 
     @Inject
     public VedtakFattetMeldingConsumer(@KonfigVerdi("kafka.fattevedtak.topic") String topic,
-                                       @KonfigVerdi("bootstrap.servers") String bootstrapServers,
+                                       @KonfigVerdi("kafka.bootstrap.servers") String bootstrapServers,
                                        @KonfigVerdi("systembruker.username") String username,
                                        @KonfigVerdi("systembruker.password") String password) {
         Properties properties = lagFellesProperty(bootstrapServers, ApplicationName.hvilkenTilbakeAppName());

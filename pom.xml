@@ -35,7 +35,7 @@
         <fp-tidsserie.version>2.5.8</fp-tidsserie.version>
         <fpkontrakter.version>6.1.4</fpkontrakter.version>
         <abakus-kontrakt.version>1.3.26</abakus-kontrakt.version>
-        <fp-jms.version>2.0.23</fp-jms.version>
+        <fp-jms.version>2.1.1</fp-jms.version>
 
         <surefire.version>2.22.2</surefire.version>
         <prometheus.version>0.14.1</prometheus.version>
@@ -48,7 +48,7 @@
         <apache.ws.xmlschema.version>2.2.5</apache.ws.xmlschema.version>
         <javaslang.version>2.0.6</javaslang.version>
 
-        <flyway.version>8.4.3</flyway.version>
+        <flyway.version>8.4.4</flyway.version>
         <maven.compiler.source>{java.version}</maven.compiler.source>
         <maven.compiler.target>{java.version}</maven.compiler.target>
         <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
@@ -305,7 +305,7 @@
 
             <!-- Felles biblioteker og sikkerhet -->
             <dependency>
-                <groupId>no.nav.vedtak.felles.familie-jms-integrasjon</groupId>
+                <groupId>no.nav.vedtak.felles.fp-jms-integrasjon</groupId>
                 <artifactId>jms-integrasjon</artifactId>
                 <version>${fp-jms.version}</version>
             </dependency>
@@ -406,7 +406,7 @@
                 <!-- velger en transitiv avhengighet - felles ikke enig med seg selv, velger den som blir brukt i prod-scope i felles -->
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.21.1</version>
+                <version>3.21.2</version>
             </dependency>
 
             <dependency>
