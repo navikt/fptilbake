@@ -2,7 +2,15 @@ package no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Named;
+import javax.jms.JMSException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.ibm.mq.jms.MQConnectionFactory;
+import com.ibm.mq.jms.MQQueue;
+import com.ibm.msg.client.jms.JmsConstants;
+import com.ibm.msg.client.wmq.compat.jms.internal.JMSC;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.vedtak.felles.integrasjon.jms.JmsKonfig;
@@ -10,9 +18,11 @@ import no.nav.vedtak.felles.integrasjon.jms.JmsKonfig;
 @ApplicationScoped
 public class KravgrunnlagJmsConsumerKonfig {
 
-    public static final String JNDI_QUEUE = "jms/QueueFptilbakeKravgrunnlag";
+    private static final Logger logger = LoggerFactory.getLogger(KravgrunnlagJmsConsumerKonfig.class);
 
     private JmsKonfig jmsKonfig;
+    private MQQueue mqQueue;
+    private MQConnectionFactory mqConnectionFactory;
 
     KravgrunnlagJmsConsumerKonfig() {
         // CDI
@@ -25,8 +35,41 @@ public class KravgrunnlagJmsConsumerKonfig {
                                          @KonfigVerdi("mqGateway02.port") int port,
                                          @KonfigVerdi("mqGateway02.name") String managerName,
                                          @KonfigVerdi("mqGateway02.channel") String channel,
-                                         @KonfigVerdi("fptilbake.kravgrunnlag.queuename") String queueName) {
+                                         @KonfigVerdi("fptilbake.kravgrunnlag.queuename") String queueName) throws JMSException {
         this.jmsKonfig = new JmsKonfig(host, port, managerName, channel, bruker, passord, queueName, null);
+        this.mqQueue = settOppMessageQueue(queueName);
+        this.mqConnectionFactory = settOppJndiConnectionfactory(host, port, channel, managerName);
+    }
+
+    private static MQQueue settOppMessageQueue(String queueName) throws JMSException {
+        return new MQQueue(queueName);
+    }
+
+    private static MQConnectionFactory settOppJndiConnectionfactory(String host, int port, String channel, String manager) throws JMSException {
+        return createConnectionFactory(host, port, channel, manager);
+    }
+
+    private static MQConnectionFactory createConnectionFactory(String hostName, Integer port, String channel, String queueManagerName) throws JMSException {
+        MQConnectionFactory connectionFactory = new MQConnectionFactory();
+        connectionFactory.setHostName(hostName);
+        connectionFactory.setPort(port);
+        if (channel != null) {
+            connectionFactory.setChannel(channel);
+        }
+        connectionFactory.setQueueManager(queueManagerName);
+
+        connectionFactory.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP);
+        connectionFactory.setBooleanProperty(JmsConstants.USER_AUTHENTICATION_MQCSP, true);
+
+        return connectionFactory;
+    }
+
+    public MQConnectionFactory getMqConnectionFactory() {
+        return mqConnectionFactory;
+    }
+
+    public MQQueue getMqQueue() {
+        return mqQueue;
     }
 
     public JmsKonfig getJmsKonfig() {
