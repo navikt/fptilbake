@@ -4,9 +4,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.jms.JMSException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.ibm.mq.jms.MQConnectionFactory;
 import com.ibm.mq.jms.MQQueue;
 import com.ibm.msg.client.jms.JmsConstants;
@@ -18,11 +15,9 @@ import no.nav.vedtak.felles.integrasjon.jms.JmsKonfig;
 @ApplicationScoped
 public class KravgrunnlagJmsConsumerKonfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(KravgrunnlagJmsConsumerKonfig.class);
-
     private JmsKonfig jmsKonfig;
-    private MQQueue mqQueue;
     private MQConnectionFactory mqConnectionFactory;
+    private MQQueue mqQueue;
 
     KravgrunnlagJmsConsumerKonfig() {
         // CDI
@@ -34,18 +29,18 @@ public class KravgrunnlagJmsConsumerKonfig {
                                          @KonfigVerdi("mqGateway02.hostname") String host,
                                          @KonfigVerdi("mqGateway02.port") int port,
                                          @KonfigVerdi("mqGateway02.name") String managerName,
-                                         @KonfigVerdi("mqGateway02.channel") String channel,
+                                         @KonfigVerdi(value = "mqGateway02.channel", required = false) String channel,
                                          @KonfigVerdi("fptilbake.kravgrunnlag.queuename") String queueName) throws JMSException {
         this.jmsKonfig = new JmsKonfig(host, port, managerName, channel, bruker, passord, queueName, null);
+        this.mqConnectionFactory = settOppConnectionFactory(host, port, channel, managerName);
         this.mqQueue = settOppMessageQueue(queueName);
-        this.mqConnectionFactory = settOppJndiConnectionfactory(host, port, channel, managerName);
     }
 
     private static MQQueue settOppMessageQueue(String queueName) throws JMSException {
         return new MQQueue(queueName);
     }
 
-    private static MQConnectionFactory settOppJndiConnectionfactory(String host, int port, String channel, String manager) throws JMSException {
+    private static MQConnectionFactory settOppConnectionFactory(String host, int port, String channel, String manager) throws JMSException {
         return createConnectionFactory(host, port, channel, manager);
     }
 
