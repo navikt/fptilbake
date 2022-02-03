@@ -23,9 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.kafka.util.JsonDeserialiserer;
 public class VedtakFattetMeldingConsumer {
 
     protected static final int TIMEOUT = 1000;
-    protected static final String BOOTSTRAP_SERVERS = "bootstrap.servers";
-    protected static final String VEDTAKFATTET_TOPIC = "kafka.fattevedtak.topic";
-
 
     private KafkaConsumer<String, String> kafkaConsumer;
     private String topic;
@@ -35,8 +32,8 @@ public class VedtakFattetMeldingConsumer {
     }
 
     @Inject
-    public VedtakFattetMeldingConsumer(@KonfigVerdi(VEDTAKFATTET_TOPIC) String topic,
-                                       @KonfigVerdi(BOOTSTRAP_SERVERS) String bootstrapServers,
+    public VedtakFattetMeldingConsumer(@KonfigVerdi("kafka.fattevedtak.topic") String topic,
+                                       @KonfigVerdi("kafka.bootstrap.servers") String bootstrapServers,
                                        @KonfigVerdi("systembruker.username") String username,
                                        @KonfigVerdi("systembruker.password") String password) {
         Properties properties = lagFellesProperty(bootstrapServers, ApplicationName.hvilkenTilbakeAppName());
@@ -79,7 +76,7 @@ public class VedtakFattetMeldingConsumer {
         Properties properties = new Properties();
         properties.setProperty("key.deserializer", StringDeserializer.class.getName());
         properties.setProperty("value.deserializer", StringDeserializer.class.getName());
-        properties.setProperty(BOOTSTRAP_SERVERS, bootstrapServers);
+        properties.setProperty("bootstrap.servers", bootstrapServers);
         properties.setProperty("group.id", applikasjonNavn);
         properties.setProperty("client.id", applikasjonNavn);
         properties.setProperty("enable.auto.commit", "false");

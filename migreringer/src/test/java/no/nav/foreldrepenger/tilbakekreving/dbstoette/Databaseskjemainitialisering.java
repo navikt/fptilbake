@@ -1,13 +1,19 @@
 package no.nav.foreldrepenger.tilbakekreving.dbstoette;
 
+import static java.lang.Runtime.getRuntime;
+
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.eclipse.jetty.plus.jndi.EnvEntry;
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.FlywayException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,114 +25,75 @@ import no.nav.foreldrepenger.konfig.Environment;
 public final class Databaseskjemainitialisering {
 
     private static final Logger LOG = LoggerFactory.getLogger(Databaseskjemainitialisering.class);
+    private static final AtomicBoolean GUARD_UNIT_TEST_SKJEMAER = new AtomicBoolean();
+
     private static final Environment ENV = Environment.current();
-    private static final String FLYWAY_SCHEMA_TABLE = "schema_version";
+    public static final String USER = "fptilbake_unit";
+    private static final String DB_SCRIPT_LOCATION = "/db/migration/";
 
-    public static final List<DBProperties> UNIT_TEST = List.of(cfg("fptilbake.default"));
-
-    public static final List<DBProperties> DBA = List.of(cfg("fptilbake.dba"));
+    private static final DataSource DS = settJdniOppslag(USER);
+    private static final String SCHEMA = "defaultDS";
 
     public static void main(String[] args) {
-        migrer();
+        //brukes i mvn clean install
+        migrerUnittestSkjemaer();
     }
 
-    public static void migrer() {
-        migrer(DBA);
-        migrer(UNIT_TEST);
+    public static DataSource initUnitTestDataSource() {
+        if (DS != null) {
+            return DS;
+        }
+        settJdniOppslag(USER);
+        return DS;
     }
 
-    public static void settJdniOppslag() {
+    public static void migrerUnittestSkjemaer() {
+        if (GUARD_UNIT_TEST_SKJEMAER.compareAndSet(false, true)) {
+            var flyway = Flyway.configure()
+                    .dataSource(createDs(USER))
+                    .locations(DB_SCRIPT_LOCATION + SCHEMA)
+                    .table("schema_version")
+                    .baselineOnMigrate(true)
+                    .load();
+            try {
+                if (!ENV.isLocal()) {
+                    throw new IllegalStateException("Forventer at denne migreringen bare kjøres lokalt");
+                }
+                flyway.migrate();
+            } catch (FlywayException fwe) {
+                try {
+                    // prøver igjen
+                    flyway.clean();
+                    flyway.migrate();
+                } catch (FlywayException fwe2) {
+                    throw new IllegalStateException("Migrering feiler", fwe2);
+                }
+            }
+        }
+    }
+
+    private static synchronized DataSource settJdniOppslag(String user) {
+        var ds = createDs(user);
         try {
-            var props = defaultProperties();
-            new EnvEntry("jdbc/" + props.getDatasource(), ds(props));
-        } catch (Exception e) {
-            throw new RuntimeException("Feil under registrering av JDNI-entry for default datasource", e);
+            new EnvEntry("jdbc/defaultDS", ds); // NOSONAR
+            return ds;
+        } catch (NamingException e) {
+            throw new IllegalStateException("Feil under registrering av JDNI-entry for defaultDS", e); // NOSONAR
         }
     }
 
-    public static DBProperties defaultProperties() {
-        return UNIT_TEST.stream()
-                .filter(DBProperties::isDefaultDataSource)
-                .findFirst()
-                .orElseThrow();
-    }
-
-    private static void migrer(List<DBProperties> props) {
-        props.forEach(p -> migrer(ds(p), p));
-    }
-
-    private static void migrer(DataSource ds, DBProperties props) {
-        LOG.info("Migrerer {}", props.getSchema());
-        var flyway = new Flyway(Flyway.configure()
-                .dataSource(ds)
-                .locations(scriptLocation(props))
-                .table(FLYWAY_SCHEMA_TABLE)
-                .baselineOnMigrate(true)
-                .cleanOnValidationError(true)
-        );
-
-        if (!ENV.isLocal()) {
-            throw new IllegalStateException("Forventer at denne migreringen bare kjøres lokalt");
-        }
-        flyway.migrate();
-    }
-
-    private static DBProperties cfg(String prefix) {
-        String schema = ENV.getRequiredProperty(prefix + ".schema");
-        return new DBProperties.Builder()
-                .user(schema)
-                .versjonstabell(FLYWAY_SCHEMA_TABLE)
-                .password(schema)
-                .datasource(ENV.getRequiredProperty(prefix + ".datasource"))
-                .schema(schema)
-                .defaultSchema(ENV.getProperty(prefix + ".defaultschema", schema))
-                .defaultDataSource(ENV.getProperty(prefix + ".default", boolean.class, false))
-                .migrateClean(ENV.getProperty(prefix + ".migrateclean", boolean.class, true))
-                .url(ENV.getRequiredProperty(prefix + ".url"))
-                .migrationScriptsFilesystemRoot(ENV.getRequiredProperty(prefix + ".ms")).build();
-    }
-
-    private static String scriptLocation(DBProperties props) {
-        return Optional.ofNullable(props.getMigrationScriptsClasspathRoot())
-                .map(p -> "classpath:/" + p + "/" + props.getSchema())
-                .orElse(fileScriptLocation(props));
-    }
-
-    private static String fileScriptLocation(DBProperties props) {
-        String relativePath = props.getMigrationScriptsFilesystemRoot() + props.getDatasource();
-        File baseDir = new File(".").getAbsoluteFile();
-        File location = new File(baseDir, relativePath);
-        while (!location.exists()) {
-            baseDir = baseDir.getParentFile();
-            if (baseDir == null || !baseDir.isDirectory()) {
-                throw new IllegalArgumentException("Klarte ikke finne : " + baseDir);
-            }
-            location = new File(baseDir, relativePath);
-        }
-
-        return "filesystem:" + location.getPath();
-    }
-
-    public static DataSource ds(DBProperties props) {
-        var ds = new HikariDataSource(hikariConfig(props));
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ds.close();
-            }
-        }));
-        return ds;
-    }
-
-    private static HikariConfig hikariConfig(DBProperties props) {
+    private static DataSource createDs(String user) {
+        Objects.requireNonNull(user, "user");
         var cfg = new HikariConfig();
-        cfg.setJdbcUrl(props.getUrl());
-        cfg.setUsername(props.getUser());
-        cfg.setPassword(props.getPassword());
-        cfg.setConnectionTimeout(1000);
-        cfg.setMinimumIdle(0);
+        cfg.setJdbcUrl("jdbc:oracle:thin:@localhost:1521:XE");
+        cfg.setUsername(user);
+        cfg.setPassword(user);
+        cfg.setConnectionTimeout(1500);
+        cfg.setValidationTimeout(120L * 1000L);
         cfg.setMaximumPoolSize(4);
         cfg.setAutoCommit(false);
-        return cfg;
+        var ds = new HikariDataSource(cfg);
+        getRuntime().addShutdownHook(new Thread(ds::close));
+        return ds;
     }
 }
