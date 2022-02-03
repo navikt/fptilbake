@@ -1,13 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer;
 
-import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
-import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.Queue;
 import javax.jms.TextMessage;
 
 import org.slf4j.Logger;
@@ -30,8 +27,12 @@ public class KravgrunnlagAsyncJmsConsumer extends InternalQueueConsumer {
     }
 
     @Inject
-    public KravgrunnlagAsyncJmsConsumer(DefaultDatabaseOppePreconditionChecker preconditionChecker, KravgrunnlagJmsConsumerKonfig konfig, BeanManager beanManager) {
+    public KravgrunnlagAsyncJmsConsumer(DefaultDatabaseOppePreconditionChecker preconditionChecker,
+                                        KravgrunnlagJmsConsumerKonfig konfig,
+                                        BeanManager beanManager) {
         super(konfig.getJmsKonfig());
+        super.setConnectionFactory(konfig.getMqConnectionFactory());
+        super.setQueue(konfig.getMqQueue());
         this.preconditionChecker = preconditionChecker;
         this.beanManager = beanManager;
     }
@@ -58,17 +59,5 @@ public class KravgrunnlagAsyncJmsConsumer extends InternalQueueConsumer {
         String meldingsinnhold = message.getText();
         XmlMottattEvent event = new XmlMottattEvent(meldingsinnhold);
         beanManager.fireEvent(event);
-    }
-
-    @Override
-    @Resource(mappedName = "jms/ConnectionFactory")
-    protected void setConnectionFactory(ConnectionFactory connectionFactory) {
-        super.setConnectionFactory(connectionFactory);
-    }
-
-    @Override
-    @Resource(mappedName = KravgrunnlagJmsConsumerKonfig.JNDI_QUEUE)
-    protected void setQueue(Queue queue) {
-        super.setQueue(queue);
     }
 }

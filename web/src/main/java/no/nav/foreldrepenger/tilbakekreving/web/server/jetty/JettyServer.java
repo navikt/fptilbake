@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.jms.JMSException;
 import javax.naming.NamingException;
 import javax.security.auth.message.config.AuthConfigFactory;
 import javax.servlet.http.HttpServletRequest;
@@ -86,7 +85,6 @@ public class JettyServer {
         konfigurerSikkerhet();
         var dataSource = DatasourceUtil.createDatasource(30);
         konfigurerDatasource(dataSource);
-        konfigurerJms();
         migrerDatabaser(dataSource);
         start();
     }
@@ -131,11 +129,6 @@ public class JettyServer {
 
     private void konfigurerDatasource(DataSource dataSource) throws NamingException {
         new EnvEntry("jdbc/defaultDS", dataSource);
-    }
-
-    private void konfigurerJms() throws JMSException, NamingException {
-        JmsKonfig.settOppJndiConnectionfactory("jms/ConnectionFactory");
-        JmsKonfig.settOppJndiMessageQueue("jms/QueueFptilbakeKravgrunnlag", "fptilbake.kravgrunnlag.queueName");
     }
 
     private void migrerDatabaser(DataSource dataSource) {
