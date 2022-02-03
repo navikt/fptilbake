@@ -83,9 +83,3 @@ spec:
      value: "k9"
    - name: AUDITLOGGER_PRODUCT
      value: "k9-tilbake"
-   - name: APPDYNAMICS_CONTROLLER_HOST_NAME
-     value: "appdynamics.adeo.no"
-   - name: APPDYNAMICS_CONTROLLER_PORT
-     value: "443"
-   - name: APPDYNAMICS_CONTROLLER_SSL_ENABLED
-     value: "true"

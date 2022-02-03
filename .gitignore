@@ -11,16 +11,9 @@ dep.txt
 .settings
 _*.sh
 bin
-app.properties
-app-k9.properties
-app.properties.backup
-app-k9.properties.backup
-app-local.properties
-app-k9-local.properties
 mqjms.log*
 target
 truststore.jts
 conf
 .mvn/maven.config
 .flattened*
-/logback.xml

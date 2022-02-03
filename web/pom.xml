@@ -15,7 +15,7 @@
     <name>FPTILBAKE :: Web :: Applikasjon</name>
 
     <properties>
-        <swagger-ui.version>4.2.1</swagger-ui.version>
+        <swagger-ui.version>4.4.1</swagger-ui.version>
         <swagger.version>2.1.12</swagger.version>
     </properties>
 
@@ -306,14 +306,6 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-rewrite</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.components</groupId>
-            <artifactId>geronimo-jaspi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-osgi-locator</artifactId>
         </dependency>
 
         <!-- Metrics, logging, helse- og selftest -->

@@ -15,7 +15,6 @@
         <module>behandlingskontroll</module>
         <module>domenetjenester</module>
         <module>web</module>
-        <module>web-dev</module>
         <module>migreringer</module>
         <module>behandlingsprosess</module>
         <module>integrasjontjenester</module>
@@ -41,8 +40,6 @@
         <surefire.version>2.22.2</surefire.version>
         <prometheus.version>0.14.1</prometheus.version>
         <metrics.version>4.2.7</metrics.version>
-        <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
-        <geronimo.osgi.version>1.1</geronimo.osgi.version>
         <logstash.version>7.0.1</logstash.version>
         <jersey.version>2.35</jersey.version>
         <ojdbc.version>19.3.0.0</ojdbc.version>
@@ -96,11 +93,24 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Overstyre felles -->
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-bom</artifactId>
+                <version>10.0.7</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
             <!-- Felles biblioteker - Importerte avhengigheter -->
+            <dependency>
+                <groupId>no.nav.foreldrepenger</groupId>
+                <artifactId>konfig</artifactId>
+                <version>1.1.5</version>
+            </dependency>
             <dependency>
                 <groupId>org.ehcache</groupId>
                 <artifactId>ehcache</artifactId>
-                <version>3.9.6</version>
+                <version>3.9.9</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.neethi</groupId>
@@ -480,19 +490,6 @@
                 <groupId>org.apache.ws.xmlschema</groupId>
                 <artifactId>xmlschema-core</artifactId>
                 <version>${apache.ws.xmlschema.version}</version>
-            </dependency>
-
-            <!-- Sikkerhet: Geronimo -->
-
-            <dependency>
-                <groupId>org.apache.geronimo.components</groupId>
-                <artifactId>geronimo-jaspi</artifactId>
-                <version>${geronimo.jaspi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-osgi-locator</artifactId>
-                <version>${geronimo.osgi.version}</version>
             </dependency>
 
             <!-- 3dje parts biblioteker -->
