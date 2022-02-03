@@ -4,7 +4,6 @@ import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -15,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.vedtak.felles.integrasjon.jms.InternalQueueConsumer;
-import no.nav.vedtak.felles.integrasjon.jms.JmsKonfig;
 import no.nav.vedtak.felles.integrasjon.jms.precond.DefaultDatabaseOppePreconditionChecker;
 import no.nav.vedtak.felles.integrasjon.jms.precond.PreconditionChecker;
 
@@ -32,8 +30,8 @@ public class KravgrunnlagAsyncJmsConsumer extends InternalQueueConsumer {
     }
 
     @Inject
-    public KravgrunnlagAsyncJmsConsumer(DefaultDatabaseOppePreconditionChecker preconditionChecker, @Named("kravgrunnlagjmsconsumerkonfig") JmsKonfig konfig, BeanManager beanManager) {
-        super(konfig);
+    public KravgrunnlagAsyncJmsConsumer(DefaultDatabaseOppePreconditionChecker preconditionChecker, KravgrunnlagJmsConsumerKonfig konfig, BeanManager beanManager) {
+        super(konfig.getJmsKonfig());
         this.preconditionChecker = preconditionChecker;
         this.beanManager = beanManager;
     }
@@ -63,7 +61,7 @@ public class KravgrunnlagAsyncJmsConsumer extends InternalQueueConsumer {
     }
 
     @Override
-    @Resource(mappedName = KravgrunnlagJmsConsumerKonfig.JNDI_JMS_CONNECTION_FACTORY)
+    @Resource(mappedName = "jms/ConnectionFactory")
     protected void setConnectionFactory(ConnectionFactory connectionFactory) {
         super.setConnectionFactory(connectionFactory);
     }
