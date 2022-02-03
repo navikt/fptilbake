@@ -14,7 +14,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>no.nav.vedtak.felles.familie-jms-integrasjon</groupId>
+            <groupId>no.nav.vedtak.felles.fp-jms-integrasjon</groupId>
             <artifactId>jms-integrasjon</artifactId>
         </dependency>
         <dependency>

@@ -5,38 +5,31 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
-import no.nav.vedtak.felles.integrasjon.jms.BaseJmsKonfig;
+import no.nav.vedtak.felles.integrasjon.jms.JmsKonfig;
 
-@Named("kravgrunnlagjmsconsumerkonfig")
 @ApplicationScoped
-public class KravgrunnlagJmsConsumerKonfig extends BaseJmsKonfig {
+public class KravgrunnlagJmsConsumerKonfig {
 
     public static final String JNDI_QUEUE = "jms/QueueFptilbakeKravgrunnlag";
-    private static final String INN_QUEUE_PREFIX = "fptilbake_kravgrunnlag";
 
-    private String mqBruker;
-    private String mqPassord;
+    private JmsKonfig jmsKonfig;
 
-    private KravgrunnlagJmsConsumerKonfig() {
-        super(INN_QUEUE_PREFIX);
+    KravgrunnlagJmsConsumerKonfig() {
+        // CDI
     }
 
     @Inject
     public KravgrunnlagJmsConsumerKonfig(@KonfigVerdi("systembruker.username") String bruker,
-                                         @KonfigVerdi("systembruker.password") String passord) {
-        this();
-        this.mqBruker = bruker;
-        this.mqPassord = passord;
+                                         @KonfigVerdi("systembruker.password") String passord,
+                                         @KonfigVerdi("mqGateway02.hostname") String host,
+                                         @KonfigVerdi("mqGateway02.port") int port,
+                                         @KonfigVerdi("mqGateway02.name") String managerName,
+                                         @KonfigVerdi("mqGateway02.channel") String channel,
+                                         @KonfigVerdi("fptilbake.kravgrunnlag.queuename") String queueName) {
+        this.jmsKonfig = new JmsKonfig(host, port, managerName, channel, bruker, passord, queueName, null);
     }
 
-    @Override
-    public String getQueueManagerUsername() {
-        return mqBruker;
+    public JmsKonfig getJmsKonfig() {
+        return jmsKonfig;
     }
-
-    @Override
-    public String getQueueManagerPassword() {
-        return mqPassord;
-    }
-
 }
