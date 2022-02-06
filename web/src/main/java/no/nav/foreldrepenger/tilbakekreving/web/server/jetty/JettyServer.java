@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.naming.NamingException;
@@ -41,16 +42,18 @@ import org.slf4j.MDC;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.app.ApplicationConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.db.DatasourceUtil;
 import no.nav.vedtak.isso.IssoApplication;
+import no.nav.vedtak.sikkerhet.ContextPathHolder;
 import no.nav.vedtak.sikkerhet.jaspic.OidcAuthModule;
 
 public class JettyServer {
 
     private static final Environment ENV = Environment.current();
     private static final Logger LOG = LoggerFactory.getLogger(JettyServer.class);
-    private static final String CONTEXT_PATH = ENV.getRequiredProperty("context.path");
+    private static final String CONTEXT_PATH = getContextPath();
 
     /**
      * Legges først slik at alltid resetter context før prosesserer nye requests.
@@ -78,6 +81,7 @@ public class JettyServer {
 
     private JettyServer(int serverPort) {
         this.serverPort = serverPort;
+        setContextAndCookiePath();
     }
 
     protected void bootStrap() throws Exception {
@@ -231,5 +235,27 @@ public class JettyServer {
 
     private Integer getServerPort() {
         return this.serverPort;
+    }
+
+    private void setContextAndCookiePath() {
+        var appname = ApplicationName.hvilkenTilbake();
+        switch (appname) {
+            case FPTILBAKE -> ContextPathHolder.instance(CONTEXT_PATH);
+            case K9TILBAKE -> ContextPathHolder.instance(CONTEXT_PATH, "/k9");
+            default -> throw new IllegalArgumentException("Ikke-støttet applikasjonsnavn: " + appname);
+        }
+    }
+
+    public static String getContextPath() {
+        return Optional.ofNullable(ENV.getProperty("context.path"))
+            .orElseGet(() -> {
+                var appname = ApplicationName.hvilkenTilbake();
+                return switch (appname) {
+                    case FPTILBAKE -> "/fptilbake";
+                    case K9TILBAKE -> "/k9/tilbake";
+                    default -> throw new IllegalArgumentException("Ikke-støttet applikasjonsnavn: " + appname);
+                };
+            });
+
     }
 }
