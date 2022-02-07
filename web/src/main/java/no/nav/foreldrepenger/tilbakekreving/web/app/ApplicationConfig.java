@@ -48,9 +48,9 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.saksbehandler.NavA
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjenesteLocalDev;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
 import no.nav.vedtak.felles.integrasjon.rest.jersey.TimingFilter;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
-import no.nav.vedtak.sikkerhet.ContextPathHolder;
 
 
 @ApplicationPath(ApplicationConfig.API_URI)
@@ -67,7 +67,7 @@ public class ApplicationConfig extends Application {
                 .version("1.0")
                 .description("REST grensesnitt for Vedtaksløsningen.");
 
-        oas.info(info).addServersItem(new Server().url(ContextPathHolder.instance().getContextPath()));
+        oas.info(info).addServersItem(new Server().url(JettyServer.getContextPath()));
 
         SwaggerConfiguration oasConfig = new SwaggerConfiguration()
                 .openAPI(oas)
