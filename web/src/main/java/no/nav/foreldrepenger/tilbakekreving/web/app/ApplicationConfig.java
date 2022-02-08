@@ -21,8 +21,6 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import no.nav.foreldrepenger.konfig.Environment;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.ConstraintViolationMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.GeneralRestExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonMappingExceptionMapper;
@@ -50,6 +48,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.saksbehandler.NavA
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjenesteLocalDev;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
 import no.nav.vedtak.felles.integrasjon.rest.jersey.TimingFilter;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 
@@ -68,7 +67,7 @@ public class ApplicationConfig extends Application {
                 .version("1.0")
                 .description("REST grensesnitt for Vedtaksløsningen.");
 
-        oas.info(info).addServersItem(new Server().url(getContextPath()));
+        oas.info(info).addServersItem(new Server().url(JettyServer.getContextPath()));
 
         SwaggerConfiguration oasConfig = new SwaggerConfiguration()
                 .openAPI(oas)
@@ -142,14 +141,5 @@ public class ApplicationConfig extends Application {
         properties.put(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
         properties.put(ServerProperties.PROCESSING_RESPONSE_ERRORS_ENABLED, true);
         return properties;
-    }
-
-    private static String getContextPath() {
-        Fagsystem app = ApplicationName.hvilkenTilbake();
-        return switch (app) {
-            case FPTILBAKE -> "/fptilbake";
-            case K9TILBAKE -> "/k9/tilbake";
-            default -> throw new IllegalStateException("applikasjonsnavn er satt til " + app + " som ikke er en støttet verdi");
-        };
     }
 }
