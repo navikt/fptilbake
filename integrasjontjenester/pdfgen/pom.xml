@@ -6,7 +6,7 @@
     <parent>
         <artifactId>integrasjontjenester</artifactId>
         <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-        <version>${revision}${sha1}${changelist}</version>
+        <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>org.verapdf</groupId>
             <artifactId>validation-model</artifactId>
-            <version>1.18.8</version>
+            <version>1.20.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.xml.bind</groupId>
