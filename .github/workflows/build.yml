@@ -49,7 +49,7 @@ jobs:
       - name: Build (kompiler)
         run: |
           echo "Building $BUILD_VERSION"
-          mvn test-compile -P-migrer-db --batch-mode --settings .github/.m2/settings.xml-Drevision=${BUILD_VERSION}
+          mvn test-compile -P-migrer-db --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION}
 
       - name: Migrer database
         run: |
@@ -59,7 +59,7 @@ jobs:
       - name: Build artifacts & deploy (inkl test)
         run: |
           echo "Building artifacts $BUILD_VERSION"
-          mvn install -e --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION} -Dfile.encoding=UTF-8 -Pgithub
+          mvn install -e --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION} -Dfile.encoding=UTF-8
 
       - name: Bygg og push docker-image for distribuering
         run: |
