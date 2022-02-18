@@ -4,6 +4,7 @@ import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.CREAT
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -340,9 +341,7 @@ public class ForvaltningBehandlingRestTjeneste {
             throw new UgyldigTvingKoblingForespørselException("MottattXmlId=" + mottattXmlId + " peker ikke på et kravgrunnlag, men på en status-melding");
         }
 
-        if (mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId) && erKobletTilHenlagtBehandling(mottattXml)) {
-            fjernKobling(mottattXml);
-        }
+        fjernKoblingTilHenlagteBehandlinger(mottattXml);
         if (mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId)) {
             throw new UgyldigTvingKoblingForespørselException("Kravgrunnlaget med mottattXmlId=" + mottattXmlId + " er allerede koblet til en ikke-henlagt behandling");
         }
@@ -357,19 +356,19 @@ public class ForvaltningBehandlingRestTjeneste {
         logger.info("Behandling med behandlingId={} ble tvunget koblet til kravgrunnlag med mottattXmlId={}", behandlingId, mottattXmlId);
     }
 
-    private boolean erKobletTilHenlagtBehandling(ØkonomiXmlMottatt mottattXml) {
-        Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentFraHenvisning(mottattXml.getHenvisning());
-        if (eksternBehandling.isPresent()) {
-            Long kobletBehandlingId = eksternBehandling.get().getInternId();
+    private void fjernKoblingTilHenlagteBehandlinger(ØkonomiXmlMottatt mottattXml) {
+        List<EksternBehandling> koblingTilBehandlinger = eksternBehandlingRepository.hentFlereFraHenvisning(mottattXml.getHenvisning());
+        for (EksternBehandling eksternBehandling : koblingTilBehandlinger) {
+            Long kobletBehandlingId = eksternBehandling.getInternId();
             Behandling behandling = behandlingRepository.hentBehandling(kobletBehandlingId);
             Optional<Behandlingsresultat> resultat = behandlingresultatRepository.hent(behandling);
-            return resultat.isPresent() && resultat.get().erBehandlingHenlagt();
+            if (resultat.isPresent() && resultat.get().erBehandlingHenlagt()){
+                fjernKobling(mottattXml, eksternBehandling);
+            }
         }
-        return false;
     }
 
-    private void fjernKobling(ØkonomiXmlMottatt mottattXml) {
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraHenvisning(mottattXml.getHenvisning()).orElseThrow();
+    private void fjernKobling(ØkonomiXmlMottatt mottattXml, EksternBehandling eksternBehandling) {
         eksternBehandlingRepository.deaktivateTilkobling(eksternBehandling.getInternId());
         mottattXmlRepository.fjernTilkobling(mottattXml.getId());
         logger.info("Deaktiverer kobling mellom behandlingId {} og mottattXmlId {} for {}", eksternBehandling.getInternId(), mottattXml.getId(), mottattXml.getSaksnummer());

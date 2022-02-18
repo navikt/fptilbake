@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Henter informasjon fra issuet
         id: issue_comment
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -56,7 +56,7 @@ jobs:
 
       - name: Oppdater kommentar med deployment status ved feil
         if: failure()
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -66,11 +66,11 @@ jobs:
             github.rest.issues.createComment({...issue,
                             body: 'promote til ${{ env.CLUSTER }} ${{ env.NAMESPACE }} feilet'})
             github.rest.issues.addLabels({...issue,
-                            labels: ['deployment-failed','${{ env.CLUSTER }}-${{ env.NAMESPACE }}']})
+                            labels: ['deployment-failed']})
 
       - name: Oppdater kommentar med deployment status
         if: success()
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |

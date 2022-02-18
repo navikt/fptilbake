@@ -26,6 +26,7 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 @Path("/init-fetch")
 @ApplicationScoped
 @Transactional
+
 @Produces(MediaType.APPLICATION_JSON)
 public class InitielleLinksRestTjeneste {
 

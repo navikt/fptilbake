@@ -6,7 +6,7 @@
 
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
     <artifactId>fptilbake</artifactId>
-    <version>${revision}${sha1}${changelist}</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <name>FPTILBAKE :: Root</name>
 
@@ -23,19 +23,17 @@
     </modules>
 
     <properties>
-        <revision>1.0</revision>
-        <sha1/>
-        <changelist>-SNAPSHOT</changelist>
+        <revision>2.0-SNAPSHOT</revision>
         <java.version>17</java.version>
 
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
-        <felles.version>4.1.14</felles.version>
-        <prosesstask.version>3.1.6</prosesstask.version>
+        <felles.version>4.1.17</felles.version>
+        <prosesstask.version>3.1.7</prosesstask.version>
         <fp-tidsserie.version>2.5.8</fp-tidsserie.version>
-        <fpkontrakter.version>6.1.4</fpkontrakter.version>
+        <fpkontrakter.version>6.1.6</fpkontrakter.version>
         <abakus-kontrakt.version>1.3.26</abakus-kontrakt.version>
-        <fp-jms.version>2.1.1</fp-jms.version>
+        <fp-jms.version>2.1.2</fp-jms.version>
 
         <surefire.version>2.22.2</surefire.version>
         <prometheus.version>0.15.0</prometheus.version>
@@ -47,7 +45,7 @@
         <apache.ws.xmlschema.version>2.2.5</apache.ws.xmlschema.version>
         <javaslang.version>2.0.6</javaslang.version>
 
-        <flyway.version>8.4.4</flyway.version>
+        <flyway.version>8.5.0</flyway.version>
         <maven.compiler.source>{java.version}</maven.compiler.source>
         <maven.compiler.target>{java.version}</maven.compiler.target>
         <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
@@ -149,7 +147,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.12.7</version>
+                <version>1.12.8</version>
             </dependency>
 
             <!-- moduler i dette prosjektet -->
@@ -398,7 +396,7 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-core</artifactId>
-                <version>1.8.2</version>
+                <version>1.8.3</version>
             </dependency>
 
             <dependency>
@@ -585,10 +583,11 @@
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>3.1.0</version>
                 </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.10.0</version>
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
@@ -627,7 +626,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.3.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -678,13 +677,6 @@
                     <flattenedPomFilename>.flattened</flattenedPomFilename>
                 </configuration>
                 <executions>
-                    <execution>
-                        <id>flatten</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>flatten</goal>
-                        </goals>
-                    </execution>
                     <execution>
                         <id>flatten.clean</id>
                         <phase>clean</phase>
