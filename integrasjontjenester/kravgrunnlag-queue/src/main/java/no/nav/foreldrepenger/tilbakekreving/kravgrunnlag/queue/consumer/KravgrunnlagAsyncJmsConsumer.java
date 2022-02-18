@@ -10,12 +10,12 @@ import javax.jms.TextMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.vedtak.felles.integrasjon.jms.InternalQueueConsumer;
+import no.nav.vedtak.felles.integrasjon.jms.ExternalQueueConsumer;
 import no.nav.vedtak.felles.integrasjon.jms.precond.DefaultDatabaseOppePreconditionChecker;
 import no.nav.vedtak.felles.integrasjon.jms.precond.PreconditionChecker;
 
 @ApplicationScoped
-public class KravgrunnlagAsyncJmsConsumer extends InternalQueueConsumer {
+public class KravgrunnlagAsyncJmsConsumer extends ExternalQueueConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(KravgrunnlagAsyncJmsConsumer.class);
 
