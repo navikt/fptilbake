@@ -7,7 +7,7 @@
     <parent>
         <artifactId>integrasjontjenester</artifactId>
         <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-        <version>${revision}${sha1}${changelist}</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>datavarehus</artifactId>

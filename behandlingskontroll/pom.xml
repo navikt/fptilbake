@@ -6,7 +6,7 @@
     <parent>
         <artifactId>fptilbake</artifactId>
         <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-        <version>${revision}${sha1}${changelist}</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>behandlingskontroll</artifactId>
