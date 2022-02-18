@@ -7,7 +7,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
         <artifactId>behandlingslager-pom</artifactId>
-        <version>${revision}${sha1}${changelist}</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>domene-testutilities</artifactId>
