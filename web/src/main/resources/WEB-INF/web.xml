@@ -19,15 +19,10 @@
         <listener-class>org.jboss.weld.environment.servlet.Listener</listener-class>
     </listener>
     <listener>
-        <listener-class>no.nav.foreldrepenger.tilbakekreving.web.app.startupinfo.AppStartupServletContextListener
-        </listener-class>
+        <listener-class>no.nav.foreldrepenger.tilbakekreving.web.app.startupinfo.AppStartupServletContextListener</listener-class>
     </listener>
     <listener>
-        <listener-class>no.nav.vedtak.sikkerhet.jaspic.SamAutoRegistration</listener-class>
-    </listener>
-    <listener>
-        <listener-class>no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.ApplicationContextListener
-        </listener-class>
+        <listener-class>no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.ApplicationContextListener</listener-class>
     </listener>
 
     <security-constraint>

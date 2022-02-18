@@ -53,7 +53,6 @@ public class JacksonJsonConfig implements ContextResolver<ObjectMapper> {
 
     private static void addSerializers(SimpleModule module) {
         module.addSerializer(new KodelisteSerializer());
-        module.addSerializer(new StringSerializer());
     }
 
     @Override

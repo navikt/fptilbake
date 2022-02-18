@@ -1,12 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.fagsystem;
 
-import javax.ws.rs.core.Application;
-
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 
 
-public final class ApplicationName extends Application {
+public final class ApplicationName {
 
     private static final Environment ENV = Environment.current();
 
@@ -31,7 +29,7 @@ public final class ApplicationName extends Application {
     }
 
     private static void setCurrentApp() {
-        CURRENT_APPLIKASJON_NAVN = ENV.getProperty("app.name");
+        CURRENT_APPLIKASJON_NAVN = ENV.getRequiredProperty("app.name");
         CURRENT_APPLIKASJON = switch (CURRENT_APPLIKASJON_NAVN) {
             case APPLIKASJON_NAVN_FPTILBAKE -> Fagsystem.FPTILBAKE;
             case APPLIKASJON_NAVN_K9_TILBAKE -> Fagsystem.K9TILBAKE;
