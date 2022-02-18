@@ -14,7 +14,7 @@ on:
 
 env:
   IMAGE_BASE: ghcr.io/${{ github.repository }}
-  GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} # NB: må ha PAT pga avhengighet mot private repo: familie-jms-integrasjon
+  GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} # NB: må ha PAT pga avhengighet mot private repo: fp-jms-integrasjon
   TZ: "Europe/Oslo"
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
           cache: 'maven'
 
       - name: Login to GitHub Packages Docker Registry
-        uses: docker/login-action@42d299face0c5c43a0487c477f595ac9cf22f1a7 # Use commit-sha1 instead of tag for security concerns
+        uses: docker/login-action@6af3c118c8376c675363897acf1757f7a9be6583 # Use commit-sha1 instead of tag for security concerns
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -44,32 +44,30 @@ jobs:
 
       - name: Set build version
         run: |
-          echo "BUILD_VERSION=$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+          echo "BUILD_VERSION=2.0-$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
       - name: Build (kompiler)
         run: |
           echo "Building $BUILD_VERSION"
-          mvn test-compile -P-migrer-db --batch-mode --settings .github/.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn test-compile -P-migrer-db --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION}
 
       - name: Migrer database
         run: |
           echo "Migrerer database"
-          mvn exec:java -pl migreringer --batch-mode --settings .github/.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn exec:java -pl migreringer --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION}
 
       - name: Build artifacts & deploy (inkl test)
         run: |
           echo "Building artifacts $BUILD_VERSION"
-          mvn install -e --batch-mode --settings .github/.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION} -Dfile.encoding=UTF-8 -Pgithub
-          echo "Build artifacts"
-          echo "TAG=$(mvn help:evaluate --batch-mode --settings .github/.m2/settings.xml --file .flattened -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+          mvn install -e --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION} -Dfile.encoding=UTF-8
 
       - name: Bygg og push docker-image for distribuering
         run: |
-          docker build --pull --tag ${IMAGE_BASE}:${TAG} --tag ${IMAGE_BASE}:latest . | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0 }'
+          docker build --pull --tag ${IMAGE_BASE}:${BUILD_VERSION} --tag ${IMAGE_BASE}:latest . | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0 }'
           docker push ${IMAGE_BASE} --all-tags
 
       - name: Lukk gamle bygg-issues
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
             github-token: ${{ secrets.GITHUB_TOKEN }}
             script: |
@@ -92,7 +90,7 @@ jobs:
       -  name: Opprett deployment issue
          id: createdeployissue
          if: success()
-         uses: actions/github-script@v5
+         uses: actions/github-script@v6
          with:
            github-token: ${{ secrets.GITHUB_TOKEN }}
            script: |
@@ -100,7 +98,7 @@ jobs:
                owner: context.issue.owner,
                repo: context.issue.repo,
                labels: ['deployment'],
-               title: 'Deploy av ${{ env.TAG }}',
+               title: 'Deploy av ${{ env.BUILD_VERSION }}',
                body: '${{ github.sha }}'})
              .then(response => {
                      core.setOutput('number', response.data.number);
@@ -108,7 +106,7 @@ jobs:
 
       -  name: Opprett deployment issue
          if: success()
-         uses: actions/github-script@v5
+         uses: actions/github-script@v6
          with:
            github-token: ${{ secrets.GITHUB_TOKEN }}
            script: |
@@ -141,7 +139,7 @@ jobs:
           -d '{"ref":"master",
                   "inputs":{
                       "trigger": "${{ github.repository }}",
-                      "version": "${{ env.TAG }}",
+                      "version": "${{ env.BUILD_VERSION }}",
                       "issue_number": "${{ steps.createdeployissue.outputs.number }}"
                   }}'
                 

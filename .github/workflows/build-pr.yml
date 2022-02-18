@@ -10,7 +10,7 @@ on:
       - 'docs/**'
 
 env:
-  GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} # NB: må ha PAT pga avhengighet mot private repo: familie-jms-integrasjon
+  GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} # NB: må ha PAT pga avhengighet mot private repo: fp-jms-integrasjon
   TZ: "Europe/Oslo"
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
           cache: 'maven'
 
       - name: Login to GitHub Packages Docker Registry
-        uses: docker/login-action@42d299face0c5c43a0487c477f595ac9cf22f1a7 # Use commit-sha1 instead of tag for security concerns
+        uses: docker/login-action@6af3c118c8376c675363897acf1757f7a9be6583 # Use commit-sha1 instead of tag for security concerns
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -44,16 +44,16 @@ jobs:
 
       - name: Set build version
         run: |
-          echo "BUILD_VERSION=$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+          echo "BUILD_VERSION=2.0-$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
       - name: Build (kompiler)
         run: |
           echo "Building $BUILD_VERSION"
           export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
-          mvn test-compile -P-migrer-db -T2 --batch-mode --settings .github/.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn test-compile -P-migrer-db -T2 --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION}
 
       - name: Build (test)
         run: |
           echo "Building $BUILD_VERSION"
           export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
-          mvn package -T2 --batch-mode --settings .github/.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn package -T2 --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION}
