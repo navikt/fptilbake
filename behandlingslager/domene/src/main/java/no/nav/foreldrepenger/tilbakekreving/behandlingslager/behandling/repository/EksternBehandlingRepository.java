@@ -71,6 +71,15 @@ public class EksternBehandlingRepository {
     }
 
     /**
+     * Ikke bruk denne - unntatt i spesialtilfeller for å rydde opp
+     */
+    public List<EksternBehandling> hentFlereFraHenvisning(Henvisning henvisning) {
+        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where henvisning=:henvisning and aktiv='J'", EksternBehandling.class);
+        query.setParameter(HENVISNING, henvisning);
+        return query.getResultList();
+    }
+
+    /**
      * Finner alle behandlinger som knyttet med uuid fra ekstern system
      *
      * @param eksternUuid
