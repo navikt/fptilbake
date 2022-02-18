@@ -6,7 +6,7 @@
 
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
     <artifactId>fptilbake</artifactId>
-    <version>${revision}${sha1}${changelist}</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <name>FPTILBAKE :: Root</name>
 
@@ -23,9 +23,7 @@
     </modules>
 
     <properties>
-        <revision>1.0</revision>
-        <sha1/>
-        <changelist>-SNAPSHOT</changelist>
+        <revision>2.0-SNAPSHOT</revision>
         <java.version>17</java.version>
 
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
@@ -679,13 +677,6 @@
                     <flattenedPomFilename>.flattened</flattenedPomFilename>
                 </configuration>
                 <executions>
-                    <execution>
-                        <id>flatten</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>flatten</goal>
-                        </goals>
-                    </execution>
                     <execution>
                         <id>flatten.clean</id>
                         <phase>clean</phase>

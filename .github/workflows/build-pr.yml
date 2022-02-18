@@ -44,16 +44,16 @@ jobs:
 
       - name: Set build version
         run: |
-          echo "BUILD_VERSION=$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+          echo "BUILD_VERSION=2.0-$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
       - name: Build (kompiler)
         run: |
           echo "Building $BUILD_VERSION"
           export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
-          mvn test-compile -P-migrer-db -T2 --batch-mode --settings .github/.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn test-compile -P-migrer-db -T2 --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION}
 
       - name: Build (test)
         run: |
           echo "Building $BUILD_VERSION"
           export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
-          mvn package -T2 --batch-mode --settings .github/.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn package -T2 --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION}
