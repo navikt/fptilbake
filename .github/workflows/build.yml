@@ -14,7 +14,7 @@ on:
 
 env:
   IMAGE_BASE: ghcr.io/${{ github.repository }}
-  GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} # NB: må ha PAT pga avhengighet mot private repo: familie-jms-integrasjon
+  GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} # NB: må ha PAT pga avhengighet mot private repo: fp-jms-integrasjon
   TZ: "Europe/Oslo"
 
 jobs:
