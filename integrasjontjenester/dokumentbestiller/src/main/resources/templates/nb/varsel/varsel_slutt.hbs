@@ -1,5 +1,5 @@
 {{~#* inline "ytelse-navn" ~}}
-{{lookup-map ytelsetype FP="foreldrepengene" SVP="svangerskapspengene" ES="engangsstønaden" FRISINN="kompensasjonen" OMP="omsorgspengene" PSB="pleiepengene"}}
+{{lookup-map ytelsetype FP="foreldrepengene" SVP="svangerskapspengene" ES="engangsstønaden" FRISINN="kompensasjonen" OMP="omsorgspengene" PSB="pleiepengene" PPN="pleiepengene"}}
 {{~/inline~}}
 _Dette legger vi vekt på i vurderingen vår
 For å avgjøre om vi kan kreve tilbake, tar vi først stilling til de tre øverste punktene i denne listen. Hvis resultatet blir at vi kan kreve tilbake, vurderer vi om du skal betale tilbake hele eller deler av beløpet.
@@ -25,7 +25,7 @@ _Slik uttaler du deg
     {{#case "FP" "SVP" "ES"}}
 Du kan sende uttalelsen din ved å logge deg inn på foreldrepenger.nav.no. Du kan også sende uttalelsen din til oss i posten. Adressen finner du på nav.no/ettersendelser.
     {{/case}}
-    {{#case "OMP" "PSB"}}
+    {{#case "OMP" "PSB" "PPN"}}
 Du kan sende uttalelsen din ved å logge deg inn på nav.no/person/kontakt-oss/skriv-til-oss. Du kan også sende uttalelsen din til oss i posten. Adressen finner du på nav.no/ettersendelser.
     {{/case}}
     {{#case "FRISINN"}}
