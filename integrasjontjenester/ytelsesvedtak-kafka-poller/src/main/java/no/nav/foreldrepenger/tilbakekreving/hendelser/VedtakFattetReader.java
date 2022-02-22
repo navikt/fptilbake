@@ -33,7 +33,7 @@ public class VedtakFattetReader {
 
     private static final Map<Fagsystem, Set<YtelseType>> STØTTET_YTELSE_TYPER = Map.of(
             Fagsystem.FPTILBAKE, Set.of(YtelseType.ENGANGSTØNAD, YtelseType.FORELDREPENGER, YtelseType.SVANGERSKAPSPENGER),
-            Fagsystem.K9TILBAKE, Set.of(YtelseType.FRISINN, YtelseType.OMSORGSPENGER, YtelseType.PLEIEPENGER_SYKT_BARN)
+            Fagsystem.K9TILBAKE, Set.of(YtelseType.FRISINN, YtelseType.OMSORGSPENGER, YtelseType.PLEIEPENGER_SYKT_BARN, YtelseType.PLEIEPENGER_NÆRSTÅENDE)
     );
 
     private static final Map<Fagsystem, Set<YtelseType>> REST_YTELSE_TYPER = Map.of(
