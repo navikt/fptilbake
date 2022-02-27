@@ -12,12 +12,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 public class HistorikkinnslagDelDto {
+    @Deprecated // Skriv om K9-frontend til å vente seg begrunnelsetekst
     private Kodeverdi begrunnelse;
     private String begrunnelsetekst;
     private String begrunnelseFritekst;
     private HistorikkinnslagHendelseDto hendelse;
     private List<HistorikkinnslagOpplysningDto> opplysninger;
     private SkjermlenkeType skjermlenke;
+    @Deprecated // Skriv om K9-frontend til å vente seg årsaktekst
     private Kodeverdi aarsak;
     private String årsaktekst;
     private HistorikkInnslagTemaDto tema;
@@ -37,18 +39,18 @@ public class HistorikkinnslagDelDto {
     private static HistorikkinnslagDelDto mapFra(HistorikkinnslagDel historikkinnslagDel) {
         HistorikkinnslagDelDto dto = new HistorikkinnslagDelDto();
         var begrunnelseKodeverdi = historikkinnslagDel.getBegrunnelseFelt().flatMap(HistorikkinnslagDelDto::finnÅrsakKodeListe);
-        dto.setBegrunnelse(begrunnelseKodeverdi.orElse(null));
+        dto.setBegrunnelse(begrunnelseKodeverdi.orElse(null)); // Fjernes når K9 slutter å bruke den
         if (begrunnelseKodeverdi.isEmpty()) {
             historikkinnslagDel.getBegrunnelse().ifPresent(dto::setBegrunnelseFritekst);
         } else {
             dto.setBegrunnelsetekst(begrunnelseKodeverdi.get().getNavn());
         }
-        historikkinnslagDel.getAarsakFelt().flatMap(HistorikkinnslagDelDto::finnÅrsakKodeListe).ifPresent(årsak -> {
-            dto.setAarsak(årsak);
-            dto.setÅrsaktekst(årsak.getNavn());
-        });
-
-
+        historikkinnslagDel.getAarsakFelt()
+            .flatMap(HistorikkinnslagDelDto::finnÅrsakKodeListe)
+            .ifPresent(årsak -> {
+                dto.setAarsak(årsak);  // Fjernes når K9 slutter å bruke den
+                dto.setÅrsaktekst(årsak.getNavn());
+            });
         historikkinnslagDel.getTema().ifPresent(felt -> dto.setTema(HistorikkInnslagTemaDto.mapFra(felt)));
         historikkinnslagDel.getGjeldendeFraFelt().ifPresent(felt -> {
             if (felt.getNavn() != null && felt.getNavnVerdi() != null && felt.getTilVerdi() != null) {
