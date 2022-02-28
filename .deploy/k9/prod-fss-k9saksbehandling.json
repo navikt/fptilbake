@@ -13,9 +13,6 @@
   ],
   "env": {
     "APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD",
-    "SECURITYTOKENSERVICE_URL": "https://sts.adeo.no/SecurityTokenServiceProvider/",
-    "OIDC_STS_ISSUER_URL": "https://security-token-service.nais.adeo.no",
-    "OIDC_STS_JWKS_URL": "http://security-token-service.default/rest/v1/sts/jwks",
     "LDAP_URL": "ldaps://ldapgw.adeo.no",
     "LDAP_BASEDN": "dc=adeo,dc=no",
     "LDAP_DOMAIN": "ADEO.NO",
