@@ -24,9 +24,6 @@ public class DistribuerJournalpostRequest {
     @JsonProperty("bestillendeFagsystem")
     private String bestillendeFagsystem;
 
-    @JsonProperty("adresse")
-    private Adresse adresse;
-
     /**
      * Applikasjon som har produsert hoveddokumentet (for sporing og feilsøking
      */
@@ -57,7 +54,6 @@ public class DistribuerJournalpostRequest {
         private String journalpostId;
         private String batchId;
         private String bestillendeFagsystem;
-        private Adresse adresse;
         private String dokumentProdApp;
 
         private Builder() {
@@ -78,11 +74,6 @@ public class DistribuerJournalpostRequest {
             return this;
         }
 
-        public Builder medAdresse(Adresse adresse) {
-            this.adresse = adresse;
-            return this;
-        }
-
         public Builder medDokumentProdApp(String dokumentProdApp) {
             this.dokumentProdApp = dokumentProdApp;
             return this;
@@ -98,7 +89,6 @@ public class DistribuerJournalpostRequest {
             request.journalpostId = journalpostId;
             request.batchId = batchId;
             request.bestillendeFagsystem = bestillendeFagsystem;
-            request.adresse = adresse;
             request.dokumentProdApp = dokumentProdApp;
             return request;
         }

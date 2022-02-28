@@ -2,9 +2,9 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk;
 
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -12,15 +12,19 @@ import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
+import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.JacksonJsonConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.app.HentKodeverkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
-import no.nav.vedtak.util.LRUCache;
 
 @Path("/kodeverk")
 @RequestScoped
@@ -31,8 +35,11 @@ public class KodeverkRestTjeneste {
 
     private HentKodeverkTjeneste hentKodeverkTjeneste; // NOSONAR
 
-    private static final long CACHE_ELEMENT_LIVE_TIME_MS = TimeUnit.MILLISECONDS.convert(60, TimeUnit.MINUTES);
-    private LRUCache<String, Map<String, Object>> kodelisteCache = new LRUCache<>(10, CACHE_ELEMENT_LIVE_TIME_MS);
+    private static final JacksonJsonConfig jsonMapper = new JacksonJsonConfig(true); // generere fulle kodeverdi-objekt
+
+    private static final ObjectMapper objectMapper = jsonMapper.getObjectMapper();
+
+    private static String KODELISTER;
 
     public KodeverkRestTjeneste() {
         // for CDI
@@ -49,19 +56,29 @@ public class KodeverkRestTjeneste {
     @Operation(tags = "kodeverk", description = "Henter kodeliste", summary = "Returnerer gruppert kodeliste.")
     @BeskyttetRessurs(action = READ, property = AbacProperty.APPLIKASJON, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Map<String, Object> hentGruppertKodeliste() {
-        if (kodelisteCache.get("alle") == null) {
-            kodelisteCache.put("alle", this.hentGruppertKodelisteTilCache());
+    public Response hentGruppertKodeliste() throws IOException {
+        if (KODELISTER == null) {
+            hentGruppertKodelisteTilCache();
         }
-        return kodelisteCache.get("alle");
+        var cc = new CacheControl();
+        cc.setMaxAge(600 * 60); // tillater klient caching i 10 timer - case redeploy
+        return Response.ok()
+            .entity(KODELISTER)
+            .type(MediaType.APPLICATION_JSON)
+            .cacheControl(cc)
+            .build();
     }
 
-    private synchronized Map<String, Object> hentGruppertKodelisteTilCache() {
-        Map<String, Object> kodelisterGruppertPåType = new HashMap<>();
+    private synchronized void hentGruppertKodelisteTilCache() throws JsonProcessingException {
 
         var grupperteKodelister = hentKodeverkTjeneste.hentGruppertKodeliste();
-        grupperteKodelister.entrySet().forEach(e -> kodelisterGruppertPåType.put(e.getKey(), e.getValue()));
+        Map<String, Object> kodelisterGruppertPåType = new HashMap<>(grupperteKodelister);
 
-        return kodelisterGruppertPåType;
+        KODELISTER = tilJson(kodelisterGruppertPåType);
+
+    }
+
+    private static String tilJson(Map<String, Object> kodeverk) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(kodeverk);
     }
 }

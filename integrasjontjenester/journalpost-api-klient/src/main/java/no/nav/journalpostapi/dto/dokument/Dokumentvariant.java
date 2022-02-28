@@ -6,16 +6,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.journalpostapi.dto.serializer.ByteArraySomBase64StringSerializer;
-import no.nav.journalpostapi.dto.serializer.KodelisteSomKodeSerialiserer;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Dokumentvariant {
     private String filnavn;
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     private Filtype filtype;
     @JsonSerialize(using = ByteArraySomBase64StringSerializer.class)
     private byte[] fysiskDokument;
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     private Variantformat variantformat;
 
     public Variantformat getVariantformat() {

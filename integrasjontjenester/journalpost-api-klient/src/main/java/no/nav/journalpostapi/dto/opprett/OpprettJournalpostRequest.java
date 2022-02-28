@@ -6,7 +6,6 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.journalpostapi.dto.AvsenderMottaker;
 import no.nav.journalpostapi.dto.BehandlingTema;
@@ -16,23 +15,18 @@ import no.nav.journalpostapi.dto.Tema;
 import no.nav.journalpostapi.dto.Tilleggsopplysning;
 import no.nav.journalpostapi.dto.dokument.Dokument;
 import no.nav.journalpostapi.dto.sak.Sak;
-import no.nav.journalpostapi.dto.serializer.KodelisteSomKodeSerialiserer;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonSerialize()
 public class OpprettJournalpostRequest {
     private AvsenderMottaker avsenderMottaker;
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     private BehandlingTema behandlingstema;
     private Bruker bruker;
     private List<Dokument> dokumenter;
     private String eksternReferanseId = null;
     @JsonProperty("journalfoerendeEnhet")
     private Integer journalførendeEnhet;
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     private Journalposttype journalpostType;
     private Sak sak;
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     private Tema tema;
     private List<Tilleggsopplysning> tilleggsopplysninger = new ArrayList<>();
     private String tittel;
