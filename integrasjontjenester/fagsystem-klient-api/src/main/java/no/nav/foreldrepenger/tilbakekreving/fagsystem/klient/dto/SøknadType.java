@@ -64,12 +64,14 @@ public enum SøknadType {
                         kode = value;
                     }
                 }
+            } else if (Objects.equals(p.getCurrentToken(), JsonToken.VALUE_STRING)) {
+                kode = p.getValueAsString();
             }
+
 
             return SøknadType.fra(kode);
         }
 
     }
-
 
 }
