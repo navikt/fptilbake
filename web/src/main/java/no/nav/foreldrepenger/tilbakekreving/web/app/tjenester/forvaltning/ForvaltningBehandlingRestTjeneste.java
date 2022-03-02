@@ -115,17 +115,17 @@ public class ForvaltningBehandlingRestTjeneste {
     @POST
     @Path("/tving-henleggelse")
     @Operation(
-            tags = "FORVALTNING-behandling",
-            description = "Tjeneste for å tvinge en behandling til å bli henlagt, selvom normale regler for saksbehandling ikke tillater henleggelse",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Henlagt behandling"),
-                    @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet"),
-                    @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
-            })
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å tvinge en behandling til å bli henlagt, selvom normale regler for saksbehandling ikke tillater henleggelse",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Henlagt behandling"),
+            @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet"),
+            @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
+        })
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
     public Response tvingHenleggelseBehandling(
-            @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-            @QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+        @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+        @QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
         if (behandling.erAvsluttet()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -138,17 +138,17 @@ public class ForvaltningBehandlingRestTjeneste {
     @POST
     @Path("/tving-gjenoppta")
     @Operation(
-            tags = "FORVALTNING-behandling",
-            description = "Tjeneste for å tvinge en behandling til å gjenopptas (tas av vent). NB! Må ikke brukes på saker uten kravgrunnlag!",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Gjenopptatt behandling"),
-                    @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet eller behandlingen er ikke på vent"),
-                    @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
-            })
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å tvinge en behandling til å gjenopptas (tas av vent). NB! Må ikke brukes på saker uten kravgrunnlag!",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Gjenopptatt behandling"),
+            @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet eller behandlingen er ikke på vent"),
+            @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
+        })
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
     public Response tvingGjenopptaBehandling(
-            @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-            @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
+        @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+        @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
         if (behandling.erAvsluttet() || !erPåVent(behandling)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -159,7 +159,7 @@ public class ForvaltningBehandlingRestTjeneste {
         return Response.ok().build();
     }
 
-    private boolean erPåVent(Behandling behandling){
+    private boolean erPåVent(Behandling behandling) {
         //spesielt tilfelle hvor stegstatus er VENTER, men det finnes ikke åpent aksjonspunkt - trenker å kunne dytte videre
         return behandling.isBehandlingPåVent() || behandling.getBehandlingStegStatus() == BehandlingStegStatus.VENTER;
     }
@@ -167,17 +167,17 @@ public class ForvaltningBehandlingRestTjeneste {
     @POST
     @Path("/fortsett-behandling")
     @Operation(
-            tags = "FORVALTNING-behandling",
-            description = "Tjenesten for å fortsett en behandling som står i limbo tilstand (unten aksjonspunkter i status venter). NB! Må ikke brukes uten grund!",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Fortsett behandling ok"),
-                    @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet eller behandlingen er fortsatt på vent"),
-                    @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
-            })
+        tags = "FORVALTNING-behandling",
+        description = "Tjenesten for å fortsett en behandling som står i limbo tilstand (unten aksjonspunkter i status venter). NB! Må ikke brukes uten grund!",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Fortsett behandling ok"),
+            @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet eller behandlingen er fortsatt på vent"),
+            @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
+        })
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
     public Response fortsettBehandling(
-            @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-            @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
+        @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+        @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
         if (behandling.erAvsluttet() || behandling.isBehandlingPåVent()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -191,13 +191,13 @@ public class ForvaltningBehandlingRestTjeneste {
     @POST
     @Path("/tving-koble-grunnlag")
     @Operation(
-            tags = "FORVALTNING-behandling",
-            description = "Tjeneste for å tvinge en behandling til å bruke et grunnlag. NB! Kun brukes på saker som venter på grunnlag!",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Tilkoblet behandling"),
-                    @ApiResponse(responseCode = "400", description = "Ulike problemer med request, typisk at man peker på feil XML eller behandling."),
-                    @ApiResponse(responseCode = "500", description = "Feilet pga ugyldig kravgrunnlag, eller ukjent feil.")
-            })
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å tvinge en behandling til å bruke et grunnlag. NB! Kun brukes på saker som venter på grunnlag!",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Tilkoblet behandling"),
+            @ApiResponse(responseCode = "400", description = "Ulike problemer med request, typisk at man peker på feil XML eller behandling."),
+            @ApiResponse(responseCode = "500", description = "Feilet pga ugyldig kravgrunnlag, eller ukjent feil.")
+        })
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
     public Response tvingkobleBehandlingTilGrunnlag(@Valid @NotNull KobleBehandlingTilGrunnlagDto behandlingTilGrunnlagDto) {
         try {
@@ -217,13 +217,13 @@ public class ForvaltningBehandlingRestTjeneste {
     @POST
     @Path("/korriger-henvisning")
     @Operation(
-            tags = "FORVALTNING-behandling",
-            description = "Tjeneste for å korrigere henvisningen til en behandling",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "OK"),
-                    @ApiResponse(responseCode = "400", description = "Ulike problemer med request, typisk at man peker på feil eksternBehandlingUuid eller behandling!"),
-                    @ApiResponse(responseCode = "500", description = "Ukjent feil!")
-            })
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å korrigere henvisningen til en behandling",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Ulike problemer med request, typisk at man peker på feil eksternBehandlingUuid eller behandling!"),
+            @ApiResponse(responseCode = "500", description = "Ukjent feil!")
+        })
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
     public Response korrigerHenvisning(@Valid @NotNull KorrigertHenvisningDto korrigertHenvisningDto) {
         Behandling behandling = behandlingRepository.hentBehandling(korrigertHenvisningDto.getBehandlingId());
@@ -236,12 +236,12 @@ public class ForvaltningBehandlingRestTjeneste {
     @POST
     @Path("/hent-korrigert-grunnlag")
     @Operation(
-            tags = "FORVALTNING-behandling",
-            description = "Tjeneste for å hente korrigert grunnlag for en behandling",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Hent korrigerte grunnlag og tilkoblet det med en behandling"),
-                    @ApiResponse(responseCode = "400", description = "Behandling er avsluttet eller ikke gyldig")
-            })
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å hente korrigert grunnlag for en behandling",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Hent korrigerte grunnlag og tilkoblet det med en behandling"),
+            @ApiResponse(responseCode = "400", description = "Behandling er avsluttet eller ikke gyldig")
+        })
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
     public Response hentKorrigertKravgrunnlag(@Valid @NotNull HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
         Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
@@ -256,13 +256,13 @@ public class ForvaltningBehandlingRestTjeneste {
     @POST
     @Path("/tilbakefør-behandling-til-fakta")
     @Operation(
-            tags = "FORVALTNING-behandling",
-            description = "Tjeneste for å tilbakeføre behandling til FAKTA steg",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "OK"),
-                    @ApiResponse(responseCode = "400", description = "Behandling er avsluttet eller behandling er på vent"),
-                    @ApiResponse(responseCode = "500", description = "Ukjent feil!")
-            })
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å tilbakeføre behandling til FAKTA steg",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Behandling er avsluttet eller behandling er på vent"),
+            @ApiResponse(responseCode = "500", description = "Ukjent feil!")
+        })
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
     public Response tilbakeførBehandlingTilFaktaSteg(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                                      @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
@@ -280,18 +280,18 @@ public class ForvaltningBehandlingRestTjeneste {
     @POST
     @Path("/hent-oko-xml-feilet-iverksetting")
     @Operation(
-            tags = "FORVALTNING-behandling",
-            description = "Tjeneste for å hente xml til økonomi ved feilet iverksetting",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Hent xml til økonomi"),
-                    @ApiResponse(responseCode = "400", description = "Behandling eksisterer ikke")
-            })
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å hente xml til økonomi ved feilet iverksetting",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Hent xml til økonomi"),
+            @ApiResponse(responseCode = "400", description = "Behandling eksisterer ikke")
+        })
     @BeskyttetRessurs(action = READ, property = AbacProperty.DRIFT)
     public Response hentOkoXmlForFeiletIverksetting(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                                     @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
         String behandlingRef = behandlingReferanse.erInternBehandlingId()
-                ? behandlingReferanse.getBehandlingId().toString()
-                : behandlingReferanse.getBehandlingUuid().toString();
+            ? behandlingReferanse.getBehandlingId().toString()
+            : behandlingReferanse.getBehandlingUuid().toString();
         logger.info("Henter xml til økonomi for behandling: {}", behandlingRef);
 
         Behandling behandling = hentBehandling(behandlingReferanse);
@@ -305,20 +305,20 @@ public class ForvaltningBehandlingRestTjeneste {
             logger.info("Xml til økonomi ikke lagret i databasen for behandling: {}", behandlingRef);
             String xml = lagXmlTilØkonomi(behandlingId);
             return Response.ok()
-                    .type(MediaType.APPLICATION_XML)
-                    .entity(xml)
-                    .build();
+                .type(MediaType.APPLICATION_XML)
+                .entity(xml)
+                .build();
         } else if (meldinger.size() == 1) {
             logger.info("Fant lagret xml til økonomi for behandling: {}", behandlingRef);
             return Response.ok()
-                    .type(MediaType.APPLICATION_XML)
-                    .entity(meldinger.toArray()[0])
-                    .build();
+                .type(MediaType.APPLICATION_XML)
+                .entity(meldinger.toArray()[0])
+                .build();
         } else {
             logger.info("Fant {} lagrede xmler til økonomi for behandling: {}", meldinger.size(), behandlingRef);
             return Response.ok()
-                    .entity(meldinger)
-                    .build();
+                .entity(meldinger)
+                .build();
         }
     }
 
@@ -347,7 +347,7 @@ public class ForvaltningBehandlingRestTjeneste {
             throw new UgyldigTvingKoblingForespørselException("MottattXmlId=" + mottattXmlId + " peker ikke på et kravgrunnlag, men på en status-melding");
         }
 
-        fjernKoblingTilHenlagteBehandlinger(mottattXml);
+        fjernKoblingTilHenlagteBehandlinger(mottattXml, behandlingId);
         if (mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId)) {
             throw new UgyldigTvingKoblingForespørselException("Kravgrunnlaget med mottattXmlId=" + mottattXmlId + " er allerede koblet til en ikke-henlagt behandling");
         }
@@ -362,22 +362,29 @@ public class ForvaltningBehandlingRestTjeneste {
         logger.info("Behandling med behandlingId={} ble tvunget koblet til kravgrunnlag med mottattXmlId={}", behandlingId, mottattXmlId);
     }
 
-    private void fjernKoblingTilHenlagteBehandlinger(ØkonomiXmlMottatt mottattXml) {
+    private void fjernKoblingTilHenlagteBehandlinger(ØkonomiXmlMottatt mottattXml, Long behandlingIdSomTilkobles) {
         List<EksternBehandling> koblingTilBehandlinger = eksternBehandlingRepository.hentFlereFraHenvisning(mottattXml.getHenvisning());
+        boolean alleKoblingerFjernes = true;
         for (EksternBehandling eksternBehandling : koblingTilBehandlinger) {
             Long kobletBehandlingId = eksternBehandling.getInternId();
             Behandling behandling = behandlingRepository.hentBehandling(kobletBehandlingId);
             Optional<Behandlingsresultat> resultat = behandlingresultatRepository.hent(behandling);
-            if (resultat.isPresent() && resultat.get().erBehandlingHenlagt()){
-                fjernKobling(mottattXml, eksternBehandling);
+            if (kobletBehandlingId.equals(behandlingIdSomTilkobles)) {
+                //aktuell behandling skal ikke hindre frakobling, selv om ikke henlagt
+                continue;
+            }
+            if (resultat.isPresent() && resultat.get().erBehandlingHenlagt()) {
+                eksternBehandlingRepository.deaktivateTilkobling(eksternBehandling.getInternId());
+                logger.info("Deaktiverer kobling mellom behandlingId {} og mottattXmlId {} for {}", eksternBehandling.getInternId(), mottattXml.getId(), mottattXml.getSaksnummer());
+            } else {
+                alleKoblingerFjernes = false;
+                logger.info("Kan ikke fjerne tilkobling til behandling {}, denne er ikke henlagt siden behandlingsresultat er {}", kobletBehandlingId, resultat);
             }
         }
-    }
-
-    private void fjernKobling(ØkonomiXmlMottatt mottattXml, EksternBehandling eksternBehandling) {
-        eksternBehandlingRepository.deaktivateTilkobling(eksternBehandling.getInternId());
-        mottattXmlRepository.fjernTilkobling(mottattXml.getId());
-        logger.info("Deaktiverer kobling mellom behandlingId {} og mottattXmlId {} for {}", eksternBehandling.getInternId(), mottattXml.getId(), mottattXml.getSaksnummer());
+        if (alleKoblingerFjernes) {
+            mottattXmlRepository.fjernTilkobling(mottattXml.getId());
+            logger.info("Fjener tilkobling ØkonomiMottattXml id {}", mottattXml.getId());
+        }
     }
 
     static class UgyldigTvingKoblingForespørselException extends IllegalArgumentException {
@@ -391,7 +398,7 @@ public class ForvaltningBehandlingRestTjeneste {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(GjenopptaBehandlingTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         var fortsettTaskData =
-                opprettFortsettBehandlingTask(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+            opprettFortsettBehandlingTask(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         gruppe.addNesteSekvensiell(prosessTaskData);
         gruppe.addNesteSekvensiell(fortsettTaskData);
         taskTjeneste.lagre(gruppe);
