@@ -14,16 +14,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.ws.rs.core.Response;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
@@ -42,28 +41,23 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Internal
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingKandidaterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.felles.FellesQueriesForBehandlingRepositories;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepository;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.HentKorrigertKravgrunnlagDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KobleBehandlingTilGrunnlagDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KorrigertHenvisningDto;
@@ -74,50 +68,54 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
-@ExtendWith(JpaExtension.class)
+@CdiDbAwareTest
 class ForvaltningBehandlingRestTjenesteTest {
 
-    private ProsessTaskTjeneste taskTjeneste;
-    private BehandlingRepositoryProvider repositoryProvider;
-    private FagsakRepository fagsakRepository;
-    private BehandlingRepository behandlingRepository;
-    private BehandlingresultatRepository behandlingresultatRepository;
-    private HistorikkRepository historikkRepository;
-    private ØkonomiMottattXmlRepository mottattXmlRepository;
-    private EksternBehandlingRepository eksternBehandlingRepository;
+    @Inject
+    EntityManager entityManager;
+    @Inject
+    FagsakRepository fagsakRepository;
+    @Inject
+    BehandlingRepositoryProvider repositoryProvider;
+    @Inject
+    BehandlingRepository behandlingRepository;
+    @Inject
+    EksternBehandlingRepository eksternBehandlingRepository;
+    @Inject
+    BehandlingresultatRepository behandlingresultatRepository;
+    @Inject
+    ØkonomiMottattXmlRepository mottattXmlRepository;
+    @Inject
+    KravgrunnlagRepository kravgrunnlagRepository;
+    @Inject
+    HistorikkRepository historikkRepository;
+    @Inject
+    ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
+    @Inject
+    TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
+    @Inject
+    KravgrunnlagTjeneste kravgrunnlagTjeneste;
+    @Inject
+    BehandlingModellRepository behandlingModellRepository;
 
-    private PersonOrganisasjonWrapper mockTpsAdapterWrapper;
-    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
-    private ForvaltningBehandlingRestTjeneste forvaltningBehandlingRestTjeneste;
+    ProsessTaskTjeneste taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
+    PersonOrganisasjonWrapper mockTpsAdapterWrapper = Mockito.mock(PersonOrganisasjonWrapper.class);
 
-    private Behandling behandling;
+    KravgrunnlagMapper kravgrunnlagMapper = new KravgrunnlagMapper(mockTpsAdapterWrapper);
+
+    BehandlingskontrollTjeneste behandlingskontrollTjeneste;
+    ForvaltningBehandlingRestTjeneste forvaltningBehandlingRestTjeneste;
+
+    ScenarioSimple scenario = ScenarioSimple.simple();
+    Behandling behandling;
 
     @BeforeEach
-    void setup(EntityManager entityManager) {
-        taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
-        repositoryProvider = new BehandlingRepositoryProvider(entityManager);
-        fagsakRepository = repositoryProvider.getFagsakRepository();
-        behandlingRepository = repositoryProvider.getBehandlingRepository();
-        behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
-        historikkRepository = repositoryProvider.getHistorikkRepository();
-        eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
-        mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
-        FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(entityManager);
-        BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
-        BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
-        VarselresponsRepository varselresponsRepository = new VarselresponsRepository(entityManager);
-        mockTpsAdapterWrapper = mock(PersonOrganisasjonWrapper.class);
-        KravgrunnlagMapper kravgrunnlagMapper = new KravgrunnlagMapper(mockTpsAdapterWrapper);
-        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), mock(BehandlingskontrollEventPubliserer.class)));
-        ØkonomiSendtXmlRepository økonomiSendtXmlRepository = new ØkonomiSendtXmlRepository(entityManager);
-        TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste = mock(TilbakekrevingsvedtakTjeneste.class);
-        SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
-        VarselresponsTjeneste varselresponsTjeneste = new VarselresponsTjeneste(varselresponsRepository);
-        GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskTjeneste, behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjeneste);
-        KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
-        forvaltningBehandlingRestTjeneste = new ForvaltningBehandlingRestTjeneste(repositoryProvider, taskTjeneste, behandlingresultatRepository, mottattXmlRepository, kravgrunnlagMapper, økonomiSendtXmlRepository, tilbakekrevingsvedtakTjeneste, kravgrunnlagTjeneste, eksternBehandlingRepository);
+    void setup() {
+        BehandlingskontrollEventPubliserer eventPubliserer = mock(BehandlingskontrollEventPubliserer.class);
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, behandlingModellRepository, eventPubliserer));
 
-        behandling = lagBehandling();
+        forvaltningBehandlingRestTjeneste = new ForvaltningBehandlingRestTjeneste(repositoryProvider, taskTjeneste, behandlingresultatRepository, mottattXmlRepository, kravgrunnlagMapper, økonomiSendtXmlRepository, tilbakekrevingsvedtakTjeneste, kravgrunnlagTjeneste, eksternBehandlingRepository);
+        behandling = scenario.lagre(repositoryProvider);
     }
 
     @Test
@@ -205,7 +203,7 @@ class ForvaltningBehandlingRestTjenesteTest {
         //kravgrunnlag ankommer
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getKravgrunnlagXml(true));
         //behandling 1 opprettes og kobles
-        Behandling kobletBehandling = lagBehandlingFor(this.behandling.getFagsak());
+        Behandling kobletBehandling = opprettBehandling(this.behandling.getFagsak());
         Henvisning henvisning = Henvisning.fraEksternBehandlingId(100000001L);
         eksternBehandlingRepository.lagre(new EksternBehandling(kobletBehandling, henvisning, UUID.randomUUID()));
         mottattXmlRepository.opprettTilkobling(mottattXmlId);
@@ -242,7 +240,7 @@ class ForvaltningBehandlingRestTjenesteTest {
         behandlingskontrollTjeneste.henleggBehandling(kontekst, BehandlingResultatType.HENLAGT_TEKNISK_VEDLIKEHOLD);
 
         // Opprett ny behandling og sett på vent
-        var nyBehandling = lagBehandlingFor(behandling.getFagsak());
+        var nyBehandling = opprettBehandling(behandling.getFagsak());
         behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(nyBehandling,
             AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3),
             Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
@@ -355,14 +353,7 @@ class ForvaltningBehandlingRestTjenesteTest {
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
-
-    private Behandling lagBehandling() {
-        Fagsak fagsak = TestFagsakUtil.opprettFagsak();
-        fagsakRepository.lagre(fagsak);
-        return lagBehandlingFor(fagsak);
-    }
-
-    private Behandling lagBehandlingFor(Fagsak fagsak) {
+    private Behandling opprettBehandling(Fagsak fagsak) {
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
