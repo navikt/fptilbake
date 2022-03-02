@@ -34,6 +34,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.første
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagXmlUnmarshaller;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
@@ -149,13 +150,18 @@ public class ForvaltningBehandlingRestTjeneste {
             @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
             @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
-        if (behandling.erAvsluttet() || !behandling.isBehandlingPåVent()) {
+        if (behandling.erAvsluttet() || !erPåVent(behandling)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         logger.info("Tving gjenoppta. Oppretter task for å gjenoppta behandlingId={}", behandlingReferanse.getBehandlingId());
         opprettGjenopptaBehandlingTask(behandling);
 
         return Response.ok().build();
+    }
+
+    private boolean erPåVent(Behandling behandling){
+        //spesielt tilfelle hvor stegstatus er VENTER, men det finnes ikke åpent aksjonspunkt - trenker å kunne dytte videre
+        return behandling.isBehandlingPåVent() || behandling.getBehandlingStegStatus() == BehandlingStegStatus.VENTER;
     }
 
     @POST
