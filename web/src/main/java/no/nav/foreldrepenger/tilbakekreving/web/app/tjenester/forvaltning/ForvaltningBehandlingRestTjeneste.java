@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
@@ -60,7 +59,6 @@ import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.log.util.LoggerUtils;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -394,14 +392,12 @@ public class ForvaltningBehandlingRestTjeneste {
     }
 
     private void opprettGjenopptaBehandlingTask(Behandling behandling) {
-        ProsessTaskGruppe gruppe = new ProsessTaskGruppe();
-        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(GjenopptaBehandlingTask.class);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        var fortsettTaskData =
-            opprettFortsettBehandlingTask(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        gruppe.addNesteSekvensiell(prosessTaskData);
-        gruppe.addNesteSekvensiell(fortsettTaskData);
-        taskTjeneste.lagre(gruppe);
+        var fortsettTaskData = opprettFortsettBehandlingTask(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        fortsettTaskData.setProperty(FortsettBehandlingTask.MANUELL_FORTSETTELSE, "true");
+        if (behandling.getAktivtBehandlingSteg() != null) {
+            fortsettTaskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
+        }
+        taskTjeneste.lagre(fortsettTaskData);
     }
 
     private ProsessTaskData opprettFortsettBehandlingTask(long fagsakId, long behandlingId, String aktørId) {
