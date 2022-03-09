@@ -32,6 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingM
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -64,7 +65,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.Ko
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
@@ -152,19 +152,20 @@ class ForvaltningBehandlingRestTjenesteTest {
     }
 
     @Test
-    void skal_ikke_tvinge_gjenoppta_behandling() {
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling,
-            AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3),
-            Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+    void skal_tvinge_gjenoppta_behandling() {
+        behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
-        Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(
-            new BehandlingReferanse(behandling.getId()));
+        Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
 
-        var captor = ArgumentCaptor.forClass(ProsessTaskGruppe.class);
+        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
         verify(taskTjeneste, times(1)).lagre(captor.capture());
         var prosessTaskData = captor.getValue();
-        assertThat(prosessTaskData.getTasks().size()).isEqualTo(2);
+        assertThat(prosessTaskData.getTaskType()).isEqualTo("behandlingskontroll.fortsettBehandling");
+        assertThat(prosessTaskData.getPropertyValue(FortsettBehandlingTask.MANUELL_FORTSETTELSE)).isEqualTo("true");
+
+        //for klønete å sette behandlingStegTilstander til å legge til:
+        //assertThat(prosessTaskData.getPropertyValue(FortsettBehandlingTask.GJENOPPTA_STEG)).isEqualTo(BehandlingStegType.TBKGSTEG.getKode());
     }
 
     @Test
