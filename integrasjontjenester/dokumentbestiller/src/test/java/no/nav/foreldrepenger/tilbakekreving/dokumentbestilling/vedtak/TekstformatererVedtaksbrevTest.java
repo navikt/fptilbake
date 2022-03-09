@@ -895,7 +895,7 @@ public class TekstformatererVedtaksbrevTest {
                 _Du har rett til innsyn
                 På nav.no/dittnav kan du se dokumentene i saken din.
                 _Trenger du mer informasjon?
-                Du finner informasjon som kan være nyttig for deg på nav.no/omsorgspenger.
+                Du finner informasjon som kan være nyttig for deg på nav.no/omsorgspenger.
 
                 Med vennlig hilsen
                 NAV Arbeid og ytelser

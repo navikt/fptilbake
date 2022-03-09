@@ -14,12 +14,20 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
  */
 public class KodelisteSerializer extends StdSerializer<Kodeverdi> {
 
-    public KodelisteSerializer() {
+    private boolean serialiserKodeverdiSomObjekt;
+
+    public KodelisteSerializer(boolean serialiserKodeverdiSomObjekt) {
         super(Kodeverdi.class);
+        this.serialiserKodeverdiSomObjekt = serialiserKodeverdiSomObjekt;
     }
 
     @Override
     public void serialize(Kodeverdi value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+
+        if (!serialiserKodeverdiSomObjekt) {
+            jgen.writeString(value.getKode());
+            return;
+        }
 
         jgen.writeStartObject();
 

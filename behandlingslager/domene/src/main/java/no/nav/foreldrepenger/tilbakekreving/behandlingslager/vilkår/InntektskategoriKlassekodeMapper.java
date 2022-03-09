@@ -117,6 +117,18 @@ public class InntektskategoriKlassekodeMapper {
             KlasseKode.SPATFER, FERIEPENGER_ARBEIDSTAKER
     );
 
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_PLEIEPENGER_I_LIVETS_SLUTTFASE = Map.of(
+        KlasseKode.PPNPATORD, ARBEIDSTAKER,
+        KlasseKode.PPNPATFRI, FRILANSER,
+        KlasseKode.PPNPSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
+        KlasseKode.PPNPATAL, ARBEIDSLEDIG,
+        KlasseKode.PPNPATSJO, SJØMANN,
+        KlasseKode.PPNPSNDDM_OP, DAGMAMMA,
+        KlasseKode.PPNPSNDJB_OP, JORDBRUKER,
+        KlasseKode.PPNPSNDFI, FISKER,
+        KlasseKode.SPATFER, FERIEPENGER_ARBEIDSTAKER
+    );
+
     private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_FRISINN = Map.of(
             FRISINN_FRILANS, FRILANSER,
             FRISINN_SELVST_OP, SELVSTENDIG_NÆRINGSDRIVENDE
@@ -139,6 +151,8 @@ public class InntektskategoriKlassekodeMapper {
             return KLASSEKODE_INNTEKTSKATEGORI_MAP_OMSORGSPENGER.get(klasseKode);
         } else if (KLASSEKODE_INNTEKTSKATEGORI_MAP_PLEIEPENGER_SYKT_BARN.containsKey(klasseKode)) {
             return KLASSEKODE_INNTEKTSKATEGORI_MAP_PLEIEPENGER_SYKT_BARN.get(klasseKode);
+        } else if (KLASSEKODE_INNTEKTSKATEGORI_MAP_PLEIEPENGER_I_LIVETS_SLUTTFASE.containsKey(klasseKode)) {
+            return KLASSEKODE_INNTEKTSKATEGORI_MAP_PLEIEPENGER_I_LIVETS_SLUTTFASE.get(klasseKode);
         } else if (KLASSEKODE_INNTEKTSKATEGORI_MAP_FRISINN.containsKey(klasseKode)) {
             return KLASSEKODE_INNTEKTSKATEGORI_MAP_FRISINN.get(klasseKode);
         } else {

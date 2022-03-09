@@ -57,6 +57,7 @@ public class AutomatiskSaksbehandlingRepository {
                 when 'SVP' then :halvtRettsgebyr
                 when 'ES' then :halvtRettsgebyr
                 when 'PSB' then :halvtRettsgebyr
+                when 'PPN' then :halvtRettsgebyr
                 when 'OMP' then :halvtRettsgebyr
                 when 'FRISINN' then :heltRettsgebyr
                 else -1

@@ -3,14 +3,10 @@ package no.nav.journalpostapi.dto;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import no.nav.journalpostapi.dto.serializer.KodelisteSomKodeSerialiserer;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AvsenderMottaker {
     private String id;
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     private SenderMottakerIdType idType;
     private String navn;
 

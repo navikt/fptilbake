@@ -17,7 +17,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import no.nav.abakus.vedtak.ytelse.Ytelse;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
-import no.nav.foreldrepenger.tilbakekreving.kafka.util.JsonDeserialiserer;
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 @ApplicationScoped
 public class VedtakFattetMeldingConsumer {
@@ -49,7 +49,7 @@ public class VedtakFattetMeldingConsumer {
         List<Ytelse> meldinger = new ArrayList<>();
         ConsumerRecords<String, String> records = this.kafkaConsumer.poll(Duration.ofMillis(TIMEOUT));
         for (ConsumerRecord<String, String> record : records) {
-            meldinger.add(JsonDeserialiserer.deserialiser(record.value(), Ytelse.class));
+            meldinger.add(DefaultJsonMapper.fromJson(record.value(), Ytelse.class));
         }
         return meldinger;
     }

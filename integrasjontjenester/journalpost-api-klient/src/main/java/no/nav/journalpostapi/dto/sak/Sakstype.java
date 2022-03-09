@@ -1,15 +1,9 @@
 package no.nav.journalpostapi.dto.sak;
 
-import no.nav.journalpostapi.Kode;
-
-public enum Sakstype implements Kode {
+public enum Sakstype {
     FAGSAK,
     GENERELL_SAK,
     ARKIVSAK;
 
-    @Override
-    public String getKode() {
-        return name();
-    }
 }
 

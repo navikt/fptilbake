@@ -1,8 +1,6 @@
 package no.nav.journalpostapi.dto.dokument;
 
-import no.nav.journalpostapi.Kode;
-
-public enum Filtype implements Kode {
+public enum Filtype {
 
     PDF,
     PDFA,
@@ -16,8 +14,4 @@ public enum Filtype implements Kode {
     JSON,
     PNG;
 
-    @Override
-    public String getKode() {
-        return name();
-    }
 }

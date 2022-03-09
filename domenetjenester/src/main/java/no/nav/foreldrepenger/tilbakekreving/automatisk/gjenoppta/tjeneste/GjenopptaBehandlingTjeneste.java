@@ -156,7 +156,13 @@ public class GjenopptaBehandlingTjeneste {
      * @return
      */
     public boolean kanGjenopptaSteg(long behandlingId) {
-        return kanGjennopptaStatus(behandlingId) == KravgrunnlagTilstand.OK;
+        KravgrunnlagTilstand status = kanGjennopptaStatus(behandlingId);
+        if (status == KravgrunnlagTilstand.OK) {
+            return true;
+        } else {
+            logger.info("Kan ikke gjenoppta steg, status er {} ", status);
+            return false;
+        }
     }
 
     private KravgrunnlagTilstand kanGjennopptaStatus(long behandlingId) {

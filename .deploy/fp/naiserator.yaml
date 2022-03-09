@@ -2,7 +2,7 @@ kind: Application
 apiVersion: nais.io/v1alpha1
 metadata:
   name: fptilbake
-  namespace: {{namespace}}
+  namespace: teamforeldrepenger
   labels:
     team: teamforeldrepenger
 spec:
@@ -52,8 +52,6 @@ spec:
         kvPath: {{fptilbakeserviceuser}}
       - mountPath: /var/run/secrets/nais.io/ldap
         kvPath: {{ldapserviceuser}}
-      - mountPath: /var/run/secrets/nais.io/vault
-        kvPath: /kv/{{cluster}}/fss/fptilbake/{{namespace}}
   env:
   # miljø-spesifikke variable
   {{#each env}}
@@ -61,20 +59,4 @@ spec:
      value: "{{this}}"
   {{/each}}
    - name: APP_NAME
-     value: "fptilbake"
-   - name: ABAC_ATTRIBUTT_APPLIKASJON
-     value: "no.nav.abac.attributter.foreldrepenger"
-   - name: ABAC_ATTRIBUTT_FAGSAK
-     value: "no.nav.abac.attributter.foreldrepenger.fagsak"
-   - name: ABAC_ATTRIBUTT_VENTEFRIST
-     value: "no.nav.abac.attributter.foreldrepenger.fagsak.ventefrist"
-   - name: ABAC_ATTRIBUTT_BATCH
-     value: "no.nav.abac.attributter.foreldrepenger.batch"
-   - name: ABAC_ATTRIBUTT_DRIFT
-     value: "no.nav.abac.attributter.foreldrepenger.drift"
-   - name: AUDITLOGGER_ENABLED
-     value: "true"
-   - name: AUDITLOGGER_VENDOR
-     value: "fp"
-   - name: AUDITLOGGER_PRODUCT
      value: "fptilbake"

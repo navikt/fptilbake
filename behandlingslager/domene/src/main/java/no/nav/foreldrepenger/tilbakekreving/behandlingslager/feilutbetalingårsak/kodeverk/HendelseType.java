@@ -58,8 +58,6 @@ public enum HendelseType implements Kodeverdi {
     PPN_ANNET_TYPE("PPN_ANNET_TYPE", "Annet", 999),//NOSONAR
     OMP_ANNET_TYPE("OMP_ANNET_TYPE", "Annet", 999),//NOSONAR
     OLP_ANNET_TYPE("OLP_ANNET_TYPE", "Annet", 999),//NOSONAR
-
-
     ;
 
     public static final String KODEVERK = "HENDELSE_TYPE";
