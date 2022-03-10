@@ -37,7 +37,7 @@
 
         <surefire.version>2.22.2</surefire.version>
         <prometheus.version>0.15.0</prometheus.version>
-        <metrics.version>4.2.8</metrics.version>
+        <metrics.version>4.2.9</metrics.version>
         <logstash.version>7.0.1</logstash.version>
         <jersey.version>2.35</jersey.version>
         <ojdbc.version>19.3.0.0</ojdbc.version>
