@@ -2,10 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.dbstoette;
 
 import static java.lang.Runtime.getRuntime;
 
-import java.io.File;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.naming.NamingException;
