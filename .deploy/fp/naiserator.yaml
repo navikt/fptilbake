@@ -36,11 +36,11 @@ spec:
     enabled: false
   resources:
     limits:
-      cpu: "2000m"
-      memory: "1400Mi"
+      cpu: 2000m
+      memory: 2048Mi
     requests:
-      cpu: "200m"
-      memory: "1400Mi"
+      cpu: 200m
+      memory: 1400Mi
   vault:
     enabled: true
     paths:
