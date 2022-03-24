@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
+import no.nav.foreldrepenger.xmlutils.DateUtil;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.tilbakekreving.kravgrunnlag.annuller.v1.AnnullerKravgrunnlagDto;
@@ -26,7 +27,6 @@ import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
-import no.nav.vedtak.xmlutils.DateUtil;
 
 class ØkonomiConsumerMockImpl implements ØkonomiConsumer {
 

@@ -8,12 +8,12 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
+import no.nav.foreldrepenger.xmlutils.DateUtil;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsbelopDto;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsperiodeDto;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
-import no.nav.vedtak.xmlutils.DateUtil;
 
 public class TilbakekrevingsvedtakMapper {
 
