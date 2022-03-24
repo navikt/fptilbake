@@ -28,7 +28,7 @@
 
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
-        <felles.version>4.1.21</felles.version>
+        <felles.version>4.1.22</felles.version>
         <prosesstask.version>3.1.7</prosesstask.version>
         <fp-tidsserie.version>2.5.8</fp-tidsserie.version>
         <fpkontrakter.version>6.1.19</fpkontrakter.version>
@@ -396,7 +396,7 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-core</artifactId>
-                <version>1.8.3</version>
+                <version>1.8.4</version>
             </dependency>
 
             <dependency>

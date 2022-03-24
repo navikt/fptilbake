@@ -25,6 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
+import no.nav.foreldrepenger.xmlutils.DateUtil;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelopDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagPeriodeDto;
@@ -32,7 +33,6 @@ import no.nav.tilbakekreving.typer.v1.JaNeiDto;
 import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
-import no.nav.vedtak.xmlutils.DateUtil;
 
 public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
 
