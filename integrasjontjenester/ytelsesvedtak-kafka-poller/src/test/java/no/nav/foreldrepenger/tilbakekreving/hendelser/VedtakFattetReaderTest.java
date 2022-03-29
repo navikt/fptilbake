@@ -18,11 +18,11 @@ import org.mockito.ArgumentCaptor;
 
 import com.google.common.collect.Lists;
 
-import no.nav.abakus.iaygrunnlag.kodeverk.Fagsystem;
-import no.nav.abakus.iaygrunnlag.kodeverk.YtelseStatus;
-import no.nav.abakus.iaygrunnlag.kodeverk.YtelseType;
 import no.nav.abakus.vedtak.ytelse.Aktør;
+import no.nav.abakus.vedtak.ytelse.Kildesystem;
 import no.nav.abakus.vedtak.ytelse.Periode;
+import no.nav.abakus.vedtak.ytelse.Status;
+import no.nav.abakus.vedtak.ytelse.Ytelser;
 import no.nav.abakus.vedtak.ytelse.v1.YtelseV1;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
@@ -48,7 +48,7 @@ public class VedtakFattetReaderTest {
     public void skal_hente_og_behandle_meldinger() {
         //Arrange
         var reader = new VedtakFattetReader(meldingConsumer, taskTjeneste, no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem.FPTILBAKE);
-        var melding = opprettYtelseMelding(Fagsystem.FPSAK, YtelseType.FORELDREPENGER, SAKSNUMMER_FP);
+        var melding = opprettYtelseMelding(Kildesystem.FPSAK, Ytelser.FORELDREPENGER, SAKSNUMMER_FP);
         when(meldingConsumer.lesMeldinger()).thenReturn(Collections.singletonList(melding));
 
         //Act
@@ -70,7 +70,7 @@ public class VedtakFattetReaderTest {
     @Test
     public void skal_vente_med_commit_sync_til_transaksjonen_er_ferdig() {
         var reader = new VedtakFattetReader(meldingConsumer, taskTjeneste, no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem.FPTILBAKE);
-        var melding = opprettYtelseMelding(Fagsystem.FPSAK, YtelseType.FORELDREPENGER, SAKSNUMMER_FP);
+        var melding = opprettYtelseMelding(Kildesystem.FPSAK, Ytelser.FORELDREPENGER, SAKSNUMMER_FP);
         when(meldingConsumer.lesMeldinger()).thenReturn(Collections.singletonList(melding));
         PostTransactionHandler postTransactionHandler = reader.hentOgBehandleMeldinger();
 
@@ -98,7 +98,7 @@ public class VedtakFattetReaderTest {
     @Test
     public void skal_lese_og_håndtere_k9_vedtak_hendelser() {
         var reader = new VedtakFattetReader(meldingConsumer, taskTjeneste, no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem.K9TILBAKE);
-        when(meldingConsumer.lesMeldinger()).thenReturn(Lists.newArrayList(opprettYtelseMelding(Fagsystem.K9SAK, YtelseType.PLEIEPENGER_SYKT_BARN, SAKSNUMMER_K9)));
+        when(meldingConsumer.lesMeldinger()).thenReturn(Lists.newArrayList(opprettYtelseMelding(Kildesystem.K9SAK, Ytelser.PLEIEPENGER_SYKT_BARN, SAKSNUMMER_K9)));
         reader.hentOgBehandleMeldinger();
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
         verify(taskTjeneste, times(1)).lagre(captor.capture());
@@ -110,7 +110,7 @@ public class VedtakFattetReaderTest {
         assertThat(taskData.getPropertyValue(TaskProperties.EKSTERN_BEHANDLING_UUID)).isEqualTo(BEHANDLING_UUID.toString());
     }
 
-    private static YtelseV1 opprettYtelseMelding(Fagsystem system, YtelseType ytelseType, String saksnummer) {
+    private static YtelseV1 opprettYtelseMelding(Kildesystem system, Ytelser ytelseType, String saksnummer) {
         var aktør = new Aktør();
         aktør.setVerdi(AKTØR_ID);
         var periode = new Periode();
@@ -118,11 +118,11 @@ public class VedtakFattetReaderTest {
         periode.setTom(LocalDate.now().plusMonths(1));
         var melding = new YtelseV1();
         melding.setAktør(aktør);
-        melding.setFagsystem(system);
+        melding.setKildesystem(system);
         melding.setVedtakReferanse(BEHANDLING_UUID.toString());
         melding.setVedtattTidspunkt(LocalDateTime.now().minusSeconds(10));
-        melding.setType(ytelseType);
-        melding.setStatus(YtelseStatus.LØPENDE);
+        melding.setYtelse(ytelseType);
+        melding.setYtelseStatus(Status.LØPENDE);
         melding.setPeriode(periode);
         melding.setSaksnummer(saksnummer);
         return melding;

@@ -11,12 +11,13 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import no.nav.abakus.iaygrunnlag.kodeverk.Fagsystem;
-import no.nav.abakus.iaygrunnlag.kodeverk.YtelseType;
 import no.nav.abakus.vedtak.ytelse.Aktør;
+import no.nav.abakus.vedtak.ytelse.Kildesystem;
+import no.nav.abakus.vedtak.ytelse.Ytelser;
 import no.nav.abakus.vedtak.ytelse.v1.YtelseV1;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -48,7 +49,7 @@ public class HåndterHendelseTaskTest {
         td.setAktørId(melding.getAktør().getVerdi());
         td.setProperty(TaskProperties.EKSTERN_BEHANDLING_UUID, melding.getVedtakReferanse());
         td.setProperty(TaskProperties.SAKSNUMMER, melding.getSaksnummer());
-        td.setProperty(TaskProperties.FAGSAK_YTELSE_TYPE, melding.getType().getKode());
+        td.setProperty(TaskProperties.FAGSAK_YTELSE_TYPE, FagsakYtelseType.FORELDREPENGER.getKode());
         return td;
     }
 
@@ -59,8 +60,8 @@ public class HåndterHendelseTaskTest {
         melding.setAktør(aktør);
         melding.setVedtakReferanse(EKSTERN_BEHANDLING_UUID.toString());
         melding.setVedtattTidspunkt(LocalDateTime.now().minusSeconds(2));
-        melding.setFagsystem(Fagsystem.FPSAK);
-        melding.setType(YtelseType.FORELDREPENGER);
+        melding.setKildesystem(Kildesystem.FPSAK);
+        melding.setYtelse(Ytelser.FORELDREPENGER);
         melding.setSaksnummer("123456789");
         return melding;
     }

@@ -15,8 +15,8 @@ import org.apache.kafka.clients.consumer.CommitFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.abakus.iaygrunnlag.kodeverk.YtelseType;
 import no.nav.abakus.vedtak.ytelse.Ytelse;
+import no.nav.abakus.vedtak.ytelse.Ytelser;
 import no.nav.abakus.vedtak.ytelse.v1.YtelseV1;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
@@ -31,31 +31,31 @@ public class VedtakFattetReader {
 
     private static final Logger logger = LoggerFactory.getLogger(VedtakFattetReader.class);
 
-    private static final Map<Fagsystem, Set<YtelseType>> STØTTET_YTELSE_TYPER = Map.of(
-            Fagsystem.FPTILBAKE, Set.of(YtelseType.ENGANGSTØNAD, YtelseType.FORELDREPENGER, YtelseType.SVANGERSKAPSPENGER),
-            Fagsystem.K9TILBAKE, Set.of(YtelseType.FRISINN, YtelseType.OMSORGSPENGER, YtelseType.PLEIEPENGER_SYKT_BARN, YtelseType.PLEIEPENGER_NÆRSTÅENDE)
+    private static final Map<Fagsystem, Set<Ytelser>> STØTTET_YTELSE_TYPER = Map.of(
+            Fagsystem.FPTILBAKE, Set.of(Ytelser.ENGANGSTØNAD, Ytelser.FORELDREPENGER, Ytelser.SVANGERSKAPSPENGER),
+            Fagsystem.K9TILBAKE, Set.of(Ytelser.FRISINN, Ytelser.OMSORGSPENGER, Ytelser.PLEIEPENGER_SYKT_BARN, Ytelser.PLEIEPENGER_NÆRSTÅENDE)
     );
 
-    private static final Map<Fagsystem, Set<YtelseType>> REST_YTELSE_TYPER = Map.of(
+    private static final Map<Fagsystem, Set<Ytelser>> REST_YTELSE_TYPER = Map.of(
             Fagsystem.FPTILBAKE, Set.of(),
-            Fagsystem.K9TILBAKE, Set.of(YtelseType.OPPLÆRINGSPENGER)
+            Fagsystem.K9TILBAKE, Set.of(Ytelser.OPPLÆRINGSPENGER)
     );
 
-    private static final Map<YtelseType, FagsakYtelseType> YTELSE_TYPE_MAP = Map.of(
-            YtelseType.ENGANGSTØNAD, FagsakYtelseType.ENGANGSTØNAD,
-            YtelseType.FORELDREPENGER, FagsakYtelseType.FORELDREPENGER,
-            YtelseType.SVANGERSKAPSPENGER, FagsakYtelseType.SVANGERSKAPSPENGER,
-            YtelseType.FRISINN, FagsakYtelseType.FRISINN,
-            YtelseType.OMSORGSPENGER, FagsakYtelseType.OMSORGSPENGER,
-            YtelseType.OPPLÆRINGSPENGER, FagsakYtelseType.OPPLÆRINGSPENGER,
-            YtelseType.PLEIEPENGER_NÆRSTÅENDE, FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE,
-            YtelseType.PLEIEPENGER_SYKT_BARN, FagsakYtelseType.PLEIEPENGER_SYKT_BARN
+    private static final Map<Ytelser, FagsakYtelseType> YTELSE_TYPE_MAP = Map.of(
+        Ytelser.ENGANGSTØNAD, FagsakYtelseType.ENGANGSTØNAD,
+        Ytelser.FORELDREPENGER, FagsakYtelseType.FORELDREPENGER,
+        Ytelser.SVANGERSKAPSPENGER, FagsakYtelseType.SVANGERSKAPSPENGER,
+        Ytelser.FRISINN, FagsakYtelseType.FRISINN,
+        Ytelser.OMSORGSPENGER, FagsakYtelseType.OMSORGSPENGER,
+        Ytelser.OPPLÆRINGSPENGER, FagsakYtelseType.OPPLÆRINGSPENGER,
+        Ytelser.PLEIEPENGER_NÆRSTÅENDE, FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE,
+        Ytelser.PLEIEPENGER_SYKT_BARN, FagsakYtelseType.PLEIEPENGER_SYKT_BARN
     );
 
     private VedtakFattetMeldingConsumer meldingConsumer;
     private ProsessTaskTjeneste taskTjeneste;
-    private Set<YtelseType> abonnerteYtelser;
-    private Set<YtelseType> resterendeYtelser;
+    private Set<Ytelser> abonnerteYtelser;
+    private Set<Ytelser> resterendeYtelser;
 
 
     VedtakFattetReader() {
@@ -115,11 +115,11 @@ public class VedtakFattetReader {
     private void lagHåndterHendelseProsessTask(YtelseV1 melding) {
 
         validereMelding(melding);
-        if (abonnerteYtelser.contains(melding.getType())) {
+        if (abonnerteYtelser.contains(melding.getYtelse())) {
             taskTjeneste.lagre(lagProsessTaskData(melding));
-        } else if (YTELSE_TYPE_MAP.get(melding.getType()) == null || resterendeYtelser.contains(melding.getType())) {
+        } else if (YTELSE_TYPE_MAP.get(melding.getYtelse()) == null || resterendeYtelser.contains(melding.getYtelse())) {
             logger.warn("Melding om vedtak for {} for sak={} behandling={} med vedtakstidspunkt {} ble ignorert pga ikke-støttet ytelsetype",
-                    melding.getType(), melding.getSaksnummer(), melding.getVedtakReferanse(), melding.getVedtattTidspunkt());
+                    melding.getYtelse(), melding.getSaksnummer(), melding.getVedtakReferanse(), melding.getVedtattTidspunkt());
         }
     }
 
@@ -127,9 +127,9 @@ public class VedtakFattetReader {
         Objects.requireNonNull(melding.getAktør());
         Objects.requireNonNull(melding.getVedtakReferanse());
         Objects.requireNonNull(melding.getSaksnummer());
-        Objects.requireNonNull(melding.getType());
+        Objects.requireNonNull(melding.getYtelse());
         Objects.requireNonNull(melding.getVedtattTidspunkt());
-        Objects.requireNonNull(YTELSE_TYPE_MAP.get(melding.getType()));
+        Objects.requireNonNull(YTELSE_TYPE_MAP.get(melding.getYtelse()));
     }
 
     private ProsessTaskData lagProsessTaskData(YtelseV1 melding) {
@@ -137,7 +137,7 @@ public class VedtakFattetReader {
         td.setAktørId(melding.getAktør().getVerdi());
         td.setProperty(EKSTERN_BEHANDLING_UUID, melding.getVedtakReferanse());
         td.setSaksnummer(melding.getSaksnummer());
-        td.setProperty(FAGSAK_YTELSE_TYPE, YTELSE_TYPE_MAP.get(melding.getType()).getKode());
+        td.setProperty(FAGSAK_YTELSE_TYPE, YTELSE_TYPE_MAP.get(melding.getYtelse()).getKode());
         return td;
     }
 
