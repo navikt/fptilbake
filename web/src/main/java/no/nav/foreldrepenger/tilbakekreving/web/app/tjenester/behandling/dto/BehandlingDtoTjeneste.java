@@ -127,6 +127,7 @@ public class BehandlingDtoTjeneste {
         }
 
         dto.leggTil(get(kontekstPath + "/api/brev/maler", "brev-maler", uuidDto));
+        dto.leggTil(get(kontekstPath + "/api/brev/maler", "fpsak-brev-maler", uuidDto));
         dto.leggTil(new ResourceLink(kontekstPath + "/api/brev/bestill", "brev-bestill", ResourceLink.HttpMethod.POST));
         dto.leggTil(new ResourceLink(kontekstPath + "/api/brev/forhandsvis", "brev-forhandvis", ResourceLink.HttpMethod.POST));
         return dto;
