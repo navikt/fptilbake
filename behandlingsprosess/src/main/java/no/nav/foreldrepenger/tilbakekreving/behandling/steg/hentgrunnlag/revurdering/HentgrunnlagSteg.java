@@ -10,12 +10,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegKode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
-@BehandlingStegRef(kode = BehandlingStegKode.HENT_GRUNNLAG)
+@BehandlingStegRef(BehandlingStegType.HENTGRUNNLAGSTEG)
 @BehandlingTypeRef
 @ApplicationScoped
 public class HentgrunnlagSteg implements BehandlingSteg {

@@ -19,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
@@ -35,7 +34,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 
-@BehandlingStegRef(kode = BehandlingStegKode.VARSEL)
+@BehandlingStegRef(BehandlingStegType.VARSEL)
 @BehandlingTypeRef
 @ApplicationScoped
 public class VarselSteg implements BehandlingSteg {

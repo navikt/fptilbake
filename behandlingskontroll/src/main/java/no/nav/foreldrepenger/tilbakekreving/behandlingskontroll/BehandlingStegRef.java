@@ -8,11 +8,9 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Instance;
@@ -44,7 +42,7 @@ public @interface BehandlingStegRef {
      *
      * @see BehandlingStegType
      */
-    String kode();
+    BehandlingStegType value();
 
     /**
      * AnnotationLiteral som kan brukes i CDI søk.
@@ -53,25 +51,18 @@ public @interface BehandlingStegRef {
      * {@link CDI#current#select(javax.enterprise.util.TypeLiteral,
      * Annotation...)}.
      */
-    public static class BehandlingStegRefLiteral extends AnnotationLiteral<BehandlingStegRef> implements BehandlingStegRef {
+    class BehandlingStegRefLiteral extends AnnotationLiteral<BehandlingStegRef> implements BehandlingStegRef {
 
-        private String stegKode;
-
-        public BehandlingStegRefLiteral() {
-            this("*");
-        }
-
-        public BehandlingStegRefLiteral(String stegKode) {
-            this.stegKode = stegKode;
-        }
+        private BehandlingStegType stegType;
 
         public BehandlingStegRefLiteral(BehandlingStegType stegType) {
-            this(stegType == null ? "*" : stegType.getKode());
+            this.stegType = stegType;
         }
 
+
         @Override
-        public String kode() {
-            return stegKode;
+        public BehandlingStegType value() {
+            return stegType;
         }
 
     }
@@ -82,40 +73,20 @@ public @interface BehandlingStegRef {
         private Lookup() {
         }
 
-        public static <I> Optional<I> find(Class<I> cls, String behandlingType, String behandlingStegRef) {
-            return find(cls, (CDI<I>) CDI.current(), behandlingType, behandlingStegRef);
-        }
-
-        public static <I> Optional<I> find(Class<I> cls, BehandlingType behandlingType,
-                                           BehandlingStegType behandlingStegRef) {
-            return find(cls, (CDI<I>) CDI.current(), behandlingType, behandlingStegRef);
-        }
-
-        public static <I> Optional<I> find(Class<I> cls, Instance<I> instances, BehandlingType behandlingType,
-                                           BehandlingStegType behandlingStegRef) {
-            return find(cls, instances,
-                    behandlingType == null ? null : behandlingType.getKode(),
-                    behandlingStegRef == null ? null : behandlingStegRef.getKode());
-        }
-
-        public static <I> Optional<I> find(Class<I> cls, Instance<I> instances, String behandlingType,
-                                           String behandlingStegRef) { // NOSONAR
+        public static <I> Optional<I> find(Class<I> cls, Instance<I> instances, BehandlingType behandlingType, BehandlingStegType behandlingStegRef) {
             Objects.requireNonNull(instances, "instances");
 
-            for (var behandlingLiteral : coalesce(behandlingType, "*")) {
+            for (var behandlingLiteral : List.of(behandlingType, BehandlingType.UDEFINERT)) {
                 var binst = select(cls, instances, new BehandlingTypeRef.BehandlingTypeRefLiteral(behandlingLiteral));
                 if (binst.isUnsatisfied()) {
                     continue;
                 }
-                for (var stegRef : coalesce(behandlingStegRef, "*")) {
-                    var cinst = select(cls, binst, new BehandlingStegRefLiteral(stegRef));
-                    if (cinst.isResolvable()) {
-                        return Optional.of(getInstance(cinst));
-                    }
-                    if (cinst.isAmbiguous()) {
-                        throw new IllegalStateException("Har flere matchende instanser for klasse : " + cls.getName() +
-                                ", behandlingType=" + behandlingLiteral + ", behandlingStegRef=" + stegRef);
-                    }
+                var cinst = select(cls, binst, new BehandlingStegRefLiteral(behandlingStegRef));
+                if (cinst.isResolvable()) {
+                    return Optional.of(getInstance(cinst));
+                }
+                if (cinst.isAmbiguous()) {
+                    throw new IllegalStateException("Har flere matchende instanser for klasse : " + cls.getName() + ", behandlingType=" + behandlingLiteral + ", behandlingStegRef=" + behandlingStegRef);
                 }
             }
 
@@ -135,10 +106,6 @@ public @interface BehandlingStegRef {
                         "Kan ikke ha @Dependent scope bean ved Instance lookup dersom en ikke også håndtere lifecycle selv: " + i.getClass());
             }
             return i;
-        }
-
-        private static List<String> coalesce(String... vals) {
-            return Arrays.asList(vals).stream().filter(v -> v != null).distinct().collect(Collectors.toList());
         }
 
     }

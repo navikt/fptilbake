@@ -15,12 +15,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegKode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste.AutomatiskFaktaFastsettelseTjeneste;
 
-@BehandlingStegRef(kode = BehandlingStegKode.FAKTA_FEILUTBETALING)
+@BehandlingStegRef(BehandlingStegType.FAKTA_FEILUTBETALING)
 @BehandlingTypeRef
 @ApplicationScoped
 public class FaktaFeilutbetalingSteg implements BehandlingSteg {

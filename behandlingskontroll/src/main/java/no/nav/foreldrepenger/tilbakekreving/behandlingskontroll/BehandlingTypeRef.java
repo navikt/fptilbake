@@ -8,7 +8,6 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,30 +43,26 @@ public @interface BehandlingTypeRef {
      *
      * @see BehandlingType
      */
-    String value() default "*";
+    BehandlingType value() default BehandlingType.UDEFINERT;
 
     /**
      * AnnotationLiteral som kan brukes ved CDI søk.
      */
     public static class BehandlingTypeRefLiteral extends AnnotationLiteral<BehandlingTypeRef> implements BehandlingTypeRef {
 
-        private String navn;
+        private BehandlingType behandlingType;
 
         public BehandlingTypeRefLiteral() {
-            this.navn = "*";
+            this.behandlingType = BehandlingType.UDEFINERT;
         }
 
-        public BehandlingTypeRefLiteral(String navn) {
-            this.navn = navn;
-        }
-
-        public BehandlingTypeRefLiteral(BehandlingType ytelseType) {
-            this.navn = (ytelseType == null ? "*" : ytelseType.getKode());
+        public BehandlingTypeRefLiteral(BehandlingType behandlingType) {
+            this.behandlingType = (behandlingType== null ? BehandlingType.UDEFINERT : behandlingType);
         }
 
         @Override
-        public String value() {
-            return navn;
+        public BehandlingType value() {
+            return behandlingType;
         }
     }
 
@@ -77,23 +72,14 @@ public @interface BehandlingTypeRef {
         private Lookup() {
         }
 
-        public static <I> Optional<I> find(Class<I> cls, String behandlingType) {
-            return find(cls, (CDI<I>) CDI.current(), behandlingType);
-        }
-
         public static <I> Optional<I> find(Class<I> cls, BehandlingType behandlingType) {
             return find(cls, (CDI<I>) CDI.current(), behandlingType);
         }
 
         public static <I> Optional<I> find(Class<I> cls, Instance<I> instances, BehandlingType behandlingType) {
-            return find(cls, instances,
-                    behandlingType == null ? null : behandlingType.getKode());
-        }
-
-        public static <I> Optional<I> find(Class<I> cls, Instance<I> instances, String behandlingType) { // NOSONAR
             Objects.requireNonNull(instances, "instances");
 
-            for (var behandlingLiteral : coalesce(behandlingType, "*")) {
+            for (var behandlingLiteral : List.of(behandlingType, BehandlingType.UDEFINERT)) {
                 var binst = select(cls, instances, new BehandlingTypeRefLiteral(behandlingLiteral));
                 if (binst.isResolvable()) {
                     return Optional.of(getInstance(binst));
@@ -112,10 +98,6 @@ public @interface BehandlingTypeRef {
                         "Kan ikke ha @Dependent scope bean ved Instance lookup dersom en ikke også håndtere lifecycle selv: " + i.getClass());
             }
             return i;
-        }
-
-        private static List<String> coalesce(String... vals) {
-            return Arrays.stream(vals).filter(Objects::nonNull).distinct().toList();
         }
 
         private static <I> Instance<I> select(Class<I> cls, Instance<I> instances, Annotation anno) {

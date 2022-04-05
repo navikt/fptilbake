@@ -13,7 +13,7 @@ import javax.enterprise.inject.Instance;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegModell;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRef;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -87,8 +87,8 @@ class BehandlingStegModellImpl implements BehandlingStegModell {
 
     protected void initSteg() {
         if (steg == null) {
-            steg = BehandlingTypeRef.Lookup
-                    .find(BehandlingSteg.class, stegInstances, behandlingModell.getBehandlingType())
+            steg = BehandlingStegRef.Lookup
+                    .find(BehandlingSteg.class, stegInstances, behandlingModell.getBehandlingType(), behandlingStegType)
                     .orElseThrow(() -> new IllegalStateException(
                             "Mangler steg definert for stegKode=" + behandlingStegType + " [behandlingType=" //$NON-NLS-1$ //$NON-NLS-2$
                                     + behandlingModell.getBehandlingType() + "]"));

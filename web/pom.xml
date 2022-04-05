@@ -16,7 +16,7 @@
 
     <properties>
         <swagger-ui.version>4.9.1</swagger-ui.version>
-        <swagger.version>2.1.13</swagger.version>
+        <swagger.version>2.2.0</swagger.version>
     </properties>
 
     <build>

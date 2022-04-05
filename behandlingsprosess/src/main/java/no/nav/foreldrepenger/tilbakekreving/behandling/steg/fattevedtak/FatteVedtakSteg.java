@@ -20,7 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegKode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -38,7 +38,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
-@BehandlingStegRef(kode = BehandlingStegKode.FATTE_VEDTAK)
+@BehandlingStegRef(BehandlingStegType.FATTE_VEDTAK)
 @BehandlingTypeRef
 @ApplicationScoped
 public class FatteVedtakSteg implements BehandlingSteg {

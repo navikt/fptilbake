@@ -12,7 +12,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 @ApplicationScoped
 public class BehandlingModellProducer {
 
-    @BehandlingTypeRef("BT-007")
+    @BehandlingTypeRef(BehandlingType.TILBAKEKREVING)
     @Produces
     @ApplicationScoped
     public BehandlingModell tilbakekreving() {
@@ -31,7 +31,7 @@ public class BehandlingModellProducer {
         return modellBuilder.build();
     }
 
-    @BehandlingTypeRef("BT-009")
+    @BehandlingTypeRef(BehandlingType.REVURDERING_TILBAKEKREVING)
     @Produces
     @ApplicationScoped
     public BehandlingModell revurdering() {
