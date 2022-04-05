@@ -23,21 +23,21 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 public enum BehandlingStegType implements Kodeverdi {
 
     // Tilbakekreving
-    INOPPSTEG(BehandlingStegKode.INNOPP, "Innhent opplysninger", BehandlingStatus.UTREDES),
-    VARSEL(BehandlingStegKode.VARSEL, "Varsel om tilbakekreving", BehandlingStatus.UTREDES),
-    TBKGSTEG(BehandlingStegKode.TBKGSTEG, "Motatt kravgrunnlag fra økonomi", BehandlingStatus.UTREDES),
+    INOPPSTEG("INOPPSTEG", "Innhent opplysninger", BehandlingStatus.UTREDES),
+    VARSEL("VARSELSTEG", "Varsel om tilbakekreving", BehandlingStatus.UTREDES),
+    TBKGSTEG("TBKGSTEG", "Motatt kravgrunnlag fra økonomi", BehandlingStatus.UTREDES),
 
     // Tilbakekreving - revurdering
-    HENTGRUNNLAGSTEG(BehandlingStegKode.HENT_GRUNNLAG, "Hent grunnlag fra økonomi", BehandlingStatus.UTREDES),
+    HENTGRUNNLAGSTEG("HENTGRUNNLAGSTEG", "Hent grunnlag fra økonomi", BehandlingStatus.UTREDES),
 
     // Felles for behandlingene
-    FAKTA_VERGE(BehandlingStegKode.FAKTA_VERGE, "Fakta om verge", BehandlingStatus.UTREDES),
-    FAKTA_FEILUTBETALING(BehandlingStegKode.FAKTA_FEILUTBETALING, "Fakta om Feilutbetaling", BehandlingStatus.UTREDES),
-    FORELDELSEVURDERINGSTEG(BehandlingStegKode.FORELDELSEVURDERINGSTEG, "Vurder foreldelse", BehandlingStatus.UTREDES),
-    VTILBSTEG(BehandlingStegKode.VTILBSTEG, "Vurder tilbakekreving", BehandlingStatus.UTREDES),
-    FORESLÅ_VEDTAK(BehandlingStegKode.FORESLÅ_VEDTAK, "Foreslå vedtak", BehandlingStatus.UTREDES),
-    FATTE_VEDTAK(BehandlingStegKode.FATTE_VEDTAK, "Fatte Vedtak", BehandlingStatus.FATTER_VEDTAK),
-    IVERKSETT_VEDTAK(BehandlingStegKode.IVERKSETT_VEDTAK, "Iverksett Vedtak", BehandlingStatus.IVERKSETTER_VEDTAK);
+    FAKTA_VERGE("FAKTAVERGESTEG", "Fakta om verge", BehandlingStatus.UTREDES),
+    FAKTA_FEILUTBETALING("FAKTFEILUTSTEG", "Fakta om Feilutbetaling", BehandlingStatus.UTREDES),
+    FORELDELSEVURDERINGSTEG("VFORELDETSTEG", "Vurder foreldelse", BehandlingStatus.UTREDES),
+    VTILBSTEG("VTILBSTEG", "Vurder tilbakekreving", BehandlingStatus.UTREDES),
+    FORESLÅ_VEDTAK("FORVEDSTEG", "Foreslå vedtak", BehandlingStatus.UTREDES),
+    FATTE_VEDTAK( "FVEDSTEG", "Fatte Vedtak", BehandlingStatus.FATTER_VEDTAK),
+    IVERKSETT_VEDTAK("IVEDSTEG", "Iverksett Vedtak", BehandlingStatus.IVERKSETTER_VEDTAK);
 
     static final String KODEVERK = "BEHANDLING_STEG_TYPE";
 
