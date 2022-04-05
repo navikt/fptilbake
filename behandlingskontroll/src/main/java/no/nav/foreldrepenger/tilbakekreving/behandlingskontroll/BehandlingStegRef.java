@@ -8,6 +8,7 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -76,7 +77,7 @@ public @interface BehandlingStegRef {
         public static <I> Optional<I> find(Class<I> cls, Instance<I> instances, BehandlingType behandlingType, BehandlingStegType behandlingStegRef) {
             Objects.requireNonNull(instances, "instances");
 
-            for (var behandlingLiteral : List.of(behandlingType, BehandlingType.UDEFINERT)) {
+            for (var behandlingLiteral : coalesce(behandlingType, BehandlingType.UDEFINERT)) {
                 var binst = select(cls, instances, new BehandlingTypeRef.BehandlingTypeRefLiteral(behandlingLiteral));
                 if (binst.isUnsatisfied()) {
                     continue;
@@ -97,6 +98,10 @@ public @interface BehandlingStegRef {
             return cls != null
                     ? instances.select(cls, anno)
                     : instances.select(anno);
+        }
+
+        private static List<BehandlingType> coalesce(BehandlingType... vals) {
+            return Arrays.stream(vals).filter(Objects::nonNull).distinct().toList();
         }
 
         private static <I> I getInstance(Instance<I> inst) {
