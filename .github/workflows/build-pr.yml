@@ -22,7 +22,14 @@ jobs:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
 
-      - uses: actions/setup-java@v2
+      - name: Setup maven
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          repositories: '[{ "id": "github", "name": "github", "url": "https://maven.pkg.github.com/${{ github.repository }}", "releases": { "enabled": "true" }, "snapshots": { "enabled": "false" } }]'
+          servers: '[{ "id": "github", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}" }]'
+          output_file: settings.xml
+
+      - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: 17
@@ -50,10 +57,10 @@ jobs:
         run: |
           echo "Building $BUILD_VERSION"
           export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
-          mvn test-compile -P-migrer-db -T2 --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION}
+          mvn test-compile -P migrer-db -T2 -B -s settings.xml -Drevision=${BUILD_VERSION}
 
       - name: Build (test)
         run: |
           echo "Building $BUILD_VERSION"
           export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
-          mvn package -T2 --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION}
+          mvn package -T2 -B -s settings.xml -Drevision=${BUILD_VERSION}

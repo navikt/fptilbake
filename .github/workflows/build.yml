@@ -22,7 +22,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-java@v2
+
+      - name: Setup maven
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          repositories: '[{ "id": "github", "name": "github", "url": "https://maven.pkg.github.com/${{ github.repository }}", "releases": { "enabled": "true" }, "snapshots": { "enabled": "false" } }]'
+          servers: '[{ "id": "github", "username": "${{ github.actor }}", "password": "${{ secrets.READER_TOKEN }}" }]'
+          output_file: settings.xml
+
+      - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: 17
@@ -49,17 +57,17 @@ jobs:
       - name: Build (kompiler)
         run: |
           echo "Building $BUILD_VERSION"
-          mvn test-compile -P-migrer-db --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION}
+          mvn test-compile -P migrer-db -B -s settings.xml -Drevision=${BUILD_VERSION}
 
       - name: Migrer database
         run: |
           echo "Migrerer database"
-          mvn exec:java -pl migreringer --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION}
+          mvn exec:java -pl migreringer -B -s settings.xml -Drevision=${BUILD_VERSION}
 
       - name: Build artifacts & deploy (inkl test)
         run: |
           echo "Building artifacts $BUILD_VERSION"
-          mvn install -e --batch-mode --settings .github/.m2/settings.xml -Drevision=${BUILD_VERSION} -Dfile.encoding=UTF-8
+          mvn install -e -B -s settings.xml -Drevision=${BUILD_VERSION} -Dfile.encoding=UTF-8
 
       - name: Bygg og push docker-image for distribuering
         run: |
@@ -142,7 +150,7 @@ jobs:
                       "version": "${{ env.BUILD_VERSION }}",
                       "issue_number": "${{ steps.createdeployissue.outputs.number }}"
                   }}'
-                
+
       - name: Trigg deploy av k9-tilbake til dev-fss/k9saksbehandling
         if: success()
         run: |
