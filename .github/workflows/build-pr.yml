@@ -57,7 +57,7 @@ jobs:
         run: |
           echo "Building $BUILD_VERSION"
           export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
-          mvn test-compile -P-migrer-db -T2 -B -s settings.xml -Drevision=${BUILD_VERSION}
+          mvn test-compile -P migrer-db -T2 -B -s settings.xml -Drevision=${BUILD_VERSION}
 
       - name: Build (test)
         run: |
