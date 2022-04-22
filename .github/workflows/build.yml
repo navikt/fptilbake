@@ -57,7 +57,7 @@ jobs:
       - name: Build (kompiler)
         run: |
           echo "Building $BUILD_VERSION"
-          mvn test-compile -P-migrer-db -B -s settings.xml -Drevision=${BUILD_VERSION}
+          mvn test-compile -P migrer-db -B -s settings.xml -Drevision=${BUILD_VERSION}
 
       - name: Migrer database
         run: |
