@@ -14,15 +14,9 @@
     <packaging>jar</packaging>
     <name>FPTILBAKE :: Web :: Applikasjon</name>
 
-    <properties>
-        <swagger-ui.version>4.9.1</swagger-ui.version>
-        <swagger.version>2.2.0</swagger.version>
-    </properties>
-
     <build>
         <!-- setter til app da det er default for jar som kjører i nais baseimaget -->
         <finalName>app</finalName>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
