@@ -815,7 +815,7 @@
 
     <distributionManagement>
         <repository>
-            <id>github1</id>
+            <id>github</id>
             <name>GitHub Apache Maven Packages</name>
             <url>https://maven.pkg.github.com/navikt/fptilbake/</url>
         </repository>
