@@ -194,7 +194,6 @@ public class JettyServer {
         ctx.setContextPath(CONTEXT_PATH);
         ctx.setBaseResource(createResourceCollection());
         // https://archive.eclipse.org/jetty/9.4.2.v20170220/apidocs/org/eclipse/jetty/servlet/DefaultServlet.html
-        ctx.setInitParameter("org.eclipse.jetty.servlet.Default.pathInfoOnly", "true");
         ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         ctx.setAttribute("org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern",
                 "^.*jersey-.*.jar$|^.*felles-.*.jar$");
