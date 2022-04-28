@@ -25,7 +25,6 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer</mainClass>
                         </manifest>
                     </archive>

@@ -1,4 +1,5 @@
 {
+  "environment": "dev",
   "oraclefptilbakesecret":"oracle/data/dev/creds/fptilbake_q1-user",
   "oracleconfig": "oracle/data/dev/config/fptilbake_q1",
   "fptilbakeserviceuser": "serviceuser/data/dev/srvfptilbake",

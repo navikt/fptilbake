@@ -60,6 +60,8 @@ spec:
         kvPath: {{ldapserviceuser}}
       - mountPath: /var/run/secrets/nais.io/vault
         kvPath: /kv/{{cluster}}/fss/k9-tilbake/{{namespace}}
+      - mountPath: /var/run/secrets/nais.io/appdynamics
+        kvPath: /apikey/appdynamics/{{environment}}
   sidecar: true # refresh token
   env:
   # miljø-spesifikke variable
