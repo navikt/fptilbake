@@ -1,4 +1,5 @@
 {
+  "environment": "dev",
   "cluster": "preprod",
   "namespace": "k9saksbehandling",
   "oracleconfig": "oracle/data/dev/config/k9tilbake_q1",

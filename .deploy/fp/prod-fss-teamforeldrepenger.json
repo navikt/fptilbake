@@ -1,4 +1,5 @@
 {
+  "environment": "prod",
   "oraclefptilbakesecret":"oracle/data/prod/creds/fptilbake_p-fptilbake_p",
   "oracleconfig": "oracle/data/prod/config/fptilbake_p",
   "fptilbakeserviceuser": "serviceuser/data/prod/srvfptilbake",
