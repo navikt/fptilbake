@@ -6,7 +6,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonadresseDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
@@ -112,22 +110,8 @@ public class K9sakKlientTest {
 
     private PersonopplysningDto personopplysningDto() {
         PersonopplysningDto dto = new PersonopplysningDto();
-        dto.setFødselsnummer("fnr");
-        dto.setNavn("navn navn");
         dto.setAktoerId("aktørId");
-        dto.setHarVerge(false);
-        dto.setAdresser(adresser());
         return dto;
-    }
-
-    private List<PersonadresseDto> adresser() {
-        PersonadresseDto dto = new PersonadresseDto();
-        dto.setAdresselinje1("adrl1");
-        dto.setAdresselinje2("adrl2");
-        dto.setAdresselinje3("adrl3");
-        dto.setPostnummer("0001");
-        dto.setPoststed("sted");
-        return Collections.singletonList(dto);
     }
 
     private List<BehandlingResourceLinkDto> resourcelinks() {

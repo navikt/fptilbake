@@ -11,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.BehandlingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 
 public class BehandlingDto {

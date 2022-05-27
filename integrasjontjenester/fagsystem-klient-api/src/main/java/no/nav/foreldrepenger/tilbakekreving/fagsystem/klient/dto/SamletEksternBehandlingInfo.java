@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -72,7 +73,8 @@ public class SamletEksternBehandlingInfo {
     }
 
     public int getAntallBarnSøktFor() {
-        return getPersonopplysninger().getAntallBarn() != null ? personopplysninger.getAntallBarn() : getPersonopplysninger().getBarnSoktFor().size();
+        return getPersonopplysninger().getAntallBarn() != null ? personopplysninger.getAntallBarn() :
+            Optional.ofNullable(getPersonopplysninger().getBarnSoktFor()).map(Collection::size).orElseThrow();
     }
 
     SamletEksternBehandlingInfo() {

@@ -55,8 +55,6 @@ public class VarselbrevUtilTest {
         Adresseinfo adresseinfo = lagStandardNorskAdresse();
 
         PersonopplysningDto personopplysningDto = new PersonopplysningDto();
-        personopplysningDto.setNavn("Fiona");
-        personopplysningDto.setFødselsnummer(PERSONNUMMER);
 
         Personinfo personinfo = Personinfo.builder().medAktørId(new AktørId("1234567890011")).medPersonIdent(new PersonIdent(PERSONNUMMER))
                 .medNavn("Fiona").medFødselsdato(LocalDate.now().minusDays(1)).build();
@@ -114,9 +112,6 @@ public class VarselbrevUtilTest {
 
         PersonopplysningDto personopplysninger = new PersonopplysningDto();
         personopplysninger.setAktoerId("1");
-        personopplysninger.setFødselsnummer(PERSONNUMMER);
-        personopplysninger.setHarVerge(false);
-        personopplysninger.setNavn("Fiona");
         personopplysninger.setAntallBarn(1);
 
         SamletEksternBehandlingInfo behandingsinfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER)
