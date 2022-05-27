@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto;
+package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
