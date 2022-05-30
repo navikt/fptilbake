@@ -1,3 +1,0 @@
-ALTER TABLE GR_KRAV_GRUNNLAG ADD SPERRET VARCHAR2(1);
-
-COMMENT ON COLUMN GR_KRAV_GRUNNLAG.SPERRET is 'Angir om grunnlaget har fått sper melding fra økonomi';

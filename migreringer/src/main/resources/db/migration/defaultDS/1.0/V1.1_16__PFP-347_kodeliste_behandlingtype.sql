@@ -1,2 +1,0 @@
-INSERT INTO KODELISTE (ID, KODEVERK, KODE, OFFISIELL_KODE, BESKRIVELSE, GYLDIG_FOM, GYLDIG_TOM) values ( seq_kodeliste.nextval, 'BEHANDLING_TYPE', 'BT-007', null, 'Tilbakekreving', to_date('01.01.2000','DD.MM.RRRR'), to_date('31.12.9999','DD.MM.RRRR'));
-INSERT INTO KODELISTE (ID, KODEVERK, KODE, OFFISIELL_KODE, BESKRIVELSE, GYLDIG_FOM, GYLDIG_TOM) values (seq_kodeliste.nextval, 'BEHANDLING_TYPE', 'BT-008', null, 'Inntrekk', to_date('01.01.2000','DD.MM.RRRR'), to_date('31.12.9999','DD.MM.RRRR'));

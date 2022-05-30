@@ -1,1 +1,0 @@
-alter table ekstern_behandling modify (varseltekst null);

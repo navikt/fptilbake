@@ -1,2 +1,0 @@
-alter table KRAV_GRUNNLAG_BELOP_433 drop constraint FK_KRAV_GRUNNLAG_BELOP_433_1;
-alter table KRAV_GRUNNLAG_BELOP_433 drop column KL_KLASSE_KODE;
