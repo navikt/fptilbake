@@ -1,6 +1,0 @@
-INSERT INTO KODELISTE (id, kodeverk, kode, beskrivelse,GYLDIG_FOM,GYLDIG_TOM,OPPRETTET_AV,OPPRETTET_TID)
-VALUES(seq_kodeliste.nextval, 'HISTORIKKINNSLAG_TYPE', 'FJERNET_VERGE','Opplysninger om verge/fullmektig fjernete',to_date('01.01.2000','DD.MM.RRRR'),
-to_date('31.12.9999','DD.MM.RRRR'),'VL',to_date(sysdate,'DD.MM.RRRR'));
-
-INSERT INTO KODELISTE_NAVN_I18N (ID,KL_KODEVERK,KL_KODE,SPRAK,NAVN,OPPRETTET_AV,OPPRETTET_TID)
-VALUES (SEQ_KODELISTE_NAVN_I18N.NEXTVAL,'HISTORIKKINNSLAG_TYPE','FJERNET_VERGE','NB','Opplysninger om verge/fullmektig fjernet','VL',to_date(sysdate,'DD.MM.RRRR'));
