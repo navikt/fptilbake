@@ -1,3 +1,0 @@
-UPDATE KODELISTE SET BESKRIVELSE='Tilbakekreving revurdering' WHERE KODE='BT-009';
-
-UPDATE KODELISTE_NAVN_I18N SET NAVN='Tilbakekreving revurdering' WHERE KL_KODE='BT-009';

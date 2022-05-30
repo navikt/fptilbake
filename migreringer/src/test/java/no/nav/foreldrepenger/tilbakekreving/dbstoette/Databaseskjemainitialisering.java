@@ -21,7 +21,6 @@ import no.nav.foreldrepenger.konfig.Environment;
 
 public final class Databaseskjemainitialisering {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Databaseskjemainitialisering.class);
     private static final AtomicBoolean GUARD_UNIT_TEST_SKJEMAER = new AtomicBoolean();
 
     private static final Environment ENV = Environment.current();

@@ -1,1 +1,0 @@
-UPDATE KONFIG_VERDI SET GYLDIG_FOM=to_date('01.01.2016','DD.MM.RRRR') WHERE KONFIG_KODE='frist.brukerrespons.varsel';
