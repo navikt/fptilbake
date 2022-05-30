@@ -41,7 +41,7 @@ jobs:
         run: |
           echo "Building snyk_scan"
           export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
-          mvn install -T2 -B -s settings.xml -Drevision=snyk_scan
+          mvn install -T2 -B -s settings.xml -Drevision=snyk_scan -DskipTests
 
       - name: Run Snyk monitor
         run: >
