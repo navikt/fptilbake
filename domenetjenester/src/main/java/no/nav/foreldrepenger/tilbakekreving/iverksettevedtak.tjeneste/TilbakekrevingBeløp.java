@@ -84,7 +84,7 @@ public class TilbakekrevingBeløp {
     }
 
     public boolean erIkkeSkattepliktig() {
-        return klassekode.equals("FPATFER") || klassekode.equals("FPENFOD-OP") || klassekode.equals("FPENAD-OP");
+        return klassekode.equals("FPATFER") || klassekode.equals("FPENFOD-OP") || klassekode.equals("FPENAD-OP") || klassekode.equals("FPSND-OP");
     }
 
     @Override
