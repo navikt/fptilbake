@@ -84,7 +84,7 @@ public class PdfBrevTjeneste {
         return journalføringTjeneste.journalførUtgåendeBrev(behandlingId, mapBrevTypeTilDokumentKategori(detaljertBrevType), data.getMetadata(), data.getMottaker(), pdf);
     }
 
-    public ProsessTaskData lagPubliserJournalpostTask(Behandling behandling, BrevData brevdata, JournalpostIdOgDokumentId dokumentreferanse, BrevType brevType) {
+    private ProsessTaskData lagPubliserJournalpostTask(Behandling behandling, BrevData brevdata, JournalpostIdOgDokumentId dokumentreferanse, BrevType brevType) {
         ProsessTaskData data = ProsessTaskData.forProsessTask(PubliserJournalpostTask.class);
         ProsessTaskBehandlingUtil.setBehandling(data, behandling);
         data.setProperty(PubliserJournalpostTask.JOURNALPOST_ID, dokumentreferanse.getJournalpostId().getVerdi());

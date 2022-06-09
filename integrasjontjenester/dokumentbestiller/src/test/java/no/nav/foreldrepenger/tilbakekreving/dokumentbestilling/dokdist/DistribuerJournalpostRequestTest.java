@@ -41,8 +41,7 @@ class DistribuerJournalpostRequestTest {
 
         var serieliser = DefaultJsonMapper.toJson(testRequest);
 
-        assertThat(serieliser).doesNotContain("distribusjonstype");
-        assertThat(serieliser).doesNotContain("distribusjonstidspunkt");
+        assertThat(serieliser).doesNotContain("distribusjonstype").doesNotContain("distribusjonstidspunkt");
 
         var deserialisertRequest = DefaultJsonMapper.fromJson(serieliser, DistribuerJournalpostRequest.class);
 
