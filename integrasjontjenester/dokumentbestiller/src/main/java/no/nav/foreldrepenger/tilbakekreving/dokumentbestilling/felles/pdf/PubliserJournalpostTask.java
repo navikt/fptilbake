@@ -35,15 +35,9 @@ public class PubliserJournalpostTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        JournalpostId journalpostId = finnJournalpostId(prosessTaskData);
-        BrevMottaker mottaker = BrevMottaker.valueOf(prosessTaskData.getPropertyValue(MOTTAKER));
+        var journalpostId = new JournalpostId(prosessTaskData.getPropertyValue(JOURNALPOST_ID));
+        var mottaker = BrevMottaker.valueOf(prosessTaskData.getPropertyValue(MOTTAKER));
         var distribusjonstype = prosessTaskData.getPropertyValue(DISTRIBUSJONSTYPE);
         dokdistKlient.distribuerJournalpost(journalpostId, mottaker, Optional.ofNullable(distribusjonstype).map(Distribusjonstype::valueOf).orElse(null));
     }
-
-    private static JournalpostId finnJournalpostId(ProsessTaskData prosessTaskData) {
-        String journalpostId = prosessTaskData.getPropertyValue(JOURNALPOST_ID);
-        return new JournalpostId(journalpostId);
-    }
-
 }
