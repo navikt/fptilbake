@@ -5,7 +5,6 @@ import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @param journalpostId          Journalpost som skal distribueres
@@ -22,58 +21,17 @@ public record DistribuerJournalpostRequest(@NotNull String journalpostId,
                                            @JsonInclude(JsonInclude.Include.NON_NULL) Distribusjonstype distribusjonstype,
                                            @JsonInclude(JsonInclude.Include.NON_NULL) Distribusjonstidspunkt distribusjonstidspunkt) {
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private String journalpostId;
-        private String batchId;
-        private String bestillendeFagsystem;
-        private String dokumentProdApp;
-
-        private Distribusjonstype distribusjonstype;
-
-        private Builder() {
-        }
-
-        public Builder medJournalpostId(String journalpostId) {
-            this.journalpostId = journalpostId;
-            return this;
-        }
-
-        public Builder medBatchId(String batchId) {
-            this.batchId = batchId;
-            return this;
-        }
-
-        public Builder medBestillendeFagsystem(String bestillendeFagsystem) {
-            this.bestillendeFagsystem = bestillendeFagsystem;
-            return this;
-        }
-
-        public Builder medDokumentProdApp(String dokumentProdApp) {
-            this.dokumentProdApp = dokumentProdApp;
-            return this;
-        }
-
-        public Builder medDistribusjonstype(Distribusjonstype distribusjonstype) {
-            this.distribusjonstype = distribusjonstype;
-            return this;
-        }
-
-        public DistribuerJournalpostRequest build() {
-            Objects.requireNonNull(journalpostId, "jounalpostId er påkrevd");
-            Objects.requireNonNull(bestillendeFagsystem, "bestillendeFagsystem er påkrevd");
-            Objects.requireNonNull(dokumentProdApp, "dokumentProdApp er påkrevd");
-
-            return new DistribuerJournalpostRequest(
-                journalpostId,
-                batchId,
-                bestillendeFagsystem,
-                dokumentProdApp,
-                distribusjonstype,
-                distribusjonstype != null ? Distribusjonstidspunkt.KJERNETID : null);
-        }
+    public DistribuerJournalpostRequest(String journalpostId,
+                                        String batchId,
+                                        String bestillendeFagsystem,
+                                        String dokumentProdApp,
+                                        Distribusjonstype distribusjonstype,
+                                        Distribusjonstidspunkt distribusjonstidspunkt) {
+        this.journalpostId = Objects.requireNonNull(journalpostId, "jounalpostId er påkrevd");
+        this.bestillendeFagsystem = Objects.requireNonNull(bestillendeFagsystem, "bestillendeFagsystem er påkrevd");
+        this.dokumentProdApp = Objects.requireNonNull(dokumentProdApp, "dokumentProdApp er påkrevd");
+        this.batchId = batchId;
+        this.distribusjonstype = distribusjonstype;
+        this.distribusjonstidspunkt = distribusjonstidspunkt != null ? Distribusjonstidspunkt.KJERNETID : null;
     }
 }

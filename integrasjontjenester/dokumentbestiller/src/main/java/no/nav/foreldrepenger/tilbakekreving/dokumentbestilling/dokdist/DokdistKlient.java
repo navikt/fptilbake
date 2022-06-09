@@ -45,13 +45,13 @@ public class DokdistKlient {
     }
 
     public void distribuerJournalpost(JournalpostId journalpostId, BrevMottaker mottaker, Distribusjonstype distribusjonstype) {
-        DistribuerJournalpostRequest request = DistribuerJournalpostRequest.builder()
-                .medJournalpostId(journalpostId.getVerdi())
-                .medBatchId(UUID.randomUUID().toString())
-                .medBestillendeFagsystem(getBestillendeFagsystem().getKode())
-                .medDokumentProdApp(getDokumentProdAppKode())
-                .medDistribusjonstype(distribusjonstype)
-                .build();
+        DistribuerJournalpostRequest request = new DistribuerJournalpostRequest(
+            journalpostId.getVerdi(),
+            UUID.randomUUID().toString(),
+            getBestillendeFagsystem().getKode(),
+            getDokumentProdAppKode(),
+            distribusjonstype,
+            Distribusjonstidspunkt.KJERNETID);
         DistribuerJournalpostResponse response = distribuerJournalpost(request);
         logger.info("Bestilt distribusjon av journalpost til {}, bestillingId ble {}", mottaker, response.bestillingsId());
     }
