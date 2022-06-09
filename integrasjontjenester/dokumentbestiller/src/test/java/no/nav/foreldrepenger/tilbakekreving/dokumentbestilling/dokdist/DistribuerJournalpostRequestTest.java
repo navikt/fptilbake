@@ -8,6 +8,7 @@ import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 class DistribuerJournalpostRequestTest {
 
+    @Test
     void serdeTest() {
         var kjernetid = Distribusjonstidspunkt.KJERNETID;
         var distribusjonstype = Distribusjonstype.VEDTAK;
@@ -19,7 +20,13 @@ class DistribuerJournalpostRequestTest {
 
         var serieliser = DefaultJsonMapper.toJson(testRequest);
 
-        assertThat(serieliser).contains("distribusjonstype").contains("distribusjonstidspunkt");
+        assertThat(serieliser)
+            .contains("distribusjonstype")
+            .contains("distribusjonstidspunkt")
+            .contains("journalpostId")
+            .contains("batchId")
+            .contains("bestillendeFagsystem")
+            .contains("dokumentProdApp");
 
         var deserialisertRequest = DefaultJsonMapper.fromJson(serieliser, DistribuerJournalpostRequest.class);
 
@@ -41,7 +48,13 @@ class DistribuerJournalpostRequestTest {
 
         var serieliser = DefaultJsonMapper.toJson(testRequest);
 
-        assertThat(serieliser).doesNotContain("distribusjonstype").doesNotContain("distribusjonstidspunkt");
+        assertThat(serieliser)
+            .doesNotContain("distribusjonstype")
+            .doesNotContain("distribusjonstidspunkt")
+            .contains("journalpostId")
+            .contains("batchId")
+            .contains("bestillendeFagsystem")
+            .contains("dokumentProdApp");
 
         var deserialisertRequest = DefaultJsonMapper.fromJson(serieliser, DistribuerJournalpostRequest.class);
 
