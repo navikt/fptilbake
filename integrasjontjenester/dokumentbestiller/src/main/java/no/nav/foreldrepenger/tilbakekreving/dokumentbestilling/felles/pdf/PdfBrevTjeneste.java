@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskBehandlingUtil;
@@ -68,7 +69,7 @@ public class PdfBrevTjeneste {
     private void lagTaskerForUtsendingOgSporing(Long behandlingId, DetaljertBrevType detaljertBrevType, Long varsletBeløp, String fritekst, BrevData data, JournalpostIdOgDokumentId dokumentreferanse) {
         ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        taskGruppe.addNesteSekvensiell(lagPubliserJournalpostTask(behandling, data, dokumentreferanse));
+        taskGruppe.addNesteSekvensiell(lagPubliserJournalpostTask(behandling, data, dokumentreferanse, detaljertBrevType.getBrevType()));
         taskGruppe.addNesteSekvensiell(lagSporingBrevTask(behandling, detaljertBrevType, data, dokumentreferanse));
         if (detaljertBrevType.gjelderVarsel() && data.getMottaker() == BrevMottaker.BRUKER) {
             taskGruppe.addNesteSekvensiell(lagSporingVarselBrevTask(behandling, varsletBeløp, fritekst));
@@ -83,23 +84,24 @@ public class PdfBrevTjeneste {
         return journalføringTjeneste.journalførUtgåendeBrev(behandlingId, mapBrevTypeTilDokumentKategori(detaljertBrevType), data.getMetadata(), data.getMottaker(), pdf);
     }
 
-    private ProsessTaskData lagPubliserJournalpostTask(Behandling behandling, BrevData brevdata, JournalpostIdOgDokumentId dokumentreferanse) {
+    private ProsessTaskData lagPubliserJournalpostTask(Behandling behandling, BrevData brevdata, JournalpostIdOgDokumentId dokumentreferanse, BrevType brevType) {
         ProsessTaskData data = ProsessTaskData.forProsessTask(PubliserJournalpostTask.class);
         ProsessTaskBehandlingUtil.setBehandling(data, behandling);
-        data.setProperty("journalpostId", dokumentreferanse.getJournalpostId().getVerdi());
-        data.setProperty("mottaker", brevdata.getMottaker().name());
+        data.setProperty(PubliserJournalpostTask.JOURNALPOST_ID, dokumentreferanse.getJournalpostId().getVerdi());
+        data.setProperty(PubliserJournalpostTask.MOTTAKER, brevdata.getMottaker().name());
+        data.setProperty(PubliserJournalpostTask.DISTRIBUSJONSTYPE, DistribusjonstypeUtleder.utledFor(brevType).name());
         return data;
     }
 
     private ProsessTaskData lagSporingBrevTask(Behandling behandling, DetaljertBrevType detaljertBrevType, BrevData brevdata, JournalpostIdOgDokumentId dokumentreferanse) {
         ProsessTaskData data = ProsessTaskData.forProsessTask(LagreBrevSporingTask.class);
         ProsessTaskBehandlingUtil.setBehandling(data, behandling);
-        data.setProperty("journalpostId", dokumentreferanse.getJournalpostId().getVerdi());
-        data.setProperty("dokumentId", dokumentreferanse.getDokumentId());
-        data.setProperty("mottaker", brevdata.getMottaker().name());
-        data.setProperty("detaljertBrevType", detaljertBrevType.name());
+        data.setProperty(LagreBrevSporingTask.JOURNALPOST_ID, dokumentreferanse.getJournalpostId().getVerdi());
+        data.setProperty(LagreBrevSporingTask.DOKUMENT_ID, dokumentreferanse.getDokumentId());
+        data.setProperty(LagreBrevSporingTask.MOTTAKER, brevdata.getMottaker().name());
+        data.setProperty(LagreBrevSporingTask.DETALJERT_BREV_TYPE, detaljertBrevType.name());
         if (brevdata.getTittel() != null) {
-            data.setProperty("tittel", Base64.getEncoder().encodeToString(brevdata.getTittel().getBytes(StandardCharsets.UTF_8)));
+            data.setProperty(LagreBrevSporingTask.TITTEL, Base64.getEncoder().encodeToString(brevdata.getTittel().getBytes(StandardCharsets.UTF_8)));
         }
         return data;
     }
@@ -107,7 +109,7 @@ public class PdfBrevTjeneste {
     private ProsessTaskData lagSporingVarselBrevTask(Behandling behandling, Long varsletBeløp, String fritekst) {
         ProsessTaskData data = ProsessTaskData.forProsessTask(LagreVarselBrevSporingTask.class);
         ProsessTaskBehandlingUtil.setBehandling(data, behandling);
-        data.setProperty("varsletBeloep", Long.toString(varsletBeløp));
+        data.setProperty(LagreVarselBrevSporingTask.VARSLET_BELOEP, Long.toString(varsletBeløp));
         data.setPayload(fritekst);
         return data;
     }

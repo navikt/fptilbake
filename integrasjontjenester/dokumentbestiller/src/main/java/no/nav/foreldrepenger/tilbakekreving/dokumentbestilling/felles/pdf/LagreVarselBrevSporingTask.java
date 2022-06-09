@@ -15,6 +15,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class LagreVarselBrevSporingTask implements ProsessTaskHandler {
 
+    protected static final String VARSLET_BELOEP = "varsletBeloep";
     private VarselRepository varselRepository;
 
     public LagreVarselBrevSporingTask() {
@@ -30,7 +31,7 @@ public class LagreVarselBrevSporingTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         String varseltekst = prosessTaskData.getPayloadAsString();
-        Long varseltBeløp = Long.valueOf(prosessTaskData.getPropertyValue("varsletBeloep"));
+        Long varseltBeløp = Long.valueOf(prosessTaskData.getPropertyValue(VARSLET_BELOEP));
 
         varselRepository.lagre(behandlingId, varseltekst, varseltBeløp);
     }

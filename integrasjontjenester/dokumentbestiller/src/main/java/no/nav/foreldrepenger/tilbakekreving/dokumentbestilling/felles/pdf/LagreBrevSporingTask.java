@@ -21,6 +21,11 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class LagreBrevSporingTask implements ProsessTaskHandler {
 
+    protected static final String MOTTAKER = "mottaker";
+    protected static final String DOKUMENT_ID = "dokumentId";
+    protected static final String JOURNALPOST_ID = "journalpostId";
+    protected static final String DETALJERT_BREV_TYPE = "detaljertBrevType";
+    protected static final String TITTEL = "tittel";
     private HistorikkinnslagBrevTjeneste historikkinnslagBrevTjeneste;
     private BrevSporingTjeneste brevSporingTjeneste;
 
@@ -36,11 +41,13 @@ public class LagreBrevSporingTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
-        BrevMottaker mottaker = BrevMottaker.valueOf(prosessTaskData.getPropertyValue("mottaker"));
-        JournalpostIdOgDokumentId dokumentreferanse = finnJournalpostIdOgDokumentId(prosessTaskData);
-        DetaljertBrevType brevType = DetaljertBrevType.valueOf(prosessTaskData.getPropertyValue("detaljertBrevType"));
-        String tittel = base64Decode(prosessTaskData.getPropertyValue("tittel"));
+        var behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
+        var mottaker = BrevMottaker.valueOf(prosessTaskData.getPropertyValue(MOTTAKER));
+        var dokumentId = prosessTaskData.getPropertyValue(DOKUMENT_ID);
+        var journalpostId = prosessTaskData.getPropertyValue(JOURNALPOST_ID);
+        var dokumentreferanse = new JournalpostIdOgDokumentId(new JournalpostId(journalpostId), dokumentId);
+        var brevType = DetaljertBrevType.valueOf(prosessTaskData.getPropertyValue(DETALJERT_BREV_TYPE));
+        var tittel = base64Decode(prosessTaskData.getPropertyValue(TITTEL));
 
         historikkinnslagBrevTjeneste.opprettHistorikkinnslagBrevSendt(behandlingId, dokumentreferanse, brevType, mottaker, tittel);
         brevSporingTjeneste.lagreInfoOmUtsendtBrev(behandlingId, dokumentreferanse, brevType);
@@ -52,16 +59,4 @@ public class LagreBrevSporingTask implements ProsessTaskHandler {
         }
         return new String(Base64.getDecoder().decode(tittel.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
     }
-
-    private static JournalpostIdOgDokumentId finnJournalpostIdOgDokumentId(ProsessTaskData prosessTaskData) {
-        String dokumentId = prosessTaskData.getPropertyValue("dokumentId");
-        return new JournalpostIdOgDokumentId(finnJournalpostId(prosessTaskData), dokumentId);
-    }
-
-    private static JournalpostId finnJournalpostId(ProsessTaskData prosessTaskData) {
-        String journalpostId = prosessTaskData.getPropertyValue("journalpostId");
-        return new JournalpostId(journalpostId);
-    }
-
-
 }

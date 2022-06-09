@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dokdist;
 
 
 import java.net.URI;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -43,14 +44,16 @@ public class DokdistKlient {
         return oidcRestClient.post(baseUri(), request, DistribuerJournalpostResponse.class);
     }
 
-    public void distribuerJournalpost(JournalpostId journalpostId, BrevMottaker mottaker) {
-        DistribuerJournalpostRequest request = DistribuerJournalpostRequest.builder()
-                .medJournalpostId(journalpostId.getVerdi())
-                .medBestillendeFagsystem(getBestillendeFagsystem().getKode())
-                .medDokumentProdApp(getDokumentProdAppKode())
-                .build();
+    public void distribuerJournalpost(JournalpostId journalpostId, BrevMottaker mottaker, Distribusjonstype distribusjonstype) {
+        DistribuerJournalpostRequest request = new DistribuerJournalpostRequest(
+            journalpostId.getVerdi(),
+            UUID.randomUUID().toString(),
+            getBestillendeFagsystem().getKode(),
+            getDokumentProdAppKode(),
+            distribusjonstype,
+            Distribusjonstidspunkt.KJERNETID);
         DistribuerJournalpostResponse response = distribuerJournalpost(request);
-        logger.info("Bestilt distribusjon av journalpost til {}, bestillingId ble {}", mottaker, response.getBestillingsId());
+        logger.info("Bestilt distribusjon av journalpost til {}, bestillingId ble {}", mottaker, response.bestillingsId());
     }
 
     private FagsakSystem getBestillendeFagsystem() {

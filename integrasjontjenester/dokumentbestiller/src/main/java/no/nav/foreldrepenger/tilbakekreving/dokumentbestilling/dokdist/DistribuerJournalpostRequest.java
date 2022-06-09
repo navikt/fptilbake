@@ -2,95 +2,36 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dokdist;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.validation.constraints.NotNull;
 
-public class DistribuerJournalpostRequest {
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-    /**
-     * Journalpost som skal distribueres
-     */
-    @JsonProperty("journalpostId")
-    private String journalpostId;
+/**
+ * @param journalpostId          Journalpost som skal distribueres
+ * @param batchId                Identifiserer batch forsendelsen inngår i. Lar bestiller identifisere forsendelser som hører sammen. Fritekst, og konsument må selv vurdere hva som er hensiktsmessige verdier
+ * @param bestillendeFagsystem   Fagsystemet som bestiller distribusjon
+ * @param dokumentProdApp        Applikasjon som har produsert hoveddokumentet (for sporing og feilsøking)
+ * @param distribusjonstype      Påvirker varsel tekst til bruker (mulig å velge fra: VEDTAK, VIKTIG, ANNET)
+ * @param distribusjonstidspunkt Påvirker tidspunkt varsel sendes til bruker (mulig å velge fra: KJERNETID, UMIDDELBART)
+ */
+public record DistribuerJournalpostRequest(@NotNull String journalpostId,
+                                           @NotNull String batchId,
+                                           @NotNull String bestillendeFagsystem,
+                                           @NotNull String dokumentProdApp,
+                                           @JsonInclude(JsonInclude.Include.NON_NULL) Distribusjonstype distribusjonstype,
+                                           @JsonInclude(JsonInclude.Include.NON_NULL) Distribusjonstidspunkt distribusjonstidspunkt) {
 
-    /**
-     * Identifiserer batch forsendelsen inngår i. Lar bestiller identifisere forsendelser som hører sammen. Fritekst, og konsument må selv vurdere hva som er hensiktsmessige verdier
-     */
-    @JsonProperty("batchId")
-    private String batchId;
-
-    /**
-     * Fagsystemet som bestiller distribusjon
-     */
-    @JsonProperty("bestillendeFagsystem")
-    private String bestillendeFagsystem;
-
-    /**
-     * Applikasjon som har produsert hoveddokumentet (for sporing og feilsøking
-     */
-    @JsonProperty("dokumentProdApp")
-    private String dokumentProdApp;
-
-    public String getJournalpostId() {
-        return journalpostId;
-    }
-
-    public String getBatchId() {
-        return batchId;
-    }
-
-    public String getBestillendeFagsystem() {
-        return bestillendeFagsystem;
-    }
-
-    public String getDokumentProdApp() {
-        return dokumentProdApp;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private String journalpostId;
-        private String batchId;
-        private String bestillendeFagsystem;
-        private String dokumentProdApp;
-
-        private Builder() {
-        }
-
-        public Builder medJournalpostId(String journalpostId) {
-            this.journalpostId = journalpostId;
-            return this;
-        }
-
-        public Builder medBatchId(String batchId) {
-            this.batchId = batchId;
-            return this;
-        }
-
-        public Builder medBestillendeFagsystem(String bestillendeFagsystem) {
-            this.bestillendeFagsystem = bestillendeFagsystem;
-            return this;
-        }
-
-        public Builder medDokumentProdApp(String dokumentProdApp) {
-            this.dokumentProdApp = dokumentProdApp;
-            return this;
-        }
-
-        public DistribuerJournalpostRequest build() {
-            Objects.requireNonNull(journalpostId, "jounalpostId er påkrevd");
-            Objects.requireNonNull(bestillendeFagsystem, "bestillendeFagsystem er påkrevd");
-            Objects.requireNonNull(dokumentProdApp, "dokumentProdApp er påkrevd");
-
-
-            DistribuerJournalpostRequest request = new DistribuerJournalpostRequest();
-            request.journalpostId = journalpostId;
-            request.batchId = batchId;
-            request.bestillendeFagsystem = bestillendeFagsystem;
-            request.dokumentProdApp = dokumentProdApp;
-            return request;
-        }
+    public DistribuerJournalpostRequest(String journalpostId,
+                                        String batchId,
+                                        String bestillendeFagsystem,
+                                        String dokumentProdApp,
+                                        Distribusjonstype distribusjonstype,
+                                        Distribusjonstidspunkt distribusjonstidspunkt) {
+        this.journalpostId = Objects.requireNonNull(journalpostId, "jounalpostId er påkrevd");
+        this.bestillendeFagsystem = Objects.requireNonNull(bestillendeFagsystem, "bestillendeFagsystem er påkrevd");
+        this.dokumentProdApp = Objects.requireNonNull(dokumentProdApp, "dokumentProdApp er påkrevd");
+        this.batchId = batchId;
+        this.distribusjonstype = distribusjonstype;
+        this.distribusjonstidspunkt = distribusjonstidspunkt != null ? Distribusjonstidspunkt.KJERNETID : null;
     }
 }
