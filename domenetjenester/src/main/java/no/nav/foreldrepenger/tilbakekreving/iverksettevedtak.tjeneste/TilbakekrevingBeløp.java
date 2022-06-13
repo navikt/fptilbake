@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeResultat;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
@@ -84,12 +85,14 @@ public class TilbakekrevingBeløp {
     }
 
     public boolean erIkkeSkattepliktig() {
-        return klassekode.equals("FPATFER") ||
-            klassekode.equals("FPENFOD-OP") ||
-            klassekode.equals("FPENAD-OP") ||
-            klassekode.equals("FPSND-OP") || // SN vanlig
-            klassekode.equals("FPSNDFI") || // SN fisker
-            klassekode.equals("FPSNDJB-OP"); // SN jordbruker
+        return !erSkattepliktig();
+    }
+
+    private static final Pattern SKATTEPLIKTIGE_YTELSE_PATTERN = Pattern.compile("^((FP|FPAD|FPSV|PNBS|PPNP|OM|OPP)(ATORD|ATFRI|ATAL|ATSJO)|FRISINN-FRILANS)$");
+    public boolean erSkattepliktig(){
+        //nav trekker skatt bare for arbeidstaker/frilans-type klassekoder
+        // se for eksempel https://github.com/navikt/k9-oppdrag/blob/master/domene/oppdragslager/src/main/java/no/nav/k9/oppdrag/oppdragslager/%C3%B8konomioppdrag/%C3%98konomiKodeKlassifik.java for mønser
+        return SKATTEPLIKTIGE_YTELSE_PATTERN.matcher(klassekode).matches();
     }
 
     @Override
@@ -97,8 +100,7 @@ public class TilbakekrevingBeløp {
         if (this == o) {
             return true;
         }
-        if (o instanceof TilbakekrevingBeløp) {
-            TilbakekrevingBeløp annen = (TilbakekrevingBeløp) o;
+        if (o instanceof TilbakekrevingBeløp annen) {
             return Objects.equals(klasseType, annen.klasseType) &&
                     Objects.equals(klassekode, annen.klassekode) &&
                     equals(nyttBeløp, annen.nyttBeløp) &&
