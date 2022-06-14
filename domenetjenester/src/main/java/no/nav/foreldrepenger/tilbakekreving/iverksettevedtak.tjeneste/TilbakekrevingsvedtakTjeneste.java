@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -39,14 +41,15 @@ public class TilbakekrevingsvedtakTjeneste {
     }
 
     private void validerSkattBeløp(final List<TilbakekrevingPeriode> tilbakekrevingPerioder) {
-        var sumSkattPåIkkeSkattepliktigeYtelser = tilbakekrevingPerioder.stream()
-                .flatMap(periode -> periode.getBeløp().stream())
-                .filter(TilbakekrevingBeløp::erIkkeSkattepliktig)
-                .map(TilbakekrevingBeløp::getSkattBeløp)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        Set<String> klassekoderSomFeilaktigHarSkattebeløp = tilbakekrevingPerioder.stream()
+            .flatMap(periode -> periode.getBeløp().stream())
+            .filter(TilbakekrevingBeløp::erIkkeSkattepliktig)
+            .filter(beløp -> beløp.getSkattBeløp().compareTo(BigDecimal.ZERO) != 0)
+            .map(TilbakekrevingBeløp::getKlassekode)
+            .collect(Collectors.toSet());
 
-        if (sumSkattPåIkkeSkattepliktigeYtelser.compareTo(BigDecimal.ZERO) != 0) {
-            throw new IllegalStateException("Skattebeløp for ikke skattepliktige ytelser skal være 0, men var ikke dette!");
+        if (!klassekoderSomFeilaktigHarSkattebeløp.isEmpty()) {
+            throw new IllegalStateException("Skattebeløp for ikke skattepliktige ytelser skal være 0, men var ikke dette for posteringer med klassekode " + klassekoderSomFeilaktigHarSkattebeløp);
         }
     }
 }
