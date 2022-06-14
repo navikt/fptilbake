@@ -14,6 +14,7 @@ class TilbakekrevingBeløpTest {
         assertThat(new TilbakekrevingBeløp(KlasseType.YTEL, "FPATAL").erSkattepliktig()).isTrue();
         assertThat(new TilbakekrevingBeløp(KlasseType.YTEL, "FPATFRI").erSkattepliktig()).isTrue();
         assertThat(new TilbakekrevingBeløp(KlasseType.YTEL, "FPATSJO").erSkattepliktig()).isTrue();
+        assertThat(new TilbakekrevingBeløp(KlasseType.YTEL, "FPSNDFI").erSkattepliktig()).isTrue();
 
         assertThat(new TilbakekrevingBeløp(KlasseType.YTEL, "FPADATORD").erSkattepliktig()).isTrue();
         assertThat(new TilbakekrevingBeløp(KlasseType.YTEL, "FPSVATORD").erSkattepliktig()).isTrue();
