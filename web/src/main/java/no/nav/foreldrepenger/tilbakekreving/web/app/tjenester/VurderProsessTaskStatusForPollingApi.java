@@ -73,7 +73,7 @@ public class VurderProsessTaskStatusForPollingApi {
     }
 
     private Optional<AsyncPollingStatus> håndterFeil(String gruppe, ProsessTaskData task, String callId) {
-        log.warn(String.format("FPT-193308:[%1$s]. Forespørsel på behandling [id=%2$s] som ikke kan fortsette, Problemer med task gruppe [%3$s]. Siste prosesstask[id=%4$s] status=%5$s", callId, entityId, gruppe, task.getId(), task.getStatus()));
+        log.info(String.format("FPT-193308:[%1$s]. Forespørsel på behandling [id=%2$s] som ikke kan fortsette, Problemer med task gruppe [%3$s]. Siste prosesstask[id=%4$s] status=%5$s", callId, entityId, gruppe, task.getId(), task.getStatus()));
 
         AsyncPollingStatus status = new AsyncPollingStatus(AsyncPollingStatus.Status.HALTED, null, task.getSisteFeil());
         return Optional.of(status); // fortsett å polle på gruppe, er ikke ferdig.
@@ -81,7 +81,7 @@ public class VurderProsessTaskStatusForPollingApi {
 
     private Optional<AsyncPollingStatus> ventPåSvar(String gruppe, ProsessTaskData task, String callId) {
         var feil = ProsessTaskFeilmelder.venterPåSvar(callId, entityId, gruppe, task.getId(), task.getStatus());
-        logWarn(feil);
+        logInfo(feil);
 
         AsyncPollingStatus status = new AsyncPollingStatus(
                 AsyncPollingStatus.Status.DELAYED,
@@ -91,8 +91,8 @@ public class VurderProsessTaskStatusForPollingApi {
         return Optional.of(status); // er ikke ferdig, men ok å videresende til visning av behandling med feilmelding der.
     }
 
-    private void logWarn(TekniskException feil) {
-        log.warn("{}: {}", feil.getKode(), feil.getMessage());
+    private void logInfo(TekniskException feil) {
+        log.info("{}: {}", feil.getKode(), feil.getMessage());
     }
 
     private Optional<AsyncPollingStatus> ventPåKlar(String gruppe, LocalDateTime maksTidFørNesteKjøring, ProsessTaskData task, String callId) {
@@ -108,7 +108,7 @@ public class VurderProsessTaskStatusForPollingApi {
         } else {
             var feil = ProsessTaskFeilmelder.utsattKjøringAvProsessTask(
                     callId, entityId, gruppe, task.getId(), task.getStatus(), task.getNesteKjøringEtter());
-            logWarn(feil);
+            logInfo(feil);
 
             AsyncPollingStatus status = new AsyncPollingStatus(
                     AsyncPollingStatus.Status.DELAYED,
