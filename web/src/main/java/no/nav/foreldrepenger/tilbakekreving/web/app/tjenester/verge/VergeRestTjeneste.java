@@ -87,7 +87,7 @@ public class VergeRestTjeneste {
     public Response opprettVerge(@Context HttpServletRequest request,
                                  @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                  @Parameter(description = "Behandling som skal få verge/fullmektig") @Valid BehandlingReferanse dto) throws URISyntaxException {
-        Behandling behandling = behandlingTjeneste.hentBehandling(dto.getBehandlingId());
+        Behandling behandling = hentBehandling(dto);
         if (behandling.erSaksbehandlingAvsluttet() || behandling.isBehandlingPåVent()) {
             throw new TekniskException("FPT-763493", String.format("Behandlingen er allerede avsluttet eller sett på vent, kan ikke opprette verge for behandling %s", behandling.getId()));
         }
@@ -113,7 +113,7 @@ public class VergeRestTjeneste {
     public Response fjernVerge(@Context HttpServletRequest request,
                                @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                @Parameter(description = "Behandling som skal få fjernet verge/fullmektig") @Valid BehandlingReferanse dto) throws URISyntaxException {
-        Behandling behandling = behandlingTjeneste.hentBehandling(dto.getBehandlingId());
+        Behandling behandling = hentBehandling(dto);
         if (behandling.erSaksbehandlingAvsluttet() || behandling.isBehandlingPåVent()) {
             throw new TekniskException("FPT-763494", String.format("Behandlingen er allerede avsluttet eller sett på vent, kan ikke fjerne verge for behandling %s", behandling.getId()));
         }
