@@ -7,7 +7,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>0.3.0</version>
+        <version>0.3.1</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -34,7 +34,7 @@
         <felles.version>4.1.28</felles.version>
         <prosesstask.version>3.1.8</prosesstask.version>
         <fp-tidsserie.version>2.6.4</fp-tidsserie.version>
-        <fp-jms.version>2.1.3</fp-jms.version>
+        <fp-jms.version>2.2.0</fp-jms.version>
 
         <fpkontrakter.version>6.1.21</fpkontrakter.version>
         <abakus-kontrakt.version>1.3.30</abakus-kontrakt.version>
@@ -244,6 +244,11 @@
 
             <!-- Felles biblioteker og sikkerhet -->
             <dependency>
+                <groupId>jakarta.jms</groupId>
+                <artifactId>jakarta.jms-api</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+            <dependency>
                 <groupId>no.nav.vedtak.felles.fp-jms-integrasjon</groupId>
                 <artifactId>jms-integrasjon</artifactId>
                 <version>${fp-jms.version}</version>
@@ -329,7 +334,7 @@
                 <!-- velger en transitiv avhengighet - felles ikke enig med seg selv, velger den som blir brukt i prod-scope i felles -->
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.22.1</version>
+                <version>3.23.0</version>
             </dependency>
 
 
