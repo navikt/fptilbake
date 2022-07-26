@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.selftest.checks;
 
-import javax.jms.JMSException;
-import javax.jms.JMSRuntimeException;
+import jakarta.jms.JMSException;
+import jakarta.jms.JMSRuntimeException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
