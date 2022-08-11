@@ -37,7 +37,7 @@
         <fp-jms.version>2.2.0</fp-jms.version>
 
         <fpkontrakter.version>6.1.21</fpkontrakter.version>
-        <abakus-kontrakt.version>1.3.30</abakus-kontrakt.version>
+        <abakus-kontrakt.version>1.3.34</abakus-kontrakt.version>
 
         <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
     </properties>
