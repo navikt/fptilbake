@@ -7,7 +7,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>0.3.2</version>
+        <version>0.3.4</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -36,7 +36,7 @@
         <fp-tidsserie.version>2.6.4</fp-tidsserie.version>
         <fp-jms.version>2.2.0</fp-jms.version>
 
-        <fpkontrakter.version>6.1.23</fpkontrakter.version>
+        <fpkontrakter.version>6.1.24</fpkontrakter.version>
         <abakus-kontrakt.version>1.3.34</abakus-kontrakt.version>
 
         <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
@@ -84,7 +84,7 @@
             <dependency>
                 <groupId>org.ehcache</groupId>
                 <artifactId>ehcache</artifactId>
-                <version>3.10.0</version>
+                <version>3.10.1</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>

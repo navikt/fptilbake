@@ -236,7 +236,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         if (diff.abs().intValue() > GRENSE_AVRUNDINGSFEIL) {
             throw feil;
         }
-        logWarn(feil);
+        logInfo(feil);
     }
 
     private void oppdaterGjenståendeSkattetrekk(List<TilbakekrevingPeriode> perioder, Map<YearMonth, BigDecimal> kgGjenståendeMuligSkattetrekk) {
@@ -403,11 +403,11 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         if (diff.abs().intValue() > GRENSE_AVRUNDINGSFEIL) {
             throw e;
         }
-        logWarn(e);
+        logInfo(e);
     }
 
-    private static void logWarn(TekniskException e) {
-        logger.warn(String.format("%s: %s", e.getKode(), e.getMessage()));
+    private static void logInfo(TekniskException e) {
+        logger.info(String.format("%s: %s", e.getKode(), e.getMessage()));
     }
 
     static class TilbakekrevingVedtakPeriodeBeregnerFeil {
