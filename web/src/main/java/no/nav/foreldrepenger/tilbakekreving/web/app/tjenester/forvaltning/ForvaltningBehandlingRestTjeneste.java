@@ -230,26 +230,6 @@ public class ForvaltningBehandlingRestTjeneste {
     }
 
     @POST
-    @Path("/hent-korrigert-grunnlag")
-    @Operation(
-        tags = "FORVALTNING-behandling",
-        description = "Tjeneste for å hente korrigert grunnlag for en behandling",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Hent korrigerte grunnlag og tilkoblet det med en behandling"),
-            @ApiResponse(responseCode = "400", description = "Behandling er avsluttet eller ikke gyldig")
-        })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
-    public Response hentKorrigertKravgrunnlag(@Valid @NotNull HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
-        Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
-        if (behandling.erAvsluttet()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Kan ikke hente korrigert kravbrunnlag, behandlingen er avsluttet").build();
-        }
-        logger.info("Oppretter task for å hente korrigert kravgrunnlag for behandlingId={}", behandling.getId());
-        opprettHentKorrigertGrunnlagTask(behandling, hentKorrigertKravgrunnlagDto.getKravgrunnlagId());
-        return Response.ok().build();
-    }
-
-    @POST
     @Path("/tilbakefør-behandling-til-fakta")
     @Operation(
         tags = "FORVALTNING-behandling",
