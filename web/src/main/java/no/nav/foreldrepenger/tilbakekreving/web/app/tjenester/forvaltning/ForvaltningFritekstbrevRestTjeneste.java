@@ -40,8 +40,8 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
-import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.util.InputValideringRegex;
 
 @Path("/forvaltningBrev")
@@ -163,7 +163,7 @@ public class ForvaltningFritekstbrevRestTjeneste {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     @Operation(tags = "FORVALTNING-brev", description = "Tjeneste for å forhåndsvise et fritekstbrev.")
-    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
     public Response forhåndsvisBrev(@Valid @NotNull FritekstbrevDto dto) {
         Behandling behandling = behandlingRepository.hentBehandling(dto.getBehandlingId());
         byte[] dokument = fritekstbrevTjeneste.hentForhåndsvisningFritekstbrev(behandling, dto.getTittel(), dto.getOverskrift(), dto.getFritekst());
@@ -176,7 +176,7 @@ public class ForvaltningFritekstbrevRestTjeneste {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     @Operation(tags = "FORVALTNING-brev", description = "Tjeneste for å sende et fritekstbrev.")
-    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
     public Response sendBrev(@Valid @NotNull FritekstbrevDto dto) {
         ProsessTaskData task = ProsessTaskData.forProsessTask(SendFritekstbrevTask.class);
         task.setPayload(dto.getFritekst());
@@ -194,7 +194,7 @@ public class ForvaltningFritekstbrevRestTjeneste {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     @Operation(tags = "FORVALTNING-brev", description = "Tjeneste for å forhåndsvise brev ang feilutsendt varsel.")
-    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
     public Response forhåndsvisBrevFeilutsendtVarselGet(@Parameter(description = "BehandlingId") @BeanParam @Valid @NotNull BehandlingIdDto behandligId) {
         Behandling behandling = behandlingRepository.hentBehandling(behandligId.getBehandlingId());
         FagsakYtelseType ytelseType = behandling.getFagsak().getFagsakYtelseType();
@@ -209,7 +209,7 @@ public class ForvaltningFritekstbrevRestTjeneste {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     @Operation(tags = "FORVALTNING-brev", description = "Tjeneste for å sende brev ang feilutsendt varsel.")
-    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
     public Response sendBrev(@Valid @NotNull BehandlingIdOgMottakerDto dto) {
         Behandling behandling = behandlingRepository.hentBehandling(dto.getBehandlingId());
         FagsakYtelseType ytelseType = behandling.getFagsak().getFagsakYtelseType();

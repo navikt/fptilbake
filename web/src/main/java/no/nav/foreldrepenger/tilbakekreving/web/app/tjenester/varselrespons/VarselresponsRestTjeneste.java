@@ -1,8 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons;
 
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.UPDATE;
-
 import java.util.Optional;
 
 import javax.enterprise.context.RequestScoped;
@@ -31,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.Behandl
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
 @Path(value = "/varsel/respons")
 @Produces(value = MediaType.APPLICATION_JSON)
@@ -60,7 +58,7 @@ public class VarselresponsRestTjeneste {
                     @ApiResponse(responseCode = "404", description = "Response finnes ikke")
             })
     @Path(value = "/hent-respons")
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     public Response finnRespons(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                 @Valid @NotNull @QueryParam("behandlingId") BehandlingReferanse behandlingReferanse) {
         Optional<VarselresponsDto> responsDto = responsTjeneste.hentRespons(behandlingReferanse.getBehandlingId()).map(VarselresponsDto::fraDomene);
@@ -78,7 +76,7 @@ public class VarselresponsRestTjeneste {
                     @ApiResponse(responseCode = "200", description = "Respons registrert")
             })
     @Path(value = "/registrer")
-    @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, property = AbacProperty.FAGSAK)
     public Response registrerBrukerrespons(@Valid @NotNull VarselresponsDto brukerRespons) {
         responsTjeneste.lagreRespons(brukerRespons.getBehandlingId(), ResponsKanal.SELVBETJENING, brukerRespons.getAkseptertFaktagrunnlag());
         gjenopptaBehandlingTjeneste.fortsettBehandling(brukerRespons.getBehandlingId());
