@@ -98,6 +98,11 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
     }
 
     @Override
+    public String abacDomene() {
+        return ABAC_DOMAIN;
+    }
+
+    @Override
     public boolean nyttAbacGrensesnitt() {
         return true;
     }
