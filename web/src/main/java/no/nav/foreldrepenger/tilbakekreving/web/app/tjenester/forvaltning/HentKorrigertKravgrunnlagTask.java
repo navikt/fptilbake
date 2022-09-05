@@ -126,5 +126,4 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 
-
 }

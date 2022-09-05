@@ -60,6 +60,12 @@ public class ØkonomiMottattXmlRepository {
         return query.getResultList();
     }
 
+    public List<ØkonomiXmlMottatt> finnAlleForSaksnummer(String saksnummer) {
+        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer=:saksnummer", ØkonomiXmlMottatt.class);
+        query.setParameter("saksnummer", saksnummer);
+        return query.getResultList();
+    }
+
     public void oppdaterMedHenvisningOgSaksnummer(Henvisning henvisning, String saksnummer, Long kravgrunnlagXmlId) {
         ØkonomiXmlMottatt entity = finnMottattXml(kravgrunnlagXmlId);
         Long eksisterendeVersjon = finnHøyesteVersjonsnummer(henvisning);

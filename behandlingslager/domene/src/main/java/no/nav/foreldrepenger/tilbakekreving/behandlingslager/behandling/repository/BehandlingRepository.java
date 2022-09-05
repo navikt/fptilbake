@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository;
 
 import static no.nav.vedtak.felles.jpa.HibernateVerktøy.hentEksaktResultat;
+import static no.nav.vedtak.felles.jpa.HibernateVerktøy.hentUniktResultat;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -69,17 +70,14 @@ public class BehandlingRepository {
         return query.getResultList();
     }
 
-    public String hentSaksnummerForBehandling(long behandlingId) {
-        Query query = getEntityManager().createNativeQuery("select f.saksnummer from Fagsak f inner join Behandling b on b.fagsak_id = f.id where b.id = :behandlingId");
-        query.setParameter("behandlingId", behandlingId);
-        List<Object> resultat = query.getResultList();
-        if (resultat.isEmpty()) {
-            throw new IllegalStateException("Utviklerfeil: fant ingen fagsaker knyttet til behandlingId ('" + behandlingId + "')");
-        }
-        if (resultat.size() > 1) {
-            throw new IllegalStateException("Utviklerfeil: fant flere fagsaker knyttet til samme behandlingId ('" + behandlingId + "')");
-        }
-        return (String) resultat.get(0);
+    public Optional<Behandling> finnÅpenTilbakekrevingsbehandling(String saksnummer) {
+        TypedQuery<Behandling> query = getEntityManager().createQuery("""
+            SELECT beh FROM Behandling beh JOIN beh.fagsak f
+                WHERE f.saksnummer = :saksnummer
+                AND beh.status <>'AVSLU'
+                AND beh.behandlingType='BT-007'""", Behandling.class);
+        query.setParameter("saksnummer", saksnummer);
+        return hentUniktResultat(query);
     }
 
     public List<Long> hentAlleBehandlingIder() {

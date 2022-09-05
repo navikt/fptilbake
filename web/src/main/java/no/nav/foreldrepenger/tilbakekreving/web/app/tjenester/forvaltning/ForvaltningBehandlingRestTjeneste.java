@@ -44,7 +44,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.HentKorrigertKravgrunnlagDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KobleBehandlingTilGrunnlagDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KorrigertHenvisningDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
@@ -226,26 +225,6 @@ public class ForvaltningBehandlingRestTjeneste {
         UUID eksternBehandlingUuid = korrigertHenvisningDto.getEksternBehandlingUuid();
         logger.info("Korrigerer henvisning. Oppretter task for å korrigere henvisning={} behandlingId={}", eksternBehandlingUuid, behandling.getId());
         opprettKorrigertHenvisningTask(behandling, eksternBehandlingUuid);
-        return Response.ok().build();
-    }
-
-    @POST
-    @Path("/hent-korrigert-grunnlag")
-    @Operation(
-        tags = "FORVALTNING-behandling",
-        description = "Tjeneste for å hente korrigert grunnlag for en behandling",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Hent korrigerte grunnlag og tilkoblet det med en behandling"),
-            @ApiResponse(responseCode = "400", description = "Behandling er avsluttet eller ikke gyldig")
-        })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
-    public Response hentKorrigertKravgrunnlag(@Valid @NotNull HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
-        Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
-        if (behandling.erAvsluttet()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Kan ikke hente korrigert kravbrunnlag, behandlingen er avsluttet").build();
-        }
-        logger.info("Oppretter task for å hente korrigert kravgrunnlag for behandlingId={}", behandling.getId());
-        opprettHentKorrigertGrunnlagTask(behandling, hentKorrigertKravgrunnlagDto.getKravgrunnlagId());
         return Response.ok().build();
     }
 
