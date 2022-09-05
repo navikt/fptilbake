@@ -22,7 +22,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 @ApplicationScoped
@@ -71,13 +70,13 @@ public class BehandlingRepository {
         return query.getResultList();
     }
 
-    public Optional<Behandling> finnÅpenTilbakekrevingsbehandling(Saksnummer saksnummer) {
+    public Optional<Behandling> finnÅpenTilbakekrevingsbehandling(String saksnummer) {
         TypedQuery<Behandling> query = getEntityManager().createQuery("""
             SELECT beh FROM Behandling beh JOIN beh.fagsak f
                 WHERE f.saksnummer = :saksnummer
                 AND beh.status <>'AVSLU'
                 AND beh.behandlingType='BT-007'""", Behandling.class);
-        query.setParameter("saksnummer", saksnummer.getVerdi());
+        query.setParameter("saksnummer", saksnummer);
         return hentUniktResultat(query);
     }
 

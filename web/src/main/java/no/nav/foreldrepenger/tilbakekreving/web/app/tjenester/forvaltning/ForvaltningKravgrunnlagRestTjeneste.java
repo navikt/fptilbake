@@ -13,6 +13,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -52,6 +55,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.HentKorrigertKravgrunnlagDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KobleBehandlingTilGrunnlagDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KorrigertHenvisningDto;
@@ -66,7 +70,9 @@ import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.Tilbakekrevingsvedt
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.log.util.LoggerUtils;
+import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 
 @Path("/forvaltning/kravgrunnlag")
@@ -79,7 +85,6 @@ public class ForvaltningKravgrunnlagRestTjeneste {
     private static final Logger logger = LoggerFactory.getLogger(ForvaltningKravgrunnlagRestTjeneste.class);
 
     private BehandlingRepository behandlingRepository;
-    private KravgrunnlagTjeneste kravgrunnlagTjeneste;
     private ForvaltningTjeneste forvaltningTjeneste;
 
     public ForvaltningKravgrunnlagRestTjeneste() {
@@ -87,11 +92,9 @@ public class ForvaltningKravgrunnlagRestTjeneste {
     }
 
     @Inject
-    public ForvaltningKravgrunnlagRestTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                               KravgrunnlagTjeneste kravgrunnlagTjeneste,
+    public ForvaltningKravgrunnlagRestTjeneste(BehandlingRepository behandlingRepository,
                                                ForvaltningTjeneste forvaltningTjeneste) {
-        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
+        this.behandlingRepository = behandlingRepository;
         this.forvaltningTjeneste = forvaltningTjeneste;
     }
 
@@ -122,19 +125,17 @@ public class ForvaltningKravgrunnlagRestTjeneste {
         description = "Tjeneste for å annulere en mottatt kravgrunnlag hos økonomi, f.eks pga brukerens død",
         responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "Behandling er avsluttet eller behandling er på vent"),
+            @ApiResponse(responseCode = "400", description = "Finnes ikke kravgrunnlag."),
             @ApiResponse(responseCode = "500", description = "Ukjent feil!")
         })
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.DRIFT)
-    public Response annulerKravgrunnlag(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                                     @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
-        Behandling behandling = hentBehandling(behandlingReferanse);
-        if (behandling.erAvsluttet()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Kan ikke flyttes, behandlingen er avsluttet!").build();
-        } else if (behandling.isBehandlingPåVent()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Kan ikke flyttes, behandlingen er på vent!").build();
+    public Response annulerKravgrunnlag(@Valid @NotNull HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
+        Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
+        try {
+            forvaltningTjeneste.annulerKravgrunnlag(behandling.getId());
+        } catch (Exception e) {
+            return Response.serverError().entity(e.getMessage()).build();
         }
-        kravgrunnlagTjeneste.tilbakeførBehandlingTilFaktaSteg(behandling);
         return Response.ok().build();
     }
 
@@ -149,9 +150,9 @@ public class ForvaltningKravgrunnlagRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.DRIFT)
     public Response hentForvaltninginfo(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataSaksnummerReferanse.class)
-                                        @NotNull @QueryParam("saksnummer") @Valid Saksnummer saksnummer) {
+                                        @NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummer) {
         try {
-            return Response.ok(forvaltningTjeneste.hentForvaltningsinfo(saksnummer)).build();
+            return Response.ok(forvaltningTjeneste.hentForvaltningsinfo(saksnummer.getVerdi())).build();
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
