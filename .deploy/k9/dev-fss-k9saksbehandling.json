@@ -14,6 +14,7 @@
   ],
   "env": {
     "APPDYNAMICS_AGENT_ACCOUNT_NAME": "NON-PROD",
+    "APPD_ENABLED": "true",
     "LDAP_URL": "ldaps://ldapgw.preprod.local",
     "LDAP_BASEDN": "dc=preprod,dc=local",
     "LDAP_DOMAIN": "PREPROD.LOCAL",
