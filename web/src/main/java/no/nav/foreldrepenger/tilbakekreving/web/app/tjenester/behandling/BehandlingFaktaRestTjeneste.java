@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -24,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.Behandl
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
 @Path(BehandlingFaktaRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -53,7 +53,7 @@ public class BehandlingFaktaRestTjeneste {
             description = "Hent fakta om feilutbetaling"
     )
     @Path("/hent-fakta/feilutbetaling")
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     public BehandlingFeilutbetalingFaktaDto hentFeilutbetalingFakta(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                                                     @QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         BehandlingFeilutbetalingFakta fakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(hentBehandlingId(behandlingReferanse));

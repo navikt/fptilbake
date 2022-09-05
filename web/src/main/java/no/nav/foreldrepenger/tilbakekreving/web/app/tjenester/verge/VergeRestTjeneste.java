@@ -1,8 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge;
 
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.UPDATE;
-
 import java.net.URISyntaxException;
 import java.util.Optional;
 
@@ -46,6 +43,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
 @ApplicationScoped
 @Path(VergeRestTjeneste.BASE_PATH)
@@ -82,7 +80,7 @@ public class VergeRestTjeneste {
                             headers = @Header(name = HttpHeaders.LOCATION)
                     )
             })
-    @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response opprettVerge(@Context HttpServletRequest request,
                                  @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
@@ -108,7 +106,7 @@ public class VergeRestTjeneste {
                             headers = @Header(name = HttpHeaders.LOCATION)
                     )
             })
-    @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response fjernVerge(@Context HttpServletRequest request,
                                @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
@@ -135,7 +133,7 @@ public class VergeRestTjeneste {
                             )
                     )
             })
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public VergeDto getVerge(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                              @QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse dto) {
@@ -157,7 +155,7 @@ public class VergeRestTjeneste {
                             )
                     )
             })
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentBehandlingsmenyvalg(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                             @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {

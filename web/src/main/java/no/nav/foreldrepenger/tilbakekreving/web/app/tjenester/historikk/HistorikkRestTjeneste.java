@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk;
 
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -30,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjeneste
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
 @Path("/historikk")
 @ApplicationScoped
@@ -53,7 +52,7 @@ public class HistorikkRestTjeneste {
     @Timed
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Operation(tags = "historikk", description = "Henter alle historikkinnslag for gitt behandling.")
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentAlleInnslag(@Context HttpServletRequest request,
                                     @NotNull @QueryParam("saksnummer")

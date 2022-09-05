@@ -21,8 +21,9 @@ import no.nav.vedtak.felles.testutilities.cdi.WeldContext;
 import no.nav.vedtak.isso.config.ServerInfo;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
-import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
 public class RestApiAbacTest {
 
@@ -110,7 +111,7 @@ public class RestApiAbacTest {
                 AbacProperty.FAGSAK,
                 AbacProperty.VENTEFRIST
         );
-        if (!annotation.resource().equals(FPTilbakeBeskyttetRessursAttributt.DUMMY)) {
+        if (!annotation.resource().equals(FPTilbakeBeskyttetRessursAttributt.DUMMY) || annotation.resourceType() != ResourceType.DUMMY) {
             fail(klasse.getSimpleName() + "." + metode.getName() + " Skal ikke bruke ressurs, bruk property i @" + annotation.getClass().getSimpleName());
         }
         if (!annotation.resource().isEmpty()) {
@@ -119,9 +120,9 @@ public class RestApiAbacTest {
         if (!godkjenteProperties.contains(annotation.property())) {
             fail(klasse.getSimpleName() + "." + metode.getName() + " Skal ikke bruke ukjent property " + annotation.property() + " , bruk en av " + godkjenteProperties + "i @" + annotation.getClass().getSimpleName());
         }
-        if (annotation.action() == BeskyttetRessursActionAttributt.DUMMY) {
+        if (annotation.actionType() == ActionType.DUMMY) {
             fail(klasse.getSimpleName() + "." + metode.getName() + " Ikke bruk DUMMY-verdi for "
-                    + BeskyttetRessursActionAttributt.class.getSimpleName());
+                    + ActionType.class.getSimpleName());
         }
     }
 

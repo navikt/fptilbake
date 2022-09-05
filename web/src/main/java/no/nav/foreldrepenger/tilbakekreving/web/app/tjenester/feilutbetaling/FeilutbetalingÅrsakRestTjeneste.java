@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 
 import java.util.List;
 
@@ -21,6 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyp
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste.FeilutbetalingÅrsakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
 @Path("/feilutbetalingaarsak")
 @Produces(APPLICATION_JSON)
@@ -46,7 +46,7 @@ public class FeilutbetalingÅrsakRestTjeneste {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Kodeverk", content = @Content(schema = @Schema(implementation = HendelseTypeMedUndertypeDto.class)))
             })
-    @BeskyttetRessurs(action = READ, property = AbacProperty.APPLIKASJON)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.APPLIKASJON)
     public List<HendelseTyperPrYtelseTypeDto> hentAlleFeilutbetalingÅrsaker() {
         return feilutbetalingÅrsakTjeneste.hentFeilutbetalingårsaker();
     }

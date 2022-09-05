@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk;
 
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.JacksonJsonConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.app.HentKodeverkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
 @Path("/kodeverk")
 @RequestScoped
@@ -54,7 +53,7 @@ public class KodeverkRestTjeneste {
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(tags = "kodeverk", description = "Henter kodeliste", summary = "Returnerer gruppert kodeliste.")
-    @BeskyttetRessurs(action = READ, property = AbacProperty.APPLIKASJON, sporingslogg = false)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.APPLIKASJON, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentGruppertKodeliste() throws IOException {
         if (KODELISTER == null) {

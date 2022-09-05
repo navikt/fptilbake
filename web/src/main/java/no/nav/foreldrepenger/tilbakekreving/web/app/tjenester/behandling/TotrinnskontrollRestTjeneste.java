@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -25,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.Behandl
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
 @Path("/behandling/totrinnskontroll")
 @ApplicationScoped
@@ -49,7 +48,7 @@ public class TotrinnskontrollRestTjeneste {
     @Timed
     @Path("/arsaker")
     @Operation(tags = "totrinnskontroll", description = "Hent aksjonspunkter som skal til totrinnskontroll.", summary = "Returner aksjonspunkter til totrinnskontroll for behandling.")
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<TotrinnskontrollSkjermlenkeContextDto> hentTotrinnskontrollSkjermlenkeContext(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                                                                               @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
@@ -61,7 +60,7 @@ public class TotrinnskontrollRestTjeneste {
     @Timed
     @Path("/arsaker_read_only")
     @Operation(tags = "totrinnskontroll", description = "Hent totrinnsvurderinger for aksjonspunkter.", summary = "Returner vurderinger for aksjonspunkter etter totrinnskontroll for behandling.")
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<TotrinnskontrollSkjermlenkeContextDto> hentTotrinnskontrollvurderingSkjermlenkeContext(
             @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)

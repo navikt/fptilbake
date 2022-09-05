@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 
 import java.util.List;
 
@@ -33,6 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.Behandl
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
 @Path(BrevRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -63,7 +63,7 @@ public class BrevRestTjeneste {
     @Path("/maler")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Operation(tags = "brev", description = "Henter liste over tilgjengelige brevtyper")
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK, sporingslogg = false)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<BrevmalDto> hentMaler(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                       @Valid @QueryParam("uuid") BehandlingReferanse behandlingReferanse) {
@@ -76,7 +76,7 @@ public class BrevRestTjeneste {
     @Path("/bestill")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Operation(tags = "brev", description = "bestiller brev")
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK, sporingslogg = false)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response bestillBrev(@NotNull @Valid BestillBrevDto bestillBrevDto) {
         DokumentMalType malType = DokumentMalType.fraKode(bestillBrevDto.getBrevmalkode());
@@ -90,7 +90,7 @@ public class BrevRestTjeneste {
     @Path("/forhandsvis")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "brev", description = "Returnerer en pdf som er en forhåndsvisning av brevet")
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response forhåndsvisBrev(@Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @NotNull @Valid BestillBrevDto forhåndsvisBestillBrevDto) {
         DokumentMalType malType = DokumentMalType.fraKode(forhåndsvisBestillBrevDto.getBrevmalkode());
