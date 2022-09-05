@@ -95,6 +95,11 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
     }
 
     @Override
+    public String abacDomene() {
+        return ABAC_DOMAIN;
+    }
+
+    @Override
     public boolean nyttAbacGrensesnitt() {
         return true;
     }
