@@ -14,6 +14,7 @@
     "https://fptilbake.dev.intern.nav.no/"
   ],
   "env": {
-    "APPDYNAMICS_AGENT_ACCOUNT_NAME": "NON-PROD"
+    "APPDYNAMICS_AGENT_ACCOUNT_NAME": "NON-PROD",
+    "APPD_ENABLED": "false"
   }
 }

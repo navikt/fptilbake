@@ -14,6 +14,7 @@
   ],
   "env": {
     "APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD",
+    "APPD_ENABLED": "true",
     "LDAP_URL": "ldaps://ldapgw.adeo.no",
     "LDAP_BASEDN": "dc=adeo,dc=no",
     "LDAP_DOMAIN": "ADEO.NO",
