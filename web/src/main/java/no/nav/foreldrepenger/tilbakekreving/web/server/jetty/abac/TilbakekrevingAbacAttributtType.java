@@ -4,13 +4,7 @@ import no.nav.vedtak.sikkerhet.abac.AbacAttributtType;
 
 public enum TilbakekrevingAbacAttributtType implements AbacAttributtType {
 
-    YTELSEBEHANDLING_UUID("ytelsebehandling-uuid");
-
-    private final String sporingsloggEksternKode;
-
-    TilbakekrevingAbacAttributtType(String sporingsloggEksternKode) {
-        this.sporingsloggEksternKode = sporingsloggEksternKode;
-    }
+    YTELSEBEHANDLING_UUID;
 
     @Override
     public boolean getMaskerOutput() {
