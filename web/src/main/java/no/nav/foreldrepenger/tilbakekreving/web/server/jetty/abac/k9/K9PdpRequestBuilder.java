@@ -120,8 +120,7 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
         LOG_CONTEXT.add("k9sakBehandlingUuid", k9sakBehandlingUuid);
         K9PipDto pipDto = k9sakPipKlient.hentPipdataForK9sakBehandling(k9sakBehandlingUuid);
         return new PipBehandlingInfo(pipDto.getAktørIder().stream().map(K9AktørId::getId).map(PipAktørId::new).collect(Collectors.toSet()),
-            null, oversettFagstatus(pipDto.getFagsakStatus()),
-            null, oversettBehandlingStatus(pipDto.getBehandlingStatus()), null);
+            null, oversettFagstatus(pipDto.getFagsakStatus()), oversettBehandlingStatus(pipDto.getBehandlingStatus()), null);
     }
 
     private PipBehandlingInfo lagBehandlingData(Long behandlingId) {
