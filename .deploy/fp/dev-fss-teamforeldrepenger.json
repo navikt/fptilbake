@@ -4,8 +4,8 @@
   "oracleconfig": "oracle/data/dev/config/fptilbake_q1",
   "fptilbakeserviceuser": "serviceuser/data/dev/srvfptilbake",
   "ldapserviceuser": "serviceuser/data/dev/srvssolinux",
-  "minReplicas": "2",
-  "maxReplicas": "3",
+  "minReplicas": "1",
+  "maxReplicas": "2",
   "ingresses": [
     "https://fptilbake-q1.nais.preprod.local/",
     "https://app-q1.adeo.no/fptilbake",
