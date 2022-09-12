@@ -12,6 +12,7 @@ import javax.ws.rs.core.UriBuilder;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.integrasjon.rest.SystemUserOidcRestClient;
+import no.nav.vedtak.sikkerhet.abac.pipdata.AbacPipDto;
 
 @ApplicationScoped
 public class FpsakPipKlient {
@@ -30,14 +31,14 @@ public class FpsakPipKlient {
         this.restClient = restClient;
     }
 
-    public PipDto hentPipdataForFpsakBehandling(UUID behandlingUUid) {
+    public AbacPipDto hentPipdataForFpsakBehandling(UUID behandlingUUid) {
         var uri = UriBuilder
                 .fromUri(baseUri())
                 .path(FPSAK_API_PATH)
-                .path("/pip/pipdata-for-behandling")
+                .path("/pip/pipdata-for-behandling-appintern")
                 .queryParam("behandlingUuid", behandlingUUid.toString())
                 .build();
-        return restClient.get(uri, PipDto.class);
+        return restClient.get(uri, AbacPipDto.class);
     }
 
     public Set<String> hentAktørIderSomString(Saksnummer saksnummer) {
