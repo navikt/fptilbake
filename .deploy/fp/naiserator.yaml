@@ -31,16 +31,25 @@ spec:
     min: {{minReplicas}}
     max: {{maxReplicas}}
     cpuThresholdPercentage: 80
-  leaderElection: false
-  istio: # Optional.
-    enabled: false
   resources:
     limits:
-      cpu: 2000m
-      memory: 2048Mi
+      cpu: "2000m"
+      memory: "2048Mi"
     requests:
-      cpu: 200m
-      memory: 1400Mi
+      cpu: "200m"
+      memory: "1400Mi"
+  azure:
+    application:
+      enabled: true
+      claims:
+        extra:
+          - "NAVident"
+          - "azp_name"
+  accessPolicy:
+    inbound:
+      rules:
+        - application: fp-frontend-azure
+          cluster: dev-fss
   vault:
     enabled: true
     paths:
