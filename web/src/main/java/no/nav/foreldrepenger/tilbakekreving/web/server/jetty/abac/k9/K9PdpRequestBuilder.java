@@ -119,8 +119,10 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
     private PipBehandlingInfo hentK9sakBehandlingData(UUID k9sakBehandlingUuid) {
         LOG_CONTEXT.add("k9sakBehandlingUuid", k9sakBehandlingUuid);
         K9PipDto pipDto = k9sakPipKlient.hentPipdataForK9sakBehandling(k9sakBehandlingUuid);
-        return new PipBehandlingInfo(pipDto.getAktørIder().stream().map(K9AktørId::getId).map(PipAktørId::new).collect(Collectors.toSet()),
-            null, oversettFagstatus(pipDto.getFagsakStatus()), oversettBehandlingStatus(pipDto.getBehandlingStatus()), null);
+        var aktører = pipDto.getAktørIder().stream().map(K9AktørId::getId).map(PipAktørId::new).collect(Collectors.toSet());
+        var fagsakStatus = Optional.ofNullable(pipDto.getFagsakStatus()).map(K9PdpRequestBuilder::oversettFagstatus).orElse(null);
+        var behandlingStatus = Optional.ofNullable(pipDto.getBehandlingStatus()).map(K9PdpRequestBuilder::oversettBehandlingStatus).orElse(null);
+        return new PipBehandlingInfo(aktører, null, fagsakStatus, behandlingStatus, null);
     }
 
     private PipBehandlingInfo lagBehandlingData(Long behandlingId) {
@@ -137,7 +139,7 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
             .orElseThrow(() -> fantIkkeBehandling(behandlingUuid));
     }
 
-    private PipFagsakStatus oversettFagstatus(String kode) {
+    private static PipFagsakStatus oversettFagstatus(String kode) {
         return Arrays.stream(PipFagsakStatus.values()).filter(fss -> kode.equals(fss.getVerdi())).findFirst().orElse(null);
     }
 
