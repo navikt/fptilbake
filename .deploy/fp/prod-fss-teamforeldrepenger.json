@@ -9,7 +9,8 @@
   "ingresses": [
     "https://fptilbake.nais.adeo.no",
     "https://app.adeo.no/fptilbake",
-    "https://fptilbake.intern.nav.no"
+    "https://fptilbake.intern.nav.no",
+    "https://fptilbake.prod-fss-pub.nais.io"
   ],
   "env": {
     "APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD",
