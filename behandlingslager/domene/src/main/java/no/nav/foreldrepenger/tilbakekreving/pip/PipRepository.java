@@ -1,14 +1,20 @@
 package no.nav.foreldrepenger.tilbakekreving.pip;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.BehandlingInfo;
 
@@ -108,5 +114,12 @@ public class PipRepository {
             throw new IllegalStateException("Utvikler feil: Forventet 0 eller 1 treff etter søk på behandlingId, fikk "
                     + resultater.size() + " [behandlingUuid: " + behandlingUuid);
         }
+    }
+
+    public Set<AksjonspunktType> hentAksjonspunktTypeForAksjonspunktKoder(Collection<AksjonspunktDefinisjon> aksjonspunktKoder) {
+        return aksjonspunktKoder.stream()
+            .map(ak -> ak.getAksjonspunktType())
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
     }
 }
