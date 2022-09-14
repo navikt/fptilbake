@@ -85,9 +85,8 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
         var ressursData = AppRessursData.builder()
             .leggTilAktørIdSet(dataAttributter.getVerdier(AppAbacAttributtType.AKTØR_ID));
         Optional.ofNullable(behandlingData).ifPresent(bi -> ressursData.leggTilAbacAktørIdSet(bi.getAktørIdNonNull()));
-
-        Optional.ofNullable(behandlingData).flatMap(b -> utledSaksnummer(dataAttributter, b))
-            .ifPresent(s -> ressursData.leggTilRessurs(K9DataKeys.SAKSNUMMER, s));
+        utledSaksnummer(dataAttributter, behandlingData).ifPresent(s -> ressursData.leggTilRessurs(K9DataKeys.SAKSNUMMER, s));
+        
         Optional.ofNullable(behandlingData).map(PipBehandlingInfo::fagsakstatus)
             .ifPresent(fss -> ressursData.leggTilRessurs(K9DataKeys.FAGSAK_STATUS, fss));
         Optional.ofNullable(behandlingData).map(PipBehandlingInfo::statusForBehandling)
@@ -100,11 +99,8 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
     }
 
     private Optional<String> utledSaksnummer(AbacDataAttributter attributter, PipBehandlingInfo behandlingData) {
-        Set<String> saksnumre = new HashSet<>();
-        saksnumre.addAll(attributter.getVerdier(AppAbacAttributtType.SAKSNUMMER));
-        if (behandlingData != null && behandlingData.saksnummer() != null) {
-            saksnumre.add(behandlingData.saksnummer());
-        }
+        Set<String> saksnumre = new HashSet<>(attributter.getVerdier(AppAbacAttributtType.SAKSNUMMER));
+        Optional.ofNullable(behandlingData).map(PipBehandlingInfo::saksnummer).ifPresent(saksnumre::add);
         if (saksnumre.isEmpty()) {
             return Optional.empty();
         }
