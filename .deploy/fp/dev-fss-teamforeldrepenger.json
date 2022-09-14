@@ -11,7 +11,9 @@
     "https://app-q1.adeo.no/fptilbake",
     "https://fptilbake-q1.dev.adeo.no/",
     "https://fptilbake.dev.adeo.no/",
-    "https://fptilbake.dev.intern.nav.no/"
+    "https://fptilbake.dev.intern.nav.no/",
+    "https://fptilbake.dev-fss-pub.nais.io"
+
   ],
   "env": {
     "APPDYNAMICS_AGENT_ACCOUNT_NAME": "NON-PROD",
