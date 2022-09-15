@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.pip;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 
@@ -14,8 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
@@ -71,14 +68,6 @@ public class PipRepositoryTest {
     public void skal_hentBehandlingData_medUgyldigBehandlingId() {
         Optional<PipBehandlingData> pipBehandlingData = pipRepository.hentBehandlingData(1234l);
         assertThat(pipBehandlingData).isEmpty();
-    }
-
-    @Test
-    public void skal_hentAksjonspunkttypeForAksjonspunktkoder_medGyldigAkskonspunktKode() {
-        Set<AksjonspunktType> aksjonspunktTyper = pipRepository.hentAksjonspunktTypeForAksjonspunktKoder(Set.of(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
-        assertThat(aksjonspunktTyper).isNotEmpty();
-        assertThat(aksjonspunktTyper).contains(AksjonspunktType.MANUELL);
-        assertThat(aksjonspunktTyper).contains(AksjonspunktType.AUTOPUNKT);
     }
 
 }

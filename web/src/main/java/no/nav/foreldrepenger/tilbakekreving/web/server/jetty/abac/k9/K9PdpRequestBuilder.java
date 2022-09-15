@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktType;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
@@ -83,8 +82,6 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
             behandlingData = hentK9sakBehandlingData(ytelesbehandlingId.get());
         }
 
-        Set<AksjonspunktType> aksjonspunkttype = pipRepository.hentAksjonspunktTypeForAksjonspunktKoder(dataAttributter.getVerdier(AppAbacAttributtType.AKSJONSPUNKT_KODE));
-
         var ressursData = AppRessursData.builder()
             .leggTilAktørIdSet(dataAttributter.getVerdier(AppAbacAttributtType.AKTØR_ID));
         Optional.ofNullable(behandlingData).ifPresent(bi -> ressursData.leggTilAbacAktørIdSet(bi.getAktørIdNonNull()));
@@ -96,12 +93,10 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
             .ifPresent(bs -> ressursData.leggTilRessurs(K9DataKeys.BEHANDLING_STATUS, bs));
         Optional.ofNullable(behandlingData).map(PipBehandlingInfo::ansvarligSaksbehandler)
             .ifPresent(sbh -> ressursData.leggTilRessurs(K9DataKeys.SAKSBEHANDLER, sbh));
-        aksjonspunkttype.stream().map(a->oversettAksjonspunktType(a.getKode()))
-            .forEach(at -> ressursData.leggTilRessurs(K9DataKeys.AKSJONSPUNKT_TYPE, at));
+
 
         return ressursData.build();
     }
-
 
     private Optional<String> utledSaksnummer(AbacDataAttributter attributter, PipBehandlingInfo behandlingData) {
         Set<String> saksnumre = new HashSet<>(attributter.getVerdier(AppAbacAttributtType.SAKSNUMMER));
@@ -142,10 +137,6 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
 
     private static PipFagsakStatus oversettFagstatus(String kode) {
         return Arrays.stream(PipFagsakStatus.values()).filter(fss -> kode.equals(fss.getVerdi())).findFirst().orElse(null);
-    }
-
-    private static PipAksjonspunktType oversettAksjonspunktType(String kode) {
-        return Arrays.stream(PipAksjonspunktType.values()).filter(fss -> kode.equals(fss.getVerdi())).findFirst().orElse(null);
     }
 
     private static PipBehandlingStatus oversettBehandlingStatus(String kode) {

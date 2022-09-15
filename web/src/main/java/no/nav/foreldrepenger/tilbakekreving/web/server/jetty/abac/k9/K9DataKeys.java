@@ -6,8 +6,7 @@ public enum K9DataKeys implements RessursDataKey {
     SAKSBEHANDLER("no.nav.abac.attributter.resource.k9.sak.ansvarlig_saksbehandler"),
     BEHANDLING_STATUS("no.nav.abac.attributter.resource.k9.sak.behandlingsstatus"),
     FAGSAK_STATUS("no.nav.abac.attributter.resource.k9.sak.saksstatus"),
-    SAKSNUMMER("no.nav.abac.attributter.resource.k9.saksnr"),
-    AKSJONSPUNKT_TYPE("no.nav.abac.attributter.resource.k9.sak.aksjonspunkt_type");
+    SAKSNUMMER("no.nav.abac.attributter.resource.k9.saksnr");
 
     private final String key;
 
