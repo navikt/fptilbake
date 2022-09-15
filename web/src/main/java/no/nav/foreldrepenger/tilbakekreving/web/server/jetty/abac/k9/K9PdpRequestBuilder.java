@@ -1,12 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -21,9 +19,6 @@ import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
-import no.nav.vedtak.sikkerhet.abac.pipdata.PipAktørId;
-import no.nav.vedtak.sikkerhet.abac.pipdata.PipBehandlingStatus;
-import no.nav.vedtak.sikkerhet.abac.pipdata.PipFagsakStatus;
 
 /**
  * Implementasjon av PDP request for k9-tilbake.
@@ -36,16 +31,14 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
 
     private PipRepository pipRepository;
-    private K9sakPipKlient k9sakPipKlient;
 
     K9PdpRequestBuilder() {
         // For CDI proxy
     }
 
     @Inject
-    public K9PdpRequestBuilder(PipRepository pipRepository, K9sakPipKlient k9sakPipKlient) {
+    public K9PdpRequestBuilder(PipRepository pipRepository) {
         this.pipRepository = pipRepository;
-        this.k9sakPipKlient = k9sakPipKlient;
     }
 
     @Override
@@ -78,8 +71,6 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
             behandlingData = lagBehandlingData(behandlingId.get());
         } else if (behandlingUuid.isPresent()) {
             behandlingData = lagBehandlingData(behandlingUuid.get());
-        } else if (ytelesbehandlingId.isPresent()) {
-            behandlingData = hentK9sakBehandlingData(ytelesbehandlingId.get());
         }
 
         var ressursData = AppRessursData.builder()
@@ -112,15 +103,6 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
         throw new IllegalArgumentException("Ikke støttet å ha to saksnumre samtidig");
     }
 
-    private PipBehandlingInfo hentK9sakBehandlingData(UUID k9sakBehandlingUuid) {
-        LOG_CONTEXT.add("k9sakBehandlingUuid", k9sakBehandlingUuid);
-        K9PipDto pipDto = k9sakPipKlient.hentPipdataForK9sakBehandling(k9sakBehandlingUuid);
-        var aktører = pipDto.getAktørIder().stream().map(K9AktørId::getId).map(PipAktørId::new).collect(Collectors.toSet());
-        var fagsakStatus = Optional.ofNullable(pipDto.getFagsakStatus()).map(K9PdpRequestBuilder::oversettFagstatus).orElse(null);
-        var behandlingStatus = Optional.ofNullable(pipDto.getBehandlingStatus()).map(K9PdpRequestBuilder::oversettBehandlingStatus).orElse(null);
-        return new PipBehandlingInfo(aktører, null, fagsakStatus, behandlingStatus, null);
-    }
-
     private PipBehandlingInfo lagBehandlingData(Long behandlingId) {
         LOG_CONTEXT.add("behandling", behandlingId);
         return pipRepository.hentBehandlingData(behandlingId)
@@ -133,14 +115,6 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
         return pipRepository.hentBehandlingData(behandlingUuid)
             .map(PipBehandlingInfo::new)
             .orElseThrow(() -> fantIkkeBehandling(behandlingUuid));
-    }
-
-    private static PipFagsakStatus oversettFagstatus(String kode) {
-        return Arrays.stream(PipFagsakStatus.values()).filter(fss -> kode.equals(fss.getVerdi())).findFirst().orElse(null);
-    }
-
-    private static PipBehandlingStatus oversettBehandlingStatus(String kode) {
-        return Arrays.stream(PipBehandlingStatus.values()).filter(bhs -> kode.equals(bhs.getVerdi())).findFirst().orElse(null);
     }
 
     private Optional<Long> utledBehandlingId(Set<Long> behandlingIder) {
