@@ -16,11 +16,11 @@ import no.nav.vedtak.felles.integrasjon.rest.RestRequest;
 import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 
 @ApplicationScoped
-@RestClientConfig(tokenConfig = TokenFlow.STS_CC, endpointProperty = "dokarkiv.base.url", endpointDefault = "http://dokarkiv.teamdokumenthandtering")
+@RestClientConfig(tokenConfig = TokenFlow.STS_CC, endpointProperty = "dokarkiv.base.url", endpointDefault = "http://dokarkiv.teamdokumenthandtering/rest/journalpostapi/v1/journalpost")
 public class JournalpostApiKlient {
 
     private RestClient restClient;
-    private URI target;
+    private URI endpoint;
 
     JournalpostApiKlient() {
         //for CDI proxy
@@ -29,12 +29,11 @@ public class JournalpostApiKlient {
     @Inject
     public JournalpostApiKlient(RestClient restClient) {
         this.restClient = restClient;
-        var endpoint = RestConfig.endpointFromAnnotation(JournalpostApiKlient.class);
-        this.target = URI.create(endpoint.toString() + "/rest/journalpostapi/v1/journalpost");
+        this.endpoint = RestConfig.endpointFromAnnotation(JournalpostApiKlient.class);
     }
 
     public OpprettJournalpostResponse opprettJournalpost(OpprettJournalpostRequest request, boolean forsøkFerdigstill) {
-        var opprett = forsøkFerdigstill ? UriBuilder.fromUri(target).queryParam("forsoekFerdigstill", "true").build() : target;
+        var opprett = forsøkFerdigstill ? UriBuilder.fromUri(endpoint).queryParam("forsoekFerdigstill", "true").build() : endpoint;
         var rrequest = RestRequest.newPOSTJson(request, opprett, JournalpostApiKlient.class);
         return restClient.sendExpectConflict(rrequest, OpprettJournalpostResponse.class);
     }
