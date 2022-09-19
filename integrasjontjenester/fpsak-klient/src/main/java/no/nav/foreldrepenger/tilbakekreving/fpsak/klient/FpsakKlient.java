@@ -13,7 +13,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 
-import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
@@ -31,13 +30,19 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceL
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingInfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering.FpoppdragRestKlient;
 import no.nav.vedtak.exception.IntegrasjonException;
-import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
+import no.nav.vedtak.felles.integrasjon.rest.RestClient;
+import no.nav.vedtak.felles.integrasjon.rest.RestClientConfig;
+import no.nav.vedtak.felles.integrasjon.rest.RestConfig;
+import no.nav.vedtak.felles.integrasjon.rest.RestRequest;
+import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 
 @ApplicationScoped
 @Fptilbake
+@RestClientConfig(tokenConfig = TokenFlow.CONTEXT, endpointProperty = "fpsak.base.url", endpointDefault = "http://fpsak")
 public class FpsakKlient implements FagsystemKlient {
 
-    private OidcRestClient restClient;
+    private RestClient restClient;
+    private URI base;
 
     //TODO skriv om slik at fpoppdrag ikke behandles spesielt
     //fpoppdrag trenger ikke en egen klient
@@ -49,9 +54,10 @@ public class FpsakKlient implements FagsystemKlient {
     }
 
     @Inject
-    public FpsakKlient(OidcRestClient restClient, FpoppdragRestKlient fpoppdragKlient) {
+    public FpsakKlient(RestClient restClient, FpoppdragRestKlient fpoppdragKlient) {
         this.restClient = restClient;
         this.fpoppdragKlient = fpoppdragKlient;
+        this.base = RestConfig.endpointFromAnnotation(FpsakKlient.class);
     }
 
     @Override
@@ -158,7 +164,7 @@ public class FpsakKlient implements FagsystemKlient {
 
     public List<FpsakBehandlingInfoDto> hentFpsakBehandlingForSaksnummer(String saksnummer) {
         URI endpoint = createUri("/behandlinger/alle", "saksnummer", saksnummer);
-        List<FpsakBehandlingInfoDto> behandlinger = restClient.get(endpoint, ListeAvFpsakBehandlingInfoDto.class);
+        List<FpsakBehandlingInfoDto> behandlinger = restClient.send(RestRequest.newGET(endpoint, FpsakKlient.class), ListeAvFpsakBehandlingInfoDto.class);
         for (FpsakBehandlingInfoDto dto : behandlinger) {
             dto.setHenvisning(Henvisning.fraEksternBehandlingId(dto.getId()));
         }
@@ -166,7 +172,7 @@ public class FpsakKlient implements FagsystemKlient {
     }
 
     private PersonopplysningDto hentPersonopplysninger(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = URI.create(baseUri() + resourceLink.getHref());
+        URI endpoint = URI.create(base + resourceLink.getHref());
         PersonopplysningDto dto = get(endpoint, PersonopplysningDto.class).orElseThrow(() -> new IllegalArgumentException("Forventet å finne personopplysninger på lenken: " + endpoint));
         if (dto == null) {
             throw new IllegalArgumentException("Fikk null personopplysninger på lenken: " + endpoint);
@@ -175,40 +181,40 @@ public class FpsakKlient implements FagsystemKlient {
     }
 
     private Optional<VarseltekstDto> hentVarseltekst(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = URI.create(baseUri() + resourceLink.getHref());
+        URI endpoint = URI.create(base + resourceLink.getHref());
         return get(endpoint, VarseltekstDto.class);
 
     }
 
     private SoknadDto hentSøknad(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = URI.create(baseUri() + resourceLink.getHref());
+        URI endpoint = URI.create(base + resourceLink.getHref());
         return get(endpoint, SoknadDto.class)
                 .orElseThrow(() -> new IllegalArgumentException("Forventet å finne søknad på lenken: " + endpoint));
     }
 
     private Optional<TilbakekrevingValgDto> hentTilbakekrevingValg(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = URI.create(baseUri() + resourceLink.getHref());
+        URI endpoint = URI.create(base + resourceLink.getHref());
         return get(endpoint, TilbakekrevingValgDto.class);
     }
 
     private FagsakDto hentFagsak(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = URI.create(baseUri() + resourceLink.getHref());
+        URI endpoint = URI.create(base + resourceLink.getHref());
         return get(endpoint, FagsakDto.class)
                 .orElseThrow(() -> new IllegalArgumentException("Forventet å finne fagsak på lenken: " + endpoint));
     }
 
     private Optional<VergeDto> hentVergeInformasjon(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = URI.create(baseUri() + resourceLink.getHref());
+        URI endpoint = URI.create(base + resourceLink.getHref());
         return get(endpoint, VergeDto.class);
     }
 
     private <T> Optional<T> get(URI endpoint, Class<T> tClass) {
-        return restClient.getReturnsOptional(endpoint, tClass);
+        return restClient.sendReturnOptional(RestRequest.newGET(endpoint, FpsakKlient.class), tClass);
     }
 
     private URI createUri(String endpoint, String paramName, String paramValue) {
         var builder = UriBuilder
-                .fromUri(baseUri())
+                .fromUri(base)
                 .path("/fpsak/api")
                 .path(endpoint);
 
@@ -216,10 +222,6 @@ public class FpsakKlient implements FagsystemKlient {
             builder.queryParam(paramName, paramValue);
         }
         return builder.build();
-    }
-
-    private URI baseUri() {
-        return Environment.current().getProperty("fpsak.base.url", URI.class);
     }
 
     private boolean notNullOrEmpty(String str) {

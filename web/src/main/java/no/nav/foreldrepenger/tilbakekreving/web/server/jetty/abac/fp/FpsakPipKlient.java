@@ -9,49 +9,49 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 
-import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.vedtak.felles.integrasjon.rest.SystemUserOidcRestClient;
+import no.nav.vedtak.felles.integrasjon.rest.FpApplication;
+import no.nav.vedtak.felles.integrasjon.rest.RestClient;
+import no.nav.vedtak.felles.integrasjon.rest.RestClientConfig;
+import no.nav.vedtak.felles.integrasjon.rest.RestConfig;
+import no.nav.vedtak.felles.integrasjon.rest.RestRequest;
+import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 import no.nav.vedtak.sikkerhet.abac.pipdata.AbacPipDto;
 
 @ApplicationScoped
+@RestClientConfig(tokenConfig = TokenFlow.STS_CC, application = FpApplication.FPSAK)
 public class FpsakPipKlient {
 
-    private static final Environment ENV = Environment.current();
-    private static final String FPSAK_API_PATH = "/fpsak/api";
+    private static final String PIP_PATH = "/api/pip";
 
-    private SystemUserOidcRestClient restClient;
+    private RestClient restClient;
+    private URI contextPath;
 
     protected FpsakPipKlient() {
         // CDI
     }
 
     @Inject
-    public FpsakPipKlient(SystemUserOidcRestClient restClient) {
+    public FpsakPipKlient(RestClient restClient) {
         this.restClient = restClient;
+        this.contextPath = RestConfig.endpointFromAnnotation(FpsakPipKlient.class);
     }
 
     public AbacPipDto hentPipdataForFpsakBehandling(UUID behandlingUUid) {
-        var uri = UriBuilder
-                .fromUri(baseUri())
-                .path(FPSAK_API_PATH)
-                .path("/pip/pipdata-for-behandling-appintern")
-                .queryParam("behandlingUuid", behandlingUUid.toString())
-                .build();
-        return restClient.get(uri, AbacPipDto.class);
+        var uri = UriBuilder.fromUri(contextPath)
+            .path(PIP_PATH)
+            .path("/pipdata-for-behandling-appintern")
+            .queryParam("behandlingUuid", behandlingUUid.toString())
+            .build();
+        return restClient.send(RestRequest.newGET(uri, TokenFlow.STS_CC, null), AbacPipDto.class);
     }
 
     public Set<String> hentAktørIderSomString(Saksnummer saksnummer) {
-        var uri = UriBuilder
-                .fromUri(baseUri())
-                .path(FPSAK_API_PATH)
-                .path("/pip/aktoer-for-sak")
+        var uri = UriBuilder.fromUri(contextPath)
+                .path(PIP_PATH)
+                .path("/aktoer-for-sak")
                 .queryParam("saksnummer", saksnummer.getVerdi())
                 .build();
-        return restClient.get(uri, HashSet.class);
-    }
-
-    private URI baseUri() {
-        return ENV.getProperty("fpsak.base.url", URI.class);
+        return restClient.send(RestRequest.newGET(uri, TokenFlow.STS_CC, null), HashSet.class);
     }
 }
