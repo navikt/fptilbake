@@ -3,10 +3,10 @@ package no.nav.foreldrepenger.tilbakekreving.fpsak.klient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,7 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceL
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingInfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering.FpoppdragRestKlient;
 import no.nav.vedtak.exception.IntegrasjonException;
-import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
+import no.nav.vedtak.felles.integrasjon.rest.RestClient;
 
 public class FpsakKlientTest {
 
@@ -36,15 +36,11 @@ public class FpsakKlientTest {
     private static final UUID BEHANDLING_UUID = UUID.randomUUID();
 
     private static final String BASE_URI = "http://fpsak";
-    private static final URI BEHANDLING_URI = URI.create(BASE_URI + "/fpsak/api/behandling/backend-root?uuid=" + BEHANDLING_UUID);
-    private static final URI BEHANDLING_ALLE_URI = URI.create(BASE_URI + "/fpsak/api/behandlinger/alle?saksnummer=" + SAKSNUMMER);
-    private static final URI PERSONOPPLYSNING_URI = URI.create(BASE_URI + "/fpsak/api/behandling/person/personopplysninger?uuid=" + BEHANDLING_UUID);
-    private static final URI TILBAKEKREVING_VALG_URI = URI.create(BASE_URI + "/fpsak/api/behandling/tilbakekreving/valg?uuid=" + BEHANDLING_UUID);
 
-    private OidcRestClient oidcRestClientMock = mock(OidcRestClient.class);
+    private RestClient restClientMock = mock(RestClient.class);
     private FpoppdragRestKlient fpoppdragRestKlient = mock(FpoppdragRestKlient.class);
 
-    private FpsakKlient klient = new FpsakKlient(oidcRestClientMock, fpoppdragRestKlient);
+    private FpsakKlient klient = new FpsakKlient(restClientMock, fpoppdragRestKlient);
 
     @BeforeEach
     void setUp() {
@@ -60,8 +56,8 @@ public class FpsakKlientTest {
     public void skal_hente_DokumentinfoDto() {
         FpsakBehandlingInfoDto returnDto = dokumentinfoDto();
 
-        when(oidcRestClientMock.getReturnsOptional(BEHANDLING_URI, FpsakBehandlingInfoDto.class)).thenReturn(Optional.of(returnDto));
-        when(oidcRestClientMock.getReturnsOptional(PERSONOPPLYSNING_URI, PersonopplysningDto.class)).thenReturn(Optional.of(personopplysningDto()));
+        when(restClientMock.sendReturnOptional(any(), eq(FpsakBehandlingInfoDto.class))).thenReturn(Optional.of(returnDto));
+        when(restClientMock.sendReturnOptional(any(), eq(PersonopplysningDto.class))).thenReturn(Optional.of(personopplysningDto()));
 
         SamletEksternBehandlingInfo dokumentinfoDto = klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER);
 
@@ -71,7 +67,7 @@ public class FpsakKlientTest {
 
     @Test
     public void skal_kaste_exception_når_fpsak_behandling_ikke_finnes() {
-        when(oidcRestClientMock.getReturnsOptional(any(), any())).thenReturn(Optional.empty());
+        when(restClientMock.sendReturnOptional(any(), any())).thenReturn(Optional.empty());
 
         Assertions.assertThrows(IntegrasjonException.class, () -> klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER));
     }
@@ -81,7 +77,7 @@ public class FpsakKlientTest {
         FpsakBehandlingInfoDto eksternBehandlingInfo = dokumentinfoDto();
         FpsakKlient.ListeAvFpsakBehandlingInfoDto liste = new FpsakKlient.ListeAvFpsakBehandlingInfoDto();
         liste.add(eksternBehandlingInfo);
-        when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, FpsakKlient.ListeAvFpsakBehandlingInfoDto.class)).thenReturn(liste);
+        when(restClientMock.send(any(), eq(FpsakKlient.ListeAvFpsakBehandlingInfoDto.class))).thenReturn(liste);
 
         boolean erFinnesIFpsak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
         assertThat(erFinnesIFpsak).isTrue();
@@ -89,7 +85,7 @@ public class FpsakKlientTest {
 
     @Test
     public void skal_returnere_tom_hvis_finnes_ikke_behandling_i_fpsak() {
-        when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, FpsakKlient.ListeAvFpsakBehandlingInfoDto.class)).thenReturn(new FpsakKlient.ListeAvFpsakBehandlingInfoDto());
+        when(restClientMock.send(any(), eq(FpsakKlient.ListeAvFpsakBehandlingInfoDto.class))).thenReturn(new FpsakKlient.ListeAvFpsakBehandlingInfoDto());
 
         boolean erFinnesIFpsak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
         assertThat(erFinnesIFpsak).isFalse();
@@ -98,8 +94,8 @@ public class FpsakKlientTest {
     @Test
     public void skal_returnere_tilbakekreving_valg() {
         TilbakekrevingValgDto tilbakekrevingValgDto = new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD);
-        when(oidcRestClientMock.getReturnsOptional(BEHANDLING_URI, FpsakBehandlingInfoDto.class)).thenReturn(Optional.of(dokumentinfoDto()));
-        when(oidcRestClientMock.getReturnsOptional(TILBAKEKREVING_VALG_URI, TilbakekrevingValgDto.class)).thenReturn(Optional.of(tilbakekrevingValgDto));
+        when(restClientMock.sendReturnOptional(any(), eq(FpsakBehandlingInfoDto.class))).thenReturn(Optional.of(dokumentinfoDto()));
+        when(restClientMock.sendReturnOptional(any(), eq(TilbakekrevingValgDto.class))).thenReturn(Optional.of(tilbakekrevingValgDto));
 
         Optional<TilbakekrevingValgDto> valgDto = klient.hentTilbakekrevingValg(BEHANDLING_UUID);
         assertThat(valgDto).isPresent();
@@ -108,8 +104,8 @@ public class FpsakKlientTest {
 
     @Test
     public void skal_returnere_tom_tilbakekreving_valg() {
-        when(oidcRestClientMock.getReturnsOptional(BEHANDLING_URI, FpsakBehandlingInfoDto.class)).thenReturn(Optional.of(dokumentinfoDto()));
-        when(oidcRestClientMock.getReturnsOptional(TILBAKEKREVING_VALG_URI, TilbakekrevingValgDto.class)).thenReturn(Optional.empty());
+        when(restClientMock.sendReturnOptional(any(), eq(FpsakBehandlingInfoDto.class))).thenReturn(Optional.of(dokumentinfoDto()));
+        when(restClientMock.sendReturnOptional(any(), eq(TilbakekrevingValgDto.class))).thenReturn(Optional.empty());
 
         Optional<TilbakekrevingValgDto> valgDto = klient.hentTilbakekrevingValg(BEHANDLING_UUID);
         assertThat(valgDto).isEmpty();
