@@ -1,17 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9;
 
-import static no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9AbacAttributter.RESOURCE_K9_SAK_ANSVARLIG_SAKSBEHANDLER;
-import static no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9AbacAttributter.RESOURCE_K9_SAK_BEHANDLINGSSTATUS;
-import static no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9AbacAttributter.RESOURCE_K9_SAK_SAKSNUMMER;
-import static no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9AbacAttributter.RESOURCE_K9_SAK_SAKSSTATUS;
-
 import no.nav.vedtak.sikkerhet.abac.pdp.RessursDataKey;
 
 public enum K9DataKeys implements RessursDataKey {
-    SAKSBEHANDLER(RESOURCE_K9_SAK_ANSVARLIG_SAKSBEHANDLER),
-    BEHANDLING_STATUS(RESOURCE_K9_SAK_BEHANDLINGSSTATUS),
-    FAGSAK_STATUS(RESOURCE_K9_SAK_SAKSSTATUS),
-    SAKSNUMMER(RESOURCE_K9_SAK_SAKSNUMMER);
+    SAKSBEHANDLER("no.nav.abac.attributter.resource.k9.sak.ansvarlig_saksbehandler"),
+    BEHANDLING_STATUS("no.nav.abac.attributter.resource.k9.sak.behandlingsstatus"),
+    FAGSAK_STATUS("no.nav.abac.attributter.resource.k9.sak.saksstatus"),
+    SAKSNUMMER("no.nav.abac.attributter.resource.k9.saksnr");
 
     private final String key;
 
