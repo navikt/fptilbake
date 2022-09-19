@@ -13,7 +13,7 @@
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
     <artifactId>fptilbake</artifactId>
     <version>${revision}</version>
-    <packaging>pom</packaging>>
+    <packaging>pom</packaging>
     <name>FPTILBAKE :: Root</name>
 
     <modules>
