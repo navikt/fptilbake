@@ -2,10 +2,10 @@ package no.nav.foreldrepenger.tilbakekreving.k9sak.klient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,7 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingV
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.K9sakBehandlingInfoDto;
 import no.nav.vedtak.exception.IntegrasjonException;
-import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
+import no.nav.vedtak.felles.integrasjon.rest.RestClient;
 
 public class K9sakKlientTest {
 
@@ -31,21 +31,17 @@ public class K9sakKlientTest {
     private static final Henvisning HENVISNING = K9HenvisningKonverterer.uuidTilHenvisning(BEHANDLING_UUID);
 
     private static final String BASE_URI = "http://k9-sak";
-    private static final URI BEHANDLING_URI = URI.create(BASE_URI + "/k9/sak/api/behandling/backend-root?behandlingUuid=" + BEHANDLING_UUID);
-    private static final URI BEHANDLING_ALLE_URI = URI.create(BASE_URI + "/k9/sak/api/behandlinger/alle?saksnummer=" + SAKSNUMMER);
-    private static final URI PERSONOPPLYSNING_URI = URI.create(BASE_URI + "/k9/sak/api/behandling/person/personopplysninger?behandlingUuid=" + BEHANDLING_UUID);
-    private static final URI TILBAKEKREVING_VALG_URI = URI.create(BASE_URI + "/k9/sak/api/behandling/tilbakekreving/valg?behandlingUuid=" + BEHANDLING_UUID);
 
-    private final OidcRestClient oidcRestClientMock = mock(OidcRestClient.class);
+    private final RestClient restClientMock = mock(RestClient.class);
 
-    private final K9sakKlient klient = new K9sakKlient(oidcRestClientMock);
+    private final K9sakKlient klient = new K9sakKlient(restClientMock);
 
     @Test
     public void skal_hente_behandlingInfoDto() {
         K9sakBehandlingInfoDto returnDto = k9sakBehandlingInfoDto();
 
-        when(oidcRestClientMock.getReturnsOptional(BEHANDLING_URI, K9sakBehandlingInfoDto.class)).thenReturn(Optional.of(returnDto));
-        when(oidcRestClientMock.getReturnsOptional(PERSONOPPLYSNING_URI, PersonopplysningDto.class)).thenReturn(Optional.of(personopplysningDto()));
+        when(restClientMock.sendReturnOptional(any(), eq(K9sakBehandlingInfoDto.class))).thenReturn(Optional.of(returnDto));
+        when(restClientMock.sendReturnOptional(any(), eq(PersonopplysningDto.class))).thenReturn(Optional.of(personopplysningDto()));
 
         SamletEksternBehandlingInfo dokumentinfoDto = klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER);
 
@@ -55,7 +51,7 @@ public class K9sakKlientTest {
 
     @Test
     public void skal_kaste_exception_når_k9sak_behandling_ikke_finnes() {
-        when(oidcRestClientMock.getReturnsOptional(any(), any())).thenReturn(Optional.empty());
+        when(restClientMock.sendReturnOptional(any(), any())).thenReturn(Optional.empty());
 
         Assertions.assertThrows(IntegrasjonException.class, () -> klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER));
     }
@@ -65,7 +61,7 @@ public class K9sakKlientTest {
         K9sakBehandlingInfoDto eksternBehandlingInfo = k9sakBehandlingInfoDto();
         K9sakKlient.ListeAvK9sakBehandlingInfoDto liste = new K9sakKlient.ListeAvK9sakBehandlingInfoDto();
         liste.add(eksternBehandlingInfo);
-        when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, K9sakKlient.ListeAvK9sakBehandlingInfoDto.class)).thenReturn(liste);
+        when(restClientMock.send(any(), eq(K9sakKlient.ListeAvK9sakBehandlingInfoDto.class))).thenReturn(liste);
 
         boolean erFinnesIK9sak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
         assertThat(erFinnesIK9sak).isTrue();
@@ -73,7 +69,7 @@ public class K9sakKlientTest {
 
     @Test
     public void skal_returnere_tom_hvis_finnes_ikke_behandling_i_k9sak() {
-        when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, K9sakKlient.ListeAvK9sakBehandlingInfoDto.class)).thenReturn(new K9sakKlient.ListeAvK9sakBehandlingInfoDto());
+        when(restClientMock.send(any(), eq(K9sakKlient.ListeAvK9sakBehandlingInfoDto.class))).thenReturn(new K9sakKlient.ListeAvK9sakBehandlingInfoDto());
 
         boolean erFinnesIK9sak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
         assertThat(erFinnesIK9sak).isFalse();
@@ -82,8 +78,8 @@ public class K9sakKlientTest {
     @Test
     public void skal_returnere_tilbakekreving_valg() {
         TilbakekrevingValgDto tilbakekrevingValgDto = new TilbakekrevingValgDto(VidereBehandling.TILBAKEKR_OPPRETT);
-        when(oidcRestClientMock.getReturnsOptional(BEHANDLING_URI, K9sakBehandlingInfoDto.class)).thenReturn(Optional.of(k9sakBehandlingInfoDto()));
-        when(oidcRestClientMock.getReturnsOptional(TILBAKEKREVING_VALG_URI, TilbakekrevingValgDto.class)).thenReturn(Optional.of(tilbakekrevingValgDto));
+        when(restClientMock.sendReturnOptional(any(), eq(K9sakBehandlingInfoDto.class))).thenReturn(Optional.of(k9sakBehandlingInfoDto()));
+        when(restClientMock.sendReturnOptional(any(), eq(TilbakekrevingValgDto.class))).thenReturn(Optional.of(tilbakekrevingValgDto));
 
         Optional<TilbakekrevingValgDto> valgDto = klient.hentTilbakekrevingValg(BEHANDLING_UUID);
         assertThat(valgDto).isPresent();
@@ -92,8 +88,8 @@ public class K9sakKlientTest {
 
     @Test
     public void skal_returnere_tom_tilbakekreving_valg() {
-        when(oidcRestClientMock.getReturnsOptional(BEHANDLING_URI, K9sakBehandlingInfoDto.class)).thenReturn(Optional.of(k9sakBehandlingInfoDto()));
-        when(oidcRestClientMock.getReturnsOptional(TILBAKEKREVING_VALG_URI, TilbakekrevingValgDto.class)).thenReturn(Optional.empty());
+        when(restClientMock.sendReturnOptional(any(), eq(K9sakBehandlingInfoDto.class))).thenReturn(Optional.of(k9sakBehandlingInfoDto()));
+        when(restClientMock.sendReturnOptional(any(), eq(TilbakekrevingValgDto.class))).thenReturn(Optional.empty());
 
         Optional<TilbakekrevingValgDto> valgDto = klient.hentTilbakekrevingValg(BEHANDLING_UUID);
         assertThat(valgDto).isEmpty();

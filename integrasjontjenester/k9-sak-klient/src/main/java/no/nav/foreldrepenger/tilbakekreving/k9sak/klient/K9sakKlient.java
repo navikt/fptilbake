@@ -32,10 +32,14 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.Feil
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.K9sakBehandlingInfoDto;
 import no.nav.vedtak.exception.IntegrasjonException;
-import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
+import no.nav.vedtak.felles.integrasjon.rest.RestClient;
+import no.nav.vedtak.felles.integrasjon.rest.RestClientConfig;
+import no.nav.vedtak.felles.integrasjon.rest.RestRequest;
+import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 
 @ApplicationScoped
 @K9tilbake
+@RestClientConfig(tokenConfig = TokenFlow.CONTEXT)
 public class K9sakKlient implements FagsystemKlient {
 
     private static final Logger logger = LoggerFactory.getLogger(K9sakKlient.class);
@@ -54,10 +58,10 @@ public class K9sakKlient implements FagsystemKlient {
     private static final String K9_OPPDRAG_OVERRIDE_URL = "k9oppdrag.override.url";
     private static final String K9_OPPDRAG_HENT_FEILUTBETALINGER = "/simulering/feilutbetalte-perioder";
 
-    private OidcRestClient restClient;
+    private RestClient restClient;
 
     @Inject
-    public K9sakKlient(OidcRestClient restClient) {
+    public K9sakKlient(RestClient restClient) {
         this.restClient = restClient;
     }
 
@@ -115,8 +119,8 @@ public class K9sakKlient implements FagsystemKlient {
     public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning) {
         UUID uuid = K9HenvisningKonverterer.henvisningTilUuid(henvisning);
         URI hentFeilutbetalingerUri = URI.create(getK9OoppdragBaseUri() + K9_OPPDRAG_HENT_FEILUTBETALINGER);
-        return restClient
-                .postReturnsOptional(hentFeilutbetalingerUri, uuid, FeilutbetaltePerioderDto.class)
+        var request = RestRequest.newPOSTJson(uuid, hentFeilutbetalingerUri, K9sakKlient.class);
+        return restClient.sendReturnOptional(request, FeilutbetaltePerioderDto.class)
                 .orElseThrow(() -> new IntegrasjonException("FPT-748280", String.format("Fant ikke behandling med behandlingUuid %s k9-oppdrag", uuid)));
     }
 
@@ -125,7 +129,7 @@ public class K9sakKlient implements FagsystemKlient {
 
     private List<K9sakBehandlingInfoDto> hentK9sakBehandlingForSaksnummer(String saksnummer) {
         URI endpoint = createUri(BEHANDLING_ALLE_EP, PARAM_NAME_SAKSNUMMER, saksnummer);
-        List<K9sakBehandlingInfoDto> behandlinger = restClient.get(endpoint, ListeAvK9sakBehandlingInfoDto.class);
+        List<K9sakBehandlingInfoDto> behandlinger = restClient.send(RestRequest.newGET(endpoint, K9sakKlient.class), ListeAvK9sakBehandlingInfoDto.class);
         for (K9sakBehandlingInfoDto dto : behandlinger) {
             dto.setHenvisning(hentHenvisning(dto.getUuid()));
         }
@@ -213,7 +217,7 @@ public class K9sakKlient implements FagsystemKlient {
     }
 
     private <T> Optional<T> get(URI endpoint, Class<T> tClass) {
-        return restClient.getReturnsOptional(endpoint, tClass);
+        return restClient.sendReturnOptional(RestRequest.newGET(endpoint, K9sakKlient.class), tClass);
     }
 
     private URI apiUri() {

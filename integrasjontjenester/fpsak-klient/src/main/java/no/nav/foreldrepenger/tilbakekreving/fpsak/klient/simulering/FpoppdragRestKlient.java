@@ -5,38 +5,39 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.core.UriBuilder;
 
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.FeilutbetaltePerioderDto;
-import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
+import no.nav.vedtak.felles.integrasjon.rest.FpApplication;
+import no.nav.vedtak.felles.integrasjon.rest.RestClient;
+import no.nav.vedtak.felles.integrasjon.rest.RestClientConfig;
+import no.nav.vedtak.felles.integrasjon.rest.RestConfig;
+import no.nav.vedtak.felles.integrasjon.rest.RestRequest;
+import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 
 @ApplicationScoped
+@RestClientConfig(tokenConfig = TokenFlow.CONTEXT, application = FpApplication.FPOPPDRAG)
 public class FpoppdragRestKlient {
 
     private static final Environment ENV = Environment.current();
 
-    private OidcRestClient restClient;
+    private RestClient restClient;
+    private URI target;
 
     protected FpoppdragRestKlient() {
         //for cdi proxy
     }
 
     @Inject
-    public FpoppdragRestKlient(OidcRestClient restClient) {
+    public FpoppdragRestKlient(RestClient restClient) {
         this.restClient = restClient;
+        var endpoint = RestConfig.endpointFromAnnotation(FpoppdragRestKlient.class);
+        this.target = URI.create(endpoint.toString() + "/api/simulering/feilutbetalte-perioder");
     }
 
     public Optional<FeilutbetaltePerioderDto> hentFeilutbetaltePerioder(long fpsakBehandlingId) {
-        var uri = UriBuilder
-                .fromUri(baseUri())
-                .path("/fpoppdrag/api")
-                .path("/simulering/feilutbetalte-perioder")
-                .build();
-        return restClient.postReturnsOptional(uri, new BehandlingIdDto(fpsakBehandlingId), FeilutbetaltePerioderDto.class);
+        var request = RestRequest.newPOSTJson(new BehandlingIdDto(fpsakBehandlingId), target, FpoppdragRestKlient.class);
+        return restClient.sendReturnOptional(request, FeilutbetaltePerioderDto.class);
     }
 
-    private static URI baseUri() {
-        return ENV.getProperty("fpoppdrag.base.url", URI.class);
-    }
 }
