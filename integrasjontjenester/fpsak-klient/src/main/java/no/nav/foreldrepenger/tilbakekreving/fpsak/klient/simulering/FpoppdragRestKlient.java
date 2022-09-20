@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.core.UriBuilder;
 
-import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.FeilutbetaltePerioderDto;
 import no.nav.vedtak.felles.integrasjon.rest.FpApplication;
 import no.nav.vedtak.felles.integrasjon.rest.RestClient;
@@ -19,8 +19,6 @@ import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 @RestClientConfig(tokenConfig = TokenFlow.CONTEXT, application = FpApplication.FPOPPDRAG)
 public class FpoppdragRestKlient {
 
-    private static final Environment ENV = Environment.current();
-
     private RestClient restClient;
     private URI target;
 
@@ -31,8 +29,8 @@ public class FpoppdragRestKlient {
     @Inject
     public FpoppdragRestKlient(RestClient restClient) {
         this.restClient = restClient;
-        var endpoint = RestConfig.endpointFromAnnotation(FpoppdragRestKlient.class);
-        this.target = URI.create(endpoint.toString() + "/api/simulering/feilutbetalte-perioder");
+        var endpoint = RestConfig.contextPathFromAnnotation(FpoppdragRestKlient.class);
+        this.target = UriBuilder.fromUri(endpoint).path("/api/simulering/feilutbetalte-perioder").build();
     }
 
     public Optional<FeilutbetaltePerioderDto> hentFeilutbetaltePerioder(long fpsakBehandlingId) {
