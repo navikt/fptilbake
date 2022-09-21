@@ -63,6 +63,13 @@ spec:
       - mountPath: /var/run/secrets/nais.io/appdynamics
         kvPath: /apikey/appdynamics/{{environment}}
   sidecar: true # refresh token
+  
+  azure:
+    application:
+      enabled: true
+      claims:
+        extra:
+          - "NAVident"
   env:
   # miljø-spesifikke variable
   {{#each env}}
