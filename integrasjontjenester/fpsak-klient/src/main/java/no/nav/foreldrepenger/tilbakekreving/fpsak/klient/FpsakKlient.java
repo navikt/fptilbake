@@ -30,6 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceL
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingInfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering.FpoppdragRestKlient;
 import no.nav.vedtak.exception.IntegrasjonException;
+import no.nav.vedtak.felles.integrasjon.rest.FpApplication;
 import no.nav.vedtak.felles.integrasjon.rest.RestClient;
 import no.nav.vedtak.felles.integrasjon.rest.RestClientConfig;
 import no.nav.vedtak.felles.integrasjon.rest.RestConfig;
@@ -38,15 +39,12 @@ import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 
 @ApplicationScoped
 @Fptilbake
-@RestClientConfig(tokenConfig = TokenFlow.CONTEXT, endpointProperty = "fpsak.base.url", endpointDefault = "http://fpsak")
+@RestClientConfig(tokenConfig = TokenFlow.ADAPTIVE, application = FpApplication.FPSAK)
 public class FpsakKlient implements FagsystemKlient {
 
     private RestClient restClient;
     private URI base;
 
-    //TODO skriv om slik at fpoppdrag ikke behandles spesielt
-    //fpoppdrag trenger ikke en egen klient
-    //kanskje den til og med skal skrives om til at fpsak gir lenke (slik som for de andre tjenestene)
     private FpoppdragRestKlient fpoppdragKlient;
 
     FpsakKlient() {
@@ -57,7 +55,7 @@ public class FpsakKlient implements FagsystemKlient {
     public FpsakKlient(RestClient restClient, FpoppdragRestKlient fpoppdragKlient) {
         this.restClient = restClient;
         this.fpoppdragKlient = fpoppdragKlient;
-        this.base = RestConfig.endpointFromAnnotation(FpsakKlient.class);
+        this.base = RestConfig.contextPathFromAnnotation(FpsakKlient.class);
     }
 
     @Override
@@ -117,7 +115,7 @@ public class FpsakKlient implements FagsystemKlient {
     }
 
     private Optional<FpsakBehandlingInfoDto> hentFpsakBehandlingOptional(UUID eksternUuid) {
-        URI endpoint = createUri("/behandling/backend-root", "uuid", eksternUuid.toString());
+        URI endpoint = createUri("/api/behandling/backend-root", "uuid", eksternUuid.toString());
         Optional<FpsakBehandlingInfoDto> dto = get(endpoint, FpsakBehandlingInfoDto.class);
         if (dto.isPresent()) {
             FpsakBehandlingInfoDto fpsakdto = dto.get();
@@ -163,7 +161,7 @@ public class FpsakKlient implements FagsystemKlient {
     }
 
     public List<FpsakBehandlingInfoDto> hentFpsakBehandlingForSaksnummer(String saksnummer) {
-        URI endpoint = createUri("/behandlinger/alle", "saksnummer", saksnummer);
+        URI endpoint = createUri("/api/behandlinger/alle", "saksnummer", saksnummer);
         List<FpsakBehandlingInfoDto> behandlinger = restClient.send(RestRequest.newGET(endpoint, FpsakKlient.class), ListeAvFpsakBehandlingInfoDto.class);
         for (FpsakBehandlingInfoDto dto : behandlinger) {
             dto.setHenvisning(Henvisning.fraEksternBehandlingId(dto.getId()));
@@ -171,40 +169,43 @@ public class FpsakKlient implements FagsystemKlient {
         return behandlinger;
     }
 
+    private URI endpointFraLink(BehandlingResourceLinkDto resourceLink) {
+        var linkpath = resourceLink.getHref();
+        var path = linkpath.startsWith("/fpsak") ?  linkpath.replaceFirst("/fpsak", "") : linkpath;
+        return URI.create(base + path);
+    }
+
     private PersonopplysningDto hentPersonopplysninger(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = URI.create(base + resourceLink.getHref());
-        PersonopplysningDto dto = get(endpoint, PersonopplysningDto.class).orElseThrow(() -> new IllegalArgumentException("Forventet å finne personopplysninger på lenken: " + endpoint));
-        if (dto == null) {
-            throw new IllegalArgumentException("Fikk null personopplysninger på lenken: " + endpoint);
-        }
-        return dto;
+        URI endpoint = endpointFraLink(resourceLink);
+        return get(endpoint, PersonopplysningDto.class)
+            .orElseThrow(() -> new IllegalArgumentException("Forventet å finne personopplysninger på lenken: " + endpoint));
     }
 
     private Optional<VarseltekstDto> hentVarseltekst(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = URI.create(base + resourceLink.getHref());
+        URI endpoint = endpointFraLink(resourceLink);
         return get(endpoint, VarseltekstDto.class);
 
     }
 
     private SoknadDto hentSøknad(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = URI.create(base + resourceLink.getHref());
+        URI endpoint = endpointFraLink(resourceLink);
         return get(endpoint, SoknadDto.class)
                 .orElseThrow(() -> new IllegalArgumentException("Forventet å finne søknad på lenken: " + endpoint));
     }
 
     private Optional<TilbakekrevingValgDto> hentTilbakekrevingValg(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = URI.create(base + resourceLink.getHref());
+        URI endpoint = endpointFraLink(resourceLink);
         return get(endpoint, TilbakekrevingValgDto.class);
     }
 
     private FagsakDto hentFagsak(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = URI.create(base + resourceLink.getHref());
+        URI endpoint = endpointFraLink(resourceLink);
         return get(endpoint, FagsakDto.class)
                 .orElseThrow(() -> new IllegalArgumentException("Forventet å finne fagsak på lenken: " + endpoint));
     }
 
     private Optional<VergeDto> hentVergeInformasjon(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = URI.create(base + resourceLink.getHref());
+        URI endpoint = endpointFraLink(resourceLink);
         return get(endpoint, VergeDto.class);
     }
 
@@ -213,10 +214,8 @@ public class FpsakKlient implements FagsystemKlient {
     }
 
     private URI createUri(String endpoint, String paramName, String paramValue) {
-        var builder = UriBuilder
-                .fromUri(base)
-                .path("/fpsak/api")
-                .path(endpoint);
+        var builder = UriBuilder.fromUri(base)
+            .path(endpoint);
 
         if (notNullOrEmpty(paramName) && notNullOrEmpty(paramValue)) {
             builder.queryParam(paramName, paramValue);
