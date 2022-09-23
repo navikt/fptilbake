@@ -43,8 +43,8 @@
     "KODEVERK_V2_URL": "https://kodeverk.nais.adeo.no/ws/kodeverk/v2",
     "FORELDELSE_ANTALLMAANEDER" : "P1M",
     "VEDTAKSBREV_JOIN_PERIODER" : "true"
-  }
-    "AZURE_IAC_RULES": [
+  },
+  "AZURE_IAC_RULES": [
     {
       "app": "k9-sak",
       "namespace": "k9saksbehandling",
