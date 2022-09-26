@@ -19,14 +19,6 @@
     {
       "app": "fp-swagger",
       "namespace": "teamforeldrepenger",
-      "cluster": "dev-fss",
-      "scopes": [
-        "swagger"
-      ]
-    },
-    {
-      "app": "fp-swagger",
-      "namespace": "teamforeldrepenger",
       "cluster": "dev-gcp",
       "scopes": [
         "swagger"
