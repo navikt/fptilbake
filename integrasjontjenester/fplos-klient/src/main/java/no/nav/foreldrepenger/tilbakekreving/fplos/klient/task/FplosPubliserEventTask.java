@@ -148,6 +148,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
                 .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligSaksbehandler())
                 .medFørsteFeilutbetaling(hentFørsteFeilutbetalingDato(kravgrunnlag431, kravgrunnlagManglerFristTid))
                 .medFeilutbetaltBeløp(kravgrunnlag431 != null ? hentFeilutbetaltBeløp(behandling.getId()) : BigDecimal.ZERO)
+                .medAnsvarligBeslutterIdent(behandling.getAnsvarligBeslutter())
                 .build();
     }
 
