@@ -75,9 +75,14 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
 
         var ressursData = AppRessursData.builder()
             .leggTilAktørIdSet(dataAttributter.getVerdier(AppAbacAttributtType.AKTØR_ID));
-        Optional.ofNullable(behandlingData).ifPresent(bi -> ressursData.leggTilAbacAktørIdSet(bi.getAktørIdNonNull()));
-        utledSaksnummer(dataAttributter, behandlingData).ifPresent(s -> ressursData.leggTilRessurs(K9DataKeys.SAKSNUMMER, s));
-        
+
+        Optional<String> saksnummer = utledSaksnummer(dataAttributter, behandlingData);
+        saksnummer.ifPresent(s -> ressursData.leggTilRessurs(K9DataKeys.SAKSNUMMER, s));
+
+        if (saksnummer.isEmpty()) {
+            Optional.ofNullable(behandlingData).ifPresent(bi -> ressursData.leggTilAbacAktørIdSet(bi.getAktørIdNonNull()));
+        }
+
         Optional.ofNullable(behandlingData).map(PipBehandlingInfo::fagsakstatus)
             .ifPresent(fss -> ressursData.leggTilRessurs(K9DataKeys.FAGSAK_STATUS, fss));
         Optional.ofNullable(behandlingData).map(PipBehandlingInfo::statusForBehandling)
