@@ -43,7 +43,7 @@
     "KODEVERK_V2_URL": "https://kodeverk.nais.adeo.no/ws/kodeverk/v2",
     "FORELDELSE_ANTALLMAANEDER" : "P1M",
     "VEDTAKSBREV_JOIN_PERIODER" : "true",
-    "AKTIVER_ABAC_LOGGING" : "true"
+    "AKTIVER_ABAC_LOGGING" : "false"
   },
   "AZURE_IAC_RULES": [
     {
