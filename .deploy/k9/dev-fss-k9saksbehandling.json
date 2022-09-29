@@ -42,7 +42,8 @@
     "ABAC_ATTRIBUTT_DRIFT" : "no.nav.abac.attributter.k9.drift",
     "KODEVERK_V2_URL": "https://kodeverk.nais.adeo.no/ws/kodeverk/v2",
     "FORELDELSE_ANTALLMAANEDER" : "P1M",
-    "VEDTAKSBREV_JOIN_PERIODER" : "true"
+    "VEDTAKSBREV_JOIN_PERIODER" : "true",
+    "AKTIVER_ABAC_LOGGING" : "true"
   },
   "AZURE_IAC_RULES": [
     {

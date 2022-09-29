@@ -9,6 +9,10 @@ import java.util.UUID;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
@@ -27,18 +31,23 @@ import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
 @K9tilbake
 public class K9PdpRequestBuilder implements PdpRequestBuilder {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(K9PdpRequestBuilder.class);
+
     public static final String ABAC_DOMAIN = "k9";
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
 
     private PipRepository pipRepository;
+    private boolean aktiverAbacLogging;
 
     K9PdpRequestBuilder() {
         // For CDI proxy
     }
 
     @Inject
-    public K9PdpRequestBuilder(PipRepository pipRepository) {
+    public K9PdpRequestBuilder(PipRepository pipRepository,
+                               @KonfigVerdi(value = "aktiver.abac.logging", required = false, defaultVerdi = "false") boolean aktiverAbacLogging) {
         this.pipRepository = pipRepository;
+        this.aktiverAbacLogging = aktiverAbacLogging;
     }
 
     @Override
@@ -90,8 +99,27 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
         Optional.ofNullable(behandlingData).map(PipBehandlingInfo::ansvarligSaksbehandler)
             .ifPresent(sbh -> ressursData.leggTilRessurs(K9DataKeys.SAKSBEHANDLER, sbh));
 
+        AppRessursData ressursDataBuild = ressursData.build();
 
-        return ressursData.build();
+        if (aktiverAbacLogging) {
+            logg(ressursDataBuild);
+        }
+
+        return ressursDataBuild;
+    }
+
+    private static void logg(AppRessursData build) {
+        String melding = String.format(
+            "Abac Ressursdata: saksnummer=%s behandlingstatus=%s fagsakstatus=%s harSaksbehandler=%s  antallAktørIdSet=%d antallFnr=%d",
+            build.getResource(K9DataKeys.SAKSNUMMER),
+            build.getResource(K9DataKeys.BEHANDLING_STATUS),
+            build.getResource(K9DataKeys.FAGSAK_STATUS),
+            build.getResource(K9DataKeys.SAKSBEHANDLER) != null,
+            build.getAktørIdSet().size(),
+            build.getFødselsnumre().size()
+        );
+
+        LOGGER.info(melding);
     }
 
     private Optional<String> utledSaksnummer(AbacDataAttributter attributter, PipBehandlingInfo behandlingData) {
