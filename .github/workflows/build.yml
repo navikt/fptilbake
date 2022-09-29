@@ -122,7 +122,7 @@ jobs:
                owner: context.issue.owner,
                repo: context.issue.repo,
                issue_number: ${{ steps.createdeployissue.outputs.number }},
-               body: 'Kommenter med <b>/promote cluster namespace</b>, <b>cluster</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.\n\
+               body: 'Kommenter med <b>/promote cluster namespace</b>, hvor <b>cluster</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.\n\
                 <table>\n\
                 <tr><th>kommando</th><th>Cluster</th><th>Namespace</th></tr>\n\
                 <tr><td>promote</td><td>dev-fss</td><td>teamforeldrepenger</td></tr>\n\
