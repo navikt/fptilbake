@@ -50,7 +50,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgru
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
-import no.nav.vedtak.felles.integrasjon.rest.jersey.TimingFilter;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 
 
@@ -122,7 +121,6 @@ public class ApplicationConfig extends Application {
         classes.add(OpenApiResource.class);
 
         // Applikasjonsoppsett
-        classes.add(TimingFilter.class);
         classes.add(JacksonJsonConfig.class);
 
         // ExceptionMappers pga de som finnes i Jackson+Jersey-media

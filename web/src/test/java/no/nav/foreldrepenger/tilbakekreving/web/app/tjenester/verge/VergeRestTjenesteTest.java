@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -17,7 +18,6 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -131,7 +131,7 @@ public class VergeRestTjenesteTest {
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
         when(vergeTjenesteMock.hentVergeInformasjon(anyLong())).thenReturn(Optional.empty());
         Response response = vergeRestTjeneste.hentBehandlingsmenyvalg(new BehandlingReferanse(behandling.getId()));
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
         assertThat(((VergeBehandlingsmenyDto) response.getEntity()).getVergeBehandlingsmeny()).isEqualByComparingTo(VergeBehandlingsmenyEnum.OPPRETT);
     }
 
@@ -148,7 +148,7 @@ public class VergeRestTjenesteTest {
                 .medBegrunnelse("begunnlese").build();
         when(vergeTjenesteMock.hentVergeInformasjon(anyLong())).thenReturn(Optional.of(vergeEntitet));
         Response response = vergeRestTjeneste.hentBehandlingsmenyvalg(new BehandlingReferanse(behandling.getId()));
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
         assertThat(((VergeBehandlingsmenyDto) response.getEntity()).getVergeBehandlingsmeny()).isEqualByComparingTo(VergeBehandlingsmenyEnum.FJERN);
     }
 
@@ -160,7 +160,7 @@ public class VergeRestTjenesteTest {
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
         when(vergeTjenesteMock.hentVergeInformasjon(anyLong())).thenReturn(Optional.empty());
         Response response = vergeRestTjeneste.hentBehandlingsmenyvalg(new BehandlingReferanse(behandling.getId()));
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
         assertThat(((VergeBehandlingsmenyDto) response.getEntity()).getVergeBehandlingsmeny()).isEqualByComparingTo(VergeBehandlingsmenyEnum.SKJUL);
     }
 

@@ -8,29 +8,30 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.vedtak.felles.integrasjon.organisasjon.OrganisasjonRestKlient;
+import no.nav.vedtak.felles.integrasjon.organisasjon.OrgInfo;
+
 
 @ApplicationScoped
 public class VirksomhetTjeneste {
 
     private static final Logger log = LoggerFactory.getLogger(VirksomhetTjeneste.class);
-    private OrganisasjonRestKlient organisasjonConsumer;
+    private OrgInfo organisasjonConsumer;
 
     VirksomhetTjeneste() {
         // for CDI
     }
 
     @Inject
-    public VirksomhetTjeneste(OrganisasjonRestKlient organisasjonConsumer) {
+    public VirksomhetTjeneste(OrgInfo organisasjonConsumer) {
         this.organisasjonConsumer = organisasjonConsumer;
     }
 
     public Virksomhet hentOrganisasjon(String orgNummer) {
         Objects.requireNonNull(orgNummer, "orgNummer");
-        var response = organisasjonConsumer.hentOrganisasjon(orgNummer);
+        var response = organisasjonConsumer.hentOrganisasjonNavn(orgNummer);
         return new Virksomhet.Builder()
                 .medOrgnr(orgNummer)
-                .medNavn(response.getNavn())
+                .medNavn(response)
                 .build();
     }
 

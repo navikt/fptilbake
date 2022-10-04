@@ -67,8 +67,8 @@ public class NavAnsattRestTjeneste {
     }
 
     InnloggetNavAnsattDto getInnloggetBrukerDto(String ident, LdapBruker ldapBruker) {
-        String navn = ldapBruker.getDisplayName();
-        Collection<String> grupper = LdapUtil.filtrerGrupper(ldapBruker.getGroups());
+        String navn = ldapBruker.displayName();
+        Collection<String> grupper = LdapUtil.filtrerGrupper(ldapBruker.groups());
         return InnloggetNavAnsattDto.builder()
                 .setBrukernavn(ident)
                 .setNavn(navn)

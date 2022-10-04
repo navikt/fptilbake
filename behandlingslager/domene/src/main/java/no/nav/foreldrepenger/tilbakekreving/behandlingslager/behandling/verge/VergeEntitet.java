@@ -14,8 +14,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.apache.http.util.Args;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -162,11 +160,9 @@ public class VergeEntitet extends BaseEntitet {
             Objects.requireNonNull(this.kladd.navn, "navn");
             Objects.requireNonNull(this.kladd.begrunnelse, "begrunnelse");
 
-            if (this.kladd.vergeAktørId == null) {
-                Args.notEmpty(this.kladd.organisasjonsnummer, "Organisasjonsnummer må finnes for verge organisasjon");
-            }
-            if (this.kladd.organisasjonsnummer == null) {
-                Args.notNull(this.kladd.vergeAktørId, "AktørId må finnes for verge organisasjon");
+            if (this.kladd.vergeAktørId == null && (this.kladd.organisasjonsnummer == null || this.kladd.organisasjonsnummer.isEmpty())) {
+                throw new IllegalArgumentException("Organisasjonsnummer eller vergeAktørId må finnes for verge organisasjon");
+
             }
             return kladd;
         }
