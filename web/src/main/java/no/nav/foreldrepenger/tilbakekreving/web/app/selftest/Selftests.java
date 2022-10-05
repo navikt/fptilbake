@@ -45,28 +45,7 @@ public class Selftests {
         }
     }
 
-    public static class Resultat {
-        private final boolean isReady;
-        private final String description;
-        private final String endpoint;
-
-        public Resultat(boolean isReady, String description, String endpoint) {
-            this.isReady = isReady;
-            this.description = description;
-            this.endpoint = endpoint;
-        }
-
-        public boolean isReady() {
-            return isReady;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getEndpoint() {
-            return endpoint;
-        }
+    public record Resultat(boolean isReady, String description, String endpoint) {
     }
 
 }

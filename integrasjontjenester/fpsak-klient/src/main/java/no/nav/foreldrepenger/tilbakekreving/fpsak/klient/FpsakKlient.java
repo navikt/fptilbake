@@ -43,7 +43,7 @@ import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 public class FpsakKlient implements FagsystemKlient {
 
     private RestClient restClient;
-    private URI base;
+    private RestConfig restConfig;
 
     private FpoppdragRestKlient fpoppdragKlient;
 
@@ -54,8 +54,8 @@ public class FpsakKlient implements FagsystemKlient {
     @Inject
     public FpsakKlient(RestClient restClient, FpoppdragRestKlient fpoppdragKlient) {
         this.restClient = restClient;
+        this.restConfig = RestConfig.forClient(this.getClass());
         this.fpoppdragKlient = fpoppdragKlient;
-        this.base = RestConfig.contextPathFromAnnotation(FpsakKlient.class);
     }
 
     @Override
@@ -162,7 +162,7 @@ public class FpsakKlient implements FagsystemKlient {
 
     public List<FpsakBehandlingInfoDto> hentFpsakBehandlingForSaksnummer(String saksnummer) {
         URI endpoint = createUri("/api/behandlinger/alle", "saksnummer", saksnummer);
-        List<FpsakBehandlingInfoDto> behandlinger = restClient.send(RestRequest.newGET(endpoint, FpsakKlient.class), ListeAvFpsakBehandlingInfoDto.class);
+        List<FpsakBehandlingInfoDto> behandlinger = restClient.send(RestRequest.newGET(endpoint, restConfig), ListeAvFpsakBehandlingInfoDto.class);
         for (FpsakBehandlingInfoDto dto : behandlinger) {
             dto.setHenvisning(Henvisning.fraEksternBehandlingId(dto.getId()));
         }
@@ -172,7 +172,7 @@ public class FpsakKlient implements FagsystemKlient {
     private URI endpointFraLink(BehandlingResourceLinkDto resourceLink) {
         var linkpath = resourceLink.getHref();
         var path = linkpath.startsWith("/fpsak") ?  linkpath.replaceFirst("/fpsak", "") : linkpath;
-        return URI.create(base + path);
+        return URI.create(restConfig.fpContextPath() + path);
     }
 
     private PersonopplysningDto hentPersonopplysninger(BehandlingResourceLinkDto resourceLink) {
@@ -210,11 +210,11 @@ public class FpsakKlient implements FagsystemKlient {
     }
 
     private <T> Optional<T> get(URI endpoint, Class<T> tClass) {
-        return restClient.sendReturnOptional(RestRequest.newGET(endpoint, FpsakKlient.class), tClass);
+        return restClient.sendReturnOptional(RestRequest.newGET(endpoint, restConfig), tClass);
     }
 
     private URI createUri(String endpoint, String paramName, String paramValue) {
-        var builder = UriBuilder.fromUri(base)
+        var builder = UriBuilder.fromUri(restConfig.fpContextPath())
             .path(endpoint);
 
         if (notNullOrEmpty(paramName) && notNullOrEmpty(paramValue)) {

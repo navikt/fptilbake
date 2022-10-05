@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -18,7 +19,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
@@ -130,7 +130,7 @@ public class BehandlingRestTjenesteTest {
         Response response = behandlingRestTjeneste.opprettBehandling(mock(HttpServletRequest.class), opprettBehandlingDto);
 
         verify(revurderingTjenesteMock, atLeastOnce()).opprettRevurdering(any(Long.class), any(BehandlingÅrsakType.class), any(OrganisasjonsEnhet.class));
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_ACCEPTED);
+        assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_ACCEPTED);
     }
 
     @Test
@@ -172,7 +172,7 @@ public class BehandlingRestTjenesteTest {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(Lists.newArrayList(behandling));
         Response response = behandlingRestTjeneste.harÅpenTilbakekrevingBehandling(saksnummerDto);
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
         assertThat(response.getEntity()).isEqualTo(true);
     }
 
@@ -183,7 +183,7 @@ public class BehandlingRestTjenesteTest {
         when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(Lists.newArrayList(behandling));
 
         Response response = behandlingRestTjeneste.harÅpenTilbakekrevingBehandling(saksnummerDto);
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
         assertThat(response.getEntity()).isEqualTo(false);
     }
 
@@ -264,7 +264,7 @@ public class BehandlingRestTjenesteTest {
         when(behandlingTjenesteMock.hentBehandlingvedtakForBehandlingId(any(Long.class))).thenReturn(Optional.of(behandlingVedtak));
 
         Response response = behandlingRestTjeneste.hentTilbakekrevingsVedtakInfo(uuidDto);
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
         KlageTilbakekrevingDto klageTilbakekrevingDto = (KlageTilbakekrevingDto) response.getEntity();
         assertThat(klageTilbakekrevingDto.getBehandlingType()).isEqualTo(BehandlingType.TILBAKEKREVING.getKode());
         assertThat(klageTilbakekrevingDto.getBehandlingId()).isNotNull();

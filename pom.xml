@@ -7,7 +7,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>0.3.5</version>
+        <version>0.3.6</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -31,9 +31,9 @@
     <properties>
         <revision>2.0-SNAPSHOT</revision>
 
-        <felles.version>4.1.45</felles.version>
-        <prosesstask.version>3.1.10</prosesstask.version>
-        <fp-tidsserie.version>2.6.4</fp-tidsserie.version>
+        <felles.version>4.2.1</felles.version>
+        <prosesstask.version>3.1.11</prosesstask.version>
+        <fp-tidsserie.version>2.6.5</fp-tidsserie.version>
         <fp-jms.version>2.2.0</fp-jms.version>
 
         <fpkontrakter.version>6.1.27</fpkontrakter.version>
@@ -334,7 +334,7 @@
                 <!-- velger en transitiv avhengighet - felles ikke enig med seg selv, velger den som blir brukt i prod-scope i felles -->
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.25.0</version>
+                <version>3.26.0</version>
             </dependency>
 
 
