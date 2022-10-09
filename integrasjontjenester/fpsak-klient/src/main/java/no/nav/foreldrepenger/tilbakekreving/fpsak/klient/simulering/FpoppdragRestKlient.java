@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering;
 import java.net.URI;
 import java.util.Optional;
 
-import javax.enterprise.context.Dependent;
 import javax.ws.rs.core.UriBuilder;
 
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.FeilutbetaltePerioderDto;
@@ -14,7 +13,6 @@ import no.nav.vedtak.felles.integrasjon.rest.RestConfig;
 import no.nav.vedtak.felles.integrasjon.rest.RestRequest;
 import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 
-@Dependent
 @RestClientConfig(tokenConfig = TokenFlow.ADAPTIVE, application = FpApplication.FPOPPDRAG)
 public class FpoppdragRestKlient {
 

@@ -12,7 +12,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
-import no.nav.journalpostapi.dto.sak.FagsakSystem;
 import no.nav.vedtak.felles.integrasjon.rest.RestClient;
 import no.nav.vedtak.felles.integrasjon.rest.RestClientConfig;
 import no.nav.vedtak.felles.integrasjon.rest.RestConfig;
@@ -26,9 +25,9 @@ public class DokdistKlient {
 
     private static final Logger logger = LoggerFactory.getLogger(DokdistKlient.class);
 
-    private RestClient restClient;
-    private RestConfig restConfig;
-    private Fagsystem application;
+    private final RestClient restClient;
+    private final RestConfig restConfig;
+    private final Fagsystem application;
 
     public DokdistKlient() {
         this.restClient = RestClient.client();
@@ -48,20 +47,12 @@ public class DokdistKlient {
         DistribuerJournalpostRequest request = new DistribuerJournalpostRequest(
             journalpostId.getVerdi(),
             UUID.randomUUID().toString(),
-            getBestillendeFagsystem().getKode(),
+            application.getOffisiellKode(),
             getDokumentProdAppKode(),
             distribusjonstype,
             Distribusjonstidspunkt.KJERNETID);
         DistribuerJournalpostResponse response = distribuerJournalpost(request);
         logger.info("Bestilt distribusjon av journalpost til {}, bestillingId ble {}", mottaker, response.bestillingsId());
-    }
-
-    private FagsakSystem getBestillendeFagsystem() {
-        return switch (application) {
-            case FPTILBAKE -> FagsakSystem.FORELDREPENGELØSNINGEN;
-            case K9TILBAKE -> FagsakSystem.K9SAK;
-            default -> throw new IllegalArgumentException("Ikke-støttet applikasjon: " + application);
-        };
     }
 
     private String getDokumentProdAppKode() {
