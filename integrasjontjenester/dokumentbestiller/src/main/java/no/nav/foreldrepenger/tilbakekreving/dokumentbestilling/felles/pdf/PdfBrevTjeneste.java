@@ -22,7 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.pdfgen.DokumentVariant;
 import no.nav.foreldrepenger.tilbakekreving.pdfgen.PdfGenerator;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.SelvbetjeningTilbakekrevingStøtte;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendBeskjedUtsendtVarselTilSelvbetjeningTask;
-import no.nav.journalpostapi.dto.dokument.Dokumentkategori;
+import no.nav.journalpostapi.DokArkivKlient;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
@@ -138,11 +138,11 @@ public class PdfBrevTjeneste {
         }
     }
 
-    private Dokumentkategori mapBrevTypeTilDokumentKategori(DetaljertBrevType brevType) {
+    private String mapBrevTypeTilDokumentKategori(DetaljertBrevType brevType) {
         if (DetaljertBrevType.VEDTAK == brevType) {
-            return Dokumentkategori.Vedtaksbrev;
+            return DokArkivKlient.DOKUMENTKATEGORI_VEDTAKSBREV;
         } else {
-            return Dokumentkategori.Brev;
+            return DokArkivKlient.DOKUMENTKATEGORI_BREV;
         }
     }
 

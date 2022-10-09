@@ -10,7 +10,6 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -42,17 +41,16 @@ import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 @RestClientConfig(tokenConfig = TokenFlow.ADAPTIVE, application = FpApplication.FPSAK)
 public class FpsakKlient implements FagsystemKlient {
 
-    private RestClient restClient;
-    private RestConfig restConfig;
+    private final RestClient restClient;
+    private final RestConfig restConfig;
 
-    private FpoppdragRestKlient fpoppdragKlient;
+    private final FpoppdragRestKlient fpoppdragKlient;
 
-    FpsakKlient() {
-        // CDI
+    public FpsakKlient() {
+        this(RestClient.client(), new FpoppdragRestKlient());
     }
 
-    @Inject
-    public FpsakKlient(RestClient restClient, FpoppdragRestKlient fpoppdragKlient) {
+    FpsakKlient(RestClient restClient, FpoppdragRestKlient fpoppdragKlient) {
         this.restClient = restClient;
         this.restConfig = RestConfig.forClient(this.getClass());
         this.fpoppdragKlient = fpoppdragKlient;
