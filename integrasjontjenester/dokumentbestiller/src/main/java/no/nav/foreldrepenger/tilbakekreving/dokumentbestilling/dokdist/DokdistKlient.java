@@ -47,12 +47,20 @@ public class DokdistKlient {
         DistribuerJournalpostRequest request = new DistribuerJournalpostRequest(
             journalpostId.getVerdi(),
             UUID.randomUUID().toString(),
-            application.getOffisiellKode(),
+            getBestillendeFagsystem(),
             getDokumentProdAppKode(),
             distribusjonstype,
             Distribusjonstidspunkt.KJERNETID);
         DistribuerJournalpostResponse response = distribuerJournalpost(request);
         logger.info("Bestilt distribusjon av journalpost til {}, bestillingId ble {}", mottaker, response.bestillingsId());
+    }
+
+    private String getBestillendeFagsystem() {
+        return switch (application) {
+            case FPTILBAKE -> Fagsystem.FPSAK.getOffisiellKode();
+            case K9TILBAKE -> Fagsystem.K9SAK.getOffisiellKode();
+            default -> throw new IllegalArgumentException("Ikke-støttet applikasjon: " + application);
+        };
     }
 
     private String getDokumentProdAppKode() {
