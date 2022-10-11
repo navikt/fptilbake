@@ -10,7 +10,6 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 
 import org.slf4j.Logger;
@@ -59,10 +58,13 @@ public class K9sakKlient implements FagsystemKlient {
     private static final String K9_OPPDRAG_OVERRIDE_URL = "k9oppdrag.override.url";
     private static final String K9_OPPDRAG_HENT_FEILUTBETALINGER = "/simulering/feilutbetalte-perioder";
 
-    private RestClient restClient;
+    private final RestClient restClient;
 
-    @Inject
-    public K9sakKlient(RestClient restClient) {
+    public K9sakKlient() {
+        this(RestClient.client());
+    }
+
+    K9sakKlient(RestClient restClient) {
         this.restClient = restClient;
     }
 
