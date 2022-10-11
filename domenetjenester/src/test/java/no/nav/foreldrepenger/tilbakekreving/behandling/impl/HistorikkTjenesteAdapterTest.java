@@ -26,7 +26,7 @@ public class HistorikkTjenesteAdapterTest extends FellesTestOppsett {
                 .medHendelse(HistorikkinnslagType.FAKTA_ENDRET, internBehandlingId)
                 .medEndretFelt(HistorikkEndretFeltType.BEHANDLING, "behandling", 1, 2);
         historikkTjenesteAdapter.opprettHistorikkInnslag(behandling, HistorikkinnslagType.FAKTA_ENDRET);
-        List<HistorikkinnslagDto> historikkinnslager = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(saksnummer);
+        List<HistorikkinnslagDto> historikkinnslager = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(saksnummer, "http://dummy/dummy");
         assertThat(historikkinnslager).isNotEmpty();
         assertThat(historikkinnslager.size()).isEqualTo(1);
         HistorikkinnslagDto historikkinnslagDto = historikkinnslager.get(0);
