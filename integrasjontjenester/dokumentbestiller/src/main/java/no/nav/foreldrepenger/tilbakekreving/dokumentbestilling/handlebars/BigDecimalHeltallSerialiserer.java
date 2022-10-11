@@ -13,15 +13,12 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  * <p>
  * TODO: bør bruke noe i handlebars for å håndtere formattering, decorator? formatter+
  */
-public class BigDecimalHeltallSerialiserer extends JsonSerializer {
+public class BigDecimalHeltallSerialiserer extends JsonSerializer<BigDecimal> {
 
     @Override
-    public void serialize(Object o, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        if (o instanceof BigDecimal) {
-            BigDecimal verdi = (BigDecimal) o;
-            jsonGenerator.writeObject(verdi.longValueExact());
-        } else {
-            throw new IllegalArgumentException("Serialiserer kan bare brukes BigDecimal");
+    public void serialize(BigDecimal o, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        if (o != null) {
+            jsonGenerator.writeObject(o.longValueExact());
         }
     }
 }

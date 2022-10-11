@@ -507,11 +507,14 @@ public class BehandlingRestTjeneste {
         return new SakRettigheterDto(false, oppretting, List.of());
     }
 
+
+    // TBK opprette når kommer med yelsebehandling UUID return !(harÅpenBehandling(saksnummer) || finnesTilbakekrevingsbehandlingForYtelsesbehandlingen(eksternUuid));
+    // TBK revurdering: gitt uuid - vurderOmRevurderingKanOpprettes
     @GET
-    @Path(SAK_RETTIGHETER_PART_PATH)
+    @Path(SAK_FULL_PART_PATH)
     @Operation(
         tags = "behandlinger",
-        description = "Henter rettigheter for lovlige behandlingsoprettinger for sak")
+        description = "Henter informasjon om rettigheter, behandlinger og historikk for sak")
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public SakFullDto hentSaksinformasjon(@Context HttpServletRequest request, @NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto) {

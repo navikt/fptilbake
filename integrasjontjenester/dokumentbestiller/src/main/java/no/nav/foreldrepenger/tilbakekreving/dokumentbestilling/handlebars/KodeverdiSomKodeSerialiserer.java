@@ -9,15 +9,12 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-public class KodeverdiSomKodeSerialiserer extends JsonSerializer {
+public class KodeverdiSomKodeSerialiserer extends JsonSerializer<Kodeverdi> {
 
     @Override
-    public void serialize(Object o, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        if (o instanceof Kodeverdi) {
-            Kodeverdi verdi = (Kodeverdi) o;
-            jsonGenerator.writeObject(verdi.getKode());
-        } else {
-            throw new IllegalArgumentException("Serialiserer kan bare brukes for Kodeverdi");
+    public void serialize(Kodeverdi o, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        if (o != null) {
+            jsonGenerator.writeObject(o.getKode());
         }
     }
 }
