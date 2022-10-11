@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -138,7 +139,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     }
 
     private List<HistorikkinnslagDto> testHistorikkInnslag() {
-        List<HistorikkinnslagDto> historikkinnslager = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(nyBehandling.getFagsak().getSaksnummer(), "http://dummy/dummy");
+        List<HistorikkinnslagDto> historikkinnslager = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(nyBehandling.getFagsak().getSaksnummer(), URI.create("http://dummy/dummy"));
         assertThat(historikkinnslager).isNotEmpty();
         assertThat(historikkinnslager.get(0).getAktoer()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
         assertThat(historikkinnslager.get(0).getType()).isEqualTo(HistorikkinnslagType.FAKTA_OM_FEILUTBETALING);
