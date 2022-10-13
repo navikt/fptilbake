@@ -56,6 +56,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDto;
@@ -71,6 +72,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Kla
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.OpprettBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ProsessTaskGruppeIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.SakFullDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.SakRettigheterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.SettBehandlingPåVentDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UtvidetBehandlingDto;
@@ -98,6 +100,9 @@ public class BehandlingRestTjeneste {
 
     public static final String STATUS_PATH = PATH_FRAGMENT + "/status";
 
+    private static final String SAK_FULL_PART_PATH = "/fagsak-full";
+    public static final String SAK_FULL_PATH = PATH_FRAGMENT + SAK_FULL_PART_PATH;
+
     private static final String SAK_RETTIGHETER_PART_PATH = "/sak-rettigheter";
     public static final String SAK_RETTIGHETER_PATH = PATH_FRAGMENT + SAK_RETTIGHETER_PART_PATH;
     private static final String BEHANDLING_RETTIGHETER_PART_PATH = "/behandling-rettigheter";
@@ -123,6 +128,7 @@ public class BehandlingRestTjeneste {
     private BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer;
     private TotrinnTjeneste totrinnTjeneste;
     private VergeTjeneste vergeTjeneste;
+    private HistorikkTjenesteAdapter historikkTjenesteAdapter;
 
     public BehandlingRestTjeneste() {
         // CDI
@@ -137,7 +143,8 @@ public class BehandlingRestTjeneste {
                                   HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                   BehandlingsprosessApplikasjonTjeneste behandlingsprosessTjeneste,
                                   BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste,
-                                  BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer) {
+                                  BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer,
+                                  HistorikkTjenesteAdapter historikkTjenesteAdapter) {
         this.behandlingTjeneste = behandlingsTjenesteProvider.getBehandlingTjeneste();
         this.gjenopptaBehandlingTjeneste = behandlingsTjenesteProvider.getGjenopptaBehandlingTjeneste();
         this.behandlingDtoTjeneste = behandlingDtoTjeneste;
@@ -150,6 +157,7 @@ public class BehandlingRestTjeneste {
         this.fristenEndretEventPubliserer = fristenEndretEventPubliserer;
         this.taskTjeneste = taskTjeneste;
         this.totrinnTjeneste = totrinnTjeneste;
+        this.historikkTjenesteAdapter = historikkTjenesteAdapter;
     }
 
     @GET
@@ -497,6 +505,28 @@ public class BehandlingRestTjeneste {
         var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, kanOppretteTilbake),
                 new BehandlingOpprettingDto(BehandlingType.REVURDERING_TILBAKEKREVING, kanOppretteRevurdering));
         return new SakRettigheterDto(false, oppretting, List.of());
+    }
+
+
+    // TBK opprette når kommer med yelsebehandling UUID return !(harÅpenBehandling(saksnummer) || finnesTilbakekrevingsbehandlingForYtelsesbehandlingen(eksternUuid));
+    // TBK revurdering: gitt uuid - vurderOmRevurderingKanOpprettes
+    @GET
+    @Path(SAK_FULL_PART_PATH)
+    @Operation(
+        tags = "behandlinger",
+        description = "Henter informasjon om rettigheter, behandlinger og historikk for sak")
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
+    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
+    public SakFullDto hentSaksinformasjon(@Context HttpServletRequest request, @NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto) {
+        Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
+        var hentDokumentPath = historikkTjenesteAdapter.getRequestPath(request);
+        var historikkInnslagDtoList = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
+        var kanOppretteTilbake = behandlingTjeneste.hentBehandlinger(saksnummer).stream().allMatch(Behandling::erSaksbehandlingAvsluttet);
+        var kanOppretteRevurdering = behandlingTjeneste.hentBehandlinger(saksnummer).stream().anyMatch(revurderingTjeneste::kanRevurderingOpprettes);
+        var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, kanOppretteTilbake),
+            new BehandlingOpprettingDto(BehandlingType.REVURDERING_TILBAKEKREVING, kanOppretteRevurdering));
+        var behandlinger = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
+        return new SakFullDto(saksnummer.getVerdi(), oppretting, behandlinger, historikkInnslagDtoList);
     }
 
     @GET

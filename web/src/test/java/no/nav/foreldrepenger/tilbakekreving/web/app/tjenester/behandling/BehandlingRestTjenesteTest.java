@@ -53,6 +53,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.Iverksetting
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDtoTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
@@ -86,9 +87,10 @@ public class BehandlingRestTjenesteTest {
             revurderingTjenesteMock, behandlendeEnhetTjenesteMock);
     private BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer = mock(BehandlingManglerKravgrunnlagFristenEndretEventPubliserer.class);
     private VergeTjeneste vergeTjenesteMock = mock(VergeTjeneste.class);
+    private HistorikkTjenesteAdapter historikkTjenesteAdapter = mock(HistorikkTjenesteAdapter.class);
 
     private BehandlingRestTjeneste behandlingRestTjeneste = new BehandlingRestTjeneste(behandlingsTjenesteProvider, behandlingDtoTjenesteMock, taskTjeneste, vergeTjenesteMock,
-            mock(TotrinnTjeneste.class), henleggBehandlingTjenesteMock, behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock, fristenEndretEventPubliserer);
+            mock(TotrinnTjeneste.class), henleggBehandlingTjenesteMock, behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock, fristenEndretEventPubliserer, historikkTjenesteAdapter);
 
     private static SaksnummerDto saksnummerDto = new SaksnummerDto(GYLDIG_SAKSNR);
     private static FpsakUuidDto fpsakUuidDto = new FpsakUuidDto(EKSTERN_BEHANDLING_UUID);
