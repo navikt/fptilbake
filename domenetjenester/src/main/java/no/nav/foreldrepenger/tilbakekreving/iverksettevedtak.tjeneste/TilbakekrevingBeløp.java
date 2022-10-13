@@ -88,7 +88,7 @@ public class TilbakekrevingBeløp {
         return !erSkattepliktig();
     }
 
-    private static final Pattern SKATTEPLIKTIGE_YTELSE_PATTERN = Pattern.compile("^((FP|FPAD|FPSV|PNBS|PPNP|OM|OPP)(ATORD|ATFRI|ATAL|ATSJO|SNDFI)|FRISINN-FRILANS)$");
+    private static final Pattern SKATTEPLIKTIGE_YTELSE_PATTERN = Pattern.compile("^((FP|FPAD|FPSV|PNBS|PPNP|OM|OPP)(ATORD|ATFRI|ATAL|ATSJO|SNDFI)|FRISINN-FRILANS|FPATFER-SSKT)$");
     public boolean erSkattepliktig(){
         //nav trekker skatt bare for arbeidstaker/frilans-type klassekoder
         // se for eksempel https://github.com/navikt/k9-oppdrag/blob/master/domene/oppdragslager/src/main/java/no/nav/k9/oppdrag/oppdragslager/%C3%B8konomioppdrag/%C3%98konomiKodeKlassifik.java for mønser
