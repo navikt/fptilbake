@@ -92,16 +92,16 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
         assertThat(brevMaler).isNotEmpty();
         Optional<BrevmalDto> innhentBrevMal = hentSpesifiskBrevMal(brevMaler, DokumentMalType.INNHENT_DOK);
         assertThat(innhentBrevMal).isPresent();
-        assertThat(innhentBrevMal.get().getTilgjengelig()).isTrue();
+        assertThat(innhentBrevMal.get().tilgjengelig()).isTrue();
 
         Optional<BrevmalDto> fritekstBrevMal = hentSpesifiskBrevMal(brevMaler, DokumentMalType.FRITEKST_DOK);
         assertThat(fritekstBrevMal).isNotPresent();
 
         Optional<BrevmalDto> varselBrevMal = hentSpesifiskBrevMal(brevMaler, DokumentMalType.VARSEL_DOK);
         assertThat(varselBrevMal).isPresent();
-        assertThat(varselBrevMal.get().getTilgjengelig()).isFalse();
+        assertThat(varselBrevMal.get().tilgjengelig()).isFalse();
 
-        assertThat(brevMaler.stream().filter(brevmalDto -> brevmalDto.getKode().equals(DokumentMalType.KORRIGERT_VARSEL_DOK)).findFirst()).isEmpty();
+        assertThat(brevMaler.stream().filter(brevmalDto -> brevmalDto.kode().equals(DokumentMalType.KORRIGERT_VARSEL_DOK)).findFirst()).isEmpty();
     }
 
     @Test
@@ -192,7 +192,7 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
     }
 
     private Optional<BrevmalDto> hentSpesifiskBrevMal(List<BrevmalDto> brevMaler, DokumentMalType malType) {
-        return brevMaler.stream().filter(brevmalDto -> malType.getKode().equals(brevmalDto.getKode())).findFirst();
+        return brevMaler.stream().filter(brevmalDto -> malType.getKode().equals(brevmalDto.kode())).findFirst();
     }
 
     private void lagreInfoOmVarselbrev(Long behandlingId, String journalpostId, String dokumentId) {
