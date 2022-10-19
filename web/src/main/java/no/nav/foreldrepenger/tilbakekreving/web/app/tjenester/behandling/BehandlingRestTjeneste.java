@@ -55,6 +55,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
@@ -127,6 +128,7 @@ public class BehandlingRestTjeneste {
     private BehandlendeEnhetTjeneste behandlendeEnhetTjeneste;
     private BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer;
     private TotrinnTjeneste totrinnTjeneste;
+    private DokumentBehandlingTjeneste dokumentBehandlingTjeneste;
     private VergeTjeneste vergeTjeneste;
     private HistorikkTjenesteAdapter historikkTjenesteAdapter;
 
@@ -140,6 +142,7 @@ public class BehandlingRestTjeneste {
                                   ProsessTaskTjeneste taskTjeneste,
                                   VergeTjeneste vergeTjeneste,
                                   TotrinnTjeneste totrinnTjeneste,
+                                  DokumentBehandlingTjeneste dokumentBehandlingTjeneste,
                                   HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                   BehandlingsprosessApplikasjonTjeneste behandlingsprosessTjeneste,
                                   BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste,
@@ -157,6 +160,7 @@ public class BehandlingRestTjeneste {
         this.fristenEndretEventPubliserer = fristenEndretEventPubliserer;
         this.taskTjeneste = taskTjeneste;
         this.totrinnTjeneste = totrinnTjeneste;
+        this.dokumentBehandlingTjeneste = dokumentBehandlingTjeneste;
         this.historikkTjenesteAdapter = historikkTjenesteAdapter;
     }
 
@@ -526,6 +530,7 @@ public class BehandlingRestTjeneste {
         var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, kanOppretteTilbake),
             new BehandlingOpprettingDto(BehandlingType.REVURDERING_TILBAKEKREVING, kanOppretteRevurdering));
         var behandlinger = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
+        behandlinger.forEach(b -> b.setBrevmaler(dokumentBehandlingTjeneste.hentBrevmalerFor(b.getId())));
         return new SakFullDto(saksnummer.getVerdi(), oppretting, behandlinger, historikkInnslagDtoList);
     }
 
@@ -539,16 +544,7 @@ public class BehandlingRestTjeneste {
     public BehandlingOperasjonerDto hentMenyOpsjoner(@NotNull @QueryParam(UuidDto.NAME) @Parameter(description = UuidDto.DESC) @Valid UuidDto uuidDto) {
         UUID behandlingUUId = uuidDto.getBehandlingUuid();
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingUUId);
-        return lovligeOperasjoner(behandling);
-    }
-
-    private VergeBehandlingsmenyEnum viseVerge(Behandling behandling) {
-        boolean kanBehandlingEndres = !behandling.erSaksbehandlingAvsluttet() && !behandling.isBehandlingPåVent();
-        boolean finnesVerge = vergeTjeneste.hentVergeInformasjon(behandling.getId()).isPresent();
-        if (kanBehandlingEndres) {
-            return finnesVerge ? VergeBehandlingsmenyEnum.FJERN : VergeBehandlingsmenyEnum.OPPRETT;
-        }
-        return VergeBehandlingsmenyEnum.SKJUL;
+        return lovligeOperasjoner(behandling, vergeTjeneste.hentVergeInformasjon(behandling.getId()).isPresent());
     }
 
     private Behandling getBehandling(BehandlingReferanse behandlingReferanse) {
@@ -561,7 +557,7 @@ public class BehandlingRestTjeneste {
         return behandling;
     }
 
-    private BehandlingOperasjonerDto lovligeOperasjoner(Behandling b) {
+    private BehandlingOperasjonerDto lovligeOperasjoner(Behandling b, boolean finnesVerge) {
         if (b.erSaksbehandlingAvsluttet()) {
             return BehandlingOperasjonerDto.builder(b.getUuid()).build(); // Skal ikke foreta menyvalg lenger
         } else if (BehandlingStatus.FATTER_VEDTAK.equals(b.getStatus())) {
@@ -570,16 +566,26 @@ public class BehandlingRestTjeneste {
         } else {
             boolean totrinnRetur = totrinnTjeneste.hentTotrinnsvurderinger(b).stream().anyMatch(tt -> !tt.isGodkjent());
             return BehandlingOperasjonerDto.builder(b.getUuid())
-                    .medTilGodkjenning(false)
-                    .medFraBeslutter(!b.isBehandlingPåVent() && totrinnRetur)
-                    .medKanBytteEnhet(true)
-                    .medKanHenlegges(henleggBehandlingTjeneste.kanHenleggeBehandlingManuelt(b))
-                    .medKanSettesPaVent(!b.isBehandlingPåVent())
-                    .medKanGjenopptas(b.isBehandlingPåVent())
-                    .medKanOpnesForEndringer(false)
-                    .medKanSendeMelding(!b.isBehandlingPåVent())
-                    .medVergemeny(viseVerge(b))
-                    .build();
+                .medTilGodkjenning(false)
+                .medFraBeslutter(!b.isBehandlingPåVent() && totrinnRetur)
+                .medKanBytteEnhet(true)
+                .medKanHenlegges(henleggBehandlingTjeneste.kanHenleggeBehandlingManuelt(b))
+                .medKanSettesPaVent(!b.isBehandlingPåVent())
+                .medKanGjenopptas(b.isBehandlingPåVent())
+                .medKanOpnesForEndringer(false)
+                .medKanSendeMelding(!b.isBehandlingPåVent())
+                .medVergemeny(viseVerge(b, finnesVerge))
+                .build();
         }
     }
+
+    private VergeBehandlingsmenyEnum viseVerge(Behandling behandling, boolean finnesVerge) {
+        boolean kanBehandlingEndres = !behandling.erSaksbehandlingAvsluttet() && !behandling.isBehandlingPåVent();
+        if (kanBehandlingEndres) {
+            return finnesVerge ? VergeBehandlingsmenyEnum.FJERN : VergeBehandlingsmenyEnum.OPPRETT;
+        }
+        return VergeBehandlingsmenyEnum.SKJUL;
+    }
+
+
 }

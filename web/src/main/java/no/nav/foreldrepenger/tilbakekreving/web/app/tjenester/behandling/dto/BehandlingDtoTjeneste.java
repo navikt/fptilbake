@@ -14,6 +14,8 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
@@ -37,6 +39,9 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.TotrinnskontrollAksjonspunkterTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
+import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 
 /**
  * Bygger BehandlingDto og UtvidetBehandlingDto
@@ -51,7 +56,9 @@ public class BehandlingDtoTjeneste {
     private static final long OPPRETTELSE_DAGER_BEGRENSNING = 6L;
 
     private BehandlingTjeneste behandlingTjeneste;
-
+    private TotrinnTjeneste totrinnTjeneste;
+    private TotrinnskontrollAksjonspunkterTjeneste totrinnskontrollTjeneste;
+    private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
     private VurdertForeldelseTjeneste vurdertForeldelseTjeneste;
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
@@ -69,13 +76,20 @@ public class BehandlingDtoTjeneste {
 
     @Inject
     public BehandlingDtoTjeneste(BehandlingTjeneste behandlingTjeneste,
+                                 TotrinnTjeneste totrinnTjeneste,
+                                 TotrinnskontrollAksjonspunkterTjeneste totrinnskontrollTjeneste,
+                                 HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                  VurdertForeldelseTjeneste vurdertForeldelseTjeneste,
                                  BehandlingRepositoryProvider repositoryProvider,
                                  BehandlingModellRepository behandlingModellRepository) {
-        this(behandlingTjeneste, vurdertForeldelseTjeneste, repositoryProvider, behandlingModellRepository, ApplicationName.hvilkenTilbake());
+        this(behandlingTjeneste, totrinnTjeneste, totrinnskontrollTjeneste, henleggBehandlingTjeneste, vurdertForeldelseTjeneste,
+            repositoryProvider, behandlingModellRepository, ApplicationName.hvilkenTilbake());
     }
 
     public BehandlingDtoTjeneste(BehandlingTjeneste behandlingTjeneste,
+                                 TotrinnTjeneste totrinnTjeneste,
+                                 TotrinnskontrollAksjonspunkterTjeneste totrinnskontrollTjeneste,
+                                 HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                  VurdertForeldelseTjeneste vurdertForeldelseTjeneste,
                                  BehandlingRepositoryProvider repositoryProvider,
                                  BehandlingModellRepository behandlingModellRepository,
@@ -88,6 +102,9 @@ public class BehandlingDtoTjeneste {
         this.vergeRepository = repositoryProvider.getVergeRepository();
         this.behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
         this.behandlingModellRepository = behandlingModellRepository;
+        this.totrinnTjeneste = totrinnTjeneste;
+        this.totrinnskontrollTjeneste = totrinnskontrollTjeneste;
+        this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
 
         kontekstPath = switch (applikasjon) {
             case FPTILBAKE -> "/fptilbake";
@@ -186,7 +203,46 @@ public class BehandlingDtoTjeneste {
         dto.setFørsteÅrsak(førsteÅrsak(behandling).orElse(null));
         dto.setBehandlingÅrsaker(lagBehandlingÅrsakDto(behandling));
         dto.setKanHenleggeBehandling(kanHenleggeBehandling(behandling));
-        vergeRepository.finnVergeInformasjon(behandling.getId()).ifPresent(verge -> dto.setHarVerge(true));
+        var vergeInfo = vergeRepository.finnVergeInformasjon(behandling.getId());
+        vergeInfo.ifPresent(verge -> dto.setHarVerge(true));
+        dto.setBehandlingTillatteOperasjoner(lovligeOperasjoner(behandling, vergeInfo.isPresent()));
+        if (BehandlingStatus.FATTER_VEDTAK.equals(behandling.getStatus())) {
+            dto.setTotrinnskontrollReadonly(false);
+            dto.setTotrinnskontrollÅrsaker(totrinnskontrollTjeneste.hentTotrinnsSkjermlenkeContext(behandling));
+        } else if (BehandlingStatus.UTREDES.equals(behandling.getStatus())) {
+            dto.setTotrinnskontrollReadonly(true);
+            dto.setTotrinnskontrollÅrsaker(totrinnskontrollTjeneste.hentTotrinnsvurderingSkjermlenkeContext(behandling));
+        }
+    }
+
+    private BehandlingOperasjonerDto lovligeOperasjoner(Behandling b, boolean finnesVerge) {
+        if (b.erSaksbehandlingAvsluttet()) {
+            return BehandlingOperasjonerDto.builder(b.getUuid()).build(); // Skal ikke foreta menyvalg lenger
+        } else if (BehandlingStatus.FATTER_VEDTAK.equals(b.getStatus())) {
+            boolean tilgokjenning = b.getAnsvarligSaksbehandler() != null && !b.getAnsvarligSaksbehandler().equalsIgnoreCase(SubjectHandler.getSubjectHandler().getUid());
+            return BehandlingOperasjonerDto.builder(b.getUuid()).medTilGodkjenning(tilgokjenning).build();
+        } else {
+            boolean totrinnRetur = totrinnTjeneste.hentTotrinnsvurderinger(b).stream().anyMatch(tt -> !tt.isGodkjent());
+            return BehandlingOperasjonerDto.builder(b.getUuid())
+                .medTilGodkjenning(false)
+                .medFraBeslutter(!b.isBehandlingPåVent() && totrinnRetur)
+                .medKanBytteEnhet(true)
+                .medKanHenlegges(henleggBehandlingTjeneste.kanHenleggeBehandlingManuelt(b))
+                .medKanSettesPaVent(!b.isBehandlingPåVent())
+                .medKanGjenopptas(b.isBehandlingPåVent())
+                .medKanOpnesForEndringer(false)
+                .medKanSendeMelding(!b.isBehandlingPåVent())
+                .medVergemeny(viseVerge(b, finnesVerge))
+                .build();
+        }
+    }
+
+    private VergeBehandlingsmenyEnum viseVerge(Behandling behandling, boolean finnesVerge) {
+        boolean kanBehandlingEndres = !behandling.erSaksbehandlingAvsluttet() && !behandling.isBehandlingPåVent();
+        if (kanBehandlingEndres) {
+            return finnesVerge ? VergeBehandlingsmenyEnum.FJERN : VergeBehandlingsmenyEnum.OPPRETT;
+        }
+        return VergeBehandlingsmenyEnum.SKJUL;
     }
 
     private List<BehandlingÅrsakDto> lagBehandlingÅrsakDto(Behandling behandling) {

@@ -11,7 +11,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.BrevmalDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.totrinn.TotrinnskontrollSkjermlenkeContextDto;
 
 public class BehandlingDto {
 
@@ -40,6 +42,11 @@ public class BehandlingDto {
     private boolean kanHenleggeBehandling;
     private boolean harVerge;
     private BehandlingsresultatDto behandlingsresultat;
+
+    private BehandlingOperasjonerDto behandlingTillatteOperasjoner;
+    private List<TotrinnskontrollSkjermlenkeContextDto> totrinnskontrollÅrsaker;
+    private boolean totrinnskontrollReadonly = true;
+    private List<BrevmalDto> brevmaler;
 
     /**
      * REST HATEOAS - pekere på data innhold som hentes fra andre url'er, eller handlinger som er tilgjengelig på behandling.
@@ -244,5 +251,37 @@ public class BehandlingDto {
 
     public void setBehandlingsresultat(BehandlingsresultatDto behandlingsresultat) {
         this.behandlingsresultat = behandlingsresultat;
+    }
+
+    public BehandlingOperasjonerDto getBehandlingTillatteOperasjoner() {
+        return behandlingTillatteOperasjoner;
+    }
+
+    public void setBehandlingTillatteOperasjoner(BehandlingOperasjonerDto behandlingTillatteOperasjoner) {
+        this.behandlingTillatteOperasjoner = behandlingTillatteOperasjoner;
+    }
+
+    public List<TotrinnskontrollSkjermlenkeContextDto> getTotrinnskontrollÅrsaker() {
+        return totrinnskontrollÅrsaker;
+    }
+
+    public void setTotrinnskontrollÅrsaker(List<TotrinnskontrollSkjermlenkeContextDto> totrinnskontrollÅrsaker) {
+        this.totrinnskontrollÅrsaker = totrinnskontrollÅrsaker;
+    }
+
+    public boolean isTotrinnskontrollReadonly() {
+        return totrinnskontrollReadonly;
+    }
+
+    public void setTotrinnskontrollReadonly(boolean totrinnskontrollReadonly) {
+        this.totrinnskontrollReadonly = totrinnskontrollReadonly;
+    }
+
+    public List<BrevmalDto> getBrevmaler() {
+        return brevmaler;
+    }
+
+    public void setBrevmaler(List<BrevmalDto> brevmaler) {
+        this.brevmaler = brevmaler;
     }
 }
