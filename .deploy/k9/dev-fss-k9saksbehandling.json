@@ -5,7 +5,6 @@
   "oracleconfig": "oracle/data/dev/config/k9tilbake_q1",
   "oraclek9tilbakesecret": "oracle/data/dev/creds/k9tilbake_q1-user",
   "k9tilbakeserviceuser": "serviceuser/data/dev/srvk9-tilbake",
-  "ldapserviceuser": "serviceuser/data/dev/srvssolinux",
   "minReplicas": "2",
   "maxReplicas": "2",
   "ingresses": [
@@ -15,11 +14,6 @@
   "env": {
     "APPDYNAMICS_AGENT_ACCOUNT_NAME": "NON-PROD",
     "APPD_ENABLED": "true",
-    "LDAP_URL": "ldaps://ldapgw.preprod.local",
-    "LDAP_BASEDN": "dc=preprod,dc=local",
-    "LDAP_DOMAIN": "PREPROD.LOCAL",
-    "LDAP_USER_BASEDN": "ou=NAV,ou=BusinessUnits,dc=preprod,dc=local",
-    "LDAP_SERVICEUSER_BASEDN": "ou=ServiceAccounts,dc=preprod,dc=local",
     "MQGATEWAY02_NAME": "MQLS02",
     "MQGATEWAY02_HOSTNAME": "b27apvl220.preprod.local",
     "MQGATEWAY02_PORT": "1413",
