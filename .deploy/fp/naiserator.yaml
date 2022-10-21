@@ -47,8 +47,6 @@ spec:
         kvPath:  {{oraclefptilbakesecret}}
       - mountPath: /var/run/secrets/nais.io/serviceuser
         kvPath: {{fptilbakeserviceuser}}
-      - mountPath: /var/run/secrets/nais.io/ldap
-        kvPath: {{ldapserviceuser}}
       - mountPath: /var/run/secrets/nais.io/appdynamics
         kvPath: /apikey/appdynamics/{{environment}}
   env:

@@ -56,8 +56,6 @@ spec:
         kvPath:  {{oraclek9tilbakesecret}}
       - mountPath: /var/run/secrets/nais.io/serviceuser
         kvPath: {{k9tilbakeserviceuser}}
-      - mountPath: /var/run/secrets/nais.io/ldap
-        kvPath: {{ldapserviceuser}}
       - mountPath: /var/run/secrets/nais.io/vault
         kvPath: /kv/{{cluster}}/fss/k9-tilbake/{{namespace}}
       - mountPath: /var/run/secrets/nais.io/appdynamics
