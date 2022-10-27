@@ -9,6 +9,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.time.Period;
 import java.util.Collections;
@@ -18,7 +19,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -99,7 +99,7 @@ public class AksjonspunktRestTjenesteTest {
 
         Response result = aksjonspunktRestTjeneste.getAksjonspunkter(new BehandlingReferanse("1234"));
 
-        assertThat(result.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(result.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
         assertThat(result.getEntity()).isNotNull();
     }
 

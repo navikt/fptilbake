@@ -28,6 +28,8 @@ import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -69,6 +71,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.TotrinnskontrollAksjonspunkterTjeneste;
 
 @ExtendWith(JpaExtension.class)
 public class BehandlingDtoTjenesteTest {
@@ -98,8 +101,9 @@ public class BehandlingDtoTjenesteTest {
         vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
         grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository();
-        behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, foreldelseTjeneste, repositoryProvider,
-                behandlingModellRepository, Fagsystem.FPTILBAKE);
+        behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, mock(TotrinnTjeneste.class),
+            mock(TotrinnskontrollAksjonspunkterTjeneste.class), mock(HenleggBehandlingTjeneste.class),
+            foreldelseTjeneste, repositoryProvider, behandlingModellRepository, Fagsystem.FPTILBAKE);
 
         entityManager.setFlushMode(FlushModeType.AUTO);
     }

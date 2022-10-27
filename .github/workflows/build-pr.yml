@@ -17,13 +17,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3.1.0
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
 
       - name: Setup maven
-        uses: whelk-io/maven-settings-xml-action@v20
+        uses: whelk-io/maven-settings-xml-action@v21
         with:
           repositories: '[{ "id": "github", "name": "github", "url": "https://maven.pkg.github.com/${{ github.repository }}", "releases": { "enabled": "true" }, "snapshots": { "enabled": "false" } }]'
           servers: '[{ "id": "github", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}" }]'
@@ -36,7 +36,7 @@ jobs:
           cache: 'maven'
 
       - name: Login to GitHub Packages Docker Registry
-        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b # Use commit-sha1 instead of tag for security concerns
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # Use commit-sha1 instead of tag for security concerns
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -57,7 +57,7 @@ jobs:
         run: |
           echo "Building $BUILD_VERSION"
           export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
-          mvn test-compile -P migrer-db -T2 -B -s settings.xml -Drevision=${BUILD_VERSION}
+          mvn test-compile -P migrer-db -T 2C -B -s settings.xml -Drevision=${BUILD_VERSION}
 
       - name: Build (test)
         run: |

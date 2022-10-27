@@ -10,18 +10,14 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
-public class LocalDateTilLangtNorskFormatSerialiserer extends JsonSerializer {
+public class LocalDateTilLangtNorskFormatSerialiserer extends JsonSerializer<LocalDate> {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("d. MMMM yyyy", new Locale("no"));
 
     @Override
-    public void serialize(Object o, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        if (o instanceof LocalDate) {
-            LocalDate verdi = (LocalDate) o;
-            jsonGenerator.writeObject(FORMATTER.format(verdi));
-        } else {
-            throw new IllegalArgumentException("Serialiserer kan bare brukes for LocalDate");
+    public void serialize(LocalDate o, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        if (o != null) {
+            jsonGenerator.writeObject(FORMATTER.format(o));
         }
-
     }
 }

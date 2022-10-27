@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
@@ -41,16 +39,6 @@ public class FpsakKlientTest {
     private FpoppdragRestKlient fpoppdragRestKlient = mock(FpoppdragRestKlient.class);
 
     private FpsakKlient klient = new FpsakKlient(restClientMock, fpoppdragRestKlient);
-
-    @BeforeEach
-    void setUp() {
-        System.setProperty("fpsak.base.url", BASE_URI);
-    }
-
-    @AfterEach
-    void tearDown() {
-        System.clearProperty("fpsak.base.url");
-    }
 
     @Test
     public void skal_hente_DokumentinfoDto() {

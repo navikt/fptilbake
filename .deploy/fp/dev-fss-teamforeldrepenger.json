@@ -3,7 +3,6 @@
   "oraclefptilbakesecret":"oracle/data/dev/creds/fptilbake_q1-user",
   "oracleconfig": "oracle/data/dev/config/fptilbake_q1",
   "fptilbakeserviceuser": "serviceuser/data/dev/srvfptilbake",
-  "ldapserviceuser": "serviceuser/data/dev/srvssolinux",
   "minReplicas": "1",
   "maxReplicas": "2",
   "ingresses": [
@@ -19,18 +18,18 @@
     {
       "app": "fp-swagger",
       "namespace": "teamforeldrepenger",
-      "cluster": "dev-fss",
+      "cluster": "dev-gcp",
       "scopes": [
         "swagger"
       ]
     },
     {
-      "app": "fp-frontend-azure",
+      "app": "fp-frontend",
       "namespace": "teamforeldrepenger",
       "cluster": "dev-gcp"
     },
     {
-      "app": "fp-frontend-azure",
+      "app": "fpsak",
       "namespace": "teamforeldrepenger",
       "cluster": "dev-fss"
     }
