@@ -68,7 +68,7 @@ public class FatteVedtakTjeneste {
                     .medGodkjent(aks.isGodkjent())
                     .medBegrunnelse(aks.getBegrunnelse()).build();
 
-            vurderÅrsaker.forEach(vurderÅrsak -> totrinnsvurdering.leggTilVurderÅrsakTotrinnsvurdering(vurderÅrsak));
+            vurderÅrsaker.forEach(totrinnsvurdering::leggTilVurderÅrsakTotrinnsvurdering);
             totrinnsvurderinger.add(totrinnsvurdering);
         }
         totrinnTjeneste.settNyeTotrinnaksjonspunktvurderinger(behandling, totrinnsvurderinger);
