@@ -14,6 +14,7 @@ jobs:
           java-version: 17
           distribution: temurin
           cache: maven
+
       - uses: snyk/actions/setup@master
 
       - name: Setup maven
@@ -30,18 +31,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Hent og start Oracle image
-        run: |
-          echo "Henter og starter Oracle image"
-          cd .oracle
-          docker-compose up --quiet-pull > nohup.out 2>&1 &
-          sh -c 'tail -n +0 -f nohup.out | { sed "/Database opened./q" && kill $$; }' || true
-
       - name: Build
         run: |
-          echo "Building snyk_scan"
-          export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
-          mvn install -T2 -B -s settings.xml -Drevision=snyk_scan -DskipTests
+          echo "Building snyk-snapshot"
+          mvn -B -s settings.xml versions:set -DnewVersion=snyk-snapshot
+          mvn install -T 2C -q -B -s settings.xml -DskipTests
 
       - name: Run Snyk monitor
         run: >
