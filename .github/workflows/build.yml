@@ -67,7 +67,7 @@ jobs:
       - name: Build artifacts & deploy (inkl test)
         run: |
           echo "Building artifacts $BUILD_VERSION"
-          mvn install -e -B -s settings.xml -Drevision=${BUILD_VERSION} -Dfile.encoding=UTF-8
+          mvn install -T 2C -e -B -s settings.xml -Drevision=${BUILD_VERSION} -Dfile.encoding=UTF-8
 
       - name: Bygg og push docker-image for distribuering
         run: |
