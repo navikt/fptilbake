@@ -40,6 +40,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.TotrinnskontrollAksjonspunkterTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AksjonspunktDtoMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 
@@ -172,6 +173,7 @@ public class BehandlingDtoTjeneste {
         settStandardFelter(behandling, dto);
         boolean behandlingHenlagt = behandlingTjeneste.erBehandlingHenlagt(behandling);
         dto.setBehandlingHenlagt(behandlingHenlagt);
+        dto.setAksjonspunktene(AksjonspunktDtoMapper.lagAksjonspunktDto(behandling, totrinnTjeneste.hentTotrinnsvurderinger(behandling)));
 
         settResourceLinks(behandling, dto, behandlingHenlagt);
 

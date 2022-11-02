@@ -1,8 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AksjonspunktDto;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public class UtvidetBehandlingDto extends BehandlingDto {
@@ -12,6 +16,9 @@ public class UtvidetBehandlingDto extends BehandlingDto {
 
     @JsonProperty("originalBehandlingId")
     private Long originalBehandlingId;
+
+    @JsonProperty("aksjonspunktene")
+    private Set<AksjonspunktDto> aksjonspunktene;
 
     /**
      * Eventuelt async status på tasks.
@@ -25,6 +32,10 @@ public class UtvidetBehandlingDto extends BehandlingDto {
 
     public Long getOriginalBehandlingId() {
         return originalBehandlingId;
+    }
+
+    public Set<AksjonspunktDto> getAksjonspunktene() {
+        return aksjonspunktene;
     }
 
     public AsyncPollingStatus getTaskStatus() {
@@ -43,4 +54,7 @@ public class UtvidetBehandlingDto extends BehandlingDto {
         this.taskStatus = taskStatus;
     }
 
+    public void setAksjonspunktene(Set<AksjonspunktDto> aksjonspunktene) {
+        this.aksjonspunktene = aksjonspunktene;
+    }
 }
