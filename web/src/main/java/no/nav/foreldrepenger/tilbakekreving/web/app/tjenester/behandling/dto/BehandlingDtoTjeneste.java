@@ -173,7 +173,9 @@ public class BehandlingDtoTjeneste {
         settStandardFelter(behandling, dto);
         boolean behandlingHenlagt = behandlingTjeneste.erBehandlingHenlagt(behandling);
         dto.setBehandlingHenlagt(behandlingHenlagt);
-        dto.setAksjonspunktene(AksjonspunktDtoMapper.lagAksjonspunktDto(behandling, totrinnTjeneste.hentTotrinnsvurderinger(behandling)));
+        var aksjonspunkt = AksjonspunktDtoMapper.lagAksjonspunktDto(behandling, totrinnTjeneste.hentTotrinnsvurderinger(behandling));
+        dto.setAksjonspunktene(aksjonspunkt);
+        dto.setAksjonspunkt(aksjonspunkt);
 
         settResourceLinks(behandling, dto, behandlingHenlagt);
 

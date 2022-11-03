@@ -20,6 +20,9 @@ public class UtvidetBehandlingDto extends BehandlingDto {
     @JsonProperty("aksjonspunktene")
     private Set<AksjonspunktDto> aksjonspunktene;
 
+    @JsonProperty("aksjonspunkt")
+    private Set<AksjonspunktDto> aksjonspunkt;
+
     /**
      * Eventuelt async status på tasks.
      */
@@ -36,6 +39,10 @@ public class UtvidetBehandlingDto extends BehandlingDto {
 
     public Set<AksjonspunktDto> getAksjonspunktene() {
         return aksjonspunktene;
+    }
+
+    public Set<AksjonspunktDto> getAksjonspunkt() {
+        return aksjonspunkt;
     }
 
     public AsyncPollingStatus getTaskStatus() {
@@ -56,5 +63,9 @@ public class UtvidetBehandlingDto extends BehandlingDto {
 
     public void setAksjonspunktene(Set<AksjonspunktDto> aksjonspunktene) {
         this.aksjonspunktene = aksjonspunktene;
+    }
+
+    public void setAksjonspunkt(Set<AksjonspunktDto> aksjonspunkt) {
+        this.aksjonspunkt = aksjonspunkt;
     }
 }
