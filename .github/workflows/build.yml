@@ -30,14 +30,14 @@ jobs:
       build-version: ${{ needs.build-app.outputs.build-version }}
     secrets: inherit
 
-#  comment-issue:
-#    name: Issues
-#    if: github.ref_name == 'master'
-#    needs: create-issue
-#    uses: navikt/fptilbake/.github/workflows/comment.yml@master
-#    with:
-#      build-version: ${{ needs.create-issue.outputs.issue-number }}
-#    secrets: inherit
+  comment-issue:
+    name: Issues
+    if: github.ref_name == 'master'
+    needs: create-issue
+    uses: navikt/fptilbake/.github/workflows/comment.yml@master
+    with:
+      build-version: ${{ needs.create-issue.outputs.issue-number }}
+    secrets: inherit
 
   trigger-autotest:
     name: Autotest
