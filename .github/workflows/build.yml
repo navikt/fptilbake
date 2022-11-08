@@ -30,27 +30,14 @@ jobs:
       build-version: ${{ needs.build-app.outputs.build-version }}
     secrets: inherit
 
-  comment-on-issue:
-    name: Comment
+  comment-issue:
+    name: Issues
     if: github.ref_name == 'master'
     needs: create-issue
-    uses: actions/github-script@v6
+    uses: .github/workflows/comment.yml@master
     with:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
-      script: |
-        github.rest.issues.createComment( {
-          owner: context.issue.owner,
-          repo: context.issue.repo,
-          issue_number: ${{ steps.createdeployissue.outputs.number }},
-          body: 'Kommenter med <b>/promote cluster namespace</b>, hvor <b>cluster</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.\n\
-           <table>\n\
-           <tr><th>kommando</th><th>Cluster</th><th>Namespace</th></tr>\n\
-           <tr><td>promote</td><td>dev-fss</td><td>teamforeldrepenger</td></tr>\n\
-           <tr><td>promote</td><td>prod-fss</td><td>teamforeldrepenger</td></tr>\n\
-           <tr><td>promote</td><td>dev-fss</td><td>k9saksbehandling</td></tr>\n\
-           <tr><td>promote</td><td>prod-fss</td><td>k9saksbehandling</td></tr>\n\
-           </table>'
-         })
+      build-version: ${{ needs.create-issue.outputs.issue-number }}
+    secrets: inherit
 
   trigger-autotest:
     name: Autotest
@@ -61,28 +48,3 @@ jobs:
       build-version: ${{ needs.build-app.outputs.build-version }}
       issue-number: ${{ needs.create-issue.outputs.issue-number }}
     secrets: inherit
-
-    promote:
-      name: Promote k9-tilbake til dev-fss
-      if: github.ref_name == 'master'
-      needs: create-issue
-      run: |
-        curl -XPOST -u "x-access-token:${{ steps.get-token.outputs.token }}" \
-        -H "Accept: application/vnd.github.v3+json" \
-        https://api.github.com/repos/${{ github.event.inputs.trigger }}/dispatches \
-        -d '{
-              "event_type": "promote-command",
-              "client_payload": {
-                "github": {
-                    "payload": {
-                        "issue": {
-                            "number": "${{ steps.createdeployissue.outputs.number }}"
-                }}},
-                "slash_command": {
-                    "args": {
-                        "unnamed": {
-                            "arg1": "dev-fss",
-                            "arg2": "k9saksbehandling"
-                }}}
-              }
-            }'
