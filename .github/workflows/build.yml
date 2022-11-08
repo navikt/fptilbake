@@ -34,7 +34,7 @@ jobs:
     name: Issues
     if: github.ref_name == 'master'
     needs: create-issue
-    uses: .github/workflows/comment.yml@master
+    uses: navikt/fptilbake/.github/workflows/comment.yml@master
     with:
       build-version: ${{ needs.create-issue.outputs.issue-number }}
     secrets: inherit
