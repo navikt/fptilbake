@@ -36,7 +36,7 @@ jobs:
     needs: create-issue
     uses: navikt/fptilbake/.github/workflows/comment.yml@master
     with:
-      build-version: ${{ needs.create-issue.outputs.issue-number }}
+      issue-number: ${{ needs.create-issue.outputs.issue-number }}
     secrets: inherit
 
   trigger-autotest:
