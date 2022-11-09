@@ -20,9 +20,9 @@ on:
 jobs:
   promote:
     env:
-      CLUSTER: ${{ fromJSON('[$inputs.cluster, $github.event.client_payload.slash_command.args.unnamed.arg1]')[$inputs.cluster == null] }}
-      NAMESPACE: ${{ fromJSON('[$inputs.namespace, $github.event.client_payload.slash_command.args.unnamed.arg2]')[$inputs.namespace == null] }}
-      ISSUE: ${{ fromJSON('[$inputs.issue-number, $github.event.client_payload.github.payload.issue.number]')[$inputs.issue-number == null] }}
+      CLUSTER: ${{ fromJSON('[${{inputs.cluster}}, ${{github.event.client_payload.slash_command.args.unnamed.arg1}}]')[${{inputs.cluster}} == null] }}
+      NAMESPACE: ${{ fromJSON('[${{inputs.namespace}}, ${{github.event.client_payload.slash_command.args.unnamed.arg2}}]')[${{inputs.namespace}} == null] }}
+      ISSUE: ${{ fromJSON('[${{inputs.issue-number}}, ${{github.event.client_payload.github.payload.issue.number}}]')[${{inputs.issue-number}} == null] }}
     runs-on: ubuntu-latest
     steps:
       - name: Henter informasjon fra issuet nr ${{env.ISSUE}}
