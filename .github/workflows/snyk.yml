@@ -11,10 +11,8 @@ on:
 
 jobs:
   snyk:
-    snyk:
-      name: Snyk
-      needs: build-app
-      uses: navikt/fp-gha-workflows/.github/workflows/snyk.yml@main
-      with:
-        build-version: snyk-snapshot
-      secrets: inherit
+    name: Snyk
+    uses: navikt/fp-gha-workflows/.github/workflows/snyk.yml@main
+    with:
+      build-version: snyk-snapshot
+    secrets: inherit
