@@ -39,15 +39,15 @@ jobs:
       issue-number: ${{ needs.create-issue.outputs.issue-number }}
     secrets: inherit
 
-#  trigger-autotest:
-#    name: Autotest
-#    if: github.ref_name == 'master'
-#    needs: [ build-app, create-issue ]
-#    uses: navikt/fp-gha-workflows/.github/workflows/autotest.yml@main
-#    with:
-#      build-version: ${{ needs.build-app.outputs.build-version }}
-#      issue-number: ${{ needs.create-issue.outputs.issue-number }}
-#    secrets: inherit
+  trigger-autotest:
+    name: Autotest
+    if: github.ref_name == 'master'
+    needs: [ build-app, create-issue ]
+    uses: navikt/fp-gha-workflows/.github/workflows/autotest.yml@main
+    with:
+      build-version: ${{ needs.build-app.outputs.build-version }}
+      issue-number: ${{ needs.create-issue.outputs.issue-number }}
+    secrets: inherit
 
   snyk:
     name: Snyk
@@ -61,7 +61,7 @@ jobs:
     name: Deploy til K9 dev
     if: github.ref_name == 'master'
     needs: [ build-app, create-issue ]
-    uses: navikt/fptilbake/.github/workflows/promote.yml@master
+    uses: navikt/fptilbake/.github/workflows/promote-manuelt.yml@master
     with:
       issue-number: ${{ needs.create-issue.outputs.issue-number }}
       cluster: dev-fss

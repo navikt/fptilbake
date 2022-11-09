@@ -2,28 +2,14 @@ name: Promote
 on:
   repository_dispatch:
     types: [promote-command]
-  workflow_call:
-    inputs:
-      issue-number:
-        required: true
-        type: string
-        description: 'The deployment cluster.'
-      cluster:
-        required: true
-        type: string
-        description: 'The deployment cluster.'
-      namespace:
-        required: true
-        type: string
-        description: 'The deployment namespace.'
 
 jobs:
   promote:
-    env:
-      CLUSTER: ${{fromJSON('[${inputs.cluster}, ${github.event.client_payload.slash_command.args.unnamed.arg1}]')[inputs.cluster == null]}}
-      NAMESPACE: ${{fromJSON('[${inputs.namespace}, ${github.event.client_payload.slash_command.args.unnamed.arg2}]')[inputs.namespace == null]}}
-      ISSUE: ${{fromJSON('[${inputs.issue-number}, ${github.event.client_payload.github.payload.issue.number}]')[inputs.issue-number == null]}}
     runs-on: ubuntu-latest
+    env:
+      CLUSTER: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
+      NAMESPACE: ${{ github.event.client_payload.slash_command.args.unnamed.arg2 }}
+      ISSUE: ${{ github.event.client_payload.github.payload.issue.number }}
     steps:
       - name: Henter informasjon fra issuet nr ${{env.ISSUE}}
         id: issue_comment
