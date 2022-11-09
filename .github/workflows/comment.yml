@@ -8,7 +8,6 @@ on:
         type: string
         description: 'The deployment issue.'
 
-
 jobs:
   comment-on-issue:
     name: Comment
