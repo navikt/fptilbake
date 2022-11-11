@@ -56,13 +56,35 @@ spec:
         kvPath:  {{oraclek9tilbakesecret}}
       - mountPath: /var/run/secrets/nais.io/serviceuser
         kvPath: {{k9tilbakeserviceuser}}
-      - mountPath: /var/run/secrets/nais.io/ldap
-        kvPath: {{ldapserviceuser}}
       - mountPath: /var/run/secrets/nais.io/vault
         kvPath: /kv/{{cluster}}/fss/k9-tilbake/{{namespace}}
       - mountPath: /var/run/secrets/nais.io/appdynamics
         kvPath: /apikey/appdynamics/{{environment}}
   sidecar: true # refresh token
+  
+  azure:
+    application:
+      enabled: true
+      claims:
+        extra:
+          - "NAVident"
+  {{#if AZURE_IAC_RULES}}
+  accessPolicy:
+      inbound:
+        rules:
+        {{#each AZURE_IAC_RULES}}
+           - application: {{app}}
+             namespace: {{namespace}}
+             cluster: {{cluster}}
+             {{#if scopes}}
+             permissions:
+               scopes:
+               {{#each scopes}}
+               - "{{this}}"
+               {{/each}}
+             {{/if}}
+        {{/each}}
+  {{/if}}
   env:
   # miljø-spesifikke variable
   {{#each env}}

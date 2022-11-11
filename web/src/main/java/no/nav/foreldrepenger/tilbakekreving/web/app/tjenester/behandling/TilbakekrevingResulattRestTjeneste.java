@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -22,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.Behandl
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
 @Path(TilbakekrevingResulattRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -47,7 +47,7 @@ public class TilbakekrevingResulattRestTjeneste {
     @GET
     @Path("/resultat")
     @Operation(tags = "beregning", description = "Henter beregningsresultat for tilbakekreving")
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     public BeregningResultat hentBeregningResultat(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class) @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         return tilbakekrevingBeregningTjeneste.beregn(hentBehandlingId(behandlingReferanse));
     }

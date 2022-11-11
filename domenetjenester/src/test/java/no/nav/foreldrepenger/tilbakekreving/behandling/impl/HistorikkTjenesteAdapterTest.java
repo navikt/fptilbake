@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.URI;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ public class HistorikkTjenesteAdapterTest extends FellesTestOppsett {
                 .medHendelse(HistorikkinnslagType.FAKTA_ENDRET, internBehandlingId)
                 .medEndretFelt(HistorikkEndretFeltType.BEHANDLING, "behandling", 1, 2);
         historikkTjenesteAdapter.opprettHistorikkInnslag(behandling, HistorikkinnslagType.FAKTA_ENDRET);
-        List<HistorikkinnslagDto> historikkinnslager = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(saksnummer);
+        List<HistorikkinnslagDto> historikkinnslager = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(saksnummer, URI.create("http://dummy/dummy"));
         assertThat(historikkinnslager).isNotEmpty();
         assertThat(historikkinnslager.size()).isEqualTo(1);
         HistorikkinnslagDto historikkinnslagDto = historikkinnslager.get(0);

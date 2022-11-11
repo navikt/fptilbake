@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -18,7 +19,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
@@ -50,9 +50,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDtoTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
@@ -86,9 +88,11 @@ public class BehandlingRestTjenesteTest {
             revurderingTjenesteMock, behandlendeEnhetTjenesteMock);
     private BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer = mock(BehandlingManglerKravgrunnlagFristenEndretEventPubliserer.class);
     private VergeTjeneste vergeTjenesteMock = mock(VergeTjeneste.class);
+    private HistorikkTjenesteAdapter historikkTjenesteAdapter = mock(HistorikkTjenesteAdapter.class);
 
     private BehandlingRestTjeneste behandlingRestTjeneste = new BehandlingRestTjeneste(behandlingsTjenesteProvider, behandlingDtoTjenesteMock, taskTjeneste, vergeTjenesteMock,
-            mock(TotrinnTjeneste.class), henleggBehandlingTjenesteMock, behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock, fristenEndretEventPubliserer);
+        mock(TotrinnTjeneste.class), mock(DokumentBehandlingTjeneste.class), henleggBehandlingTjenesteMock,
+        behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock, fristenEndretEventPubliserer, historikkTjenesteAdapter);
 
     private static SaksnummerDto saksnummerDto = new SaksnummerDto(GYLDIG_SAKSNR);
     private static FpsakUuidDto fpsakUuidDto = new FpsakUuidDto(EKSTERN_BEHANDLING_UUID);
@@ -130,7 +134,7 @@ public class BehandlingRestTjenesteTest {
         Response response = behandlingRestTjeneste.opprettBehandling(mock(HttpServletRequest.class), opprettBehandlingDto);
 
         verify(revurderingTjenesteMock, atLeastOnce()).opprettRevurdering(any(Long.class), any(BehandlingÅrsakType.class), any(OrganisasjonsEnhet.class));
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_ACCEPTED);
+        assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_ACCEPTED);
     }
 
     @Test
@@ -172,7 +176,7 @@ public class BehandlingRestTjenesteTest {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(Lists.newArrayList(behandling));
         Response response = behandlingRestTjeneste.harÅpenTilbakekrevingBehandling(saksnummerDto);
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
         assertThat(response.getEntity()).isEqualTo(true);
     }
 
@@ -183,7 +187,7 @@ public class BehandlingRestTjenesteTest {
         when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(Lists.newArrayList(behandling));
 
         Response response = behandlingRestTjeneste.harÅpenTilbakekrevingBehandling(saksnummerDto);
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
         assertThat(response.getEntity()).isEqualTo(false);
     }
 
@@ -264,7 +268,7 @@ public class BehandlingRestTjenesteTest {
         when(behandlingTjenesteMock.hentBehandlingvedtakForBehandlingId(any(Long.class))).thenReturn(Optional.of(behandlingVedtak));
 
         Response response = behandlingRestTjeneste.hentTilbakekrevingsVedtakInfo(uuidDto);
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
         KlageTilbakekrevingDto klageTilbakekrevingDto = (KlageTilbakekrevingDto) response.getEntity();
         assertThat(klageTilbakekrevingDto.getBehandlingType()).isEqualTo(BehandlingType.TILBAKEKREVING.getKode());
         assertThat(klageTilbakekrevingDto.getBehandlingId()).isNotNull();

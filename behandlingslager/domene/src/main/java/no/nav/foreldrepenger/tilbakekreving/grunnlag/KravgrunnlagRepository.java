@@ -41,6 +41,19 @@ public class KravgrunnlagRepository {
         lagreNyttKravgrunnlag(behandlingId, kravgrunnlag);
     }
 
+    public Kravgrunnlag431 hentIsAktivFor(Long behandlingId) {
+        TypedQuery<Kravgrunnlag431> query = getEntityManager().createQuery("""
+            SELECT kg431 FROM KravgrunnlagAggregateEntity grunnlag JOIN grunnlag.grunnlagØkonomi kg431
+                WHERE grunnlag.behandlingId = :behandlingId
+                AND grunnlag.aktiv = true""", Kravgrunnlag431.class);
+        query.setParameter("behandlingId", behandlingId);
+        return hentEksaktResultat(query);
+    }
+
+    public boolean finnesIsAktivFor(Long behandlingId) {
+        return Optional.ofNullable(hentIsAktivFor(behandlingId)).isPresent();
+    }
+
     public void lagreOgFiksDuplikateKravgrunnlag(Long behandlingId, Kravgrunnlag431 kravgrunnlag) {
         List<KravgrunnlagAggregateEntity> forrigeKravgrunnlag = finnAktiveKravgrunnlag(behandlingId);
         for (KravgrunnlagAggregateEntity forrige : forrigeKravgrunnlag) {

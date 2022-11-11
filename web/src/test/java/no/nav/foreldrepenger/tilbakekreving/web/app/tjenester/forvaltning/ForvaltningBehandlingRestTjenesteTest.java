@@ -48,7 +48,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
@@ -59,7 +58,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.HentKorrigertKravgrunnlagDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KobleBehandlingTilGrunnlagDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KorrigertHenvisningDto;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
@@ -74,8 +72,6 @@ class ForvaltningBehandlingRestTjenesteTest {
     @Inject
     EntityManager entityManager;
     @Inject
-    FagsakRepository fagsakRepository;
-    @Inject
     BehandlingRepositoryProvider repositoryProvider;
     @Inject
     BehandlingRepository behandlingRepository;
@@ -85,8 +81,6 @@ class ForvaltningBehandlingRestTjenesteTest {
     BehandlingresultatRepository behandlingresultatRepository;
     @Inject
     ØkonomiMottattXmlRepository mottattXmlRepository;
-    @Inject
-    KravgrunnlagRepository kravgrunnlagRepository;
     @Inject
     HistorikkRepository historikkRepository;
     @Inject
@@ -282,24 +276,6 @@ class ForvaltningBehandlingRestTjenesteTest {
         assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
         assertThat(repositoryProvider.getGrunnlagRepository().harGrunnlagForBehandlingId(behandling.getId())).isFalse();
         assertThat(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId)).isFalse();
-    }
-
-    @Test
-    void skal_hente_korrigert_kravgrunnlag() {
-        HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto = new HentKorrigertKravgrunnlagDto(behandling.getId(),
-            "");
-        Response respons = forvaltningBehandlingRestTjeneste.hentKorrigertKravgrunnlag(hentKorrigertKravgrunnlagDto);
-        assertThat(respons.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-        assertProsessTask(TaskType.forProsessTask(HentKorrigertKravgrunnlagTask.class));
-    }
-
-    @Test
-    void skal_ikke_hente_korrigert_kravgrunnlag_når_behandling_er_avsluttet() {
-        behandling.avsluttBehandling();
-        HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto = new HentKorrigertKravgrunnlagDto(behandling.getId(),
-            "");
-        Response respons = forvaltningBehandlingRestTjeneste.hentKorrigertKravgrunnlag(hentKorrigertKravgrunnlagDto);
-        assertThat(respons.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     @Test

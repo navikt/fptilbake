@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.init;
 
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.Historik
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
 @Path("/init-fetch")
 @ApplicationScoped
@@ -47,11 +46,12 @@ public class InitielleLinksRestTjeneste {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(description = "Returnerer lenker til init av frontend", tags = "init-fetch")
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     public InitLinksDto hentInitielleRessurser() {
         List<ResourceLink> lenkene = new ArrayList<>();
         lenkene.add(get(KodeverkRestTjeneste.KODERVERK_PATH, "tilbake-kodeverk"));
         List<ResourceLink> saklenker = new ArrayList<>();
+        saklenker.add(get(BehandlingRestTjeneste.SAK_FULL_PATH, "tilbake-fagsak-full"));
         saklenker.add(get(HistorikkRestTjeneste.HISTORIKK_PATH, "tilbake-historikk"));
         saklenker.add(get(BehandlingRestTjeneste.SAK_RETTIGHETER_PATH, "tilbake-sak-rettigheter"));
         saklenker.add(get(BehandlingRestTjeneste.BEHANDLING_ALLE_PATH, "tilbake-alle-behandlinger"));

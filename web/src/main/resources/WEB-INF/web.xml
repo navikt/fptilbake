@@ -32,6 +32,8 @@
             <url-pattern>/internal/health/isAlive</url-pattern>
             <url-pattern>/internal/health/isReady</url-pattern>
             <url-pattern>/internal/metrics/prometheus</url-pattern>
+            <url-pattern>/api/openapi.yaml</url-pattern>
+            <url-pattern>/api/openapi.json</url-pattern>
         </web-resource-collection>
     </security-constraint>
     <security-constraint>

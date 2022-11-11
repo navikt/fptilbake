@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
@@ -39,7 +37,7 @@ public class KravgrunnlagValidator {
 
     private static void validerReferanse(Kravgrunnlag431 kravgrunnlag) {
         Henvisning referanse = kravgrunnlag.getReferanse();
-        if (referanse == null || StringUtils.isEmpty(referanse.getVerdi())) {
+        if (referanse == null || referanse.getVerdi() == null || referanse.getVerdi().isEmpty()) {
             throw KravgrunnlagFeil.manglerReferanse(kravgrunnlag.getEksternKravgrunnlagId());
         }
     }

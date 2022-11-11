@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personop
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.pdl.Doedsfall;
 import no.nav.pdl.DoedsfallResponseProjection;
 import no.nav.pdl.Foedsel;
@@ -41,9 +41,8 @@ import no.nav.pdl.Sivilstand;
 import no.nav.pdl.SivilstandResponseProjection;
 import no.nav.pdl.Sivilstandstype;
 import no.nav.vedtak.exception.VLException;
-import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
-import no.nav.vedtak.felles.integrasjon.pdl.PdlKlient;
-import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
+import no.nav.vedtak.felles.integrasjon.person.Persondata;
+import no.nav.vedtak.felles.integrasjon.person.Tema;
 import no.nav.vedtak.util.LRUCache;
 
 @ApplicationScoped
@@ -67,18 +66,18 @@ public class AktørTjeneste {
             Map.entry(Sivilstandstype.GJENLEVENDE_PARTNER, SivilstandType.GJENLEVENDE_PARTNER)
     );
 
-    private LRUCache<AktørId, PersonIdent> cacheAktørIdTilIdent;
-    private LRUCache<PersonIdent, AktørId> cacheIdentTilAktørId;
+    private final LRUCache<AktørId, PersonIdent> cacheAktørIdTilIdent;
+    private final LRUCache<PersonIdent, AktørId> cacheIdentTilAktørId;
 
-    private Pdl pdlKlient;
+    private final Persondata pdlKlient;
 
-    AktørTjeneste() {
-        // CDI
-    }
-
-    @Inject
-    public AktørTjeneste(@Jersey Pdl pdlKlient) {
-        this.pdlKlient = pdlKlient;
+    public AktørTjeneste() {
+        var tema = switch (ApplicationName.hvilkenTilbake()) {
+            case FPTILBAKE -> Tema.FOR;
+            case K9TILBAKE -> Tema.OMS;
+            default -> throw new IllegalStateException("applikasjonsnavn er satt til " + ApplicationName.hvilkenTilbake() + " som ikke er en støttet verdi");
+        };
+        this.pdlKlient = new PdlKlient(tema);
         this.cacheAktørIdTilIdent = new LRUCache<>(DEFAULT_CACHE_SIZE, DEFAULT_CACHE_TIMEOUT);
         this.cacheIdentTilAktørId = new LRUCache<>(DEFAULT_CACHE_SIZE, DEFAULT_CACHE_TIMEOUT);
     }
@@ -104,7 +103,7 @@ public class AktørTjeneste {
         try {
             identliste = pdlKlient.hentIdenter(request, projection);
         } catch (VLException v) {
-            if (PdlKlient.PDL_KLIENT_NOT_FOUND_KODE.equals(v.getKode())) {
+            if (Persondata.PDL_KLIENT_NOT_FOUND_KODE.equals(v.getKode())) {
                 return Optional.empty();
             }
             throw v;
@@ -132,7 +131,7 @@ public class AktørTjeneste {
         try {
             identliste = pdlKlient.hentIdenter(request, projection);
         } catch (VLException v) {
-            if (PdlKlient.PDL_KLIENT_NOT_FOUND_KODE.equals(v.getKode())) {
+            if (Persondata.PDL_KLIENT_NOT_FOUND_KODE.equals(v.getKode())) {
                 return Optional.empty();
             }
             throw v;

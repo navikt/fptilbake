@@ -1,180 +1,69 @@
 name: Bygg og deploy
-
 on:
   push:
     branches:
-      - master   # Push events on master branch
+      - '**'
     paths-ignore:
-      - '.gitignore'
-      - '**.editorconfig'
       - '**.md'
       - '**.MD'
-      - 'docs/**'
-      - 'web-dev/**'
-
-env:
-  IMAGE_BASE: ghcr.io/${{ github.repository }}
-  GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} # NB: må ha PAT pga avhengighet mot private repo: fp-jms-integrasjon
-  TZ: "Europe/Oslo"
+      - '.gitignore'
+      - '.editorconfig'
+      - '.java-version'
+      - 'LICENCE'
+      - 'CODEOWNERS'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+  build-app:
+    name: Build
+    uses: navikt/fp-gha-workflows/.github/workflows/build-app.yml@main
+    with:
+      build-image: ${{ github.ref_name == 'master' }} # default: true
+      push-image: ${{ github.ref_name == 'master' }} # default: false
+    secrets: inherit
 
-      - name: Setup maven
-        uses: whelk-io/maven-settings-xml-action@v20
-        with:
-          repositories: '[{ "id": "github", "name": "github", "url": "https://maven.pkg.github.com/${{ github.repository }}", "releases": { "enabled": "true" }, "snapshots": { "enabled": "false" } }]'
-          servers: '[{ "id": "github", "username": "${{ github.actor }}", "password": "${{ secrets.READER_TOKEN }}" }]'
-          output_file: settings.xml
+  create-issue:
+    name: Issues
+    if: github.ref_name == 'master'
+    needs: build-app
+    uses: navikt/fp-gha-workflows/.github/workflows/issues.yml@main
+    with:
+      build-version: ${{ needs.build-app.outputs.build-version }}
+    secrets: inherit
 
-      - uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 17
-          cache: 'maven'
+  comment-issue:
+    name: Issues
+    if: github.ref_name == 'master'
+    needs: create-issue
+    uses: navikt/fptilbake/.github/workflows/comment.yml@master
+    with:
+      issue-number: ${{ needs.create-issue.outputs.issue-number }}
+    secrets: inherit
 
-      - name: Login to GitHub Packages Docker Registry
-        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b # Use commit-sha1 instead of tag for security concerns
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  trigger-autotest:
+    name: Autotest
+    if: github.ref_name == 'master'
+    needs: [ build-app, create-issue ]
+    uses: navikt/fp-gha-workflows/.github/workflows/autotest.yml@main
+    with:
+      build-version: ${{ needs.build-app.outputs.build-version }}
+      issue-number: ${{ needs.create-issue.outputs.issue-number }}
+    secrets: inherit
 
-      - name: Hent og start Oracle image
-        run: |
-          echo "Henter og starter Oracle image"
-          cd .oracle
-          docker-compose up --quiet-pull > nohup.out 2>&1 &
-          sh -c 'tail -n +0 -f nohup.out | { sed "/Database opened./q" && kill $$; }' || true
+  snyk:
+    name: Snyk
+    needs: build-app
+    uses: navikt/fp-gha-workflows/.github/workflows/snyk.yml@main
+    with:
+      build-version: ${{ needs.build-app.outputs.build-version }}
+    secrets: inherit
 
-      - name: Set build version
-        run: |
-          echo "BUILD_VERSION=2.0-$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
-
-      - name: Build (kompiler)
-        run: |
-          echo "Building $BUILD_VERSION"
-          mvn test-compile -P migrer-db -B -s settings.xml -Drevision=${BUILD_VERSION}
-
-      - name: Migrer database
-        run: |
-          echo "Migrerer database"
-          mvn exec:java -pl migreringer -B -s settings.xml -Drevision=${BUILD_VERSION}
-
-      - name: Build artifacts & deploy (inkl test)
-        run: |
-          echo "Building artifacts $BUILD_VERSION"
-          mvn install -e -B -s settings.xml -Drevision=${BUILD_VERSION} -Dfile.encoding=UTF-8
-
-      - name: Bygg og push docker-image for distribuering
-        run: |
-          docker build --pull --tag ${IMAGE_BASE}:${BUILD_VERSION} --tag ${IMAGE_BASE}:latest . | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0 }'
-          docker push ${IMAGE_BASE} --all-tags
-
-      - name: Lukk gamle bygg-issues
-        uses: actions/github-script@v6
-        with:
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            script: |
-              github.rest.issues.listForRepo({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  state: 'open',
-                  labels: ['deployment']
-                }).then(response => {
-                  response.data.forEach(issue => {
-                    github.rest.issues.update({
-                      owner: context.repo.owner,
-                      repo: context.repo.repo,
-                      issue_number: issue.number,
-                      state: 'closed'
-                    });
-                  });
-                });
-
-      -  name: Opprett deployment issue
-         id: createdeployissue
-         if: success()
-         uses: actions/github-script@v6
-         with:
-           github-token: ${{ secrets.GITHUB_TOKEN }}
-           script: |
-             github.rest.issues.create( {
-               owner: context.issue.owner,
-               repo: context.issue.repo,
-               labels: ['deployment'],
-               title: 'Deploy av ${{ env.BUILD_VERSION }}',
-               body: '${{ github.sha }}'})
-             .then(response => {
-                     core.setOutput('number', response.data.number);
-              });
-
-      -  name: Opprett deployment issue
-         if: success()
-         uses: actions/github-script@v6
-         with:
-           github-token: ${{ secrets.GITHUB_TOKEN }}
-           script: |
-             github.rest.issues.createComment( {
-               owner: context.issue.owner,
-               repo: context.issue.repo,
-               issue_number: ${{ steps.createdeployissue.outputs.number }},
-               body: 'Kommenter med <b>/promote område env namespace</b>, hvor <b>område</b> er fp eller k9, <b>env</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.\n\
-                <table>\n\
-                <tr><th>kommando</th><th>Cluster</th><th>Namespace</th></tr>\n\
-                <tr><td>promote</td><td>dev-fss</td><td>teamforeldrepenger</td></tr>\n\
-                <tr><td>promote</td><td>prod-fss</td><td>teamforeldrepenger</td></tr>\n\
-                <tr><td>promote</td><td>dev-fss</td><td>k9saksbehandling</td></tr>\n\
-                <tr><td>promote</td><td>prod-fss</td><td>k9saksbehandling</td></tr>\n\
-                </table>'
-              })
-
-      - uses: navikt/github-app-token-generator@v1.1
-        id: get-token
-        with:
-          private-key: ${{ secrets.FP_PRIVATE_KEY }}
-          app-id: ${{ secrets.FP_APP_ID }}
-
-      - name: Trigger tester for FP
-        shell: bash
-        run: |
-          curl -XPOST -u "x-access-token:${{ steps.get-token.outputs.token }}" \
-          -H "Accept: application/vnd.github.v3+json" \
-          https://api.github.com/repos/navikt/fpsak-autotest/actions/workflows/trigger.yml/dispatches \
-          -d '{"ref":"master",
-                  "inputs":{
-                      "trigger": "${{ github.repository }}",
-                      "version": "${{ env.BUILD_VERSION }}",
-                      "issue_number": "${{ steps.createdeployissue.outputs.number }}"
-                  }}'
-
-      - name: Trigg deploy av k9-tilbake til dev-fss/k9saksbehandling
-        if: success()
-        run: |
-          curl -XPOST -u "x-access-token:${{ steps.get-token.outputs.token }}" \
-          -H "Accept: application/vnd.github.v3+json" \
-          https://api.github.com/repos/${{ github.event.inputs.trigger }}/dispatches \
-          -d '{
-                "event_type": "promote-command",
-                "client_payload": {
-                  "github": {
-                      "payload": {
-                          "issue": {
-                              "number": "${{ steps.createdeployissue.outputs.number }}"
-                  }}},
-                  "slash_command": {
-                      "args": {
-                          "unnamed": {
-                              "arg1": "dev-fss",
-                              "arg2": "k9saksbehandling"
-                  }}}
-                }
-              }'
-
-      - name: Rydd genererte artefakter fra cache før den lagres
-        shell: bash
-        run: |
-          rm ~/.m2/repository/no/nav/foreldrepenger/tilbakekreving -r
+  promote:
+    name: Deploy til K9 dev
+    if: github.ref_name == 'master'
+    needs: [ build-app, create-issue ]
+    uses: navikt/fptilbake/.github/workflows/promote-manuelt.yml@master
+    with:
+      issue-number: ${{ needs.create-issue.outputs.issue-number }}
+      cluster: dev-fss
+      namespace: k9saksbehandling
+    secrets: inherit

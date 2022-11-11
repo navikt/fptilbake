@@ -34,7 +34,6 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.json.JsonValue;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 import javax.validation.Valid;
@@ -56,6 +55,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.IgnoreKodeverk;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;

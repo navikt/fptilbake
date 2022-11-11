@@ -1,10 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.UriBuilder;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
@@ -19,6 +22,9 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDto;
 // RequestScoped fordi HistorikkInnslagTekstBuilder inneholder state og denne deles på tvers av AksjonspunktOppdaterere
 @RequestScoped
 public class HistorikkTjenesteAdapter {
+
+    private static final String HENT_DOK_PATH = "/dokument/hent-dokument"; // FIXME - her trengs path til sak, ikke tilbake
+
     private HistorikkRepository historikkRepository;
     private HistorikkInnslagTekstBuilder builder;
     private HistorikkInnslagKonverter historikkinnslagKonverter;
@@ -36,14 +42,13 @@ public class HistorikkTjenesteAdapter {
     }
 
 
-    public List<HistorikkinnslagDto> hentAlleHistorikkInnslagForSak(Saksnummer saksnummer) {
-        List<Historikkinnslag> historikkinnslagList = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
+    public List<HistorikkinnslagDto> hentAlleHistorikkInnslagForSak(Saksnummer saksnummer, URI dokumentPath) {
+        var historikkinnslagList = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         return historikkinnslagList.stream()
-                .map(historikkinnslag -> historikkinnslagKonverter.mapFra(historikkinnslag))
+                .map(historikkinnslag -> historikkinnslagKonverter.mapFra(historikkinnslag, dokumentPath))
                 .sorted()
                 .collect(Collectors.toList());
     }
-
 
     public void lagInnslag(Historikkinnslag historikkinnslag) {
         resetBuilder();
@@ -74,5 +79,23 @@ public class HistorikkTjenesteAdapter {
 
     public void resetBuilder() {
         builder = new HistorikkInnslagTekstBuilder();
+    }
+
+    public URI getRequestPath(HttpServletRequest request) {
+        // FIXME XSS valider requestURL eller bruk relativ URL
+        if (request == null) {
+            return null;
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append(request.getScheme())
+            .append("://")
+            .append(request.getLocalName())
+            .append(":") // NOSONAR
+            .append(request.getLocalPort());
+
+        stringBuilder.append(request.getContextPath())
+            .append(request.getServletPath());
+        return UriBuilder.fromUri(stringBuilder.toString()).path(HENT_DOK_PATH).build();
     }
 }

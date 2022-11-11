@@ -206,11 +206,6 @@
             <artifactId>jersey-hk2</artifactId>
         </dependency>
 
-        <!-- TODO (Frode M): sjekk om vi trenger ldap-klient -->
-        <dependency>
-            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
-            <artifactId>ldap-klient</artifactId>
-        </dependency>
         <!-- CDI -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
@@ -223,11 +218,6 @@
 
 
         <!-- For Status side -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>com.fasterxml.woodstox</groupId>
             <artifactId>woodstox-core</artifactId>

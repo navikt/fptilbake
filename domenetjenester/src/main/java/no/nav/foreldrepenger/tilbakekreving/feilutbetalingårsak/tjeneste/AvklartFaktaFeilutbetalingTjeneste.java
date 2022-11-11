@@ -8,8 +8,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FaktaFeilutbetalingDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
@@ -159,7 +157,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
     }
 
     private boolean harBegrunnelseEndret(String forrigeBegrunnelse, String begrunnelse) {
-        return StringUtils.isNotEmpty(forrigeBegrunnelse) && !forrigeBegrunnelse.equalsIgnoreCase(begrunnelse);
+        return forrigeBegrunnelse != null && !forrigeBegrunnelse.isEmpty() && !forrigeBegrunnelse.equalsIgnoreCase(begrunnelse);
     }
 
 }

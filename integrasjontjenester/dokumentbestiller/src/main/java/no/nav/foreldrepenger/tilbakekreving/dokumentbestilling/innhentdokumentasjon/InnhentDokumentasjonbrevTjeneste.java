@@ -8,8 +8,6 @@ import java.util.UUID;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -124,7 +122,7 @@ public class InnhentDokumentasjonbrevTjeneste {
                 .medFagsaktype(ytelseType)
                 .medSprakkode(mottakersSpråkkode)
                 .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
-                .medAnsvarligSaksbehandler(StringUtils.isNotEmpty(behandling.getAnsvarligSaksbehandler()) ? behandling.getAnsvarligSaksbehandler() : "VL")
+                .medAnsvarligSaksbehandler(behandling.getAnsvarligSaksbehandler() != null && !behandling.getAnsvarligSaksbehandler().isEmpty() ? behandling.getAnsvarligSaksbehandler() : "VL")
                 .medTittel(getTittel(brevMottaker) + ytelseNavn.getNavnPåBokmål())
                 .medFinnesVerge(finnesVerge)
                 .medVergeNavn(vergeNavn)

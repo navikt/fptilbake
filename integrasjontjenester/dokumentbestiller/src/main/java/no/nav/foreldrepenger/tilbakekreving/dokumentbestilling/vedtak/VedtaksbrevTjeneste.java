@@ -17,7 +17,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -459,7 +458,7 @@ public class VedtaksbrevTjeneste {
                 VedtakResultatType.DELVIS_TILBAKEBETALING.equals(vedtakResultatType);
 
         return new BrevMetadata.Builder()
-                .medAnsvarligSaksbehandler(StringUtils.isNotEmpty(behandling.getAnsvarligSaksbehandler()) ? behandling.getAnsvarligSaksbehandler() : "VL")
+                .medAnsvarligSaksbehandler(behandling.getAnsvarligSaksbehandler() != null && !behandling.getAnsvarligSaksbehandler().isEmpty() ? behandling.getAnsvarligSaksbehandler() : "VL")
                 .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
                 .medBehandlendeEnhetNavn(behandling.getBehandlendeEnhetNavn())
                 .medMottakerAdresse(adresseinfo)

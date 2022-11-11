@@ -3,8 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.inhentopplysning;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRef;
@@ -47,7 +45,7 @@ public class InnhentOpplysningSteg implements BehandlingSteg {
 
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VARSELTEKST);
         String varselTekst = samletEksternBehandlingInfo.getVarseltekst();
-        if (StringUtils.isNotEmpty(varselTekst)) {
+        if (varselTekst != null && !varselTekst.isEmpty()) {
             varselRepository.lagre(behandlingId, varselTekst, null);
         }
         return BehandleStegResultat.utførtUtenAksjonspunkter();

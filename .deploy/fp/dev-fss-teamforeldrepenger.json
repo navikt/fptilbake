@@ -3,17 +3,35 @@
   "oraclefptilbakesecret":"oracle/data/dev/creds/fptilbake_q1-user",
   "oracleconfig": "oracle/data/dev/config/fptilbake_q1",
   "fptilbakeserviceuser": "serviceuser/data/dev/srvfptilbake",
-  "ldapserviceuser": "serviceuser/data/dev/srvssolinux",
-  "minReplicas": "2",
-  "maxReplicas": "3",
+  "minReplicas": "1",
+  "maxReplicas": "2",
   "ingresses": [
-    "https://fptilbake-q1.nais.preprod.local/",
     "https://app-q1.adeo.no/fptilbake",
-    "https://fptilbake-q1.dev.adeo.no/",
-    "https://fptilbake.dev.adeo.no/",
-    "https://fptilbake.dev.intern.nav.no/"
+    "https://fptilbake.dev.intern.nav.no/",
+    "https://fptilbake.dev-fss-pub.nais.io"
   ],
   "env": {
-    "APPDYNAMICS_AGENT_ACCOUNT_NAME": "NON-PROD"
-  }
+    "APPDYNAMICS_AGENT_ACCOUNT_NAME": "NON-PROD",
+    "APPD_ENABLED": "false"
+  },
+  "AZURE_IAC_RULES": [
+    {
+      "app": "fp-swagger",
+      "namespace": "teamforeldrepenger",
+      "cluster": "dev-gcp",
+      "scopes": [
+        "swagger"
+      ]
+    },
+    {
+      "app": "fp-frontend",
+      "namespace": "teamforeldrepenger",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "fpsak",
+      "namespace": "teamforeldrepenger",
+      "cluster": "dev-fss"
+    }
+  ]
 }

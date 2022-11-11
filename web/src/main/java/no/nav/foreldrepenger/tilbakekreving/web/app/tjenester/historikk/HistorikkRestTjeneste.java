@@ -1,10 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk;
 
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-
-import java.util.Collections;
-import java.util.List;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -24,12 +19,11 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagDokumentLinkDto;
-import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
 @Path("/historikk")
 @ApplicationScoped
@@ -53,49 +47,17 @@ public class HistorikkRestTjeneste {
     @Timed
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Operation(tags = "historikk", description = "Henter alle historikkinnslag for gitt behandling.")
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentAlleInnslag(@Context HttpServletRequest request,
                                     @NotNull @QueryParam("saksnummer")
                                     @Parameter(description = "Saksnummer må være et eksisterende saksnummer")
                                     @Valid SaksnummerDto saksnummerDto) {
-        Response.ResponseBuilder responseBuilder = Response.ok();
-        // FIXME XSS valider requestURL eller bruk relativ URL
-        String requestURL = getRequestPath(request);
-        String url = requestURL + "/dokument/hent-dokument";
 
-        List<HistorikkinnslagDto> historikkInnslagDtoList = historikkTjeneste.hentAlleHistorikkInnslagForSak(
-                new Saksnummer(saksnummerDto.getVerdi()));
-        if (!historikkInnslagDtoList.isEmpty()) {
-            responseBuilder.entity(historikkInnslagDtoList);
-            for (HistorikkinnslagDto dto : historikkInnslagDtoList) {
-                for (HistorikkInnslagDokumentLinkDto linkDto : dto.getDokumentLinks()) {
-                    String journalpostId = linkDto.getJournalpostId();
-                    String dokumentId = linkDto.getDokumentId();
-                    // FIXME XSS escape URL-parametre
-                    linkDto.setUrl(url + "?journalpostId=" + journalpostId + "&dokumentId=" + dokumentId);
-                }
-            }
-        } else {
-            responseBuilder.entity(Collections.emptyList());
-        }
-        return responseBuilder.build();
+        var path = historikkTjeneste.getRequestPath(request);
+
+        var historikkInnslagDtoList = historikkTjeneste.hentAlleHistorikkInnslagForSak(new Saksnummer(saksnummerDto.getVerdi()), path);
+        return Response.ok().entity(historikkInnslagDtoList).build();
     }
 
-    String getRequestPath(HttpServletRequest request) {
-        if (request == null) {
-            return null;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-
-        stringBuilder.append(request.getScheme())
-                .append("://")
-                .append(request.getLocalName())
-                .append(":") // NOSONAR
-                .append(request.getLocalPort());
-
-        stringBuilder.append(request.getContextPath())
-                .append(request.getServletPath());
-        return stringBuilder.toString();
-    }
 }

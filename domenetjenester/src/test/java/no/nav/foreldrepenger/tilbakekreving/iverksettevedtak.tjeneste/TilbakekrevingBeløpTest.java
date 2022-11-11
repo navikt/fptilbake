@@ -27,7 +27,15 @@ class TilbakekrevingBeløpTest {
 
         assertThat(new TilbakekrevingBeløp(KlasseType.YTEL, "FPATFER").erSkattepliktig()).isFalse();
         assertThat(new TilbakekrevingBeløp(KlasseType.YTEL, "FPENAD-OP").erSkattepliktig()).isFalse();
+    }
 
+    @Test
+    void feriepenger_på_svalbard_er_skattepliktig() {
+        assertThat(new TilbakekrevingBeløp(KlasseType.YTEL, "FPATFER-SSKT").erSkattepliktig()).isTrue();
+    }
 
+    @Test
+    void vanlige_feriepenger_er_ikke_skattepliktig() {
+        assertThat(new TilbakekrevingBeløp(KlasseType.YTEL, "FPATFER").erSkattepliktig()).isFalse();
     }
 }

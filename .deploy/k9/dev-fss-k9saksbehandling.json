@@ -5,7 +5,6 @@
   "oracleconfig": "oracle/data/dev/config/k9tilbake_q1",
   "oraclek9tilbakesecret": "oracle/data/dev/creds/k9tilbake_q1-user",
   "k9tilbakeserviceuser": "serviceuser/data/dev/srvk9-tilbake",
-  "ldapserviceuser": "serviceuser/data/dev/srvssolinux",
   "minReplicas": "2",
   "maxReplicas": "2",
   "ingresses": [
@@ -14,11 +13,7 @@
   ],
   "env": {
     "APPDYNAMICS_AGENT_ACCOUNT_NAME": "NON-PROD",
-    "LDAP_URL": "ldaps://ldapgw.preprod.local",
-    "LDAP_BASEDN": "dc=preprod,dc=local",
-    "LDAP_DOMAIN": "PREPROD.LOCAL",
-    "LDAP_USER_BASEDN": "ou=NAV,ou=BusinessUnits,dc=preprod,dc=local",
-    "LDAP_SERVICEUSER_BASEDN": "ou=ServiceAccounts,dc=preprod,dc=local",
+    "APPD_ENABLED": "true",
     "MQGATEWAY02_NAME": "MQLS02",
     "MQGATEWAY02_HOSTNAME": "b27apvl220.preprod.local",
     "MQGATEWAY02_PORT": "1413",
@@ -26,6 +21,7 @@
     "FPTILBAKE_KRAVGRUNNLAG_QUEUENAME": "QA.Q1_K9_TILBAKE.KRAVGRUNNLAG",
     "PDL_BASE_URL": "http://pdl-api.pdl/graphql",
     "PDL_TEMA": "OMS",
+    "PDL_SCOPES": "api://dev-fss.pdl.pdl-api/.default",
     "TILBAKEKREVING_V1_URL": "https://cics-q1.adeo.no/oppdrag/K231CW80",
     "DOKUMENTPRODUKSJON_V2_URL": "https://dokprod-q1.nais.preprod.local/dokprod/ws/dokumentproduksjon/v2",
     "KAFKA_BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
@@ -35,12 +31,19 @@
     "KAFKA_DVH_VEDTAK_TOPIC": "privat-k9-tilbakekreving-dvh-vedtak-v1",
     "KAFKA_DVH_SAKSSTATISTIKK_TOPIC": "privat-k9-tilbakekreving-dvh-saksstatistikk-v1",
     "ORGANISASJON_RS_URL": "https://modapp-q1.adeo.no/ereg/api/v1/organisasjon",
-    "JOURNALPOSTAPI_OVERRIDE_URL": "http://dokarkiv-q1.teamdokumenthandtering",
-    "DOKARKIV_BASE_URL": "http://dokarkiv-q1.teamdokumenthandtering",
+    "DOKARKIV_BASE_URL": "http://dokarkiv-q1.teamdokumenthandtering/rest/journalpostapi/v1/journalpost",
     "DOKDIST_REST_DISTRIBUER_JOURNALPOST" : "https://dokdistfordeling-q1.nais.preprod.local/rest/v1/distribuerjournalpost",
     "ABAC_ATTRIBUTT_DRIFT" : "no.nav.abac.attributter.k9.drift",
     "KODEVERK_V2_URL": "https://kodeverk.nais.adeo.no/ws/kodeverk/v2",
     "FORELDELSE_ANTALLMAANEDER" : "P1M",
-    "VEDTAKSBREV_JOIN_PERIODER" : "true"
-  }
+    "VEDTAKSBREV_JOIN_PERIODER" : "true",
+    "AKTIVER_ABAC_LOGGING" : "false"
+  },
+  "AZURE_IAC_RULES": [
+    {
+      "app": "k9-sak",
+      "namespace": "k9saksbehandling",
+      "cluster": "dev-fss"
+    }
+  ]
 }
