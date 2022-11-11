@@ -40,6 +40,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.TotrinnskontrollAksjonspunkterTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AksjonspunktDtoMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 
@@ -170,8 +171,12 @@ public class BehandlingDtoTjeneste {
 
         UtvidetBehandlingDto dto = new UtvidetBehandlingDto();
         settStandardFelter(behandling, dto);
+        dto.setBehandlingsresultat(lagBehandlingsresultat(behandling));
         boolean behandlingHenlagt = behandlingTjeneste.erBehandlingHenlagt(behandling);
         dto.setBehandlingHenlagt(behandlingHenlagt);
+        var aksjonspunkt = AksjonspunktDtoMapper.lagAksjonspunktDto(behandling, totrinnTjeneste.hentTotrinnsvurderinger(behandling));
+        dto.setAksjonspunktene(aksjonspunkt);
+        dto.setAksjonspunkt(aksjonspunkt);
 
         settResourceLinks(behandling, dto, behandlingHenlagt);
 
@@ -315,6 +320,7 @@ public class BehandlingDtoTjeneste {
         //FIXME det er i beste fall forvirrende å returnere både resultat og perioder som skal vurderes på samme navn "perioderForeldelse". Bør splittes tilsvarende hvordan det er for vilkårsvurdering
         if (harVurdertForeldelse) {
             dto.leggTil(get(kontekstPath + "/api/foreldelse/vurdert", FORELDELSE, uuidDto));
+            dto.leggTil(get(kontekstPath + "/api/foreldelse/vurdert", "perioderForeldelseVurdert", uuidDto));
         } else if (harDataForFaktaFeilutbetaling) {
             dto.leggTil(get(kontekstPath + "/api/foreldelse", FORELDELSE, uuidDto));
         }

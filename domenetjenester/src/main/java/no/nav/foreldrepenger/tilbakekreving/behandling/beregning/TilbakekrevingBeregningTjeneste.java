@@ -189,14 +189,12 @@ public class TilbakekrevingBeregningTjeneste {
         List<GrunnlagPeriodeMedSkattProsent> perioderMedSkattProsent = new ArrayList<>();
         for (KravgrunnlagPeriode432 kgPeriode : kgPerioder) {
             List<KravgrunnlagBelop433> kgBeløper = kgPeriode.getKravgrunnlagBeloper433().stream()
-                    .filter(kgBeløp -> KlasseType.YTEL.equals(kgBeløp.getKlasseType()))
-                    .collect(Collectors.toList());
+                .filter(kgBeløp -> KlasseType.YTEL.equals(kgBeløp.getKlasseType())).toList();
             List<GrunnlagPeriodeMedSkattProsent> periodeMedSkattProsent = kgBeløper.stream()
-                    .map(kgBeløp -> {
-                        BigDecimal maksTilbakekrevesBeløp = beregnBeløpUtil.beregnBeløpForPeriode(kgBeløp.getTilbakekrevesBelop(), periode, kgPeriode.getPeriode());
-                        return new GrunnlagPeriodeMedSkattProsent(kgPeriode.getPeriode(), maksTilbakekrevesBeløp, kgBeløp.getSkattProsent());
-                    })
-                    .collect(Collectors.toList());
+                .map(kgBeløp -> {
+                    BigDecimal maksTilbakekrevesBeløp = beregnBeløpUtil.beregnBeløpForPeriode(kgBeløp.getTilbakekrevesBelop(), periode, kgPeriode.getPeriode());
+                    return new GrunnlagPeriodeMedSkattProsent(kgPeriode.getPeriode(), maksTilbakekrevesBeløp, kgBeløp.getSkattProsent());
+                }).toList();
             perioderMedSkattProsent.addAll(periodeMedSkattProsent);
         }
         return perioderMedSkattProsent;

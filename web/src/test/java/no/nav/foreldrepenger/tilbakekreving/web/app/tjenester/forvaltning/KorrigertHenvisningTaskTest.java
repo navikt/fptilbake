@@ -93,7 +93,6 @@ class KorrigertHenvisningTaskTest {
         eksternBehandlingsinfoDto.setHenvisning(Henvisning.fraEksternBehandlingId(123l));
         eksternBehandlingsinfoDto.setUuid(uuid);
         FagsakDto fagsakDto = new FagsakDto();
-        fagsakDto.setAktoerId(behandling.getAktørId().getId());
         fagsakDto.setSaksnummer(saksnummer.getVerdi());
         fagsakDto.setSakstype(FagsakYtelseType.FORELDREPENGER);
         SamletEksternBehandlingInfo eksternBehandlingInfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.FAGSAK)

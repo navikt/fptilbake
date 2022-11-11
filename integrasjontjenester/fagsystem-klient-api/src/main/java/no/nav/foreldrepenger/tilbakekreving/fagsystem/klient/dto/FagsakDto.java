@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto;
 
+import java.util.Optional;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -9,9 +11,8 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 public class FagsakDto {
 
     private String saksnummer;
-    private FagsakYtelseType sakstype;
-    private FagsakYtelseType fagsakYtelseType;
-    private String aktoerId;
+    private FagsakYtelseType sakstype; // Fra k9-sak?
+    private FagsakYtelseType fagsakYtelseType;  // Fra fpsak
 
     public void setSaksnummer(String saksnummer) {
         this.saksnummer = saksnummer;
@@ -22,7 +23,7 @@ public class FagsakDto {
     }
 
     public FagsakYtelseType getSakstype() {
-        return sakstype != null ? sakstype : fagsakYtelseType;
+        return Optional.ofNullable(sakstype).orElse(fagsakYtelseType);
     }
 
     public void setSakstype(FagsakYtelseType sakstype) {
@@ -37,11 +38,4 @@ public class FagsakDto {
         this.fagsakYtelseType = fagsakYtelseType;
     }
 
-    public String getAktoerId() {
-        return aktoerId;
-    }
-
-    public void setAktoerId(String aktoerId) {
-        this.aktoerId = aktoerId;
-    }
 }

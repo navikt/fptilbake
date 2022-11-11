@@ -2,16 +2,16 @@ name: Promote
 on:
   repository_dispatch:
     types: [promote-command]
-env:
-  IMAGE_BASE: ghcr.io/${{ github.repository }}
-  CLUSTER: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }} # dev-fss eller prod-fss
-  NAMESPACE: ${{ github.event.client_payload.slash_command.args.unnamed.arg2 }} # teamforeldrepenger eller k9saksbehandling
 
 jobs:
   promote:
     runs-on: ubuntu-latest
+    env:
+      CLUSTER: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
+      NAMESPACE: ${{ github.event.client_payload.slash_command.args.unnamed.arg2 }}
+      ISSUE: ${{ github.event.client_payload.github.payload.issue.number }}
     steps:
-      - name: Henter informasjon fra issuet
+      - name: Henter informasjon fra issuet nr ${{env.ISSUE}}
         id: issue_comment
         uses: actions/github-script@v6
         with:
@@ -20,14 +20,14 @@ jobs:
             github.rest.issues.get( {
               owner: context.issue.owner,
               repo: context.issue.repo,
-              issue_number: ${{ github.event.client_payload.github.payload.issue.number }} })
+              issue_number: ${{ env.ISSUE }} })
             .then(response => {
               core.setOutput('sha', response.data.body);
               core.setOutput('title', response.data.title);
             });
 
       - name: Setter IMAGE som brukes i deploy filen
-        run: echo "IMAGE=$IMAGE_BASE:$(echo ${{ steps.issue_comment.outputs.title }} | awk '{print $NF}')" >> $GITHUB_ENV
+        run: echo "IMAGE=ghcr.io/${{ github.repository }}:$(echo ${{ steps.issue_comment.outputs.title }} | awk '{print $NF}')" >> $GITHUB_ENV
 
       - name: Sjekk ut kode
         uses: actions/checkout@v3.1.0
