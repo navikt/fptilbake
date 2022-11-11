@@ -171,6 +171,7 @@ public class BehandlingDtoTjeneste {
 
         UtvidetBehandlingDto dto = new UtvidetBehandlingDto();
         settStandardFelter(behandling, dto);
+        dto.setBehandlingsresultat(lagBehandlingsresultat(behandling));
         boolean behandlingHenlagt = behandlingTjeneste.erBehandlingHenlagt(behandling);
         dto.setBehandlingHenlagt(behandlingHenlagt);
         var aksjonspunkt = AksjonspunktDtoMapper.lagAksjonspunktDto(behandling, totrinnTjeneste.hentTotrinnsvurderinger(behandling));
@@ -319,6 +320,7 @@ public class BehandlingDtoTjeneste {
         //FIXME det er i beste fall forvirrende å returnere både resultat og perioder som skal vurderes på samme navn "perioderForeldelse". Bør splittes tilsvarende hvordan det er for vilkårsvurdering
         if (harVurdertForeldelse) {
             dto.leggTil(get(kontekstPath + "/api/foreldelse/vurdert", FORELDELSE, uuidDto));
+            dto.leggTil(get(kontekstPath + "/api/foreldelse/vurdert", "perioderForeldelseVurdert", uuidDto));
         } else if (harDataForFaktaFeilutbetaling) {
             dto.leggTil(get(kontekstPath + "/api/foreldelse", FORELDELSE, uuidDto));
         }
