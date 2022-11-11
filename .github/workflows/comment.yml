@@ -1,0 +1,33 @@
+name: Comment
+
+on:
+  workflow_call:
+    inputs:
+      issue-number:
+        required: true
+        type: string
+        description: 'The deployment issue.'
+
+jobs:
+  comment-on-issue:
+    name: Comment
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Comment on issue
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment( {
+              owner: context.issue.owner,
+              repo: context.issue.repo,
+              issue_number: ${{ inputs.issue-number }},
+              body: 'Kommenter med <b>/promote cluster namespace</b>, hvor <b>cluster</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.\n\
+               <table>\n\
+               <tr><th>kommando</th><th>Cluster</th><th>Namespace</th></tr>\n\
+               <tr><td>promote</td><td>dev-fss</td><td>teamforeldrepenger</td></tr>\n\
+               <tr><td>promote</td><td>prod-fss</td><td>teamforeldrepenger</td></tr>\n\
+               <tr><td>promote</td><td>dev-fss</td><td>k9saksbehandling</td></tr>\n\
+               <tr><td>promote</td><td>prod-fss</td><td>k9saksbehandling</td></tr>\n\
+               </table>'
+             })
