@@ -16,6 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingB
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
@@ -178,7 +179,10 @@ public class BehandlingDtoTjeneste {
         BehandlingsresultatDto dto = new BehandlingsresultatDto();
         var type = behandlingresultatRepository.hent(behandling)
             .map(Behandlingsresultat::getBehandlingResultatType)
-            .orElseGet(() -> BehandlingResultatType.fraVedtakResultatType(tilbakekrevingBeregningTjeneste.beregn(behandling.getId()).getVedtakResultatType()));
+            .or(() -> Optional.ofNullable(tilbakekrevingBeregningTjeneste.beregn(behandling.getId()))
+                .map(BeregningResultat::getVedtakResultatType)
+                .map(BehandlingResultatType::fraVedtakResultatType))
+            .orElse(BehandlingResultatType.IKKE_FASTSATT);
         dto.setType(type);
         return dto;
     }
