@@ -24,8 +24,8 @@ import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.B
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTypeMapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingÅrsakMapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.YtelseTypeMapper;
-import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.Periode;
 
 @ApplicationScoped
 public class BehandlingTilstandTjeneste {
@@ -85,9 +85,8 @@ public class BehandlingTilstandTjeneste {
 
         Optional<PeriodeMedBeløp> totaltFraKravgrunnlag = kravgrunnlagTjeneste.finnTotaltForKravgrunnlag(behandlingId);
         totaltFraKravgrunnlag.ifPresent(totalt -> {
-            Periode periode = totalt.getPeriode();
-            tilstand.setTotalFeilutbetaltPeriodeFom(periode == null ? null : periode.getFom());
-            tilstand.setTotalFeilutbetaltPeriodeTom(periode == null ? null : periode.getTom());
+            var periode = totalt.getPeriode();
+            tilstand.setTotalFeilutbetaltPeriode(periode != null ? new Periode(periode.getFom(), periode.getTom()) : null);
             tilstand.setTotalFeilutbetaltBeløp(totalt.getBeløp());
         });
 

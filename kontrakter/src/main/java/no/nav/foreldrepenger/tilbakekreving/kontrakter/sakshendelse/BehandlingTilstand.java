@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -38,13 +37,10 @@ public class BehandlingTilstand {
     @JsonProperty(value = "revurderingOpprettetAarsak")
     private RevurderingOpprettetÅrsak revurderingOpprettetÅrsak;
 
-    @JsonProperty(value = "totalFeilutbetaltPeriodeFom")
-    private LocalDate totalFeilutbetaltPeriodeFom;
+    @JsonProperty(value = "totalFeilutbetaltPeriode")
+    private Periode totalFeilutbetaltPeriode;
 
-    @JsonProperty(value = "totalFeilutbetaltPeriodeTom")
-    private LocalDate totalFeilutbetaltPeriodeTom;
-
-    @JsonProperty(value = "totalFeilutbetaltBeloep")
+    @JsonProperty(value = "totalFeilutbetaltBeløp")
     private BigDecimal totalFeilutbetaltBeløp;
 
     public OffsetDateTime getFunksjonellTid() {
@@ -183,20 +179,12 @@ public class BehandlingTilstand {
         this.revurderingOpprettetÅrsak = revurderingOpprettetÅrsak;
     }
 
-    public LocalDate getTotalFeilutbetaltPeriodeFom() {
-        return totalFeilutbetaltPeriodeFom;
+    public Periode getTotalFeilutbetaltPeriode() {
+        return totalFeilutbetaltPeriode;
     }
 
-    public void setTotalFeilutbetaltPeriodeFom(LocalDate totalFeilutbetaltPeriodeFom) {
-        this.totalFeilutbetaltPeriodeFom = totalFeilutbetaltPeriodeFom;
-    }
-
-    public LocalDate getTotalFeilutbetaltPeriodeTom() {
-        return totalFeilutbetaltPeriodeTom;
-    }
-
-    public void setTotalFeilutbetaltPeriodeTom(LocalDate totalFeilutbetaltPeriodeTom) {
-        this.totalFeilutbetaltPeriodeTom = totalFeilutbetaltPeriodeTom;
+    public void setTotalFeilutbetaltPeriode(Periode totalFeilutbetaltPeriode) {
+        this.totalFeilutbetaltPeriode = totalFeilutbetaltPeriode;
     }
 
     public BigDecimal getTotalFeilutbetaltBeløp() {
