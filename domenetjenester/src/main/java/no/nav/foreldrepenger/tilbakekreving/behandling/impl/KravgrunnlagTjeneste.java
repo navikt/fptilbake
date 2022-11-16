@@ -3,8 +3,11 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType.FAKTA_FEILUTBETALING;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -79,19 +82,36 @@ public class KravgrunnlagTjeneste {
 
     private SortedMap<Periode, BigDecimal> finnFeilutbetalingPrPeriode(Long behandlingId) {
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
+        return mapFeilutbetalingPrPeriode(kravgrunnlag);
+    }
+
+    private SortedMap<Periode, BigDecimal> mapFeilutbetalingPrPeriode(Kravgrunnlag431 kravgrunnlag) {
         SortedMap<Periode, BigDecimal> feilutbetalingPrPeriode = new TreeMap<>(Periode.COMPARATOR);
         for (KravgrunnlagPeriode432 kravgrunnlagPeriode432 : kravgrunnlag.getPerioder()) {
             BigDecimal feilutbetalt = kravgrunnlagPeriode432.getKravgrunnlagBeloper433().stream()
-                    .filter(beløp433 -> beløp433.getKlasseType() == KlasseType.FEIL)
-                    .map(KravgrunnlagBelop433::getNyBelop)
-                    .reduce(BigDecimal::add)
-                    .orElse(BigDecimal.ZERO);
+                .filter(beløp433 -> beløp433.getKlasseType() == KlasseType.FEIL)
+                .map(KravgrunnlagBelop433::getNyBelop)
+                .reduce(BigDecimal::add)
+                .orElse(BigDecimal.ZERO);
 
             if (feilutbetalt.compareTo(BigDecimal.ZERO) != 0) {
                 feilutbetalingPrPeriode.put(kravgrunnlagPeriode432.getPeriode(), feilutbetalt);
             }
         }
         return feilutbetalingPrPeriode;
+    }
+
+    public Optional<PeriodeMedBeløp> finnTotaltForKravgrunnlag(Long behandlingId) {
+        Optional<Kravgrunnlag431> kravgrunnlagOpt = kravgrunnlagRepository.finnKravgrunnlagOpt(behandlingId);
+        if (kravgrunnlagOpt.isPresent()) {
+            SortedMap<Periode, BigDecimal> periodisert = mapFeilutbetalingPrPeriode(kravgrunnlagOpt.get());
+            LocalDate fom = periodisert.keySet().stream().map(Periode::getFom).min(Comparator.naturalOrder()).orElse(null);
+            LocalDate tom = periodisert.keySet().stream().map(Periode::getTom).max(Comparator.naturalOrder()).orElse(null);
+            Periode periode = periodisert.isEmpty() ? null : new Periode(fom, tom);
+            BigDecimal sum = periodisert.values().stream().reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
+            return Optional.of(new PeriodeMedBeløp(periode, sum));
+        }
+        return Optional.empty();
     }
 
 
@@ -152,8 +172,8 @@ public class KravgrunnlagTjeneste {
         historikkinnslag.setType(HistorikkinnslagType.BEH_STARTET_FORFRA);
         historikkinnslag.setAktør(HistorikkAktør.VEDTAKSLØSNINGEN);
         HistorikkInnslagTekstBuilder historikkInnslagTekstBuilder = new HistorikkInnslagTekstBuilder()
-                .medHendelse(HistorikkinnslagType.BEH_STARTET_FORFRA)
-                .medBegrunnelse(BEGRUNNELSE_BEHANDLING_STARTET_FORFRA);
+            .medHendelse(HistorikkinnslagType.BEH_STARTET_FORFRA)
+            .medBegrunnelse(BEGRUNNELSE_BEHANDLING_STARTET_FORFRA);
         historikkInnslagTekstBuilder.build(historikkinnslag);
         historikkinnslag.setBehandling(behandling);
         historikkRepository.lagre(historikkinnslag);
