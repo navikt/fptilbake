@@ -4,9 +4,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingEnhetEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
@@ -21,8 +18,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
 public class SakshendelserEventObserver {
-
-    private static final Logger logger = LoggerFactory.getLogger(SakshendelserEventObserver.class);
 
     private ProsessTaskTjeneste taskTjeneste;
     private BehandlingTilstandTjeneste behandlingTilstandTjeneste;
