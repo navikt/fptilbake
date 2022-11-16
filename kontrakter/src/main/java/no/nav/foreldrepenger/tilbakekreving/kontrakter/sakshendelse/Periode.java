@@ -18,8 +18,8 @@ public class Periode {
     private LocalDate tom;
 
     @JsonCreator
-    public Periode(@JsonProperty(value = "periode", required = true) @NotNull LocalDate fom,
-                   @JsonProperty(value = "periode", required = true) @NotNull LocalDate tom) {
+    public Periode(@JsonProperty(value = "fom", required = true) @NotNull LocalDate fom,
+                   @JsonProperty(value = "tom", required = true) @NotNull LocalDate tom) {
         this.fom = fom;
         this.tom = tom;
     }
