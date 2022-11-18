@@ -43,7 +43,7 @@ public final class Redirect {
 
     private static UriBuilder getUriBuilder(HttpServletRequest request) {
         UriBuilder uriBuilder = request == null || request.getContextPath() == null ? UriBuilder.fromUri("") : UriBuilder.fromUri(URI.create(request.getContextPath()));
-        Optional.ofNullable(request).map(r -> r.getServletPath()).ifPresent(c -> uriBuilder.path(c));
+        Optional.ofNullable(request).map(HttpServletRequest::getServletPath).ifPresent(uriBuilder::path);
         return uriBuilder;
     }
 
@@ -64,14 +64,14 @@ public final class Redirect {
             String xForwardedProto = getXForwardedProtoHeader(request);
 
             if (mismatchedScheme(xForwardedProto, request)) {
-                String path = location.toString();
+                var path = location.toString();
                 if (path.startsWith("/")) { // NOSONAR
                     path = path.substring(1); // NOSONAR
                 }
-                URI baseUri = new URI(request.getRequestURI());
+                var baseUri = new URI(request.getRequestURI());
                 try {
-                    URI rewritten = new URI(xForwardedProto, baseUri.getSchemeSpecificPart(), baseUri.getFragment())
-                            .resolve(path);
+                    var rewritten = new URI(xForwardedProto, baseUri.getSchemeSpecificPart(), baseUri.getFragment())
+                        .resolve(path);
                     LOG.info("Rewrote URI from '{}' to '{}'", location, rewritten);
                     newLocation = rewritten;
                 } catch (URISyntaxException e) {
@@ -79,7 +79,12 @@ public final class Redirect {
                 }
             }
         }
-        return newLocation != null ? newLocation : leggTilBaseUri(location);
+        return newLocation != null ? newLocation : (erKallFraGcp(request) ? location : leggTilBaseUri(location));
+    }
+
+    private static boolean erKallFraGcp(HttpServletRequest request) {
+        var xForwardedHost = request.getHeader("X-Forwarded-Host");
+        return xForwardedHost != null && xForwardedHost.contains("fss-pub.nais.io");
     }
 
     private static boolean relativLocationAndRequestAvailable(URI location) {
