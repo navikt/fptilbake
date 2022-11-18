@@ -12,9 +12,11 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
@@ -59,6 +61,7 @@ public class BehandlingDtoTjeneste {
     private BehandlingTjeneste behandlingTjeneste;
     private TotrinnTjeneste totrinnTjeneste;
     private TotrinnskontrollAksjonspunkterTjeneste totrinnskontrollTjeneste;
+    private TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste;
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
     private VurdertForeldelseTjeneste vurdertForeldelseTjeneste;
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
@@ -81,10 +84,11 @@ public class BehandlingDtoTjeneste {
                                  TotrinnskontrollAksjonspunkterTjeneste totrinnskontrollTjeneste,
                                  HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                  VurdertForeldelseTjeneste vurdertForeldelseTjeneste,
+                                 TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste,
                                  BehandlingRepositoryProvider repositoryProvider,
                                  BehandlingModellRepository behandlingModellRepository) {
         this(behandlingTjeneste, totrinnTjeneste, totrinnskontrollTjeneste, henleggBehandlingTjeneste, vurdertForeldelseTjeneste,
-            repositoryProvider, behandlingModellRepository, ApplicationName.hvilkenTilbake());
+            tilbakekrevingBeregningTjeneste, repositoryProvider, behandlingModellRepository, ApplicationName.hvilkenTilbake());
     }
 
     public BehandlingDtoTjeneste(BehandlingTjeneste behandlingTjeneste,
@@ -92,6 +96,7 @@ public class BehandlingDtoTjeneste {
                                  TotrinnskontrollAksjonspunkterTjeneste totrinnskontrollTjeneste,
                                  HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                  VurdertForeldelseTjeneste vurdertForeldelseTjeneste,
+                                 TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste,
                                  BehandlingRepositoryProvider repositoryProvider,
                                  BehandlingModellRepository behandlingModellRepository,
                                  Fagsystem applikasjon) {
@@ -106,6 +111,7 @@ public class BehandlingDtoTjeneste {
         this.totrinnTjeneste = totrinnTjeneste;
         this.totrinnskontrollTjeneste = totrinnskontrollTjeneste;
         this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
+        this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
 
         kontekstPath = switch (applikasjon) {
             case FPTILBAKE -> "/fptilbake";
@@ -163,6 +169,21 @@ public class BehandlingDtoTjeneste {
                 }
             });
         }
+        return dto;
+    }
+
+    private BehandlingsresultatDto lagUtledetBehandlingsresultat(Behandling behandling) {
+        if (behandling.erAvsluttet()) {
+            return lagBehandlingsresultat(behandling);
+        }
+        BehandlingsresultatDto dto = new BehandlingsresultatDto();
+        var type = behandlingresultatRepository.hent(behandling)
+            .map(Behandlingsresultat::getBehandlingResultatType)
+            .or(() -> Optional.ofNullable(tilbakekrevingBeregningTjeneste.beregn(behandling.getId()))
+                .map(BeregningResultat::getVedtakResultatType)
+                .map(BehandlingResultatType::fraVedtakResultatType))
+            .orElse(BehandlingResultatType.IKKE_FASTSATT);
+        dto.setType(type);
         return dto;
     }
 
@@ -320,7 +341,6 @@ public class BehandlingDtoTjeneste {
         //FIXME det er i beste fall forvirrende å returnere både resultat og perioder som skal vurderes på samme navn "perioderForeldelse". Bør splittes tilsvarende hvordan det er for vilkårsvurdering
         if (harVurdertForeldelse) {
             dto.leggTil(get(kontekstPath + "/api/foreldelse/vurdert", FORELDELSE, uuidDto));
-            dto.leggTil(get(kontekstPath + "/api/foreldelse/vurdert", "perioderForeldelseVurdert", uuidDto));
         } else if (harDataForFaktaFeilutbetaling) {
             dto.leggTil(get(kontekstPath + "/api/foreldelse", FORELDELSE, uuidDto));
         }
@@ -331,6 +351,7 @@ public class BehandlingDtoTjeneste {
             dto.leggTil(get(kontekstPath + "/api/vilkarsvurdering/vurdert", "vilkarvurdering", uuidDto));
         }
         if (iEllerEtterForeslåVedtakSteg && !behandlingHenlagt) {
+            dto.setBehandlingsresultat(lagUtledetBehandlingsresultat(behandling));
             dto.leggTil(get(kontekstPath + "/api/beregning/resultat", "beregningsresultat", uuidDto));
             dto.leggTil(get(kontekstPath + "/api/dokument/hent-vedtaksbrev", "vedtaksbrev", uuidDto));
         }

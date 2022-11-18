@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -35,6 +36,12 @@ public class BehandlingTilstand {
     private UUID forrigeBehandling;
     @JsonProperty(value = "revurderingOpprettetAarsak")
     private RevurderingOpprettetÅrsak revurderingOpprettetÅrsak;
+
+    @JsonProperty(value = "totalFeilutbetaltPeriode")
+    private Periode totalFeilutbetaltPeriode;
+
+    @JsonProperty(value = "totalFeilutbetaltBeløp")
+    private BigDecimal totalFeilutbetaltBeløp;
 
     public OffsetDateTime getFunksjonellTid() {
         return funksjonellTid;
@@ -170,5 +177,21 @@ public class BehandlingTilstand {
 
     public void setRevurderingOpprettetÅrsak(RevurderingOpprettetÅrsak revurderingOpprettetÅrsak) {
         this.revurderingOpprettetÅrsak = revurderingOpprettetÅrsak;
+    }
+
+    public Periode getTotalFeilutbetaltPeriode() {
+        return totalFeilutbetaltPeriode;
+    }
+
+    public void setTotalFeilutbetaltPeriode(Periode totalFeilutbetaltPeriode) {
+        this.totalFeilutbetaltPeriode = totalFeilutbetaltPeriode;
+    }
+
+    public BigDecimal getTotalFeilutbetaltBeløp() {
+        return totalFeilutbetaltBeløp;
+    }
+
+    public void setTotalFeilutbetaltBeløp(BigDecimal totalFeilutbetaltBeløp) {
+        this.totalFeilutbetaltBeløp = totalFeilutbetaltBeløp;
     }
 }

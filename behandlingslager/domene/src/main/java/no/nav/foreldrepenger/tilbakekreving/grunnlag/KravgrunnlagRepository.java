@@ -89,6 +89,12 @@ public class KravgrunnlagRepository {
         return aggregate.getGrunnlagØkonomi();
     }
 
+    public Optional<Kravgrunnlag431> finnKravgrunnlagOpt(Long behandlingId) {
+        TypedQuery<KravgrunnlagAggregateEntity> query = lagFinnKravgrunnlagQuery(behandlingId);
+        Optional<KravgrunnlagAggregateEntity> aggregate = hentUniktResultat(query);
+        return aggregate.map(KravgrunnlagAggregateEntity::getGrunnlagØkonomi);
+    }
+
     public boolean harGrunnlagForBehandlingId(Long behandlingId) {
         TypedQuery<Long> query = entityManager.createQuery("select count(1) from KravgrunnlagAggregateEntity aggr " +
                 "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", Long.class);
