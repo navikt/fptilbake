@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -37,11 +38,12 @@ public class MigrerSakshendleserTilDvhTaskTest {
 
     @BeforeEach
     public void setup(EntityManager entityManager) {
+        KravgrunnlagTjeneste kravgrunnlagTjeneste = Mockito.mock(KravgrunnlagTjeneste.class);
         BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(
                 entityManager);
         BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
         ProsessTaskTjeneste taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
-        BehandlingTilstandTjeneste tilstandTjeneste = new BehandlingTilstandTjeneste(repositoryProvider);
+        BehandlingTilstandTjeneste tilstandTjeneste = new BehandlingTilstandTjeneste(repositoryProvider, kravgrunnlagTjeneste);
         kafkaProducerMock = Mockito.mock(SakshendelserKafkaProducer.class);
         manueltSendSakshendleserTilDvhTask = new MigrerSakshendleserTilDvhTask(kafkaProducerMock, tilstandTjeneste,
                 behandlingRepository, taskTjeneste);
