@@ -21,7 +21,7 @@ jobs:
       - name: Deploy topics to dev
         uses: nais/deploy/actions/deploy@v1
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_K9 }}
           CLUSTER: dev-gcp
           RESOURCE: kafka/k9tilbake/dev/topic-${{ matrix.topic }}.yaml
 
@@ -29,6 +29,6 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: nais/deploy/actions/deploy@v1
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_K9 }}
           CLUSTER: prod-gcp
           RESOURCE: kafka/k9tilbake/prod/topic-${{ matrix.topic }}.yaml
