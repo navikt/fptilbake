@@ -40,7 +40,7 @@ public class BehandlingTilstand {
     @JsonProperty(value = "totalFeilutbetaltPeriode")
     private Periode totalFeilutbetaltPeriode;
 
-    @JsonProperty(value = "totalFeilutbetaltBeløp")
+    @JsonProperty(value = "totalFeilutbetaltBeloep")
     private BigDecimal totalFeilutbetaltBeløp;
 
     public OffsetDateTime getFunksjonellTid() {
