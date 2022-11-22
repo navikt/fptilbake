@@ -71,7 +71,7 @@ class TilbakekrevingBeregnerVilkår {
         for (GrunnlagPeriodeMedSkattProsent grunnlagPeriodeMedSkattProsent : perioderMedSkattProsent) {
             if (periode.overlapper(grunnlagPeriodeMedSkattProsent.getPeriode())) {
                 BigDecimal delTilbakekrevesBeløp = grunnlagPeriodeMedSkattProsent.getTilbakekrevesBeløp().multiply(andel);
-                skattBeløp = skattBeløp.add(delTilbakekrevesBeløp.multiply(grunnlagPeriodeMedSkattProsent.getSkattProsent()).divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
+                skattBeløp = skattBeløp.add(delTilbakekrevesBeløp.multiply(grunnlagPeriodeMedSkattProsent.getSkattProsent()).divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN));
             }
         }
         return skattBeløp;
