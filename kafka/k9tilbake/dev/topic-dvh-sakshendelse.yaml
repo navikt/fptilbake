@@ -18,9 +18,9 @@ spec:
     - team: k9saksbehandling
       application: k9-tilbake
       access: write
-    - team: pt-sak
+    - team: ptsak
       application: pt-sak-k9tilbake-dev
-      access: write
-    - team: pt-sak
+      access: read
+    - team: ptsak
       application: pt-sak-k9tilbake-preprod
-      access: write
+      access: read

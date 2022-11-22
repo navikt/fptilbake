@@ -18,6 +18,6 @@ spec:
     - team: k9saksbehandling
       application: k9-tilbake
       access: write
-    - team: pt-sak
+    - team: ptsak
       application: pt-sak-k9tilbake
-      access: write
+      access: read
