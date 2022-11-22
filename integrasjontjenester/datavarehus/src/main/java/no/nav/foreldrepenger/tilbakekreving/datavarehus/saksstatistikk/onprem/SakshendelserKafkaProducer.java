@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk;
+package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.onprem;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
