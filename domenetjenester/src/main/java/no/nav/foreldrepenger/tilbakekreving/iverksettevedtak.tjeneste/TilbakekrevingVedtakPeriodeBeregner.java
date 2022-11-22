@@ -46,7 +46,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         this.beregningTjeneste = beregningTjeneste;
     }
 
-    public List<TilbakekrevingPeriode> lagTilbakekrevingsPerioder(Long behandlingId, Kravgrunnlag431 kravgrunnlag431) {
+     List<TilbakekrevingPeriode> lagTilbakekrevingsPerioder(Long behandlingId, Kravgrunnlag431 kravgrunnlag431) {
         BeregningResultat beregningResultat = beregningTjeneste.beregn(behandlingId);
         return lagTilbakekrevingsPerioder(kravgrunnlag431, beregningResultat);
     }
@@ -108,8 +108,8 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         int virkedagerOverlapp = virkedagerOverlapp(kPeriode, bgPeriode.getPeriode(), gjelderEngangsstønad);
         int kgBehandledeVirkedager = kgTidligereBehandledeVirkedager.get(kPeriode);
         int kgPeriodeVirkedager = gjelderEngangsstønad ? 1 : Ukedager.beregnAntallVirkedager(kPeriode);
-        Skalering kgTidligereSkalering = Skalering.opprett(kgBehandledeVirkedager, kgPeriodeVirkedager);
-        Skalering kgKumulativSkalering = Skalering.opprett(kgBehandledeVirkedager + virkedagerOverlapp, kgPeriodeVirkedager);
+        Skalering<Integer> kgTidligereSkalering = Skalering.opprett(kgBehandledeVirkedager, kgPeriodeVirkedager);
+        Skalering<Integer> kgKumulativSkalering = Skalering.opprett(kgBehandledeVirkedager + virkedagerOverlapp, kgPeriodeVirkedager);
         kgTidligereBehandledeVirkedager.put(kPeriode, kgBehandledeVirkedager + virkedagerOverlapp);
 
         TilbakekrevingPeriode tp = new TilbakekrevingPeriode(kPeriode.overlap(bgPeriode.getPeriode()).orElseThrow());
