@@ -57,6 +57,8 @@ spec:
   {{/each}}
    - name: APP_NAME
      value: "fptilbake"
+  kafka:
+    pool: {{kafkaPool}}
   azure:
     application:
       enabled: true

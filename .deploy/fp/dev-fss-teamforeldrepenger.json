@@ -10,6 +10,7 @@
     "https://fptilbake.dev.intern.nav.no/",
     "https://fptilbake.dev-fss-pub.nais.io"
   ],
+  "kafkaPool" : "nav-dev",
   "env": {
     "APPDYNAMICS_AGENT_ACCOUNT_NAME": "NON-PROD",
     "APPD_ENABLED": "false"
