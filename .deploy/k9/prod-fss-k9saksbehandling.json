@@ -11,6 +11,7 @@
     "https://k9-tilbake.nais.adeo.no",
     "https://app.adeo.no/k9/tilbake/"
   ],
+  "kafkaPool" : "nav-prod",
   "env": {
     "APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD",
     "APPD_ENABLED": "true",

@@ -61,7 +61,8 @@ spec:
       - mountPath: /var/run/secrets/nais.io/appdynamics
         kvPath: /apikey/appdynamics/{{environment}}
   sidecar: true # refresh token
-  
+  kafka:
+    pool: {{kafkaPool}}
   azure:
     application:
       enabled: true
