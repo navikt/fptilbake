@@ -39,6 +39,6 @@
     "ABAC_ATTRIBUTT_DRIFT" : "no.nav.abac.attributter.k9.oppdrag.drift",
     "KODEVERK_V2_URL": "https://kodeverk.nais.adeo.no/ws/kodeverk/v2",
     "VEDTAKSBREV_JOIN_PERIODER" : "true",
-    "TOGGLE_AIVEN_DVH" : "false"
+    "TOGGLE_AIVEN_DVH" : "true"
   }
 }
