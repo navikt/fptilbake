@@ -334,8 +334,8 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         BeregningResultatPeriode brp0 = resultat.get(0);
         assertThat(brp0.getPeriode()).isEqualTo(vurderingPeriode0);
         assertThat(brp0.getTilbakekrevingBeløpUtenRenter()).isEqualByComparingTo(BigDecimal.valueOf(3877));
-        assertThat(brp0.getSkattBeløp()).isEqualByComparingTo(BigDecimal.valueOf(955));
-        assertThat(brp0.getTilbakekrevingBeløpEtterSkatt()).isEqualByComparingTo(BigDecimal.valueOf(3877 - 955));
+        assertThat(brp0.getSkattBeløp()).isEqualByComparingTo(BigDecimal.valueOf(954));
+        assertThat(brp0.getTilbakekrevingBeløpEtterSkatt()).isEqualByComparingTo(BigDecimal.valueOf(3877 - 954));
         BeregningResultatPeriode brp1 = resultat.get(1);
         assertThat(brp1.getPeriode()).isEqualTo(vurderingPeriode1);
         assertThat(brp1.getTilbakekrevingBeløpUtenRenter()).isEqualByComparingTo(BigDecimal.valueOf(1278));
