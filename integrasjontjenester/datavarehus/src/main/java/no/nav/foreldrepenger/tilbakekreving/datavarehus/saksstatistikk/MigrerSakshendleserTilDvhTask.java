@@ -5,9 +5,12 @@ import java.time.ZoneId;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.aiven.AivenSakshendelserKafkaProducer;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
+import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.onprem.SakshendelserKafkaProducer;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingResultat;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
@@ -25,19 +28,25 @@ public class MigrerSakshendleserTilDvhTask implements ProsessTaskHandler {
     // Denne kan utvides for alle andre sakshendler senere ved behov
 
     private SakshendelserKafkaProducer kafkaProducer;
+    private AivenSakshendelserKafkaProducer aivenSakshendelserKafkaProducer;
     private BehandlingTilstandTjeneste behandlingTilstandTjeneste;
     private BehandlingRepository behandlingRepository;
     private ProsessTaskTjeneste taskTjeneste;
+    private boolean brukAiven;
 
     @Inject
     public MigrerSakshendleserTilDvhTask(SakshendelserKafkaProducer kafkaProducer,
+                                         AivenSakshendelserKafkaProducer aivenSakshendelserKafkaProducer,
                                          BehandlingTilstandTjeneste behandlingTilstandTjeneste,
                                          BehandlingRepository behandlingRepository,
-                                         ProsessTaskTjeneste taskTjeneste) {
+                                         ProsessTaskTjeneste taskTjeneste,
+                                         @KonfigVerdi(value = "toggle.aiven.dvh", defaultVerdi = "true") boolean brukAiven) {
         this.kafkaProducer = kafkaProducer;
+        this.aivenSakshendelserKafkaProducer = aivenSakshendelserKafkaProducer;
         this.behandlingTilstandTjeneste = behandlingTilstandTjeneste;
         this.behandlingRepository = behandlingRepository;
         this.taskTjeneste = taskTjeneste;
+        this.brukAiven = brukAiven;
     }
 
     @Override
@@ -57,6 +66,11 @@ public class MigrerSakshendleserTilDvhTask implements ProsessTaskHandler {
         }
         prosessTaskData.setPayload(BehandlingTilstandMapper.tilJsonString(behandlingTilstand));
         taskTjeneste.lagre(prosessTaskData);
-        kafkaProducer.sendMelding(behandlingTilstand);
+
+        if (brukAiven){
+            aivenSakshendelserKafkaProducer.sendMelding(behandlingTilstand);
+        } else {
+            kafkaProducer.sendMelding(behandlingTilstand);
+        }
     }
 }
