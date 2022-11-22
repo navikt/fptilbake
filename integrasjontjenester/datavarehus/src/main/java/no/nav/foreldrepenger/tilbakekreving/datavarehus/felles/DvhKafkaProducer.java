@@ -10,6 +10,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.errors.AuthenticationException;
 import org.apache.kafka.common.errors.AuthorizationException;
@@ -55,7 +56,8 @@ public class DvhKafkaProducer {
     public void sendMelding(ProducerRecord<String, String> melding) {
         String topic = melding.topic();
         try {
-            producer.send(melding).get();
+            RecordMetadata recordMetadata = producer.send(melding).get();
+            log.info("Melding sendt til onprem kafka på {}. Key {} offset {}", melding.topic(), melding.key(), recordMetadata.offset());
             producer.flush(); //påkrevd for å sikre at prosesstask feiler hvis sending til kafka feiler
         } catch (InterruptedException e) {
             log.warn("Uventet feil ved sending til Kafka, topic:" + topic, e);
