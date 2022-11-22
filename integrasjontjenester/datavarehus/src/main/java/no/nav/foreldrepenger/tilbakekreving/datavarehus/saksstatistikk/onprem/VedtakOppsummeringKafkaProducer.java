@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk;
+package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.onprem;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
