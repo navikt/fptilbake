@@ -456,8 +456,8 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
                                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(6).medTilbakekrevBeløp(6).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
                         )),
                 Map.of(
-                        janDel1, 5,
-                        janDel2, 5,
+                        janDel1, 10,
+                        janDel2, 10,
                         feb, 2,
                         mars, 3
                 ));
@@ -471,8 +471,8 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
 
         //det viktigste her er at skatt fordeles slik at den ikke overstiger "kvoten" skatt pr mnd slik det er definert i grunnlaget
-        //det er viktig at det kommer 1 kr skatt pr periode i januar,
-        //og 0 krone i februar og i mars.
+        //det er viktig at det kommer 5 kr skatt pr periode i januar,
+        //og 2 kr i februar og 3 kr i mars.
         assertThat(resultat).containsOnly(
                 TilbakekrevingPeriode.med(janDel1).medRenter(1)
                         .medBeløp(TbkBeløp.feil(10))
