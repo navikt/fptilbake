@@ -1,0 +1,144 @@
+package no.nav.foreldrepenger.tilbakekreving.hendelser;
+
+import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.EKSTERN_BEHANDLING_UUID;
+import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.FAGSAK_YTELSE_TYPE;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.apache.kafka.clients.consumer.CommitFailedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import no.nav.abakus.vedtak.ytelse.Ytelse;
+import no.nav.abakus.vedtak.ytelse.Ytelser;
+import no.nav.abakus.vedtak.ytelse.v1.YtelseV1;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
+import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
+import no.nav.foreldrepenger.tilbakekreving.kafka.util.KafkaConsumerFeil;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+
+@ApplicationScoped
+public class VedtakFattetReaderAiven {
+
+    private static final Logger logger = LoggerFactory.getLogger(VedtakFattetReaderAiven.class);
+
+    private static final Map<Fagsystem, Set<Ytelser>> STØTTET_YTELSE_TYPER = Map.of(
+            Fagsystem.FPTILBAKE, Set.of(Ytelser.ENGANGSTØNAD, Ytelser.FORELDREPENGER, Ytelser.SVANGERSKAPSPENGER),
+            Fagsystem.K9TILBAKE, Set.of(Ytelser.FRISINN, Ytelser.OMSORGSPENGER, Ytelser.PLEIEPENGER_SYKT_BARN, Ytelser.PLEIEPENGER_NÆRSTÅENDE)
+    );
+
+    private static final Map<Fagsystem, Set<Ytelser>> REST_YTELSE_TYPER = Map.of(
+            Fagsystem.FPTILBAKE, Set.of(),
+            Fagsystem.K9TILBAKE, Set.of(Ytelser.OPPLÆRINGSPENGER)
+    );
+
+    private static final Map<Ytelser, FagsakYtelseType> YTELSE_TYPE_MAP = Map.of(
+        Ytelser.ENGANGSTØNAD, FagsakYtelseType.ENGANGSTØNAD,
+        Ytelser.FORELDREPENGER, FagsakYtelseType.FORELDREPENGER,
+        Ytelser.SVANGERSKAPSPENGER, FagsakYtelseType.SVANGERSKAPSPENGER,
+        Ytelser.FRISINN, FagsakYtelseType.FRISINN,
+        Ytelser.OMSORGSPENGER, FagsakYtelseType.OMSORGSPENGER,
+        Ytelser.OPPLÆRINGSPENGER, FagsakYtelseType.OPPLÆRINGSPENGER,
+        Ytelser.PLEIEPENGER_NÆRSTÅENDE, FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE,
+        Ytelser.PLEIEPENGER_SYKT_BARN, FagsakYtelseType.PLEIEPENGER_SYKT_BARN
+    );
+
+    private VedtakFattetMeldingConsumerAiven meldingConsumer;
+    private ProsessTaskTjeneste taskTjeneste;
+    private Set<Ytelser> abonnerteYtelser;
+    private Set<Ytelser> resterendeYtelser;
+
+
+    VedtakFattetReaderAiven() {
+        // CDI
+    }
+
+    @Inject
+    public VedtakFattetReaderAiven(VedtakFattetMeldingConsumerAiven meldingConsumer,
+                                   ProsessTaskTjeneste taskTjeneste) {
+        this.meldingConsumer = meldingConsumer;
+        this.taskTjeneste = taskTjeneste;
+        this.abonnerteYtelser = STØTTET_YTELSE_TYPER.getOrDefault(ApplicationName.hvilkenTilbake(), Set.of());
+        this.resterendeYtelser = REST_YTELSE_TYPER.getOrDefault(ApplicationName.hvilkenTilbake(), Set.of());
+    }
+
+    public VedtakFattetReaderAiven(VedtakFattetMeldingConsumerAiven meldingConsumer,
+                                   ProsessTaskTjeneste taskTjeneste,
+                                   Fagsystem applikasjon) {
+        this.meldingConsumer = meldingConsumer;
+        this.taskTjeneste = taskTjeneste;
+        this.abonnerteYtelser = STØTTET_YTELSE_TYPER.getOrDefault(applikasjon, Set.of());
+        this.resterendeYtelser = REST_YTELSE_TYPER.getOrDefault(applikasjon, Set.of());
+    }
+
+    public PostTransactionHandler hentOgBehandleMeldinger() {
+        List<Ytelse> meldinger = meldingConsumer.lesMeldinger();
+        if (meldinger.isEmpty()) {
+            return () -> {
+            }; //trenger ikke å gjøre commit, siden ingen nye meldinger er lest
+        }
+
+        logger.info("Leste {} meldinger fra topic {}", meldinger.size(), meldingConsumer.getTopic());
+        behandleMeldinger(meldinger);
+        return this::commitMeldinger;
+    }
+
+    private void behandleMeldinger(List<Ytelse> meldinger) {
+        for (Ytelse melding : meldinger) {
+            prosesserMelding(melding);
+        }
+    }
+
+    public void commitMeldinger() {
+        try {
+            meldingConsumer.manualCommitSync();
+        } catch (CommitFailedException e) {
+            throw KafkaConsumerFeil.kunneIkkeCommitOffset(e);
+        }
+    }
+
+    private void prosesserMelding(Ytelse melding) {
+        if (melding instanceof YtelseV1 ytelseV1) {
+            lagHåndterHendelseProsessTask(ytelseV1);
+        }
+    }
+
+    private void lagHåndterHendelseProsessTask(YtelseV1 melding) {
+
+        validereMelding(melding);
+        if (abonnerteYtelser.contains(melding.getYtelse())) {
+            taskTjeneste.lagre(lagProsessTaskData(melding));
+        } else if (YTELSE_TYPE_MAP.get(melding.getYtelse()) == null || resterendeYtelser.contains(melding.getYtelse())) {
+            logger.warn("Melding om vedtak for {} for sak={} behandling={} med vedtakstidspunkt {} ble ignorert pga ikke-støttet ytelsetype",
+                    melding.getYtelse(), melding.getSaksnummer(), melding.getVedtakReferanse(), melding.getVedtattTidspunkt());
+        }
+    }
+
+    private void validereMelding(YtelseV1 melding) {
+        Objects.requireNonNull(melding.getAktør());
+        Objects.requireNonNull(melding.getVedtakReferanse());
+        Objects.requireNonNull(melding.getSaksnummer());
+        Objects.requireNonNull(melding.getYtelse());
+        Objects.requireNonNull(melding.getVedtattTidspunkt());
+        Objects.requireNonNull(YTELSE_TYPE_MAP.get(melding.getYtelse()));
+    }
+
+    private ProsessTaskData lagProsessTaskData(YtelseV1 melding) {
+        ProsessTaskData td = ProsessTaskData.forProsessTask(HåndterVedtakFattetTask.class);
+        td.setAktørId(melding.getAktør().getVerdi());
+        td.setProperty(EKSTERN_BEHANDLING_UUID, melding.getVedtakReferanse());
+        td.setSaksnummer(melding.getSaksnummer());
+        td.setProperty(FAGSAK_YTELSE_TYPE, YTELSE_TYPE_MAP.get(melding.getYtelse()).getKode());
+        return td;
+    }
+
+}
