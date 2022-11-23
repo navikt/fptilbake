@@ -27,6 +27,7 @@
     "DOKUMENTPRODUKSJON_V2_URL": "https://dokprod-q1.nais.preprod.local/dokprod/ws/dokumentproduksjon/v2",
     "KAFKA_BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
     "KAFKA_FATTEVEDTAK_TOPIC": "privat-familie-vedtakFattet-v1-q1",
+    "KAFKA_FATTEVEDTAK_AIVEN_TOPIC": "teamforeldrepenger.familie-vedtakfattet-v1",
     "KAFKA_TILBAKEKREVING_BRUKERDIALOG_HENDELSE_V1_TOPIC_URL": "TODO",
     "KAFKA_FPLOS_TOPIC": "privat-tilbakekreving-k9loshendelse-v1",
     "KAFKA_DVH_VEDTAK_TOPIC": "privat-k9-tilbakekreving-dvh-vedtak-v1",
