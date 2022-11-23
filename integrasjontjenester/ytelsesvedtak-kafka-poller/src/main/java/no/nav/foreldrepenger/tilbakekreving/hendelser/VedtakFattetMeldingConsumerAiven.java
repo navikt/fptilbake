@@ -90,9 +90,7 @@ public class VedtakFattetMeldingConsumerAiven {
     public List<Ytelse> lesMeldinger() {
         List<Ytelse> meldinger = new ArrayList<>();
         ConsumerRecords<String, String> records = this.kafkaConsumer.poll(Duration.ofMillis(TIMEOUT));
-        if (records.isEmpty()) {
-            logger.debug("Leste {} meldinger fra {}", records.count(), topic);
-        } else {
+        if (!records.isEmpty()) {
             logger.info("Leste {} meldinger fra {}", records.count(), topic);
         }
         for (ConsumerRecord<String, String> record : records) {
