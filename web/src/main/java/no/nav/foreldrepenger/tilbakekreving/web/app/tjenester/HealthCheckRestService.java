@@ -35,7 +35,7 @@ public class HealthCheckRestService {
     @Path("isAlive")
     @Operation(tags = "nais", description = "sjekker om applikasjonen er i live", hidden = true)
     public Response isAlive() {
-        if (isContextStartupReady) {
+        if (isContextStartupReady && selftests.isKafkaAlive()) {
             return Response
                     .ok(RESPONSE_OK, MediaType.TEXT_PLAIN_TYPE)
                     .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
