@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.aiven;
+package no.nav.foreldrepenger.tilbakekreving.integrasjon.kafka;
 
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -17,22 +17,16 @@ import org.apache.kafka.common.errors.AuthorizationException;
 import org.apache.kafka.common.errors.RetriableException;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import no.nav.vedtak.exception.ManglerTilgangException;
 import no.nav.vedtak.exception.TekniskException;
 
-// Dette er copy/paste med små modifikasjoner fra k9-sak.
-// TODO Legge denne et felles sted for å slippe å ha mange kopier
 public abstract class AivenMeldingProducer {
-
-    private static final Logger logger = LoggerFactory.getLogger(AivenMeldingProducer.class);
 
     private Producer<String, String> producer;
     private String topic;
 
-    AivenMeldingProducer(String topic,
+    protected AivenMeldingProducer(String topic,
                          String bootstrapServers,
                          String clientId,
                          String truststorePath,
@@ -76,7 +70,7 @@ public abstract class AivenMeldingProducer {
         this.producer = new KafkaProducer<>(properties);
     }
 
-    AivenMeldingProducer() {
+    protected AivenMeldingProducer() {
     }
 
     protected String getTopic() {
@@ -92,11 +86,10 @@ public abstract class AivenMeldingProducer {
         producer.flush();
     }
 
-    protected void runProducerWithSingleJson(ProducerRecord<String, String> record) {
+    protected RecordMetadata runProducerWithSingleJson(ProducerRecord<String, String> record) {
         try {
-            RecordMetadata recordMetadata = producer.send(record)
+            return producer.send(record)
                 .get();
-            logger.info("Melding sendt til Aiven på {}. Key {} offset {}", record.topic(), record.key(), recordMetadata.offset());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw uventetFeilKafka(topic, e);
@@ -110,11 +103,6 @@ public abstract class AivenMeldingProducer {
             throw feilMedKafka(topic, e);
         }
     }
-
-    protected void send(String key, String value) {
-        runProducerWithSingleJson(new ProducerRecord<>(topic, key, value));
-    }
-
 
     private static TekniskException uventetFeilKafka(String topic, Exception cause) {
         return new TekniskException("FPT-151561", String.format("Uventet feil ved sending til Kafka for topic %s", topic), cause);

@@ -1,6 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.fplos.klient.producer;
 
+import java.io.IOException;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -9,6 +11,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
@@ -16,7 +19,9 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
+import no.nav.foreldrepenger.tilbakekreving.fplos.klient.TilbakebetalingBehandlingProsessEventMapper;
 import no.nav.vedtak.exception.IntegrasjonException;
+import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEventDto;
 import no.nav.vedtak.log.mdc.MDCOperations;
 
 @ApplicationScoped
@@ -27,7 +32,6 @@ public class FplosKafkaProducer {
 
     private Producer<String, String> producer;
     private String topic;
-
 
     FplosKafkaProducer() {
         // for CDI proxy
@@ -53,14 +57,18 @@ public class FplosKafkaProducer {
 
     }
 
-    public void sendJsonMedNøkkel(String nøkkel, String json) {
-        String callId = MDCOperations.getCallId() != null ? MDCOperations.getCallId() : MDCOperations.generateCallId();
-        runProducerWithSingleJson(new ProducerRecord<>(topic, null, nøkkel, json, new RecordHeaders().add(CALLID_NAME, callId.getBytes())));
+    public RecordMetadata sendHendelse(UUID uuid, TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto) throws IOException {
+        return sendJsonMedNøkkel(uuid.toString(), TilbakebetalingBehandlingProsessEventMapper.getJson(behandlingProsessEventDto));
     }
 
-    private void runProducerWithSingleJson(ProducerRecord<String, String> record) {
+    private RecordMetadata sendJsonMedNøkkel(String nøkkel, String json) {
+        String callId = MDCOperations.getCallId() != null ? MDCOperations.getCallId() : MDCOperations.generateCallId();
+        return runProducerWithSingleJson(new ProducerRecord<>(topic, null, nøkkel, json, new RecordHeaders().add(CALLID_NAME, callId.getBytes())));
+    }
+
+    private RecordMetadata runProducerWithSingleJson(ProducerRecord<String, String> record) {
         try {
-            producer.send(record).get();
+            return producer.send(record).get();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw kafkaPubliseringException(e);
