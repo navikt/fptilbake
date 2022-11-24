@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.hotspot.DefaultExports;
 import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.foreldrepenger.tilbakekreving.hendelser.AivenVedtakConsumer;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.KafkaPollerManager;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.felles.integrasjon.jms.QueueConsumerManager;
@@ -29,6 +30,7 @@ public class ApplicationServiceStarter {
         start(TaskManager.class);
         start(BatchTaskScheduler.class);
         start(KafkaPollerManager.class);
+        start(AivenVedtakConsumer.class);
 
         if (Environment.current().isProd() || !"true".equalsIgnoreCase(Environment.current().getProperty("test.only.disable.mq"))) {
             startQueueConsumerManager();

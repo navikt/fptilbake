@@ -26,6 +26,10 @@
             <artifactId>kafka-poller</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-streams</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>k9-sak-klient</artifactId>
             <exclusions>
