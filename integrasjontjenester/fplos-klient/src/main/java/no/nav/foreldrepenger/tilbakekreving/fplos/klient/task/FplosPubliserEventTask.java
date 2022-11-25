@@ -106,7 +106,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) ? grunnlagRepository.finnKravgrunnlag(behandlingId) : null;
         try {
             TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto = getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, eventName, kravgrunnlag431);
-            if (brukAiven){
+            if (ApplicationName.hvilkenTilbake() == Fagsystem.K9TILBAKE && brukAiven) {
                 losKafkaProducerAiven.sendHendelse(behandling.getUuid(), behandlingProsessEventDto);
             } else {
                 fplosKafkaProducer.sendHendelse(behandling.getUuid(), behandlingProsessEventDto);

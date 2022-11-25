@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.fplos.klient.producer;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -39,7 +40,7 @@ public class LosKafkaProducerAiven extends AivenMeldingProducer {
                                  @KonfigVerdi(value = "KAFKA_KEYSTORE_PATH", required = false) String keyStorePath,
                                  @KonfigVerdi(value = "KAFKA_CREDSTORE_PASSWORD", required = false) String keyStorePassword,
                                  @KonfigVerdi(value = "KAFKA_OVERRIDE_KEYSTORE_PASSWORD", required = false) String vtpOverride) {
-        super(topic, bootstrapServers, "KP-" + topic, trustStorePath, trustStorePassword, keyStorePath, keyStorePassword, vtpOverride);
+        super(topic, bootstrapServers, "KP-" + Objects.requireNonNull(topic), trustStorePath, trustStorePassword, keyStorePath, keyStorePassword, vtpOverride);
     }
 
     public void sendHendelse(UUID uuid, TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto) throws IOException {
