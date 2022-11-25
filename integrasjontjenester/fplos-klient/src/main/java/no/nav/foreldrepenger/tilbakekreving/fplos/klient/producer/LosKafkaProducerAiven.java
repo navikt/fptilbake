@@ -26,7 +26,7 @@ public class LosKafkaProducerAiven extends AivenMeldingProducer {
 
     private static final Logger logger = LoggerFactory.getLogger(LosKafkaProducerAiven.class);
     private static final String CALLID_NAME = "Nav-Tbk-CallId";
-    private static final String HEARTHBEAT_HEADER = "Hearthbeat";
+    private static final String HEARTBEAT_HEADER = "Heartbeat";
 
     public LosKafkaProducerAiven() {
         //for CDI proxy
@@ -54,12 +54,12 @@ public class LosKafkaProducerAiven extends AivenMeldingProducer {
         logger.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandlingId {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), behandlingProsessEventDto.getBehandlingId());
     }
 
-    public void sendHearthbeat() {
+    public void sendHeartbeat() {
         String nøkkel = null;
         String verdi = LocalDateTime.now().toInstant(ZoneOffset.UTC).toString();
-        ProducerRecord<String, String> melding = new ProducerRecord<>(getTopic(), null, nøkkel, verdi, new RecordHeaders().add(HEARTHBEAT_HEADER, null));
+        ProducerRecord<String, String> melding = new ProducerRecord<>(getTopic(), null, nøkkel, verdi, new RecordHeaders().add(HEARTBEAT_HEADER, null));
         RecordMetadata recordMetadata = runProducerWithSingleJson(melding);
-        logger.info("Sendt hearthbeat til Aiven på {} partisjon {} offset {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
+        logger.info("Sendt heartbeat til Aiven på {} partisjon {} offset {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
     }
 
 }

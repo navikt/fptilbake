@@ -20,19 +20,19 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
  * Se https://doc.nais.io/persistence/kafka/offsets/
  */
 @ApplicationScoped
-@ProsessTask(value = "kafka.hearthbeat.los", cronExpression = "0 0/15 * * * * " /* TODO kan reduseres til 1 om dagen, har her 1 hvert kvarter for å slippe å vente når vi tester */)
-public class LosHearthbeatTask implements ProsessTaskHandler {
+@ProsessTask(value = "kafka.heartbeat.los", cronExpression = "0 0/15 * * * * " /* TODO kan reduseres til 1 om dagen, har her 1 hvert kvarter for å slippe å vente når vi tester */)
+public class LosHeartbeatTask implements ProsessTaskHandler {
 
     private LosKafkaProducerAiven kafkaProducer;
     private boolean brukAiven;
 
-    public LosHearthbeatTask() {
+    public LosHeartbeatTask() {
         //for CDI proxy
     }
 
     @Inject
-    public LosHearthbeatTask(LosKafkaProducerAiven kafkaProducer,
-                             @KonfigVerdi(value = "toggle.aiven.los", defaultVerdi = "false") boolean brukAiven) {
+    public LosHeartbeatTask(LosKafkaProducerAiven kafkaProducer,
+                            @KonfigVerdi(value = "toggle.aiven.los", defaultVerdi = "false") boolean brukAiven) {
         this.kafkaProducer = kafkaProducer;
         this.brukAiven = brukAiven;
     }
@@ -40,7 +40,7 @@ public class LosHearthbeatTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         if (ApplicationName.hvilkenTilbake() == Fagsystem.K9TILBAKE && brukAiven) {
-            kafkaProducer.sendHearthbeat();
+            kafkaProducer.sendHeartbeat();
         }
     }
 }
