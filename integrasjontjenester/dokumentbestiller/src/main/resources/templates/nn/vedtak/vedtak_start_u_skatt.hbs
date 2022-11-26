@@ -9,13 +9,13 @@ Vi har vurdert saka di om tilbakebetaling på nytt. Derfor gjeld ikkje det tidle
 {{#if varsel.varslet-dato}}
     {{#switch totalresultat.hovedresultat}}
     {{#case "FULL_TILBAKEBETALING"}}
-Vi varsla deg {{varsel.varslet-dato}} om at du har fått utbetalt for mykje.{{>korrigert-total-beløp}} Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er heile det feilutbetalte beløpet.{{>evt-renter-utsagn}}
+Du fekk varsel frå oss {{varsel.varslet-dato}} om at du har fått utbetalt for mykje.{{>korrigert-total-beløp}} Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er heile det feilutbetalte beløpet.{{>evt-renter-utsagn}}
     {{/case}}
     {{#case "DELVIS_TILBAKEBETALING"}}
-Vi varsla deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mykje.{{>korrigert-total-beløp}} Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er delar av det feilutbetalte beløpet.{{>evt-renter-utsagn}}
+Du fekk varsel frå oss {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mykje.{{>korrigert-total-beløp}} Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er delar av det feilutbetalte beløpet.{{>evt-renter-utsagn}}
     {{/case}}
     {{#case "INGEN_TILBAKEBETALING"}}
-Vi varsla deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mykje.{{>korrigert-total-beløp}} Vi har behandlet saka di og du må ikkje betale tilbake det feilutbetalte beløpet.
+Du fekk varsel frå oss {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mykje.{{>korrigert-total-beløp}} Vi har behandlet saka di og du må ikkje betale tilbake det feilutbetalte beløpet.
     {{/case}}
     {{/switch}}
 
