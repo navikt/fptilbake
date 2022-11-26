@@ -45,7 +45,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     public static final String PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE = "kravgrunnlagManglerAksjonspunktStatusKode";
     public static final String FP_DEFAULT_HREF = "/fpsak/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
     public static final String K9_DEFAULT_HREF = "/k9/web/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
-    private String fagsystem;
+    private Fagsystem fagsystem;
     private String defaultHRef;
 
     private static final Logger logger = LoggerFactory.getLogger(FplosPubliserEventTask.class);
@@ -86,11 +86,11 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
 
         switch (applikasjonNavn) {
             case FPTILBAKE -> {
-                fagsystem = Fagsystem.FPTILBAKE.getKode();
+                fagsystem = Fagsystem.FPTILBAKE;
                 defaultHRef = FP_DEFAULT_HREF;
             }
             case K9TILBAKE -> {
-                fagsystem = Fagsystem.K9TILBAKE.getKode();
+                fagsystem = Fagsystem.K9TILBAKE;
                 defaultHRef = K9_DEFAULT_HREF;
             }
             default -> throw new IllegalStateException("applikasjonsnavn er satt til " + applikasjonNavn + " som ikke er en støttet verdi");
@@ -106,7 +106,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) ? grunnlagRepository.finnKravgrunnlag(behandlingId) : null;
         try {
             TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto = getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, eventName, kravgrunnlag431);
-            if (ApplicationName.hvilkenTilbake() == Fagsystem.K9TILBAKE && brukAiven) {
+            if (fagsystem == Fagsystem.K9TILBAKE && brukAiven) {
                 losKafkaProducerAiven.sendHendelse(behandling.getUuid(), behandlingProsessEventDto);
             } else {
                 fplosKafkaProducer.sendHendelse(behandling.getUuid(), behandlingProsessEventDto);
@@ -135,7 +135,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         return TilbakebetalingBehandlingProsessEventDto.builder()
             .medBehandlingStatus(behandling.getStatus().getKode())
             .medEksternId(behandling.getUuid())
-            .medFagsystem(fagsystem)
+            .medFagsystem(fagsystem.getKode())
             .medSaksnummer(saksnummer)
             .medAktørId(behandling.getAktørId().getId())
             .medBehandlingSteg(behandling.getAktivtBehandlingSteg() == null ? null : behandling.getAktivtBehandlingSteg().getKode())

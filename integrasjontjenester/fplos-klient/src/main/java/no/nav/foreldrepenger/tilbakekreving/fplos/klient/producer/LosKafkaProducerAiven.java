@@ -43,6 +43,7 @@ public class LosKafkaProducerAiven extends AivenMeldingProducer {
         super(topic, bootstrapServers, "KP-" + Objects.requireNonNull(topic), trustStorePath, trustStorePassword, keyStorePath, keyStorePassword, vtpOverride);
     }
 
+
     public void sendHendelse(UUID uuid, TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto) throws IOException {
         String nøkkel = uuid.toString();
         String verdi = TilbakebetalingBehandlingProsessEventMapper.getJson(behandlingProsessEventDto);
