@@ -28,10 +28,9 @@
             <artifactId>behandlingskontroll</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>kafka-producer</artifactId>
         </dependency>
-
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>domene-testutilities</artifactId>

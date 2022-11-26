@@ -30,6 +30,7 @@
     "KAFKA_FATTEVEDTAK_AIVEN_TOPIC": "teamforeldrepenger.familie-vedtakfattet-v1",
     "KAFKA_TILBAKEKREVING_BRUKERDIALOG_HENDELSE_V1_TOPIC_URL": "TODO",
     "KAFKA_FPLOS_TOPIC": "privat-tilbakekreving-k9loshendelse-v1",
+    "KAFKA_LOS_AIVEN_TOPIC": "k9saksbehandling.tilbakekreving-hendelse-los",
     "KAFKA_DVH_VEDTAK_TOPIC": "privat-k9-tilbakekreving-dvh-vedtak-v1",
     "KAFKA_DVH_SAKSSTATISTIKK_TOPIC": "privat-k9-tilbakekreving-dvh-saksstatistikk-v1",
     "KAFKA_DVH_VEDTAK_AIVEN_TOPIC" : "k9saksbehandling.tilbakekreving-dvh-vedtak",
@@ -42,7 +43,8 @@
     "FORELDELSE_ANTALLMAANEDER" : "P1M",
     "VEDTAKSBREV_JOIN_PERIODER" : "true",
     "AKTIVER_ABAC_LOGGING" : "false",
-    "TOGGLE_AIVEN_DVH" : "true"
+    "TOGGLE_AIVEN_DVH" : "true",
+    "TOGGLE_AIVEN_LOS" : "false"
   },
   "AZURE_IAC_RULES": [
     {

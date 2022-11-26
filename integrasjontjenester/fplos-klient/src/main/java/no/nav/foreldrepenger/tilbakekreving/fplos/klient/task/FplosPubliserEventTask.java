@@ -1,8 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.fplos.klient.task;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,10 +12,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
@@ -30,6 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.producer.FplosKafkaProducer;
+import no.nav.foreldrepenger.tilbakekreving.fplos.klient.producer.LosKafkaProducerAiven;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -50,17 +45,18 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     public static final String PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE = "kravgrunnlagManglerAksjonspunktStatusKode";
     public static final String FP_DEFAULT_HREF = "/fpsak/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
     public static final String K9_DEFAULT_HREF = "/k9/web/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
-    private String fagsystem;
+    private Fagsystem fagsystem;
     private String defaultHRef;
 
     private static final Logger logger = LoggerFactory.getLogger(FplosPubliserEventTask.class);
-
-    private ObjectMapper objectMapper = lagObjectMapper();
 
     private KravgrunnlagRepository grunnlagRepository;
     private BehandlingRepository behandlingRepository;
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste;
     private FplosKafkaProducer fplosKafkaProducer;
+    private LosKafkaProducerAiven losKafkaProducerAiven;
+
+    boolean brukAiven;
 
     FplosPubliserEventTask() {
         // for CDI proxy
@@ -69,26 +65,32 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     @Inject
     public FplosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
                                   FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
-                                  FplosKafkaProducer fplosKafkaProducer) {
-        this(repositoryProvider, faktaFeilutbetalingTjeneste, fplosKafkaProducer, ApplicationName.hvilkenTilbake());
+                                  FplosKafkaProducer fplosKafkaProducer,
+                                  LosKafkaProducerAiven losKafkaProducerAiven,
+                                  @KonfigVerdi(value = "toggle.aiven.los", defaultVerdi = "false") boolean brukAiven) {
+        this(repositoryProvider, faktaFeilutbetalingTjeneste, fplosKafkaProducer, losKafkaProducerAiven, ApplicationName.hvilkenTilbake(), brukAiven);
     }
 
     public FplosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
                                   FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
                                   FplosKafkaProducer fplosKafkaProducer,
-                                  Fagsystem applikasjonNavn) {
+                                  LosKafkaProducerAiven losKafkaProducerAiven,
+                                  Fagsystem applikasjonNavn,
+                                  boolean brukAiven) {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
         this.fplosKafkaProducer = fplosKafkaProducer;
+        this.losKafkaProducerAiven = losKafkaProducerAiven;
+        this.brukAiven = brukAiven;
 
         switch (applikasjonNavn) {
             case FPTILBAKE -> {
-                fagsystem = Fagsystem.FPTILBAKE.getKode();
+                fagsystem = Fagsystem.FPTILBAKE;
                 defaultHRef = FP_DEFAULT_HREF;
             }
             case K9TILBAKE -> {
-                fagsystem = Fagsystem.K9TILBAKE.getKode();
+                fagsystem = Fagsystem.K9TILBAKE;
                 defaultHRef = K9_DEFAULT_HREF;
             }
             default -> throw new IllegalStateException("applikasjonsnavn er satt til " + applikasjonNavn + " som ikke er en støttet verdi");
@@ -103,16 +105,16 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) ? grunnlagRepository.finnKravgrunnlag(behandlingId) : null;
         try {
-            fplosKafkaProducer.sendJsonMedNøkkel(behandling.getUuid().toString(), opprettEventJson(prosessTaskData, behandling, eventName, kravgrunnlag431));
-            logger.info("Publiserer event:{} på kafka slik at f.eks fplos kan fordele oppgaven for videre behandling. BehandlingsId: {}", eventName, behandlingId);
+            TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto = getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, eventName, kravgrunnlag431);
+            if (fagsystem == Fagsystem.K9TILBAKE && brukAiven) {
+                losKafkaProducerAiven.sendHendelse(behandling.getUuid(), behandlingProsessEventDto);
+            } else {
+                fplosKafkaProducer.sendHendelse(behandling.getUuid(), behandlingProsessEventDto);
+                logger.info("Publiserer event:{} på on-prem kafka slik at los kan fordele oppgaven for videre behandling. BehandlingsId: {}", eventName, behandlingId);
+            }
         } catch (Exception e) {
             throw new TekniskException("FPT-770744", String.format("Publisering av FPLOS event=%s feilet med exception %s", eventName, e), e);
         }
-    }
-
-    private String opprettEventJson(ProsessTaskData prosessTaskData, Behandling behandling, String eventName, Kravgrunnlag431 kravgrunnlag431) throws IOException {
-        TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto = getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, eventName, kravgrunnlag431);
-        return getJson(behandlingProsessEventDto);
     }
 
     public TilbakebetalingBehandlingProsessEventDto getTilbakebetalingBehandlingProsessEventDto(ProsessTaskData prosessTaskData, Behandling behandling, String eventName, Kravgrunnlag431 kravgrunnlag431) {
@@ -127,29 +129,29 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
             aksjonspunktKoderMedStatusListe.put(AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG, kravgrunnlagManglerAksjonspunktStatusKode);
         } else {
             behandling.getAksjonspunkter().forEach(aksjonspunkt ->
-                    aksjonspunktKoderMedStatusListe.put(aksjonspunkt.getAksjonspunktDefinisjon().getKode(), aksjonspunkt.getStatus().getKode()));
+                aksjonspunktKoderMedStatusListe.put(aksjonspunkt.getAksjonspunktDefinisjon().getKode(), aksjonspunkt.getStatus().getKode()));
         }
 
         return TilbakebetalingBehandlingProsessEventDto.builder()
-                .medBehandlingStatus(behandling.getStatus().getKode())
-                .medEksternId(behandling.getUuid())
-                .medFagsystem(fagsystem)
-                .medSaksnummer(saksnummer)
-                .medAktørId(behandling.getAktørId().getId())
-                .medBehandlingSteg(behandling.getAktivtBehandlingSteg() == null ? null : behandling.getAktivtBehandlingSteg().getKode())
-                .medBehandlingTypeKode(behandling.getType().getKode())
-                .medBehandlendeEnhet(behandling.getBehandlendeEnhetId())
-                .medEventHendelse(EventHendelse.valueOf(eventName))
-                .medEventTid(LocalDateTime.now())
-                .medOpprettetBehandling(behandling.getOpprettetTidspunkt())
-                .medYtelseTypeKode(fagsak.getFagsakYtelseType().getKode())
-                .medAksjonspunktKoderMedStatusListe(aksjonspunktKoderMedStatusListe)
-                .medHref(String.format(defaultHRef, saksnummer, behandling.getId()))
-                .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligSaksbehandler())
-                .medFørsteFeilutbetaling(hentFørsteFeilutbetalingDato(kravgrunnlag431, kravgrunnlagManglerFristTid))
-                .medFeilutbetaltBeløp(kravgrunnlag431 != null ? hentFeilutbetaltBeløp(behandling.getId()) : BigDecimal.ZERO)
-                .medAnsvarligBeslutterIdent(behandling.getAnsvarligBeslutter())
-                .build();
+            .medBehandlingStatus(behandling.getStatus().getKode())
+            .medEksternId(behandling.getUuid())
+            .medFagsystem(fagsystem.getKode())
+            .medSaksnummer(saksnummer)
+            .medAktørId(behandling.getAktørId().getId())
+            .medBehandlingSteg(behandling.getAktivtBehandlingSteg() == null ? null : behandling.getAktivtBehandlingSteg().getKode())
+            .medBehandlingTypeKode(behandling.getType().getKode())
+            .medBehandlendeEnhet(behandling.getBehandlendeEnhetId())
+            .medEventHendelse(EventHendelse.valueOf(eventName))
+            .medEventTid(LocalDateTime.now())
+            .medOpprettetBehandling(behandling.getOpprettetTidspunkt())
+            .medYtelseTypeKode(fagsak.getFagsakYtelseType().getKode())
+            .medAksjonspunktKoderMedStatusListe(aksjonspunktKoderMedStatusListe)
+            .medHref(String.format(defaultHRef, saksnummer, behandling.getId()))
+            .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligSaksbehandler())
+            .medFørsteFeilutbetaling(hentFørsteFeilutbetalingDato(kravgrunnlag431, kravgrunnlagManglerFristTid))
+            .medFeilutbetaltBeløp(kravgrunnlag431 != null ? hentFeilutbetaltBeløp(behandling.getId()) : BigDecimal.ZERO)
+            .medAnsvarligBeslutterIdent(behandling.getAnsvarligBeslutter())
+            .build();
     }
 
     private LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431, LocalDateTime kravgrunnlagManglerFristTid) {
@@ -160,27 +162,14 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
             return null;
         }
         return kravgrunnlag431.getPerioder().stream()
-                .map(KravgrunnlagPeriode432::getFom)
-                .min(LocalDate::compareTo)
-                .orElse(null);
+            .map(KravgrunnlagPeriode432::getFom)
+            .min(LocalDate::compareTo)
+            .orElse(null);
     }
 
     private BigDecimal hentFeilutbetaltBeløp(Long behandlingId) {
         return faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandlingId).getAktuellFeilUtbetaltBeløp();
     }
 
-    private String getJson(TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto) throws IOException {
-        Writer jsonWriter = new StringWriter();
-        objectMapper.writeValue(jsonWriter, behandlingProsessEventDto);
-        jsonWriter.flush();
-        return jsonWriter.toString();
-    }
-
-    private ObjectMapper lagObjectMapper() {
-        ObjectMapper om = new ObjectMapper();
-        om.registerModule(new JavaTimeModule());
-        om.registerModule(new Jdk8Module());
-        return om;
-    }
 
 }
