@@ -52,9 +52,9 @@ public interface CustomHelpers {
             Object condition_variable = model.get("__condition_variable");
 
             int antallTreff = konstanter.stream()
-                    .mapToInt(k -> k.equals(condition_variable) ? 1 : 0)
-                    .reduce(Integer::sum)
-                    .orElseThrow();
+                .mapToInt(k -> k.equals(condition_variable) ? 1 : 0)
+                .reduce(Integer::sum)
+                .orElseThrow();
 
             if (antallTreff > 0) {
                 Integer kumulativtAntallTreff = (Integer) model.get("__condition_fulfilled");
@@ -179,7 +179,16 @@ public interface CustomHelpers {
                     perioder.add("perioden " + fraTekst + " " + fom + " " + tilTekst + " " + tom);
                 }
             }
-            return listUt(perioder);
+            return storForbokstav(listUt(perioder));
+        }
+
+        private String storForbokstav(String tekst) {
+            if (tekst.isEmpty()) {
+                return tekst;
+            }
+            String førsteTegn = tekst.substring(0, 1);
+            String resten = tekst.substring(1);
+            return førsteTegn.toUpperCase() + resten;
         }
 
         private String listUt(List<String> perioder) {
