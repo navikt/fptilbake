@@ -6,27 +6,31 @@ _{{#if hjemmel.lovhjemmel-flertall}}Lovhjemler{{else}}Lovhjemmelen{{/if}} vi har
 Vedtaket er gjort etter {{hjemmel.lovhjemmel-vedtak}}.
 {{#if (neq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}}
     {{#if (neq sak.ytelsetype "ES")}}
-_Skatt
+_Skatt og skatteoppgjer
         {{#if skal-ikke-vise-skatt }}
 NAV gjev opplysningar til Skatteetaten. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjer.
         {{else}}
-Beløpet du skal betale tilbake etter skatt er trekt frå, er berekna etter ditt gjennomsnittlege skattetrekk per månad. Det gjer at beløpet du skal betale tilbake etter skatt, ikkje alltid er likt med det beløpet du mottok på konto.
+Skatten som er trekt frå beløpet du skal betale tilbake, er berekna etter det du har blitt trekt i skatt i gjennomsnitt per månad. Det gjer at beløpet du skal betale tilbake etter skatt, ikkje alltid er likt med det beløpet du fekk inn på konto.
 
 NAV gjev opplysningar til Skattetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trekt frå. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
         {{/if}}
     {{/if}}
-_Korleis betale tilbake pengane du skuldar
+_Korleis betaler du tilbake?
     {{#if behandling.er-revurdering}}
 NAV Innkreving vil korrigere beløpet du skal betale tilbake. Du finn meir informasjon på nav.no/innkreving.
     {{else}}
-Du vil få krav frå NAV Innkrevjing på det beløpet du skal betale tilbake. Du finn meir informasjon på nav.no/innkreving.
+Du vil få faktura fra NAV Innkrevjing på det beløpet du skal betale tilbake.
+
+På fakturaen vil det stå informasjon om nøyaktig beløp, kontonummer og forfallsdato. Du trenger ikkje å gjere noko før du får fakturaen.
+
+Du finn meir informasjon på nav.no/innkreving.
     {{/if}}
 {{/if}}
 _Du har rett til å klage
 Du kan klage innan {{konfigurasjon.klagefrist-uker}} veker frå den datoen du fekk vedtaket. Du finn skjema og informasjon på nav.no/klage.
 {{#if (neq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}}
 
-Du må som hovudregel begynne å betale beløpet tilbake, sjølv om du klagar på dette vedtaket. Dette følgjer av forvaltningslova § 42. Vi vil betale tilbake pengane du har betalt inn, om du får vedtak om at du ikkje trong å betale tilbake heile eller delar av beløpet du skulda.
+Du må som hovudregel begynne å betale tilbake beløpet når du får fakturaen. Dette gjeld også om du klagar på dette vedtaket, ifølge forvaltningslova § 42. Vi vil betale tilbake pengane du har betalt inn, om du får vedtak om at du ikkje trong å betale tilbake heile eller delar av beløpet du skulda.
 {{/if}}
 {{#if (neq sak.ytelsetype "FRISINN") }}
 _Du har rett til innsyn

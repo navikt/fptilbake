@@ -2,13 +2,13 @@
 {{~#* inline "varsel-tekst" ~}}
     {{#switch totalresultat.hovedresultat}}
     {{#case "FULL_TILBAKEBETALING"}}
-Vi varsla deg {{varsel.varslet-dato}} om at du har fått utbetalt for mykje.{{>korrigert-total-beløp}}
+Du fekk varsel frå oss {{varsel.varslet-dato}} om at du har fått utbetalt for mykje.{{>korrigert-total-beløp}}
     {{/case}}
     {{#case "DELVIS_TILBAKEBETALING"}}
-Vi varsla deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mykje.{{>korrigert-total-beløp}}
+Du fekk varsel frå oss {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mykje.{{>korrigert-total-beløp}}
     {{/case}}
     {{#case "INGEN_TILBAKEBETALING"}}
-Vi varsla deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mykje.{{>korrigert-total-beløp}} Vi har behandla saka di, og du må ikkje betale tilbake det feilutbetalte beløpet.
+Du fekk varsel frå oss {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mykje.{{>korrigert-total-beløp}} Vi har behandla saka di, og du må ikkje betale tilbake det feilutbetalte beløpet.
     {{/case}}
     {{/switch}}
 {{~/inline~}}
@@ -30,7 +30,7 @@ I brev {{sak.dato-fagsakvedtak}} fekk du melding om at {{>ytelse-produkt}} {{>di
 {{/if}}
 {{#if (neq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}}
 
-Beløpet du skuldar før skatt er {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er {{#if (eq totalresultat.hovedresultat "FULL_TILBAKEBETALING")}}heile{{else}}delar av{{/if}} det feilutbetalte beløpet.{{>evt-renter-utsagn}} Beløpet du skal betale tilbake etter skatten er trekt frå er {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter-uten-skatt}}.
+Beløpet du skuldar før skatt er {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}. Dette er {{#if (eq totalresultat.hovedresultat "FULL_TILBAKEBETALING")}}heile{{else}}delar av{{/if}} det feilutbetalte beløpet.{{>evt-renter-utsagn}} Det du skal betale tilbake etter at skatten er trekt frå er {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter-uten-skatt}}.
 {{/if}}
 {{#if fritekst-oppsummering}}
 
