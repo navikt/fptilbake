@@ -44,7 +44,7 @@
     "VEDTAKSBREV_JOIN_PERIODER" : "true",
     "AKTIVER_ABAC_LOGGING" : "false",
     "TOGGLE_AIVEN_DVH" : "true",
-    "TOGGLE_AIVEN_LOS" : "true"
+    "TOGGLE_AIVEN_LOS" : "false"
   },
   "AZURE_IAC_RULES": [
     {
