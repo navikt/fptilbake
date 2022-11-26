@@ -53,6 +53,7 @@ public class AutomatiskFaktaFastsettelseTjeneste {
             case OMSORGSPENGER -> new HendelseTypeMedUndertypeDto(HendelseType.OMP_ANNET_TYPE, hendelseUnderType);
             case PLEIEPENGER_SYKT_BARN -> new HendelseTypeMedUndertypeDto(HendelseType.PSB_ANNET_TYPE, hendelseUnderType);
             case PLEIEPENGER_NÆRSTÅENDE -> new HendelseTypeMedUndertypeDto(HendelseType.PPN_ANNET_TYPE, hendelseUnderType);
+            case OPPLÆRINGSPENGER -> new HendelseTypeMedUndertypeDto(HendelseType.OLP_ANNET_TYPE, hendelseUnderType);
             default -> throw new IllegalArgumentException("Ikke-støttet fagsak ytelse type: " + fagsakYtelseType);
         };
         return hendelseTypeMedUndertypeDto;

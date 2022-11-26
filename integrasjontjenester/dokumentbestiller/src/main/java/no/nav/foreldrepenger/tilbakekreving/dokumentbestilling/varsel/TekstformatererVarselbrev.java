@@ -28,6 +28,7 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
             FagsakYtelseType.OMSORGSPENGER,
             FagsakYtelseType.PLEIEPENGER_SYKT_BARN,
             FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE,
+            FagsakYtelseType.OPPLÆRINGSPENGER,
             FagsakYtelseType.FRISINN);
 
     private TekstformatererVarselbrev() {
