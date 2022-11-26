@@ -204,7 +204,7 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-                <artifactId>fplos-klient</artifactId>
+                <artifactId>los-klient</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

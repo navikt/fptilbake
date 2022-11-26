@@ -21,7 +21,7 @@
         <module>kravgrunnlag-queue</module>
         <module>person</module>
         <module>pdfgen</module>
-        <module>fplos-klient</module>
+        <module>los-klient</module>
         <module>datavarehus</module>
         <module>selvbetjening-klient</module>
         <module>organisasjon</module>

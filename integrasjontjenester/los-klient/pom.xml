@@ -8,9 +8,9 @@
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>fplos-klient</artifactId>
+    <artifactId>los-klient</artifactId>
     <packaging>jar</packaging>
-    <name>FPTILBAKE :: Integrasjontjenester - Fplos</name>
+    <name>FPTILBAKE :: Integrasjontjenester - los</name>
 
     <dependencies>
         <dependency>

@@ -142,7 +142,7 @@
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>fplos-klient</artifactId>
+            <artifactId>los-klient</artifactId>
         </dependency>
         <dependency>
             <!-- må legge til her får å få fpsak-klient på classpatwh -->
