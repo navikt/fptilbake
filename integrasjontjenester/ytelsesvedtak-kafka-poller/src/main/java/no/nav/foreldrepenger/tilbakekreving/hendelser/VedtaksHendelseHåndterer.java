@@ -54,8 +54,7 @@ public class VedtaksHendelseHåndterer {
         Ytelser.PLEIEPENGER_NÆRSTÅENDE, FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE,
         Ytelser.PLEIEPENGER_SYKT_BARN, FagsakYtelseType.PLEIEPENGER_SYKT_BARN
     );
-
-    private static final Logger log = LoggerFactory.getLogger(VedtaksHendelseHåndterer.class);
+    
     private ProsessTaskTjeneste taskTjeneste;
     private Set<Ytelser> abonnerteYtelser;
     private Set<Ytelser> resterendeYtelser;
@@ -73,6 +72,7 @@ public class VedtaksHendelseHåndterer {
     void handleMessage(String key, String payload) {
         // enhver exception ut fra denne metoden medfører at tråden som leser fra kafka gir opp og dør på seg.
         try {
+            LOG.info("TILBAKE VEDTAKFATTET: mottok nøkkel {}", key);
             var mottattVedtak = DefaultJsonMapper.fromJson(payload, Ytelse.class);
             if (mottattVedtak instanceof YtelseV1 ytelse) {
                 lagHåndterHendelseProsessTask(ytelse);
