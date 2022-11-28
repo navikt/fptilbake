@@ -18,6 +18,7 @@ import org.apache.kafka.streams.errors.LogAndFailExceptionHandler;
 
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 
 @Dependent
@@ -61,7 +62,7 @@ class AivenVedtakProperties {
         Properties props = new Properties();
 
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, applicationId); // Hold denne konstant pga offset-commit
-        props.put(StreamsConfig.CLIENT_ID_CONFIG, applicationId + UUID.randomUUID());
+        props.put(StreamsConfig.CLIENT_ID_CONFIG, applicationId + "-" + UUID.randomUUID());
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 
         // Sikkerhet - miljø eller lokal
