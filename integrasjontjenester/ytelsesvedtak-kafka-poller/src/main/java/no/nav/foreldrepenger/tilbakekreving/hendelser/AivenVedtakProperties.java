@@ -56,7 +56,7 @@ class AivenVedtakProperties {
     }
 
     Properties getProperties() {
-        var applicationId = ApplicationName.hvilkenTilbakeAppName(); // Hold denne konstant pga offset-commit
+        var applicationId = ApplicationName.hvilkenTilbakeAppName() + "-vedtak"; // Hold denne konstant pga offset-commit
 
         Properties props = new Properties();
 
