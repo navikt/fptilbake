@@ -30,7 +30,9 @@ I brev {{sak.dato-fagsakvedtak}} fikk du melding om at {{>ytelse-produkt}} {{>di
 {{/if}}
 {{#if (neq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}}
 
-Beløpet du skylder før skatt, er {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}. Dette er {{#if (eq totalresultat.hovedresultat "FULL_TILBAKEBETALING")}}hele{{else}}deler av{{/if}} det feilutbetalte beløpet.{{>evt-renter-utsagn}} Det du skal betale tilbake etter at skatten er trukket fra, er {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter-uten-skatt}}.
+Beløpet du skylder før skatt, er {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}. Dette er {{#if (eq totalresultat.hovedresultat "FULL_TILBAKEBETALING")}}hele{{else}}deler av{{/if}} det feilutbetalte beløpet.{{>evt-renter-utsagn}}
+
+Det du skal betale tilbake etter at skatten er trukket fra, er {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter-uten-skatt}}.
 {{/if}}
 {{#if fritekst-oppsummering}}
 

@@ -867,7 +867,9 @@ public class TekstformatererVedtaksbrevTest {
         assertThat(generertBrev).isEqualToNormalizingNewlines("""
             Du fikk varsel fra oss 4. april 2020 om at du har fått 3 000 kroner for mye.
 
-            Beløpet du skylder før skatt, er 3 000 kroner. Dette er deler av det feilutbetalte beløpet. Det du skal betale tilbake etter at skatten er trukket fra, er 2 000 kroner.
+            Beløpet du skylder før skatt, er 3 000 kroner. Dette er deler av det feilutbetalte beløpet. 
+            
+            Det du skal betale tilbake etter at skatten er trukket fra, er 2 000 kroner.
             _Perioden fra og med 5. april 2021 til og med 6. april 2021
             _Hvordan har vi kommet fram til at du må betale tilbake?
             Du har fått vite om du har rett til omsorgspenger og hvor mye du har rett til. Etter vår vurdering burde du forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
@@ -916,7 +918,9 @@ public class TekstformatererVedtaksbrevTest {
         assertThat(generertBrev).isEqualToNormalizingNewlines("""
 Du fikk varsel fra oss 4. april 2020 om at du har fått 3 000 kroner for mye.
 
-Beløpet du skylder før skatt, er 3 000 kroner. Dette er deler av det feilutbetalte beløpet. Det du skal betale tilbake etter at skatten er trukket fra, er 2 000 kroner.
+Beløpet du skylder før skatt, er 3 000 kroner. Dette er deler av det feilutbetalte beløpet. 
+
+Det du skal betale tilbake etter at skatten er trukket fra, er 2 000 kroner.
 _Perioden fra og med 5. april 2021 til og med 6. april 2021
 _Hvordan har vi kommet fram til at du må betale tilbake?
 Du har fått vite om du har rett til opplæringspenger og hvor mye du har rett til. Etter vår vurdering burde du forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
