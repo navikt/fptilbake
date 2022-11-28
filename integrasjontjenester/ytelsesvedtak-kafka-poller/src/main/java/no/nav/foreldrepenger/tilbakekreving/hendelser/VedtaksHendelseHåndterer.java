@@ -73,6 +73,7 @@ public class VedtaksHendelseHåndterer {
     void handleMessage(String key, String payload) {
         // enhver exception ut fra denne metoden medfører at tråden som leser fra kafka gir opp og dør på seg.
         try {
+            LOG.info("TILBAKE VEDTAKFATTET: mottok nøkkel {}", key);
             var mottattVedtak = DefaultJsonMapper.fromJson(payload, Ytelse.class);
             if (mottattVedtak instanceof YtelseV1 ytelse) {
                 lagHåndterHendelseProsessTask(ytelse);

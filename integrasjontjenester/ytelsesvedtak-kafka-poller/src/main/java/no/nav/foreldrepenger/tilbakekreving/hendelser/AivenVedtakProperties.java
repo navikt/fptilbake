@@ -18,15 +18,14 @@ import org.apache.kafka.streams.errors.LogAndFailExceptionHandler;
 
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 
 @Dependent
 class AivenVedtakProperties {
 
     private static final Environment ENV = Environment.current();
 
-    private final String clientId;
     private final String bootstrapServers;
-    private final String applicationId;
     private final String trustStorePath;
     private final String keyStoreLocation;
     private final String credStorePassword;
@@ -44,8 +43,6 @@ class AivenVedtakProperties {
         this.trustStorePath = trustStorePath;
         this.keyStoreLocation = keyStoreLocation;
         this.credStorePassword = credStorePassword;
-        this.applicationId = "fpabakus"; // Hold konstant pga offset commit
-        this.clientId = "fpabakus-" + UUID.randomUUID();
         this.bootstrapServers = bootstrapServers;
         this.topicName = topicName;
     }
@@ -59,10 +56,12 @@ class AivenVedtakProperties {
     }
 
     Properties getProperties() {
+        var applicationId = ApplicationName.hvilkenTilbakeAppName(); // Hold denne konstant pga offset-commit
+
         Properties props = new Properties();
 
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, applicationId);
-        props.put(StreamsConfig.CLIENT_ID_CONFIG, clientId);
+        props.put(StreamsConfig.APPLICATION_ID_CONFIG, applicationId); // Hold denne konstant pga offset-commit
+        props.put(StreamsConfig.CLIENT_ID_CONFIG, applicationId + UUID.randomUUID());
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 
         // Sikkerhet - miljø eller lokal
