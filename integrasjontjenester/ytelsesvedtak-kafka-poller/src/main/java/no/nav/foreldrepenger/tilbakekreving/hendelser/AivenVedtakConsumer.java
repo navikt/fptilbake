@@ -13,7 +13,6 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.felles.KafkaIntegration;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 

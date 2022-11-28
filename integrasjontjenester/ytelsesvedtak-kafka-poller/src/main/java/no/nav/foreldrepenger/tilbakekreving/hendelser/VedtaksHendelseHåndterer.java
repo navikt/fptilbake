@@ -54,8 +54,7 @@ public class VedtaksHendelseHåndterer {
         Ytelser.PLEIEPENGER_NÆRSTÅENDE, FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE,
         Ytelser.PLEIEPENGER_SYKT_BARN, FagsakYtelseType.PLEIEPENGER_SYKT_BARN
     );
-
-    private static final Logger log = LoggerFactory.getLogger(VedtaksHendelseHåndterer.class);
+    
     private ProsessTaskTjeneste taskTjeneste;
     private Set<Ytelser> abonnerteYtelser;
     private Set<Ytelser> resterendeYtelser;
