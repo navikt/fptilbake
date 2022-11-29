@@ -457,7 +457,7 @@ public class TekstformatererVedtaksbrevTest {
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_SVP_og_ett_barn_og_forsett() throws Exception {
+    public void skal_generere_vedtaksbrev_for_SVP_og_ett_barn_forstod_at_beløp_var_feil() throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
@@ -498,7 +498,7 @@ public class TekstformatererVedtaksbrevTest {
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/SVP_forsett.txt");
+        String fasit = les("/vedtaksbrev/SVP_forstod.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
@@ -536,7 +536,7 @@ public class TekstformatererVedtaksbrevTest {
                     .build())
                 .medVurderinger(HbVurderinger.builder()
                     .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                    .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
+                    .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
                     .medAktsomhetResultat(Aktsomhet.FORSETT)
                     .build())
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløpOgRenter(10000, 0))

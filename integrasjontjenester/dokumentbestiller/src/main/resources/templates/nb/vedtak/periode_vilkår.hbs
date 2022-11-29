@@ -65,17 +65,23 @@ Vi har ikke gitt deg den informasjonen du trengte for å forstå at beløpet du 
 {{> fritekst}}
 {{/if}}
 {{#if (eq vurderinger.aktsomhet-resultat "FORSETT")}}
-Du har fått informasjon om hvor mye du har rett til å få i {{> ytelse-navn}} og at du må melde fra om endringer til NAV. Informasjonen du har fått forklarer om du har rett til {{> ytelse-navn}} og hvor mye du har rett til å få utbetalt.
-{{>fritekst}}
-
     {{#switch vurderinger.vilkår-resultat}}
     {{#case "FORSTO_BURDE_FORSTAATT"}}
+Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv hvis du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye hvis du forsto at beløpet var feil. At du må betale tilbake, betyr ikke at du selv har skyld i feilutbetalingen.
+{{>fritekst}}
+
 Vi mener at du forstod at beløpet du fikk utbetalt var feil. Du må derfor betale tilbake det du har fått for mye.
     {{/case}}
     {{#case "FEIL_OPPLYSNINGER"}}
+Du har fått informasjon om hvor mye du har rett til å få i {{> ytelse-navn}} og at du må melde fra om endringer til NAV. Informasjonen du har fått forklarer om du har rett til {{> ytelse-navn}} og hvor mye du har rett til å få utbetalt.
+{{>fritekst}}
+
 Etter vår vurdering forsto du at du ga oss uriktige opplysninger. Derfor må du betale tilbake det du har fått for mye.
     {{/case}}
     {{#case "MANGELFULL_OPPLYSNING"}}
+Du har fått informasjon om hvor mye du har rett til å få i {{> ytelse-navn}} og at du må melde fra om endringer til NAV. Informasjonen du har fått forklarer om du har rett til {{> ytelse-navn}} og hvor mye du har rett til å få utbetalt.
+{{>fritekst}}
+
 Vi vurderer at du forsto at du ikke ga oss alle nødvendige opplysninger i saken din. Du må derfor betale tilbake det du har fått for mye.
     {{/case}}
     {{/switch}}
