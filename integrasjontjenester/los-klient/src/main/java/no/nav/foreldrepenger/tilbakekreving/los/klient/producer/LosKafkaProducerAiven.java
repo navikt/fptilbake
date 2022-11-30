@@ -1,8 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.los.klient.producer;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -16,8 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
-import no.nav.foreldrepenger.tilbakekreving.los.klient.TilbakebetalingBehandlingProsessEventMapper;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.kafka.AivenMeldingProducer;
+import no.nav.foreldrepenger.tilbakekreving.los.klient.TilbakebetalingBehandlingProsessEventMapper;
 import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEventDto;
 import no.nav.vedtak.log.mdc.MDCOperations;
 
@@ -26,7 +24,6 @@ public class LosKafkaProducerAiven extends AivenMeldingProducer {
 
     private static final Logger logger = LoggerFactory.getLogger(LosKafkaProducerAiven.class);
     private static final String CALLID_NAME = "Nav-Tbk-CallId";
-    private static final String HEARTBEAT_HEADER = "Heartbeat";
 
     public LosKafkaProducerAiven() {
         //for CDI proxy
@@ -53,14 +50,6 @@ public class LosKafkaProducerAiven extends AivenMeldingProducer {
 
         RecordMetadata recordMetadata = runProducerWithSingleJson(melding);
         logger.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandlingId {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), behandlingProsessEventDto.getBehandlingId());
-    }
-
-    public void sendHeartbeat() {
-        String nøkkel = null;
-        String verdi = LocalDateTime.now().toInstant(ZoneOffset.UTC).toString();
-        ProducerRecord<String, String> melding = new ProducerRecord<>(getTopic(), null, nøkkel, verdi, new RecordHeaders().add(HEARTBEAT_HEADER, null));
-        RecordMetadata recordMetadata = runProducerWithSingleJson(melding);
-        logger.info("Sendt heartbeat til Aiven på {} partisjon {} offset {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
     }
 
 }
