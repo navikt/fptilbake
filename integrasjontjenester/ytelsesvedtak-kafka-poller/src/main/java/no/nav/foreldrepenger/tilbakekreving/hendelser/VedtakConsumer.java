@@ -17,17 +17,17 @@ import no.nav.foreldrepenger.tilbakekreving.felles.KafkaIntegration;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 
 @ApplicationScoped
-public class AivenVedtakConsumer implements AppServiceHandler, KafkaIntegration {
+public class VedtakConsumer implements AppServiceHandler, KafkaIntegration {
 
-    private static final Logger log = LoggerFactory.getLogger(AivenVedtakConsumer.class);
+    private static final Logger log = LoggerFactory.getLogger(VedtakConsumer.class);
     private KafkaStreams stream;
     private String topic;
 
-    AivenVedtakConsumer() {
+    VedtakConsumer() {
     }
 
     @Inject
-    public AivenVedtakConsumer(VedtaksHendelseHåndterer vedtaksHendelseHåndterer, AivenVedtakProperties streamKafkaProperties) {
+    public VedtakConsumer(VedtaksHendelseHåndterer vedtaksHendelseHåndterer, VedtakProperties streamKafkaProperties) {
         this.topic = streamKafkaProperties.getTopicName();
 
         final Consumed<String, String> consumed = Consumed.with(Topology.AutoOffsetReset.EARLIEST);
