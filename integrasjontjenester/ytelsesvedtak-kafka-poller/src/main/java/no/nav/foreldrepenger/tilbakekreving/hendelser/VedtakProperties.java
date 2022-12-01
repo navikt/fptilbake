@@ -21,7 +21,7 @@ import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 
 @Dependent
-class AivenVedtakProperties {
+class VedtakProperties {
 
     private static final Environment ENV = Environment.current();
 
@@ -34,12 +34,12 @@ class AivenVedtakProperties {
 
 
     @Inject
-    AivenVedtakProperties(@KonfigVerdi(value = "kafka.fattevedtak.aiven.topic", defaultVerdi = "teamforeldrepenger.familie-vedtakfattet-v1") String topicName,
-                          // De neste stammer fra Aivenator
-                          @KonfigVerdi("KAFKA_BROKERS") String bootstrapServers,
-                          @KonfigVerdi("KAFKA_TRUSTSTORE_PATH") String trustStorePath,
-                          @KonfigVerdi("KAFKA_KEYSTORE_PATH") String keyStoreLocation,
-                          @KonfigVerdi("KAFKA_CREDSTORE_PASSWORD") String credStorePassword) {
+    VedtakProperties(@KonfigVerdi(value = "kafka.fattevedtak.aiven.topic", defaultVerdi = "teamforeldrepenger.familie-vedtakfattet-v1") String topicName,
+                     // De neste stammer fra Aivenator
+                     @KonfigVerdi("KAFKA_BROKERS") String bootstrapServers,
+                     @KonfigVerdi("KAFKA_TRUSTSTORE_PATH") String trustStorePath,
+                     @KonfigVerdi("KAFKA_KEYSTORE_PATH") String keyStoreLocation,
+                     @KonfigVerdi("KAFKA_CREDSTORE_PASSWORD") String credStorePassword) {
         this.trustStorePath = trustStorePath;
         this.keyStoreLocation = keyStoreLocation;
         this.credStorePassword = credStorePassword;

@@ -17,17 +17,17 @@ import no.nav.foreldrepenger.tilbakekreving.felles.KafkaIntegration;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 
 @ApplicationScoped
-public class AivenVedtakConsumer implements AppServiceHandler, KafkaIntegration {
+public class VedtakConsumer implements AppServiceHandler, KafkaIntegration {
 
-    private static final Logger log = LoggerFactory.getLogger(AivenVedtakConsumer.class);
+    private static final Logger log = LoggerFactory.getLogger(VedtakConsumer.class);
     private KafkaStreams stream;
     private String topic;
 
-    AivenVedtakConsumer() {
+    VedtakConsumer() {
     }
 
     @Inject
-    public AivenVedtakConsumer(VedtaksHendelseHåndterer vedtaksHendelseHåndterer, AivenVedtakProperties streamKafkaProperties) {
+    public VedtakConsumer(VedtaksHendelseHåndterer vedtaksHendelseHåndterer, VedtakProperties streamKafkaProperties) {
         this.topic = streamKafkaProperties.getTopicName();
 
         final Consumed<String, String> consumed = Consumed.with(Topology.AutoOffsetReset.EARLIEST);
@@ -74,8 +74,9 @@ public class AivenVedtakConsumer implements AppServiceHandler, KafkaIntegration 
 
     @Override
     public void stop() {
-        log.info("Starter shutdown av topic={}, tilstand={} med 10 sekunder timeout", topic, stream.state());
-        stream.close(Duration.of(30, ChronoUnit.SECONDS));
-        log.info("Shutdown av topic={}, tilstand={} med 10 sekunder timeout", topic, stream.state());
+        int timeoutSekunder = 30;
+        log.info("Starter shutdown av topic={}, tilstand={} med {} sekunder timeout", topic, stream.state(), timeoutSekunder);
+        stream.close(Duration.of(timeoutSekunder, ChronoUnit.SECONDS));
+        log.info("Shutdown av topic={}, tilstand={} med {} sekunder timeout", topic, stream.state(), timeoutSekunder);
     }
 }
