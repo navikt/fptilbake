@@ -31,6 +31,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.Feil
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.K9sakBehandlingInfoDto;
 import no.nav.vedtak.exception.IntegrasjonException;
+import no.nav.vedtak.felles.integrasjon.rest.FpApplication;
 import no.nav.vedtak.felles.integrasjon.rest.RestClient;
 import no.nav.vedtak.felles.integrasjon.rest.RestClientConfig;
 import no.nav.vedtak.felles.integrasjon.rest.RestConfig;
@@ -39,7 +40,7 @@ import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 
 @ApplicationScoped
 @K9tilbake
-@RestClientConfig(tokenConfig = TokenFlow.CONTEXT)
+@RestClientConfig(tokenConfig = TokenFlow.ADAPTIVE, scopesProperty = "k9sak.scopes", scopesDefault = "api://prod-fss.k9saksbehandling.k9-sak/.default")
 public class K9sakKlient implements FagsystemKlient {
 
     private static final Logger logger = LoggerFactory.getLogger(K9sakKlient.class);
