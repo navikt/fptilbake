@@ -49,6 +49,8 @@ spec:
         kvPath: {{fptilbakeserviceuser}}
       - mountPath: /var/run/secrets/nais.io/appdynamics
         kvPath: /apikey/appdynamics/{{environment}}
+  secureLogs:
+    enabled: true
   env:
   # miljø-spesifikke variable
   {{#each env}}
