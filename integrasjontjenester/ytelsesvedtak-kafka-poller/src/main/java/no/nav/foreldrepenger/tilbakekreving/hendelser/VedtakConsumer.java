@@ -74,8 +74,9 @@ public class VedtakConsumer implements AppServiceHandler, KafkaIntegration {
 
     @Override
     public void stop() {
-        log.info("Starter shutdown av topic={}, tilstand={} med 10 sekunder timeout", topic, stream.state());
-        stream.close(Duration.of(30, ChronoUnit.SECONDS));
-        log.info("Shutdown av topic={}, tilstand={} med 10 sekunder timeout", topic, stream.state());
+        int timeoutSekunder = 30;
+        log.info("Starter shutdown av topic={}, tilstand={} med {} sekunder timeout", topic, stream.state(), timeoutSekunder);
+        stream.close(Duration.of(timeoutSekunder, ChronoUnit.SECONDS));
+        log.info("Shutdown av topic={}, tilstand={} med {} sekunder timeout", topic, stream.state(), timeoutSekunder);
     }
 }
