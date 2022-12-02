@@ -221,7 +221,6 @@ public class K9sakKlient implements FagsystemKlient {
     }
 
     private <T> Optional<T> get(URI endpoint, Class<T> tClass) {
-        var restConfig = new RestConfig(TokenFlow.CONTEXT, endpoint, null, null);
         return restClient.sendReturnOptional(RestRequest.newGET(endpoint, restConfig), tClass);
     }
 
