@@ -49,7 +49,7 @@ public class LosKafkaProducerAiven extends AivenMeldingProducer {
         ProducerRecord<String, String> melding = new ProducerRecord<>(getTopic(), null, nøkkel, verdi, new RecordHeaders().add(CALLID_NAME, callId.getBytes()));
 
         RecordMetadata recordMetadata = runProducerWithSingleJson(melding);
-        logger.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandlingId {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), behandlingProsessEventDto.getBehandlingId());
+        logger.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandlingId {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), nøkkel);
     }
 
 }
