@@ -41,7 +41,7 @@
     "KODEVERK_V2_URL": "https://kodeverk.nais.adeo.no/ws/kodeverk/v2",
     "VEDTAKSBREV_JOIN_PERIODER" : "true",
     "TOGGLE_AIVEN_DVH" : "true",
-    "TOGGLE_AIVEN_LOS" : "false"
+    "TOGGLE_AIVEN_LOS" : "true"
   },
   "AZURE_IAC_RULES": [
     {
