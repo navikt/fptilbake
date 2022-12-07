@@ -15,14 +15,14 @@ _Hvordan har vi kommet fram til at du {{#if resultat.tilbakekreves-beløp}}{{els
         {{#if vurderinger.unntas-innkreving-pga-lavt-beløp}}
         {{> ikke-krev-småbeløp}}
         {{else}}
-Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye hvis du burde forstått at beløpet var feil. At du må betale tilbake, betyr ikke at du selv har skyld i feilutbetalingen.
+Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv hvis du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye hvis du burde forstått at beløpet var feil. At du må betale tilbake, betyr ikke at du selv har skyld i feilutbetalingen.
 {{> fritekst}}
 
 Ut fra informasjonen du har fått, burde du etter vår vurdering forstått at du fikk for mye utbetalt. Derfor kan vi kreve tilbake.
         {{/if}}
     {{/if}}
     {{#if (eq vurderinger.aktsomhet-resultat "GROVT_UAKTSOM")}}
-Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye hvis du må ha forstått at beløpet var feil. At du må betale tilbake, betyr ikke at du selv har skyld i feilutbetalingen.
+Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv hvis du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye hvis du må ha forstått at beløpet var feil. At du må betale tilbake, betyr ikke at du selv har skyld i feilutbetalingen.
 {{> fritekst}}
 
 Ut fra informasjonen du har fått, må du etter vår vurdering ha forstått at du fikk for mye utbetalt. Derfor kan vi kreve tilbake.
@@ -70,7 +70,7 @@ Vi har ikke gitt deg den informasjonen du trengte for å forstå at beløpet du 
 Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv hvis du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye hvis du forsto at beløpet var feil. At du må betale tilbake, betyr ikke at du selv har skyld i feilutbetalingen.
 {{>fritekst}}
 
-Vi mener at du forstod at beløpet du fikk utbetalt var feil. Du må derfor betale tilbake det du har fått for mye.
+Ut fra informasjonen du har fått, legger vi til grunn at du forsto at du fikk utbetalt for mye. Derfor kan vi kreve tilbake.
     {{/case}}
     {{#case "FEIL_OPPLYSNINGER"}}
 Du har fått informasjon om hvor mye du har rett til å få i {{> ytelse-navn}} og at du må melde fra om endringer til NAV. Informasjonen du har fått forklarer om du har rett til {{> ytelse-navn}} og hvor mye du har rett til å få utbetalt.

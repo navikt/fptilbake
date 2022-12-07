@@ -12,7 +12,7 @@ Ingen vet riktig hva som har skjedd, men du har fått utbetalt alt for mye penge
 
 Du har fått 1 234 567 890 kroner for mye utbetalt.
 _Hvordan har vi kommet fram til at du må betale tilbake?
-Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye hvis du må ha forstått at beløpet var feil. At du må betale tilbake, betyr ikke at du selv har skyld i feilutbetalingen.
+Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Selv hvis du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye hvis du må ha forstått at beløpet var feil. At du må betale tilbake, betyr ikke at du selv har skyld i feilutbetalingen.
 
 Det er helt utrolig om du ikke har oppdaget dette!
 
@@ -56,7 +56,7 @@ NAV Innkreving vil korrigere beløpet du skal betale tilbake. Du finner mer info
 _Du har rett til å klage
 Du kan klage innen 6 uker fra den datoen du mottok vedtaket. Du finner skjema og informasjon på nav.no/klage.
 
-Du må som hovedregel begynne å betale tilbake beløpet når du får fakturaen, selv om du klager på dette vedtaket. Dette følger av forvaltningsloven § 42. Hvis du får vedtak om at du ikke trengte å betale tilbake hele eller deler av beløpet du skyldte, betaler vi pengene tilbake til deg.
+Du må som hovedregel begynne å betale beløpet tilbake når du får fakturaen selv om du klager på dette vedtaket. Dette følger av forvaltningsloven § 42. Hvis du får vedtak om at du ikke trengte å betale tilbake hele eller deler av beløpet du skyldte, betaler vi pengene tilbake til deg.
 _Du har rett til innsyn
 På nav.no/dittnav kan du se dokumentene i saken din.
 _Har du spørsmål?

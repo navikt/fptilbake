@@ -865,72 +865,21 @@ public class TekstformatererVedtaksbrevTest {
 
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         assertThat(generertBrev).isEqualToNormalizingNewlines("""
-            Du fikk varsel fra oss 4. april 2020 om at du har fått 3 000 kroner for mye.
-
-            Beløpet du skylder før skatt, er 3 000 kroner. Dette er deler av det feilutbetalte beløpet. 
-            
-            Det du skal betale tilbake etter at skatten er trukket fra, er 2 000 kroner.
-            _Perioden fra og med 5. april 2021 til og med 6. april 2021
-            _Hvordan har vi kommet fram til at du må betale tilbake?
-            Du har fått vite om du har rett til omsorgspenger og hvor mye du har rett til. Etter vår vurdering burde du forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
-
-            Du er heldig som slapp å betale alt!
-            _Er det særlige grunner til å redusere beløpet?
-            Vi har vurdert om det er grunner til å redusere beløpet. Vi har lagt vekt på at du ikke har gitt oss alle nødvendige opplysninger tidsnok til at vi kunne unngå feilutbetalingen. Det er også kort tid siden utbetalingen skjedde og beløpet er høyt. Derfor må du betale tilbake hele beløpet.
-            _12. april 2021
-            _Hvordan har vi kommet fram til at du må betale tilbake?
-            Du har fått vite om du har rett til omsorgspenger og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye hvis du burde forstått at beløpet var feil. At du må betale tilbake, betyr ikke at du selv har skyld i feilutbetalingen.
-
-            Ut fra informasjonen du har fått, burde du etter vår vurdering forstått at du fikk for mye utbetalt. Derfor kan vi kreve tilbake.
-            _Lovhjemmelen vi har brukt
-            Vedtaket er gjort etter Folketrygdloven § 22-15.
-            _Skatt og skatteoppgjør
-            Skatten som er trukket fra beløpet du skal betale tilbake, er beregnet etter det du har blitt trukket i skatt i gjennomsnitt per måned. Det betyr at beløpet du skal betale tilbake etter skatt, ikke alltid er likt med det beløpet du fikk inn på konto.
-
-            NAV gir opplysninger til Skattetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trukket fra. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
-            _Hvordan betaler du tilbake?
-            Du vil få faktura fra NAV Innkreving på det beløpet du skal betale tilbake.
-
-            På fakturaen vil det stå informasjon om nøyaktig beløp, kontonummer og forfallsdato. Du trenger ikke å gjøre noe før du får fakturaen.
-
-            Du finner mer informasjon på nav.no/innkreving.
-            _Du har rett til å klage
-            Du kan klage innen 6 uker fra den datoen du mottok vedtaket. Du finner skjema og informasjon på nav.no/klage.
-
-            Du må som hovedregel begynne å betale tilbake beløpet når du får fakturaen, selv om du klager på dette vedtaket. Dette følger av forvaltningsloven § 42. Hvis du får vedtak om at du ikke trengte å betale tilbake hele eller deler av beløpet du skyldte, betaler vi pengene tilbake til deg.
-            _Du har rett til innsyn
-            På nav.no/dittnav kan du se dokumentene i saken din.
-            _Trenger du mer informasjon?
-            Du finner informasjon som kan være nyttig for deg på nav.no/omsorgspenger.
-
-            Med vennlig hilsen
-            NAV Arbeid og ytelser
-
-
-            Vedlegg: Resultatet av tilbakebetalingssaken""");
-    }
-
-    @Test
-    public void skal_generere_vedtaksbrev_for_OLP() {
-        HbVedtaksbrevData data = getVedtaksbrevDataOlp();
-
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        assertThat(generertBrev).isEqualToNormalizingNewlines("""
 Du fikk varsel fra oss 4. april 2020 om at du har fått 3 000 kroner for mye.
 
-Beløpet du skylder før skatt, er 3 000 kroner. Dette er deler av det feilutbetalte beløpet. 
+Beløpet du skylder før skatt, er 3 000 kroner. Dette er deler av det feilutbetalte beløpet.
 
 Det du skal betale tilbake etter at skatten er trukket fra, er 2 000 kroner.
 _Perioden fra og med 5. april 2021 til og med 6. april 2021
 _Hvordan har vi kommet fram til at du må betale tilbake?
-Du har fått vite om du har rett til opplæringspenger og hvor mye du har rett til. Etter vår vurdering burde du forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
+Du har fått vite om du har rett til omsorgspenger og hvor mye du har rett til. Etter vår vurdering burde du forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
 
 Du er heldig som slapp å betale alt!
 _Er det særlige grunner til å redusere beløpet?
 Vi har vurdert om det er grunner til å redusere beløpet. Vi har lagt vekt på at du ikke har gitt oss alle nødvendige opplysninger tidsnok til at vi kunne unngå feilutbetalingen. Det er også kort tid siden utbetalingen skjedde og beløpet er høyt. Derfor må du betale tilbake hele beløpet.
 _12. april 2021
 _Hvordan har vi kommet fram til at du må betale tilbake?
-Du har fått vite om du har rett til opplæringspenger og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye hvis du burde forstått at beløpet var feil. At du må betale tilbake, betyr ikke at du selv har skyld i feilutbetalingen.
+Du har fått vite om du har rett til omsorgspenger og hvor mye du har rett til. Selv hvis du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye hvis du burde forstått at beløpet var feil. At du må betale tilbake, betyr ikke at du selv har skyld i feilutbetalingen.
 
 Ut fra informasjonen du har fått, burde du etter vår vurdering forstått at du fikk for mye utbetalt. Derfor kan vi kreve tilbake.
 _Lovhjemmelen vi har brukt
@@ -948,7 +897,58 @@ Du finner mer informasjon på nav.no/innkreving.
 _Du har rett til å klage
 Du kan klage innen 6 uker fra den datoen du mottok vedtaket. Du finner skjema og informasjon på nav.no/klage.
 
-Du må som hovedregel begynne å betale tilbake beløpet når du får fakturaen, selv om du klager på dette vedtaket. Dette følger av forvaltningsloven § 42. Hvis du får vedtak om at du ikke trengte å betale tilbake hele eller deler av beløpet du skyldte, betaler vi pengene tilbake til deg.
+Du må som hovedregel begynne å betale beløpet tilbake når du får fakturaen selv om du klager på dette vedtaket. Dette følger av forvaltningsloven § 42. Hvis du får vedtak om at du ikke trengte å betale tilbake hele eller deler av beløpet du skyldte, betaler vi pengene tilbake til deg.
+_Du har rett til innsyn
+På nav.no/dittnav kan du se dokumentene i saken din.
+_Trenger du mer informasjon?
+Du finner informasjon som kan være nyttig for deg på nav.no/omsorgspenger.
+
+Med vennlig hilsen
+NAV Arbeid og ytelser
+
+
+Vedlegg: Resultatet av tilbakebetalingssaken""");
+    }
+
+    @Test
+    public void skal_generere_vedtaksbrev_for_OLP() {
+        HbVedtaksbrevData data = getVedtaksbrevDataOlp();
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        assertThat(generertBrev).isEqualToNormalizingNewlines("""
+Du fikk varsel fra oss 4. april 2020 om at du har fått 3 000 kroner for mye.
+
+Beløpet du skylder før skatt, er 3 000 kroner. Dette er deler av det feilutbetalte beløpet.
+
+Det du skal betale tilbake etter at skatten er trukket fra, er 2 000 kroner.
+_Perioden fra og med 5. april 2021 til og med 6. april 2021
+_Hvordan har vi kommet fram til at du må betale tilbake?
+Du har fått vite om du har rett til opplæringspenger og hvor mye du har rett til. Etter vår vurdering burde du forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
+
+Du er heldig som slapp å betale alt!
+_Er det særlige grunner til å redusere beløpet?
+Vi har vurdert om det er grunner til å redusere beløpet. Vi har lagt vekt på at du ikke har gitt oss alle nødvendige opplysninger tidsnok til at vi kunne unngå feilutbetalingen. Det er også kort tid siden utbetalingen skjedde og beløpet er høyt. Derfor må du betale tilbake hele beløpet.
+_12. april 2021
+_Hvordan har vi kommet fram til at du må betale tilbake?
+Du har fått vite om du har rett til opplæringspenger og hvor mye du har rett til. Selv hvis du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye hvis du burde forstått at beløpet var feil. At du må betale tilbake, betyr ikke at du selv har skyld i feilutbetalingen.
+
+Ut fra informasjonen du har fått, burde du etter vår vurdering forstått at du fikk for mye utbetalt. Derfor kan vi kreve tilbake.
+_Lovhjemmelen vi har brukt
+Vedtaket er gjort etter Folketrygdloven § 22-15.
+_Skatt og skatteoppgjør
+Skatten som er trukket fra beløpet du skal betale tilbake, er beregnet etter det du har blitt trukket i skatt i gjennomsnitt per måned. Det betyr at beløpet du skal betale tilbake etter skatt, ikke alltid er likt med det beløpet du fikk inn på konto.
+
+NAV gir opplysninger til Skattetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trukket fra. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
+_Hvordan betaler du tilbake?
+Du vil få faktura fra NAV Innkreving på det beløpet du skal betale tilbake.
+
+På fakturaen vil det stå informasjon om nøyaktig beløp, kontonummer og forfallsdato. Du trenger ikke å gjøre noe før du får fakturaen.
+
+Du finner mer informasjon på nav.no/innkreving.
+_Du har rett til å klage
+Du kan klage innen 6 uker fra den datoen du mottok vedtaket. Du finner skjema og informasjon på nav.no/klage.
+
+Du må som hovedregel begynne å betale beløpet tilbake når du får fakturaen selv om du klager på dette vedtaket. Dette følger av forvaltningsloven § 42. Hvis du får vedtak om at du ikke trengte å betale tilbake hele eller deler av beløpet du skyldte, betaler vi pengene tilbake til deg.
 _Du har rett til innsyn
 På nav.no/dittnav kan du se dokumentene i saken din.
 _Trenger du mer informasjon?
