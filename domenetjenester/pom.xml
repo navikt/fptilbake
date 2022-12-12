@@ -47,6 +47,10 @@
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>avstemming</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>sensu-klient</artifactId>
+        </dependency>
 
         <!-- Test avhengigheter -->
         <dependency>

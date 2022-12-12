@@ -41,10 +41,14 @@
     "DOKDIST_REST_DISTRIBUER_JOURNALPOST" : "https://dokdistfordeling-q1.nais.preprod.local/rest/v1/distribuerjournalpost",
     "ABAC_ATTRIBUTT_DRIFT" : "no.nav.abac.attributter.k9.drift",
     "KODEVERK_V2_URL": "https://kodeverk.nais.adeo.no/ws/kodeverk/v2",
+    "SENSU_HOST": "sensu.nais",
+    "SENSU_PORT": "3030",
+    "METRIKKER_KRAVGRUNNLAG_OPPDATERINGSPERIODE" : "P1Y",
     "FORELDELSE_ANTALLMAANEDER" : "P1M",
     "VEDTAKSBREV_JOIN_PERIODER" : "true",
     "AKTIVER_ABAC_LOGGING" : "false",
-    "TOGGLE_AIVEN_LOS" : "true"
+    "TOGGLE_AIVEN_LOS" : "true",
+    "TOGGLE_ENABLE_SENSU" : "true"
   },
   "AZURE_IAC_RULES": [
     {
