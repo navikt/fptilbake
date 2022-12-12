@@ -38,10 +38,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.sensu.SensuEvent;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskFeil;
@@ -55,33 +55,23 @@ public class StatistikkRepository {
 
     private static final String UDEFINERT = "-";
 
-    static final List<String> YTELSER = Stream.of(
-            FagsakYtelseType.FORELDREPENGER,
-            FagsakYtelseType.SVANGERSKAPSPENGER,
-            FagsakYtelseType.ENGANGSTØNAD,
-            FagsakYtelseType.FRISINN,
-            FagsakYtelseType.OMSORGSPENGER,
-            FagsakYtelseType.PLEIEPENGER_SYKT_BARN,
-            FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE)
-        .map(FagsakYtelseType::getKode).collect(Collectors.toList());
-
-    static final List<String> PROSESS_TASK_STATUSER = Stream.of(ProsessTaskStatus.KLAR, ProsessTaskStatus.FEILET, ProsessTaskStatus.VENTER_SVAR, ProsessTaskStatus.SUSPENDERT).map(ProsessTaskStatus::getDbKode).collect(Collectors.toList());
+    static final List<String> PROSESS_TASK_STATUSER = Stream.of(ProsessTaskStatus.KLAR, ProsessTaskStatus.FEILET, ProsessTaskStatus.VENTER_SVAR, ProsessTaskStatus.SUSPENDERT).map(ProsessTaskStatus::getDbKode).toList();
     static final List<String> AKSJONSPUNKTER = AksjonspunktDefinisjon.kodeMap().values().stream()
-        .filter(p -> !AksjonspunktDefinisjon.UNDEFINED.equals(p)).map(k -> k.getKode()).collect(Collectors.toList());
+        .filter(p -> !AksjonspunktDefinisjon.UNDEFINED.equals(p)).map(AksjonspunktDefinisjon::getKode).toList();
     static final List<String> AKSJONSPUNKT_STATUSER = AksjonspunktStatus.kodeMap().values().stream()
-        .filter(p -> !AksjonspunktStatus.AVBRUTT.equals(p)).map(k -> k.getKode())
-        .collect(Collectors.toList());
+        .filter(p -> !AksjonspunktStatus.AVBRUTT.equals(p)).map(AksjonspunktStatus::getKode)
+        .toList();
 
     static final List<String> BEHANDLING_RESULTAT_TYPER = List.copyOf(BehandlingResultatType.kodeMap().keySet());
     static final List<String> BEHANDLING_STATUS = List.copyOf(BehandlingStatus.kodeMap().keySet());
     static final List<String> FAGSAK_STATUS = List.copyOf(FagsakStatus.kodeMap().keySet());
-    static final List<String> BEHANDLING_TYPER = BehandlingType.kodeMap().values().stream().filter(p -> !BehandlingType.UDEFINERT.equals(p)).map(k -> k.getKode()).collect(Collectors.toList());
-    static final List<String> VENT_ÅRSAKER = Venteårsak.kodeMap().values().stream().filter(p -> !Venteårsak.UDEFINERT.equals(p)).map(k -> k.getKode()).collect(Collectors.toList());
+    static final List<String> BEHANDLING_TYPER = BehandlingType.kodeMap().values().stream().filter(p -> !BehandlingType.UDEFINERT.equals(p)).map(BehandlingType::getKode).toList();
 
     private static final ObjectMapper OM = new ObjectMapper();
 
     static final String PROSESS_TASK_VER = "v1";
     private final Set<String> taskTyper;
+    private final List<String> ytelseTypeKoder;
 
     private EntityManager entityManager;
 
@@ -92,6 +82,14 @@ public class StatistikkRepository {
             .map(this::extractClass)
             .map(it -> it.getAnnotation(ProsessTask.class).value())
             .collect(Collectors.toSet());
+
+        Set<FagsakYtelseType> ytelsetyper = switch (ApplicationName.hvilkenTilbake()) {
+            case FPTILBAKE -> Set.of(FagsakYtelseType.FORELDREPENGER, FagsakYtelseType.SVANGERSKAPSPENGER, FagsakYtelseType.ENGANGSTØNAD);
+            case K9TILBAKE ->
+                Set.of(FagsakYtelseType.PLEIEPENGER_SYKT_BARN, FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE, FagsakYtelseType.OPPLÆRINGSPENGER, FagsakYtelseType.OMSORGSPENGER, FagsakYtelseType.FRISINN);
+            default -> throw new IllegalArgumentException("Ikke-støttet applikasjonsnavn " + ApplicationName.hvilkenTilbakeAppName());
+        };
+        ytelseTypeKoder = ytelsetyper.stream().map(FagsakYtelseType::getKode).toList();
     }
 
     private Class<?> extractClass(ProsessTaskHandler bean) {
@@ -157,7 +155,7 @@ public class StatistikkRepository {
         /* siden fagsak endrer status må vi ta hensyn til at noen verdier vil gå til 0, ellers vises siste verdi i stedet. */
         var zeroValues = emptyEvents(metricName,
             Map.of(
-                "ytelse_type", YTELSER,
+                "ytelse_type", ytelseTypeKoder,
                 "fagsak_status", FAGSAK_STATUS),
             Map.of(
                 metricField, BigInteger.ZERO));
@@ -205,7 +203,7 @@ public class StatistikkRepository {
         /* siden aksjonspunkt endrer status må vi ta hensyn til at noen verdier vil gå til 0, ellers vises siste verdi i stedet. */
         var zeroValues = emptyEvents(metricName,
             Map.of(
-                "ytelse_type", YTELSER,
+                "ytelse_type", ytelseTypeKoder,
                 "behandling_type", BEHANDLING_TYPER,
                 "behandling_resultat_type", BEHANDLING_RESULTAT_TYPER),
             Map.of(
@@ -225,7 +223,7 @@ public class StatistikkRepository {
             "      from fagsak f" +
             "      inner join behandling b on b.fagsak_id=f.id" +
             "      group by 1, 2, 3" +
-            "      order by 1, 2;";
+            "      order by 1, 2, 3;";
 
         NativeQuery<Tuple> query = (NativeQuery<Tuple>) entityManager.createNativeQuery(sql, Tuple.class);
         Stream<Tuple> stream = query.getResultStream();
@@ -245,7 +243,7 @@ public class StatistikkRepository {
         /* siden behandling endrer status må vi ta hensyn til at noen verdier vil gå til 0, ellers vises siste verdi i stedet. */
         var zeroValues = emptyEvents(metricName,
             Map.of(
-                "ytelse_type", YTELSER,
+                "ytelse_type", ytelseTypeKoder,
                 "behandling_type", BEHANDLING_TYPER,
                 "behandling_status", BEHANDLING_STATUS),
             Map.of(
@@ -286,7 +284,7 @@ public class StatistikkRepository {
         /* siden aksjonspunkt endrer status må vi ta hensyn til at noen verdier vil gå til 0, ellers vises siste verdi i stedet. */
         var zeroValues = emptyEvents(metricName,
             Map.of(
-                "ytelse_type", YTELSER,
+                "ytelse_type", ytelseTypeKoder,
                 "aksjonspunkt", AKSJONSPUNKTER,
                 "aksjonspunkt_status", AKSJONSPUNKT_STATUSER),
             Map.of(
@@ -338,7 +336,7 @@ public class StatistikkRepository {
                         "behandlingId", behandlingId),
                     tidsstempel);
             })
-            .collect(Collectors.toList());
+            .toList();
 
         return values;
 
@@ -377,7 +375,7 @@ public class StatistikkRepository {
         /* siden aksjonspunkt endrer status må vi ta hensyn til at noen verdier vil gå til 0, ellers vises siste verdi i stedet. */
         var zeroValues = emptyEvents(metricName,
             Map.of(
-                "ytelse_type", YTELSER,
+                "ytelse_type", ytelseTypeKoder,
                 "prosess_task_type", taskTyper,
                 "status", PROSESS_TASK_STATUSER),
             Map.of(
@@ -446,7 +444,7 @@ public class StatistikkRepository {
                         "gruppe_sekvensnr", gruppeSekvensnr == null ? UDEFINERT : gruppeSekvensnr.toString()),
                     tidsstempel);
             })
-            .collect(Collectors.toList());
+            .toList();
 
         return values;
     }
@@ -485,9 +483,9 @@ public class StatistikkRepository {
         return values;
     }
 
-    private static FagsakYtelseType mapFagområdeTilYtelseType(String fagområdeKode){
+    private static FagsakYtelseType mapFagområdeTilYtelseType(String fagområdeKode) {
         FagOmrådeKode fagOmrådeKode = FagOmrådeKode.fraKode(fagområdeKode);
-        return switch (fagOmrådeKode){
+        return switch (fagOmrådeKode) {
             case FORELDREPENGER -> FagsakYtelseType.FORELDREPENGER;
             case ENGANGSSTØNAD -> FagsakYtelseType.ENGANGSTØNAD;
             case SVANGERSKAPSPENGER -> FagsakYtelseType.SVANGERSKAPSPENGER;
