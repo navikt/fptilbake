@@ -23,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.Hendelse;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.SelvbetjeningMelding;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.producer.SelvbetjeningMeldingProducer;
+import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.producer.OnpremSelvbetjeningMeldingProducer;
 
 @ApplicationScoped
 public class SelvbetjeningTjeneste {
@@ -33,6 +34,7 @@ public class SelvbetjeningTjeneste {
     private BrevSporingRepository brevSporingRepository;
     private BehandlingRepository behandlingRepository;
     private SelvbetjeningMeldingProducer meldingProducer;
+    private OnpremSelvbetjeningMeldingProducer onpremMeldingProducer;
     private PersoninfoAdapter aktørConsumer;
 
     SelvbetjeningTjeneste() {
@@ -42,10 +44,12 @@ public class SelvbetjeningTjeneste {
     @Inject
     public SelvbetjeningTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                  SelvbetjeningMeldingProducer meldingProducer,
+                                 OnpremSelvbetjeningMeldingProducer onpremMeldingProducer,
                                  PersoninfoAdapter aktørConsumer) {
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.meldingProducer = meldingProducer;
+        this.onpremMeldingProducer = onpremMeldingProducer;
         this.aktørConsumer = aktørConsumer;
     }
 
@@ -58,7 +62,11 @@ public class SelvbetjeningTjeneste {
         SelvbetjeningMelding svInfo = lagSelvbetjeningMelding(behandling, varselSporing, aktørId, personIdent.get(), hendelse);
 
         logMelding("Sender", hendelse, personIdent.get());
-        meldingProducer.sendMelding(svInfo);
+        if (ENV.isProd()) {
+            onpremMeldingProducer.sendMelding(svInfo);
+        } else {
+            meldingProducer.sendMelding(svInfo);
+        }
         logMelding("Sendte", hendelse, personIdent.get());
     }
 
@@ -75,19 +83,19 @@ public class SelvbetjeningTjeneste {
 
         LocalDateTime nå = LocalDateTime.now();
         SelvbetjeningMelding.Builder meldingsBuilder = SelvbetjeningMelding.builder()
-                .medAktørId(aktørId)
-                .medNorskIdent(personIdent)
-                .medSaksnummer(saksnummer)
-                .medDialogId(saksnummer.getVerdi()) // unik referanse, saksnummer er akkurat unikt nok
-                .medYtelseType(fagsak.getFagsakYtelseType())
-                .medDokumentId(varselSporing.getDokumentId())
-                .medHendelse(hendelse)
-                .medOpprettet(nå);
+            .medAktørId(aktørId)
+            .medNorskIdent(personIdent)
+            .medSaksnummer(saksnummer)
+            .medDialogId(saksnummer.getVerdi()) // unik referanse, saksnummer er akkurat unikt nok
+            .medYtelseType(fagsak.getFagsakYtelseType())
+            .medDokumentId(varselSporing.getDokumentId())
+            .medHendelse(hendelse)
+            .medOpprettet(nå);
 
         if (Hendelse.TILBAKEKREVING_SPM.equals(hendelse)) {
             meldingsBuilder
-                    .medJournalpostId(varselSporing.getJournalpostId())
-                    .medGyldigTil(nå.plusWeeks(3).toLocalDate());
+                .medJournalpostId(varselSporing.getJournalpostId())
+                .medGyldigTil(nå.plusWeeks(3).toLocalDate());
         }
 
         return meldingsBuilder.build();
