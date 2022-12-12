@@ -454,16 +454,18 @@ public class StatistikkRepository {
     Collection<SensuEvent> meldingerFraØkonomiStatistikk() {
 
         String sql = """
-            select tidspunkt, meldingstype, count(*) as antall
+            select tidspunkt, meldingstype, fagomraade, count(*) as antall
             from (
               select opprettet_tid as tidspunkt,
               case
                 when melding like '<?xml version="1.0" encoding="utf-8"?><urn:detaljertKravgrunnlagMelding%' then 'KRAVGRUNNLAG' 
                 when melding like '<?xml version="1.0" encoding="utf-8"?><urn:endringKravOgVedtakstatus%' then 'STATUSMELDING'
-                else 'UKJENT' end as meldingstype
+                else 'UKJENT' end as meldingstype,
+                cast(regexp_substr(melding, 'kodeStatusKrav>([^<]*)<', 1, 1, null, 1) as varchar2(10 char)) as status,
+                cast(regexp_substr(melding, 'kodeFagomraade>([^<]*)<', 1, 1, null, 1) as varchar2(10 char)) as fagomraade
               from K9TILBAKE.OKO_XML_MOTTATT
             )
-            group by dato, meldingstype;
+            group by tidspunkt, meldingstype, status, fagomraade;
             """;
 
         String metricName = "meldinger_fra_OS_v1";
@@ -471,8 +473,11 @@ public class StatistikkRepository {
         NativeQuery<Tuple> query = (NativeQuery<Tuple>) entityManager.createNativeQuery(sql, Tuple.class);
         Stream<Tuple> stream = query.getResultStream();
         var values = stream.map(t -> SensuEvent.createSensuEvent(metricName,
-                Map.of("meldingstype", t.get(1, String.class)),
-                Map.of("totalt_antall", t.get(2, BigInteger.class)),
+                Map.of("meldingstype", t.get(1, String.class),
+                    "status", t.get(2, String.class),
+                    "fagomraade", t.get(3, String.class)
+                ),
+                Map.of("totalt_antall", t.get(4, BigInteger.class)),
                 t.get(0, Timestamp.class).getTime()))
             .collect(Collectors.toCollection(LinkedHashSet::new));
         return values;
