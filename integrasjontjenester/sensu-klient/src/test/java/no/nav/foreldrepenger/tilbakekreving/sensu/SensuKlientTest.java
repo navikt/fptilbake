@@ -15,7 +15,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +27,16 @@ class SensuKlientTest {
     private static SensuKlient sensuKlient;
 
     private BlockingQueue<String> socketOutput = new ArrayBlockingQueue<>(100);
+
+    @BeforeAll
+    static void beforeAll() {
+        System.setProperty("app.name", "local-app");
+    }
+
+    @AfterAll
+    static void afterAll() {
+        System.clearProperty("app.name");
+    }
 
     private static final String expectedJsonBeforeTimestamp = "{" +
             "\"name\":\"sensu-event-local-app\"," +
