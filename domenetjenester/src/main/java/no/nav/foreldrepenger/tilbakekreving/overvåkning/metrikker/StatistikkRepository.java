@@ -1,9 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.overvåkning.metrikker;
 
 import java.math.BigInteger;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -72,11 +76,14 @@ public class StatistikkRepository {
     static final String PROSESS_TASK_VER = "v1";
     private final Set<String> taskTyper;
     private final List<String> ytelseTypeKoder;
+    private final Period kravgrunnlagOppdateringsperiode;
 
     private EntityManager entityManager;
 
     @Inject
-    public StatistikkRepository(EntityManager entityManager, @Any Instance<ProsessTaskHandler> handlers) {
+    public StatistikkRepository(EntityManager entityManager,
+                                @Any Instance<ProsessTaskHandler> handlers,
+                                @KonfigVerdi(value = "metrikker.kravgrunnlag.oppdateringsperiode", defaultVerdi = "PT1Y") Period kravgrunnlagOppdateringsperiode) {
         this.entityManager = entityManager;
         this.taskTyper = handlers.stream()
             .map(this::extractClass)
@@ -90,6 +97,7 @@ public class StatistikkRepository {
             default -> throw new IllegalArgumentException("Ikke-støttet applikasjonsnavn " + ApplicationName.hvilkenTilbakeAppName());
         };
         ytelseTypeKoder = ytelsetyper.stream().map(FagsakYtelseType::getKode).toList();
+        this.kravgrunnlagOppdateringsperiode = kravgrunnlagOppdateringsperiode;
     }
 
     private Class<?> extractClass(ProsessTaskHandler bean) {
@@ -452,6 +460,8 @@ public class StatistikkRepository {
 
     Collection<SensuEvent> meldingerFraØkonomiStatistikk() {
 
+        LocalDateTime startpunkt = LocalDateTime.now().minus(kravgrunnlagOppdateringsperiode);
+        Date startpunktDbTid = new Date(startpunkt.toEpochSecond(ZoneOffset.UTC));
         String sql = """
             select tidspunkt, meldingstype, fagomraade, count(*) as antall
             from (
@@ -463,13 +473,15 @@ public class StatistikkRepository {
                 cast(regexp_substr(melding, 'kodeStatusKrav>([^<]*)<', 1, 1, null, 1) as varchar2(10 char)) as status,
                 cast(regexp_substr(melding, 'kodeFagomraade>([^<]*)<', 1, 1, null, 1) as varchar2(10 char)) as fagomraade
               from K9TILBAKE.OKO_XML_MOTTATT
+              where opprettet_tid > :starttid
             )
             group by tidspunkt, meldingstype, status, fagomraade;
             """;
 
         String metricName = "meldinger_fra_OS_v1";
 
-        NativeQuery<Tuple> query = (NativeQuery<Tuple>) entityManager.createNativeQuery(sql, Tuple.class);
+        NativeQuery<Tuple> query = (NativeQuery<Tuple>) entityManager.createNativeQuery(sql, Tuple.class)
+            .setParameter("starttid", startpunktDbTid);
         Stream<Tuple> stream = query.getResultStream();
         var values = stream.map(t -> SensuEvent.createSensuEvent(metricName,
                 Map.of("meldingstype", t.get(1, String.class),
