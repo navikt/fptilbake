@@ -113,11 +113,43 @@ public class KravgrunnlagPeriode432 extends BaseEntitet {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        KravgrunnlagPeriode432 that = (KravgrunnlagPeriode432) o;
+        return Objects.equals(periode, that.periode) &&
+            erBigDecimalLik(beløpSkattMnd, that.beløpSkattMnd) &&
+            erListeLik(kravgrunnlagBeloper433, that.kravgrunnlagBeloper433);
+    }
+
+    private boolean erBigDecimalLik(BigDecimal bd1, BigDecimal bd2) {
+        if (bd1 == null && bd2 == null)
+            return true;
+        if (bd1 == null || bd2 == null)
+            return false;
+        return bd1.compareTo(bd2) == 0;
+    }
+
+    private boolean erListeLik(List<KravgrunnlagBelop433> l1, List<KravgrunnlagBelop433> l2) {
+        if (l1 == null && l2 == null)
+            return true;
+        if (l1 == null || l2 == null)
+            return false;
+        return l1.size() == l2.size() && l2.containsAll(l1);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(periode, beløpSkattMnd, kravgrunnlagBeloper433);
+    }
+
+
+    @Override
     public String toString() {
-        return getClass().getSimpleName() + "<" + //$NON-NLS-1$
-                (id != null ? "id=" + id + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$
-                + "periode=" + periode + ", " //$NON-NLS-1$ //$NON-NLS-2$
-                + "beløpSkattMnd=" + beløpSkattMnd + ", " //$NON-NLS-1$ //$NON-NLS-2$
-                + ">";//$NON-NLS-1$
+        return "KravgrunnlagPeriode432{" +
+            "periode=" + periode +
+            ", beløpSkattMnd=" + beløpSkattMnd +
+            ", kravgrunnlagBeloper433=" + kravgrunnlagBeloper433 +
+            '}';
     }
 }

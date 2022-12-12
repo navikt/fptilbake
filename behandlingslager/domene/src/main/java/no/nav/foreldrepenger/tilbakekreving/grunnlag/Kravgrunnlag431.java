@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.grunnlag;
 
+import static no.nav.vedtak.log.util.LoggerUtils.mask;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -199,20 +201,42 @@ public class Kravgrunnlag431 extends BaseEntitet {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         Kravgrunnlag431 that = (Kravgrunnlag431) o;
         return Objects.equals(eksternKravgrunnlagId, that.eksternKravgrunnlagId) &&
-                Objects.equals(vedtakId, that.vedtakId);
+            Objects.equals(vedtakId, that.vedtakId) &&
+            kravStatusKode == that.kravStatusKode &&
+            fagOmrådeKode == that.fagOmrådeKode &&
+            Objects.equals(fagSystemId, that.fagSystemId) &&
+            Objects.equals(vedtakFagSystemDato, that.vedtakFagSystemDato) &&
+            Objects.equals(omgjortVedtakId, that.omgjortVedtakId) &&
+            Objects.equals(gjelderVedtakId, that.gjelderVedtakId) &&
+            gjelderType == that.gjelderType &&
+            Objects.equals(utbetalesTilId, that.utbetalesTilId) &&
+            utbetGjelderType == that.utbetGjelderType &&
+            Objects.equals(hjemmelKode, that.hjemmelKode) &&
+            Objects.equals(beregnesRenter, that.beregnesRenter) &&
+            Objects.equals(ansvarligEnhet, that.ansvarligEnhet) &&
+            Objects.equals(bostedEnhet, that.bostedEnhet) &&
+            Objects.equals(behandlendeEnhet, that.behandlendeEnhet) &&
+            Objects.equals(kontrollFelt, that.kontrollFelt) &&
+            Objects.equals(saksBehId, that.saksBehId) &&
+            Objects.equals(referanse, that.referanse) &&
+            erListeLik(perioder, that.perioder);
+    }
+
+    private boolean erListeLik(List<KravgrunnlagPeriode432> l1, List<KravgrunnlagPeriode432> l2) {
+        if (l1 == null && l2 == null)
+            return true;
+        if (l1 == null || l2 == null)
+            return false;
+        return l1.size() == l2.size() && l2.containsAll(l1);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(eksternKravgrunnlagId, vedtakId);
+        return Objects.hash(eksternKravgrunnlagId, vedtakId, kravStatusKode, fagOmrådeKode, fagSystemId, vedtakFagSystemDato, omgjortVedtakId, gjelderVedtakId, gjelderType, utbetalesTilId, utbetGjelderType, hjemmelKode, beregnesRenter, ansvarligEnhet, bostedEnhet, behandlendeEnhet, kontrollFelt, saksBehId, referanse, perioder);
     }
 
     public static Builder builder() {
@@ -334,11 +358,27 @@ public class Kravgrunnlag431 extends BaseEntitet {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<" + //$NON-NLS-1$
-                (id != null ? "id=" + id + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$
-                + "vedtakId=" + vedtakId + "," //$NON-NLS-1$ //$NON-NLS-2$
-                + "kravStatusKode='" + kravStatusKode //$NON-NLS-1$ //$NON-NLS-2$
-                + ">"; //$NON-NLS-1$
+        return "Kravgrunnlag431{" +
+            "eksternKravgrunnlagId='" + eksternKravgrunnlagId + '\'' +
+            ", vedtakId=" + vedtakId +
+            ", kravStatusKode=" + kravStatusKode +
+            ", fagOmrådeKode=" + fagOmrådeKode +
+            ", fagSystemId='" + fagSystemId + '\'' +
+            ", vedtakFagSystemDato=" + vedtakFagSystemDato +
+            ", omgjortVedtakId=" + omgjortVedtakId +
+            ", gjelderVedtakId='" + mask(gjelderVedtakId) + '\'' +
+            ", gjelderType=" + gjelderType +
+            ", utbetalesTilId='" + mask(utbetalesTilId) + '\'' +
+            ", utbetGjelderType=" + utbetGjelderType +
+            ", hjemmelKode='" + hjemmelKode + '\'' +
+            ", beregnesRenter='" + beregnesRenter + '\'' +
+            ", ansvarligEnhet='" + ansvarligEnhet + '\'' +
+            ", bostedEnhet='" + bostedEnhet + '\'' +
+            ", behandlendeEnhet='" + behandlendeEnhet + '\'' +
+            ", kontrollFelt='" + kontrollFelt + '\'' +
+            ", saksBehId='" + saksBehId + '\'' +
+            ", referanse=" + referanse +
+            ", perioder=" + perioder +
+            '}';
     }
-
 }
