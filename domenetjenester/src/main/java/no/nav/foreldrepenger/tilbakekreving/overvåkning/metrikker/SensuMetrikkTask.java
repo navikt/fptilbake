@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.sensu.SensuEvent;
 import no.nav.foreldrepenger.tilbakekreving.sensu.SensuKlient;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -29,6 +30,7 @@ public class SensuMetrikkTask implements ProsessTaskHandler {
     static final String TASKTYPE = "sensu.metrikk.task";
 
     private static final Logger log = LoggerFactory.getLogger(SensuMetrikkTask.class);
+    private boolean lansert;
 
     private SensuKlient sensuKlient;
 
@@ -39,13 +41,20 @@ public class SensuMetrikkTask implements ProsessTaskHandler {
     }
 
     @Inject
-    public SensuMetrikkTask(SensuKlient sensuKlient, StatistikkRepository statistikkRepository) {
+    public SensuMetrikkTask(SensuKlient sensuKlient,
+                            StatistikkRepository statistikkRepository,
+                            @KonfigVerdi(value = "toggle.enable.sensu", defaultVerdi = "false") boolean lansert) {
         this.sensuKlient = sensuKlient;
         this.statistikkRepository = statistikkRepository;
+        this.lansert = lansert;
     }
 
     @Override
     public void doTask(ProsessTaskData data) {
+        if (!lansert) {
+            return;
+        }
+
         long startTime = System.nanoTime();
 
         try {

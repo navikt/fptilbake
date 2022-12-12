@@ -39,6 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.sensu.SensuEvent;
@@ -475,12 +476,28 @@ public class StatistikkRepository {
         var values = stream.map(t -> SensuEvent.createSensuEvent(metricName,
                 Map.of("meldingstype", t.get(1, String.class),
                     "status", t.get(2, String.class),
-                    "fagomraade", t.get(3, String.class)
+                    "fagomraade", t.get(3, String.class),
+                    "ytelseType", mapFagområdeTilYtelseType(t.get(3, String.class)).getKode()
                 ),
                 Map.of("totalt_antall", t.get(4, BigInteger.class)),
                 t.get(0, Timestamp.class).getTime()))
             .collect(Collectors.toCollection(LinkedHashSet::new));
         return values;
+    }
+
+    private static FagsakYtelseType mapFagområdeTilYtelseType(String fagområdeKode){
+        FagOmrådeKode fagOmrådeKode = FagOmrådeKode.fraKode(fagområdeKode);
+        return switch (fagOmrådeKode){
+            case FORELDREPENGER -> FagsakYtelseType.FORELDREPENGER;
+            case ENGANGSSTØNAD -> FagsakYtelseType.ENGANGSTØNAD;
+            case SVANGERSKAPSPENGER -> FagsakYtelseType.SVANGERSKAPSPENGER;
+            case PLEIEPENGER_SYKT_BARN -> FagsakYtelseType.PLEIEPENGER_SYKT_BARN;
+            case PLEIEPENGER_NÆRSTÅENDE -> FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE;
+            case OMSORGSPENGER -> FagsakYtelseType.OMSORGSPENGER;
+            case OPPLÆRINGSPENGER -> FagsakYtelseType.OPPLÆRINGSPENGER;
+            case FRISINN -> FagsakYtelseType.FRISINN;
+            default -> FagsakYtelseType.UDEFINERT; //alt som ikke er forventet, mappes til udefinert, så kan man evt. overvåke det i grafana
+        };
     }
 
     Collection<SensuEvent> behandlingerOpprettet() {
