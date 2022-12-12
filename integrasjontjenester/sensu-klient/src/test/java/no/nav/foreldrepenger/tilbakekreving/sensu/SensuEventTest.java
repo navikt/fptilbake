@@ -5,9 +5,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Map;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class SensuEventTest {
+
+    @BeforeAll
+    static void beforeAll() {
+        System.setProperty("app.name", "k9-tilbake");
+    }
+
+    @AfterAll
+    static void afterAll() {
+        System.clearProperty("app.name");
+    }
 
     @Test
     void toSensuRequest_illegal_state_exception_metrikk_felter_kan_ikke_være_tomt() {
