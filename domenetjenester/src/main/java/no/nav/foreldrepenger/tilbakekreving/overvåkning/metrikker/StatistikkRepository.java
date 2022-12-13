@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.overvåkning.metrikker;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -168,7 +167,7 @@ public class StatistikkRepository {
             toMap(
                 "ytelse_type", t.get(0, String.class),
                 "fagsak_status", t.get(1, String.class)),
-            Map.of("totalt_antall", t.get(2, BigInteger.class)))).collect(Collectors.toCollection(LinkedHashSet::new));
+            Map.of("totalt_antall", t.get(2, BigDecimal.class)))).collect(Collectors.toCollection(LinkedHashSet::new));
 
         /* siden fagsak endrer status må vi ta hensyn til at noen verdier vil gå til 0, ellers vises siste verdi i stedet. */
         var zeroValues = emptyEvents(metricName,
@@ -176,7 +175,7 @@ public class StatistikkRepository {
                 "ytelse_type", ytelseTypeKoder,
                 "fagsak_status", FAGSAK_STATUS),
             Map.of(
-                metricField, BigInteger.ZERO));
+                metricField, BigDecimal.ZERO));
 
         values.addAll(zeroValues); // NB: utnytter at Set#addAll ikke legger til verdier som ikke finnes fra før
 
@@ -204,7 +203,7 @@ public class StatistikkRepository {
                     "behandling_type", t.get(1, String.class),
                     "behandling_status", t.get(2, String.class)),
                 Map.of(
-                    metricField, t.get(3, BigInteger.class))))
+                    metricField, t.get(3, BigDecimal.class))))
             .collect(Collectors.toCollection(LinkedHashSet::new));
 
         /* siden behandling endrer status må vi ta hensyn til at noen verdier vil gå til 0, ellers vises siste verdi i stedet. */
@@ -214,7 +213,7 @@ public class StatistikkRepository {
                 "behandling_type", BEHANDLING_TYPER,
                 "behandling_status", BEHANDLING_STATUS),
             Map.of(
-                metricField, BigInteger.ZERO));
+                metricField, BigDecimal.ZERO));
 
         values.addAll(zeroValues); // NB: utnytter at Set#addAll ikke legger til verdier som ikke finnes fra før
 
@@ -245,7 +244,7 @@ public class StatistikkRepository {
                     "aksjonspunkt", t.get(1, String.class),
                     "aksjonspunkt_status", t.get(2, String.class)),
                 Map.of(
-                    metricField, t.get(3, BigInteger.class))))
+                    metricField, t.get(3, BigDecimal.class))))
             .collect(Collectors.toCollection(LinkedHashSet::new));
 
         /* siden aksjonspunkt endrer status må vi ta hensyn til at noen verdier vil gå til 0, ellers vises siste verdi i stedet. */
@@ -255,7 +254,7 @@ public class StatistikkRepository {
                 "aksjonspunkt", AKSJONSPUNKTER,
                 "aksjonspunkt_status", AKSJONSPUNKT_STATUSER),
             Map.of(
-                metricField, BigInteger.ZERO));
+                metricField, BigDecimal.ZERO));
 
         values.addAll(zeroValues); // NB: utnytter at Set#addAll ikke legger til verdier som ikke finnes fra før
 
@@ -285,7 +284,7 @@ public class StatistikkRepository {
         var values = stream.map(t -> {
                 String ytelseType = t.get(0, String.class);
                 String saksnummer = t.get(1, String.class);
-                String behandlingId = t.get(2, BigInteger.class).toString();
+                String behandlingId = t.get(2, BigDecimal.class).toString();
                 String aksjonspunktKode = t.get(3, String.class);
                 String aksjonspunktNavn = coalesce(AksjonspunktDefinisjon.kodeMap().getOrDefault(aksjonspunktKode, AksjonspunktDefinisjon.UNDEFINED).getNavn(), UDEFINERT);
                 String aksjonspunktStatus = t.get(4, String.class);
@@ -345,7 +344,7 @@ public class StatistikkRepository {
                 "prosess_task_type", taskTyper,
                 "status", PROSESS_TASK_STATUSER),
             Map.of(
-                metricField, BigInteger.ZERO));
+                metricField, BigDecimal.ZERO));
 
         values.addAll(zeroValues); // NB: utnytter at Set#addAll ikke legger til verdier som ikke finnes fra før
 
@@ -388,12 +387,12 @@ public class StatistikkRepository {
                 String sisteFeil = finnStacktraceStartFra(t.get(6, String.class), 500).orElse(UDEFINERT);
                 String taskParams = t.get(7, String.class);
 
-                BigInteger blokkertAvId = t.get(8, BigInteger.class);
+                BigDecimal blokkertAvId = t.get(8, BigDecimal.class);
                 String blokkertAv = blokkertAvId == null ? null : blokkertAvId.toString();
 
                 String opprettetTid = t.get(9, Timestamp.class).toInstant().toString();
 
-                var gruppeSekvensnr = t.get(10, BigInteger.class);
+                var gruppeSekvensnr = t.get(10, BigDecimal.class);
 
                 return SensuEvent.createSensuEvent(metricName,
                     toMap(
@@ -494,7 +493,7 @@ public class StatistikkRepository {
         Stream<Tuple> stream = query.getResultStream();
         var values = stream.map(t -> SensuEvent.createSensuEvent(metricName,
                 Map.of("meldingstype", t.get(1, String.class)),
-                Map.of("totalt_antall", t.get(2, BigInteger.class)),
+                Map.of("totalt_antall", t.get(2, BigDecimal.class)),
                 t.get(0, Timestamp.class).getTime()))
             .collect(Collectors.toCollection(LinkedHashSet::new));
         return values;
@@ -524,7 +523,7 @@ public class StatistikkRepository {
                     "saksbehandlingType", t.get(3, String.class),
                     "ytelseType", t.get(4, String.class)
                 ),
-                Map.of("totalt_antall", t.get(2, BigInteger.class)),
+                Map.of("totalt_antall", t.get(2, BigDecimal.class)),
                 t.get(0, Timestamp.class).getTime()))
             .collect(Collectors.toCollection(LinkedHashSet::new));
         return values;
@@ -549,7 +548,7 @@ public class StatistikkRepository {
                 Map.of("brev_type", t.get(1, String.class),
                     "ytelseType", t.get(2, String.class)
                 ),
-                Map.of("totalt_antall", t.get(3, BigInteger.class)),
+                Map.of("totalt_antall", t.get(3, BigDecimal.class)),
                 t.get(0, Timestamp.class).getTime()))
             .collect(Collectors.toCollection(LinkedHashSet::new));
         return values;
