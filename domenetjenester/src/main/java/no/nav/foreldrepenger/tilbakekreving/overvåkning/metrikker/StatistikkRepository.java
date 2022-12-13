@@ -133,7 +133,7 @@ public class StatistikkRepository {
 
 
         //tilpasset for k9/fp-tilbake
-        metrikker.addAll(timeCall(this::meldingerFraØkonomiStatistikk, "meldingerFraØknomiStatistikk"));
+        //metrikker.addAll(timeCall(this::meldingerFraØkonomiStatistikk, "meldingerFraØknomiStatistikk"));
         metrikker.addAll(timeCall(this::behandlingerOpprettet, "behandlingerOpprettet"));
         metrikker.addAll(timeCall(this::behandlingVedtak, "behandlingVedtak"));
         metrikker.addAll(timeCall(this::brevsporing, "brevsporing"));
