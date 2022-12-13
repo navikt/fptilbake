@@ -32,6 +32,7 @@ import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyIntegrasjonResponsSammenligner;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
@@ -92,6 +93,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
     private final PersoninfoAdapter tpsTjenesteMock = mock(PersoninfoAdapter.class);
     private final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(tpsTjenesteMock);
     private final ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
+    private final ØkonomiProxyIntegrasjonResponsSammenligner økonomiProxyIntegrasjonResponsSammenligner = mock(ØkonomiProxyIntegrasjonResponsSammenligner.class);
     private final BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
     private final FagsystemKlient fagsystemKlientMock = mock(FagsystemKlient.class);
 
@@ -130,7 +132,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
                 behandlingskontrollProvider, fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock, Period.ofWeeks(4));
         HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(
                 mottattXmlRepository, grunnlagRepository, hentKravgrunnlagMapper, lesKravgrunnlagMapper, behandlingTjeneste,
-                økonomiConsumerMock, fagsystemKlientMock);
+                økonomiConsumerMock, fagsystemKlientMock, økonomiProxyIntegrasjonResponsSammenligner); // TODO: fiks test
         håndterGamleKravgrunnlagTask = new HåndterGamleKravgrunnlagTask(håndterGamleKravgrunnlagTjeneste);
 
         behandling = ScenarioSimple.simple().lagMocked();
@@ -142,6 +144,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
         when(fagsystemKlientMock.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingData(eksternBehandlingsinfoDto));
         when(fagsystemKlientMock.hentBehandlingOptional(any(UUID.class))).thenReturn(Optional.of(eksternBehandlingsinfoDto));
         when(fagsystemKlientMock.hentBehandling(any(UUID.class))).thenReturn(eksternBehandlingsinfoDto);
+
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML());
     }
 

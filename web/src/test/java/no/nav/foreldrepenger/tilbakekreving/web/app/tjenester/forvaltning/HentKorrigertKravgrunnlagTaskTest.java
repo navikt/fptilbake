@@ -29,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyIntegrasjonResponsSammenligner;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
@@ -64,6 +65,7 @@ public class HentKorrigertKravgrunnlagTaskTest {
     private final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(tpsAdapterMock);
     private final ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
     private final FagsystemKlient fagsystemKlient = mock(FagsystemKlient.class);
+    private final ØkonomiProxyIntegrasjonResponsSammenligner økonomiProxyIntegrasjonSammenligner = mock(ØkonomiProxyIntegrasjonResponsSammenligner.class);
     private KravgrunnlagRepository kravgrunnlagRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private HentKorrigertKravgrunnlagTask hentKorrigertGrunnlagTask;
@@ -77,7 +79,7 @@ public class HentKorrigertKravgrunnlagTaskTest {
         kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         HentKravgrunnlagMapper hentKravgrunnlagMapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
-        hentKorrigertGrunnlagTask = new HentKorrigertKravgrunnlagTask(repositoryProvider, hentKravgrunnlagMapper, økonomiConsumerMock, fagsystemKlient);
+        hentKorrigertGrunnlagTask = new HentKorrigertKravgrunnlagTask(repositoryProvider, hentKravgrunnlagMapper, økonomiConsumerMock, fagsystemKlient, økonomiProxyIntegrasjonSammenligner);
 
         entityManager.setFlushMode(FlushModeType.AUTO);
         ScenarioSimple scenarioSimple = ScenarioSimple.simple();

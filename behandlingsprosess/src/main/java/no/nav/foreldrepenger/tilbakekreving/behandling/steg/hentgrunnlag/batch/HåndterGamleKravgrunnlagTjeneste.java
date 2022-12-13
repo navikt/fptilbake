@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyIntegrasjonResponsSammenligner;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagXmlUnmarshaller;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
@@ -49,6 +50,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
     private BehandlingTjeneste behandlingTjeneste;
     private ØkonomiConsumer økonomiConsumer;
     private FagsystemKlient fagsystemKlient;
+    private ØkonomiProxyIntegrasjonResponsSammenligner økonomiProxyIntegrasjonSammenligner;
 
     HåndterGamleKravgrunnlagTjeneste() {
         // for CDI proxy
@@ -61,7 +63,8 @@ public class HåndterGamleKravgrunnlagTjeneste {
                                             KravgrunnlagMapper kravgrunnlagMapper,
                                             BehandlingTjeneste behandlingTjeneste,
                                             ØkonomiConsumer økonomiConsumer,
-                                            FagsystemKlient fagsystemKlient) {
+                                            FagsystemKlient fagsystemKlient,
+                                            ØkonomiProxyIntegrasjonResponsSammenligner økonomiProxyIntegrasjonSammenligner) {
         this.mottattXmlRepository = mottattXmlRepository;
         this.grunnlagRepository = grunnlagRepository;
         this.hentKravgrunnlagMapper = hentKravgrunnlagMapper;
@@ -69,6 +72,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
         this.behandlingTjeneste = behandlingTjeneste;
         this.økonomiConsumer = økonomiConsumer;
         this.fagsystemKlient = fagsystemKlient;
+        this.økonomiProxyIntegrasjonSammenligner = økonomiProxyIntegrasjonSammenligner;
     }
 
     protected KravgrunnlagMedStatus hentKravgrunnlagFraØkonomi(ØkonomiXmlMottatt økonomiXmlMottatt) {
@@ -77,9 +81,15 @@ public class HåndterGamleKravgrunnlagTjeneste {
         DetaljertKravgrunnlag detaljertKravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, melding);
         HentKravgrunnlagDetaljDto hentKravgrunnlagDetalj = forberedHentKravgrunnlagRequest(detaljertKravgrunnlag);
         try {
+            // Gammel
             DetaljertKravgrunnlagDto detaljertKravgrunnlagDto = økonomiConsumer.hentKravgrunnlag(null, hentKravgrunnlagDetalj);
             LOG.info("Referanse fra WS: {}", detaljertKravgrunnlagDto.getReferanse());
-            return KravgrunnlagMedStatus.forIkkeSperretKravgrunnlag(hentKravgrunnlagMapper.mapTilDomene(detaljertKravgrunnlagDto));
+            var kravgrunnlag = hentKravgrunnlagMapper.mapTilDomene(detaljertKravgrunnlagDto);
+
+            // NY
+            økonomiProxyIntegrasjonSammenligner.hentKravgrunnlagFraFpwsproxyOgSammenlignFailsafe(null, hentKravgrunnlagDetalj, kravgrunnlag);
+
+            return KravgrunnlagMedStatus.forIkkeSperretKravgrunnlag(kravgrunnlag);
         } catch (ManglendeKravgrunnlagException e) {
             LOG.info("Kravgrunnlag mangler i økonomi med følgende respons:{}", e.getMessage());
             arkiverMotattXml(mottattXmlId, melding);

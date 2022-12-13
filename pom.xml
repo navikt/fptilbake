@@ -184,6 +184,11 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>sensu-klient</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>kravgrunnlag-queue</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -310,6 +315,11 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.kontrakter.topics</groupId>
                 <artifactId>fp-topics-behandlingsprosess</artifactId>
+                <version>${fpkontrakter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.kontrakter</groupId>
+                <artifactId>fp-ws-proxy-v1</artifactId>
                 <version>${fpkontrakter.version}</version>
             </dependency>
             <dependency>
