@@ -45,6 +45,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.sensu.SensuEvent;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -90,11 +91,19 @@ public class StatistikkRepository {
             .map(it -> it.getAnnotation(ProsessTask.class).value())
             .collect(Collectors.toSet());
 
-        Set<FagsakYtelseType> ytelsetyper = switch (ApplicationName.hvilkenTilbake()) {
-            case FPTILBAKE -> Set.of(FagsakYtelseType.FORELDREPENGER, FagsakYtelseType.SVANGERSKAPSPENGER, FagsakYtelseType.ENGANGSTØNAD);
-            case K9TILBAKE ->
-                Set.of(FagsakYtelseType.PLEIEPENGER_SYKT_BARN, FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE, FagsakYtelseType.OPPLÆRINGSPENGER, FagsakYtelseType.OMSORGSPENGER, FagsakYtelseType.FRISINN);
-            default -> throw new IllegalArgumentException("Ikke-støttet applikasjonsnavn " + ApplicationName.hvilkenTilbakeAppName());
+        Fagsystem fagsystem = ApplicationName.hvilkenTilbake();
+        Set<FagsakYtelseType> ytelsetyper = switch (fagsystem) {
+            case FPTILBAKE -> Set.of(
+                FagsakYtelseType.FORELDREPENGER,
+                FagsakYtelseType.SVANGERSKAPSPENGER,
+                FagsakYtelseType.ENGANGSTØNAD);
+            case K9TILBAKE -> Set.of(
+                FagsakYtelseType.PLEIEPENGER_SYKT_BARN,
+                FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE,
+                FagsakYtelseType.OPPLÆRINGSPENGER,
+                FagsakYtelseType.OMSORGSPENGER,
+                FagsakYtelseType.FRISINN);
+            default -> throw new IllegalArgumentException("Ikke-støttet applikasjon: " + fagsystem);
         };
         ytelseTypeKoder = ytelsetyper.stream().map(FagsakYtelseType::getKode).toList();
         this.kravgrunnlagOppdateringsperiode = kravgrunnlagOppdateringsperiode;

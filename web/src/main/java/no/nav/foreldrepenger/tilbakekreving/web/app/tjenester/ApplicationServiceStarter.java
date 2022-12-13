@@ -11,7 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.hotspot.DefaultExports;
 import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.VedtakConsumer;
+import no.nav.foreldrepenger.tilbakekreving.sensu.SensuKlient;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.felles.integrasjon.jms.QueueConsumerManager;
 import no.nav.vedtak.felles.prosesstask.impl.BatchTaskScheduler;
@@ -21,7 +23,16 @@ import no.nav.vedtak.felles.prosesstask.impl.TaskManager;
 public class ApplicationServiceStarter {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationServiceStarter.class);
+    private boolean startSensuKlient;
     private List<Class<AppServiceHandler>> services = new ArrayList<>();
+
+    public ApplicationServiceStarter() {
+        //for CDI proxy
+    }
+
+    public ApplicationServiceStarter(@KonfigVerdi(value = "toggle.enable.sensu", defaultVerdi = "false") boolean startSensuKlient) {
+        this.startSensuKlient = startSensuKlient;
+    }
 
     public void startServices() {
         DefaultExports.initialize();
@@ -29,6 +40,9 @@ public class ApplicationServiceStarter {
         start(TaskManager.class);
         start(BatchTaskScheduler.class);
         start(VedtakConsumer.class);
+        if (startSensuKlient) {
+            start(SensuKlient.class);
+        }
 
         if (Environment.current().isProd() || !"true".equalsIgnoreCase(Environment.current().getProperty("test.only.disable.mq"))) {
             startQueueConsumerManager();

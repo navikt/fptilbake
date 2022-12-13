@@ -20,7 +20,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(value = SensuMetrikkTask.TASKTYPE, cronExpression = "0 */5 * * * *", maxFailedRuns = 20, firstDelay = 60)
+@ProsessTask(value = SensuMetrikkTask.TASKTYPE, cronExpression = "0 */15 * * * *", maxFailedRuns = 20, firstDelay = 60)
 public class SensuMetrikkTask implements ProsessTaskHandler {
 
     private static final int CHUNK_EVENT_SIZE = 1000;
@@ -54,23 +54,21 @@ public class SensuMetrikkTask implements ProsessTaskHandler {
         if (!lansert) {
             return;
         }
+        log.info("Publisering vha sensu er skrudd på");
 
         long startTime = System.nanoTime();
 
         try {
             var metrikker = statistikkRepository.hentAlle();
-
             logMetrics(metrikker);
-
-            if (metrikker.size() > LOG_THRESHOLD) {
-                log.info("Generert {} metrikker til sensu", metrikker.size());
-            }
+            log.info("Generert {} metrikker til sensu", metrikker.size());
         } finally {
-
             var varighet = Duration.ofNanos(System.nanoTime() - startTime);
             if (Duration.ofSeconds(20).minus(varighet).isNegative()) {
                 // bruker for lang tid på logging av metrikker.
                 log.warn("Generering av sensu metrikker tok : " + varighet);
+            } else {
+                log.info("Generering av sensu metrikker tok : " + varighet);
             }
         }
 
