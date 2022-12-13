@@ -62,6 +62,9 @@ public class SensuMetrikkTask implements ProsessTaskHandler {
             var metrikker = statistikkRepository.hentAlle();
             logMetrics(metrikker);
             log.info("Generert {} metrikker til sensu", metrikker.size());
+        } catch (Exception e){
+            log.warn(e.getMessage(), e);
+            throw e;
         } finally {
             var varighet = Duration.ofNanos(System.nanoTime() - startTime);
             if (Duration.ofSeconds(20).minus(varighet).isNegative()) {
