@@ -83,7 +83,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Finnes ikke kravgrunnlag."),
             @ApiResponse(responseCode = "500", description = "Ukjent feil!")
         })
-    @BeskyttetRessurs(actionType = ActionType.UPDATE, property = AbacProperty.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
     public Response annulerKravgrunnlag(@Valid @NotNull HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
         Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
         try {
