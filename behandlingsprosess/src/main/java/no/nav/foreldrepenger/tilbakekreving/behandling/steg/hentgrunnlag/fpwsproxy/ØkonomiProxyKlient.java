@@ -48,7 +48,7 @@ public class ØkonomiProxyKlient {
         var request = RestRequest.newPOSTJson(hentKravgrunnlagDetaljDto, target, restConfig);
         return handleResponse(restClient.sendReturnUnhandled(request))
                 .map(r -> fromJson(r, Kravgrunnlag431Dto.class))
-                .orElseThrow(() -> new IllegalStateException("Respons fra fpwsproxy tilsier at det er funnet et kravgrunnlag men responsen er tom. Dette må sjekkes opp i! Sjekk fpwsproxy for mer info."));
+                .orElseThrow(() -> new IllegalStateException("Respons fra fpwsproxy tilsier at det er funnet et kravgrunnlag men responsen er tom. Dette må sjekkes opp i! Sjekk loggen til fpwsproxy for mer info."));
     }
 
     private static Optional<String> handleResponse(HttpResponse<String> response) {
@@ -56,7 +56,7 @@ public class ØkonomiProxyKlient {
         var body = response.body();
         if (status >= HTTP_OK && status < HTTP_MULT_CHOICE) {
             if (status == HTTP_NOT_AUTHORITATIVE && erKravgrunnlagSperret(body)) {
-                throw new SperringKravgrunnlagException("FPT-539081", "Fikk feil fra OS ved henting av kravgrunnlag. Sjekk fpwsproxy for mer info.");
+                throw new SperringKravgrunnlagException("FPT-539081", "Fikk feil fra OS ved henting av kravgrunnlag. Sjekk loggen til fpwsproxy for mer info.");
             }
             return body != null && !body.isEmpty() ? Optional.of(body) : Optional.empty();
         } else if (status == HTTP_FORBIDDEN) {
@@ -64,7 +64,7 @@ public class ØkonomiProxyKlient {
         } else if (status == HTTP_GONE && finnesIkkeKravgrunnlagPåRequest(body)) {
             throw new ManglendeKravgrunnlagException("FPT-539080", "Fikk feil fra OS ved henting av kravgrunnlag. Request er logget i secure loggs til fpwsproxy.");
         } else if (status == HTTP_INTERNAL_ERROR && kvitteringInneholderUkjentFeil(body)) {
-            throw new UkjentOppdragssystemException("FPT-539080", "Fikk feil fra OS ved henting av kravgrunnlag. Request er logget i secure loggs til fpwsproxy.");
+            throw new UkjentOppdragssystemException("FPT-539080", "Fikk feil fra OS ved henting av kravgrunnlag. Sjekk loggen til fpwsproxy for mer info.");
         } else {
             throw new IntegrasjonException("F-468817", String.format("Uventet respons %s fra FpWsProxy. Sjekk loggen til fpwsproxy for mer info.", status));
         }
