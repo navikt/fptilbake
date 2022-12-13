@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.overvåkning.metrikker;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -84,7 +85,7 @@ public class StatistikkRepository {
     @Inject
     public StatistikkRepository(EntityManager entityManager,
                                 @Any Instance<ProsessTaskHandler> handlers,
-                                @KonfigVerdi(value = "metrikker.kravgrunnlag.oppdateringsperiode", defaultVerdi = "PT1Y") Period kravgrunnlagOppdateringsperiode) {
+                                @KonfigVerdi(value = "metrikker.kravgrunnlag.oppdateringsperiode", defaultVerdi = "P1Y") Period kravgrunnlagOppdateringsperiode) {
         this.entityManager = entityManager;
         this.taskTyper = handlers.stream()
             .map(this::extractClass)
@@ -125,7 +126,6 @@ public class StatistikkRepository {
         //følgende er kopiert fra k9-sak
         metrikker.addAll(timeCall(this::fagsakStatusStatistikk, "fagsakStatusStatistikk"));
         metrikker.addAll(timeCall(this::behandlingStatusStatistikk, "behandlingStatusStatistikk"));
-        metrikker.addAll(timeCall(this::behandlingResultatStatistikk, "behandlingResultatStatistikk"));
         metrikker.addAll(timeCall(this::prosessTaskStatistikk, "prosessTaskStatistikk"));
         metrikker.addAll(timeCall(this::aksjonspunktStatistikk, "aksjonspunktStatistikk"));
         metrikker.addAll(timeCall(() -> aksjonspunktStatistikkDaglig(dag), "aksjonspunktStatistikkDaglig"));
@@ -133,7 +133,7 @@ public class StatistikkRepository {
 
 
         //tilpasset for k9/fp-tilbake
-        //metrikker.addAll(timeCall(this::meldingerFraØkonomiStatistikk, "meldingerFraØknomiStatistikk"));
+        metrikker.addAll(timeCall(this::meldingerFraØkonomiStatistikk, "meldingerFraØknomiStatistikk"));
         metrikker.addAll(timeCall(this::behandlingerOpprettet, "behandlingerOpprettet"));
         metrikker.addAll(timeCall(this::behandlingVedtak, "behandlingVedtak"));
         metrikker.addAll(timeCall(this::brevsporing, "brevsporing"));
@@ -156,7 +156,7 @@ public class StatistikkRepository {
     Collection<SensuEvent> fagsakStatusStatistikk() {
         String sql = "select f.ytelse_type, f.fagsak_status, count(*) as antall" +
             "         from fagsak f" +
-            "         group by 1, 2" +
+            "         group by f.ytelse_type, f.fagsak_status" +
             "         order by 1, 2";
 
         String metricField = "totalt_antall";
@@ -185,63 +185,12 @@ public class StatistikkRepository {
     }
 
     @SuppressWarnings("unchecked")
-    Collection<SensuEvent> behandlingResultatStatistikk() {
-
-        String sql = "select f.ytelse_type, b.behandling_type, b.behandling_resultat_type,  " +
-            "         count(*) antall, " +
-            "         count(ansvarlig_saksbehandler) filter (where ansvarlig_saksbehandler is not null) manuell_antall, " +
-            "         count(totrinnsbehandling) filter (where totrinnsbehandling=true) as totrinn " +
-            "         from fagsak f  " +
-            "         inner join behandling b on b.fagsak_id=f.id " +
-            "         where b.behandling_status IN (:statuser) and behandling_resultat_type is not null " +
-            "         group by 1, 2, 3 " +
-            "         order by 1, 2, 3 ";
-
-        NativeQuery<Tuple> query = (NativeQuery<Tuple>) entityManager.createNativeQuery(sql, Tuple.class)
-            .setParameter("statuser", Set.of(BehandlingStatus.IVERKSETTER_VEDTAK.getKode(), BehandlingStatus.AVSLUTTET.getKode()));
-
-        Stream<Tuple> stream = query.getResultStream();
-
-        String metricName = "behandling_resultat_v1";
-        String metricField1 = "totalt_antall";
-        String metricField2 = "totalt_antall_manuell";
-        String metricField3 = "totalt_antall_totrinn";
-
-        var values = stream.map(t -> SensuEvent.createSensuEvent(metricName,
-                toMap(
-                    "ytelse_type", t.get(0, String.class),
-                    "behandling_type", t.get(1, String.class),
-                    "behandling_resultat_type", t.get(2, String.class)),
-                Map.of(
-                    metricField1, t.get(3, BigInteger.class),
-                    metricField2, t.get(4, BigInteger.class),
-                    metricField3, t.get(5, BigInteger.class))))
-            .collect(Collectors.toCollection(LinkedHashSet::new));
-
-        /* siden aksjonspunkt endrer status må vi ta hensyn til at noen verdier vil gå til 0, ellers vises siste verdi i stedet. */
-        var zeroValues = emptyEvents(metricName,
-            Map.of(
-                "ytelse_type", ytelseTypeKoder,
-                "behandling_type", BEHANDLING_TYPER,
-                "behandling_resultat_type", BEHANDLING_RESULTAT_TYPER),
-            Map.of(
-                metricField1, BigInteger.ZERO,
-                metricField2, BigInteger.ZERO,
-                metricField3, BigInteger.ZERO));
-
-        values.addAll(zeroValues); // NB: utnytter at Set#addAll ikke legger til verdier som ikke finnes fra før
-
-        return values;
-
-    }
-
-    @SuppressWarnings("unchecked")
     Collection<SensuEvent> behandlingStatusStatistikk() {
         String sql = "select f.ytelse_type, b.behandling_type, b.behandling_status, count(*) as antall" +
             "      from fagsak f" +
             "      inner join behandling b on b.fagsak_id=f.id" +
-            "      group by 1, 2, 3" +
-            "      order by 1, 2, 3;";
+            "      group by f.ytelse_type, b.behandling_type, b.behandling_status" +
+            "      order by 1, 2, 3";
 
         NativeQuery<Tuple> query = (NativeQuery<Tuple>) entityManager.createNativeQuery(sql, Tuple.class);
         Stream<Tuple> stream = query.getResultStream();
@@ -281,7 +230,7 @@ public class StatistikkRepository {
             " inner join behandling b on b.id =a.behandling_id" +
             " inner join fagsak f on f.id=b.fagsak_id" +
             " where a.aksjonspunkt_status IN (:statuser)" +
-            " group by 1, 2, 3";
+            " group by f.ytelse_type, a.aksjonspunkt_def, a.aksjonspunkt_status";
 
         String metricName = "aksjonspunkt_per_ytelse_type_v1";
         String metricField = "totalt_antall";
@@ -366,12 +315,11 @@ public class StatistikkRepository {
 
         // hardkoder statuser for bedre access plan for partisjon i db
         String sql = " select coalesce(f.ytelse_type, 'NONE') as ytelse_type, p.task_type, p.status, count(*) antall " +
-            " from prosess_task_type t" +
-            " inner join prosess_task p on p.task_type=t.kode and p.status in (:statuser)" +
+            " from prosess_task p " +
             " left outer join fagsak_prosess_task fpt on fpt.prosess_task_id=p.id" +
             " left outer join fagsak f on f.id=fpt.fagsak_id" +
             " where p.status IN (:statuser)" +
-            " group by 1, 2, 3" +
+            " group by coalesce(f.ytelse_type, 'NONE'), p.task_type, p.status " +
             " order by 1, 2, 3";
 
         String metricName = "prosess_task_" + PROSESS_TASK_VER;
@@ -387,7 +335,7 @@ public class StatistikkRepository {
                     "prosess_task_type", t.get(1, String.class),
                     "status", t.get(2, String.class)),
                 Map.of(
-                    metricField, t.get(3, BigInteger.class))))
+                    metricField, t.get(3, BigDecimal.class))))
             .collect(Collectors.toCollection(LinkedHashSet::new));
 
         /* siden aksjonspunkt endrer status må vi ta hensyn til at noen verdier vil gå til 0, ellers vises siste verdi i stedet. */
@@ -431,7 +379,7 @@ public class StatistikkRepository {
         Collection<SensuEvent> values = stream.map(t -> {
                 String ytelseType = t.get(0, String.class);
                 String saksnummer = t.get(1, String.class);
-                String taskId = t.get(2, BigInteger.class).toString();
+                String taskId = t.get(2, BigDecimal.class).toString();
                 String taskType = t.get(3, String.class);
                 String status = t.get(4, String.class);
                 Timestamp sistKjørt = t.get(5, Timestamp.class);
@@ -482,10 +430,10 @@ public class StatistikkRepository {
                 else 'UKJENT' end as meldingstype,
                 cast(regexp_substr(melding, 'kodeStatusKrav>([^<]*)<', 1, 1, null, 1) as varchar2(10 char)) as status,
                 cast(regexp_substr(melding, 'kodeFagomraade>([^<]*)<', 1, 1, null, 1) as varchar2(10 char)) as fagomraade
-              from K9TILBAKE.OKO_XML_MOTTATT
+              from OKO_XML_MOTTATT
               where opprettet_tid > :starttid
             )
-            group by tidspunkt, meldingstype, status, fagomraade;
+            group by tidspunkt, meldingstype, status, fagomraade
             """;
 
         String metricName = "meldinger_fra_OS_v1";
@@ -499,7 +447,7 @@ public class StatistikkRepository {
                     "fagomraade", t.get(3, String.class),
                     "ytelseType", mapFagområdeTilYtelseType(t.get(3, String.class)).getKode()
                 ),
-                Map.of("totalt_antall", t.get(4, BigInteger.class)),
+                Map.of("totalt_antall", t.get(4, BigDecimal.class)),
                 t.get(0, Timestamp.class).getTime()))
             .collect(Collectors.toCollection(LinkedHashSet::new));
         return values;
@@ -537,7 +485,7 @@ public class StatistikkRepository {
               LEFT OUTER JOIN OKO_XML_MOTTATT oxm on oxm.henvisning = eb.henvisning and oxm.melding like '<?xml version="1.0" encoding="utf-8"?><urn:detaljertKravgrunnlagMelding%'
             ) where rnk = 1
             group by time, behandling_type, behandling_status, ytelse_type, opprettelsegrunn
-            order by time;
+            order by 1, 2, 3, 4, 5
             """;
 
         String metricName = "behandlinger_opprettet_v1";
@@ -563,7 +511,7 @@ public class StatistikkRepository {
                      B.BEHANDLING_TYPE,
                      BR.BEHANDLING_RESULTAT_TYPE,
                      B.SAKSBEHANDLING_TYPE,
-                     F.YTELSE_TYPE;
+                     F.YTELSE_TYPE
             """;
 
         String metricName = "behandling_vedtak_v1";
@@ -590,7 +538,7 @@ public class StatistikkRepository {
             JOIN FAGSAK F ON B.FAGSAK_ID = F.ID       
             GROUP BY BS.OPPRETTET_TID,
                      BS.BREV_TYPE,
-                     F.YTELSE_TYPE;
+                     F.YTELSE_TYPE
             """;
 
         String metricName = "brev_v1";
