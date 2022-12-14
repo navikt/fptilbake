@@ -7,8 +7,7 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyIntegrasjonResponsSammenligner;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -23,9 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
-import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.foreldrepenger.tilbakekreving.web.app.util.StringUtils;
-import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -45,10 +42,8 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
     private KravgrunnlagRepository kravgrunnlagRepository;
     private BehandlingRepository behandlingRepository;
 
-    private HentKravgrunnlagMapper hentKravgrunnlagMapper;
-    private ØkonomiConsumer økonomiConsumer;
     private FagsystemKlient fagsystemKlient;
-    private ØkonomiProxyIntegrasjonResponsSammenligner økonomiProxyIntegrasjonSammenligner;
+    private KravgrunnlagHenter kravgrunnlagHenter;
 
     HentKorrigertKravgrunnlagTask() {
         // for CDI
@@ -56,18 +51,13 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
 
     @Inject
     public HentKorrigertKravgrunnlagTask(BehandlingRepositoryProvider repositoryProvider,
-                                         HentKravgrunnlagMapper hentKravgrunnlagMapper,
-                                         ØkonomiConsumer økonomiConsumer,
                                          FagsystemKlient fagsystemKlient,
-                                         ØkonomiProxyIntegrasjonResponsSammenligner økonomiProxyIntegrasjonSammenligner) {
+                                         KravgrunnlagHenter kravgrunnlagHenter) {
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-
-        this.hentKravgrunnlagMapper = hentKravgrunnlagMapper;
-        this.økonomiConsumer = økonomiConsumer;
         this.fagsystemKlient = fagsystemKlient;
-        this.økonomiProxyIntegrasjonSammenligner = økonomiProxyIntegrasjonSammenligner;
+        this.kravgrunnlagHenter = kravgrunnlagHenter;
     }
 
     @Override
@@ -104,12 +94,7 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
             Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
             request = forberedHentKravgrunnlagDetailRequest(kravgrunnlag431.getEksternKravgrunnlagId(), kravgrunnlag431.getAnsvarligEnhet(), kravgrunnlag431.getSaksBehId());
         }
-        DetaljertKravgrunnlagDto detaljertKravgrunnlagDto = økonomiConsumer.hentKravgrunnlag(behandlingId, request);
-        var kravgrunnlag = hentKravgrunnlagMapper.mapTilDomene(detaljertKravgrunnlagDto);
-
-        // Sammenligning
-        økonomiProxyIntegrasjonSammenligner.hentKravgrunnlagFraFpwsproxyOgSammenlignFailsafe(behandlingId, request, kravgrunnlag);
-        return kravgrunnlag;
+        return kravgrunnlagHenter.hentKravgrunnlagMedFailsafeSammenligningMotProxy(behandlingId, request);
     }
 
     private boolean finnesEksternBehandling(long behandlingId, Henvisning henvisning) {
