@@ -1,7 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.overvåkning.metrikker;
 
 import java.math.BigDecimal;
+import java.sql.Clob;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -383,8 +385,19 @@ public class StatistikkRepository {
                 String status = t.get(4, String.class);
                 Timestamp sistKjørt = t.get(5, Timestamp.class);
                 long tidsstempel = sistKjørt == null ? now : sistKjørt.getTime();
+                Clob feilmelding = (Clob) t.get(6);
+                String sisteFeil;
+                if (feilmelding != null) {
+                    try {
+                        sisteFeil = finnStacktraceStartFra(feilmelding.getSubString(1, (int) feilmelding.length()), 500).orElse(UDEFINERT);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    sisteFeil = masker(sisteFeil); //tiltak for å ikke dytte evt. sensitive data ut i åpen influx-database
+                } else {
+                    sisteFeil = null;
+                }
 
-                String sisteFeil = finnStacktraceStartFra(t.get(6, String.class), 500).orElse(UDEFINERT);
                 String taskParams = t.get(7, String.class);
 
                 BigDecimal blokkertAvId = t.get(8, BigDecimal.class);
@@ -402,7 +415,7 @@ public class StatistikkRepository {
                     Map.of(
                         "taskId", taskId,
                         "saksnummer", coalesce(saksnummer, UDEFINERT),
-                        "siste_feil", sisteFeil,
+                        "siste_feil", coalesce(sisteFeil, UDEFINERT),
                         "task_parametere", coalesce(taskParams, UDEFINERT),
                         "blokkert_av", coalesce(blokkertAv, UDEFINERT),
                         "opprettet_tid", opprettetTid,
@@ -412,6 +425,12 @@ public class StatistikkRepository {
             .toList();
 
         return values;
+    }
+
+    static String masker(String sisteFeil) {
+        return sisteFeil.replaceAll("(?<!\\d)\\d{9}(?!\\d)", "MASKERT9") //masker evt orgnr
+            .replaceAll("(?<!\\d)\\d{11}(?!\\d)", "MASKERT11") //masker evt fnr/dnr
+            .replaceAll("(?<!\\d)\\d{13}(?!\\d)", "MASKERT13"); //masker evt aktørid
     }
 
 
