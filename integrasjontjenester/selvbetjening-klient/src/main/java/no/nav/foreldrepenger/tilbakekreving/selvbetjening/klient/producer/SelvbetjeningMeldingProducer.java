@@ -2,16 +2,13 @@ package no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.producer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.kafka.AivenMeldingProducer;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.SelvbetjeningMelding;
@@ -20,15 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.Selvbetjeni
 public class SelvbetjeningMeldingProducer extends AivenMeldingProducer {
     private static final Logger logger = LoggerFactory.getLogger(SelvbetjeningMeldingProducer.class);
 
-    private static final ObjectMapper OBJECT_MAPPER;
-
-    static {
-        OBJECT_MAPPER = new ObjectMapper();
-        OBJECT_MAPPER.registerModule(new JavaTimeModule());
-        OBJECT_MAPPER.registerModule(new Jdk8Module());
-        OBJECT_MAPPER.registerModule(new SimpleModule());
-        OBJECT_MAPPER.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
+    private static final ObjectMapper MAPPER = DefaultJsonMapper.getObjectMapper();
 
     public SelvbetjeningMeldingProducer() {
         //for CDI proxy
@@ -49,7 +38,7 @@ public class SelvbetjeningMeldingProducer extends AivenMeldingProducer {
     public void sendMelding(SelvbetjeningMelding hendelse) {
         try {
             var nøkkel = hendelse.getNorskIdent();
-            var verdiSomJson = OBJECT_MAPPER.writeValueAsString(hendelse);
+            var verdiSomJson = MAPPER.writeValueAsString(hendelse);
             var record = new ProducerRecord<>(getTopic(), nøkkel, verdiSomJson);
             var recordMetadata = runProducerWithSingleJson(record);
             logger.info("Melding sendt til {} partisjon {} offset {} for saksnummer {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), hendelse.getSaksnummer());
