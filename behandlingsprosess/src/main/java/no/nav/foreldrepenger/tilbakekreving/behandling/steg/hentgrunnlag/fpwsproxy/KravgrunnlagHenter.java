@@ -86,10 +86,8 @@ public class KravgrunnlagHenter {
 
     private void sammenlignException(Long behandlingId, HentKravgrunnlagDetaljDto hentKravgrunnlagDetaljDto, Exception opprinneligException) {
         try {
-            var kravgrunnlag431 = hentKravgrunnlagFraFpwsproxy(behandlingId, hentKravgrunnlagDetaljDto);
-            if (kravgrunnlag431 != null) {
-                LOG.info("Avvik! Skulle returnert exception men returnerte et gyldig kravgrunnlag!");
-            }
+            hentKravgrunnlagFraFpwsproxy(behandlingId, hentKravgrunnlagDetaljDto);
+            LOG.info("Avvik! Skulle returnert exception men returnerte et gyldig kravgrunnlag!");
         } catch (Exception exceptionFraFpwsproxy) {
             if (!opprinneligException.getClass().equals(exceptionFraFpwsproxy.getClass())) {
                 LOG.info("Avvik! Exception fra fpwsproxy er forskjellig enn det mottatt med direkteintegrasjon {} vs {}", opprinneligException.getClass(), exceptionFraFpwsproxy.getClass());
