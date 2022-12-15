@@ -545,7 +545,7 @@ public class StatistikkRepository {
                     "saksbehandling_type", t.get(3, String.class),
                     "ytelse_type", t.get(4, String.class)
                 ),
-                Map.of("totalt_antall", t.get(2, BigDecimal.class)),
+                Map.of("totalt_antall", t.get(5, BigDecimal.class)),
                 t.get(0, Timestamp.class).getTime()))
             .collect(Collectors.toCollection(LinkedHashSet::new));
         return values;
