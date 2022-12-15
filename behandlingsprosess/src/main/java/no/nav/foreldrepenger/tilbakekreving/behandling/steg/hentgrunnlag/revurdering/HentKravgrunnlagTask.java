@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyIntegrasjonResponsSammenligner;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
@@ -32,8 +32,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
-import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
-import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -52,12 +50,9 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
     private EksternBehandlingRepository eksternBehandlingRepository;
 
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
-    private HentKravgrunnlagMapper kravgrunnlagMapper;
-
-    private ØkonomiConsumer økonomiConsumer;
     private FagsystemKlient fagsystemKlient;
 
-    private ØkonomiProxyIntegrasjonResponsSammenligner økonomiProxyIntegrasjonSammenligner;
+    private KravgrunnlagHenter kravgrunnlagHenter;
 
     HentKravgrunnlagTask() {
         // for CDI proxy
@@ -66,19 +61,15 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
     @Inject
     public HentKravgrunnlagTask(BehandlingRepositoryProvider repositoryProvider,
                                 KravgrunnlagTjeneste kravgrunnlagTjeneste,
-                                HentKravgrunnlagMapper kravgrunnlagMapper,
-                                ØkonomiConsumer økonomiConsumer,
                                 FagsystemKlient fagsystemKlient,
-                                ØkonomiProxyIntegrasjonResponsSammenligner økonomiProxyIntegrasjonSammenligner) {
+                                KravgrunnlagHenter kravgrunnlagHenter) {
         this.repositoryProvider = repositoryProvider;
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
 
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
-        this.kravgrunnlagMapper = kravgrunnlagMapper;
-        this.økonomiConsumer = økonomiConsumer;
         this.fagsystemKlient = fagsystemKlient;
-        this.økonomiProxyIntegrasjonSammenligner = økonomiProxyIntegrasjonSammenligner;
+        this.kravgrunnlagHenter = kravgrunnlagHenter;
     }
 
     @Override
@@ -99,15 +90,9 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
     }
 
     private Kravgrunnlag431 hentNyttKravgrunnlag(Long origBehandlingId) {
-        Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(origBehandlingId);
-
-        // hentNyttKravgrunnlagFraØkonomi() metoden
-        HentKravgrunnlagDetaljDto hentKravgrunnlagDetalj = forberedeHentKravgrunnlagDetailRequest(kravgrunnlag);
-        DetaljertKravgrunnlagDto grunnlag = økonomiConsumer.hentKravgrunnlag(origBehandlingId, hentKravgrunnlagDetalj);
-
-        Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagMapper.mapTilDomene(grunnlag);
-        økonomiProxyIntegrasjonSammenligner.hentKravgrunnlagFraFpwsproxyOgSammenlignFailsafe(origBehandlingId, hentKravgrunnlagDetalj, kravgrunnlag431);
-        return kravgrunnlag431;
+        var kravgrunnlag = grunnlagRepository.finnKravgrunnlag(origBehandlingId);
+        var hentKravgrunnlagDetalj = forberedeHentKravgrunnlagDetailRequest(kravgrunnlag);
+        return kravgrunnlagHenter.hentKravgrunnlagMedFailsafeSammenligningMotProxy(origBehandlingId, hentKravgrunnlagDetalj);
     }
 
     //private DetaljertKravgrunnlagDto hentNyttKravgrunnlagFraØkonomi(Long origBehandlingId, Kravgrunnlag431 kravgrunnlag431) {

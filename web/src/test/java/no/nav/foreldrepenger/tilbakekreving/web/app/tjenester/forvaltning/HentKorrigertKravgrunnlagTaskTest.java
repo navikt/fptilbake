@@ -29,7 +29,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyIntegrasjonResponsSammenligner;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.HentKravgrunnlagMapperProxy;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
@@ -64,8 +66,9 @@ public class HentKorrigertKravgrunnlagTaskTest {
     private final PersoninfoAdapter tpsAdapterMock = mock(PersoninfoAdapter.class);
     private final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(tpsAdapterMock);
     private final ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
+    private final HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy = mock(HentKravgrunnlagMapperProxy.class);
+    private final ØkonomiProxyKlient økonomiProxyKlient = mock(ØkonomiProxyKlient.class);
     private final FagsystemKlient fagsystemKlient = mock(FagsystemKlient.class);
-    private final ØkonomiProxyIntegrasjonResponsSammenligner økonomiProxyIntegrasjonSammenligner = mock(ØkonomiProxyIntegrasjonResponsSammenligner.class);
     private KravgrunnlagRepository kravgrunnlagRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private HentKorrigertKravgrunnlagTask hentKorrigertGrunnlagTask;
@@ -79,7 +82,8 @@ public class HentKorrigertKravgrunnlagTaskTest {
         kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         HentKravgrunnlagMapper hentKravgrunnlagMapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
-        hentKorrigertGrunnlagTask = new HentKorrigertKravgrunnlagTask(repositoryProvider, hentKravgrunnlagMapper, økonomiConsumerMock, fagsystemKlient, økonomiProxyIntegrasjonSammenligner);
+        var kravgrunnlagHenter = new KravgrunnlagHenter(økonomiProxyKlient, hentKravgrunnlagMapperProxy, økonomiConsumerMock, hentKravgrunnlagMapper);
+        hentKorrigertGrunnlagTask = new HentKorrigertKravgrunnlagTask(repositoryProvider, fagsystemKlient, kravgrunnlagHenter);
 
         entityManager.setFlushMode(FlushModeType.AUTO);
         ScenarioSimple scenarioSimple = ScenarioSimple.simple();

@@ -26,13 +26,14 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyIntegrasjonResponsSammenligner;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.HentKravgrunnlagMapperProxy;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
@@ -85,17 +86,17 @@ import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ExtendWith(JpaExtension.class)
 public class HåndterGamleKravgrunnlagTaskTest {
 
     private final PersoninfoAdapter tpsTjenesteMock = mock(PersoninfoAdapter.class);
     private final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(tpsTjenesteMock);
-    private final ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
-    private final ØkonomiProxyIntegrasjonResponsSammenligner økonomiProxyIntegrasjonResponsSammenligner = mock(ØkonomiProxyIntegrasjonResponsSammenligner.class);
     private final BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
     private final FagsystemKlient fagsystemKlientMock = mock(FagsystemKlient.class);
+    private final ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
+    private final HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy = mock(HentKravgrunnlagMapperProxy.class);
+    private final ØkonomiProxyKlient økonomiProxyKlient = mock(ØkonomiProxyKlient.class);
 
     private FagsakRepository fagsakRepository;
     private BehandlingRepository behandlingRepository;
@@ -117,7 +118,6 @@ public class HåndterGamleKravgrunnlagTaskTest {
         behandlingRepository = repositoryProvider.getBehandlingRepository();
         mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
         grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        ProsessTaskTjeneste taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         NavBrukerRepository navBrukerRepository = new NavBrukerRepository(entityManager);
         BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(
                 entityManager, new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
@@ -130,9 +130,10 @@ public class HåndterGamleKravgrunnlagTaskTest {
         FagsakTjeneste fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repositoryProvider,
                 behandlingskontrollProvider, fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock, Period.ofWeeks(4));
+        var kravgrunnlagHenter = new KravgrunnlagHenter(økonomiProxyKlient, hentKravgrunnlagMapperProxy, økonomiConsumerMock, hentKravgrunnlagMapper);
         HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(
-                mottattXmlRepository, grunnlagRepository, hentKravgrunnlagMapper, lesKravgrunnlagMapper, behandlingTjeneste,
-                økonomiConsumerMock, fagsystemKlientMock, økonomiProxyIntegrasjonResponsSammenligner); // TODO: fiks test
+                mottattXmlRepository, grunnlagRepository, lesKravgrunnlagMapper, behandlingTjeneste,
+                fagsystemKlientMock, kravgrunnlagHenter);
         håndterGamleKravgrunnlagTask = new HåndterGamleKravgrunnlagTask(håndterGamleKravgrunnlagTjeneste);
 
         behandling = ScenarioSimple.simple().lagMocked();
