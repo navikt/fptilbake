@@ -439,7 +439,7 @@ public class StatistikkRepository {
         LocalDateTime startpunkt = LocalDateTime.now().minus(kravgrunnlagOppdateringsperiode);
         Date startpunktDbTid = new Date(startpunkt.toEpochSecond(ZoneOffset.UTC));
         String sql = """
-            select tidspunkt, meldingstype, fagomraade, count(*) as antall
+            select tidspunkt, meldingstype, status, fagomraade, count(*) as antall
             from (
               select opprettet_tid as tidspunkt,
               case
