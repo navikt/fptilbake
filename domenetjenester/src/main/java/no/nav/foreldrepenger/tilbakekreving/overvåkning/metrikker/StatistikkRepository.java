@@ -409,11 +409,11 @@ public class StatistikkRepository {
 
                 return SensuEvent.createSensuEvent(metricName,
                     toMap(
-                        "ytelseType", coalesce(ytelseType, UDEFINERT),
+                        "ytelse_type", coalesce(ytelseType, UDEFINERT),
                         "status", status,
                         "prosess_task_type", taskType),
                     Map.of(
-                        "taskId", taskId,
+                        "task_id", taskId,
                         "saksnummer", coalesce(saksnummer, UDEFINERT),
                         "siste_feil", coalesce(sisteFeil, UDEFINERT),
                         "task_parametere", coalesce(taskParams, UDEFINERT),
@@ -460,10 +460,10 @@ public class StatistikkRepository {
             .setParameter("starttid", startpunktDbTid);
         Stream<Tuple> stream = query.getResultStream();
         var values = stream.map(t -> SensuEvent.createSensuEvent(metricName,
-                Map.of("meldingstype", t.get(1, String.class),
+                Map.of("melding_type", t.get(1, String.class),
                     "status", t.get(2, String.class),
                     "fagomraade", t.get(3, String.class),
-                    "ytelseType", mapFagområdeTilYtelseType(t.get(3, String.class)).getKode()
+                    "ytelse_type", mapFagområdeTilYtelseType(t.get(3, String.class)).getKode()
                 ),
                 Map.of("totalt_antall", t.get(4, BigDecimal.class)),
                 t.get(0, Timestamp.class).getTime()))
@@ -511,8 +511,11 @@ public class StatistikkRepository {
         NativeQuery<Tuple> query = (NativeQuery<Tuple>) entityManager.createNativeQuery(sql, Tuple.class);
         Stream<Tuple> stream = query.getResultStream();
         var values = stream.map(t -> SensuEvent.createSensuEvent(metricName,
-                Map.of("meldingstype", t.get(1, String.class)),
-                Map.of("totalt_antall", t.get(2, BigDecimal.class)),
+                Map.of("behandling_type", t.get(1, String.class),
+                    "behandling_status", t.get(2, String.class),
+                    "ytelse_type", t.get(3, String.class),
+                    "opprettelsesgrunn", t.get(4, String.class)),
+                Map.of("totalt_antall", t.get(5, BigDecimal.class)),
                 t.get(0, Timestamp.class).getTime()))
             .collect(Collectors.toCollection(LinkedHashSet::new));
         return values;
@@ -537,10 +540,10 @@ public class StatistikkRepository {
         NativeQuery<Tuple> query = (NativeQuery<Tuple>) entityManager.createNativeQuery(sql, Tuple.class);
         Stream<Tuple> stream = query.getResultStream();
         var values = stream.map(t -> SensuEvent.createSensuEvent(metricName,
-                Map.of("behandlingtype", t.get(1, String.class),
-                    "behandlingResultatType", t.get(2, String.class),
-                    "saksbehandlingType", t.get(3, String.class),
-                    "ytelseType", t.get(4, String.class)
+                Map.of("behandling_type", t.get(1, String.class),
+                    "behandling_resultat_type", t.get(2, String.class),
+                    "saksbehandling_type", t.get(3, String.class),
+                    "ytelse_type", t.get(4, String.class)
                 ),
                 Map.of("totalt_antall", t.get(2, BigDecimal.class)),
                 t.get(0, Timestamp.class).getTime()))
@@ -565,7 +568,7 @@ public class StatistikkRepository {
         Stream<Tuple> stream = query.getResultStream();
         var values = stream.map(t -> SensuEvent.createSensuEvent(metricName,
                 Map.of("brev_type", t.get(1, String.class),
-                    "ytelseType", t.get(2, String.class)
+                    "ytelse_type", t.get(2, String.class)
                 ),
                 Map.of("totalt_antall", t.get(3, BigDecimal.class)),
                 t.get(0, Timestamp.class).getTime()))
