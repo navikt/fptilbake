@@ -23,7 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.Hendelse;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.SelvbetjeningMelding;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.producer.SelvbetjeningMeldingProducer;
-import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.producer.OnpremSelvbetjeningMeldingProducer;
 
 @ApplicationScoped
 public class SelvbetjeningTjeneste {
@@ -34,7 +33,6 @@ public class SelvbetjeningTjeneste {
     private BrevSporingRepository brevSporingRepository;
     private BehandlingRepository behandlingRepository;
     private SelvbetjeningMeldingProducer meldingProducer;
-    private OnpremSelvbetjeningMeldingProducer onpremMeldingProducer;
     private PersoninfoAdapter aktørConsumer;
 
     SelvbetjeningTjeneste() {
@@ -44,12 +42,10 @@ public class SelvbetjeningTjeneste {
     @Inject
     public SelvbetjeningTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                  SelvbetjeningMeldingProducer meldingProducer,
-                                 OnpremSelvbetjeningMeldingProducer onpremMeldingProducer,
                                  PersoninfoAdapter aktørConsumer) {
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.meldingProducer = meldingProducer;
-        this.onpremMeldingProducer = onpremMeldingProducer;
         this.aktørConsumer = aktørConsumer;
     }
 
@@ -62,11 +58,7 @@ public class SelvbetjeningTjeneste {
         SelvbetjeningMelding svInfo = lagSelvbetjeningMelding(behandling, varselSporing, aktørId, personIdent.get(), hendelse);
 
         logMelding("Sender", hendelse, personIdent.get());
-        if (ENV.isProd()) {
-            onpremMeldingProducer.sendMelding(svInfo);
-        } else {
-            meldingProducer.sendMelding(svInfo);
-        }
+        meldingProducer.sendMelding(svInfo);
         logMelding("Sendte", hendelse, personIdent.get());
     }
 
