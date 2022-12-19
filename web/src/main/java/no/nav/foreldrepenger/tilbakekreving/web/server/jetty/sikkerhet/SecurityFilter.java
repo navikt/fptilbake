@@ -11,10 +11,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletResponse;
 
-import no.nav.vedtak.isso.config.ServerInfo;
+import no.nav.foreldrepenger.konfig.Environment;
 
 @WebFilter(urlPatterns = "/*")
 public class SecurityFilter implements Filter {
+
+    private static final String LBURL = Environment.current().getProperty("loadbalancer.url", "");
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -24,7 +26,7 @@ public class SecurityFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         if (servletResponse instanceof HttpServletResponse response) {
-            response.setHeader("Content-Security-Policy", String.format("script-src %s", ServerInfo.instance().getSchemeHostPort()));
+            response.setHeader("Content-Security-Policy", String.format("script-src %s", LBURL));
             response.setHeader("X-Content-Type-Options", "nosniff");
             response.setHeader("X-XSS-Protection", "1;mode=block");
             response.setHeader("Strict-Transport-Security", "max-age=31536000");

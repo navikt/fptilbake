@@ -42,10 +42,10 @@ import org.slf4j.MDC;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.app.ApplicationConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.db.DatasourceUtil;
-import no.nav.vedtak.isso.IssoApplication;
 import no.nav.vedtak.sikkerhet.ContextPathHolder;
 import no.nav.vedtak.sikkerhet.jaspic.OidcAuthModule;
 
@@ -231,7 +231,7 @@ public class JettyServer {
     }
 
     private static List<Class<?>> getWebInfClasses() {
-        return List.of(ApplicationConfig.class, IssoApplication.class);
+        return List.of(ApplicationConfig.class);
     }
 
     private Integer getServerPort() {
@@ -240,10 +240,8 @@ public class JettyServer {
 
     private void setContextAndCookiePath() {
         var appname = ApplicationName.hvilkenTilbake();
-        switch (appname) {
-            case FPTILBAKE -> ContextPathHolder.instance(CONTEXT_PATH);
-            case K9TILBAKE -> ContextPathHolder.instance(CONTEXT_PATH, "/k9");
-            default -> throw new IllegalArgumentException("Ikke-støttet applikasjonsnavn: " + appname);
+        if (Fagsystem.K9TILBAKE.equals(appname)) {
+            ContextPathHolder.instance(CONTEXT_PATH, "/k9");
         }
     }
 
