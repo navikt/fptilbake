@@ -79,9 +79,14 @@ public class KravgrunnlagHenter {
     }
 
     private Kravgrunnlag431 hentKravgrunnlagFraFpwsproxy(Long behandlingId, HentKravgrunnlagDetaljDto hentKravgrunnlagDetaljDto) {
-        var request = tilHentKravgrunnlagDetaljDto(hentKravgrunnlagDetaljDto, behandlingId);
+        LOG.info("Henter kravgrunnlag for behandling{} med kravgrunnlagId {}",
+            behandlingId != null ? " " + behandlingId : "",
+            hentKravgrunnlagDetaljDto.getKravgrunnlagId().intValue());
+        var request = tilHentKravgrunnlagDetaljDto(hentKravgrunnlagDetaljDto);
         var respons = økonomiProxyKlient.hentKravgrunnlag(request);
-        return hentKravgrunnlagMapperProxy.mapTilDomene(respons);
+        var kravgrunnlag431 = hentKravgrunnlagMapperProxy.mapTilDomene(respons);
+        LOG.info("Kravgrunnlag hentet OK");
+        return kravgrunnlag431;
     }
 
     private void sammenlignException(Long behandlingId, HentKravgrunnlagDetaljDto hentKravgrunnlagDetaljDto, Exception opprinneligException) {
@@ -95,13 +100,12 @@ public class KravgrunnlagHenter {
         }
     }
 
-    private no.nav.foreldrepenger.kontrakter.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto tilHentKravgrunnlagDetaljDto(HentKravgrunnlagDetaljDto hentKravgrunnlagDetaljDto, Long behandlingId) {
+    private no.nav.foreldrepenger.kontrakter.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto tilHentKravgrunnlagDetaljDto(HentKravgrunnlagDetaljDto hentKravgrunnlagDetaljDto) {
         return new no.nav.foreldrepenger.kontrakter.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto.Builder()
             .kravgrunnlagId(hentKravgrunnlagDetaljDto.getKravgrunnlagId())
             .kodeAksjon(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG)
             .enhetAnsvarlig(hentKravgrunnlagDetaljDto.getEnhetAnsvarlig())
             .saksbehId(hentKravgrunnlagDetaljDto.getSaksbehId())
-            .behandlingsId(behandlingId)
             .build();
     }
 }
