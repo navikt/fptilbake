@@ -25,8 +25,6 @@ public class SensuMetrikkTask implements ProsessTaskHandler {
 
     private static final int CHUNK_EVENT_SIZE = 1000;
 
-    private static final int LOG_THRESHOLD = 5000;
-
     static final String TASKTYPE = "sensu.metrikk.task";
 
     private static final Logger log = LoggerFactory.getLogger(SensuMetrikkTask.class);
