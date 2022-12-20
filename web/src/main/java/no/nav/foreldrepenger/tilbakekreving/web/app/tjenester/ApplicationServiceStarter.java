@@ -42,6 +42,8 @@ public class ApplicationServiceStarter {
         start(VedtakConsumer.class);
         if (startSensuKlient) {
             start(SensuKlient.class);
+        } else {
+            logger.info("Starter ikke sensu klient");
         }
 
         if (Environment.current().isProd() || !"true".equalsIgnoreCase(Environment.current().getProperty("test.only.disable.mq"))) {

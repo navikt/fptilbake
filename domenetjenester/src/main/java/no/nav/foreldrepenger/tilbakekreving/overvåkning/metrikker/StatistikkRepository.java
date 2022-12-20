@@ -143,7 +143,6 @@ public class StatistikkRepository {
     }
 
     private Collection<SensuEvent> timeCall(Supplier<Collection<SensuEvent>> collectionSupplier, String function) {
-        log.info("Starter {}", function);
         var start = System.currentTimeMillis();
         var sensuEvents = collectionSupplier.get();
         var slutt = System.currentTimeMillis();
