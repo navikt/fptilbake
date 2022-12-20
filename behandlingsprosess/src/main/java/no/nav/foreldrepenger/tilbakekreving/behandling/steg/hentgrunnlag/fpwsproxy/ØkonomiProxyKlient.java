@@ -15,8 +15,10 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.core.UriBuilder;
 
-import no.nav.foreldrepenger.kontrakter.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
-import no.nav.foreldrepenger.kontrakter.tilbakekreving.kravgrunnlag.respons.Kravgrunnlag431Dto;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.error.FeilDto;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.error.FeilType;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.Kravgrunnlag431Dto;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ManglendeKravgrunnlagException;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.SperringKravgrunnlagException;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.UkjentOppdragssystemException;
@@ -88,24 +90,10 @@ public class ØkonomiProxyKlient {
 
     private static boolean kvitteringInneholderUkjentFeil(String body) {
         try {
-            return FeilType.KRAVGRUNNLAG_UKJENT_FEIL.equals(fromJson(body, FeilDto.class).type());
+            return FeilType.KVITTERING_UKJENT_FEIL.equals(fromJson(body, FeilDto.class).type());
         } catch (Exception e) {
             return false;
         }
-    }
-
-    // TODO: Konsolider FeilDto fra web modul. Flytt til felles? kontrakter? egen FeilDto for fpwsproxy integrasjon?
-    private record FeilDto(FeilType type) {
-    }
-
-    private enum FeilType {
-        MANGLER_TILGANG_FEIL,
-        TOMT_RESULTAT_FEIL,
-        OPPDRAG_FORVENTET_NEDETID,
-        KRAVGRUNNLAG_MANGLER,
-        KRAVGRUNNLAG_SPERRET,
-        KRAVGRUNNLAG_UKJENT_FEIL,
-        GENERELL_FEIL,
     }
 
 }

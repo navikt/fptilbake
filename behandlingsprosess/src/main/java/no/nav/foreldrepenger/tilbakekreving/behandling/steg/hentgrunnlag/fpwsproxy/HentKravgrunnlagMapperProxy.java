@@ -6,9 +6,9 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.kontrakter.tilbakekreving.kravgrunnlag.respons.Kravgrunnlag431Dto;
-import no.nav.foreldrepenger.kontrakter.tilbakekreving.kravgrunnlag.respons.KravgrunnlagBelop433Dto;
-import no.nav.foreldrepenger.kontrakter.tilbakekreving.kravgrunnlag.respons.KravgrunnlagPeriode432Dto;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.Kravgrunnlag431Dto;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.KravgrunnlagBelop433Dto;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.KravgrunnlagPeriode432Dto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -115,7 +115,7 @@ public class HentKravgrunnlagMapperProxy {
             .build();
     }
 
-    private static KlasseType map(no.nav.foreldrepenger.kontrakter.tilbakekreving.kravgrunnlag.respons.KlasseType typeKlasse) {
+    private static KlasseType map(no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.KlasseType typeKlasse) {
         return switch (typeKlasse) {
             case FEIL -> KlasseType.FEIL;
             case JUST -> KlasseType.JUST;
