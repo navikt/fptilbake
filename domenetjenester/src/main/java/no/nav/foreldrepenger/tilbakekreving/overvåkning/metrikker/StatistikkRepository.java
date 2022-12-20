@@ -436,7 +436,7 @@ public class StatistikkRepository {
     Collection<SensuEvent> meldingerFraØkonomiStatistikk() {
 
         LocalDateTime startpunkt = LocalDateTime.now().minus(kravgrunnlagOppdateringsperiode);
-        Date startpunktDbTid = new Date(startpunkt.toEpochSecond(ZoneOffset.UTC));
+        Date startpunktDbTid = new Date(startpunkt.toEpochSecond(ZoneOffset.UTC) * 1000L);
         String sql = """
             select tidspunkt, meldingstype, status, fagomraade, count(*) as antall
             from (
