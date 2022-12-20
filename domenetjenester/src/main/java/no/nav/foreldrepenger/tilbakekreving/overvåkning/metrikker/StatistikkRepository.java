@@ -466,7 +466,7 @@ public class StatistikkRepository {
                 ),
                 Map.of("totalt_antall", t.get(4, BigDecimal.class)),
                 t.get(0, Timestamp.class).getTime()))
-            .collect(Collectors.toCollection(LinkedHashSet::new));
+            .toList();
         return values;
     }
 
@@ -516,7 +516,7 @@ public class StatistikkRepository {
                     "opprettelsesgrunn", t.get(4, String.class)),
                 Map.of("totalt_antall", t.get(5, BigDecimal.class)),
                 t.get(0, Timestamp.class).getTime()))
-            .collect(Collectors.toCollection(LinkedHashSet::new));
+            .toList();
         return values;
     }
 
@@ -546,7 +546,7 @@ public class StatistikkRepository {
                 ),
                 Map.of("totalt_antall", t.get(5, BigDecimal.class)),
                 t.get(0, Timestamp.class).getTime()))
-            .collect(Collectors.toCollection(LinkedHashSet::new));
+            .toList();
         return values;
     }
 
@@ -571,7 +571,7 @@ public class StatistikkRepository {
                 ),
                 Map.of("totalt_antall", t.get(3, BigDecimal.class)),
                 t.get(0, Timestamp.class).getTime()))
-            .collect(Collectors.toCollection(LinkedHashSet::new));
+            .toList();
         return values;
     }
 
