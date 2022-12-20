@@ -147,7 +147,7 @@ public class StatistikkRepository {
         var sensuEvents = collectionSupplier.get();
         var slutt = System.currentTimeMillis();
 
-        log.info("{} benyttet {} ms", function, (slutt - start));
+        log.info("{} benyttet {} ms. Har {} eventer", function, (slutt - start), sensuEvents.size());
 
         return sensuEvents;
     }
