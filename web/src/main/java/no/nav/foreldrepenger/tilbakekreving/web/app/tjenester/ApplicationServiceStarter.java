@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.hotspot.DefaultExports;
 import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.VedtakConsumer;
 import no.nav.foreldrepenger.tilbakekreving.sensu.SensuKlient;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
@@ -30,7 +32,7 @@ public class ApplicationServiceStarter {
         start(TaskManager.class);
         start(BatchTaskScheduler.class);
         start(VedtakConsumer.class);
-        if (Environment.current().isDev()) {
+        if (ApplicationName.hvilkenTilbake() == Fagsystem.K9TILBAKE) {
             start(SensuKlient.class);
         } else {
             logger.info("Starter ikke sensu klient");
