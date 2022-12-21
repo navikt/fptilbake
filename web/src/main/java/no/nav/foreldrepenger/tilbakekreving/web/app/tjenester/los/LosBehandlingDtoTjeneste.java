@@ -131,11 +131,8 @@ public class LosBehandlingDtoTjeneste {
     }
 
     private static LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431, LocalDateTime kravgrunnlagManglerFrist) {
-        if (kravgrunnlag431 == null && kravgrunnlagManglerFrist != null) {
-            return kravgrunnlagManglerFrist.toLocalDate();
-        }
         if (kravgrunnlag431 == null) {
-            return null;
+            return kravgrunnlagManglerFrist != null ? kravgrunnlagManglerFrist.toLocalDate() : null;
         }
         return kravgrunnlag431.getPerioder().stream()
             .map(KravgrunnlagPeriode432::getFom)
@@ -148,6 +145,12 @@ public class LosBehandlingDtoTjeneste {
     }
 
     private static LocalDateTime hentFrist(Behandling behandling) {
+        var erPåVentAnnenÅrsak = behandling.getAksjonspunkter().stream()
+            .filter(o -> !AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(o.getAksjonspunktDefinisjon()))
+            .anyMatch(Aksjonspunkt::erOpprettet);
+        if (erPåVentAnnenÅrsak) {
+            return null;
+        }
         return behandling.getAksjonspunkter().stream()
             .filter(o -> AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(o.getAksjonspunktDefinisjon()))
             .map(Aksjonspunkt::getFristTid)
