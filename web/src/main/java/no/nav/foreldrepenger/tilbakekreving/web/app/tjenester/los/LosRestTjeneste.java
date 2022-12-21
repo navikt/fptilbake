@@ -24,7 +24,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty
 import no.nav.vedtak.hendelser.behandling.los.LosBehandlingDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
-import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
 @ApplicationScoped
 @Transactional
@@ -35,7 +34,6 @@ public class LosRestTjeneste {
     static final String BASE_PATH = "/los";
 
     private static final String LOS_BEHANDLING_PATH = "/los-behandling";
-    public static final String LOS_NØKKELTALL_PATH = "/los-nokkeltall";
 
     private BehandlingRepository behandlingRepository;
     private LosBehandlingDtoTjeneste losBehandlingDtoTjeneste;

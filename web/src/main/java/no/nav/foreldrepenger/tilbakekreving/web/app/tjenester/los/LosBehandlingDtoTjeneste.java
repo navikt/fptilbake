@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.los;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -99,15 +98,15 @@ public class LosBehandlingDtoTjeneste {
     }
 
     private static List<LosBehandlingDto.LosAksjonspunktDto> mapAksjonspunkter(Behandling behandling, Kravgrunnlag431 kravgrunnlag431, LocalDateTime kravgrunnlagManglerFrist) {
-        var vanlige = behandling.getAksjonspunkter().stream()
-            .map(LosBehandlingDtoTjeneste::mapTilLosAksjonspunkt)
-            .collect(Collectors.toList());
-        List<LosBehandlingDto.LosAksjonspunktDto> aksjonspunkter = new ArrayList<>(vanlige);
         if (kravgrunnlag431 == null && kravgrunnlagManglerFrist != null) {
-            aksjonspunkter.add(new LosBehandlingDto.LosAksjonspunktDto(AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG,
+            return List.of(new LosBehandlingDto.LosAksjonspunktDto(AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG,
                 Aksjonspunktstatus.OPPRETTET, null, kravgrunnlagManglerFrist));
+        } else {
+            return behandling.getAksjonspunkter().stream()
+                .map(LosBehandlingDtoTjeneste::mapTilLosAksjonspunkt)
+                .collect(Collectors.toList());
         }
-        return aksjonspunkter;
+
     }
 
     private static LosBehandlingDto.LosAksjonspunktDto mapTilLosAksjonspunkt(Aksjonspunkt aksjonspunkt) {
@@ -145,9 +144,10 @@ public class LosBehandlingDtoTjeneste {
     }
 
     private static LocalDateTime hentFrist(Behandling behandling) {
+        var nå = LocalDateTime.now();
         var erPåVentAnnenÅrsak = behandling.getAksjonspunkter().stream()
             .filter(o -> !AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(o.getAksjonspunktDefinisjon()))
-            .anyMatch(Aksjonspunkt::erOpprettet);
+            .anyMatch(a -> a.erOpprettet() && a.erAutopunkt() && (a.getFristTid() != null && a.getFristTid().isAfter(nå)));
         if (erPåVentAnnenÅrsak) {
             return null;
         }
@@ -155,7 +155,7 @@ public class LosBehandlingDtoTjeneste {
             .filter(o -> AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(o.getAksjonspunktDefinisjon()))
             .map(Aksjonspunkt::getFristTid)
             .filter(Objects::nonNull)
-            .filter(LocalDateTime.now()::isAfter)
+            .filter(nå::isAfter)
             .findFirst().orElse(null);
     }
 
