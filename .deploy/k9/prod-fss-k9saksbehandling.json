@@ -46,6 +46,7 @@
     "TOGGLE_AIVEN_LOS" : "true",
     "TOGGLE_ENABLE_SENSU" : "true"
   },
+  "AZURE_REPLY_URL" :  "https://k9.intern.nav.no/k9/tilbake/cb",
   "AZURE_IAC_RULES": [
     {
       "app": "k9-sak",
