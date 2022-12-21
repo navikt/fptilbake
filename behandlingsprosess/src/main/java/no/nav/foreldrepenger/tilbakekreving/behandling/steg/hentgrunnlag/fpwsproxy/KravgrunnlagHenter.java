@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
@@ -43,8 +42,6 @@ public class KravgrunnlagHenter {
 
 
     // TODO: Når en flytter over kan en sende inn HentKravgrunnlagDetaljDto for fpwsproxy direkte
-
-
     public Kravgrunnlag431 hentKravgrunnlagMedFailsafeSammenligningMotProxy(Long behandlingId, String kodeAksjon, BigInteger kravgrunnlagId, String ansvarligEnhet, String saksbehId) {
         return hentKravgrunnlagMedFailsafeSammenligningMotProxy(behandlingId, lagHentKravgrunnlagDetaljDtoRequest(kodeAksjon, kravgrunnlagId, ansvarligEnhet, saksbehId));
     }
@@ -117,30 +114,11 @@ public class KravgrunnlagHenter {
     }
 
     private no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto tilHentKravgrunnlagDetaljDto(HentKravgrunnlagDetaljDto hentKravgrunnlagDetaljDto) {
-        return tilHentKravgrunnlagDetaljDto(
-            KodeAksjon.valueOf(hentKravgrunnlagDetaljDto.getKodeAksjon()),
-            hentKravgrunnlagDetaljDto.getKravgrunnlagId(),
-            hentKravgrunnlagDetaljDto.getEnhetAnsvarlig(),
-            hentKravgrunnlagDetaljDto.getSaksbehId()
-        );
-    }
-
-    private no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto tilHentKravgrunnlagDetaljDto(KodeAksjon kodeAksjon, BigInteger kravgrunnlagId, String enhetAnsvarlig, String saksbehId) {
         return new no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto.Builder()
-            .kravgrunnlagId(kravgrunnlagId)
-            .kodeAksjon(tilKodeAksjonDto(kodeAksjon))
-            .enhetAnsvarlig(enhetAnsvarlig)
-            .saksbehId(saksbehId)
+            .kodeAksjon(no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon.fraKode(hentKravgrunnlagDetaljDto.getKodeAksjon()))
+            .kravgrunnlagId(hentKravgrunnlagDetaljDto.getKravgrunnlagId())
+            .enhetAnsvarlig(hentKravgrunnlagDetaljDto.getEnhetAnsvarlig())
+            .saksbehId(hentKravgrunnlagDetaljDto.getSaksbehId())
             .build();
-    }
-
-    private no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon tilKodeAksjonDto(KodeAksjon kodeAksjon) {
-        return switch (kodeAksjon) {
-            case FINN_GRUNNLAG_OMGJØRING -> no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon.FINN_GRUNNLAG_OMGJØRING;
-            case HENT_GRUNNLAG_OMGJØRING -> no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon.HENT_GRUNNLAG_OMGJØRING;
-            case HENT_KORRIGERT_KRAVGRUNNLAG -> no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG;
-            case FATTE_VEDTAK -> no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon.FATTE_VEDTAK; // Kan disse forkomme fra XML unmarshall for eldre kravgrunnlag?
-            case ANNULERE_GRUNNLAG -> no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon.ANNULERE_GRUNNLAG; // Kan disse forkomme fra XML unmarshall for eldre kravgrunnlag?
-        };
     }
 }
