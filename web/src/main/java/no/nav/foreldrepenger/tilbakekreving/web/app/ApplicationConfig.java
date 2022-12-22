@@ -44,6 +44,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.Historik
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.init.InitielleLinksRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.konfig.KonfigRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.los.LosRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.migrasjon.MigrasjonRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjenesteLocalDev;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
@@ -111,6 +112,7 @@ public class ApplicationConfig extends Application {
         classes.add(ForvaltningKravgrunnlagRestTjeneste.class);
         classes.add(MigrasjonRestTjeneste.class);
         classes.add(VergeRestTjeneste.class);
+        classes.add(LosRestTjeneste.class);
         if (ENV.isLocal()) {
             classes.add(GrunnlagRestTestTjenesteLocalDev.class);
         }

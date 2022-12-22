@@ -68,6 +68,8 @@ spec:
   azure:
     application:
       enabled: true
+      replyURLs:
+        - {{AZURE_REPLY_URL}}
       claims:
         extra:
           - "NAVident"
