@@ -1,12 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy;
 
+import java.math.BigInteger;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
@@ -40,15 +41,27 @@ public class KravgrunnlagHenter {
     }
 
 
+    // TODO: Når en flytter over kan en sende inn HentKravgrunnlagDetaljDto for fpwsproxy direkte
+    public Kravgrunnlag431 hentKravgrunnlagMedFailsafeSammenligningMotProxy(Long behandlingId, String kodeAksjon, BigInteger kravgrunnlagId, String ansvarligEnhet, String saksbehId) {
+        return hentKravgrunnlagMedFailsafeSammenligningMotProxy(behandlingId, lagHentKravgrunnlagDetaljDtoRequest(kodeAksjon, kravgrunnlagId, ansvarligEnhet, saksbehId));
+    }
 
-    public Kravgrunnlag431 hentKravgrunnlagMedFailsafeSammenligningMotProxy(Long behandlingId, HentKravgrunnlagDetaljDto hentKravgrunnlagDetaljDto) {
+    private HentKravgrunnlagDetaljDto lagHentKravgrunnlagDetaljDtoRequest(String kodeAksjon, BigInteger kravgrunnlagId, String ansvarligEnhet, String saksbehId) {
+        HentKravgrunnlagDetaljDto hentKravgrunnlagDetalj = new HentKravgrunnlagDetaljDto();
+        hentKravgrunnlagDetalj.setKodeAksjon(kodeAksjon);
+        hentKravgrunnlagDetalj.setEnhetAnsvarlig(ansvarligEnhet);
+        hentKravgrunnlagDetalj.setKravgrunnlagId(kravgrunnlagId);
+        hentKravgrunnlagDetalj.setSaksbehId(saksbehId);
+        return hentKravgrunnlagDetalj;
+    }
+
+    public Kravgrunnlag431 hentKravgrunnlagMedFailsafeSammenligningMotProxy(Long behandlingId, HentKravgrunnlagDetaljDto hentKravgrunnlagDetaljDtoRequest) {
         try {
-            var kravgrunnlag = hentKravgrunnlagDirekteIntegrasjon(behandlingId, hentKravgrunnlagDetaljDto);
-            sammenlignKravgrunnlagFailSafe(behandlingId, hentKravgrunnlagDetaljDto, kravgrunnlag);
+            var kravgrunnlag = hentKravgrunnlagDirekteIntegrasjon(behandlingId, hentKravgrunnlagDetaljDtoRequest);
+            sammenlignKravgrunnlagFailSafe(behandlingId, hentKravgrunnlagDetaljDtoRequest, kravgrunnlag);
             return kravgrunnlag;
-
         } catch (Exception e) {
-            sammenlignException(behandlingId, hentKravgrunnlagDetaljDto, e);
+            sammenlignException(behandlingId, hentKravgrunnlagDetaljDtoRequest, e);
             throw e;
         }
     }
@@ -102,8 +115,8 @@ public class KravgrunnlagHenter {
 
     private no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto tilHentKravgrunnlagDetaljDto(HentKravgrunnlagDetaljDto hentKravgrunnlagDetaljDto) {
         return new no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto.Builder()
+            .kodeAksjon(no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon.fraKode(hentKravgrunnlagDetaljDto.getKodeAksjon()))
             .kravgrunnlagId(hentKravgrunnlagDetaljDto.getKravgrunnlagId())
-            .kodeAksjon(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG)
             .enhetAnsvarlig(hentKravgrunnlagDetaljDto.getEnhetAnsvarlig())
             .saksbehId(hentKravgrunnlagDetaljDto.getSaksbehId())
             .build();

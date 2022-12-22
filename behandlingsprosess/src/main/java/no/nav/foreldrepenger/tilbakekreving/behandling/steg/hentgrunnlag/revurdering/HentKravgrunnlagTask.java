@@ -32,7 +32,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
-import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -91,22 +90,13 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
 
     private Kravgrunnlag431 hentNyttKravgrunnlag(Long origBehandlingId) {
         var kravgrunnlag = grunnlagRepository.finnKravgrunnlag(origBehandlingId);
-        var hentKravgrunnlagDetalj = forberedeHentKravgrunnlagDetailRequest(kravgrunnlag);
-        return kravgrunnlagHenter.hentKravgrunnlagMedFailsafeSammenligningMotProxy(origBehandlingId, hentKravgrunnlagDetalj);
-    }
-
-    //private DetaljertKravgrunnlagDto hentNyttKravgrunnlagFraØkonomi(Long origBehandlingId, Kravgrunnlag431 kravgrunnlag431) {
-    //    HentKravgrunnlagDetaljDto hentKravgrunnlagDetalj = forberedeHentKravgrunnlagDetailRequest(kravgrunnlag431);
-    //    return økonomiConsumer.hentKravgrunnlag(origBehandlingId, hentKravgrunnlagDetalj);
-    //}
-
-    private HentKravgrunnlagDetaljDto forberedeHentKravgrunnlagDetailRequest(Kravgrunnlag431 kravgrunnlag431) {
-        HentKravgrunnlagDetaljDto hentKravgrunnlagDetalj = new HentKravgrunnlagDetaljDto();
-        hentKravgrunnlagDetalj.setKodeAksjon(KodeAksjon.HENT_GRUNNLAG_OMGJØRING.getKode());
-        hentKravgrunnlagDetalj.setEnhetAnsvarlig(kravgrunnlag431.getAnsvarligEnhet());
-        hentKravgrunnlagDetalj.setKravgrunnlagId(new BigInteger(kravgrunnlag431.getEksternKravgrunnlagId()));
-        hentKravgrunnlagDetalj.setSaksbehId(kravgrunnlag431.getSaksBehId());
-        return hentKravgrunnlagDetalj;
+        return kravgrunnlagHenter.hentKravgrunnlagMedFailsafeSammenligningMotProxy(
+            origBehandlingId,
+            KodeAksjon.HENT_GRUNNLAG_OMGJØRING.getKode(),
+            new BigInteger(kravgrunnlag.getEksternKravgrunnlagId()),
+            kravgrunnlag.getAnsvarligEnhet(),
+            kravgrunnlag.getSaksBehId()
+        );
     }
 
     private void lagHistorikkInnslagForMotattKravgrunnlag(Behandling behandling, Kravgrunnlag431 kravgrunnlag431) {
