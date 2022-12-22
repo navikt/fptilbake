@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -50,13 +49,12 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
-import no.nav.foreldrepenger.tilbakekreving.los.klient.producer.LosKafkaProducerOnPrem;
-import no.nav.foreldrepenger.tilbakekreving.los.klient.producer.LosKafkaProducerAiven;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
+import no.nav.foreldrepenger.tilbakekreving.los.klient.producer.LosKafkaProducerAiven;
 import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
 import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEventDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -72,7 +70,6 @@ public class LosPubliserEventTaskAivenTest {
 
     private BehandlingRepositoryProvider repositoryProvider;
 
-    private LosKafkaProducerOnPrem mockKafkaProducer;
     private LosKafkaProducerAiven mockKafkaProducerAiven = mock(LosKafkaProducerAiven.class);
 
     private LosPubliserEventTask losPubliserEventTask;
@@ -89,12 +86,11 @@ public class LosPubliserEventTaskAivenTest {
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
         SlettGrunnlagEventPubliserer mockEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
         FagsystemKlient mockFagsystemKlient = mock(FagsystemKlient.class);
-        mockKafkaProducer = mock(LosKafkaProducerOnPrem.class);
         KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider,
                 mockGjenopptaBehandlingTjeneste, mockBehandlingskontrollTjeneste, mockEventPubliserer);
         FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repositoryProvider,
                 kravgrunnlagTjeneste, mockFagsystemKlient);
-        losPubliserEventTask = new LosPubliserEventTask(repositoryProvider, faktaFeilutbetalingTjeneste, mockKafkaProducer, mockKafkaProducerAiven, Fagsystem.K9TILBAKE, true);
+        losPubliserEventTask = new LosPubliserEventTask(repositoryProvider, faktaFeilutbetalingTjeneste, mockKafkaProducerAiven, Fagsystem.K9TILBAKE);
 
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
         behandling.setAnsvarligSaksbehandler("1234");
@@ -119,7 +115,6 @@ public class LosPubliserEventTaskAivenTest {
 
         losPubliserEventTask.doTask(prosessTaskData);
 
-        verifyNoInteractions(mockKafkaProducer);
         verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelse(any(), any());
         TilbakebetalingBehandlingProsessEventDto event = losPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, EventHendelse.AKSJONSPUNKT_OPPRETTET.name(),
                 kravgrunnlag431);
@@ -150,7 +145,6 @@ public class LosPubliserEventTaskAivenTest {
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
 
         losPubliserEventTask.doTask(prosessTaskData);
-        verifyNoInteractions(mockKafkaProducer);
         verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelse(any(), any());
 
         TilbakebetalingBehandlingProsessEventDto event = losPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, EventHendelse.AKSJONSPUNKT_AVBRUTT.name(), null);
@@ -183,7 +177,6 @@ public class LosPubliserEventTaskAivenTest {
         prosessTaskData.setProperty(LosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE, AksjonspunktStatus.OPPRETTET.getKode());
 
         losPubliserEventTask.doTask(prosessTaskData);
-        verifyNoInteractions(mockKafkaProducer);
         verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelse(any(), any());
         TilbakebetalingBehandlingProsessEventDto event = losPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, EventHendelse.AKSJONSPUNKT_OPPRETTET.name(), null);
 
@@ -215,7 +208,6 @@ public class LosPubliserEventTaskAivenTest {
         prosessTaskData.setProperty(LosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE, AksjonspunktStatus.AVBRUTT.getKode());
 
         losPubliserEventTask.doTask(prosessTaskData);
-        verifyNoInteractions(mockKafkaProducer);
         verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelse(any(), any());
         TilbakebetalingBehandlingProsessEventDto event = losPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, EventHendelse.AKSJONSPUNKT_AVBRUTT.name(), null);
 

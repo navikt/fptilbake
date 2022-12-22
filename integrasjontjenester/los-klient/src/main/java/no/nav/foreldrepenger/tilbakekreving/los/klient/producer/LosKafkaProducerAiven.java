@@ -55,7 +55,7 @@ public class LosKafkaProducerAiven extends AivenMeldingProducer {
         logger.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandlingId {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), nøkkel);
     }
 
-    public void sendHendelseFplos(Saksnummer saksnummer, BehandlingHendelseV1 dto) throws IOException {
+    public void sendHendelseFplos(Saksnummer saksnummer, BehandlingHendelseV1 dto)  {
         String nøkkel = saksnummer.getVerdi();
         String verdi = DefaultJsonMapper.toJson(dto);
 

@@ -13,8 +13,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.konfig.Environment;
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
@@ -30,7 +28,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.los.klient.producer.LosKafkaProducerAiven;
-import no.nav.foreldrepenger.tilbakekreving.los.klient.producer.LosKafkaProducerOnPrem;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
 import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEventDto;
@@ -54,17 +51,14 @@ public class LosPubliserEventTask implements ProsessTaskHandler {
     public static final String FP_DEFAULT_HREF = "/fpsak/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
     public static final String K9_DEFAULT_HREF = "/k9/web/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
 
-    private static final boolean IS_PROD = Environment.current().isProd();
-
     private Fagsystem fagsystem;
     private String defaultHRef;
 
-    private static final Logger logger = LoggerFactory.getLogger(LosPubliserEventTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LosPubliserEventTask.class);
 
     private KravgrunnlagRepository grunnlagRepository;
     private BehandlingRepository behandlingRepository;
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste;
-    private LosKafkaProducerOnPrem losKafkaProducerOnPrem;
     private LosKafkaProducerAiven losKafkaProducerAiven;
 
     boolean brukAiven;
@@ -76,24 +70,18 @@ public class LosPubliserEventTask implements ProsessTaskHandler {
     @Inject
     public LosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
                                 FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
-                                LosKafkaProducerOnPrem losKafkaProducerOnPrem,
-                                LosKafkaProducerAiven losKafkaProducerAiven,
-                                @KonfigVerdi(value = "toggle.aiven.los", defaultVerdi = "true") boolean brukAiven) {
-        this(repositoryProvider, faktaFeilutbetalingTjeneste, losKafkaProducerOnPrem, losKafkaProducerAiven, ApplicationName.hvilkenTilbake(), brukAiven);
+                                LosKafkaProducerAiven losKafkaProducerAiven) {
+        this(repositoryProvider, faktaFeilutbetalingTjeneste, losKafkaProducerAiven, ApplicationName.hvilkenTilbake());
     }
 
     public LosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
                                 FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
-                                LosKafkaProducerOnPrem losKafkaProducerOnPrem,
                                 LosKafkaProducerAiven losKafkaProducerAiven,
-                                Fagsystem applikasjonNavn,
-                                boolean brukAiven) {
+                                Fagsystem applikasjonNavn) {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
-        this.losKafkaProducerOnPrem = losKafkaProducerOnPrem;
         this.losKafkaProducerAiven = losKafkaProducerAiven;
-        this.brukAiven = brukAiven;
 
         switch (applikasjonNavn) {
             case FPTILBAKE -> {
@@ -116,10 +104,10 @@ public class LosPubliserEventTask implements ProsessTaskHandler {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) ? grunnlagRepository.finnKravgrunnlag(behandlingId) : null;
         try {
-            if (fagsystem == Fagsystem.K9TILBAKE && brukAiven) {
+            if (Fagsystem.K9TILBAKE.equals(fagsystem)) {
                 TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto = getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, eventName, kravgrunnlag431);
                 losKafkaProducerAiven.sendHendelse(behandling.getUuid(), behandlingProsessEventDto);
-            } else if (!IS_PROD && fagsystem == Fagsystem.FPTILBAKE) {
+            } else if (Fagsystem.FPTILBAKE.equals(fagsystem)) {
                 var losHendelseDto = new BehandlingHendelseV1.Builder().medKildesystem(Kildesystem.FPTILBAKE)
                     .medHendelseUuid(UUID.randomUUID())
                     .medBehandlingUuid(behandling.getUuid())
@@ -131,9 +119,7 @@ public class LosPubliserEventTask implements ProsessTaskHandler {
                     .build();
                 losKafkaProducerAiven.sendHendelseFplos(behandling.getFagsak().getSaksnummer(), losHendelseDto);
             } else {
-                TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto = getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, eventName, kravgrunnlag431);
-                losKafkaProducerOnPrem.sendHendelse(behandling.getUuid(), behandlingProsessEventDto);
-                logger.info("Publiserer event:{} på on-prem kafka slik at los kan fordele oppgaven for videre behandling. BehandlingsId: {}", eventName, behandlingId);
+                throw new IllegalStateException("Mangler fagsystem");
             }
         } catch (Exception e) {
             throw new TekniskException("FPT-770744", String.format("Publisering av FPLOS event=%s feilet med exception %s", eventName, e), e);
