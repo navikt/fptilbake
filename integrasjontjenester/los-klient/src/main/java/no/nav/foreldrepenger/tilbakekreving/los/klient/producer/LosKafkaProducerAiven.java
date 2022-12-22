@@ -14,10 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.kafka.AivenMeldingProducer;
 import no.nav.foreldrepenger.tilbakekreving.los.klient.TilbakebetalingBehandlingProsessEventMapper;
 import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEventDto;
+import no.nav.vedtak.hendelser.behandling.v1.BehandlingHendelseV1;
 import no.nav.vedtak.log.mdc.MDCOperations;
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 @ApplicationScoped
 public class LosKafkaProducerAiven extends AivenMeldingProducer {
@@ -50,6 +53,14 @@ public class LosKafkaProducerAiven extends AivenMeldingProducer {
 
         RecordMetadata recordMetadata = runProducerWithSingleJson(melding);
         logger.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandlingId {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), nøkkel);
+    }
+
+    public void sendHendelseFplos(Saksnummer saksnummer, BehandlingHendelseV1 dto) throws IOException {
+        String nøkkel = saksnummer.getVerdi();
+        String verdi = DefaultJsonMapper.toJson(dto);
+
+        runProducerWithSingleJson(new ProducerRecord<>(getTopic(), nøkkel, verdi));
+        logger.info("Melding sendt til Aiven på {} for behandlingId {}", getTopic(), nøkkel);
     }
 
 }
