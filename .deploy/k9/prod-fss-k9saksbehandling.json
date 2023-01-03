@@ -41,7 +41,7 @@
     "KODEVERK_V2_URL": "https://kodeverk.nais.adeo.no/ws/kodeverk/v2",
     "SENSU_HOST": "sensu.nais",
     "SENSU_PORT": "3030",
-    "METRIKKER_KRAVGRUNNLAG_OPPDATERINGSPERIODE" : "P1Y",
+    "METRIKKER_KRAVGRUNNLAG_OPPDATERINGSPERIODE" : "P2W",
     "VEDTAKSBREV_JOIN_PERIODER" : "true",
     "TOGGLE_AIVEN_LOS" : "true",
     "TOGGLE_ENABLE_SENSU" : "true"
