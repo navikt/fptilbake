@@ -30,6 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VarseltekstDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.K9sakBehandlingInfoDto;
+import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.simulering.K9oppdragRestKlient;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.integrasjon.rest.RestClient;
 import no.nav.vedtak.felles.integrasjon.rest.RestClientConfig;
@@ -55,19 +56,19 @@ public class K9sakKlient implements FagsystemKlient {
     private static final String PARAM_NAME_BEHANDLING_UUID = "behandlingUuid";
     private static final String PARAM_NAME_SAKSNUMMER = "saksnummer";
 
-    private static final String K9_OPPDRAG_BASE_URL = "http://k9-oppdrag/k9/oppdrag/api";
-    private static final String K9_OPPDRAG_OVERRIDE_URL = "k9oppdrag.override.url";
-    private static final String K9_OPPDRAG_HENT_FEILUTBETALINGER = "/simulering/feilutbetalte-perioder";
 
     private final RestClient restClient;
     private RestConfig restConfig;
 
+    private K9oppdragRestKlient k9oppdragRestKlient;
+
     public K9sakKlient() {
-        this(RestClient.client());
+        this(RestClient.client(), new K9oppdragRestKlient());
     }
 
-    K9sakKlient(RestClient restClient) {
+    K9sakKlient(RestClient restClient, K9oppdragRestKlient k9oppdragRestKlient) {
         this.restClient = restClient;
+        this.k9oppdragRestKlient = k9oppdragRestKlient;
         this.restConfig = RestConfig.forClient(this.getClass());
     }
 
@@ -124,10 +125,8 @@ public class K9sakKlient implements FagsystemKlient {
     @Override
     public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning) {
         UUID uuid = K9HenvisningKonverterer.henvisningTilUuid(henvisning);
-        URI hentFeilutbetalingerUri = URI.create(getK9OoppdragBaseUri() + K9_OPPDRAG_HENT_FEILUTBETALINGER);
-        var request = RestRequest.newPOSTJson(uuid, hentFeilutbetalingerUri, restConfig);
-        return restClient.sendReturnOptional(request, FeilutbetaltePerioderDto.class)
-            .orElseThrow(() -> new IntegrasjonException("FPT-748280", String.format("Fant ikke behandling med behandlingUuid %s k9-oppdrag", uuid)));
+        return k9oppdragRestKlient.hentFeilutbetaltePerioder(uuid)
+            .orElseThrow(() -> new IntegrasjonException("FPT-748279", String.format("Fant ikke behandling med uuid %s i k9-oppdrag", uuid)));
     }
 
     private List<K9sakBehandlingInfoDto> hentK9sakBehandlingForSaksnummer(String saksnummer) {
@@ -235,17 +234,6 @@ public class K9sakKlient implements FagsystemKlient {
             return URI.create(override);
         }
         return URI.create(K9SAK_BASE_URL);
-    }
-
-    private URI getK9OoppdragBaseUri() {
-        String overrideUrl = Environment.current().getProperty(K9_OPPDRAG_OVERRIDE_URL);
-        if (overrideUrl != null && !overrideUrl.isEmpty()) {
-            logger.info("Overstyrte URL til k9-oppdrag til {}", overrideUrl);
-            return URI.create(overrideUrl);
-        } else {
-            return URI.create(K9_OPPDRAG_BASE_URL);
-        }
-
     }
 
     private boolean notNullOrEmpty(String str) {
