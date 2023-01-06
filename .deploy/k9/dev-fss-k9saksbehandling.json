@@ -25,7 +25,7 @@
     "PDL_SCOPES": "api://dev-fss.pdl.pdl-api/.default",
     "K9SAK_SCOPES": "api://dev-fss.k9saksbehandling.k9-sak/.default",
     "K9SAK_URL": "http://k9-sak.k9saksbehandling",
-    "K9OPPDRAG_SCOPES": "api://dev-fss.pdl.pdl-api/.default",
+    "K9OPPDRAG_SCOPES": "api://dev-fss.k9saksbehandling.k9-oppdrag/.default",
     "K9OPPDRAG_URL": "http://k9-oppdrag.k9saksbehandling",
     "TILBAKEKREVING_V1_URL": "https://cics-q1.adeo.no/oppdrag/K231CW80",
     "DOKUMENTPRODUKSJON_V2_URL": "https://dokprod-q1.nais.preprod.local/dokprod/ws/dokumentproduksjon/v2",
