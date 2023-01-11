@@ -6,13 +6,11 @@
   "minReplicas": "2",
   "maxReplicas": "3",
   "ingresses": [
-    "https://app.adeo.no/fptilbake",
     "https://fptilbake.intern.nav.no",
     "https://fptilbake.prod-fss-pub.nais.io"
   ],
   "kafkaPool" : "nav-prod",
   "env": {
-    "APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD",
     "APPD_ENABLED": "true"
   },
   "AZURE_IAC_RULES": [
