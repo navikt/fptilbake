@@ -20,7 +20,6 @@ import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
-import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.ConstraintViolationMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.GeneralRestExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonMappingExceptionMapper;
@@ -46,7 +45,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkR
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.konfig.KonfigRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.los.LosRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.migrasjon.MigrasjonRestTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjenesteLocalDev;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
@@ -55,8 +53,6 @@ import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 
 @ApplicationPath(ApplicationConfig.API_URI)
 public class ApplicationConfig extends Application {
-
-    private static final Environment ENV = Environment.current();
 
     public static final String API_URI = "/api";
 
@@ -113,9 +109,6 @@ public class ApplicationConfig extends Application {
         classes.add(MigrasjonRestTjeneste.class);
         classes.add(VergeRestTjeneste.class);
         classes.add(LosRestTjeneste.class);
-        if (ENV.isLocal()) {
-            classes.add(GrunnlagRestTestTjenesteLocalDev.class);
-        }
 
         // swagger
         classes.add(OpenApiResource.class);
