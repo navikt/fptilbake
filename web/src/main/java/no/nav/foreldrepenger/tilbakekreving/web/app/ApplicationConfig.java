@@ -35,6 +35,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.Totrinn
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.VilkårsvurderingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.AksjonspunktRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.dokument.DokumentRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.FeilutbetalingSisteBehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.FeilutbetalingÅrsakRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordeling.FordelRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningBehandlingRestTjeneste;
@@ -101,6 +102,7 @@ public class ApplicationConfig extends Application {
         classes.add(ForeldelseRestTjeneste.class);
         classes.add(VarselresponsRestTjeneste.class);
         classes.add(BehandlingFaktaRestTjeneste.class);
+        classes.add(FeilutbetalingSisteBehandlingRestTjeneste.class);
         classes.add(FeilutbetalingÅrsakRestTjeneste.class);
         classes.add(VilkårsvurderingRestTjeneste.class);
         classes.add(TilbakekrevingResulattRestTjeneste.class);
