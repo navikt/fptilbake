@@ -12,11 +12,12 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -55,7 +56,7 @@ public class FeilutbetalingSisteBehandlingRestTjeneste {
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
     }
 
-    @GET
+    @POST
     @Path("/siste-behandling")
     @Operation(
         tags = "feilutbetaling",
@@ -65,7 +66,7 @@ public class FeilutbetalingSisteBehandlingRestTjeneste {
             @ApiResponse(responseCode = "204", description = "Det finnes ingen tilbakekrevigsbehandlnig for saken")
         })
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
-    public Response hentInfoForSisteFørstegangsBehandling(@NotNull @Valid @QueryParam("saksnummer") SaksnummerDto saksnummer) {
+    public Response hentInfoForSisteFørstegangsBehandling(@NotNull @Valid SaksnummerDto saksnummer) {
         Saksnummer saksnummeret = new Saksnummer(saksnummer.getVerdi());
 
         List<Behandling> behandlinger = behandlingRepository.hentAlleBehandlingerForSaksnummer(saksnummeret);
@@ -90,6 +91,7 @@ public class FeilutbetalingSisteBehandlingRestTjeneste {
 
         private List<Periode> feilutbetaltePerioder;
 
+        @JsonCreator
         public BehandlingStatusOgFeilutbetalinger(LocalDate avsluttetDato, List<Periode> feilutbetaltePerioder) {
             this.avsluttetDato = avsluttetDato;
             this.feilutbetaltePerioder = feilutbetaltePerioder;
