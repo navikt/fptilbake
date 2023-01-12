@@ -109,6 +109,7 @@ public class KravgrunnlagHenter {
         } catch (Exception exceptionFraFpwsproxy) {
             if (!opprinneligException.getClass().equals(exceptionFraFpwsproxy.getClass())) {
                 LOG.info("Avvik! Exception fra fpwsproxy er forskjellig enn det mottatt med direkteintegrasjon {} vs {}", opprinneligException.getClass(), exceptionFraFpwsproxy.getClass());
+                LOG.info("Exception mottatt fra fpwsproxy:", exceptionFraFpwsproxy);
             }
         }
     }

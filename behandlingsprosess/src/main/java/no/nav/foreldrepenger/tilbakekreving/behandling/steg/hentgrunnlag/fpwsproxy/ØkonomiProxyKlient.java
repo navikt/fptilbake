@@ -56,7 +56,7 @@ public class ØkonomiProxyKlient {
     private static Optional<String> handleResponse(HttpResponse<String> response) {
         int status = response.statusCode();
         var body = response.body();
-        if (status >= HTTP_OK && status < HTTP_MULT_CHOICE) {
+        if (status >= HTTP_OK && status < HTTP_MULT_CHOICE) { // 2xx status
             if (status == HTTP_NOT_AUTHORITATIVE && erKravgrunnlagSperret(body)) {
                 throw new SperringKravgrunnlagException("FPT-539081", "Fikk feil fra OS ved henting av kravgrunnlag. Sjekk loggen til fpwsproxy for mer info.");
             }
