@@ -9,13 +9,10 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -31,18 +28,10 @@ import com.codahale.metrics.annotation.Timed;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
-import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.MigrerSakshendleserTilDvhTask;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.FagsystemId;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.DvhEventHendelse;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
@@ -54,24 +43,14 @@ public class MigrasjonRestTjeneste {
     private static final Logger logger = LoggerFactory.getLogger(MigrasjonRestTjeneste.class);
 
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
-    private BehandlingRepository behandlingRepository;
-    private BehandlingVedtakRepository behandlingVedtakRepository;
-    private BehandlingresultatRepository behandlingresultatRepository;
-    private ProsessTaskTjeneste taskTjeneste;
 
     public MigrasjonRestTjeneste() {
         // for CDI
     }
 
     @Inject
-    public MigrasjonRestTjeneste(ØkonomiMottattXmlRepository økonomiMottattXmlRepository,
-                                 BehandlingRepositoryProvider repositoryProvider,
-                                 ProsessTaskTjeneste taskTjeneste) {
+    public MigrasjonRestTjeneste(ØkonomiMottattXmlRepository økonomiMottattXmlRepository) {
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
-        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.behandlingVedtakRepository = repositoryProvider.getBehandlingVedtakRepository();
-        this.behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
-        this.taskTjeneste = taskTjeneste;
     }
 
     @POST
@@ -105,38 +84,5 @@ public class MigrasjonRestTjeneste {
         return Response.status(Response.Status.OK).build();
     }
 
-    @POST
-    @Timed
-    @Path("/hendelserTilDvh")
-    @Consumes(APPLICATION_JSON)
-    @Produces(APPLICATION_JSON)
-    @Operation(tags = "migrasjon", description = "Tjeneste for å sende sakshendelser til Dvh for alle eksisterende behandlinger",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Migrasjon er ferdig"),
-                    @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
-            })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
-    public Response sendSakshendelserTilDvhForAlleEksisterendeBehandlinger(@QueryParam("hendelse") @NotNull @Valid EventHendelseDto hendelse) {
-        DvhEventHendelse eventHendelse = DvhEventHendelse.valueOf(hendelse.getHendelse());
-        if (DvhEventHendelse.AKSJONSPUNKT_OPPRETTET.equals(eventHendelse)) {
-            List<Long> eksisterendeBehandlingIder = behandlingRepository.hentAlleBehandlingIder();
-            for (Long behandlingId : eksisterendeBehandlingIder) {
-                opprettProsessTask(eventHendelse, behandlingId);
-            }
-        } else if (DvhEventHendelse.AKSJONSPUNKT_AVBRUTT.equals(eventHendelse)) {
-            List<Long> avsluttetBehandlingIder = behandlingRepository.hentAlleAvsluttetBehandlingIder();
-            for (Long behandlingId : avsluttetBehandlingIder) {
-                opprettProsessTask(eventHendelse, behandlingId);
-            }
-        }
-        return Response.status(Response.Status.OK).build();
-    }
-
-    private void opprettProsessTask(DvhEventHendelse eventHendelse, Long behandlingId) {
-        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(MigrerSakshendleserTilDvhTask.class);
-        prosessTaskData.setProperty("behandlingId", String.valueOf(behandlingId));
-        prosessTaskData.setProperty("eventHendelse", eventHendelse.name());
-        taskTjeneste.lagre(prosessTaskData);
-    }
 
 }

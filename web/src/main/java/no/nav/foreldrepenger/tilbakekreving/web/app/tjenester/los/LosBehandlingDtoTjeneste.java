@@ -98,7 +98,7 @@ public class LosBehandlingDtoTjeneste {
     }
 
     private static List<LosBehandlingDto.LosAksjonspunktDto> mapAksjonspunkter(Behandling behandling, Kravgrunnlag431 kravgrunnlag431, LocalDateTime kravgrunnlagManglerFrist) {
-        if (kravgrunnlag431 == null && kravgrunnlagManglerFrist != null) {
+        if (!behandling.erAvsluttet() && kravgrunnlag431 == null && kravgrunnlagManglerFrist != null) {
             return List.of(new LosBehandlingDto.LosAksjonspunktDto(AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG,
                 Aksjonspunktstatus.OPPRETTET, null, kravgrunnlagManglerFrist));
         } else {
