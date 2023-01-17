@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -20,7 +21,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
-import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.HentKorrigertKravgrunnlagDto;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
@@ -44,7 +44,7 @@ class ForvaltningKravgrunnlagRestTjenesteTest {
 
     @BeforeEach
     void setup() {
-        var forvaltningTjeneste = new ForvaltningTjeneste(mock(ProsessTaskTjeneste.class), mottattXmlRepository, repositoryProvider.getBehandlingRepository(), kravgrunnlagRepository, mock(ØkonomiConsumer.class));
+        var forvaltningTjeneste = new ForvaltningTjeneste(mock(ProsessTaskTjeneste.class), mottattXmlRepository, repositoryProvider.getBehandlingRepository(), kravgrunnlagRepository, mock(ØkonomiProxyKlient.class));
 
         forvaltningKravgrunnlagRestTjeneste = new ForvaltningKravgrunnlagRestTjeneste(repositoryProvider.getBehandlingRepository(), forvaltningTjeneste);
         behandling = scenario.lagre(repositoryProvider);
@@ -82,7 +82,7 @@ class ForvaltningKravgrunnlagRestTjenesteTest {
 
         HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto = new HentKorrigertKravgrunnlagDto(behandling.getId(),
             "");
-        Response respons = forvaltningKravgrunnlagRestTjeneste.annulerKravgrunnlag(hentKorrigertKravgrunnlagDto);
+        Response respons = forvaltningKravgrunnlagRestTjeneste.annullerKravgrunnlag(hentKorrigertKravgrunnlagDto);
         assertThat(respons.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     }
 
@@ -92,7 +92,7 @@ class ForvaltningKravgrunnlagRestTjenesteTest {
 
         HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto = new HentKorrigertKravgrunnlagDto(behandling.getId(),
             "");
-        Response respons = forvaltningKravgrunnlagRestTjeneste.annulerKravgrunnlag(hentKorrigertKravgrunnlagDto);
+        Response respons = forvaltningKravgrunnlagRestTjeneste.annullerKravgrunnlag(hentKorrigertKravgrunnlagDto);
         assertThat(respons.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
     }
 

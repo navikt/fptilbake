@@ -77,17 +77,20 @@ public class ForvaltningKravgrunnlagRestTjeneste {
     @Path("/annuler")
     @Operation(
         tags = "FORVALTNING-kravgrunnlag",
-        description = "Tjeneste for å annulere en mottatt kravgrunnlag hos økonomi, f.eks pga brukerens død",
+        description = "Tjeneste for å annullere en mottatt kravgrunnlag hos økonomi, f.eks pga brukerens død",
         responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "Finnes ikke kravgrunnlag."),
             @ApiResponse(responseCode = "500", description = "Ukjent feil!")
         })
     @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
-    public Response annulerKravgrunnlag(@Valid @NotNull HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
+    public Response annullerKravgrunnlag(@Valid @NotNull HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
         Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
         try {
-            forvaltningTjeneste.annulerKravgrunnlag(behandling.getId());
+            var behandlingId = behandling.getId();
+            logger.info("Starter Anullerekravgrunnlag for behandlingId={}", behandlingId);
+            forvaltningTjeneste.annullerKravgrunnlag(behandlingId);
+            logger.info("AnnulereKravgrunnlag sendt til oppdragssystemet.");
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
