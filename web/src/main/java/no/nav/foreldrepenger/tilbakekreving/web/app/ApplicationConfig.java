@@ -39,14 +39,12 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.Fei
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.FeilutbetalingÅrsakRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordeling.FordelRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningBehandlingRestTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningFritekstbrevRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningKravgrunnlagRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.init.InitielleLinksRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.konfig.KonfigRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.los.LosRestTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.migrasjon.MigrasjonRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjenesteLocalDev;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
@@ -110,9 +108,7 @@ public class ApplicationConfig extends Application {
         classes.add(BrevRestTjeneste.class);
         classes.add(FordelRestTjeneste.class);
         classes.add(ForvaltningBehandlingRestTjeneste.class);
-        classes.add(ForvaltningFritekstbrevRestTjeneste.class);
         classes.add(ForvaltningKravgrunnlagRestTjeneste.class);
-        classes.add(MigrasjonRestTjeneste.class);
         classes.add(VergeRestTjeneste.class);
         classes.add(LosRestTjeneste.class);
         if (ENV.isLocal()) {
