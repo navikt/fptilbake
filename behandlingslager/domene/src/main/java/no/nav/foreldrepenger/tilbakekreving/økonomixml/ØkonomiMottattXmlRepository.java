@@ -93,17 +93,6 @@ public class ØkonomiMottattXmlRepository {
         return finnMottattXml(mottattXmlId).isTilkoblet();
     }
 
-    public List<ØkonomiXmlMottatt> hentAlleMeldingerUtenSaksnummer() {
-        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer is null", ØkonomiXmlMottatt.class);
-        return query.getResultList();
-    }
-
-    public void oppdaterSaksnummer(Long kravgrunnlagXmlId, String saksnummer) {
-        ØkonomiXmlMottatt entity = finnMottattXml(kravgrunnlagXmlId);
-        entity.setSaksnummer(saksnummer);
-        entityManager.persist(entity);
-    }
-
     public List<Long> hentGamleUkobledeKravgrunnlagXmlIds(LocalDateTime dato) {
         TypedQuery<Long> query = entityManager.createQuery("select id from ØkonomiXmlMottatt where tilkoblet='N' and opprettetTidspunkt < :dato" +
                 " and melding like '%detaljertKravgrunnlagMelding%'", Long.class);
