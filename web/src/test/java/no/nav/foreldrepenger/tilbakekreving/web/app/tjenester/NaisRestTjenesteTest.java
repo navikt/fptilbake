@@ -11,15 +11,15 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.Selftests;
 
-public class HealthCheckRestServiceTest {
+public class NaisRestTjenesteTest {
 
-    private HealthCheckRestService restTjeneste;
+    private NaisRestTjeneste restTjeneste;
 
     private final Selftests selftestsMock = mock(Selftests.class);
 
     @BeforeEach
     public void setup() {
-        restTjeneste = new HealthCheckRestService(selftestsMock);
+        restTjeneste = new NaisRestTjeneste(selftestsMock);
     }
 
     @Test

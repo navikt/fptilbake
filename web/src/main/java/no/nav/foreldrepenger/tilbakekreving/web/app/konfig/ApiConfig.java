@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.app;
+package no.nav.foreldrepenger.tilbakekreving.web.app.konfig;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -6,15 +6,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import org.glassfish.jersey.server.ServerProperties;
 
-import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import io.swagger.v3.oas.integration.GenericOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -52,31 +51,29 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 
 
-@ApplicationPath(ApplicationConfig.API_URI)
-public class ApplicationConfig extends Application {
+@ApplicationPath(ApiConfig.API_URI)
+public class ApiConfig extends Application {
 
     private static final Environment ENV = Environment.current();
 
     public static final String API_URI = "/api";
 
-    public ApplicationConfig() {
+    public ApiConfig() {
         OpenAPI oas = new OpenAPI();
         Info info = new Info()
                 .title("Vedtaksløsningen - Tilbakekreving")
                 .version("1.0")
-                .description("REST grensesnitt for Vedtaksløsningen.");
+                .description("REST grensesnitt for tilbakekreving.");
 
         oas.info(info).addServersItem(new Server().url(JettyServer.getContextPath()));
 
         SwaggerConfiguration oasConfig = new SwaggerConfiguration()
                 .openAPI(oas)
                 .prettyPrint(true)
-                .scannerClass("io.swagger.v3.jaxrs2.integration.JaxrsAnnotationScanner")
-                .resourcePackages(Stream.of("no.nav.vedtak", "no.nav.foreldrepenger")
-                        .collect(Collectors.toSet()));
+                .resourceClasses(getClasses().stream().map(Class::getName).collect(Collectors.toSet()));
 
         try {
-            new JaxrsOpenApiContextBuilder<>()
+            new GenericOpenApiContextBuilder<>()
                     .openApiConfiguration(oasConfig)
                     .buildContext(true)
                     .read();

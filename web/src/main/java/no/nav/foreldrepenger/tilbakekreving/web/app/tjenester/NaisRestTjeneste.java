@@ -12,7 +12,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.Selftests;
 
 @Path("/health")
 @ApplicationScoped
-public class HealthCheckRestService {
+public class NaisRestTjeneste {
 
     private static final String RESPONSE_CACHE_KEY = "Cache-Control";
     private static final String RESPONSE_CACHE_VAL = "must-revalidate,no-cache,no-store";
@@ -22,12 +22,12 @@ public class HealthCheckRestService {
 
     private Boolean isContextStartupReady = false;
 
-    public HealthCheckRestService() {
+    public NaisRestTjeneste() {
         // CDI
     }
 
     @Inject
-    public HealthCheckRestService(Selftests selftests) {
+    public NaisRestTjeneste(Selftests selftests) {
         this.selftests = selftests;
     }
 

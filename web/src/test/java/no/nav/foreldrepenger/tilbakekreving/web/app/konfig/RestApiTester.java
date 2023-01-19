@@ -12,7 +12,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
-import no.nav.foreldrepenger.tilbakekreving.web.app.ApplicationConfig;
 
 public class RestApiTester {
 
@@ -35,7 +34,7 @@ public class RestApiTester {
 
         List<Class<?>> klasser = new ArrayList<>();
 
-        klasser.addAll(finnAlleRestTjenester(new ApplicationConfig()));
+        klasser.addAll(finnAlleRestTjenester(new ApiConfig()));
 
         return klasser;
     }

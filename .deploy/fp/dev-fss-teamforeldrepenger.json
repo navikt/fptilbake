@@ -6,7 +6,7 @@
   "minReplicas": "1",
   "maxReplicas": "2",
   "ingresses": [
-    "https://fptilbake.dev.intern.nav.no/",
+    "https://fptilbake.dev.intern.nav.no",
     "https://fptilbake.dev-fss-pub.nais.io"
   ],
   "kafkaPool" : "nav-dev",
