@@ -17,6 +17,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.error.FeilDto;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.error.FeilType;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.AnnullerKravGrunnlagDto;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.Kravgrunnlag431Dto;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ManglendeKravgrunnlagException;
@@ -37,22 +38,41 @@ public class ØkonomiProxyKlient {
     private final RestClient restClient;
     private final RestConfig restConfig;
     private final URI endpointKravgrunnlag;
+    private final URI endpointKravgrunnlagAnnuller;
 
     public ØkonomiProxyKlient() {
         this.restClient = RestClient.client();
         this.restConfig = RestConfig.forClient(this.getClass());
-        this.endpointKravgrunnlag = UriBuilder.fromUri(restConfig.endpoint()).path("/tilbakekreving/kravgrunnlag").build();
+        this.endpointKravgrunnlag = UriBuilder.fromUri(restConfig.endpoint()).path("/tilbakekreving").path("/kravgrunnlag").build();
+        this.endpointKravgrunnlagAnnuller = UriBuilder.fromUri(restConfig.endpoint()).path("/tilbakekreving").path("/kravgrunnlag/annuller").build();
     }
 
     public Kravgrunnlag431Dto hentKravgrunnlag(HentKravgrunnlagDetaljDto hentKravgrunnlagDetaljDto) {
         var target = UriBuilder.fromUri(endpointKravgrunnlag).build();
         var request = RestRequest.newPOSTJson(hentKravgrunnlagDetaljDto, target, restConfig);
-        return handleResponse(restClient.sendReturnUnhandled(request))
+        return handleKravgrunnlagResponse(restClient.sendReturnUnhandled(request))
                 .map(r -> fromJson(r, Kravgrunnlag431Dto.class))
                 .orElseThrow(() -> new IllegalStateException("Respons fra fpwsproxy tilsier at det er funnet et kravgrunnlag men responsen er tom. Dette må sjekkes opp i! Sjekk loggen til fpwsproxy for mer info."));
     }
 
-    private static Optional<String> handleResponse(HttpResponse<String> response) {
+    public void anullereKravgrunnlag(AnnullerKravGrunnlagDto annullerKravgrunnlagDto) {
+        var target = UriBuilder.fromUri(endpointKravgrunnlagAnnuller).build();
+        var putMethod = new RestRequest.Method(RestRequest.WebMethod.PUT, RestRequest.jsonPublisher(annullerKravgrunnlagDto));
+        var request = RestRequest.newRequest(putMethod, target, restConfig);
+        handleAnnullertKravgrunnlagResponse(restClient.sendReturnUnhandled(request));
+    }
+
+    private static void handleAnnullertKravgrunnlagResponse(HttpResponse<String> response) {
+        int status = response.statusCode();
+        if (status == HTTP_FORBIDDEN) {
+            throw new ManglerTilgangException("F-468816", "Mangler tilgang. Fikk http-kode 403 fra server");
+        }
+        if (status < HTTP_OK || status >= HTTP_MULT_CHOICE) {
+            throw new IntegrasjonException("F-468817", String.format("Uventet respons %s fra FpWsProxy ved annullering av kravgrunnlag. Sjekk loggen til fpwsproxy for mer info.", status));
+        }
+    }
+
+    private static Optional<String> handleKravgrunnlagResponse(HttpResponse<String> response) {
         int status = response.statusCode();
         var body = response.body();
         if (status >= HTTP_OK && status < HTTP_MULT_CHOICE) { // 2xx status
@@ -67,7 +87,7 @@ public class ØkonomiProxyKlient {
         } else if (status == HTTP_INTERNAL_ERROR && kvitteringInneholderUkjentFeil(body)) {
             throw new UkjentOppdragssystemException("FPT-539080", "Fikk feil fra OS ved henting av kravgrunnlag. Sjekk loggen til fpwsproxy for mer info.");
         } else {
-            throw new IntegrasjonException("F-468817", String.format("Uventet respons %s fra FpWsProxy. Sjekk loggen til fpwsproxy for mer info.", status));
+            throw new IntegrasjonException("F-468817", String.format("Uventet respons %s fra FpWsProxy ved henting av kravgrunnlag. Sjekk loggen til fpwsproxy for mer info.", status));
         }
     }
 
