@@ -44,7 +44,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
-import no.nav.foreldrepenger.tilbakekreving.web.app.ApplicationConfig;
+import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.ApiConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.db.DatasourceUtil;
 import no.nav.vedtak.sikkerhet.ContextPathHolder;
 import no.nav.vedtak.sikkerhet.jaspic.OidcAuthModule;
@@ -197,6 +197,10 @@ public class JettyServer {
         ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         ctx.setAttribute("org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern",
                 "^.*jersey-.*.jar$|^.*felles-.*.jar$");
+
+        ctx.addEventListener(new org.jboss.weld.environment.servlet.BeanManagerResourceBindingListener());
+        ctx.addEventListener(new org.jboss.weld.environment.servlet.Listener());
+
         ctx.setSecurityHandler(createSecurityHandler());
         updateMetaData(ctx.getMetaData());
         ctx.setThrowUnavailableOnStartupException(true);
@@ -231,7 +235,7 @@ public class JettyServer {
     }
 
     private static List<Class<?>> getWebInfClasses() {
-        return List.of(ApplicationConfig.class);
+        return List.of(ApiConfig.class);
     }
 
     private Integer getServerPort() {

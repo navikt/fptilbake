@@ -142,6 +142,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagDetaljertKravgrunnlagDto(true));
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = lagEksternBehandlingData();
         when(fagsystemKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(eksternBehandlingsinfoDto));
+        when(fagsystemKlientMock.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingData(eksternBehandlingsinfoDto));
         when(fagsystemKlientMock.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingData(eksternBehandlingsinfoDto));
         when(fagsystemKlientMock.hentBehandlingOptional(any(UUID.class))).thenReturn(Optional.of(eksternBehandlingsinfoDto));
         when(fagsystemKlientMock.hentBehandling(any(UUID.class))).thenReturn(eksternBehandlingsinfoDto);
