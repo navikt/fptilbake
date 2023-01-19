@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingsbelopDTO;
@@ -19,28 +21,29 @@ public class TilbakekrevingsvedtakMapperFpwsproxy {
     }
 
     static TilbakekrevingVedtakDTO tilDto(Kravgrunnlag431 kravgrunnlag, List<TilbakekrevingPeriode> tilbakekrevingPerioder) {
-        var tilbakekrevingsvedtak = TilbakekrevingsvedtakMapperFpwsproxy.tilDto(kravgrunnlag);
-        for (TilbakekrevingPeriode tilbakekrevingPeriode : tilbakekrevingPerioder) {
-            tilbakekrevingsvedtak.tilbakekrevingsperiode().add(TilbakekrevingsvedtakMapperFpwsproxy.tilDto(tilbakekrevingPeriode));
-        }
-        return tilbakekrevingsvedtak;
-    }
-
-    private static TilbakekrevingVedtakDTO tilDto(Kravgrunnlag431 kravgrunnlag) {
-        var vedtakFagsystemDato = kravgrunnlag.getVedtakFagSystemDato();
-        if (vedtakFagsystemDato == null) {
-            vedtakFagsystemDato = LocalDate.now();
-        }
-
         return new TilbakekrevingVedtakDTO.Builder()
             .kodeAksjon(KodeAksjon.FATTE_VEDTAK.getKode()) // fast verdi, Fatte Vedtak(8)
             .vedtakId(kravgrunnlag.getVedtakId())
-            .datoVedtakFagsystem(vedtakFagsystemDato)
+            .datoVedtakFagsystem(vedatkFagsystemDato(kravgrunnlag))
             .kodeHjemmel("22-15") // fast verdi
             .enhetAnsvarlig(kravgrunnlag.getAnsvarligEnhet())
             .kontrollfelt(kravgrunnlag.getKontrollFelt())
             .saksbehId(SubjectHandler.getSubjectHandler().getUid())
+            .tilbakekrevingsperiode(tilTilbakekrevingsperiodeDTOer(tilbakekrevingPerioder))
             .build();
+    }
+    private static LocalDate vedatkFagsystemDato(Kravgrunnlag431 kravgrunnlag) {
+        var vedtakFagsystemDato = kravgrunnlag.getVedtakFagSystemDato();
+        if (vedtakFagsystemDato == null) {
+            vedtakFagsystemDato = LocalDate.now();
+        }
+        return vedtakFagsystemDato;
+    }
+
+    private static List<TilbakekrevingsperiodeDTO> tilTilbakekrevingsperiodeDTOer(List<TilbakekrevingPeriode> tilbakekrevingPerioder) {
+        return safeStream(tilbakekrevingPerioder)
+            .map(TilbakekrevingsvedtakMapperFpwsproxy::tilDto)
+            .toList();
     }
 
     private static TilbakekrevingsperiodeDTO tilDto(TilbakekrevingPeriode tilbakekrevingPeriode) {
@@ -52,7 +55,7 @@ public class TilbakekrevingsvedtakMapperFpwsproxy {
     }
 
     private static List<TilbakekrevingsbelopDTO> lagTilbakekrevignsbelopDTOPerioder(List<TilbakekrevingBeløp> beløp) {
-        return beløp.stream()
+        return safeStream(beløp)
             .map(TilbakekrevingsvedtakMapperFpwsproxy::lagTilbakekrevignsbelopDTOPeriode)
             .toList();
     }
@@ -76,6 +79,12 @@ public class TilbakekrevingsvedtakMapperFpwsproxy {
 
     private static no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.Periode lagPeriodeDto(Periode periode) {
         return new no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.Periode(periode.getFom(), periode.getTom());
+    }
+
+    public static <T> Stream<T> safeStream(List<T> list) {
+        return Optional.ofNullable(list)
+            .orElseGet(List::of)
+            .stream();
     }
 
 }
