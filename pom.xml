@@ -36,7 +36,7 @@
         <fp-tidsserie.version>2.6.5</fp-tidsserie.version>
         <fp-jms.version>2.2.0</fp-jms.version>
 
-        <fpkontrakter.version>6.2.6</fpkontrakter.version>
+        <fpkontrakter.version>6.2.8</fpkontrakter.version>
         <abakus-kontrakt.version>1.3.38</abakus-kontrakt.version>
 
         <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
