@@ -1,15 +1,18 @@
 package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 
+import static no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.KodeSkyld.IKKE_FORDELT;
+import static no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.KodeÅrsak.ANNET;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.KodeResultat;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingsbelopDTO;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingsperiodeDTO;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
@@ -22,10 +25,8 @@ public class TilbakekrevingsvedtakMapperFpwsproxy {
 
     static TilbakekrevingVedtakDTO tilDto(Kravgrunnlag431 kravgrunnlag, List<TilbakekrevingPeriode> tilbakekrevingPerioder) {
         return new TilbakekrevingVedtakDTO.Builder()
-            .kodeAksjon(KodeAksjon.FATTE_VEDTAK.getKode()) // fast verdi, Fatte Vedtak(8)
             .vedtakId(kravgrunnlag.getVedtakId())
             .datoVedtakFagsystem(vedatkFagsystemDato(kravgrunnlag))
-            .kodeHjemmel("22-15") // fast verdi
             .enhetAnsvarlig(kravgrunnlag.getAnsvarligEnhet())
             .kontrollfelt(kravgrunnlag.getKontrollFelt())
             .saksbehId(SubjectHandler.getSubjectHandler().getUid())
@@ -69,12 +70,24 @@ public class TilbakekrevingsvedtakMapperFpwsproxy {
             .belopNy(b.getNyttBeløp())
             .belopSkatt(b.getSkattBeløp());
         if (KlasseType.YTEL.equals(b.getKlasseType())) {
-            builder.kodeResultat(b.getKodeResultat().getKode());
-            builder.kodeAarsak("ANNET"); // fast verdi
-            builder.kodeSkyld("IKKE_FORDELT"); // fast verdi
+            builder.kodeResultat(tilKodeResultat(b.getKodeResultat()));
+            builder.kodeAarsak(ANNET);
+            builder.kodeSkyld(IKKE_FORDELT);
         }
         return builder.build();
 
+    }
+
+    private static KodeResultat tilKodeResultat(no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeResultat kodeResultat) {
+        if (kodeResultat == null) return null;
+        return switch (kodeResultat) {
+            case FORELDET -> KodeResultat.FORELDET;
+            case FEILREGISTRERT -> KodeResultat.FEILREGISTRERT;
+            case INGEN_TILBAKEKREVING -> KodeResultat.INGEN_TILBAKEKREV;
+            case DELVIS_TILBAKEKREVING -> KodeResultat.DELVIS_TILBAKEKREV;
+            case FULL_TILBAKEKREVING -> KodeResultat.FULL_TILBAKEKREV;
+
+        };
     }
 
     private static no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.Periode lagPeriodeDto(Periode periode) {
