@@ -15,8 +15,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.codahale.metrics.annotation.Timed;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
@@ -65,7 +63,6 @@ public class DokumentRestTjeneste {
     }
 
     @POST
-    @Timed
     @Path("/forhandsvis-varselbrev")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av varselbrevet")
@@ -79,7 +76,6 @@ public class DokumentRestTjeneste {
     }
 
     @GET
-    @Timed
     @Path("/hent-vedtaksbrev")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "dokument", description = "Returnerer forhåndsvisning av vedtaksbrevet som tekst, slik at det kan vises i GUI for redigering")
@@ -99,7 +95,6 @@ public class DokumentRestTjeneste {
     }
 
     @POST
-    @Timed
     @Path("/forhandsvis-vedtaksbrev")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av vedtaksbrevet")
@@ -112,7 +107,6 @@ public class DokumentRestTjeneste {
     }
 
     @POST
-    @Timed
     @Path("/forhandsvis-henleggelsesbrev")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av henleggelsesbrevet")

@@ -18,8 +18,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.codahale.metrics.annotation.Timed;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
@@ -59,7 +57,6 @@ public class BrevRestTjeneste {
 
 
     @GET
-    @Timed
     @Path("/maler")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Operation(tags = "brev", description = "Henter liste over tilgjengelige brevtyper")
@@ -72,7 +69,6 @@ public class BrevRestTjeneste {
     }
 
     @POST
-    @Timed
     @Path("/bestill")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Operation(tags = "brev", description = "bestiller brev")
@@ -86,7 +82,6 @@ public class BrevRestTjeneste {
     }
 
     @POST
-    @Timed
     @Path("/forhandsvis")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "brev", description = "Returnerer en pdf som er en forhåndsvisning av brevet")

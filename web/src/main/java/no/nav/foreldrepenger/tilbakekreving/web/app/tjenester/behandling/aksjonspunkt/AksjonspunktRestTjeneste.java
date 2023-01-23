@@ -21,8 +21,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.codahale.metrics.annotation.Timed;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -73,7 +71,6 @@ public class AksjonspunktRestTjeneste {
     }
 
     @GET
-    @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(
             tags = "aksjonspunkt",
@@ -104,7 +101,6 @@ public class AksjonspunktRestTjeneste {
      * @throws URISyntaxException
      */
     @POST
-    @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(
             tags = "aksjonspunkt",
