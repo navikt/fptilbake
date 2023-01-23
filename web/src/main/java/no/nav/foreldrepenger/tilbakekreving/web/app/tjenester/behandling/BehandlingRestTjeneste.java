@@ -24,8 +24,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.codahale.metrics.annotation.Timed;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -269,7 +267,6 @@ public class BehandlingRestTjeneste {
     }
 
     @POST
-    @Timed
     @Path("/gjenoppta")
     @Operation(
             tags = "behandlinger",
@@ -291,7 +288,6 @@ public class BehandlingRestTjeneste {
     }
 
     @POST
-    @Timed
     @Path("/henlegg")
     @Operation(
             tags = "behandlinger",
@@ -311,7 +307,6 @@ public class BehandlingRestTjeneste {
     }
 
     @POST
-    @Timed
     @Path("/sett-pa-vent")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(
@@ -328,7 +323,6 @@ public class BehandlingRestTjeneste {
 
 
     @POST
-    @Timed
     @Path("/endre-pa-vent")
     @Operation(
             tags = "behandlinger",
@@ -344,7 +338,6 @@ public class BehandlingRestTjeneste {
 
     @GET
     @Path(BEHANDLING_ALLE_PART_PATH)
-    @Timed
     @Operation(
             tags = "behandlinger",
             description = "Søk etter behandlinger på saksnummer", summary = "Returnerer alle behandlinger som er tilknyttet saksnummer.")
@@ -357,7 +350,6 @@ public class BehandlingRestTjeneste {
     }
 
     @POST
-    @Timed
     @Operation(
             tags = "behandlinger",
             description = "Init hent behandling",
@@ -376,7 +368,6 @@ public class BehandlingRestTjeneste {
 
     @GET
     @Path("/status")
-    @Timed
     @Operation(
             tags = "behandlinger",
             description = "Url for å polle på behandling mens behandlingprosessen pågår i bakgrunnen(asynkront)", summary = "Returnerer link til enten samme (hvis ikke ferdig) eller redirecter til /behandlinger dersom asynkrone operasjoner er ferdig.",
@@ -398,7 +389,6 @@ public class BehandlingRestTjeneste {
     }
 
     @GET
-    @Timed
     @Operation(
             tags = "behandlinger",
             description = "Hent behandling gitt id", summary = "Returnerer behandlingen som er tilknyttet id. Dette er resultat etter at asynkrone operasjoner er utført.",
@@ -422,7 +412,6 @@ public class BehandlingRestTjeneste {
     //kun brukes av fpsak(backend)
     @GET
     @Path("/tilbakekreving/aapen")
-    @Timed
     @Operation(
             tags = "behandlinger",
             description = "Sjekk hvis tilbakekrevingbehandling er åpen",
@@ -441,7 +430,6 @@ public class BehandlingRestTjeneste {
     //kun brukes av fpsak(backend)
     @GET
     @Path("/tilbakekreving/vedtak-info")
-    @Timed
     @Operation(
             tags = "behandlinger",
             description = "Hent tilbakekrevingsvedtakInfo",

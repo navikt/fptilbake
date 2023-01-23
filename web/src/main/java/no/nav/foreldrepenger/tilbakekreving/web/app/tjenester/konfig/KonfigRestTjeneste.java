@@ -9,8 +9,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import com.codahale.metrics.annotation.Timed;
-
 import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
@@ -36,7 +34,6 @@ public class KonfigRestTjeneste {
     }
 
     @GET
-    @Timed
     @Path("/rettskilde")
     @Produces("application/json")
     @Operation(tags = "konfigurasjon", description = "Henter lenke til rettskilde.")
@@ -47,7 +44,6 @@ public class KonfigRestTjeneste {
     }
 
     @GET
-    @Timed
     @Path("/systemrutine")
     @Produces("application/json")
     @Operation(tags = "konfigurasjon", description = "Henter lenge til systemrutine")
