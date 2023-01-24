@@ -33,7 +33,7 @@
 
         <felles.version>4.2.21</felles.version>
         <prosesstask.version>3.1.16</prosesstask.version>
-        <fp-tidsserie.version>2.6.5</fp-tidsserie.version>
+        <fp-tidsserie.version>2.6.6</fp-tidsserie.version>
         <fp-jms.version>2.2.0</fp-jms.version>
 
         <fpkontrakter.version>6.2.8</fpkontrakter.version>
