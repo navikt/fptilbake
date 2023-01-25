@@ -9,7 +9,6 @@ import javax.enterprise.inject.spi.CDI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.prometheus.client.hotspot.DefaultExports;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
@@ -27,7 +26,6 @@ public class ApplicationServiceStarter {
     private List<Class<AppServiceHandler>> services = new ArrayList<>();
 
     public void startServices() {
-        DefaultExports.initialize();
 
         start(TaskManager.class);
         start(BatchTaskScheduler.class);
