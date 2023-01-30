@@ -7,6 +7,8 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
@@ -18,7 +20,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDat
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
@@ -76,24 +77,23 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
     }
 
     private Kravgrunnlag431 hentKorrigertKravgrunnlagFraØkonomi(Long behandlingId, String kravgrunnlagId) {
-        var kodeAksjon = KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG.getKode();
         if (StringUtils.erIkkeTom(kravgrunnlagId)) {
-            return kravgrunnlagHenter.hentKravgrunnlagMedFailsafeSammenligningMotProxy(
-                behandlingId,
-                kodeAksjon,
-                new BigInteger(kravgrunnlagId),
-                ANSVARLIG_ENHET_NØS,
-                OKO_SAKSBEH_ID
-            );
+            var hentKravgrunnlagDetaljDto = new HentKravgrunnlagDetaljDto.Builder()
+                .kodeAksjon(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG)
+                .kravgrunnlagId(new BigInteger(kravgrunnlagId))
+                .enhetAnsvarlig(ANSVARLIG_ENHET_NØS)
+                .saksbehId(OKO_SAKSBEH_ID)
+                .build();
+            return kravgrunnlagHenter.hentKravgrunnlagFraOS(behandlingId, hentKravgrunnlagDetaljDto);
         } else {
-            Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
-            return kravgrunnlagHenter.hentKravgrunnlagMedFailsafeSammenligningMotProxy(
-                behandlingId,
-                kodeAksjon,
-                new BigInteger(kravgrunnlag431.getEksternKravgrunnlagId()),
-                kravgrunnlag431.getAnsvarligEnhet(),
-                kravgrunnlag431.getSaksBehId()
-            );
+            var kravgrunnlag431 = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
+            var hentKravgrunnlagDetaljDto = new HentKravgrunnlagDetaljDto.Builder()
+                .kodeAksjon(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG)
+                .kravgrunnlagId(new BigInteger(kravgrunnlag431.getEksternKravgrunnlagId()))
+                .enhetAnsvarlig(kravgrunnlag431.getAnsvarligEnhet())
+                .saksbehId(kravgrunnlag431.getSaksBehId())
+                .build();
+            return kravgrunnlagHenter.hentKravgrunnlagFraOS(behandlingId, hentKravgrunnlagDetaljDto);
         }
     }
 
