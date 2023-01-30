@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch;
 
+import static no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.HentKravgrunnlagMapperProxyTest.lagKravgrunnlag;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -7,8 +8,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,7 +20,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,13 +27,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.google.common.collect.Lists;
 
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.HentKravgrunnlagMapperProxy;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
@@ -50,7 +48,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -71,20 +68,10 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.Personopplysnin
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumerFeil;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
-import no.nav.foreldrepenger.xmlutils.DateUtil;
-import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelopDto;
-import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
-import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagPeriodeDto;
-import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
-import no.nav.tilbakekreving.typer.v1.PeriodeDto;
-import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
-import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 @ExtendWith(JpaExtension.class)
@@ -94,8 +81,6 @@ public class HåndterGamleKravgrunnlagTaskTest {
     private final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(tpsTjenesteMock);
     private final BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
     private final FagsystemKlient fagsystemKlientMock = mock(FagsystemKlient.class);
-    private final ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
-    private final HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy = mock(HentKravgrunnlagMapperProxy.class);
     private final ØkonomiProxyKlient økonomiProxyKlient = mock(ØkonomiProxyKlient.class);
 
     private FagsakRepository fagsakRepository;
@@ -103,7 +88,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private KravgrunnlagRepository grunnlagRepository;
 
-    private HentKravgrunnlagMapper hentKravgrunnlagMapper;
+    private HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy;
 
     private BehandlingTjeneste behandlingTjeneste;
     private HåndterGamleKravgrunnlagTask håndterGamleKravgrunnlagTask;
@@ -121,7 +106,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
         NavBrukerRepository navBrukerRepository = new NavBrukerRepository(entityManager);
         BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(
                 entityManager, new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
-        hentKravgrunnlagMapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
+        hentKravgrunnlagMapperProxy = new HentKravgrunnlagMapperProxy(tpsAdapterWrapper);
         KravgrunnlagMapper lesKravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
         BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(
                 behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
@@ -130,7 +115,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
         FagsakTjeneste fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repositoryProvider,
                 behandlingskontrollProvider, fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock, Period.ofWeeks(4));
-        var kravgrunnlagHenter = new KravgrunnlagHenter(økonomiProxyKlient, hentKravgrunnlagMapperProxy, økonomiConsumerMock, hentKravgrunnlagMapper);
+        var kravgrunnlagHenter = new KravgrunnlagHenter(økonomiProxyKlient, hentKravgrunnlagMapperProxy);
         HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(
                 mottattXmlRepository, grunnlagRepository, lesKravgrunnlagMapper, behandlingTjeneste,
                 fagsystemKlientMock, kravgrunnlagHenter);
@@ -139,7 +124,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
         behandling = ScenarioSimple.simple().lagMocked();
         when(tpsTjenesteMock.hentBrukerForAktør(any(AktørId.class))).thenReturn(lagPersonInfo(behandling.getFagsak().getAktørId()));
         when(tpsTjenesteMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));
-        when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagDetaljertKravgrunnlagDto(true));
+        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(true, true));
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = lagEksternBehandlingData();
         when(fagsystemKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(eksternBehandlingsinfoDto));
         when(fagsystemKlientMock.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingData(eksternBehandlingsinfoDto));
@@ -167,7 +152,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
 
     @Test
     public void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_grunnlaget_ikke_finnes_i_økonomi() {
-        when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
+        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class)))
                 .thenThrow(ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(behandling.getId(), 100000001L, "kravgrunnlag ikke finnes"));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNotNull();
@@ -177,7 +162,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
 
     @Test
     public void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_økonomi_svarer_ukjent_feil() {
-        when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
+        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class)))
                 .thenThrow(ØkonomiConsumerFeil.fikkUkjentFeilkodeVedHentingAvKravgrunnlag(behandling.getId(), 100000001L, "ukjent feil"));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
@@ -187,7 +172,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
 
     @Test
     public void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_grunnlaget_er_sperret() {
-        when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
+        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class)))
                 .thenThrow(ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandling.getId(), 100000001L, "sperret"));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
@@ -213,7 +198,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
 
     @Test
     public void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_kravgrunnlaget_ikke_er_gyldig() {
-        when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagDetaljertKravgrunnlagDto(false));
+        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(true, false));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
         assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNotNull();
@@ -228,7 +213,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
-        when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagDetaljertKravgrunnlagDto(true));
+        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(true, true));
 
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
@@ -244,9 +229,9 @@ public class HåndterGamleKravgrunnlagTaskTest {
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
-        DetaljertKravgrunnlagDto detaljertKravgrunnlagDto = lagDetaljertKravgrunnlagDto(true);
-        when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(detaljertKravgrunnlagDto);
-        Kravgrunnlag431 kravgrunnlag431 = hentKravgrunnlagMapper.mapTilDomene(detaljertKravgrunnlagDto);
+        var kravgrunnlag431Dto = lagKravgrunnlag(true, true);
+        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class))).thenReturn(kravgrunnlag431Dto);
+        Kravgrunnlag431 kravgrunnlag431 = hentKravgrunnlagMapperProxy.mapTilDomene(kravgrunnlag431Dto);
         grunnlagRepository.lagre(behandling.getId(), kravgrunnlag431);
 
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
@@ -264,7 +249,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
-        when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
+        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class)))
                 .thenThrow(ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandling.getId(), 100000001L, "sperret"));
 
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
@@ -274,61 +259,6 @@ public class HåndterGamleKravgrunnlagTaskTest {
         assertThat(behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"))).isNotEmpty();
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isTrue();
-    }
-
-    private DetaljertKravgrunnlagDto lagDetaljertKravgrunnlagDto(boolean erGyldig) {
-        DetaljertKravgrunnlagDto kravgrunnlagDto = new DetaljertKravgrunnlagDto();
-        kravgrunnlagDto.setKravgrunnlagId(BigInteger.valueOf(123456789));
-        kravgrunnlagDto.setVedtakId(BigInteger.valueOf(100));
-        kravgrunnlagDto.setKodeStatusKrav(KravStatusKode.NYTT.getKode());
-        kravgrunnlagDto.setKodeFagomraade(FagOmrådeKode.FORELDREPENGER.getKode());
-        kravgrunnlagDto.setFagsystemId("139015144100");
-        kravgrunnlagDto.setDatoVedtakFagsystem(konvertDato(LocalDate.of(2019, 10, 26)));
-        kravgrunnlagDto.setVedtakGjelderId("12345678901");
-        kravgrunnlagDto.setUtbetalesTilId("12345678901");
-        kravgrunnlagDto.setTypeGjelderId(TypeGjelderDto.PERSON);
-        kravgrunnlagDto.setTypeUtbetId(TypeGjelderDto.PERSON);
-        kravgrunnlagDto.setEnhetAnsvarlig("8020");
-        kravgrunnlagDto.setEnhetBehandl("8020");
-        kravgrunnlagDto.setEnhetBosted("8020");
-        kravgrunnlagDto.setKontrollfelt("kontrolll-123");
-        kravgrunnlagDto.setSaksbehId("Z111111");
-        kravgrunnlagDto.setReferanse("100000001");
-        kravgrunnlagDto.getTilbakekrevingsPeriode().addAll(lagPerioder(erGyldig));
-        return kravgrunnlagDto;
-    }
-
-    private List<DetaljertKravgrunnlagPeriodeDto> lagPerioder(boolean erGyldig) {
-        DetaljertKravgrunnlagPeriodeDto kravgrunnlagPeriode1 = new DetaljertKravgrunnlagPeriodeDto();
-        PeriodeDto periode = new PeriodeDto();
-        periode.setFom(konvertDato(LocalDate.of(2018, 1, 1)));
-        periode.setTom(konvertDato(LocalDate.of(2018, 1, 22)));
-        kravgrunnlagPeriode1.setPeriode(periode);
-        if (erGyldig) {
-            kravgrunnlagPeriode1.setBelopSkattMnd(BigDecimal.valueOf(4500.00));
-        }
-        kravgrunnlagPeriode1.getTilbakekrevingsBelop().add(lagKravgrunnlagBeløp(BigDecimal.valueOf(9000), BigDecimal.ZERO, BigDecimal.ZERO, TypeKlasseDto.FEIL));
-        kravgrunnlagPeriode1.getTilbakekrevingsBelop().add(lagKravgrunnlagBeløp(BigDecimal.ZERO, BigDecimal.valueOf(9000), BigDecimal.valueOf(9000), TypeKlasseDto.YTEL));
-
-        return Lists.newArrayList(kravgrunnlagPeriode1);
-    }
-
-    private DetaljertKravgrunnlagBelopDto lagKravgrunnlagBeløp(BigDecimal nyBeløp, BigDecimal tilbakekrevesBeløp,
-                                                               BigDecimal opprUtbetBeløp, TypeKlasseDto typeKlasse) {
-        DetaljertKravgrunnlagBelopDto detaljertKravgrunnlagBelop = new DetaljertKravgrunnlagBelopDto();
-        detaljertKravgrunnlagBelop.setTypeKlasse(typeKlasse);
-        detaljertKravgrunnlagBelop.setBelopNy(nyBeløp);
-        detaljertKravgrunnlagBelop.setBelopOpprUtbet(opprUtbetBeløp);
-        detaljertKravgrunnlagBelop.setBelopTilbakekreves(tilbakekrevesBeløp);
-        detaljertKravgrunnlagBelop.setBelopUinnkrevd(BigDecimal.ZERO);
-        detaljertKravgrunnlagBelop.setKodeKlasse("FPATAL");
-        detaljertKravgrunnlagBelop.setSkattProsent(BigDecimal.valueOf(50.0000));
-
-        return detaljertKravgrunnlagBelop;
-    }
-
-    private XMLGregorianCalendar konvertDato(LocalDate localDate) {
-        return DateUtil.convertToXMLGregorianCalendar(localDate);
     }
 
     private EksternBehandlingsinfoDto lagEksternBehandlingData() {

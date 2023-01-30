@@ -26,7 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 
-class HentKravgrunnlagMapperProxyTest {
+public class HentKravgrunnlagMapperProxyTest {
 
     private static final String ENHET = "8020";
     private static final AktørId AKTØR_ID = new AktørId(999999L);
@@ -38,7 +38,7 @@ class HentKravgrunnlagMapperProxyTest {
     void skalMappeUtenAvvikFraDtoTilDomeneModell() {
         Mockito.when(personinfoAdapterMock.hentAktørForFnr(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(AKTØR_ID));
 
-        var kravgrunnlag431Dto = lagKravgrunnlag(true);
+        var kravgrunnlag431Dto = lagKravgrunnlag(true, true);
         var kravgrunnlagDomenemodell = mapper.mapTilDomene(kravgrunnlag431Dto);
 
         verifiserAtMappingIkkeMisterNoeData(kravgrunnlag431Dto, kravgrunnlagDomenemodell);
@@ -56,7 +56,7 @@ class HentKravgrunnlagMapperProxyTest {
         kravgrunnlagBeloper433Liste.add(ytelPostering);
         kravgrunnlagBeloper433Liste.add(positivYtelPostering);
 
-        var kravgrunnlag431Dto = lagKravgrunnlag(false);
+        var kravgrunnlag431Dto = lagKravgrunnlag(false, true);
 
         var kravgrunnlagPeriode = new KravgrunnlagPeriode432Dto.Builder()
             .periode(new Periode(LocalDate.now().minusYears(1), LocalDate.now().minusYears(1).plusMonths(1)))
@@ -149,62 +149,60 @@ class HentKravgrunnlagMapperProxyTest {
         }
     }
 
-
-    private static Kravgrunnlag431Dto lagKravgrunnlag(boolean medKravgrunnlagPeriode432Dto) {
+    public static Kravgrunnlag431Dto lagKravgrunnlag(boolean medKravgrunnlagPeriode432Dto, boolean erGyldig) {
         return new Kravgrunnlag431Dto.Builder()
-            .vedtakId(207406L)
-            .eksternKravgrunnlagId("152806")
+            .vedtakId(100L)
+            .eksternKravgrunnlagId("123456789")
             .vedtakFagSystemDato(LocalDate.now().minusYears(1))
             .ansvarligEnhet(ENHET)
-            .fagSystemId("10000000000000000")
+            .fagSystemId("139015144100")
             .fagOmrådeKode(FagOmrådeKode.FP)
             .hjemmelKode("1234239042304")
-            .kontrollFelt("42354353453454")
-            .referanse("1")
+            .kontrollFelt("kontrolll-123")
+            .referanse("100000001")
             .beregnesRenter("N")
-            .saksBehId("Z9901136")
+            .saksBehId("Z111111")
             .utbetalesTilId("12345678901")
             .utbetGjelderType(GjelderType.PERSON)
             .gjelderType(GjelderType.PERSON)
             .behandlendeEnhet(ENHET)
             .bostedEnhet(ENHET)
-            .kravStatusKode(KravStatusKode.BEHA)
+            .kravStatusKode(KravStatusKode.NY)
             .gjelderVedtakId("12345678901")
             .omgjortVedtakId(207407L)
-            .perioder(medKravgrunnlagPeriode432Dto ? lagPerioder() : new ArrayList<>())
+            .perioder(medKravgrunnlagPeriode432Dto ? lagPerioder(erGyldig) : new ArrayList<>())
             .build();
     }
 
-    private static List<KravgrunnlagPeriode432Dto> lagPerioder() {
+    private static List<KravgrunnlagPeriode432Dto> lagPerioder(boolean erGyldig) {
         List<KravgrunnlagPeriode432Dto> KravgrunnlagPeriode432DtoListe = new ArrayList<>();
         var kravgrunnlagPeriode1 = new KravgrunnlagPeriode432Dto.Builder()
-            .periode(new Periode(LocalDate.now().minusYears(2), LocalDate.now().minusYears(1).plusMonths(1)))
-            .beløpSkattMnd(BigDecimal.valueOf(600.00))
+            .periode(new Periode(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 1, 22)))
             .kravgrunnlagBeloper433(List.of(
                 hentBeløp(BigDecimal.valueOf(6000.00), BigDecimal.ZERO, BigDecimal.ZERO, KlasseType.FEIL),
                 hentBeløp(BigDecimal.ZERO, BigDecimal.valueOf(6000.00), BigDecimal.valueOf(6000.00), KlasseType.YTEL)
-            ))
-            .build();
+            ));
         var kravgrunnlagPeriode2 = new KravgrunnlagPeriode432Dto.Builder()
-            .periode(new Periode(LocalDate.now().minusYears(2).plusMonths(1).plusDays(1), LocalDate.now().minusYears(1).plusMonths(2)))
-            .beløpSkattMnd(BigDecimal.valueOf(300.00))
+            .periode(new Periode(LocalDate.of(2022, 4, 1), LocalDate.of(2022, 4, 25)))
             .kravgrunnlagBeloper433(List.of(
                 hentBeløp(BigDecimal.valueOf(3000.00), BigDecimal.ZERO, BigDecimal.ZERO, KlasseType.FEIL),
                 hentBeløp(BigDecimal.ZERO, BigDecimal.valueOf(3000.00), BigDecimal.valueOf(3000.00), KlasseType.YTEL)
-            ))
-            .build();
+            ));
         var kravgrunnlagPeriode3 = new KravgrunnlagPeriode432Dto.Builder()
-            .periode(new Periode(LocalDate.now().minusYears(1).plusMonths(2).plusDays(1), LocalDate.now().minusYears(1).plusMonths(3)))
-            .beløpSkattMnd(BigDecimal.valueOf(2100.00))
+            .periode(new Periode(LocalDate.of(2022, 10, 10), LocalDate.of(2022, 10, 27)))
             .kravgrunnlagBeloper433(List.of(
                 hentBeløp(BigDecimal.valueOf(21000.00), BigDecimal.ZERO, BigDecimal.ZERO, KlasseType.FEIL),
                 hentBeløp(BigDecimal.ZERO, BigDecimal.valueOf(21000.00), BigDecimal.valueOf(21000.00), KlasseType.YTEL)
-            ))
-            .build();
+            ));
+        if (erGyldig) {
+            kravgrunnlagPeriode1.beløpSkattMnd(BigDecimal.valueOf(600.00));
+            kravgrunnlagPeriode2.beløpSkattMnd(BigDecimal.valueOf(300.00));
+            kravgrunnlagPeriode3.beløpSkattMnd(BigDecimal.valueOf(2100.00));
+        }
 
-        KravgrunnlagPeriode432DtoListe.add(kravgrunnlagPeriode1);
-        KravgrunnlagPeriode432DtoListe.add(kravgrunnlagPeriode2);
-        KravgrunnlagPeriode432DtoListe.add(kravgrunnlagPeriode3);
+        KravgrunnlagPeriode432DtoListe.add(kravgrunnlagPeriode1.build());
+        KravgrunnlagPeriode432DtoListe.add(kravgrunnlagPeriode2.build());
+        KravgrunnlagPeriode432DtoListe.add(kravgrunnlagPeriode3.build());
         return KravgrunnlagPeriode432DtoListe;
     }
 

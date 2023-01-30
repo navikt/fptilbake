@@ -10,6 +10,8 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
@@ -24,7 +26,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
@@ -34,7 +35,6 @@ import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.UkjentOppdragss
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
-import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
 
 @ApplicationScoped
 public class HåndterGamleKravgrunnlagTjeneste {
@@ -67,12 +67,12 @@ public class HåndterGamleKravgrunnlagTjeneste {
     }
 
     protected KravgrunnlagMedStatus hentKravgrunnlagFraØkonomi(ØkonomiXmlMottatt økonomiXmlMottatt) {
-        String melding = økonomiXmlMottatt.getMottattXml();
-        long mottattXmlId = økonomiXmlMottatt.getId();
-        DetaljertKravgrunnlag detaljertKravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, melding);
-        HentKravgrunnlagDetaljDto hentKravgrunnlagDetalj = forberedHentKravgrunnlagRequest(detaljertKravgrunnlag);
+        var melding = økonomiXmlMottatt.getMottattXml();
+        var mottattXmlId = økonomiXmlMottatt.getId();
+        var detaljertKravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, melding);
+        var hentKravgrunnlagDetalj = forberedHentKravgrunnlagRequest(detaljertKravgrunnlag);
         try {
-            var kravgrunnlag = kravgrunnlagHenter.hentKravgrunnlagMedFailsafeSammenligningMotProxy(null, hentKravgrunnlagDetalj);
+            var kravgrunnlag = kravgrunnlagHenter.hentKravgrunnlagFraOS(null, hentKravgrunnlagDetalj);
             LOG.info("Referanse fra WS: {}", kravgrunnlag.getReferanse());
             return KravgrunnlagMedStatus.forIkkeSperretKravgrunnlag(kravgrunnlag);
         } catch (ManglendeKravgrunnlagException e) {
@@ -210,12 +210,12 @@ public class HåndterGamleKravgrunnlagTjeneste {
     }
 
     private HentKravgrunnlagDetaljDto forberedHentKravgrunnlagRequest(DetaljertKravgrunnlag detaljertKravgrunnlag) {
-        HentKravgrunnlagDetaljDto hentKravgrunnlagDetalj = new HentKravgrunnlagDetaljDto();
-        hentKravgrunnlagDetalj.setKravgrunnlagId(detaljertKravgrunnlag.getKravgrunnlagId());
-        hentKravgrunnlagDetalj.setKodeAksjon(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG.getKode());
-        hentKravgrunnlagDetalj.setEnhetAnsvarlig(detaljertKravgrunnlag.getEnhetAnsvarlig());
-        hentKravgrunnlagDetalj.setSaksbehId(detaljertKravgrunnlag.getSaksbehId());
-        return hentKravgrunnlagDetalj;
+        return new HentKravgrunnlagDetaljDto.Builder()
+            .kravgrunnlagId(detaljertKravgrunnlag.getKravgrunnlagId())
+            .kodeAksjon(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG)
+            .enhetAnsvarlig(detaljertKravgrunnlag.getEnhetAnsvarlig())
+            .saksbehId(detaljertKravgrunnlag.getSaksbehId())
+            .build();
     }
 
     private void lagreGrunnlag(long behandlingId, Kravgrunnlag431 kravgrunnlag431) {
