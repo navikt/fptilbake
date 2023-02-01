@@ -275,7 +275,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
     private static void leggPåKodeResultat(BeregningResultatPeriode bgPeriode, List<TilbakekrevingPeriode> tmp) {
         tmp.stream()
                 .flatMap(p -> p.getBeløp().stream())
-                .forEach(b -> b.medKodeResultat(bgPeriode.getKodeResultat()));
+                .forEach(b -> b.medKodeResultat(bgPeriode.utledKodeResultat()));
     }
 
     private static void leggPåRenter(BeregningResultatPeriode bgPeriode, List<TilbakekrevingPeriode> tmp) {

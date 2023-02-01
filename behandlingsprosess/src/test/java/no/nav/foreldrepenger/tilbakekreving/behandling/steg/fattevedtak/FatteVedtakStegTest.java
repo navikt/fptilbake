@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -37,8 +38,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvur
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
+import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
@@ -142,10 +143,16 @@ public class FatteVedtakStegTest {
 
     private BeregningResultat lagBeregningResultat() {
         BeregningResultat beregningResultat = new BeregningResultat();
-        BeregningResultatPeriode periode = new BeregningResultatPeriode();
-        periode.setTilbakekrevingBeløp(BigDecimal.valueOf(5000.00));
-        periode.setFeilutbetaltBeløp(BigDecimal.valueOf(7000.00));
-        periode.setVurdering(AnnenVurdering.GOD_TRO);
+        BeregningResultatPeriode periode = BeregningResultatPeriode.builder()
+            .medPeriode(Periode.of(LocalDate.now(), LocalDate.now()))
+            .medErForeldet(false)
+            .medTilbakekrevingBeløp(BigDecimal.valueOf(5000.00))
+            .medTilbakekrevingBeløpUtenRenter(BigDecimal.valueOf(5000.00))
+            .medTilbakekrevingBeløpEtterSkatt(BigDecimal.valueOf(5000.00))
+            .medSkattBeløp(BigDecimal.ZERO)
+            .medRenteBeløp(BigDecimal.ZERO)
+            .medFeilutbetaltBeløp(BigDecimal.valueOf(7000.00))
+            .build();
         beregningResultat.setVedtakResultatType(VedtakResultatType.DELVIS_TILBAKEBETALING);
         beregningResultat.setBeregningResultatPerioder(Lists.newArrayList(periode));
 

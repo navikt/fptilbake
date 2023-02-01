@@ -93,6 +93,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
 
     @Test
     public void skal_saksbehandle_automatisk() {
+        int antallKlareFør = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).size();
         automatiskSaksbehandlingProsessTask.doTask(lagProsesTaskData());
         behandling = behandlingRepository.hentBehandling(behandlingId);
         assertThat(behandling.isAutomatiskSaksbehandlet()).isTrue();
@@ -101,7 +102,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
         assertThat(behandling.getStatus()).isEqualByComparingTo(BehandlingStatus.IVERKSETTER_VEDTAK);
 
         var prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker.size()).isEqualTo(3);
+        assertThat(prosessTasker.size() - antallKlareFør).isEqualTo(3);
         List<TaskType> prosessTaskNavn = prosessTasker.stream()
                 .map(ProsessTaskData::taskType)
                 .collect(Collectors.toList());

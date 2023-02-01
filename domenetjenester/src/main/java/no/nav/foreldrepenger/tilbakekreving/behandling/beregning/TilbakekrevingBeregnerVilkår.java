@@ -9,8 +9,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vurdering;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 class TilbakekrevingBeregnerVilkår {
@@ -28,36 +26,34 @@ class TilbakekrevingBeregnerVilkår {
                                            List<GrunnlagPeriodeMedSkattProsent> perioderMedSkattProsent,
                                            boolean beregnRenter) {
         Periode periode = vilkårVurdering.getPeriode();
-        Vurdering vurdering = finnVurdering(vilkårVurdering);
-        boolean renter = beregnRenter && finnRenter(vilkårVurdering);
+
+        boolean leggPåRenter = beregnRenter && finnRenter(vilkårVurdering);
         BigDecimal andel = finnAndelAvBeløp(vilkårVurdering);
         BigDecimal manueltBeløp = finnManueltSattBeløp(vilkårVurdering);
         boolean ignoreresPgaLavtBeløp = Boolean.FALSE.equals(vilkårVurdering.tilbakekrevesSmåbeløp());
 
-        BeregningResultatPeriode resulat = new BeregningResultatPeriode();
-        resulat.setPeriode(periode);
-        resulat.setVurdering(vurdering);
-        resulat.setRenterProsent(renter ? RENTESATS : null);
-        resulat.setFeilutbetaltBeløp(delresultat.getFeilutbetaltBeløp());
-        resulat.setRiktigYtelseBeløp(delresultat.getRiktigYtelseBeløp());
-        resulat.setUtbetaltYtelseBeløp(delresultat.getUtbetaltYtelseBeløp());
-        resulat.setAndelAvBeløp(andel);
-        resulat.setManueltSattTilbakekrevingsbeløp(manueltBeløp);
-
         BigDecimal beløpUtenRenter = ignoreresPgaLavtBeløp
-                ? BigDecimal.ZERO
-                : finnBeløpUtenRenter(delresultat.getFeilutbetaltBeløp(), andel, manueltBeløp);
-        BigDecimal rentebeløp = beregnRentebeløp(beløpUtenRenter, renter);
+            ? BigDecimal.ZERO
+            : finnBeløpUtenRenter(delresultat.getFeilutbetaltBeløp(), andel, manueltBeløp);
+        BigDecimal rentesats = leggPåRenter ? RENTESATS : null;
+        BigDecimal rentebeløp = beregnRentebeløp(beløpUtenRenter, leggPåRenter);
         BigDecimal tilbakekrevingBeløp = beløpUtenRenter.add(rentebeløp);
-        BigDecimal skattBeløp = beregnSkattBeløp(periode, beløpUtenRenter, perioderMedSkattProsent).setScale(0, RoundingMode.DOWN); //skatt beregnet alltid uten renter
+        BigDecimal skattBeløp = beregnSkattBeløp(periode, beløpUtenRenter, perioderMedSkattProsent).setScale(0, RoundingMode.DOWN); //skatt beregnet alltid uten leggPåRenter
         BigDecimal nettoBeløp = tilbakekrevingBeløp.subtract(skattBeløp);
 
-        resulat.setTilbakekrevingBeløpUtenRenter(beløpUtenRenter);
-        resulat.setRenteBeløp(rentebeløp);
-        resulat.setTilbakekrevingBeløpEtterSkatt(nettoBeløp);
-        resulat.setSkattBeløp(skattBeløp);
-        resulat.setTilbakekrevingBeløp(tilbakekrevingBeløp);
-        return resulat;
+        return BeregningResultatPeriode.builder()
+            .medPeriode(periode)
+            .medErForeldet(false)
+            .medRenterProsent(rentesats)
+            .medFeilutbetaltBeløp(delresultat.getFeilutbetaltBeløp())
+            .medRiktigYtelseBeløp(delresultat.getRiktigYtelseBeløp())
+            .medUtbetaltYtelseBeløp(delresultat.getUtbetaltYtelseBeløp())
+            .medTilbakekrevingBeløpUtenRenter(beløpUtenRenter)
+            .medRenteBeløp(rentebeløp)
+            .medTilbakekrevingBeløpEtterSkatt(nettoBeløp)
+            .medSkattBeløp(skattBeløp)
+            .medTilbakekrevingBeløp(tilbakekrevingBeløp)
+            .build();
     }
 
     private static BigDecimal beregnRentebeløp(BigDecimal beløp, boolean renter) {
@@ -92,7 +88,7 @@ class TilbakekrevingBeregnerVilkår {
         if (aktsomhet != null) {
             boolean erForsett = Aktsomhet.FORSETT.equals(aktsomhet.getAktsomhet());
             return (erForsett && (aktsomhet.getIleggRenter() == null || aktsomhet.getIleggRenter())) ||
-                    (aktsomhet.getIleggRenter() != null && aktsomhet.getIleggRenter());
+                (aktsomhet.getIleggRenter() != null && aktsomhet.getIleggRenter());
         }
         return false;
     }
@@ -126,14 +122,5 @@ class TilbakekrevingBeregnerVilkår {
         throw new IllegalArgumentException("VVurdering skal peke til GodTro-entiet eller Aktsomhet-entitet");
     }
 
-    private static Vurdering finnVurdering(VilkårVurderingPeriodeEntitet vurdering) {
-        if (vurdering.getAktsomhet() != null) {
-            return vurdering.getAktsomhet().getAktsomhet();
-        }
-        if (vurdering.getGodTro() != null) {
-            return AnnenVurdering.GOD_TRO;
-        }
-        throw new IllegalArgumentException("VVurdering skal peke til GodTro-entiet eller Aktsomhet-entitet");
-    }
 
 }
