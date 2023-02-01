@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
@@ -37,8 +36,6 @@ import no.nav.vedtak.exception.TekniskException;
 @Dependent
 public class VedtaksbrevFritekstValidator {
 
-    boolean støttSammenslåingAvVedtaksbrevperioder;
-
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private BehandlingRepository behandlingRepository;
@@ -46,12 +43,10 @@ public class VedtaksbrevFritekstValidator {
     @Inject
     public VedtaksbrevFritekstValidator(FaktaFeilutbetalingRepository faktaFeilutbetalingRepository,
                                         VilkårsvurderingRepository vilkårsvurderingRepository,
-                                        BehandlingRepository behandlingRepository,
-                                        @KonfigVerdi(value = "vedtaksbrev.join.perioder", required = false, defaultVerdi = "true") boolean støttSammenslåingAvVedtaksbrevperioder) {
+                                        BehandlingRepository behandlingRepository) {
         this.faktaFeilutbetalingRepository = faktaFeilutbetalingRepository;
         this.vilkårsvurderingRepository = vilkårsvurderingRepository;
         this.behandlingRepository = behandlingRepository;
-        this.støttSammenslåingAvVedtaksbrevperioder = støttSammenslåingAvVedtaksbrevperioder;
     }
 
     public void validerAtPåkrevdeFriteksterErSatt(Long behandlingId,
@@ -89,31 +84,11 @@ public class VedtaksbrevFritekstValidator {
     }
 
     private void validerSærligeGrunnerAnnet(VilkårVurderingEntitet vilkårVurdering, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
-        if (støttSammenslåingAvVedtaksbrevperioder) {
-            validerSærligeGrunnerAnnetTimelineImpl(vilkårVurdering, vedtaksbrevFritekstPerioder);
-        } else {
-            validerSærligeGrunnerAnnetOneByOneImpl(vilkårVurdering, vedtaksbrevFritekstPerioder);
-        }
-    }
-
-    private static void validerSærligeGrunnerAnnetOneByOneImpl(VilkårVurderingEntitet vilkårVurdering, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
-        vilkårVurdering.getPerioder().stream()
-                .filter(p -> p.getAktsomhet() != null && p.getAktsomhet().getSærligGrunner().stream().map(VilkårVurderingSærligGrunnEntitet::getGrunn).anyMatch(SærligGrunn.ANNET::equals))
-                .forEach(p -> validerFritekstSatt(vedtaksbrevFritekstPerioder, p.getPeriode(), "særlige grunner - annet", VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT));
+        validerSærligeGrunnerAnnetTimelineImpl(vilkårVurdering, vedtaksbrevFritekstPerioder);
     }
 
     private void validerFritekstFakta(FaktaFeilutbetaling fakta, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
-        if (støttSammenslåingAvVedtaksbrevperioder) {
-            validerFritekstFaktaTimelineImpl(fakta, vedtaksbrevFritekstPerioder);
-        } else {
-            validerFritekstFaktaOneByOneImpl(fakta, vedtaksbrevFritekstPerioder);
-        }
-    }
-
-    private static void validerFritekstFaktaOneByOneImpl(FaktaFeilutbetaling fakta, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
-        for (HendelseUnderType hendelseUnderType : VedtaksbrevFritekstKonfigurasjon.UNDERTYPER_MED_PÅKREVD_FRITEKST) {
-            validerFritekstFakta(fakta, hendelseUnderType, vedtaksbrevFritekstPerioder);
-        }
+        validerFritekstFaktaTimelineImpl(fakta, vedtaksbrevFritekstPerioder);
     }
 
     private static void validerFritekstFakta(FaktaFeilutbetaling fakta, HendelseUnderType hendelseUnderType, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {

@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import com.github.jknack.handlebars.internal.text.WordUtils;
 
 import no.nav.foreldrepenger.konfig.Environment;
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
@@ -128,15 +127,12 @@ public class VedtaksbrevTjeneste {
 
     private PdfBrevTjeneste pdfBrevTjeneste;
 
-    private boolean slåSammenPerioderMedLikVurdering;
-
     @Inject
     public VedtaksbrevTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
                                TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste,
                                BehandlingTjeneste behandlingTjeneste,
                                EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
-                               PdfBrevTjeneste pdfBrevTjeneste,
-                               @KonfigVerdi(value = "vedtaksbrev.join.perioder", required = false, defaultVerdi = "true") boolean slåSammenPerioderMedLikVurdering) {
+                               PdfBrevTjeneste pdfBrevTjeneste) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.behandlingVedtakRepository = behandlingRepositoryProvider.getBehandlingVedtakRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
@@ -152,7 +148,6 @@ public class VedtaksbrevTjeneste {
         this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.pdfBrevTjeneste = pdfBrevTjeneste;
-        this.slåSammenPerioderMedLikVurdering = slåSammenPerioderMedLikVurdering;
     }
 
     VedtaksbrevTjeneste() {
@@ -368,10 +363,6 @@ public class VedtaksbrevTjeneste {
     }
 
     private List<Periode> utledPerioder(List<BeregningResultatPeriode> beregningResultatPerioder, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, List<PeriodeMedTekstDto> perioderFritekst) {
-        if (!slåSammenPerioderMedLikVurdering) {
-            return beregningResultatPerioder.stream().map(BeregningResultatPeriode::getPeriode).collect(Collectors.toList());
-        }
-
         VedtaksbrevPeriodeSammenslåer sammenslåer = new VedtaksbrevPeriodeSammenslåer(vilkårPerioder, foreldelse, perioderFritekst);
         return sammenslåer.utledPerioder(beregningResultatPerioder);
     }
