@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRef;
@@ -49,7 +49,7 @@ public class FatteVedtakSteg implements BehandlingSteg {
     private BehandlingRepository behandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
     private BehandlingVedtakRepository behandlingVedtakRepository;
-    private TilbakekrevingBeregningTjeneste beregningTjeneste;
+    private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private HistorikkTjenesteAdapter historikkTjenesteAdapter;
 
     FatteVedtakSteg() {
@@ -58,13 +58,13 @@ public class FatteVedtakSteg implements BehandlingSteg {
 
     @Inject
     public FatteVedtakSteg(BehandlingRepositoryProvider repositoryProvider, TotrinnRepository totrinnRepository,
-                           TilbakekrevingBeregningTjeneste beregningTjeneste,
+                           BeregningsresultatTjeneste beregningsresultatTjeneste,
                            HistorikkTjenesteAdapter historikkTjenesteAdapter) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.totrinnRepository = totrinnRepository;
         this.behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
         this.behandlingVedtakRepository = repositoryProvider.getBehandlingVedtakRepository();
-        this.beregningTjeneste = beregningTjeneste;
+        this.beregningsresultatTjeneste = beregningsresultatTjeneste;
         this.historikkTjenesteAdapter = historikkTjenesteAdapter;
     }
 
@@ -95,7 +95,7 @@ public class FatteVedtakSteg implements BehandlingSteg {
     }
 
     private void opprettBehandlingVedtak(Behandling behandling) {
-        BeregningResultat beregningResultat = beregningTjeneste.beregn(behandling.getId());
+        BeregningResultat beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandling.getId());
         BehandlingResultatType behandlingResultatType = BehandlingResultatType.fraVedtakResultatType(beregningResultat.getVedtakResultatType());
 
         Optional<BehandlingVedtak> eksisterendeVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandling.getId());
@@ -154,7 +154,7 @@ public class FatteVedtakSteg implements BehandlingSteg {
 
         HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
 
-        BeregningResultat beregningResultat = beregningTjeneste.beregn(behandling.getId());
+        BeregningResultat beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandling.getId());
         tekstBuilder.medSkjermlenke(SkjermlenkeType.VEDTAK)
                 .medResultat(beregningResultat.getVedtakResultatType())
                 .medHendelse(HistorikkinnslagType.VEDTAK_FATTET_AUTOMATISK)

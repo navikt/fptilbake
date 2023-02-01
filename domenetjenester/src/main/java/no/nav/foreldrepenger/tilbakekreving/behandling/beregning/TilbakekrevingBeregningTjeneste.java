@@ -15,7 +15,6 @@ import javax.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BeregnBeløpUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FordeltKravgrunnlagBeløp;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.SaksbehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
@@ -46,6 +45,7 @@ public class TilbakekrevingBeregningTjeneste {
 
     private KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste;
 
+
     TilbakekrevingBeregningTjeneste() {
         //for CDI proxy
     }
@@ -59,7 +59,7 @@ public class TilbakekrevingBeregningTjeneste {
         this.kravgrunnlagBeregningTjeneste = kravgrunnlagBeregningTjeneste;
     }
 
-    public BeregningResultat beregn(Long behandlingId) {
+    BeregningResultat beregn(Long behandlingId) {
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         VurdertForeldelse vurdertForeldelse = hentVurdertForeldelse(behandlingId);

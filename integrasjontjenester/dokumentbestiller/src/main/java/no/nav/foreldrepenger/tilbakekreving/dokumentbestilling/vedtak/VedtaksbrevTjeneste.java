@@ -23,11 +23,11 @@ import org.slf4j.LoggerFactory;
 import com.github.jknack.handlebars.internal.text.WordUtils;
 
 import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstValidator;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -122,14 +122,14 @@ public class VedtaksbrevTjeneste {
     private VergeRepository vergeRepository;
 
     private BehandlingTjeneste behandlingTjeneste;
-    private TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste;
+    private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
 
     private PdfBrevTjeneste pdfBrevTjeneste;
 
     @Inject
     public VedtaksbrevTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
-                               TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste,
+                               BeregningsresultatTjeneste beregningsresultatTjeneste,
                                BehandlingTjeneste behandlingTjeneste,
                                EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                                PdfBrevTjeneste pdfBrevTjeneste) {
@@ -145,7 +145,7 @@ public class VedtaksbrevTjeneste {
         this.vergeRepository = behandlingRepositoryProvider.getVergeRepository();
 
         this.behandlingTjeneste = behandlingTjeneste;
-        this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
+        this.beregningsresultatTjeneste = beregningsresultatTjeneste;
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.pdfBrevTjeneste = pdfBrevTjeneste;
     }
@@ -240,7 +240,7 @@ public class VedtaksbrevTjeneste {
         //TODO hent data fra fpsak i tidligere steg, og hent fra repository her
         SamletEksternBehandlingInfo fagsystemBehandling = hentDataFraFagsystem(behandling);
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());
-        BeregningResultat beregnetResultat = tilbakekrevingBeregningTjeneste.beregn(behandlingId);
+        BeregningResultat beregnetResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
 
         BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, fagsystemBehandling, personinfo, beregnetResultat.getVedtakResultatType(), brevMottaker);
         HbVedtaksbrevData data = lagHbVedtaksbrevData(behandling, fagsystemBehandling, personinfo, beregnetResultat, oppsummeringFritekst, perioderFritekst, brevMetadata);
@@ -371,7 +371,7 @@ public class VedtaksbrevTjeneste {
         BehandlingÅrsak behandlingÅrsak = behandling.getBehandlingÅrsaker().get(0);
         Behandling originalBehandling = behandlingÅrsak.getOriginalBehandling().orElseThrow();
 
-        BeregningResultat originaltBeregnetResultat = tilbakekrevingBeregningTjeneste.beregn(originalBehandling.getId());
+        BeregningResultat originaltBeregnetResultat = beregningsresultatTjeneste.finnEllerBeregn(originalBehandling.getId());
         List<BeregningResultatPeriode> originalBeregningResultatPerioder = originaltBeregnetResultat.getBeregningResultatPerioder();
         BigDecimal originalBehandlingTotaltMedRenter = summer(originalBeregningResultatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp);
 

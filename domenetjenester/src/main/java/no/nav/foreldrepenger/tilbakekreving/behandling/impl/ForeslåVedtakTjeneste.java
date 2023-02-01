@@ -3,8 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
@@ -15,7 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjeneste
 @ApplicationScoped
 public class ForeslåVedtakTjeneste {
 
-    private TilbakekrevingBeregningTjeneste beregningTjeneste;
+    private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private HistorikkTjenesteAdapter historikkTjenesteAdapter;
 
     ForeslåVedtakTjeneste() {
@@ -23,9 +23,9 @@ public class ForeslåVedtakTjeneste {
     }
 
     @Inject
-    public ForeslåVedtakTjeneste(TilbakekrevingBeregningTjeneste beregningTjeneste, HistorikkTjenesteAdapter historikkTjenesteAdapter) {
-
-        this.beregningTjeneste = beregningTjeneste;
+    public ForeslåVedtakTjeneste(BeregningsresultatTjeneste beregningsresultatTjeneste,
+                                 HistorikkTjenesteAdapter historikkTjenesteAdapter) {
+        this.beregningsresultatTjeneste = beregningsresultatTjeneste;
         this.historikkTjenesteAdapter = historikkTjenesteAdapter;
     }
 
@@ -37,7 +37,7 @@ public class ForeslåVedtakTjeneste {
 
         HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
 
-        BeregningResultat beregningResultat = beregningTjeneste.beregn(behandlingId);
+        BeregningResultat beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
         tekstBuilder.medSkjermlenke(SkjermlenkeType.VEDTAK)
                 .medResultat(beregningResultat.getVedtakResultatType())
                 .medHendelse(HistorikkinnslagType.FORSLAG_VEDTAK)

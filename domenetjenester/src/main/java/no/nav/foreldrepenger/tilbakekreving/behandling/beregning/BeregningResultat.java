@@ -1,8 +1,7 @@
-package no.nav.foreldrepenger.tilbakekreving.behandling.modell;
+package no.nav.foreldrepenger.tilbakekreving.behandling.beregning;
 
 import java.util.List;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 
 public class BeregningResultat {

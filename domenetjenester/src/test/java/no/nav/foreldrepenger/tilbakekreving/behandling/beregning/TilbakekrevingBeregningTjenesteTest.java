@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;

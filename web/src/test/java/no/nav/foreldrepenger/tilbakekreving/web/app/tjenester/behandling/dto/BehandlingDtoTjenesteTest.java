@@ -26,7 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.google.common.collect.Lists;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
@@ -104,7 +104,7 @@ public class BehandlingDtoTjenesteTest {
         BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository();
         behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, mock(TotrinnTjeneste.class),
             mock(TotrinnskontrollAksjonspunkterTjeneste.class), mock(HenleggBehandlingTjeneste.class),
-            foreldelseTjeneste, mock(TilbakekrevingBeregningTjeneste.class), repositoryProvider, behandlingModellRepository, Fagsystem.FPTILBAKE);
+            foreldelseTjeneste, mock(BeregningsresultatTjeneste.class), repositoryProvider, behandlingModellRepository, Fagsystem.FPTILBAKE);
 
         entityManager.setFlushMode(FlushModeType.AUTO);
     }

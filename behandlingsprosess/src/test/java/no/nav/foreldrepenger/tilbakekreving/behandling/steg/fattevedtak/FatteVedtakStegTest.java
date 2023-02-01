@@ -18,9 +18,9 @@ import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
@@ -66,8 +66,8 @@ public class FatteVedtakStegTest {
         HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(behandlingRepository);
         HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(
                 repositoryProvider.getHistorikkRepository(), historikkInnslagKonverter);
-        TilbakekrevingBeregningTjeneste beregningTjeneste = Mockito.mock(TilbakekrevingBeregningTjeneste.class);
-        fatteVedtakSteg = new FatteVedtakSteg(repositoryProvider, totrinnRepository, beregningTjeneste,
+        BeregningsresultatTjeneste beregningsresultatTjeneste = Mockito.mock(BeregningsresultatTjeneste.class);
+        fatteVedtakSteg = new FatteVedtakSteg(repositoryProvider, totrinnRepository, beregningsresultatTjeneste,
                 historikkTjenesteAdapter);
 
         Fagsak fagsak = TestFagsakUtil.opprettFagsak();
@@ -76,7 +76,7 @@ public class FatteVedtakStegTest {
         BehandlingLås lås = repositoryProvider.getBehandlingRepository().taSkriveLås(behandling);
         behandlingskontrollKontekst = new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås);
 
-        when(beregningTjeneste.beregn(behandling.getId())).thenReturn(lagBeregningResultat());
+        when(beregningsresultatTjeneste.finnEllerBeregn(behandling.getId())).thenReturn(lagBeregningResultat());
     }
 
     @Test

@@ -13,34 +13,34 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import io.swagger.v3.oas.annotations.Operation;
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
-@Path(TilbakekrevingResulattRestTjeneste.PATH_FRAGMENT)
+@Path(TilbakekrevingResultatRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
 @ApplicationScoped
-public class TilbakekrevingResulattRestTjeneste {
+public class TilbakekrevingResultatRestTjeneste {
 
     public static final String PATH_FRAGMENT = "/beregning";
-    private TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste;
+    private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private BehandlingTjeneste behandlingTjeneste;
 
-    public TilbakekrevingResulattRestTjeneste() {
+    public TilbakekrevingResultatRestTjeneste() {
         // for CDI
     }
 
     @Inject
-    public TilbakekrevingResulattRestTjeneste(TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste,
+    public TilbakekrevingResultatRestTjeneste(BeregningsresultatTjeneste beregningsresultatTjeneste,
                                               BehandlingTjeneste behandlingTjeneste) {
-        this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
+        this.beregningsresultatTjeneste = beregningsresultatTjeneste;
         this.behandlingTjeneste = behandlingTjeneste;
     }
 
@@ -49,12 +49,12 @@ public class TilbakekrevingResulattRestTjeneste {
     @Operation(tags = "beregning", description = "Henter beregningsresultat for tilbakekreving")
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     public BeregningResultat hentBeregningResultat(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class) @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
-        return tilbakekrevingBeregningTjeneste.beregn(hentBehandlingId(behandlingReferanse));
+        return beregningsresultatTjeneste.finnEllerBeregn(hentBehandlingId(behandlingReferanse));
     }
 
     private Long hentBehandlingId(BehandlingReferanse behandlingReferanse) {
         return behandlingReferanse.erInternBehandlingId()
-                ? behandlingReferanse.getBehandlingId()
-                : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
+            ? behandlingReferanse.getBehandlingId()
+            : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
     }
 }
