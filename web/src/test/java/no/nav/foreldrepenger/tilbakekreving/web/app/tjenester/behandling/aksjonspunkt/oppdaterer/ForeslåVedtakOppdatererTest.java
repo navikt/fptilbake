@@ -71,7 +71,7 @@ public class ForeslåVedtakOppdatererTest {
         TotrinnTjeneste totrinnTjenesteMock = mock(TotrinnTjeneste.class);
         VilkårsvurderingRepository vilkårsvurderingRepository = mock(VilkårsvurderingRepository.class);
         FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = mock(FaktaFeilutbetalingRepository.class);
-        VedtaksbrevFritekstValidator vedtaksbrevFritekstValidator = new VedtaksbrevFritekstValidator(faktaFeilutbetalingRepository, vilkårsvurderingRepository, behandlingRepository, false);
+        VedtaksbrevFritekstValidator vedtaksbrevFritekstValidator = new VedtaksbrevFritekstValidator(faktaFeilutbetalingRepository, vilkårsvurderingRepository, behandlingRepository);
         VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste = new VedtaksbrevFritekstTjeneste(vedtaksbrevFritekstValidator, vedtaksbrevFritekstRepository);
         foreslåVedtakOppdaterer = new ForeslåVedtakOppdaterer(foreslåVedtakTjeneste, totrinnTjenesteMock, behandlingskontrollTjeneste, vedtaksbrevFritekstTjeneste);
 
