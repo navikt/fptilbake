@@ -43,7 +43,7 @@ class SensuKlientTest {
             "\"type\":\"metric\"," +
             "\"handlers\":[\"events_nano\"]," +
             "\"status\":0," +
-            "\"output\":\"k9-tilbake.registrert.task,application=k9-tilbake,cluster=local,namespace=default,task_type=task.registerSøknad counter=1i";
+            "\"output\":\"k9-tilbake.registrert.task,application=k9-tilbake,cluster=local,namespace=teamforeldrepenger,task_type=task.registerSøknad counter=1i";
 
     @BeforeEach
     void init() throws IOException {

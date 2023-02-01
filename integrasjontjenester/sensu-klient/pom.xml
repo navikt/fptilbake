@@ -40,7 +40,14 @@
             <groupId>no.nav.foreldrepenger.felles</groupId>
             <artifactId>felles-util</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+        </dependency>
 
         <!-- Test -->
         <dependency>
@@ -49,6 +56,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-
 </project>
