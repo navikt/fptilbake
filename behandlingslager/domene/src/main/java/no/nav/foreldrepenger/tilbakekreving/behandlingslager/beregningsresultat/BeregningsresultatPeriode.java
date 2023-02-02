@@ -14,12 +14,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 @Entity(name = "BeregningsresultatPeriode")
 @Table(name = "BEREGNINGSRESULTAT_PERIODE")
-public class BeregningsresultatPeriode {
+public class BeregningsresultatPeriode extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BEREGNINGSRESULTAT_PERIODE")
@@ -59,7 +60,7 @@ public class BeregningsresultatPeriode {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    BeregningsresultatPeriode() {
+    protected BeregningsresultatPeriode() {
     }
 
     public Periode getPeriode() {

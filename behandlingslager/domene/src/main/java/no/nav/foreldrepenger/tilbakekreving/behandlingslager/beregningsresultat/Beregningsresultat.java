@@ -20,11 +20,12 @@ import javax.persistence.Version;
 
 import org.hibernate.annotations.BatchSize;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 
 @Entity(name = "Beregningsresultat")
 @Table(name = "BEREGNINGSRESULTAT")
-public class Beregningsresultat {
+public class Beregningsresultat extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BEREGNINGSRESULTAT")
@@ -44,7 +45,7 @@ public class Beregningsresultat {
     @BatchSize(size = 20)
     private List<BeregningsresultatPeriode> perioder = new ArrayList<>();
 
-    Beregningsresultat() {
+    protected Beregningsresultat() {
     }
 
     public Beregningsresultat(VedtakResultatType vedtakResultatType, List<BeregningsresultatPeriode> perioder) {

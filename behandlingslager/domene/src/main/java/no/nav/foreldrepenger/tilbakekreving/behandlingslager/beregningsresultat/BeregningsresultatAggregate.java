@@ -12,9 +12,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
+
 @Entity(name = "BeregningsresultatAggregate")
 @Table(name = "GR_BEREGNINGSRESULTAT")
-public class BeregningsresultatAggregate {
+public class BeregningsresultatAggregate extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GR_BEREGNINGSRESULTAT")
@@ -34,7 +36,7 @@ public class BeregningsresultatAggregate {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    BeregningsresultatAggregate() {
+    protected BeregningsresultatAggregate() {
     }
 
     public BeregningsresultatAggregate(Long behandlingId, Beregningsresultat beregningsresultat) {
