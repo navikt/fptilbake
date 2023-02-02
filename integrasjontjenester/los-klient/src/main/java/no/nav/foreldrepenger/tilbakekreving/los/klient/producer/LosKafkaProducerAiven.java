@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.los.klient.producer;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -25,7 +24,7 @@ import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 @ApplicationScoped
 public class LosKafkaProducerAiven extends AivenMeldingProducer {
 
-    private static final Logger logger = LoggerFactory.getLogger(LosKafkaProducerAiven.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LosKafkaProducerAiven.class);
     private static final String CALLID_NAME = "Nav-Tbk-CallId";
 
     public LosKafkaProducerAiven() {
@@ -33,14 +32,8 @@ public class LosKafkaProducerAiven extends AivenMeldingProducer {
     }
 
     @Inject
-    public LosKafkaProducerAiven(@KonfigVerdi(value = "KAFKA_BROKERS") String bootstrapServers,
-                                 @KonfigVerdi(value = "kafka.los.aiven.topic") String topic,
-                                 @KonfigVerdi(value = "KAFKA_TRUSTSTORE_PATH", required = false) String trustStorePath,
-                                 @KonfigVerdi(value = "KAFKA_CREDSTORE_PASSWORD", required = false) String trustStorePassword,
-                                 @KonfigVerdi(value = "KAFKA_KEYSTORE_PATH", required = false) String keyStorePath,
-                                 @KonfigVerdi(value = "KAFKA_CREDSTORE_PASSWORD", required = false) String keyStorePassword,
-                                 @KonfigVerdi(value = "KAFKA_OVERRIDE_KEYSTORE_PASSWORD", required = false) String vtpOverride) {
-        super(topic, bootstrapServers, "KP-" + Objects.requireNonNull(topic), trustStorePath, trustStorePassword, keyStorePath, keyStorePassword, vtpOverride);
+    public LosKafkaProducerAiven(@KonfigVerdi(value = "kafka.los.aiven.topic") String topic) {
+        super(topic);
     }
 
 
@@ -52,7 +45,7 @@ public class LosKafkaProducerAiven extends AivenMeldingProducer {
         ProducerRecord<String, String> melding = new ProducerRecord<>(getTopic(), null, nøkkel, verdi, new RecordHeaders().add(CALLID_NAME, callId.getBytes()));
 
         RecordMetadata recordMetadata = runProducerWithSingleJson(melding);
-        logger.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandlingId {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), nøkkel);
+        LOG.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandlingId {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), nøkkel);
     }
 
     public void sendHendelseFplos(Saksnummer saksnummer, BehandlingHendelseV1 dto)  {
@@ -60,7 +53,7 @@ public class LosKafkaProducerAiven extends AivenMeldingProducer {
         String verdi = DefaultJsonMapper.toJson(dto);
 
         runProducerWithSingleJson(new ProducerRecord<>(getTopic(), nøkkel, verdi));
-        logger.info("Melding sendt til Aiven på {} for behandlingId {}", getTopic(), nøkkel);
+        LOG.info("Melding sendt til Aiven på {} for behandlingId {}", getTopic(), nøkkel);
     }
 
 }

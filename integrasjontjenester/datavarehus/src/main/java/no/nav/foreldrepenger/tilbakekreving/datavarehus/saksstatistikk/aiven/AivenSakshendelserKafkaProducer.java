@@ -19,21 +19,15 @@ import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTi
 @ApplicationScoped
 public class AivenSakshendelserKafkaProducer extends AivenMeldingProducer {
 
-    private static final Logger logger = LoggerFactory.getLogger(AivenSakshendelserKafkaProducer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AivenSakshendelserKafkaProducer.class);
 
     public AivenSakshendelserKafkaProducer() {
         //for CDI proxy
     }
 
     @Inject
-    public AivenSakshendelserKafkaProducer(@KonfigVerdi(value = "KAFKA_BROKERS") String bootstrapServers,
-                                           @KonfigVerdi(value = "kafka.dvh.sakshendelse.aiven.topic") String topic,
-                                           @KonfigVerdi(value = "KAFKA_TRUSTSTORE_PATH", required = false) String trustStorePath,
-                                           @KonfigVerdi(value = "KAFKA_CREDSTORE_PASSWORD", required = false) String trustStorePassword,
-                                           @KonfigVerdi(value = "KAFKA_KEYSTORE_PATH", required = false) String keyStorePath,
-                                           @KonfigVerdi(value = "KAFKA_CREDSTORE_PASSWORD", required = false) String keyStorePassword,
-                                           @KonfigVerdi(value = "KAFKA_OVERRIDE_KEYSTORE_PASSWORD", required = false) String vtpOverride) {
-        super(topic, bootstrapServers, "KP-" + topic, trustStorePath, trustStorePassword, keyStorePath, keyStorePassword, vtpOverride);
+    public AivenSakshendelserKafkaProducer(@KonfigVerdi(value = "kafka.dvh.sakshendelse.aiven.topic") String topic) {
+        super(topic);
     }
 
     public void sendMelding(BehandlingTilstand hendelse) {
@@ -43,6 +37,6 @@ public class AivenSakshendelserKafkaProducer extends AivenMeldingProducer {
         String verdi = BehandlingTilstandMapper.tilJsonString(hendelse);
         var melding = new ProducerRecord<>(getTopic(), nøkkel, verdi);
         RecordMetadata recordMetadata = runProducerWithSingleJson(melding);
-        logger.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandling {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), hendelse.getBehandlingUuid());
+        LOG.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandling {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), hendelse.getBehandlingUuid());
     }
 }
