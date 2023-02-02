@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,7 +40,7 @@ public class Beregningsresultat {
 
     @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true)
     @JoinColumn(name = "beregningsresultat_id", nullable = false)
-    @OrderBy(value = "periode.fomDato asc nulls first")
+    @OrderBy(value = "periode.fom asc") //equals+hashCode avhengig av sortering
     @BatchSize(size = 20)
     private List<BeregningsresultatPeriode> perioder = new ArrayList<>();
 
@@ -48,7 +49,7 @@ public class Beregningsresultat {
 
     public Beregningsresultat(VedtakResultatType vedtakResultatType, List<BeregningsresultatPeriode> perioder) {
         this.vedtakResultatType = vedtakResultatType;
-        this.perioder = perioder;
+        this.perioder = perioder.stream().sorted(Comparator.comparing(p -> p.getPeriode().getFom())).toList(); //equals+hashCode avhengig av sortering
     }
 
     public List<BeregningsresultatPeriode> getPerioder() {
@@ -75,5 +76,13 @@ public class Beregningsresultat {
     @Override
     public int hashCode() {
         return Objects.hash(vedtakResultatType, perioder);
+    }
+
+    @Override
+    public String toString() {
+        return "Beregningsresultat{" +
+            "vedtakResultatType=" + vedtakResultatType +
+            ", perioder=" + perioder +
+            '}';
     }
 }

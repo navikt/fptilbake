@@ -14,7 +14,6 @@ public class BeregningsresultatTjeneste {
 
     private TilbakekrevingBeregningTjeneste beregningTjeneste;
     private BeregningsresultatRepository beregningsresultatRepository;
-
     private boolean lansertLagring;
 
     @Inject
@@ -27,16 +26,20 @@ public class BeregningsresultatTjeneste {
     }
 
     public BeregningResultat finnEllerBeregn(Long behandlingId) {
-        Optional<Beregningsresultat> lagretResultat = beregningsresultatRepository.hentHvisEksisterer(behandlingId);
-        if (lagretResultat.isPresent()) {
-            return BeregningsresultatMapper.map(lagretResultat.get());
+        if (lansertLagring) {
+            Optional<Beregningsresultat> lagretResultat = beregningsresultatRepository.hentHvisEksisterer(behandlingId);
+            if (lagretResultat.isPresent()) {
+                return BeregningsresultatMapper.map(lagretResultat.get());
+            }
         }
         return beregningTjeneste.beregn(behandlingId);
     }
 
     public void beregnOgLagre(Long behandlingId) {
-        BeregningResultat beregnet = beregningTjeneste.beregn(behandlingId);
-        beregningsresultatRepository.lagre(behandlingId, BeregningsresultatMapper.map(beregnet));
+        if (lansertLagring) {
+            BeregningResultat beregnet = beregningTjeneste.beregn(behandlingId);
+            beregningsresultatRepository.lagre(behandlingId, BeregningsresultatMapper.map(beregnet));
+        }
     }
 
 }

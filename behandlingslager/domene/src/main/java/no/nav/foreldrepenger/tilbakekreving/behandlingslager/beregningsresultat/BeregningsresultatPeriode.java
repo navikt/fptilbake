@@ -106,6 +106,40 @@ public class BeregningsresultatPeriode {
         return riktigYtelseBeløp;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        BeregningsresultatPeriode that = (BeregningsresultatPeriode) o;
+        return erForeldet == that.erForeldet
+            && Objects.equals(periode, that.periode)
+            && Objects.equals(tilbakekrevingBeløp, that.tilbakekrevingBeløp)
+            && Objects.equals(tilbakekrevingBeløpEtterSkatt, that.tilbakekrevingBeløpEtterSkatt)
+            && Objects.equals(tilbakekrevingBeløpUtenRenter, that.tilbakekrevingBeløpUtenRenter)
+            && Objects.equals(renterProsent, that.renterProsent)
+            && Objects.equals(renteBeløp, that.renteBeløp)
+            && Objects.equals(skattBeløp, that.skattBeløp)
+            && Objects.equals(feilutbetaltBeløp, that.feilutbetaltBeløp)
+            && Objects.equals(utbetaltYtelseBeløp, that.utbetaltYtelseBeløp)
+            && Objects.equals(riktigYtelseBeløp, that.riktigYtelseBeløp);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(periode, erForeldet, tilbakekrevingBeløp, tilbakekrevingBeløpEtterSkatt, tilbakekrevingBeløpUtenRenter, renterProsent, renteBeløp, skattBeløp, feilutbetaltBeløp, utbetaltYtelseBeløp, riktigYtelseBeløp);
+    }
+
+    @Override
+    public String toString() {
+        return "BeregningsresultatPeriode{" +
+            "periode=" + periode +
+            '}';
+    }
+
     public static Builder builder() {
         return new Builder();
     }

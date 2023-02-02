@@ -7,7 +7,10 @@ import javax.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
@@ -41,6 +44,10 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
     private ØkonomiProxyKlient økonomiProxyKlient;
     private ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
 
+    private BeregningsresultatTjeneste beregningsresultatTjeneste;
+    private BeregningsresultatRepository beregningsresultatRepository;
+    private boolean lansertLagringBeregningsresultat;
+
     SendØkonomiTibakekerevingsVedtakTask() {
         // CDI krav
     }
@@ -49,17 +56,29 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
     public SendØkonomiTibakekerevingsVedtakTask(TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste,
                                                 ØkonomiConsumer økonomiConsumer,
                                                 ØkonomiProxyKlient økonomiProxyKlient,
-                                                ØkonomiSendtXmlRepository økonomiSendtXmlRepository) {
+                                                ØkonomiSendtXmlRepository økonomiSendtXmlRepository,
+                                                BeregningsresultatTjeneste beregningsresultatTjeneste,
+                                                BeregningsresultatRepository beregningsresultatRepository,
+                                                @KonfigVerdi(value = "toggle.enable.lagre.beregningsresultat", defaultVerdi = "false") boolean lansertLagringBeregningsresultat) {
         this.tilbakekrevingsvedtakTjeneste = tilbakekrevingsvedtakTjeneste;
         this.økonomiConsumer = økonomiConsumer;
         this.økonomiProxyKlient = økonomiProxyKlient;
         this.økonomiSendtXmlRepository = økonomiSendtXmlRepository;
         this.entityManager = økonomiSendtXmlRepository.getEntityManager();
+        this.beregningsresultatTjeneste = beregningsresultatTjeneste;
+        this.beregningsresultatRepository = beregningsresultatRepository;
+        this.lansertLagringBeregningsresultat = lansertLagringBeregningsresultat;
     }
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
+
+        if (lansertLagringBeregningsresultat && beregningsresultatRepository.hentHvisEksisterer(behandlingId).isEmpty()){
+            //midlertidig her for å raskere kunne fase ut håndtering av lagret XML
+            beregningsresultatTjeneste.beregnOgLagre(behandlingId);
+        }
+
         TilbakekrevingsvedtakDto tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
         TilbakekrevingsvedtakRequest request = lagRequest(tilbakekrevingsvedtak);
         Long sendtXmlId = lagreXml(behandlingId, request);
