@@ -13,13 +13,16 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.felles.KafkaIntegration;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
+import no.nav.vedtak.felles.integrasjon.kafka.KafkaProperties;
 
 @ApplicationScoped
 public class VedtakConsumer implements AppServiceHandler, KafkaIntegration {
 
-    private static final Logger log = LoggerFactory.getLogger(VedtakConsumer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(VedtakConsumer.class);
     private KafkaStreams stream;
     private String topic;
 
@@ -27,8 +30,10 @@ public class VedtakConsumer implements AppServiceHandler, KafkaIntegration {
     }
 
     @Inject
-    public VedtakConsumer(VedtaksHendelseHåndterer vedtaksHendelseHåndterer, VedtakProperties streamKafkaProperties) {
-        this.topic = streamKafkaProperties.getTopicName();
+    public VedtakConsumer(@KonfigVerdi(value = "kafka.fattevedtak.topic", defaultVerdi = "teamforeldrepenger.familie-vedtakfattet-v1") String topicName,
+                          VedtaksHendelseHåndterer vedtaksHendelseHåndterer) {
+        this.topic = topicName;
+        var applicationId = ApplicationName.hvilkenTilbakeAppName() + "-vedtak"; // Hold denne konstant pga offset-commit
 
         final Consumed<String, String> consumed = Consumed.with(Topology.AutoOffsetReset.EARLIEST);
 
@@ -36,21 +41,21 @@ public class VedtakConsumer implements AppServiceHandler, KafkaIntegration {
         builder.stream(topic, consumed)
             .foreach(vedtaksHendelseHåndterer::handleMessage);
 
-        this.stream = new KafkaStreams(builder.build(), streamKafkaProperties.getProperties());
+        this.stream = new KafkaStreams(builder.build(), KafkaProperties.forStreamsStringValue(applicationId));
     }
 
     private void addShutdownHooks() {
         stream.setStateListener((newState, oldState) -> {
-            log.info("{} :: From state={} to state={}", topic, oldState, newState);
+            LOG.info("{} :: From state={} to state={}", topic, oldState, newState);
 
             if (newState == KafkaStreams.State.ERROR) {
                 // if the stream has died there is no reason to keep spinning
-                log.warn("{} :: No reason to keep living, closing stream", topic);
+                LOG.warn("{} :: No reason to keep living, closing stream", topic);
                 stop();
             }
         });
         stream.setUncaughtExceptionHandler((t, e) -> {
-            log.error(topic + " :: Caught exception in stream, exiting", e);
+            LOG.error(topic + " :: Caught exception in stream, exiting", e);
             stop();
         });
     }
@@ -69,14 +74,14 @@ public class VedtakConsumer implements AppServiceHandler, KafkaIntegration {
     public void start() {
         addShutdownHooks();
         stream.start();
-        log.info("Starter konsumering av topic={}, tilstand={}", topic, stream.state());
+        LOG.info("Starter konsumering av topic={}, tilstand={}", topic, stream.state());
     }
 
     @Override
     public void stop() {
         int timeoutSekunder = 30;
-        log.info("Starter shutdown av topic={}, tilstand={} med {} sekunder timeout", topic, stream.state(), timeoutSekunder);
+        LOG.info("Starter shutdown av topic={}, tilstand={} med {} sekunder timeout", topic, stream.state(), timeoutSekunder);
         stream.close(Duration.of(timeoutSekunder, ChronoUnit.SECONDS));
-        log.info("Shutdown av topic={}, tilstand={} med {} sekunder timeout", topic, stream.state(), timeoutSekunder);
+        LOG.info("Shutdown av topic={}, tilstand={} med {} sekunder timeout", topic, stream.state(), timeoutSekunder);
     }
 }
