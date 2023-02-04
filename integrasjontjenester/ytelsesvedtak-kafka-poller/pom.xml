@@ -26,6 +26,10 @@
             <artifactId>kafka-streams</artifactId>
         </dependency>
         <dependency>
+            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
+            <artifactId>kafka-properties</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>k9-sak-klient</artifactId>
             <exclusions>
