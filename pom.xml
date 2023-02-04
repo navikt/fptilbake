@@ -357,9 +357,8 @@
                 <!-- velger en transitiv avhengighet - felles ikke enig med seg selv, velger den som blir brukt i prod-scope i felles -->
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.29.0</version>
+                <version>3.30.0</version>
             </dependency>
-
 
             <!-- transitiv avhengighet, sikrer konsistent versjon -->
             <!-- https://mvnrepository.com/artifact/org.codehaus.woodstox/stax2-api -->
