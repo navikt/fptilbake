@@ -31,7 +31,7 @@ import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.Tilbakekrevingsvedt
 import no.nav.tilbakekreving.typer.v1.MmelDto;
 
 @CdiDbAwareTest
-public class AvstemmingTjenesteTest {
+public class AvstemFraXmlSendtTjenesteTest {
 
     @Inject
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
@@ -41,18 +41,18 @@ public class AvstemmingTjenesteTest {
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
 
     private PersoninfoAdapter aktørConsumerMock = Mockito.mock(PersoninfoAdapter.class);
-    private AvstemmingTjeneste avstemmingTjeneste;
+    private AvstemFraXmlSendtTjeneste avstemFraXmlSendtTjeneste;
     private ScenarioSimple scenario = ScenarioSimple.simple();
 
     @BeforeEach
     public void setup() {
-        avstemmingTjeneste = new AvstemmingTjeneste("fptilbake", sendtXmlRepository, behandlingRepositoryProvider, aktørConsumerMock);
+        avstemFraXmlSendtTjeneste = new AvstemFraXmlSendtTjeneste("fptilbake", sendtXmlRepository, behandlingRepositoryProvider, aktørConsumerMock);
         when(aktørConsumerMock.hentFnrForAktør(Mockito.any())).thenReturn(Optional.of(new PersonIdent("12345678901")));
     }
 
     @Test
     public void skal_returnere_tomt_når_det_ikke_finnes_vedtak() {
-        Optional<String> oppsummer = avstemmingTjeneste.oppsummer(LocalDate.now());
+        Optional<String> oppsummer = avstemFraXmlSendtTjeneste.oppsummer(LocalDate.now());
         assertThat(oppsummer).isEmpty();
     }
 
@@ -70,7 +70,7 @@ public class AvstemmingTjenesteTest {
         String kvitteringXml = ØkonomiResponsMarshaller.marshall(lagRespons(lagKvittering()), behandlingId);
         sendtXmlRepository.oppdatereKvittering(xmlId, kvitteringXml);
 
-        Optional<String> oppsummer = avstemmingTjeneste.oppsummer(LocalDate.now());
+        Optional<String> oppsummer = avstemFraXmlSendtTjeneste.oppsummer(LocalDate.now());
         assertThat(oppsummer).isNotEmpty();
     }
 
@@ -88,7 +88,7 @@ public class AvstemmingTjenesteTest {
         String kvitteringXml = ØkonomiResponsMarshaller.marshall(lagRespons(lagKvitteringVedFeil()), behandlingId);
         sendtXmlRepository.oppdatereKvittering(xmlId, kvitteringXml);
 
-        Optional<String> oppsummer = avstemmingTjeneste.oppsummer(LocalDate.now());
+        Optional<String> oppsummer = avstemFraXmlSendtTjeneste.oppsummer(LocalDate.now());
         assertThat(oppsummer).isEmpty();
     }
 
@@ -107,7 +107,7 @@ public class AvstemmingTjenesteTest {
         String kvitteringXml = ØkonomiResponsMarshaller.marshall(lagRespons(lagKvittering()), behandlingId);
         sendtXmlRepository.oppdatereKvittering(xmlId, kvitteringXml);
 
-        Optional<String> oppsummer = avstemmingTjeneste.oppsummer(LocalDate.now());
+        Optional<String> oppsummer = avstemFraXmlSendtTjeneste.oppsummer(LocalDate.now());
         assertThat(oppsummer).isEmpty();
     }
 
@@ -131,7 +131,7 @@ public class AvstemmingTjenesteTest {
         String kvitteringXml = ØkonomiResponsMarshaller.marshall(lagRespons(lagKvittering()), behandlingId);
         sendtXmlRepository.oppdatereKvittering(xmlId, kvitteringXml);
 
-        Optional<String> oppsummer = avstemmingTjeneste.oppsummer(LocalDate.now());
+        Optional<String> oppsummer = avstemFraXmlSendtTjeneste.oppsummer(LocalDate.now());
         assertThat(oppsummer).isNotEmpty();
     }
 

@@ -146,12 +146,14 @@ public class FatteVedtakStegTest {
         BeregningResultatPeriode periode = BeregningResultatPeriode.builder()
             .medPeriode(Periode.of(LocalDate.now(), LocalDate.now()))
             .medErForeldet(false)
-            .medTilbakekrevingBeløp(BigDecimal.valueOf(5000.00))
-            .medTilbakekrevingBeløpUtenRenter(BigDecimal.valueOf(5000.00))
-            .medTilbakekrevingBeløpEtterSkatt(BigDecimal.valueOf(5000.00))
+            .medTilbakekrevingBeløp(BigDecimal.valueOf(5000))
+            .medTilbakekrevingBeløpUtenRenter(BigDecimal.valueOf(5000))
+            .medTilbakekrevingBeløpEtterSkatt(BigDecimal.valueOf(5000))
             .medSkattBeløp(BigDecimal.ZERO)
             .medRenteBeløp(BigDecimal.ZERO)
-            .medFeilutbetaltBeløp(BigDecimal.valueOf(7000.00))
+            .medFeilutbetaltBeløp(BigDecimal.valueOf(7000))
+            .medUtbetaltYtelseBeløp(BigDecimal.valueOf(7000))
+            .medRiktigYtelseBeløp(BigDecimal.ZERO)
             .build();
         beregningResultat.setVedtakResultatType(VedtakResultatType.DELVIS_TILBAKEBETALING);
         beregningResultat.setBeregningResultatPerioder(Lists.newArrayList(periode));

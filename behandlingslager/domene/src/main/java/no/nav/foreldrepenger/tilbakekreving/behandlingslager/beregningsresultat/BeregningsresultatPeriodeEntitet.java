@@ -20,7 +20,7 @@ import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 @Entity(name = "BeregningsresultatPeriode")
 @Table(name = "BEREGNINGSRESULTAT_PERIODE")
-public class BeregningsresultatPeriode extends BaseEntitet {
+public class BeregningsresultatPeriodeEntitet extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BEREGNINGSRESULTAT_PERIODE")
@@ -54,13 +54,13 @@ public class BeregningsresultatPeriode extends BaseEntitet {
 
     @ManyToOne
     @JoinColumn(name = "beregningsresultat_id", insertable = false, updatable = false)
-    private Beregningsresultat beregningsresultat;
+    private BeregningsresultatEntitet beregningsresultat;
 
     @Version
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    protected BeregningsresultatPeriode() {
+    protected BeregningsresultatPeriodeEntitet() {
     }
 
     public Periode getPeriode() {
@@ -115,7 +115,7 @@ public class BeregningsresultatPeriode extends BaseEntitet {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BeregningsresultatPeriode that = (BeregningsresultatPeriode) o;
+        BeregningsresultatPeriodeEntitet that = (BeregningsresultatPeriodeEntitet) o;
         return erForeldet == that.erForeldet
             && Objects.equals(periode, that.periode)
             && Objects.equals(tilbakekrevingBeløp, that.tilbakekrevingBeløp)
@@ -146,7 +146,7 @@ public class BeregningsresultatPeriode extends BaseEntitet {
     }
 
     public static class Builder {
-        private BeregningsresultatPeriode kladd = new BeregningsresultatPeriode();
+        private BeregningsresultatPeriodeEntitet kladd = new BeregningsresultatPeriodeEntitet();
         private Boolean erForeldet;
 
         private Builder() {
@@ -208,7 +208,7 @@ public class BeregningsresultatPeriode extends BaseEntitet {
             return this;
         }
 
-        public BeregningsresultatPeriode build() {
+        public BeregningsresultatPeriodeEntitet build() {
             Objects.requireNonNull(kladd.periode, "periode");
             validerPåkrevdOgScale(kladd.tilbakekrevingBeløp, "tilbakekrevingBeløp");
             validerPåkrevdOgScale(kladd.tilbakekrevingBeløpEtterSkatt, "tilbakekrevingBeløpEtterSkatt");

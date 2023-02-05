@@ -6,7 +6,7 @@ import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.Beregningsresultat;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatRepository;
 
 @Dependent
@@ -27,7 +27,7 @@ public class BeregningsresultatTjeneste {
 
     public BeregningResultat finnEllerBeregn(Long behandlingId) {
         if (lansertLagring) {
-            Optional<Beregningsresultat> lagretResultat = beregningsresultatRepository.hentHvisEksisterer(behandlingId);
+            Optional<BeregningsresultatEntitet> lagretResultat = beregningsresultatRepository.hentHvisEksisterer(behandlingId);
             if (lagretResultat.isPresent()) {
                 return BeregningsresultatMapper.map(lagretResultat.get());
             }

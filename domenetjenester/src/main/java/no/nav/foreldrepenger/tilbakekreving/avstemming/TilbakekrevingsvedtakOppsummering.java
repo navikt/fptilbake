@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatPeriodeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatus;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsbelopDto;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsperiodeDto;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
@@ -27,14 +30,33 @@ public class TilbakekrevingsvedtakOppsummering {
             }
         }
 
-        TilbakekrevingsvedtakOppsummering tilbakekrevingsvedtakOppsummering = new TilbakekrevingsvedtakOppsummering.Builder()
+        return new TilbakekrevingsvedtakOppsummering.Builder()
                 .medRenter(renter)
                 .medSkatt(skatt)
                 .medTilbakekrevesBruttoUtenRenter(bruttoUtenRenter)
                 .medTilbakekrevesNettoUtenRenter(bruttoUtenRenter.subtract(skatt))
                 .medØkonomiVedtakId(tilbakekrevingsvedtak.getVedtakId())
                 .build();
-        return tilbakekrevingsvedtakOppsummering;
+    }
+
+    public static TilbakekrevingsvedtakOppsummering oppsummer(OppdragIverksettingStatus oppdragIverksettingStatus, BeregningsresultatEntitet beregningsresultat) {
+        BigDecimal bruttoUtenRenter = BigDecimal.ZERO;
+        BigDecimal renter = BigDecimal.ZERO;
+        BigDecimal skatt = BigDecimal.ZERO;
+
+        for (BeregningsresultatPeriodeEntitet periode : beregningsresultat.getPerioder()) {
+            renter = renter.add(periode.getRenteBeløp());
+            bruttoUtenRenter = bruttoUtenRenter.add(periode.getTilbakekrevingBeløpUtenRenter());
+            skatt = skatt.add(periode.getSkattBeløp());
+        }
+
+        return new TilbakekrevingsvedtakOppsummering.Builder()
+            .medRenter(renter)
+            .medSkatt(skatt)
+            .medTilbakekrevesBruttoUtenRenter(bruttoUtenRenter)
+            .medTilbakekrevesNettoUtenRenter(bruttoUtenRenter.subtract(skatt))
+            .medØkonomiVedtakId(oppdragIverksettingStatus.getVedtakId())
+            .build();
     }
 
     public String getØkonomiVedtakId() {
@@ -67,6 +89,11 @@ public class TilbakekrevingsvedtakOppsummering {
 
         public Builder medØkonomiVedtakId(BigInteger økonomiVedtakId) {
             kladd.økonomiVedtakId = økonomiVedtakId.toString();
+            return this;
+        }
+
+        public Builder medØkonomiVedtakId(String økonomiVedtakId) {
+            kladd.økonomiVedtakId = økonomiVedtakId;
             return this;
         }
 

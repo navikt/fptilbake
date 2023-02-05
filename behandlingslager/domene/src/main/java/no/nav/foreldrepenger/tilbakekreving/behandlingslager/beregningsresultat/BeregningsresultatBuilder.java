@@ -12,25 +12,25 @@ import no.nav.fpsak.tidsserie.LocalDateTimeline;
 public class BeregningsresultatBuilder {
 
     private VedtakResultatType vedtakResultatType;
-    private List<BeregningsresultatPeriode> perioder;
+    private List<BeregningsresultatPeriodeEntitet> perioder;
 
     public BeregningsresultatBuilder medVedtakResultatType(VedtakResultatType vedtakResultatType) {
         this.vedtakResultatType = vedtakResultatType;
         return this;
     }
 
-    public BeregningsresultatBuilder medPerioder(List<BeregningsresultatPeriode> perioder) {
+    public BeregningsresultatBuilder medPerioder(List<BeregningsresultatPeriodeEntitet> perioder) {
         this.perioder = perioder.stream()
             .sorted(Comparator.comparing(v -> v.getPeriode().getFom()))
             .toList();
         return this;
     }
 
-    public Beregningsresultat build() {
+    public BeregningsresultatEntitet build() {
         Objects.requireNonNull(vedtakResultatType, "vedtakResultatType");
         Objects.requireNonNull(perioder, "perioder");
         validerIngenOverlapp();
-        return new Beregningsresultat(vedtakResultatType, perioder);
+        return new BeregningsresultatEntitet(vedtakResultatType, perioder);
     }
 
     private void validerIngenOverlapp() {

@@ -25,7 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 
 @Entity(name = "Beregningsresultat")
 @Table(name = "BEREGNINGSRESULTAT")
-public class Beregningsresultat extends BaseEntitet {
+public class BeregningsresultatEntitet extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BEREGNINGSRESULTAT")
@@ -43,17 +43,17 @@ public class Beregningsresultat extends BaseEntitet {
     @JoinColumn(name = "beregningsresultat_id", nullable = false)
     @OrderBy(value = "periode.fom asc") //equals+hashCode avhengig av sortering
     @BatchSize(size = 20)
-    private List<BeregningsresultatPeriode> perioder = new ArrayList<>();
+    private List<BeregningsresultatPeriodeEntitet> perioder = new ArrayList<>();
 
-    protected Beregningsresultat() {
+    protected BeregningsresultatEntitet() {
     }
 
-    public Beregningsresultat(VedtakResultatType vedtakResultatType, List<BeregningsresultatPeriode> perioder) {
+    public BeregningsresultatEntitet(VedtakResultatType vedtakResultatType, List<BeregningsresultatPeriodeEntitet> perioder) {
         this.vedtakResultatType = vedtakResultatType;
         this.perioder = perioder.stream().sorted(Comparator.comparing(p -> p.getPeriode().getFom())).toList(); //equals+hashCode avhengig av sortering
     }
 
-    public List<BeregningsresultatPeriode> getPerioder() {
+    public List<BeregningsresultatPeriodeEntitet> getPerioder() {
         return perioder;
     }
 
@@ -69,7 +69,7 @@ public class Beregningsresultat extends BaseEntitet {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Beregningsresultat that = (Beregningsresultat) o;
+        BeregningsresultatEntitet that = (BeregningsresultatEntitet) o;
         return vedtakResultatType == that.vedtakResultatType
             && Objects.equals(perioder, that.perioder);
     }

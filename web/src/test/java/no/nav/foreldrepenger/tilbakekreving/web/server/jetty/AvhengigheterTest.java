@@ -5,7 +5,7 @@ import javax.enterprise.inject.spi.CDI;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemmingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemFraXmlSendtTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SakshendelserEventObserver;
 import no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer.KravgrunnlagAsyncJmsConsumer;
 import no.nav.foreldrepenger.tilbakekreving.los.klient.observer.LosEventObserver;
@@ -24,6 +24,6 @@ public class AvhengigheterTest {
         Assertions.assertThat(CDI.current().select(SakshendelserEventObserver.class).isResolvable()).isTrue();
         Assertions.assertThat(CDI.current().select(LosEventObserver.class).isResolvable()).isTrue();
         Assertions.assertThat(CDI.current().select(KravgrunnlagAsyncJmsConsumer.class).isResolvable()).isTrue();
-        Assertions.assertThat(CDI.current().select(AvstemmingTjeneste.class).isResolvable()).isTrue();
+        Assertions.assertThat(CDI.current().select(AvstemFraXmlSendtTjeneste.class).isResolvable()).isTrue();
     }
 }

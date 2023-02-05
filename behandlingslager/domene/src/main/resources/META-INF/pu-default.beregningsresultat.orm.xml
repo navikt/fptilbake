@@ -10,7 +10,7 @@
     <sequence-generator name="seq_gr_beregningsresultat" allocation-size="50" sequence-name="seq_gr_beregningsresultat"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatAggregate"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.Beregningsresultat"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatPeriode"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatEntitet"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatPeriodeEntitet"/>
 
 </entity-mappings>

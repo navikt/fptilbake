@@ -1,21 +1,21 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.beregning;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.Beregningsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatPeriodeEntitet;
 
 class BeregningsresultatMapper {
     private BeregningsresultatMapper() {
     }
 
-    public static BeregningResultat map(Beregningsresultat entitet) {
+    public static BeregningResultat map(BeregningsresultatEntitet entitet) {
         BeregningResultat resultat = new BeregningResultat();
         resultat.setVedtakResultatType(entitet.getVedtakResultatType());
         resultat.setBeregningResultatPerioder(entitet.getPerioder().stream().map(BeregningsresultatMapper::map).toList());
         return resultat;
     }
 
-    public static BeregningResultatPeriode map(BeregningsresultatPeriode periode) {
+    public static BeregningResultatPeriode map(BeregningsresultatPeriodeEntitet periode) {
         return BeregningResultatPeriode.builder()
             .medPeriode(periode.getPeriode())
             .medTilbakekrevingBeløp(periode.getTilbakekrevingBeløp())
@@ -31,15 +31,15 @@ class BeregningsresultatMapper {
             .build();
     }
 
-    public static Beregningsresultat map(BeregningResultat resultat) {
+    public static BeregningsresultatEntitet map(BeregningResultat resultat) {
         return new BeregningsresultatBuilder()
             .medVedtakResultatType(resultat.getVedtakResultatType())
             .medPerioder(resultat.getBeregningResultatPerioder().stream().map(BeregningsresultatMapper::map).toList())
             .build();
     }
 
-    public static BeregningsresultatPeriode map(BeregningResultatPeriode periode) {
-        return BeregningsresultatPeriode.builder()
+    public static BeregningsresultatPeriodeEntitet map(BeregningResultatPeriode periode) {
+        return BeregningsresultatPeriodeEntitet.builder()
             .medPeriode(periode.getPeriode())
             .medTilbakekrevingBeløp(periode.getTilbakekrevingBeløp())
             .medTilbakekrevingBeløpUtenRenter(periode.getTilbakekrevingBeløpUtenRenter())

@@ -72,8 +72,7 @@ public class IverksetteVedtakStegTest {
         repoProvider = new BehandlingRepositoryProvider(entityManager);
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         brevSporingRepository = new BrevSporingRepository(entityManager);
-        var prosessTaskIverksett = new ProsessTaskIverksett(taskTjeneste,
-                brevSporingRepository);
+        var prosessTaskIverksett = new ProsessTaskIverksett(taskTjeneste, brevSporingRepository, false);
         iverksetteVedtakSteg = new IverksetteVedtakSteg(repoProvider, prosessTaskIverksett);
         behandlingVedtakRepository = repoProvider.getBehandlingVedtakRepository();
         behandlingRepository = repoProvider.getBehandlingRepository();
@@ -121,8 +120,8 @@ public class IverksetteVedtakStegTest {
     public void skal_utføre_iverksette_vedtak_steg_uten_å_sende_vedtaksbrev_for_tilbakekreving_revurdering_hvis_behandling_opprettet_for_klage() {
         Behandling revurdering = Behandling.nyBehandlingFor(behandling.getFagsak(), BehandlingType.REVURDERING_TILBAKEKREVING).build();
         List<BehandlingÅrsak> behandlingÅrsaker = BehandlingÅrsak.builder(BehandlingÅrsakType.RE_KLAGE_NFP)
-                .medOriginalBehandling(behandling)
-                .buildFor(revurdering);
+            .medOriginalBehandling(behandling)
+            .buildFor(revurdering);
         revurdering.getBehandlingÅrsaker().addAll(behandlingÅrsaker);
         BehandlingLås revurderingBehandlingLås = behandlingRepository.taSkriveLås(revurdering);
         behandlingRepository.lagre(revurdering, revurderingBehandlingLås);
@@ -147,8 +146,8 @@ public class IverksetteVedtakStegTest {
     public void skal_utføre_iverksette_vedtak_steg_med_å_sende_vedtaksbrev_for_tilbakekreving_revurdering_hvis_behandling_ikke_opprettet_for_klage() {
         Behandling revurdering = Behandling.nyBehandlingFor(behandling.getFagsak(), BehandlingType.REVURDERING_TILBAKEKREVING).build();
         List<BehandlingÅrsak> behandlingÅrsaker = BehandlingÅrsak.builder(BehandlingÅrsakType.RE_OPPLYSNINGER_OM_FORELDELSE)
-                .medOriginalBehandling(behandling)
-                .buildFor(revurdering);
+            .medOriginalBehandling(behandling)
+            .buildFor(revurdering);
         revurdering.getBehandlingÅrsaker().addAll(behandlingÅrsaker);
         BehandlingLås revurderingBehandlingLås = behandlingRepository.taSkriveLås(revurdering);
         behandlingRepository.lagre(revurdering, revurderingBehandlingLås);
@@ -171,15 +170,15 @@ public class IverksetteVedtakStegTest {
 
     private void opprettBehandlingVedtak(Behandling behandling, IverksettingStatus iverksettingStatus) {
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
-                .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
-                .medBehandling(behandling).build();
+            .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
+            .medBehandling(behandling).build();
         repoProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
 
         BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder()
-                .medAnsvarligSaksbehandler("VL")
-                .medIverksettingStatus(iverksettingStatus)
-                .medVedtaksdato(LocalDate.now())
-                .medBehandlingsresultat(behandlingsresultat).build();
+            .medAnsvarligSaksbehandler("VL")
+            .medIverksettingStatus(iverksettingStatus)
+            .medVedtaksdato(LocalDate.now())
+            .medBehandlingsresultat(behandlingsresultat).build();
         behandlingVedtakRepository.lagre(behandlingVedtak);
     }
 
@@ -188,17 +187,17 @@ public class IverksetteVedtakStegTest {
         assertThat(vedtak).isPresent();
         BehandlingVedtak behandlingVedtak = vedtak.get();
         assertThat(behandlingVedtak.getBehandlingsresultat().getBehandlingResultatType())
-                .isEqualByComparingTo(BehandlingResultatType.FULL_TILBAKEBETALING);
+            .isEqualByComparingTo(BehandlingResultatType.FULL_TILBAKEBETALING);
         assertThat(behandlingVedtak.getIverksettingStatus()).isEqualByComparingTo(IverksettingStatus.UNDER_IVERKSETTING);
     }
 
     private void lagreInfoOmVarselbrev(Long behandlingId, String journalpostId, String dokumentId) {
         BrevSporing brevSporing = new BrevSporing.Builder()
-                .medBehandlingId(behandlingId)
-                .medDokumentId(dokumentId)
-                .medJournalpostId(new JournalpostId(journalpostId))
-                .medBrevType(BrevType.VARSEL_BREV)
-                .build();
+            .medBehandlingId(behandlingId)
+            .medDokumentId(dokumentId)
+            .medJournalpostId(new JournalpostId(journalpostId))
+            .medBrevType(BrevType.VARSEL_BREV)
+            .build();
         brevSporingRepository.lagre(brevSporing);
         entityManager.flush();
     }

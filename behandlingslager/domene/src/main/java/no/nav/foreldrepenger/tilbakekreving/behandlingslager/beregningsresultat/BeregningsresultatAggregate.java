@@ -27,7 +27,7 @@ public class BeregningsresultatAggregate extends BaseEntitet {
 
     @ManyToOne
     @JoinColumn(name = "beregningsresultat_id", updatable = false)
-    private Beregningsresultat beregningsresultat;
+    private BeregningsresultatEntitet beregningsresultat;
 
     @Column(name = "aktiv", nullable = false)
     private boolean aktiv = true;
@@ -39,13 +39,13 @@ public class BeregningsresultatAggregate extends BaseEntitet {
     protected BeregningsresultatAggregate() {
     }
 
-    public BeregningsresultatAggregate(Long behandlingId, Beregningsresultat beregningsresultat) {
+    public BeregningsresultatAggregate(Long behandlingId, BeregningsresultatEntitet beregningsresultat) {
         Objects.requireNonNull(behandlingId, "behandlingId");
         Objects.requireNonNull(beregningsresultat, "beregningsresultat");
         this.beregningsresultat = beregningsresultat;
     }
 
-    public Beregningsresultat getBeregningsresultat() {
+    public BeregningsresultatEntitet getBeregningsresultat() {
         return beregningsresultat;
     }
 

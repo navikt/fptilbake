@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
@@ -17,20 +18,26 @@ public class ProsessTaskIverksett {
 
     private ProsessTaskTjeneste taskTjeneste;
     private BrevSporingRepository brevSporingRepository;
+    private boolean lansertLagringBeregningsresultat;
 
     ProsessTaskIverksett() {
         // for CDI
     }
 
     @Inject
-    public ProsessTaskIverksett(ProsessTaskTjeneste taskTjeneste, BrevSporingRepository brevSporingRepository) {
+    public ProsessTaskIverksett(ProsessTaskTjeneste taskTjeneste, BrevSporingRepository brevSporingRepository, @KonfigVerdi(value = "toggle.enable.lagre.beregningsresultat", defaultVerdi = "false") boolean lansertLagringBeregningsresultat) {
         this.taskTjeneste = taskTjeneste;
         this.brevSporingRepository = brevSporingRepository;
+        this.lansertLagringBeregningsresultat = lansertLagringBeregningsresultat;
     }
 
     public void opprettIverksettingstasker(Behandling behandling, boolean sendVedtaksbrev) {
         ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
-        taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class));
+        if (lansertLagringBeregningsresultat) {
+            taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(SendVedtakTilOppdragsystemetTask.class));
+        } else {
+            taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class));
+        }
         if (sendVedtaksbrev) {
             taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(SendVedtaksbrevTask.class));
         }
