@@ -41,6 +41,7 @@
 
         <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
         <handlebars.version>4.3.1</handlebars.version>
+        <open.batik.version>1.16</open.batik.version>
     </properties>
 
     <dependencies>
@@ -386,6 +387,25 @@
                 <artifactId>handlebars-jackson2</artifactId>
                 <version>${handlebars.version}</version>
             </dependency>
+
+            <!-- Batik kommer med batik 1.14 versjon som har mange sårbarheter
+            - drar derfor 1.16 versjon inn som er patched -->
+            <dependency>
+                <groupId>org.apache.xmlgraphics</groupId>
+                <artifactId>batik-transcoder</artifactId>
+                <version>${open.batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xmlgraphics</groupId>
+                <artifactId>batik-codec</artifactId>
+                <version>${open.batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xmlgraphics</groupId>
+                <artifactId>batik-ext</artifactId>
+                <version>${open.batik.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.openhtmltopdf</groupId>
                 <artifactId>openhtmltopdf-core</artifactId>
