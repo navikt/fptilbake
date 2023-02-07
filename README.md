@@ -193,3 +193,12 @@ TODO beskrivelse (aktoer_v2, person_v3)
 ## Integrasjon mot Datavarehus (DVH)
 
 TODO beskrivelse felles, saksstatistikk, vedtak
+
+### Sikkerhet
+Det er mulig å kalle fptilbake med bruk av følgende tokens
+- Azure CC
+- Azure OBO med følgende rettigheter:
+    - fpsak-saksbehandler
+    - fpsak-veileder
+    - fpsak-drift
+- STS (fases ut)
