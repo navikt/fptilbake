@@ -388,8 +388,8 @@
                 <version>${handlebars.version}</version>
             </dependency>
 
-            <!-- Batik kommer med batik 1.14 versjon som har mange sårbarheter
-            - drar derfor 1.16 versjon inn som er patched -->
+            <!-- openhtmltopdf-svg-support kommer med batik 1.14 versjon som drar inn mange sårbarheter
+            - vi bruker derfor 1.16 versjon inn som er patched allerede -->
             <dependency>
                 <groupId>org.apache.xmlgraphics</groupId>
                 <artifactId>batik-transcoder</artifactId>
