@@ -7,6 +7,8 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 public class Adresseinfo {
 
 
+
+
     private String mottakerNavn;
     private PersonIdent personIdent;
     private String vergeOrganisasjonNummer;
