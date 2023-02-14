@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -14,34 +13,27 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import org.hibernate.annotations.BatchSize;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseCreateableEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 
 @Entity(name = "Beregningsresultat")
 @Table(name = "BEREGNINGSRESULTAT")
-public class BeregningsresultatEntitet extends BaseEntitet {
+public class BeregningsresultatEntitet extends BaseCreateableEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BEREGNINGSRESULTAT")
     private Long id;
 
-    @Version
-    @Column(name = "versjon", nullable = false)
-    private long versjon;
-
     @Convert(converter = VedtakResultatType.KodeverdiConverter.class)
     @Column(name = "vedtak_resultat_type", nullable = false)
     private VedtakResultatType vedtakResultatType;
 
-    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OneToMany
     @JoinColumn(name = "beregningsresultat_id", nullable = false)
-    @OrderBy(value = "periode.fom asc") //equals+hashCode avhengig av sortering
     @BatchSize(size = 20)
     private List<BeregningsresultatPeriodeEntitet> perioder = new ArrayList<>();
 
@@ -49,12 +41,20 @@ public class BeregningsresultatEntitet extends BaseEntitet {
     }
 
     public BeregningsresultatEntitet(VedtakResultatType vedtakResultatType, List<BeregningsresultatPeriodeEntitet> perioder) {
+        Objects.requireNonNull(vedtakResultatType, "vedtakResultatType");
+        Objects.requireNonNull(perioder, "perioder");
         this.vedtakResultatType = vedtakResultatType;
-        this.perioder = perioder.stream().sorted(Comparator.comparing(p -> p.getPeriode().getFom())).toList(); //equals+hashCode avhengig av sortering
+        this.perioder = perioder;
     }
 
     public List<BeregningsresultatPeriodeEntitet> getPerioder() {
         return perioder;
+    }
+
+    private List<BeregningsresultatPeriodeEntitet> getSortertePerioder() {
+        return perioder.stream()
+            .sorted(Comparator.comparing(p -> p.getPeriode().getFom()))
+            .toList();
     }
 
     public VedtakResultatType getVedtakResultatType() {
@@ -71,12 +71,12 @@ public class BeregningsresultatEntitet extends BaseEntitet {
         }
         BeregningsresultatEntitet that = (BeregningsresultatEntitet) o;
         return vedtakResultatType == that.vedtakResultatType
-            && Objects.equals(perioder, that.perioder);
+            && Objects.equals(getSortertePerioder(), that.getSortertePerioder());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(vedtakResultatType, perioder);
+        return Objects.hash(vedtakResultatType, getSortertePerioder());
     }
 
     @Override

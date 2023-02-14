@@ -42,6 +42,7 @@ public class BeregningsresultatAggregate extends BaseEntitet {
     public BeregningsresultatAggregate(Long behandlingId, BeregningsresultatEntitet beregningsresultat) {
         Objects.requireNonNull(behandlingId, "behandlingId");
         Objects.requireNonNull(beregningsresultat, "beregningsresultat");
+        this.behandlingId = behandlingId;
         this.beregningsresultat = beregningsresultat;
     }
 

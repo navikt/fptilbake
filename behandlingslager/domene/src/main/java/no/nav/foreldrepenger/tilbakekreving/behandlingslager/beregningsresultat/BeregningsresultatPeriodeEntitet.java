@@ -12,15 +12,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseCreateableEntitet;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 @Entity(name = "BeregningsresultatPeriode")
 @Table(name = "BEREGNINGSRESULTAT_PERIODE")
-public class BeregningsresultatPeriodeEntitet extends BaseEntitet {
+public class BeregningsresultatPeriodeEntitet  extends BaseCreateableEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BEREGNINGSRESULTAT_PERIODE")
@@ -55,10 +54,6 @@ public class BeregningsresultatPeriodeEntitet extends BaseEntitet {
     @ManyToOne
     @JoinColumn(name = "beregningsresultat_id", insertable = false, updatable = false)
     private BeregningsresultatEntitet beregningsresultat;
-
-    @Version
-    @Column(name = "versjon", nullable = false)
-    private long versjon;
 
     protected BeregningsresultatPeriodeEntitet() {
     }

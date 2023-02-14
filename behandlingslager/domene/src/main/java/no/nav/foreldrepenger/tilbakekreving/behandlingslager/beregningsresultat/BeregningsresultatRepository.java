@@ -36,6 +36,9 @@ public class BeregningsresultatRepository {
             gammelKobling.ifPresent(this::deaktiverBeregningsresultat);
             BeregningsresultatAggregate kobling = new BeregningsresultatAggregate(behandlingId, beregningsresultat);
             entityManager.persist(beregningsresultat);
+            for (BeregningsresultatPeriodeEntitet periodeEntitet : beregningsresultat.getPerioder()) {
+                entityManager.persist(periodeEntitet);
+            }
             entityManager.persist(kobling);
             entityManager.flush();
             logger.info("Lagret beregningsresultat for behandlingId={}", behandlingId);
