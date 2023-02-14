@@ -18,7 +18,7 @@ import org.mockito.Mockito;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatus;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
@@ -75,7 +75,7 @@ class SendVedtakTilOppdragsystemetTaskTest {
         Mockito.verify(økonomiConsumer).iverksettTilbakekrevingsvedtak(Mockito.eq(behandling.getId()), any(TilbakekrevingsvedtakRequest.class));
 
         //har lagret status riktig
-        Optional<OppdragIverksettingStatus> status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
+        Optional<OppdragIverksettingStatusEntitet> status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
         assertThat(status).isPresent();
         assertThat(status.get().getKvitteringOk()).isTrue();
 
@@ -96,7 +96,7 @@ class SendVedtakTilOppdragsystemetTaskTest {
 
         assertThatThrownBy(() -> task.doTask(data)).hasMessageContaining("Fikk feil fra OS ved iverksetting av behandling");
         //har lagret status riktig
-        Optional<OppdragIverksettingStatus> status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
+        Optional<OppdragIverksettingStatusEntitet> status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
         assertThat(status).isPresent();
         assertThat(status.get().getKvitteringOk()).isFalse();
 

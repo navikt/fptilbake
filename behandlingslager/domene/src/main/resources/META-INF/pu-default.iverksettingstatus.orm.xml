@@ -7,6 +7,6 @@
 
     <sequence-generator name="seq_iverksetting_status_os" allocation-size="50" sequence-name="seq_iverksetting_status_os"/>
 
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatus"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusEntitet"/>
 
 </entity-mappings>

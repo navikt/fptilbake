@@ -28,12 +28,12 @@ public class OppdragIverksettingStatusRepository {
     }
 
     public void registrerStarterIverksetting(Long behandlingId, String vedtakId) {
-        Optional<OppdragIverksettingStatus> eksisterende = hentOppdragIverksettingStatus(behandlingId);
+        Optional<OppdragIverksettingStatusEntitet> eksisterende = hentOppdragIverksettingStatus(behandlingId);
         if (eksisterende.isPresent()) {
             //skjer hvis prosesstask for iverksetting rekjøres
             logger.info("Har allerede registrert at iverksetting er startet");
         } else {
-            entityManager.persist(new OppdragIverksettingStatus(behandlingId, vedtakId));
+            entityManager.persist(new OppdragIverksettingStatusEntitet(behandlingId, vedtakId));
         }
     }
 
@@ -42,30 +42,30 @@ public class OppdragIverksettingStatusRepository {
     }
 
     private void registrerKvittering(Long behandlingId, LocalDateTime tidspunkt, boolean kvitteringOk) {
-        Optional<OppdragIverksettingStatus> eksisterende = hentOppdragIverksettingStatus(behandlingId);
+        Optional<OppdragIverksettingStatusEntitet> eksisterende = hentOppdragIverksettingStatus(behandlingId);
         if (eksisterende.isEmpty()) {
-            throw new IllegalStateException("Kan ikke oppdatere " + OppdragIverksettingStatus.class + " for behandling " + behandlingId + " siden det ikke finnes noen slik fra før");
+            throw new IllegalStateException("Kan ikke oppdatere " + OppdragIverksettingStatusEntitet.class + " for behandling " + behandlingId + " siden det ikke finnes noen slik fra før");
         }
         if (Boolean.TRUE.equals(eksisterende.get().getKvitteringOk())) {
             throw new IllegalStateException("Har allerede mottatt positiv kvittering for behandlingId=" + behandlingId);
         }
-        OppdragIverksettingStatus status = eksisterende.get();
+        OppdragIverksettingStatusEntitet status = eksisterende.get();
         status.registrerKvittering(tidspunkt, kvitteringOk);
         entityManager.persist(status);
     }
 
-    public Optional<OppdragIverksettingStatus> hentOppdragIverksettingStatus(Long behandlingId) {
+    public Optional<OppdragIverksettingStatusEntitet> hentOppdragIverksettingStatus(Long behandlingId) {
         var query = entityManager.createQuery("SELECT ois " +
             "FROM OppdragIverksettingStatus ois " +
             "WHERE ois.behandlingId = :behandlingId " +
-            "AND ois.aktiv = true", OppdragIverksettingStatus.class);
+            "AND ois.aktiv = true", OppdragIverksettingStatusEntitet.class);
         query.setParameter("behandlingId", behandlingId);
 
         return HibernateVerktøy.hentUniktResultat(query);
     }
 
-    public List<OppdragIverksettingStatus> finnForDato(LocalDate dato){
-        TypedQuery<OppdragIverksettingStatus> query = entityManager.createQuery("from OppdragIverksettingStatus where opprettetTidspunkt >= :t0 and opprettetTidspunkt < :t1 order by opprettetTidspunkt desc", OppdragIverksettingStatus.class);
+    public List<OppdragIverksettingStatusEntitet> finnForDato(LocalDate dato){
+        TypedQuery<OppdragIverksettingStatusEntitet> query = entityManager.createQuery("from OppdragIverksettingStatus where opprettetTidspunkt >= :t0 and opprettetTidspunkt < :t1 order by opprettetTidspunkt desc", OppdragIverksettingStatusEntitet.class);
         query.setParameter("t0", dato.atStartOfDay());
         query.setParameter("t1", dato.plusDays(1).atStartOfDay());
         return query.getResultList();

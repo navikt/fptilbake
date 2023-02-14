@@ -6,7 +6,7 @@ import java.util.Objects;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatPeriodeEntitet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatus;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusEntitet;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsbelopDto;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsperiodeDto;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
@@ -39,7 +39,7 @@ public class TilbakekrevingsvedtakOppsummering {
                 .build();
     }
 
-    public static TilbakekrevingsvedtakOppsummering oppsummer(OppdragIverksettingStatus oppdragIverksettingStatus, BeregningsresultatEntitet beregningsresultat) {
+    public static TilbakekrevingsvedtakOppsummering oppsummer(OppdragIverksettingStatusEntitet oppdragIverksettingStatusEntitet, BeregningsresultatEntitet beregningsresultat) {
         BigDecimal bruttoUtenRenter = BigDecimal.ZERO;
         BigDecimal renter = BigDecimal.ZERO;
         BigDecimal skatt = BigDecimal.ZERO;
@@ -55,7 +55,7 @@ public class TilbakekrevingsvedtakOppsummering {
             .medSkatt(skatt)
             .medTilbakekrevesBruttoUtenRenter(bruttoUtenRenter)
             .medTilbakekrevesNettoUtenRenter(bruttoUtenRenter.subtract(skatt))
-            .medØkonomiVedtakId(oppdragIverksettingStatus.getVedtakId())
+            .medØkonomiVedtakId(oppdragIverksettingStatusEntitet.getVedtakId())
             .build();
     }
 

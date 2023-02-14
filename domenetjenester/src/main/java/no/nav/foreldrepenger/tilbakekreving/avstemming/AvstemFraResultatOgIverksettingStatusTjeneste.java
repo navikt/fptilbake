@@ -16,7 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatus;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
@@ -78,8 +78,8 @@ public class AvstemFraResultatOgIverksettingStatusTjeneste {
     public void leggTilOppsummering(LocalDate dato, AvstemmingCsvFormatter avstemmingCsvFormatter) {
         int antallFeilet = 0;
         int antallFørstegangsvedtakUtenTilbakekreving = 0;
-        List<OppdragIverksettingStatus> iverksettingStatuser = oppdragIverksettingStatusRepository.finnForDato(dato);
-        for (OppdragIverksettingStatus iverksettingStatus : iverksettingStatuser) {
+        List<OppdragIverksettingStatusEntitet> iverksettingStatuser = oppdragIverksettingStatusRepository.finnForDato(dato);
+        for (OppdragIverksettingStatusEntitet iverksettingStatus : iverksettingStatuser) {
             if (!iverksettingStatus.erSendtOk()) {
                 antallFeilet++;
                 continue;

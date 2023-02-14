@@ -15,7 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 
 @Entity(name = "OppdragIverksettingStatus")
 @Table(name = "IVERKSETTING_STATUS_OS")
-public class OppdragIverksettingStatus extends BaseEntitet {
+public class OppdragIverksettingStatusEntitet extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_IVERKSETTING_STATUS_OS")
@@ -40,10 +40,10 @@ public class OppdragIverksettingStatus extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    protected OppdragIverksettingStatus() {
+    protected OppdragIverksettingStatusEntitet() {
     }
 
-    public OppdragIverksettingStatus(Long behandlingId, String vedtakId) {
+    public OppdragIverksettingStatusEntitet(Long behandlingId, String vedtakId) {
         Objects.requireNonNull(behandlingId, "behandlingId");
         Objects.requireNonNull(vedtakId, "vedtakId");
         this.behandlingId = behandlingId;
