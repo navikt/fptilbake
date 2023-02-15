@@ -15,7 +15,6 @@ import javax.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BeregnBeløpUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FordeltKravgrunnlagBeløp;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.SaksbehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
@@ -26,7 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
@@ -47,6 +45,7 @@ public class TilbakekrevingBeregningTjeneste {
 
     private KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste;
 
+
     TilbakekrevingBeregningTjeneste() {
         //for CDI proxy
     }
@@ -60,7 +59,7 @@ public class TilbakekrevingBeregningTjeneste {
         this.kravgrunnlagBeregningTjeneste = kravgrunnlagBeregningTjeneste;
     }
 
-    public BeregningResultat beregn(Long behandlingId) {
+    BeregningResultat beregn(Long behandlingId) {
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         VurdertForeldelse vurdertForeldelse = hentVurdertForeldelse(behandlingId);
@@ -85,7 +84,7 @@ public class TilbakekrevingBeregningTjeneste {
     private VilkårVurderingEntitet hentVilkårsvurdering(Long behandlingId) {
         VilkårVurderingEntitet vurderingUtenPerioder = new VilkårVurderingEntitet();
         return vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId)
-                .orElse(vurderingUtenPerioder);
+            .orElse(vurderingUtenPerioder);
     }
 
     private VurdertForeldelse hentVurdertForeldelse(Long behandlingId) {
@@ -114,17 +113,17 @@ public class TilbakekrevingBeregningTjeneste {
 
     private List<Periode> finnIkkeForeldedePerioder(VilkårVurderingEntitet vilkårsvurdering) {
         return vilkårsvurdering.getPerioder()
-                .stream()
-                .map(VilkårVurderingPeriodeEntitet::getPeriode)
-                .collect(Collectors.toList());
+            .stream()
+            .map(VilkårVurderingPeriodeEntitet::getPeriode)
+            .collect(Collectors.toList());
     }
 
     private List<Periode> finnForeldedePerioder(VurdertForeldelse vurdertForeldelse) {
         return vurdertForeldelse.getVurdertForeldelsePerioder()
-                .stream()
-                .filter(VurdertForeldelsePeriode::erForeldet)
-                .map(VurdertForeldelsePeriode::getPeriode)
-                .collect(Collectors.toList());
+            .stream()
+            .filter(VurdertForeldelsePeriode::erForeldet)
+            .map(VurdertForeldelsePeriode::getPeriode)
+            .collect(Collectors.toList());
     }
 
     private static <T> List<T> tilEnListe(List<T>... lister) {
@@ -140,35 +139,34 @@ public class TilbakekrevingBeregningTjeneste {
                                                                                 Map<Periode, FordeltKravgrunnlagBeløp> kravbeløpPrPeriode,
                                                                                 boolean beregnRenter) {
         return vilkårsvurdering.getPerioder()
-                .stream()
-                .map(p -> beregnIkkeForeldetPeriode(kravgrunnlag, p, kravbeløpPrPeriode, beregnRenter))
-                .collect(Collectors.toList());
+            .stream()
+            .map(p -> beregnIkkeForeldetPeriode(kravgrunnlag, p, kravbeløpPrPeriode, beregnRenter))
+            .collect(Collectors.toList());
     }
 
     private Collection<BeregningResultatPeriode> beregnForForeldedePerioder(VurdertForeldelse vurdertForeldelse, Map<Periode, FordeltKravgrunnlagBeløp> kravbeløpPrPeriode) {
         return vurdertForeldelse.getVurdertForeldelsePerioder()
-                .stream()
-                .filter(p -> ForeldelseVurderingType.FORELDET.equals(p.getForeldelseVurderingType()))
-                .map(p -> beregnForeldetPeriode(kravbeløpPrPeriode, p))
-                .collect(Collectors.toList());
+            .stream()
+            .filter(p -> ForeldelseVurderingType.FORELDET.equals(p.getForeldelseVurderingType()))
+            .map(p -> beregnForeldetPeriode(kravbeløpPrPeriode, p))
+            .collect(Collectors.toList());
     }
 
     private BeregningResultatPeriode beregnForeldetPeriode(Map<Periode, FordeltKravgrunnlagBeløp> beløpPerPeriode, VurdertForeldelsePeriode foreldelsePeriode) {
         Periode periode = foreldelsePeriode.getPeriode();
-        BeregningResultatPeriode resultat = new BeregningResultatPeriode();
-        resultat.setPeriode(periode);
         FordeltKravgrunnlagBeløp delresultat = beløpPerPeriode.get(periode);
-        resultat.setFeilutbetaltBeløp(delresultat.getFeilutbetaltBeløp());
-        resultat.setRiktigYtelseBeløp(delresultat.getRiktigYtelseBeløp());
-        resultat.setUtbetaltYtelseBeløp(delresultat.getUtbetaltYtelseBeløp());
-        resultat.setTilbakekrevingBeløp(BigDecimal.ZERO);
-        resultat.setTilbakekrevingBeløpUtenRenter(BigDecimal.ZERO);
-        resultat.setRenteBeløp(BigDecimal.ZERO);
-        resultat.setAndelAvBeløp(BigDecimal.ZERO);
-        resultat.setVurdering(AnnenVurdering.FORELDET);
-        resultat.setSkattBeløp(BigDecimal.ZERO);
-        resultat.setTilbakekrevingBeløpEtterSkatt(BigDecimal.ZERO);
-        return resultat;
+        return BeregningResultatPeriode.builder()
+            .medPeriode(periode)
+            .medErForeldet(true)
+            .medFeilutbetaltBeløp(delresultat.getFeilutbetaltBeløp())
+            .medRiktigYtelseBeløp(delresultat.getRiktigYtelseBeløp())
+            .medUtbetaltYtelseBeløp(delresultat.getUtbetaltYtelseBeløp())
+            .medTilbakekrevingBeløp(BigDecimal.ZERO)
+            .medTilbakekrevingBeløpUtenRenter(BigDecimal.ZERO)
+            .medRenteBeløp(BigDecimal.ZERO)
+            .medSkattBeløp(BigDecimal.ZERO)
+            .medTilbakekrevingBeløpEtterSkatt(BigDecimal.ZERO)
+            .build();
     }
 
     private BeregningResultatPeriode beregnIkkeForeldetPeriode(Kravgrunnlag431 kravgrunnlag,
@@ -215,8 +213,8 @@ public class TilbakekrevingBeregningTjeneste {
 
     private static <T> BigDecimal sum(Collection<T> liste, Function<T, BigDecimal> konverter) {
         return liste.stream()
-                .map(konverter)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+            .map(konverter)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
 }

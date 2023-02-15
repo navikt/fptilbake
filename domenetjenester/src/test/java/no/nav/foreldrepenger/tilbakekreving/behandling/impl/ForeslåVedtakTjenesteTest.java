@@ -10,8 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
@@ -21,20 +21,20 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 
 public class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
 
-    private TilbakekrevingBeregningTjeneste beregningTjeneste;
+    private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private ForeslåVedtakTjeneste foreslåVedtakTjeneste;
 
     @BeforeEach
     void setUp() {
-        beregningTjeneste = mock(TilbakekrevingBeregningTjeneste.class);
-        foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningTjeneste, historikkTjenesteAdapter);
+        beregningsresultatTjeneste = mock(BeregningsresultatTjeneste.class);
+        foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningsresultatTjeneste, historikkTjenesteAdapter);
     }
 
     @Test
     public void lagHistorikkInnslagForForeslåVedtak() {
         BeregningResultat beregningResultat = new BeregningResultat();
         beregningResultat.setVedtakResultatType(VedtakResultatType.FULL_TILBAKEBETALING);
-        when(beregningTjeneste.beregn(internBehandlingId)).thenReturn(beregningResultat);
+        when(beregningsresultatTjeneste.finnEllerBeregn(internBehandlingId)).thenReturn(beregningResultat);
 
         foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(internBehandlingId);
 
@@ -51,7 +51,7 @@ public class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
         HistorikkinnslagDel historikkinnslagDel = historikkinnslagDeler.get(0);
         assertThat(historikkinnslagDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.VEDTAK.getKode());
         assertThat(historikkinnslagDel.getResultat().get())
-                .isEqualTo(beregningResultat.getVedtakResultatType().getKode());
+            .isEqualTo(beregningResultat.getVedtakResultatType().getKode());
     }
 
 }

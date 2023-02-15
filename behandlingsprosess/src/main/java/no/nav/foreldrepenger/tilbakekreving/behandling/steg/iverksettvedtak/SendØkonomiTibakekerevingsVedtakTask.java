@@ -60,6 +60,7 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
+
         TilbakekrevingsvedtakDto tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
         TilbakekrevingsvedtakRequest request = lagRequest(tilbakekrevingsvedtak);
         Long sendtXmlId = lagreXml(behandlingId, request);

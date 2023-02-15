@@ -29,9 +29,9 @@ import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 
 @ApplicationScoped
-public class AvstemmingTjeneste {
+public class AvstemFraXmlSendtTjeneste {
 
-    private static final Logger logger = LoggerFactory.getLogger(AvstemmingTjeneste.class);
+    private static final Logger logger = LoggerFactory.getLogger(AvstemFraXmlSendtTjeneste.class);
 
     private BehandlingRepository behandlingRepository;
     private BehandlingVedtakRepository behandlingVedtakRepository;
@@ -40,21 +40,21 @@ public class AvstemmingTjeneste {
 
     private String avsender;
 
-    AvstemmingTjeneste() {
+    AvstemFraXmlSendtTjeneste() {
         //for CDI proxy
     }
 
     @Inject
-    public AvstemmingTjeneste(ØkonomiSendtXmlRepository sendtXmlRepository,
-                              BehandlingRepositoryProvider behandlingRepositoryProvider,
-                              PersoninfoAdapter aktørConsumer) {
+    public AvstemFraXmlSendtTjeneste(ØkonomiSendtXmlRepository sendtXmlRepository,
+                                     BehandlingRepositoryProvider behandlingRepositoryProvider,
+                                     PersoninfoAdapter aktørConsumer) {
         this(ApplicationName.hvilkenTilbakeAppName(), sendtXmlRepository, behandlingRepositoryProvider, aktørConsumer);
     }
 
-    public AvstemmingTjeneste(String applikasjon,
-                              ØkonomiSendtXmlRepository sendtXmlRepository,
-                              BehandlingRepositoryProvider behandlingRepositoryProvider,
-                              PersoninfoAdapter aktørConsumer) {
+    public AvstemFraXmlSendtTjeneste(String applikasjon,
+                                     ØkonomiSendtXmlRepository sendtXmlRepository,
+                                     BehandlingRepositoryProvider behandlingRepositoryProvider,
+                                     PersoninfoAdapter aktørConsumer) {
         this.sendtXmlRepository = sendtXmlRepository;
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.behandlingVedtakRepository = behandlingRepositoryProvider.getBehandlingVedtakRepository();
@@ -63,8 +63,20 @@ public class AvstemmingTjeneste {
     }
 
     public Optional<String> oppsummer(LocalDate dato) {
-        Collection<ØkonomiXmlSendt> sendteVedtak = sendtXmlRepository.finn(MeldingType.VEDTAK, dato);
         AvstemmingCsvFormatter avstemmingCsvFormatter = new AvstemmingCsvFormatter();
+
+        leggTilOppsummering(dato, avstemmingCsvFormatter);
+
+        logger.info("Sender {} vedtak til avstemming for {}", avstemmingCsvFormatter.getAntallRader(), dato);
+
+        if (avstemmingCsvFormatter.getAntallRader() == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(avstemmingCsvFormatter.getData());
+    }
+
+    public void leggTilOppsummering(LocalDate dato, AvstemmingCsvFormatter avstemmingCsvFormatter){
+        Collection<ØkonomiXmlSendt> sendteVedtak = sendtXmlRepository.finn(MeldingType.VEDTAK, dato);
         int antallFeilet = 0;
         int antallFørstegangsvedtakUtenTilbakekreving = 0;
         for (ØkonomiXmlSendt sendtVedtak : sendteVedtak) {
@@ -79,19 +91,13 @@ public class AvstemmingTjeneste {
                 continue;
             }
             leggTilAvstemmingsdataForVedtaket(avstemmingCsvFormatter, behandling, oppsummering);
-
         }
-        if (antallFeilet == 0) {
-            logger.info("Avstemmer {}. Sender {} vedtak til avstemming. Totalt ble {} vedtak sendt til OS dette døgnet. {} førstegangsvedtak uten tilbakekreving sendes ikke til avstemming",
-                    dato, avstemmingCsvFormatter.getAntallRader(), sendteVedtak.size(), antallFørstegangsvedtakUtenTilbakekreving);
-        } else {
-            logger.warn("Avstemmer {}. Sender {} vedtak til avstemming. Totalt ble {} vedtak sendt til OS dette døgnet. {} førstegangsvedtak uten tilbakekreving sendes ikke til avstemming. {} vedtak fikk negativ kvittering fra OS og sendes ikke til avstemming",
-                    dato, avstemmingCsvFormatter.getAntallRader(), sendteVedtak.size(), antallFørstegangsvedtakUtenTilbakekreving, antallFeilet);
+        if (antallFeilet != 0){
+            logger.warn("{} vedtak har feilet i overføring til OS for {}", antallFeilet, dato);
         }
-        if (avstemmingCsvFormatter.getAntallRader() == 0) {
-            return Optional.empty();
+        if (antallFørstegangsvedtakUtenTilbakekreving != 0) {
+            logger.info("{} førstegangsvedtak uten tilbakekreving sendes ikke til avstemming for {}", antallFørstegangsvedtakUtenTilbakekreving, dato);
         }
-        return Optional.of(avstemmingCsvFormatter.getData());
     }
 
     private boolean erFørstegangsvedtakUtenTilbakekreving(Behandling behandling, TilbakekrevingsvedtakOppsummering oppsummering) {

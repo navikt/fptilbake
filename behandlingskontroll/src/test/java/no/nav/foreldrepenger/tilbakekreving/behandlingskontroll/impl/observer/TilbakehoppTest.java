@@ -46,6 +46,7 @@ public class TilbakehoppTest {
     private BehandlingStegType steg4;
     private BehandlingStegType steg5;
     private BehandlingStegType steg6;
+    private BehandlingStegType steg7;
 
     private final List<StegTransisjon> transisjoner = new ArrayList<>();
 
@@ -82,6 +83,7 @@ public class TilbakehoppTest {
         steg4 = modell.finnNesteSteg(steg3).getBehandlingStegType();
         steg5 = modell.finnNesteSteg(steg4).getBehandlingStegType();
         steg6 = modell.finnNesteSteg(steg5).getBehandlingStegType();
+        steg7 = modell.finnNesteSteg(steg6).getBehandlingStegType();
     }
 
     @Test
@@ -111,7 +113,7 @@ public class TilbakehoppTest {
     public void skal_avbryte_aksjonspunkter_som_oppsto_etter_tilsteget() {
         assertAPAvbrytesVedTilbakehopp(fra(steg3, INN), til(steg1), medUtførtAP(identifisertI(steg2), løsesI(steg2, UT)));
         assertAPAvbrytesVedTilbakehopp(fra(steg3, INN), til(steg1), medUtførtAP(identifisertI(steg2), løsesI(steg3, UT)));
-        assertAPAvbrytesVedTilbakehopp(fra(steg6, UT), til(steg1), medUtførtAP(identifisertI(steg6), løsesI(steg6, UT)));
+        assertAPAvbrytesVedTilbakehopp(fra(steg7, UT), til(steg1), medUtførtAP(identifisertI(steg7), løsesI(steg7, UT)));
     }
 
     @Test

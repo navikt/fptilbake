@@ -50,7 +50,8 @@
     "VEDTAKSBREV_JOIN_PERIODER" : "true",
     "AKTIVER_ABAC_LOGGING" : "false",
     "TOGGLE_AIVEN_LOS" : "true",
-    "TOGGLE_ENABLE_SENSU" : "true"
+    "TOGGLE_ENABLE_SENSU" : "true",
+    "TOGGLE_ENABLE_LAGRE_BEREGNINGSRESULTAT" : "true"
   },
   "AZURE_REPLY_URL" :  "https://k9.dev.intern.nav.no/k9/tilbake/cb",
   "AZURE_IAC_RULES": [

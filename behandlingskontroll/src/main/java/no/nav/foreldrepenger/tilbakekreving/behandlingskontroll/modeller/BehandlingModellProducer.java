@@ -18,16 +18,17 @@ public class BehandlingModellProducer {
     public BehandlingModell tilbakekreving() {
         var modellBuilder = BehandlingModellImpl.builder(BehandlingType.TILBAKEKREVING);
         modellBuilder.medSteg(
-                BehandlingStegType.INOPPSTEG,
-                BehandlingStegType.VARSEL,
-                BehandlingStegType.TBKGSTEG,
-                BehandlingStegType.FAKTA_VERGE,
-                BehandlingStegType.FAKTA_FEILUTBETALING,
-                BehandlingStegType.FORELDELSEVURDERINGSTEG,
-                BehandlingStegType.VTILBSTEG,
-                BehandlingStegType.FORESLÅ_VEDTAK,
-                BehandlingStegType.FATTE_VEDTAK,
-                BehandlingStegType.IVERKSETT_VEDTAK);
+            BehandlingStegType.INOPPSTEG,
+            BehandlingStegType.VARSEL,
+            BehandlingStegType.TBKGSTEG,
+            BehandlingStegType.FAKTA_VERGE,
+            BehandlingStegType.FAKTA_FEILUTBETALING,
+            BehandlingStegType.FORELDELSEVURDERINGSTEG,
+            BehandlingStegType.VTILBSTEG,
+            BehandlingStegType.BEREGN,
+            BehandlingStegType.FORESLÅ_VEDTAK,
+            BehandlingStegType.FATTE_VEDTAK,
+            BehandlingStegType.IVERKSETT_VEDTAK);
         return modellBuilder.build();
     }
 
@@ -37,14 +38,15 @@ public class BehandlingModellProducer {
     public BehandlingModell revurdering() {
         var modellBuilder = BehandlingModellImpl.builder(BehandlingType.REVURDERING_TILBAKEKREVING);
         modellBuilder.medSteg(
-                BehandlingStegType.HENTGRUNNLAGSTEG,
-                BehandlingStegType.FAKTA_VERGE,
-                BehandlingStegType.FAKTA_FEILUTBETALING,
-                BehandlingStegType.FORELDELSEVURDERINGSTEG,
-                BehandlingStegType.VTILBSTEG,
-                BehandlingStegType.FORESLÅ_VEDTAK,
-                BehandlingStegType.FATTE_VEDTAK,
-                BehandlingStegType.IVERKSETT_VEDTAK);
+            BehandlingStegType.HENTGRUNNLAGSTEG,
+            BehandlingStegType.FAKTA_VERGE,
+            BehandlingStegType.FAKTA_FEILUTBETALING,
+            BehandlingStegType.FORELDELSEVURDERINGSTEG,
+            BehandlingStegType.VTILBSTEG,
+            BehandlingStegType.BEREGN,
+            BehandlingStegType.FORESLÅ_VEDTAK,
+            BehandlingStegType.FATTE_VEDTAK,
+            BehandlingStegType.IVERKSETT_VEDTAK);
         return modellBuilder.build();
     }
 

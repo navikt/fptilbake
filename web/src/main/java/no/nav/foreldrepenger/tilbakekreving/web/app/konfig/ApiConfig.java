@@ -29,7 +29,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.Behandl
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BrevRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.ForeldelseRestTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.TilbakekrevingResulattRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.TilbakekrevingResultatRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.TotrinnskontrollRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.VilkårsvurderingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.AksjonspunktRestTjeneste;
@@ -100,7 +100,7 @@ public class ApiConfig extends Application {
         classes.add(FeilutbetalingSisteBehandlingRestTjeneste.class);
         classes.add(FeilutbetalingÅrsakRestTjeneste.class);
         classes.add(VilkårsvurderingRestTjeneste.class);
-        classes.add(TilbakekrevingResulattRestTjeneste.class);
+        classes.add(TilbakekrevingResultatRestTjeneste.class);
         classes.add(TotrinnskontrollRestTjeneste.class);
         classes.add(BrevRestTjeneste.class);
         classes.add(FordelRestTjeneste.class);

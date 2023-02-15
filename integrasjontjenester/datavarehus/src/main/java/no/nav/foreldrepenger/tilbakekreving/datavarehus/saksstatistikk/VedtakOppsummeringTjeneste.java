@@ -10,9 +10,9 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
@@ -52,7 +52,7 @@ public class VedtakOppsummeringTjeneste {
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private VurdertForeldelseRepository foreldelseRepository;
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
-    private TilbakekrevingBeregningTjeneste beregningTjeneste;
+    private BeregningsresultatTjeneste beregningsresultatTjeneste;
 
     VedtakOppsummeringTjeneste() {
         // for CDI
@@ -60,14 +60,14 @@ public class VedtakOppsummeringTjeneste {
 
     @Inject
     public VedtakOppsummeringTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                      TilbakekrevingBeregningTjeneste beregningTjeneste) {
+                                      BeregningsresultatTjeneste beregningsresultatTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.behandlingVedtakRepository = repositoryProvider.getBehandlingVedtakRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
         this.foreldelseRepository = repositoryProvider.getVurdertForeldelseRepository();
         this.faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
-        this.beregningTjeneste = beregningTjeneste;
+        this.beregningsresultatTjeneste = beregningsresultatTjeneste;
     }
 
     public VedtakOppsummering hentVedtakOppsummering(long behandlingId) {
@@ -106,7 +106,7 @@ public class VedtakOppsummeringTjeneste {
         List<VedtakPeriode> vedtakPerioder = new ArrayList<>();
         Optional<VilkårVurderingEntitet> vilkårVurderingEntitet = vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId);
         Optional<VurdertForeldelse> vurdertForeldelseEntitet = foreldelseRepository.finnVurdertForeldelse(behandlingId);
-        BeregningResultat beregningResultat = beregningTjeneste.beregn(behandlingId);
+        BeregningResultat beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
         vilkårVurderingEntitet.ifPresent(vilkårVurdering -> vedtakPerioder.addAll(hentVilkårPerioder(behandlingId, beregningResultat, vilkårVurdering)));
         vurdertForeldelseEntitet.ifPresent(vurdertForeldelse -> vedtakPerioder.addAll(hentForeldelsePerioder(behandlingId, beregningResultat, vurdertForeldelse)));
         return vedtakPerioder;

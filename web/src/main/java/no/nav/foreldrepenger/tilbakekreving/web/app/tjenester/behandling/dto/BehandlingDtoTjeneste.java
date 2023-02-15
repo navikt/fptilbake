@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
@@ -61,7 +61,7 @@ public class BehandlingDtoTjeneste {
     private BehandlingTjeneste behandlingTjeneste;
     private TotrinnTjeneste totrinnTjeneste;
     private TotrinnskontrollAksjonspunkterTjeneste totrinnskontrollTjeneste;
-    private TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste;
+    private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
     private VurdertForeldelseTjeneste vurdertForeldelseTjeneste;
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
@@ -84,11 +84,11 @@ public class BehandlingDtoTjeneste {
                                  TotrinnskontrollAksjonspunkterTjeneste totrinnskontrollTjeneste,
                                  HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                  VurdertForeldelseTjeneste vurdertForeldelseTjeneste,
-                                 TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste,
+                                 BeregningsresultatTjeneste beregningsresultatTjeneste,
                                  BehandlingRepositoryProvider repositoryProvider,
                                  BehandlingModellRepository behandlingModellRepository) {
         this(behandlingTjeneste, totrinnTjeneste, totrinnskontrollTjeneste, henleggBehandlingTjeneste, vurdertForeldelseTjeneste,
-            tilbakekrevingBeregningTjeneste, repositoryProvider, behandlingModellRepository, ApplicationName.hvilkenTilbake());
+            beregningsresultatTjeneste, repositoryProvider, behandlingModellRepository, ApplicationName.hvilkenTilbake());
     }
 
     public BehandlingDtoTjeneste(BehandlingTjeneste behandlingTjeneste,
@@ -96,7 +96,7 @@ public class BehandlingDtoTjeneste {
                                  TotrinnskontrollAksjonspunkterTjeneste totrinnskontrollTjeneste,
                                  HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                  VurdertForeldelseTjeneste vurdertForeldelseTjeneste,
-                                 TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste,
+                                 BeregningsresultatTjeneste beregningsresultatTjeneste,
                                  BehandlingRepositoryProvider repositoryProvider,
                                  BehandlingModellRepository behandlingModellRepository,
                                  Fagsystem applikasjon) {
@@ -111,7 +111,7 @@ public class BehandlingDtoTjeneste {
         this.totrinnTjeneste = totrinnTjeneste;
         this.totrinnskontrollTjeneste = totrinnskontrollTjeneste;
         this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
-        this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
+        this.beregningsresultatTjeneste = beregningsresultatTjeneste;
 
         kontekstPath = switch (applikasjon) {
             case FPTILBAKE -> "/fptilbake";
@@ -179,7 +179,7 @@ public class BehandlingDtoTjeneste {
         BehandlingsresultatDto dto = new BehandlingsresultatDto();
         var type = behandlingresultatRepository.hent(behandling)
             .map(Behandlingsresultat::getBehandlingResultatType)
-            .or(() -> Optional.ofNullable(tilbakekrevingBeregningTjeneste.beregn(behandling.getId()))
+            .or(() -> Optional.ofNullable(beregningsresultatTjeneste.finnEllerBeregn(behandling.getId()))
                 .map(BeregningResultat::getVedtakResultatType)
                 .map(BehandlingResultatType::fraVedtakResultatType))
             .orElse(BehandlingResultatType.IKKE_FASTSATT);

@@ -16,7 +16,9 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
 import no.nav.foreldrepenger.konfig.Environment;
-import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemmingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemFraResultatOgIverksettingStatusTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemFraXmlSendtTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemmingCsvFormatter;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -35,7 +37,8 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
 
     private static final String FILNAVN_MAL = "%s-%s-%s-%s.csv";
 
-    private AvstemmingTjeneste avstemmingTjeneste;
+    private AvstemFraXmlSendtTjeneste avstemFraXmlSendtTjeneste;
+    private AvstemFraResultatOgIverksettingStatusTjeneste avstemFraResultatOgIverksettingStatusTjeneste;
     private AvstemmingSftpBatchTjeneste sftpBatchTjeneste;
 
     private String miljø;
@@ -45,9 +48,11 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
     }
 
     @Inject
-    public AvstemmingBatchTask(AvstemmingTjeneste avstemmingTjeneste,
+    public AvstemmingBatchTask(AvstemFraXmlSendtTjeneste avstemFraXmlSendtTjeneste,
+                               AvstemFraResultatOgIverksettingStatusTjeneste avstemFraResultatOgIverksettingStatusTjeneste,
                                AvstemmingSftpBatchTjeneste sftpBatchTjeneste) {
-        this.avstemmingTjeneste = avstemmingTjeneste;
+        this.avstemFraXmlSendtTjeneste = avstemFraXmlSendtTjeneste;
+        this.avstemFraResultatOgIverksettingStatusTjeneste = avstemFraResultatOgIverksettingStatusTjeneste;
         this.sftpBatchTjeneste = sftpBatchTjeneste;
 
         miljø = Environment.current().isProd() ? "p" : "q";
@@ -59,7 +64,7 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
         LocalDate dato = LocalDate.now().minusDays(1);
         logger.info("Kjører avstemming for {} i batch {}", dato, batchRun);
 
-        Optional<String> resultat = avstemmingTjeneste.oppsummer(dato);
+        Optional<String> resultat = oppsummer(dato);
 
         if (resultat.isPresent()) {
             String forDato = dato.format(DATO_FORMATTER);
@@ -72,5 +77,19 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
                 throw new IntegrasjonException("FPT-614386", String.format("Overføring av fil [%s] til avstemming feilet.", filnavn), e);
             }
         }
+    }
+
+    public Optional<String> oppsummer(LocalDate dato) {
+        AvstemmingCsvFormatter avstemmingCsvFormatter = new AvstemmingCsvFormatter();
+
+        avstemFraXmlSendtTjeneste.leggTilOppsummering(dato, avstemmingCsvFormatter);
+        avstemFraResultatOgIverksettingStatusTjeneste.leggTilOppsummering(dato, avstemmingCsvFormatter);
+
+        logger.info("Sender {} vedtak til avstemming for {}", avstemmingCsvFormatter.getAntallRader(), dato);
+
+        if (avstemmingCsvFormatter.getAntallRader() == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(avstemmingCsvFormatter.getData());
     }
 }
