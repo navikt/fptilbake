@@ -5,6 +5,10 @@ import no.nav.vedtak.exception.IntegrasjonException;
 
 public class ØkonomiConsumerFeil {
 
+    private ØkonomiConsumerFeil() {
+        // Skal ikke instansieres
+    }
+
     public static IntegrasjonException fikkFeilkodeVedHentingAvKravgrunnlag(Long behandlingId, String infoFraKvittering) {
         return new IntegrasjonException("FPT-539078", String.format("Fikk feil fra OS ved henting av kravgrunnlag for behandlingId=%s.%s", behandlingId, infoFraKvittering));
     }
@@ -22,7 +26,7 @@ public class ØkonomiConsumerFeil {
     }
 
     public static IntegrasjonException fikkUkjentFeilkodeVedHentingAvKravgrunnlag(Long behandlingId, Long kravgrunnlagId, String infoFraKvittering) {
-        return new UkjentOppdragssystemException("FPT-539085", String.format("Fikk ukjent feil fra OS ved henting av kravgrunnlag for behandlingId=%s og kravgrunnlagId=%s.%s", behandlingId, kravgrunnlagId, infoFraKvittering));
+        return new UkjentKvitteringFraOSException("FPT-539085", String.format("Fikk ukjent feil fra OS ved henting av kravgrunnlag for behandlingId=%s og kravgrunnlagId=%s.%s", behandlingId, kravgrunnlagId, infoFraKvittering));
     }
 
     public static String formaterKvittering(MmelDto kvittering) {

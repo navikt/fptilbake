@@ -15,20 +15,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
-import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
+import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.UkjentKvitteringFraOSException;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
-import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
-import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
-import no.nav.tilbakekreving.typer.v1.MmelDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 
@@ -48,7 +47,7 @@ class SendVedtakTilOppdragsystemetTaskTest {
     @Inject
     private BeregningsresultatTjeneste beregningsresultatTjeneste;
 
-    private final ØkonomiConsumer økonomiConsumer = Mockito.mock(ØkonomiConsumer.class);
+    private final ØkonomiProxyKlient økonomiConsumer = Mockito.mock(ØkonomiProxyKlient.class);
 
     private SendVedtakTilOppdragsystemetTask task;
 
@@ -59,8 +58,6 @@ class SendVedtakTilOppdragsystemetTaskTest {
 
     @Test
     void skal_lagre_iverksettingstatus_og_sende_vedtak_til_os() {
-        when(økonomiConsumer.iverksettTilbakekrevingsvedtak(any(), any())).thenReturn(responseMedPositivKvittering());
-
         ScenarioSimple scenario = ScenarioSimple
             .simple()
             .medDefaultKravgrunnlag()
@@ -72,7 +69,7 @@ class SendVedtakTilOppdragsystemetTaskTest {
         task.doTask(data);
 
         //har sendt til OS:
-        Mockito.verify(økonomiConsumer).iverksettTilbakekrevingsvedtak(Mockito.eq(behandling.getId()), any(TilbakekrevingsvedtakRequest.class));
+        Mockito.verify(økonomiConsumer).iverksettTilbakekrevingsvedtak(any(TilbakekrevingVedtakDTO.class));
 
         //har lagret status riktig
         Optional<OppdragIverksettingStatusEntitet> status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
@@ -85,7 +82,7 @@ class SendVedtakTilOppdragsystemetTaskTest {
 
     @Test
     void skal_få_exception_når_kvittering_ikke_er_OK() {
-        when(økonomiConsumer.iverksettTilbakekrevingsvedtak(any(), any())).thenReturn(responseMedNegativKvittering());
+        when(økonomiConsumer.iverksettTilbakekrevingsvedtak(any())).thenThrow(UkjentKvitteringFraOSException.class);
 
         ScenarioSimple scenario = ScenarioSimple
             .simple()
@@ -109,22 +106,5 @@ class SendVedtakTilOppdragsystemetTaskTest {
         data.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         return data;
     }
-
-    private TilbakekrevingsvedtakResponse responseMedPositivKvittering() {
-        return lagResponse("00");
-    }
-
-    private TilbakekrevingsvedtakResponse responseMedNegativKvittering() {
-        return lagResponse("08");
-    }
-
-    private TilbakekrevingsvedtakResponse lagResponse(String kode) {
-        MmelDto kvittering = new MmelDto();
-        kvittering.setAlvorlighetsgrad(kode);
-        TilbakekrevingsvedtakResponse response = new TilbakekrevingsvedtakResponse();
-        response.setMmel(kvittering);
-        return response;
-    }
-
 
 }
