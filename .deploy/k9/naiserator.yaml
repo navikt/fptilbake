@@ -67,6 +67,7 @@ spec:
     pool: {{kafkaPool}}
   azure:
     application:
+      allowAllUsers: true
       enabled: true
       replyURLs:
         - {{AZURE_REPLY_URL}}
