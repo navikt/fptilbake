@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,6 +13,7 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
+import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 @Entity(name = "OppdragIverksettingStatus")
 @Table(name = "IVERKSETTING_STATUS_OS")
@@ -33,6 +35,7 @@ public class OppdragIverksettingStatusEntitet extends BaseEntitet {
     @Column(name = "kvittert_ok")
     private Boolean kvitteringOk;
 
+    @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "aktiv", nullable = false)
     private boolean aktiv = true;
 
