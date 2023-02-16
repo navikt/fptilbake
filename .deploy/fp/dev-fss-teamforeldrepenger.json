@@ -11,8 +11,7 @@
   ],
   "kafkaPool" : "nav-dev",
   "env": {
-    "APPD_ENABLED": "false",
-    "TOGGLE_ENABLE_LAGRE_BEREGNINGSRESULTAT" : "true"
+    "APPD_ENABLED": "false"
   },
   "groups": [
     "27e77109-fef2-48ce-a174-269074490353",
