@@ -28,6 +28,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
+@Deprecated
 @ApplicationScoped
 @ProsessTask("iverksetteVedtak.sendØkonomiTilbakekrevingsvedtak")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)

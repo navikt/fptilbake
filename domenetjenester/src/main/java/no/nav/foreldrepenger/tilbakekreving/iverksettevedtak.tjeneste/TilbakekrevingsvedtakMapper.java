@@ -15,6 +15,7 @@ import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.Tilbakekrevingsvedt
 import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 
+@Deprecated
 public class TilbakekrevingsvedtakMapper {
 
     private TilbakekrevingsvedtakMapper() {
