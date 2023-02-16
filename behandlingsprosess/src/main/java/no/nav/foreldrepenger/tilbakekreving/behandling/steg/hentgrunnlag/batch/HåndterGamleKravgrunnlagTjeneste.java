@@ -31,7 +31,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ManglendeKravgrunnlagException;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.SperringKravgrunnlagException;
-import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.UkjentOppdragssystemException;
+import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.UkjentKvitteringFraOSException;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
@@ -81,7 +81,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
         } catch (SperringKravgrunnlagException e) {
             LOG.info("Kravgrunnlag er sperret med følgende respons:{}", e.getMessage());
             return hentSperretKravgrunnlag(økonomiXmlMottatt);
-        } catch (UkjentOppdragssystemException e) {
+        } catch (UkjentKvitteringFraOSException e) {
             // ikke arkiver xml i tilfelle ukjent feil kommer fra økonomi
             LOG.warn(e.getMessage());
         }

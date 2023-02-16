@@ -23,7 +23,7 @@ import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.re
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.Kravgrunnlag431Dto;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ManglendeKravgrunnlagException;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.SperringKravgrunnlagException;
-import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.UkjentOppdragssystemException;
+import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.UkjentKvitteringFraOSException;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.exception.ManglerTilgangException;
 import no.nav.vedtak.felles.integrasjon.rest.RestClient;
@@ -41,6 +41,7 @@ public class ØkonomiProxyKlient {
     private final RestConfig restConfig;
     private final URI endpointKravgrunnlag;
     private final URI endpointKravgrunnlagAnnuller;
+    private final URI endpointIverksett;
     private final URI endpointIverksettSammenligning;
 
     public ØkonomiProxyKlient() {
@@ -48,31 +49,22 @@ public class ØkonomiProxyKlient {
         this.restConfig = RestConfig.forClient(this.getClass());
         this.endpointKravgrunnlag = UriBuilder.fromUri(restConfig.endpoint()).path(PATH_TILBAKEKREVING_KONTROLLER).path("/kravgrunnlag").build();
         this.endpointKravgrunnlagAnnuller = UriBuilder.fromUri(restConfig.endpoint()).path(PATH_TILBAKEKREVING_KONTROLLER).path("/kravgrunnlag/annuller").build();
+        this.endpointIverksett = UriBuilder.fromUri(restConfig.endpoint()).path(PATH_TILBAKEKREVING_KONTROLLER).path("/tilbakekrevingsvedtak").build();
         this.endpointIverksettSammenligning = UriBuilder.fromUri(restConfig.endpoint()).path(PATH_TILBAKEKREVING_KONTROLLER).path("/tilbakekrevingsvedtak/sammenligning").build();
     }
 
-//    public TilbakekrevingVedtakDTO iverksettTilbakekrvingsvedtak(TilbakekrevingVedtakDTO tilbakekrevingVedtakDTO) {
-//        var target = UriBuilder.fromUri(endpointIverksett).build();
-//        var request = RestRequest.newPOSTJson(tilbakekrevingVedtakDTO, target, restConfig);
-//        return handleIverksettVedtakRespons(restClient.sendReturnUnhandled(request))
-//            .map(r -> fromJson(r, TilbakekrevingVedtakDTO.class))
-//            .orElseThrow(() -> new IllegalStateException("Tom respons tilbake! Dette virker feil?"));
-//    }
-
-    public TilbakekrevingVedtakDtoResponsMidlertidig hentIverksettVedtakRequestXMLStrengForSammenligning(TilbakekrevingVedtakDTO tilbakekrevingVedtakDTO) {
-        var target = UriBuilder.fromUri(endpointIverksettSammenligning).build();
+    public void iverksettTilbakekrevingsvedtak(TilbakekrevingVedtakDTO tilbakekrevingVedtakDTO) {
+        var target = UriBuilder.fromUri(endpointIverksett).build();
         var request = RestRequest.newPOSTJson(tilbakekrevingVedtakDTO, target, restConfig);
-        return handleIverksettVedtakRespons(restClient.sendReturnUnhandled(request))
-            .map(r -> fromJson(r, TilbakekrevingVedtakDtoResponsMidlertidig.class))
-            .orElseThrow(() -> new IllegalStateException("Tom respons tilbake! Dette virker feil?"));
+        handleIverksettVedtakRespons(restClient.sendReturnUnhandled(request));
     }
 
     public Kravgrunnlag431Dto hentKravgrunnlag(HentKravgrunnlagDetaljDto hentKravgrunnlagDetaljDto) {
         var target = UriBuilder.fromUri(endpointKravgrunnlag).build();
         var request = RestRequest.newPOSTJson(hentKravgrunnlagDetaljDto, target, restConfig);
         return handleKravgrunnlagResponse(restClient.sendReturnUnhandled(request))
-                .map(r -> fromJson(r, Kravgrunnlag431Dto.class))
-                .orElseThrow(() -> new IllegalStateException("Respons fra fpwsproxy tilsier at det er funnet et kravgrunnlag men responsen er tom. Dette må sjekkes opp i! Sjekk loggen til fpwsproxy for mer info."));
+            .map(r -> fromJson(r, Kravgrunnlag431Dto.class))
+            .orElseThrow(() -> new IllegalStateException("Respons fra fpwsproxy tilsier at det er funnet et kravgrunnlag men responsen er tom. Dette må sjekkes opp i! Sjekk loggen til fpwsproxy for mer info."));
     }
 
     public void anullereKravgrunnlag(AnnullerKravGrunnlagDto annullerKravgrunnlagDto) {
@@ -82,7 +74,17 @@ public class ØkonomiProxyKlient {
         handleAnnullertKravgrunnlagResponse(restClient.sendReturnUnhandled(request));
     }
 
-    private static Optional<String> handleIverksettVedtakRespons(HttpResponse<String> response) {
+    @Deprecated
+    public TilbakekrevingVedtakDtoResponsMidlertidig hentIverksettVedtakRequestXMLStrengForSammenligning(TilbakekrevingVedtakDTO tilbakekrevingVedtakDTO) {
+        var target = UriBuilder.fromUri(endpointIverksettSammenligning).build();
+        var request = RestRequest.newPOSTJson(tilbakekrevingVedtakDTO, target, restConfig);
+        return handleIverksettVedtakResponsSammenlignign(restClient.sendReturnUnhandled(request))
+            .map(r -> fromJson(r, TilbakekrevingVedtakDtoResponsMidlertidig.class))
+            .orElseThrow(() -> new IllegalStateException("Tom respons tilbake! Dette virker feil?"));
+    }
+
+    @Deprecated
+    private static Optional<String> handleIverksettVedtakResponsSammenlignign(HttpResponse<String> response) {
         int status = response.statusCode();
         var body = response.body();
         if (status >= HTTP_OK && status < HTTP_MULT_CHOICE) { // 2xx status
@@ -90,8 +92,19 @@ public class ØkonomiProxyKlient {
         } else if (status == HTTP_FORBIDDEN) {
             throw new ManglerTilgangException("F-468816", "Mangler tilgang. Fikk http-kode 403 fra server");
         } else if (status == HTTP_INTERNAL_ERROR && kvitteringInneholderUkjentFeil(body)) {
-            throw new UkjentOppdragssystemException("FPT-539080", "Fikk feil fra OS ved iverksetting av tilbakekrevginsvedtak. Sjekk loggen til fpwsproxy for mer info.");
+            throw new UkjentKvitteringFraOSException("FPT-539080", "Fikk feil fra OS ved iverksetting av tilbakekrevginsvedtak. Sjekk loggen til fpwsproxy for mer info.");
         } else {
+            throw new IntegrasjonException("F-468817", String.format("Uventet respons %s fra FpWsProxy ved iverksetting av tilbakekrevginsvedtak. Sjekk loggen til fpwsproxy for mer info.", status));
+        }
+    }
+
+    private static void handleIverksettVedtakRespons(HttpResponse<String> response) {
+        int status = response.statusCode();
+        if (status == HTTP_FORBIDDEN) {
+            throw new ManglerTilgangException("F-468816", "Mangler tilgang. Fikk http-kode 403 fra server");
+        } else if (status == HTTP_INTERNAL_ERROR && kvitteringInneholderUkjentFeil(response.body())) {
+            throw new UkjentKvitteringFraOSException("FPT-539080", "Fikk feil fra OS ved iverksetting av tilbakekrevginsvedtak. Sjekk loggen til fpwsproxy for mer info.");
+        } else if (status < HTTP_OK || status >= HTTP_MULT_CHOICE){
             throw new IntegrasjonException("F-468817", String.format("Uventet respons %s fra FpWsProxy ved iverksetting av tilbakekrevginsvedtak. Sjekk loggen til fpwsproxy for mer info.", status));
         }
     }
@@ -120,7 +133,7 @@ public class ØkonomiProxyKlient {
         } else if (status == HTTP_GONE && finnesIkkeKravgrunnlagPåRequest(body)) {
             throw new ManglendeKravgrunnlagException("FPT-539080", "Fikk feil fra OS ved henting av kravgrunnlag. Request er logget i secure loggs til fpwsproxy.");
         } else if (status == HTTP_INTERNAL_ERROR && kvitteringInneholderUkjentFeil(body)) {
-            throw new UkjentOppdragssystemException("FPT-539080", "Fikk feil fra OS ved henting av kravgrunnlag. Sjekk loggen til fpwsproxy for mer info.");
+            throw new UkjentKvitteringFraOSException("FPT-539080", "Fikk feil fra OS ved henting av kravgrunnlag. Sjekk loggen til fpwsproxy for mer info.");
         } else {
             throw new IntegrasjonException("F-468817", String.format("Uventet respons %s fra FpWsProxy ved henting av kravgrunnlag. Sjekk loggen til fpwsproxy for mer info.", status));
         }
