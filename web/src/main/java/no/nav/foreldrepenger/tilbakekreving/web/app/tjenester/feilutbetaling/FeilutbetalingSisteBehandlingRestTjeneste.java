@@ -18,6 +18,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -92,7 +93,7 @@ public class FeilutbetalingSisteBehandlingRestTjeneste {
         private List<Periode> feilutbetaltePerioder;
 
         @JsonCreator
-        public BehandlingStatusOgFeilutbetalinger(LocalDate avsluttetDato, List<Periode> feilutbetaltePerioder) {
+        public BehandlingStatusOgFeilutbetalinger(@JsonProperty("avsluttetDato") LocalDate avsluttetDato, @JsonProperty("feilutbetaltePerioder") List<Periode> feilutbetaltePerioder) {
             this.avsluttetDato = avsluttetDato;
             this.feilutbetaltePerioder = feilutbetaltePerioder;
         }
