@@ -50,13 +50,12 @@ class SendVedtakTilOppdragsystemetTaskTest {
     private BeregningsresultatTjeneste beregningsresultatTjeneste;
 
     private final ØkonomiProxyKlient økonomiProxyKlient = Mockito.mock(ØkonomiProxyKlient.class);
-    private final ØkonomiConsumer økonomiConsumer = Mockito.mock(ØkonomiConsumer.class);
 
     private SendVedtakTilOppdragsystemetTask task;
 
     @BeforeEach
     void setup() {
-        task = new SendVedtakTilOppdragsystemetTask(entityManager, oppdragIverksettingStatusRepository, beregningsresultatTjeneste, tilbakekrevingsvedtakTjeneste, økonomiConsumer, økonomiProxyKlient, true);
+        task = new SendVedtakTilOppdragsystemetTask(entityManager, oppdragIverksettingStatusRepository, beregningsresultatTjeneste, tilbakekrevingsvedtakTjeneste, økonomiProxyKlient, true);
     }
 
     @Test
