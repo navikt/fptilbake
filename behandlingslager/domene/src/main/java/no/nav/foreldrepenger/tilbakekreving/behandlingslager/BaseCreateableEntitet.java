@@ -2,13 +2,15 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
-import no.nav.vedtak.sikkerhet.context.SubjectHandler;
+import no.nav.vedtak.sikkerhet.kontekst.Kontekst;
+import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 @MappedSuperclass
 public class BaseCreateableEntitet implements Serializable {
@@ -41,7 +43,7 @@ public class BaseCreateableEntitet implements Serializable {
     }
 
     private static String finnBrukernavn() {
-        String brukerident = SubjectHandler.getSubjectHandler().getUid();
-        return brukerident != null ? brukerident : BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES;
+        return Optional.ofNullable(KontekstHolder.getKontekst()).map(Kontekst::getKompaktUid)
+            .orElse(BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES);
     }
 }

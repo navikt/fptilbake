@@ -44,7 +44,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.Behandl
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.TotrinnskontrollAksjonspunkterTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AksjonspunktDtoMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
-import no.nav.vedtak.sikkerhet.context.SubjectHandler;
+import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 /**
  * Bygger BehandlingDto og UtvidetBehandlingDto
@@ -245,7 +245,8 @@ public class BehandlingDtoTjeneste {
         if (b.erSaksbehandlingAvsluttet()) {
             return BehandlingOperasjonerDto.builder(b.getUuid()).build(); // Skal ikke foreta menyvalg lenger
         } else if (BehandlingStatus.FATTER_VEDTAK.equals(b.getStatus())) {
-            boolean tilgokjenning = b.getAnsvarligSaksbehandler() != null && !b.getAnsvarligSaksbehandler().equalsIgnoreCase(SubjectHandler.getSubjectHandler().getUid());
+            boolean tilgokjenning = b.getAnsvarligSaksbehandler() != null &&
+                !b.getAnsvarligSaksbehandler().equalsIgnoreCase(KontekstHolder.getKontekst().getUid());
             return BehandlingOperasjonerDto.builder(b.getUuid()).medTilGodkjenning(tilgokjenning).build();
         } else {
             boolean totrinnRetur = totrinnTjeneste.hentTotrinnsvurderinger(b).stream().anyMatch(tt -> !tt.isGodkjent());

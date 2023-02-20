@@ -13,7 +13,7 @@ import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.Tilbakekrevingsbelo
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsperiodeDto;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.tilbakekreving.typer.v1.PeriodeDto;
-import no.nav.vedtak.sikkerhet.context.SubjectHandler;
+import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 @Deprecated
 public class TilbakekrevingsvedtakMapper {
@@ -42,7 +42,7 @@ public class TilbakekrevingsvedtakMapper {
         tilbakekrevingsvedtak.setKodeHjemmel("22-15"); // fast verdi
         tilbakekrevingsvedtak.setEnhetAnsvarlig(kravgrunnlag.getAnsvarligEnhet());
         tilbakekrevingsvedtak.setKontrollfelt(kravgrunnlag.getKontrollFelt());
-        tilbakekrevingsvedtak.setSaksbehId(SubjectHandler.getSubjectHandler().getUid());
+        tilbakekrevingsvedtak.setSaksbehId(KontekstHolder.getKontekst().getUid());
         return tilbakekrevingsvedtak;
     }
 

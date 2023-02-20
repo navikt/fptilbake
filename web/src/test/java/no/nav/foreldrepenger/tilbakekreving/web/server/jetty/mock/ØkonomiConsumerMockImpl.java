@@ -26,7 +26,7 @@ import no.nav.tilbakekreving.typer.v1.MmelDto;
 import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
-import no.nav.vedtak.sikkerhet.context.SubjectHandler;
+import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 class ØkonomiConsumerMockImpl implements ØkonomiConsumer {
 
@@ -78,7 +78,7 @@ class ØkonomiConsumerMockImpl implements ØkonomiConsumer {
         detaljertKravgrunnlag.setKontrollfelt("42354353453454");
         detaljertKravgrunnlag.setReferanse("1");
         detaljertKravgrunnlag.setRenterBeregnes(JaNeiDto.N);
-        detaljertKravgrunnlag.setSaksbehId(SubjectHandler.getSubjectHandler().getUid());
+        detaljertKravgrunnlag.setSaksbehId(KontekstHolder.getKontekst().getUid());
         detaljertKravgrunnlag.setUtbetalesTilId("07125125470");
         detaljertKravgrunnlag.setEnhetBehandl(ENHET);
         detaljertKravgrunnlag.setEnhetBosted(ENHET);
