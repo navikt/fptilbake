@@ -27,7 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.FatteVedtakDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.oppdaterer.AksjonspunktOppdaterer;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.sikkerhet.context.SubjectHandler;
+import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 @ApplicationScoped
 public class AksjonspunktApplikasjonTjeneste {
@@ -141,6 +141,6 @@ public class AksjonspunktApplikasjonTjeneste {
     }
 
     private String getCurrentUserId() {
-        return SubjectHandler.getSubjectHandler().getUid();
+        return KontekstHolder.getKontekst().getUid();
     }
 }

@@ -15,7 +15,7 @@ import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.Tilba
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
-import no.nav.vedtak.sikkerhet.context.SubjectHandler;
+import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 public class TilbakekrevingsvedtakMapperFpwsproxy {
 
@@ -29,7 +29,7 @@ public class TilbakekrevingsvedtakMapperFpwsproxy {
             .datoVedtakFagsystem(vedatkFagsystemDato(kravgrunnlag))
             .enhetAnsvarlig(kravgrunnlag.getAnsvarligEnhet())
             .kontrollfelt(kravgrunnlag.getKontrollFelt())
-            .saksbehId(SubjectHandler.getSubjectHandler().getUid())
+            .saksbehId(KontekstHolder.getKontekst().getUid())
             .tilbakekrevingsperiode(tilTilbakekrevingsperiodeDTOer(tilbakekrevingPerioder))
             .build();
     }
