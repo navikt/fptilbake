@@ -40,7 +40,7 @@ public abstract class DokumentBestillerTestOppsett {
     protected static final long FPSAK_BEHANDLING_ID = 99051L;
     protected static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(FPSAK_BEHANDLING_ID);
     protected static final UUID FPSAK_BEHANDLING_UUID = UUID.randomUUID();
-    protected static final String DUMMY_FØDSELSNUMMER = "31018143212";
+    protected static final String DUMMY_FØDSELSNUMMER = "00000000000";
 
     @Inject
     protected BehandlingRepositoryProvider repositoryProvider;
@@ -87,7 +87,7 @@ public abstract class DokumentBestillerTestOppsett {
         return new Personinfo.Builder()
                 .medPersonIdent(PersonIdent.fra(personnummer))
                 .medNavn(navn)
-                .medAktørId(new AktørId(9000000030014L))
+                .medAktørId(new AktørId(1000000000000L))
                 .medFødselsdato(LocalDate.of(1990, 2, 2))
                 .build();
     }

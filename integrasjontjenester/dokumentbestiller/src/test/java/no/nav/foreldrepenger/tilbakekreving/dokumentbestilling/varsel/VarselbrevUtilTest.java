@@ -217,7 +217,7 @@ public class VarselbrevUtilTest {
         return new Personinfo.Builder()
                 .medPersonIdent(PersonIdent.fra(personnummer))
                 .medNavn(navn)
-                .medAktørId(new AktørId(9000000030014L))
+                .medAktørId(new AktørId(1000000000000L))
                 .medFødselsdato(LocalDate.of(1990, 2, 2))
                 .build();
     }

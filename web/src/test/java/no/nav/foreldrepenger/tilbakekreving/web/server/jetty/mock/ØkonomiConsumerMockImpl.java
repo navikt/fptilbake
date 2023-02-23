@@ -79,13 +79,13 @@ class ØkonomiConsumerMockImpl implements ØkonomiConsumer {
         detaljertKravgrunnlag.setReferanse("1");
         detaljertKravgrunnlag.setRenterBeregnes(JaNeiDto.N);
         detaljertKravgrunnlag.setSaksbehId(KontekstHolder.getKontekst().getUid());
-        detaljertKravgrunnlag.setUtbetalesTilId("07125125470");
+        detaljertKravgrunnlag.setUtbetalesTilId("12345678901");
         detaljertKravgrunnlag.setEnhetBehandl(ENHET);
         detaljertKravgrunnlag.setEnhetBosted(ENHET);
         detaljertKravgrunnlag.setKodeStatusKrav("BEHA");
         detaljertKravgrunnlag.setTypeGjelderId(TypeGjelderDto.PERSON);
         detaljertKravgrunnlag.setTypeUtbetId(TypeGjelderDto.PERSON);
-        detaljertKravgrunnlag.setVedtakGjelderId("07125125470");
+        detaljertKravgrunnlag.setVedtakGjelderId("12345678901");
         detaljertKravgrunnlag.setVedtakIdOmgjort(BigInteger.valueOf(207407));
         detaljertKravgrunnlag.getTilbakekrevingsPeriode().addAll(hentPerioder());
 
