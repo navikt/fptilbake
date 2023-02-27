@@ -23,9 +23,8 @@ import no.nav.vedtak.log.metrics.Controllable;
 public class ApplicationServiceStarter {
     private static final Environment ENV = Environment.current();
     private static final Boolean MQ_DISABLED = ENV.getProperty("test.only.disable.mq", Boolean.class);
-
     private static final Logger logger = LoggerFactory.getLogger(ApplicationServiceStarter.class);
-    private List<Controllable> services = new ArrayList<>();
+    private final List<Controllable> services = new ArrayList<>();
 
     public void startServices() {
         start(TaskManager.class);
@@ -50,12 +49,12 @@ public class ApplicationServiceStarter {
         services.forEach(this::stopp);
     }
 
-    private void start(Class<? extends Controllable> klasse) {
-        var service = CDI.current().select(klasse).get();
+    private void start(Class<? extends Controllable> controllable) {
+        var service = CDI.current().select(controllable).get();
         if (services.contains(service)) {
-            logger.warn("Starter ikke {} siden den allerede er startet", klasse.getSimpleName());
+            logger.warn("Starter ikke {} siden den allerede er startet", controllable.getSimpleName());
         } else {
-            logger.info("Starter {}", klasse.getSimpleName());
+            logger.info("Starter {}", controllable.getSimpleName());
             service.start();
             services.add(service);
         }
