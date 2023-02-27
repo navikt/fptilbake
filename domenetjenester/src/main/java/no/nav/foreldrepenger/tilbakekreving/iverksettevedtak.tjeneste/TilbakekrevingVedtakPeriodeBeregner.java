@@ -18,9 +18,9 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Ukedager;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -35,19 +35,19 @@ public class TilbakekrevingVedtakPeriodeBeregner {
     private static final int GRENSE_AVRUNDINGSFEIL = 5;
     private static final Logger logger = LoggerFactory.getLogger(TilbakekrevingVedtakPeriodeBeregner.class);
 
-    private TilbakekrevingBeregningTjeneste beregningTjeneste;
+    private BeregningsresultatTjeneste beregningsresultatTjeneste;
 
     TilbakekrevingVedtakPeriodeBeregner() {
         //for CDI proxy
     }
 
     @Inject
-    public TilbakekrevingVedtakPeriodeBeregner(TilbakekrevingBeregningTjeneste beregningTjeneste) {
-        this.beregningTjeneste = beregningTjeneste;
+    public TilbakekrevingVedtakPeriodeBeregner(BeregningsresultatTjeneste beregningsresultatTjeneste) {
+        this.beregningsresultatTjeneste = beregningsresultatTjeneste;
     }
 
-    public List<TilbakekrevingPeriode> lagTilbakekrevingsPerioder(Long behandlingId, Kravgrunnlag431 kravgrunnlag431) {
-        BeregningResultat beregningResultat = beregningTjeneste.beregn(behandlingId);
+     List<TilbakekrevingPeriode> lagTilbakekrevingsPerioder(Long behandlingId, Kravgrunnlag431 kravgrunnlag431) {
+        BeregningResultat beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
         return lagTilbakekrevingsPerioder(kravgrunnlag431, beregningResultat);
     }
 
@@ -108,8 +108,8 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         int virkedagerOverlapp = virkedagerOverlapp(kPeriode, bgPeriode.getPeriode(), gjelderEngangsstønad);
         int kgBehandledeVirkedager = kgTidligereBehandledeVirkedager.get(kPeriode);
         int kgPeriodeVirkedager = gjelderEngangsstønad ? 1 : Ukedager.beregnAntallVirkedager(kPeriode);
-        Skalering kgTidligereSkalering = Skalering.opprett(kgBehandledeVirkedager, kgPeriodeVirkedager);
-        Skalering kgKumulativSkalering = Skalering.opprett(kgBehandledeVirkedager + virkedagerOverlapp, kgPeriodeVirkedager);
+        Skalering<Integer> kgTidligereSkalering = Skalering.opprett(kgBehandledeVirkedager, kgPeriodeVirkedager);
+        Skalering<Integer> kgKumulativSkalering = Skalering.opprett(kgBehandledeVirkedager + virkedagerOverlapp, kgPeriodeVirkedager);
         kgTidligereBehandledeVirkedager.put(kPeriode, kgBehandledeVirkedager + virkedagerOverlapp);
 
         TilbakekrevingPeriode tp = new TilbakekrevingPeriode(kPeriode.overlap(bgPeriode.getPeriode()).orElseThrow());
@@ -275,7 +275,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
     private static void leggPåKodeResultat(BeregningResultatPeriode bgPeriode, List<TilbakekrevingPeriode> tmp) {
         tmp.stream()
                 .flatMap(p -> p.getBeløp().stream())
-                .forEach(b -> b.medKodeResultat(bgPeriode.getKodeResultat()));
+                .forEach(b -> b.medKodeResultat(bgPeriode.utledKodeResultat()));
     }
 
     private static void leggPåRenter(BeregningResultatPeriode bgPeriode, List<TilbakekrevingPeriode> tmp) {

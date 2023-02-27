@@ -7,7 +7,9 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -18,14 +20,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDat
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
-import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.foreldrepenger.tilbakekreving.web.app.util.StringUtils;
-import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
-import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -44,9 +42,8 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
     private KravgrunnlagRepository kravgrunnlagRepository;
     private BehandlingRepository behandlingRepository;
 
-    private HentKravgrunnlagMapper hentKravgrunnlagMapper;
-    private ØkonomiConsumer økonomiConsumer;
     private FagsystemKlient fagsystemKlient;
+    private KravgrunnlagHenter kravgrunnlagHenter;
 
     HentKorrigertKravgrunnlagTask() {
         // for CDI
@@ -54,24 +51,20 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
 
     @Inject
     public HentKorrigertKravgrunnlagTask(BehandlingRepositoryProvider repositoryProvider,
-                                         HentKravgrunnlagMapper hentKravgrunnlagMapper,
-                                         ØkonomiConsumer økonomiConsumer,
-                                         FagsystemKlient fagsystemKlient) {
+                                         FagsystemKlient fagsystemKlient,
+                                         KravgrunnlagHenter kravgrunnlagHenter) {
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-
-        this.hentKravgrunnlagMapper = hentKravgrunnlagMapper;
-        this.økonomiConsumer = økonomiConsumer;
         this.fagsystemKlient = fagsystemKlient;
+        this.kravgrunnlagHenter = kravgrunnlagHenter;
     }
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         String kravgrunnlagId = prosessTaskData.getPropertyValue(KRAVGRUNNLAG_ID);
-        DetaljertKravgrunnlagDto respons = hentKorrigertKravgrunnlagFraØkonomi(behandlingId, kravgrunnlagId);
-        Kravgrunnlag431 korrigertKravgrunnlag = hentKravgrunnlagMapper.mapTilDomene(respons);
+        Kravgrunnlag431 korrigertKravgrunnlag = hentKorrigertKravgrunnlagFraØkonomi(behandlingId, kravgrunnlagId);
 
         KravgrunnlagValidator.validerGrunnlag(korrigertKravgrunnlag);
         Henvisning henvisning = korrigertKravgrunnlag.getReferanse();
@@ -83,25 +76,25 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
         kravgrunnlagRepository.lagreOgFiksDuplikateKravgrunnlag(behandlingId, korrigertKravgrunnlag);
     }
 
-    private HentKravgrunnlagDetaljDto forberedHentKravgrunnlagDetailRequest(String kravgrunnlagId, String ansvarligEnhet,
-                                                                            String saksbehId) {
-        HentKravgrunnlagDetaljDto hentKravgrunnlagDetalj = new HentKravgrunnlagDetaljDto();
-        hentKravgrunnlagDetalj.setKodeAksjon(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG.getKode());
-        hentKravgrunnlagDetalj.setEnhetAnsvarlig(ansvarligEnhet);
-        hentKravgrunnlagDetalj.setKravgrunnlagId(new BigInteger(kravgrunnlagId));
-        hentKravgrunnlagDetalj.setSaksbehId(saksbehId);
-        return hentKravgrunnlagDetalj;
-    }
-
-    private DetaljertKravgrunnlagDto hentKorrigertKravgrunnlagFraØkonomi(Long behandlingId, String kravgrunnlagId) {
-        HentKravgrunnlagDetaljDto request;
+    private Kravgrunnlag431 hentKorrigertKravgrunnlagFraØkonomi(Long behandlingId, String kravgrunnlagId) {
         if (StringUtils.erIkkeTom(kravgrunnlagId)) {
-            request = forberedHentKravgrunnlagDetailRequest(kravgrunnlagId, ANSVARLIG_ENHET_NØS, OKO_SAKSBEH_ID);
+            var hentKravgrunnlagDetaljDto = new HentKravgrunnlagDetaljDto.Builder()
+                .kodeAksjon(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG)
+                .kravgrunnlagId(new BigInteger(kravgrunnlagId))
+                .enhetAnsvarlig(ANSVARLIG_ENHET_NØS)
+                .saksbehId(OKO_SAKSBEH_ID)
+                .build();
+            return kravgrunnlagHenter.hentKravgrunnlagFraOS(behandlingId, hentKravgrunnlagDetaljDto);
         } else {
-            Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
-            request = forberedHentKravgrunnlagDetailRequest(kravgrunnlag431.getEksternKravgrunnlagId(), kravgrunnlag431.getAnsvarligEnhet(), kravgrunnlag431.getSaksBehId());
+            var kravgrunnlag431 = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
+            var hentKravgrunnlagDetaljDto = new HentKravgrunnlagDetaljDto.Builder()
+                .kodeAksjon(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG)
+                .kravgrunnlagId(new BigInteger(kravgrunnlag431.getEksternKravgrunnlagId()))
+                .enhetAnsvarlig(kravgrunnlag431.getAnsvarligEnhet())
+                .saksbehId(kravgrunnlag431.getSaksBehId())
+                .build();
+            return kravgrunnlagHenter.hentKravgrunnlagFraOS(behandlingId, hentKravgrunnlagDetaljDto);
         }
-        return økonomiConsumer.hentKravgrunnlag(behandlingId, request);
     }
 
     private boolean finnesEksternBehandling(long behandlingId, Henvisning henvisning) {

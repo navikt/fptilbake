@@ -9,9 +9,11 @@ import javax.enterprise.inject.spi.CDI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.prometheus.client.hotspot.DefaultExports;
 import no.nav.foreldrepenger.konfig.Environment;
-import no.nav.foreldrepenger.tilbakekreving.kafka.poller.KafkaPollerManager;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
+import no.nav.foreldrepenger.tilbakekreving.hendelser.VedtakConsumer;
+import no.nav.foreldrepenger.tilbakekreving.sensu.SensuKlient;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.felles.integrasjon.jms.QueueConsumerManager;
 import no.nav.vedtak.felles.prosesstask.impl.BatchTaskScheduler;
@@ -24,11 +26,15 @@ public class ApplicationServiceStarter {
     private List<Class<AppServiceHandler>> services = new ArrayList<>();
 
     public void startServices() {
-        DefaultExports.initialize();
 
         start(TaskManager.class);
         start(BatchTaskScheduler.class);
-        start(KafkaPollerManager.class);
+        start(VedtakConsumer.class);
+        if (ApplicationName.hvilkenTilbake() == Fagsystem.K9TILBAKE) {
+            start(SensuKlient.class);
+        } else {
+            logger.info("Starter ikke sensu klient");
+        }
 
         if (Environment.current().isProd() || !"true".equalsIgnoreCase(Environment.current().getProperty("test.only.disable.mq"))) {
             startQueueConsumerManager();

@@ -24,6 +24,12 @@ public enum Aktsomhet implements Vurdering {
     GROVT_UAKTSOM("GROVT_UAKTSOM", "Grov uaktsomhet"),
     SIMPEL_UAKTSOM("SIMPEL_UAKTSOM", "Simpel uaktsomhet");
 
+    /* TODO/FIXME burde egentlig ha egne koder her for bruke sammen med VilkårResultat.FORSTO_BURDE_FORSTÅTT
+     enum-verdi FORSTOD
+     enum-verdi MÅ_HA_FORSTÅTT
+     enum-verdi BURDE_HA_FORSTÅTT
+     */
+
     private String kode;
     private String navn;
 

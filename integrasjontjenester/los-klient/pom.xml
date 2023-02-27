@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+        <artifactId>integrasjontjenester</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>los-klient</artifactId>
+    <packaging>jar</packaging>
+    <name>FPTILBAKE :: Integrasjontjenester - los</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>domenetjenester</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.kontrakter.topics</groupId>
+            <artifactId>fp-topics-behandlingsprosess</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.kontrakter.topics</groupId>
+            <artifactId>hendelser-behandling</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>kafka-producer</artifactId>
+        </dependency>
+        <!--test avhengigheter-->
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>domene-testutilities</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>fpsak-klient</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

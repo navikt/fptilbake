@@ -114,23 +114,32 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         KravgrunnlagBelop433 that = (KravgrunnlagBelop433) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(klasseKode, that.klasseKode) &&
-                Objects.equals(klasseType, that.klasseType) &&
-                Objects.equals(nyBelop, that.nyBelop);
+        return Objects.equals(klasseKode, that.klasseKode) &&
+            klasseType == that.klasseType &&
+            erBigDecimalLik(opprUtbetBelop, that.opprUtbetBelop) &&
+            erBigDecimalLik(nyBelop, that.nyBelop) &&
+            erBigDecimalLik(tilbakekrevesBelop, that.tilbakekrevesBelop) &&
+            erBigDecimalLik(uinnkrevdBelop, that.uinnkrevdBelop) &&
+            erBigDecimalLik(skattProsent, that.skattProsent) &&
+            Objects.equals(resultatKode, that.resultatKode) &&
+            Objects.equals(årsakKode, that.årsakKode) &&
+            Objects.equals(skyldKode, that.skyldKode);
+    }
+
+    private boolean erBigDecimalLik(BigDecimal bd1, BigDecimal bd2) {
+        if (bd1 == null && bd2 == null)
+            return true;
+        if (bd1 == null || bd2 == null)
+            return false;
+        return bd1.compareTo(bd2) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, klasseKode, klasseType, nyBelop);
+        return Objects.hash(klasseKode, klasseType, opprUtbetBelop, nyBelop, tilbakekrevesBelop, uinnkrevdBelop, skattProsent, resultatKode, årsakKode, skyldKode);
     }
 
     public static Builder builder() {
@@ -211,18 +220,17 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<" + //$NON-NLS-1$
-                (id != null ? "id=" + id + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$
-                + "klasseKode=" + klasseKode + "," //$NON-NLS-1$ //$NON-NLS-2$
-                + "klasseType=" + klasseType + "," //$NON-NLS-1$ //$NON-NLS-2$
-                + "opprUtbetBelop=" + opprUtbetBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
-                + "nyBelop=" + nyBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
-                + "tilbakekrevesBelop=" + tilbakekrevesBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
-                + "uinnkrevdBelop=" + uinnkrevdBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
-                + "skattProsent=" + skattProsent + "," //$NON-NLS-1$ //$NON-NLS-2$
-                + "resultatKode=" + resultatKode + "," //$NON-NLS-1$ //$NON-NLS-2$
-                + "årsakKode=" + årsakKode + "," //$NON-NLS-1$ //$NON-NLS-2$
-                + "skyldKode=" + skyldKode + "," //$NON-NLS-1$ //$NON-NLS-2$
-                + ">";
+        return "KravgrunnlagBelop433{" +
+            "klasseKode='" + klasseKode + '\'' +
+            ", klasseType=" + klasseType +
+            ", opprUtbetBelop=" + opprUtbetBelop +
+            ", nyBelop=" + nyBelop +
+            ", tilbakekrevesBelop=" + tilbakekrevesBelop +
+            ", uinnkrevdBelop=" + uinnkrevdBelop +
+            ", skattProsent=" + skattProsent +
+            ", resultatKode='" + resultatKode + '\'' +
+            ", årsakKode='" + årsakKode + '\'' +
+            ", skyldKode='" + skyldKode + '\'' +
+            '}';
     }
 }

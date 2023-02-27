@@ -16,12 +16,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ForeslåVedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstValidator;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
@@ -65,18 +65,18 @@ public class ForeslåVedtakOppdatererTest {
         var svcProvider = new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), eventPublisererMock);
         var behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(svcProvider);
         vedtaksbrevFritekstRepository = new VedtaksbrevFritekstRepository(entityManager);
-        TilbakekrevingBeregningTjeneste beregningTjenesteMock = mock(TilbakekrevingBeregningTjeneste.class);
+        BeregningsresultatTjeneste beregningsresultatTjenesteMock = mock(BeregningsresultatTjeneste.class);
         HistorikkTjenesteAdapter historikkTjenesteAdapterMock = mock(HistorikkTjenesteAdapter.class);
-        ForeslåVedtakTjeneste foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningTjenesteMock, historikkTjenesteAdapterMock);
+        ForeslåVedtakTjeneste foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningsresultatTjenesteMock, historikkTjenesteAdapterMock);
         TotrinnTjeneste totrinnTjenesteMock = mock(TotrinnTjeneste.class);
         VilkårsvurderingRepository vilkårsvurderingRepository = mock(VilkårsvurderingRepository.class);
         FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = mock(FaktaFeilutbetalingRepository.class);
-        VedtaksbrevFritekstValidator vedtaksbrevFritekstValidator = new VedtaksbrevFritekstValidator(faktaFeilutbetalingRepository, vilkårsvurderingRepository, behandlingRepository, false);
+        VedtaksbrevFritekstValidator vedtaksbrevFritekstValidator = new VedtaksbrevFritekstValidator(faktaFeilutbetalingRepository, vilkårsvurderingRepository, behandlingRepository);
         VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste = new VedtaksbrevFritekstTjeneste(vedtaksbrevFritekstValidator, vedtaksbrevFritekstRepository);
         foreslåVedtakOppdaterer = new ForeslåVedtakOppdaterer(foreslåVedtakTjeneste, totrinnTjenesteMock, behandlingskontrollTjeneste, vedtaksbrevFritekstTjeneste);
 
         when(historikkTjenesteAdapterMock.tekstBuilder()).thenReturn(new HistorikkInnslagTekstBuilder());
-        when(beregningTjenesteMock.beregn(anyLong())).thenReturn(new BeregningResultat());
+        when(beregningsresultatTjenesteMock.finnEllerBeregn(anyLong())).thenReturn(new BeregningResultat());
         when(faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(anyLong())).thenReturn(Optional.of(new FaktaFeilutbetaling()));
     }
 

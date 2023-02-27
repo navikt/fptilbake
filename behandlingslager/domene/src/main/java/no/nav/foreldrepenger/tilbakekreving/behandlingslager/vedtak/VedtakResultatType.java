@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -74,5 +77,18 @@ public enum VedtakResultatType implements Kodeverdi { //Kun brukes for å sende 
     @Override
     public String getNavn() {
         return navn;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<VedtakResultatType, String> {
+        @Override
+        public String convertToDatabaseColumn(VedtakResultatType attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public VedtakResultatType convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
     }
 }

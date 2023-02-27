@@ -7,6 +7,7 @@ import javax.validation.Validator;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
+import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.aiven.AivenVedtakKafkaProducer;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.VedtakOppsummeringMapper;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.VedtakOppsummering;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -21,7 +22,7 @@ public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
 
     private ProsessTaskTjeneste taskTjeneste;
     private VedtakOppsummeringTjeneste vedtakOppsummeringTjeneste;
-    private VedtakOppsummeringKafkaProducer kafkaProducer;
+    private AivenVedtakKafkaProducer aivenVedtakKafkaProducer;
 
     private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
@@ -32,10 +33,10 @@ public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
     @Inject
     public SendVedtakHendelserTilDvhTask(ProsessTaskTjeneste taskTjeneste,
                                          VedtakOppsummeringTjeneste vedtakOppsummeringTjeneste,
-                                         VedtakOppsummeringKafkaProducer kafkaProducer) {
+                                         AivenVedtakKafkaProducer aivenVedtakKafkaProducer) {
         this.taskTjeneste = taskTjeneste;
         this.vedtakOppsummeringTjeneste = vedtakOppsummeringTjeneste;
-        this.kafkaProducer = kafkaProducer;
+        this.aivenVedtakKafkaProducer = aivenVedtakKafkaProducer;
     }
 
     @Override
@@ -43,7 +44,7 @@ public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
         long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         VedtakOppsummering vedtakOppsummering = vedtakOppsummeringTjeneste.hentVedtakOppsummering(behandlingId);
         validate(vedtakOppsummering);
-        kafkaProducer.sendMelding(vedtakOppsummering);
+        aivenVedtakKafkaProducer.sendMelding(vedtakOppsummering);
         prosessTaskData.setPayload(VedtakOppsummeringMapper.tilJsonString(vedtakOppsummering));
         taskTjeneste.lagre(prosessTaskData);
     }

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -17,9 +18,9 @@ import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
@@ -37,8 +38,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvur
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
+import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
@@ -65,8 +66,8 @@ public class FatteVedtakStegTest {
         HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(behandlingRepository);
         HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(
                 repositoryProvider.getHistorikkRepository(), historikkInnslagKonverter);
-        TilbakekrevingBeregningTjeneste beregningTjeneste = Mockito.mock(TilbakekrevingBeregningTjeneste.class);
-        fatteVedtakSteg = new FatteVedtakSteg(repositoryProvider, totrinnRepository, beregningTjeneste,
+        BeregningsresultatTjeneste beregningsresultatTjeneste = Mockito.mock(BeregningsresultatTjeneste.class);
+        fatteVedtakSteg = new FatteVedtakSteg(repositoryProvider, totrinnRepository, beregningsresultatTjeneste,
                 historikkTjenesteAdapter);
 
         Fagsak fagsak = TestFagsakUtil.opprettFagsak();
@@ -75,7 +76,7 @@ public class FatteVedtakStegTest {
         BehandlingLås lås = repositoryProvider.getBehandlingRepository().taSkriveLås(behandling);
         behandlingskontrollKontekst = new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås);
 
-        when(beregningTjeneste.beregn(behandling.getId())).thenReturn(lagBeregningResultat());
+        when(beregningsresultatTjeneste.finnEllerBeregn(behandling.getId())).thenReturn(lagBeregningResultat());
     }
 
     @Test
@@ -142,10 +143,18 @@ public class FatteVedtakStegTest {
 
     private BeregningResultat lagBeregningResultat() {
         BeregningResultat beregningResultat = new BeregningResultat();
-        BeregningResultatPeriode periode = new BeregningResultatPeriode();
-        periode.setTilbakekrevingBeløp(BigDecimal.valueOf(5000.00));
-        periode.setFeilutbetaltBeløp(BigDecimal.valueOf(7000.00));
-        periode.setVurdering(AnnenVurdering.GOD_TRO);
+        BeregningResultatPeriode periode = BeregningResultatPeriode.builder()
+            .medPeriode(Periode.of(LocalDate.now(), LocalDate.now()))
+            .medErForeldet(false)
+            .medTilbakekrevingBeløp(BigDecimal.valueOf(5000))
+            .medTilbakekrevingBeløpUtenRenter(BigDecimal.valueOf(5000))
+            .medTilbakekrevingBeløpEtterSkatt(BigDecimal.valueOf(5000))
+            .medSkattBeløp(BigDecimal.ZERO)
+            .medRenteBeløp(BigDecimal.ZERO)
+            .medFeilutbetaltBeløp(BigDecimal.valueOf(7000))
+            .medUtbetaltYtelseBeløp(BigDecimal.valueOf(7000))
+            .medRiktigYtelseBeløp(BigDecimal.ZERO)
+            .build();
         beregningResultat.setVedtakResultatType(VedtakResultatType.DELVIS_TILBAKEBETALING);
         beregningResultat.setBeregningResultatPerioder(Lists.newArrayList(periode));
 

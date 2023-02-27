@@ -11,8 +11,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
-import com.codahale.metrics.annotation.Timed;
-
 import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -45,7 +43,6 @@ public class TotrinnskontrollRestTjeneste {
 
 
     @GET
-    @Timed
     @Path("/arsaker")
     @Operation(tags = "totrinnskontroll", description = "Hent aksjonspunkter som skal til totrinnskontroll.", summary = "Returner aksjonspunkter til totrinnskontroll for behandling.")
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
@@ -57,7 +54,6 @@ public class TotrinnskontrollRestTjeneste {
     }
 
     @GET
-    @Timed
     @Path("/arsaker_read_only")
     @Operation(tags = "totrinnskontroll", description = "Hent totrinnsvurderinger for aksjonspunkter.", summary = "Returner vurderinger for aksjonspunkter etter totrinnskontroll for behandling.")
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)

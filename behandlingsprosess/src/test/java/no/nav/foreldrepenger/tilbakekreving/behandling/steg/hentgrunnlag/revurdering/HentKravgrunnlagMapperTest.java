@@ -34,6 +34,7 @@ import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
 
+@Deprecated // Flyttet over til fpwsproxy
 public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
 
     private static final String ENHET = "8020";

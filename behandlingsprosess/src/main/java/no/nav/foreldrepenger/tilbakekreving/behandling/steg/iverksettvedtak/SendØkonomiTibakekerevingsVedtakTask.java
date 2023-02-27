@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
@@ -27,6 +28,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
+@Deprecated
 @ApplicationScoped
 @ProsessTask("iverksetteVedtak.sendØkonomiTilbakekrevingsvedtak")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
@@ -37,6 +39,7 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
     private EntityManager entityManager;
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
     private ØkonomiConsumer økonomiConsumer;
+    private ØkonomiProxyKlient økonomiProxyKlient;
     private ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
 
     SendØkonomiTibakekerevingsVedtakTask() {
@@ -46,9 +49,11 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
     @Inject
     public SendØkonomiTibakekerevingsVedtakTask(TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste,
                                                 ØkonomiConsumer økonomiConsumer,
+                                                ØkonomiProxyKlient økonomiProxyKlient,
                                                 ØkonomiSendtXmlRepository økonomiSendtXmlRepository) {
         this.tilbakekrevingsvedtakTjeneste = tilbakekrevingsvedtakTjeneste;
         this.økonomiConsumer = økonomiConsumer;
+        this.økonomiProxyKlient = økonomiProxyKlient;
         this.økonomiSendtXmlRepository = økonomiSendtXmlRepository;
         this.entityManager = økonomiSendtXmlRepository.getEntityManager();
     }
@@ -56,6 +61,7 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
+
         TilbakekrevingsvedtakDto tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
         TilbakekrevingsvedtakRequest request = lagRequest(tilbakekrevingsvedtak);
         Long sendtXmlId = lagreXml(behandlingId, request);
@@ -93,7 +99,31 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
         String xml = TilbakekrevingsvedtakMarshaller.marshall(behandlingId, request);
         Long sendtXmlId = økonomiSendtXmlRepository.lagre(behandlingId, xml, MeldingType.VEDTAK);
         logger.info("lagret vedtak-xml for behandling={}", behandlingId);
+        sammenlignGenerertXMLRequestMedGenererertXMLRequestFraFpwsproxyFailSafe(xml, behandlingId);
         return sendtXmlId;
+    }
+
+    private void sammenlignGenerertXMLRequestMedGenererertXMLRequestFraFpwsproxyFailSafe(String xml, Long behandlingId) {
+        try {
+            var tilbakekrevingsvedtakDto = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtakDTOFpwsproxy(behandlingId);
+            var tilbakekrevingVedtakDTO = økonomiProxyKlient.hentIverksettVedtakRequestXMLStrengForSammenligning(tilbakekrevingsvedtakDto);
+            if (!erLik(xml, tilbakekrevingVedtakDTO.requestXml())) {
+                logger.info("""
+                    Avvik funnet mellom request XML generert av fptilbake og fpwsproxy!
+                    Orginal XML: {}
+                    Fpwsproxy XML: {}
+                    """, xml, tilbakekrevingVedtakDTO.requestXml());
+            }
+            logger.info("Ingen avvik mellom request XML generert av fptilbake og fpwsproxy");
+        } catch (Exception e) {
+            logger.info("Noe gikk galt med sammenligning av tilbakekrevingsvedtaks requester", e);
+        }
+    }
+
+    private static boolean erLik(String orginalRequestXml, String fpWsproxyRequestXml) {
+        if (orginalRequestXml == null && fpWsproxyRequestXml == null) return true;
+        if (orginalRequestXml == null || fpWsproxyRequestXml == null) return false;
+        return orginalRequestXml.equals(fpWsproxyRequestXml);
     }
 
     private void lagreRespons(long behandlingId, long sendtXmlId, TilbakekrevingsvedtakResponse respons) {

@@ -60,11 +60,17 @@ spec:
         kvPath: /kv/{{cluster}}/fss/k9-tilbake/{{namespace}}
       - mountPath: /var/run/secrets/nais.io/appdynamics
         kvPath: /apikey/appdynamics/{{environment}}
+  secureLogs:
+    enabled: true
   sidecar: true # refresh token
-  
+  kafka:
+    pool: {{kafkaPool}}
   azure:
     application:
+      allowAllUsers: true
       enabled: true
+      replyURLs:
+        - {{AZURE_REPLY_URL}}
       claims:
         extra:
           - "NAVident"

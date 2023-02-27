@@ -1,0 +1,34 @@
+name: Deploy kafka topics
+
+on:
+  push:
+    paths:
+      - 'kafka/**'
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy-topics:
+    strategy:
+      matrix:
+        topic: [dvh-vedtak, dvh-sakshendelse, k9los-hendelse]
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy topics to dev
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_K9 }}
+          CLUSTER: dev-gcp
+          RESOURCE: kafka/k9tilbake/dev/topic-${{ matrix.topic }}.yaml
+
+      - name: Deploy topics to prod
+        if: github.ref == 'refs/heads/master'
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_K9 }}
+          CLUSTER: prod-gcp
+          RESOURCE: kafka/k9tilbake/prod/topic-${{ matrix.topic }}.yaml

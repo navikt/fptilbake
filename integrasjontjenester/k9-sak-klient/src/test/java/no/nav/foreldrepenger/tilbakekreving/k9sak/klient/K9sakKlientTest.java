@@ -21,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.K9sakBehandlingInfoDto;
+import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.simulering.K9oppdragRestKlient;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.integrasjon.rest.RestClient;
 
@@ -33,8 +34,9 @@ public class K9sakKlientTest {
     private static final String BASE_URI = "http://k9-sak";
 
     private final RestClient restClientMock = mock(RestClient.class);
+    private final K9oppdragRestKlient k9oppdragRestKlientMock = mock(K9oppdragRestKlient.class);
 
-    private final K9sakKlient klient = new K9sakKlient(restClientMock);
+    private final K9sakKlient klient = new K9sakKlient(restClientMock, k9oppdragRestKlientMock);
 
     @Test
     public void skal_hente_behandlingInfoDto() {

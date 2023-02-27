@@ -10,10 +10,12 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagXmlUnmarshaller;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -24,19 +26,15 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ManglendeKravgrunnlagException;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.SperringKravgrunnlagException;
-import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.UkjentOppdragssystemException;
-import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
+import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.UkjentKvitteringFraOSException;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
-import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
-import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
 
 @ApplicationScoped
 public class HåndterGamleKravgrunnlagTjeneste {
@@ -44,11 +42,10 @@ public class HåndterGamleKravgrunnlagTjeneste {
     private static final Logger LOG = LoggerFactory.getLogger(HåndterGamleKravgrunnlagTjeneste.class);
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private KravgrunnlagRepository grunnlagRepository;
-    private HentKravgrunnlagMapper hentKravgrunnlagMapper;
     private KravgrunnlagMapper lesKravgrunnlagMapper;
     private BehandlingTjeneste behandlingTjeneste;
-    private ØkonomiConsumer økonomiConsumer;
     private FagsystemKlient fagsystemKlient;
+    private KravgrunnlagHenter kravgrunnlagHenter;
 
     HåndterGamleKravgrunnlagTjeneste() {
         // for CDI proxy
@@ -57,36 +54,34 @@ public class HåndterGamleKravgrunnlagTjeneste {
     @Inject
     public HåndterGamleKravgrunnlagTjeneste(ØkonomiMottattXmlRepository mottattXmlRepository,
                                             KravgrunnlagRepository grunnlagRepository,
-                                            HentKravgrunnlagMapper hentKravgrunnlagMapper,
                                             KravgrunnlagMapper kravgrunnlagMapper,
                                             BehandlingTjeneste behandlingTjeneste,
-                                            ØkonomiConsumer økonomiConsumer,
-                                            FagsystemKlient fagsystemKlient) {
+                                            FagsystemKlient fagsystemKlient,
+                                            KravgrunnlagHenter kravgrunnlagHenter) {
         this.mottattXmlRepository = mottattXmlRepository;
         this.grunnlagRepository = grunnlagRepository;
-        this.hentKravgrunnlagMapper = hentKravgrunnlagMapper;
         this.lesKravgrunnlagMapper = kravgrunnlagMapper;
         this.behandlingTjeneste = behandlingTjeneste;
-        this.økonomiConsumer = økonomiConsumer;
         this.fagsystemKlient = fagsystemKlient;
+        this.kravgrunnlagHenter = kravgrunnlagHenter;
     }
 
     protected KravgrunnlagMedStatus hentKravgrunnlagFraØkonomi(ØkonomiXmlMottatt økonomiXmlMottatt) {
-        String melding = økonomiXmlMottatt.getMottattXml();
-        long mottattXmlId = økonomiXmlMottatt.getId();
-        DetaljertKravgrunnlag detaljertKravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, melding);
-        HentKravgrunnlagDetaljDto hentKravgrunnlagDetalj = forberedHentKravgrunnlagRequest(detaljertKravgrunnlag);
+        var melding = økonomiXmlMottatt.getMottattXml();
+        var mottattXmlId = økonomiXmlMottatt.getId();
+        var detaljertKravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, melding);
+        var hentKravgrunnlagDetalj = forberedHentKravgrunnlagRequest(detaljertKravgrunnlag);
         try {
-            DetaljertKravgrunnlagDto detaljertKravgrunnlagDto = økonomiConsumer.hentKravgrunnlag(null, hentKravgrunnlagDetalj);
-            LOG.info("Referanse fra WS: {}", detaljertKravgrunnlagDto.getReferanse());
-            return KravgrunnlagMedStatus.forIkkeSperretKravgrunnlag(hentKravgrunnlagMapper.mapTilDomene(detaljertKravgrunnlagDto));
+            var kravgrunnlag = kravgrunnlagHenter.hentKravgrunnlagFraOS(null, hentKravgrunnlagDetalj);
+            LOG.info("Referanse fra WS: {}", kravgrunnlag.getReferanse());
+            return KravgrunnlagMedStatus.forIkkeSperretKravgrunnlag(kravgrunnlag);
         } catch (ManglendeKravgrunnlagException e) {
             LOG.info("Kravgrunnlag mangler i økonomi med følgende respons:{}", e.getMessage());
             arkiverMotattXml(mottattXmlId, melding);
         } catch (SperringKravgrunnlagException e) {
             LOG.info("Kravgrunnlag er sperret med følgende respons:{}", e.getMessage());
             return hentSperretKravgrunnlag(økonomiXmlMottatt);
-        } catch (UkjentOppdragssystemException e) {
+        } catch (UkjentKvitteringFraOSException e) {
             // ikke arkiver xml i tilfelle ukjent feil kommer fra økonomi
             LOG.warn(e.getMessage());
         }
@@ -215,12 +210,12 @@ public class HåndterGamleKravgrunnlagTjeneste {
     }
 
     private HentKravgrunnlagDetaljDto forberedHentKravgrunnlagRequest(DetaljertKravgrunnlag detaljertKravgrunnlag) {
-        HentKravgrunnlagDetaljDto hentKravgrunnlagDetalj = new HentKravgrunnlagDetaljDto();
-        hentKravgrunnlagDetalj.setKravgrunnlagId(detaljertKravgrunnlag.getKravgrunnlagId());
-        hentKravgrunnlagDetalj.setKodeAksjon(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG.getKode());
-        hentKravgrunnlagDetalj.setEnhetAnsvarlig(detaljertKravgrunnlag.getEnhetAnsvarlig());
-        hentKravgrunnlagDetalj.setSaksbehId(detaljertKravgrunnlag.getSaksbehId());
-        return hentKravgrunnlagDetalj;
+        return new HentKravgrunnlagDetaljDto.Builder()
+            .kravgrunnlagId(detaljertKravgrunnlag.getKravgrunnlagId())
+            .kodeAksjon(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG)
+            .enhetAnsvarlig(detaljertKravgrunnlag.getEnhetAnsvarlig())
+            .saksbehId(detaljertKravgrunnlag.getSaksbehId())
+            .build();
     }
 
     private void lagreGrunnlag(long behandlingId, Kravgrunnlag431 kravgrunnlag431) {

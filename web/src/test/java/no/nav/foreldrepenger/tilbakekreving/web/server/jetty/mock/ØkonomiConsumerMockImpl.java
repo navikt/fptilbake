@@ -26,7 +26,7 @@ import no.nav.tilbakekreving.typer.v1.MmelDto;
 import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
-import no.nav.vedtak.sikkerhet.context.SubjectHandler;
+import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 class ØkonomiConsumerMockImpl implements ØkonomiConsumer {
 
@@ -78,14 +78,14 @@ class ØkonomiConsumerMockImpl implements ØkonomiConsumer {
         detaljertKravgrunnlag.setKontrollfelt("42354353453454");
         detaljertKravgrunnlag.setReferanse("1");
         detaljertKravgrunnlag.setRenterBeregnes(JaNeiDto.N);
-        detaljertKravgrunnlag.setSaksbehId(SubjectHandler.getSubjectHandler().getUid());
-        detaljertKravgrunnlag.setUtbetalesTilId("07125125470");
+        detaljertKravgrunnlag.setSaksbehId(KontekstHolder.getKontekst().getUid());
+        detaljertKravgrunnlag.setUtbetalesTilId("12345678901");
         detaljertKravgrunnlag.setEnhetBehandl(ENHET);
         detaljertKravgrunnlag.setEnhetBosted(ENHET);
         detaljertKravgrunnlag.setKodeStatusKrav("BEHA");
         detaljertKravgrunnlag.setTypeGjelderId(TypeGjelderDto.PERSON);
         detaljertKravgrunnlag.setTypeUtbetId(TypeGjelderDto.PERSON);
-        detaljertKravgrunnlag.setVedtakGjelderId("07125125470");
+        detaljertKravgrunnlag.setVedtakGjelderId("12345678901");
         detaljertKravgrunnlag.setVedtakIdOmgjort(BigInteger.valueOf(207407));
         detaljertKravgrunnlag.getTilbakekrevingsPeriode().addAll(hentPerioder());
 

@@ -24,8 +24,8 @@
             <artifactId>domenetjenester</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>kafka-producer</artifactId>
         </dependency>
     </dependencies>
 

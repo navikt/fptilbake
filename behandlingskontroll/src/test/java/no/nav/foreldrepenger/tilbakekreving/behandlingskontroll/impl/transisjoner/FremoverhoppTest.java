@@ -56,6 +56,7 @@ public class FremoverhoppTest {
     private BehandlingStegType steg1;
     private BehandlingStegType steg2;
     private BehandlingStegType steg3;
+    private BehandlingStegType steg4;
     private BehandlingskontrollFremoverhoppTransisjonEventObserver observer;
 
     private Behandling behandling;
@@ -79,44 +80,45 @@ public class FremoverhoppTest {
         steg1 = BehandlingStegType.FORELDELSEVURDERINGSTEG;
         steg2 = modell.finnNesteSteg(steg1).getBehandlingStegType();
         steg3 = modell.finnNesteSteg(steg2).getBehandlingStegType();
+        steg4 = modell.finnNesteSteg(steg3).getBehandlingStegType();
     }
 
     @Test
     public void skal_avbryte_aksjonspunkt_som_skulle_vært_håndtert_i_mellomliggende_steg() {
-        assertAPAvbrytesVedFremoverhopp(fra(steg1, UT), til(steg3), medAP(steg1, UT));
-        assertAPAvbrytesVedFremoverhopp(fra(steg1, UT), til(steg3), medAP(steg1, UT));
+        assertAPAvbrytesVedFremoverhopp(fra(steg1, UT), til(steg4), medAP(steg1, UT));
+        assertAPAvbrytesVedFremoverhopp(fra(steg1, UT), til(steg4), medAP(steg1, UT));
     }
 
     @Test
     public void skal_ikke_gjøre_noe_med_aksjonspunkt_som_oppsto_og_løstes_før_steget_det_hoppes_fra() {
-        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg3), medAP(steg1, UT));
+        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg4), medAP(steg1, UT));
     }
 
     @Test
     public void skal_ikke_gjøre_noe_med_aksjonspunkt_som_løstes_ved_inngang_til_steget_når_det_hoppes_fra_utgang_av_steget() {
-        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg3), medAP(steg1, UT));
+        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg4), medAP(steg1, UT));
     }
 
     @Test
     public void skal_avbryte_aksjonspunkt_i_utgang_av_frasteget_når_frasteget_ikke_er_ferdig() {
-        assertAPAvbrytesVedFremoverhopp(fra(steg2, INN), til(steg3), medAP(steg2, UT));
-        assertAPAvbrytesVedFremoverhopp(fra(steg2, UT), til(steg3), medAP(steg2, UT));
+        assertAPAvbrytesVedFremoverhopp(fra(steg2, INN), til(steg4), medAP(steg2, UT));
+        assertAPAvbrytesVedFremoverhopp(fra(steg2, UT), til(steg4), medAP(steg2, UT));
     }
 
     @Test
     public void skal_ikke_gjøre_noe_med_aksjonspunkt_som_skal_løses_i_steget_det_hoppes_til() {
-        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg3), medAP(steg1, UT));
-        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg3), medAP(steg1, UT));
-        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg3), medAP(steg3, UT));
-        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg3), medAP(steg3, UT));
+        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg4), medAP(steg1, UT));
+        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg4), medAP(steg1, UT));
+        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg4), medAP(steg4, UT));
+        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg4), medAP(steg4, UT));
     }
 
     @Test
     public void skal_kalle_transisjoner_på_steg_det_hoppes_over() throws Exception {
-        assertThat(transisjonerVedFremoverhopp(fra(steg1, INN), til(steg3))).contains(
+        assertThat(transisjonerVedFremoverhopp(fra(steg1, INN), til(steg4))).contains(
                 StegTransisjon.hoppFremoverOver(steg1),
                 StegTransisjon.hoppFremoverOver(steg2));
-        assertThat(transisjonerVedFremoverhopp(fra(steg1, UT), til(steg3)))
+        assertThat(transisjonerVedFremoverhopp(fra(steg1, UT), til(steg4)))
                 .contains(StegTransisjon.hoppFremoverOver(steg2));
         assertThat(transisjonerVedFremoverhopp(fra(steg2, INN), til(steg3)))
                 .contains(StegTransisjon.hoppFremoverOver(steg2));

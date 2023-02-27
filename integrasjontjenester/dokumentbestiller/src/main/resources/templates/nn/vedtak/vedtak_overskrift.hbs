@@ -1,5 +1,5 @@
 {{~#* inline "ytelsen" ~}}
-{{lookup-map sak.ytelsetype FP="foreldrepengane" SVP="svangerskapspengane" ES="eingongsstønaden" FRISINN="kompensasjonsytelse for selvstendig næringsdrivende og frilansere" OMP="omsorgspengane" PSB="pleiepengane" PPN="pleiepengane"}}
+{{lookup-map sak.ytelsetype FP="foreldrepengane" SVP="svangerskapspengane" ES="eingongsstønaden" FRISINN="kompensasjonsytelse for selvstendig næringsdrivende og frilansere" OMP="omsorgspengane" PSB="pleiepengane" PPN="pleiepengane" OLP="opplæringspengane"}}
 {{~/inline~}}
 {{#switch totalresultat.hovedresultat}}
     {{#case "FULL_TILBAKEBETALING"}}
@@ -9,6 +9,6 @@ Du må betale tilbake {{> ytelsen}}
 Du må betale tilbake {{> ytelsen}}
     {{/case}}
     {{#case "INGEN_TILBAKEBETALING"}}
-Du må ikkje betale tilbake {{#if skalFjerneTekstFeriepenger}}feriepengene{{else}}{{> ytelsen}}{{/if}}
+Du må ikkje betale tilbake {{#if skalFjerneTekstFeriepenger}}feriepengane{{else}}{{> ytelsen}}{{/if}}
     {{/case}}
 {{/switch}}

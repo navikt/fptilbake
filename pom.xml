@@ -7,7 +7,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>0.3.7</version>
+        <version>0.4.3</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -31,16 +31,17 @@
     <properties>
         <revision>2.0-SNAPSHOT</revision>
 
-        <felles.version>4.2.8</felles.version>
-        <prosesstask.version>3.1.13</prosesstask.version>
-        <fp-tidsserie.version>2.6.5</fp-tidsserie.version>
-        <fp-jms.version>2.2.0</fp-jms.version>
+        <felles.version>4.2.27</felles.version>
+        <prosesstask.version>3.1.21</prosesstask.version>
+        <fp-tidsserie.version>2.6.6</fp-tidsserie.version>
+        <fp-jms.version>2.2.1</fp-jms.version>
 
-        <fpkontrakter.version>6.1.27</fpkontrakter.version>
-        <abakus-kontrakt.version>1.3.36</abakus-kontrakt.version>
+        <fpkontrakter.version>6.2.10</fpkontrakter.version>
+        <abakus-kontrakt.version>1.3.40</abakus-kontrakt.version>
 
         <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
         <handlebars.version>4.3.1</handlebars.version>
+        <open.batik.version>1.16</open.batik.version>
     </properties>
 
     <dependencies>
@@ -81,6 +82,13 @@
     <dependencyManagement>
         <dependencies>
             <!-- Felles biblioteker - Importerte avhengigheter -->
+            <dependency>
+                <groupId>no.nav.foreldrepenger.felles</groupId>
+                <artifactId>fp-bom</artifactId>
+                <version>0.4.3</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
 
             <dependency>
                 <groupId>commons-io</groupId>
@@ -184,6 +192,11 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>sensu-klient</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>kravgrunnlag-queue</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -204,7 +217,7 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-                <artifactId>fplos-klient</artifactId>
+                <artifactId>los-klient</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -229,7 +242,7 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-                <artifactId>kafka-poller</artifactId>
+                <artifactId>kafka-producer</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -285,6 +298,11 @@
                 <artifactId>ereg-klient</artifactId>
                 <version>${felles.version}</version>
             </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
+                <artifactId>kafka-properties</artifactId>
+                <version>${felles.version}</version>
+            </dependency>
 
             <dependency>
                 <!-- Importeres etter felles-root og felles for å sikre samme avhengighet av felles gjennom hele! -->
@@ -313,6 +331,16 @@
                 <version>${fpkontrakter.version}</version>
             </dependency>
             <dependency>
+                <groupId>no.nav.foreldrepenger.kontrakter</groupId>
+                <artifactId>fp-ws-proxy-v1</artifactId>
+                <version>${fpkontrakter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.kontrakter.topics</groupId>
+                <artifactId>hendelser-behandling</artifactId>
+                <version>${fpkontrakter.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>no.nav.foreldrepenger.abakus</groupId>
                 <artifactId>abakus-kontrakt</artifactId>
                 <version>${abakus-kontrakt.version}</version>
@@ -330,9 +358,8 @@
                 <!-- velger en transitiv avhengighet - felles ikke enig med seg selv, velger den som blir brukt i prod-scope i felles -->
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.26.0</version>
+                <version>3.31.0</version>
             </dependency>
-
 
             <!-- transitiv avhengighet, sikrer konsistent versjon -->
             <!-- https://mvnrepository.com/artifact/org.codehaus.woodstox/stax2-api -->
@@ -360,6 +387,25 @@
                 <artifactId>handlebars-jackson2</artifactId>
                 <version>${handlebars.version}</version>
             </dependency>
+
+            <!-- openhtmltopdf-svg-support kommer med batik 1.14 versjon som drar inn mange sårbarheter
+            - vi bruker derfor 1.16 versjon inn som er patched allerede -->
+            <dependency>
+                <groupId>org.apache.xmlgraphics</groupId>
+                <artifactId>batik-transcoder</artifactId>
+                <version>${open.batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xmlgraphics</groupId>
+                <artifactId>batik-codec</artifactId>
+                <version>${open.batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xmlgraphics</groupId>
+                <artifactId>batik-ext</artifactId>
+                <version>${open.batik.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.openhtmltopdf</groupId>
                 <artifactId>openhtmltopdf-core</artifactId>

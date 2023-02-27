@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -20,11 +19,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeResultat;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
@@ -58,11 +57,9 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         BeregningResultatPeriode r = resultat.get(0);
         assertThat(r.getPeriode()).isEqualTo(periode);
         assertThat(r.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(11000));
-        assertThat(r.getVurdering()).isEqualTo(Aktsomhet.FORSETT);
         assertThat(r.getRenterProsent()).isEqualByComparingTo(BigDecimal.valueOf(10));
         assertThat(r.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
-        assertThat(r.getManueltSattTilbakekrevingsbeløp()).isNull();
-        assertThat(r.getAndelAvBeløp()).isEqualByComparingTo(BigDecimal.valueOf(100));
+        assertThat(r.utledKodeResultat()).isEqualTo(KodeResultat.FULL_TILBAKEKREVING);
 
         assertThat(beregningResultat.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.FULL_TILBAKEBETALING);
     }
@@ -83,11 +80,9 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         BeregningResultatPeriode r = resultat.get(0);
         assertThat(r.getPeriode()).isEqualTo(periode);
         assertThat(r.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(11000));
-        assertThat(r.getVurdering()).isEqualTo(Aktsomhet.FORSETT);
         assertThat(r.getRenterProsent()).isEqualByComparingTo(BigDecimal.valueOf(10));
         assertThat(r.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
-        assertThat(r.getManueltSattTilbakekrevingsbeløp()).isNull();
-        assertThat(r.getAndelAvBeløp()).isEqualByComparingTo(BigDecimal.valueOf(100));
+        assertThat(r.utledKodeResultat()).isEqualTo(KodeResultat.FULL_TILBAKEKREVING);
 
         assertThat(beregningResultat.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.FULL_TILBAKEBETALING);
     }
@@ -108,13 +103,11 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         BeregningResultatPeriode r = resultat.get(0);
         assertThat(r.getPeriode()).isEqualTo(periode);
         assertThat(r.getTilbakekrevingBeløp()).isZero();
-        assertThat(r.getVurdering()).isEqualTo(AnnenVurdering.FORELDET);
         assertThat(r.getRenterProsent()).isNull();
         assertThat(r.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
-        assertThat(r.getManueltSattTilbakekrevingsbeløp()).isNull();
-        assertThat(r.getAndelAvBeløp()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(r.getRenteBeløp()).isZero();
         assertThat(r.getTilbakekrevingBeløpUtenRenter()).isZero();
+        assertThat(r.utledKodeResultat()).isEqualTo(KodeResultat.FORELDET);
 
         assertThat(beregningResultat.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.INGEN_TILBAKEBETALING);
     }
@@ -136,13 +129,11 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         BeregningResultatPeriode r = resultat.get(0);
         assertThat(r.getPeriode()).isEqualTo(periode);
         assertThat(r.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(11000));
-        assertThat(r.getVurdering()).isEqualTo(Aktsomhet.FORSETT);
         assertThat(r.getRenterProsent()).isEqualByComparingTo(BigDecimal.valueOf(10));
         assertThat(r.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
-        assertThat(r.getManueltSattTilbakekrevingsbeløp()).isNull();
-        assertThat(r.getAndelAvBeløp()).isEqualByComparingTo(BigDecimal.valueOf(100));
         assertThat(r.getSkattBeløp()).isEqualByComparingTo(BigDecimal.valueOf(1000));
         assertThat(r.getTilbakekrevingBeløpEtterSkatt()).isEqualByComparingTo(BigDecimal.valueOf(10000));
+        assertThat(r.utledKodeResultat()).isEqualTo(KodeResultat.FULL_TILBAKEKREVING);
 
         assertThat(beregningResultat.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.FULL_TILBAKEBETALING);
     }
@@ -237,13 +228,11 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         BeregningResultatPeriode r = resultat.get(0);
         assertThat(r.getPeriode()).isEqualTo(logiskPeriode);
         assertThat(r.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(22000));
-        assertThat(r.getVurdering()).isEqualTo(Aktsomhet.FORSETT);
         assertThat(r.getRenterProsent()).isEqualByComparingTo(BigDecimal.valueOf(10));
         assertThat(r.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(20000));
-        assertThat(r.getManueltSattTilbakekrevingsbeløp()).isNull();
-        assertThat(r.getAndelAvBeløp()).isEqualByComparingTo(BigDecimal.valueOf(100));
         assertThat(r.getSkattBeløp()).isEqualByComparingTo(BigDecimal.valueOf(2000));
         assertThat(r.getTilbakekrevingBeløpEtterSkatt()).isEqualByComparingTo(BigDecimal.valueOf(20000));
+        assertThat(r.utledKodeResultat()).isEqualTo(KodeResultat.FULL_TILBAKEKREVING);
 
         assertThat(beregningResultat.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.FULL_TILBAKEBETALING);
     }
@@ -334,8 +323,8 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         BeregningResultatPeriode brp0 = resultat.get(0);
         assertThat(brp0.getPeriode()).isEqualTo(vurderingPeriode0);
         assertThat(brp0.getTilbakekrevingBeløpUtenRenter()).isEqualByComparingTo(BigDecimal.valueOf(3877));
-        assertThat(brp0.getSkattBeløp()).isEqualByComparingTo(BigDecimal.valueOf(955));
-        assertThat(brp0.getTilbakekrevingBeløpEtterSkatt()).isEqualByComparingTo(BigDecimal.valueOf(3877 - 955));
+        assertThat(brp0.getSkattBeløp()).isEqualByComparingTo(BigDecimal.valueOf(954));
+        assertThat(brp0.getTilbakekrevingBeløpEtterSkatt()).isEqualByComparingTo(BigDecimal.valueOf(3877 - 954));
         BeregningResultatPeriode brp1 = resultat.get(1);
         assertThat(brp1.getPeriode()).isEqualTo(vurderingPeriode1);
         assertThat(brp1.getTilbakekrevingBeløpUtenRenter()).isEqualByComparingTo(BigDecimal.valueOf(1278));

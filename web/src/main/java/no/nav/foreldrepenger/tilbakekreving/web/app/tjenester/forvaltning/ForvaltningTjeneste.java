@@ -5,15 +5,14 @@ import java.math.BigInteger;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.AnnullerKravGrunnlagDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagXmlUnmarshaller;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
-import no.nav.tilbakekreving.kravgrunnlag.annuller.v1.AnnullerKravgrunnlagDto;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
@@ -25,19 +24,20 @@ class ForvaltningTjeneste {
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
     private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository kravgrunnlagRepository;
-    private ØkonomiConsumer økonomiConsumer;
+    private ØkonomiProxyKlient økonomiProxyKlient;
+
 
     @Inject
     public ForvaltningTjeneste(ProsessTaskTjeneste prosessTaskTjeneste,
                                ØkonomiMottattXmlRepository økonomiMottattXmlRepository,
                                BehandlingRepository behandlingRepository,
                                KravgrunnlagRepository kravgrunnlagRepository,
-                               ØkonomiConsumer økonomiConsumer) {
+                               ØkonomiProxyKlient økonomiProxyKlient) {
         this.prosessTaskTjeneste = prosessTaskTjeneste;
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
         this.behandlingRepository = behandlingRepository;
         this.kravgrunnlagRepository = kravgrunnlagRepository;
-        this.økonomiConsumer = økonomiConsumer;
+        this.økonomiProxyKlient = økonomiProxyKlient;
     }
 
     void hentKorrigertKravgrunnlag(Behandling behandling, String kravgrunnlagId) {
@@ -47,17 +47,10 @@ class ForvaltningTjeneste {
         prosessTaskTjeneste.lagre(prosessTaskData);
     }
 
-    void annulerKravgrunnlag(Long behandlingId) {
+    void annullerKravgrunnlag(Long behandlingId) {
         var kravgrunnlag431 = kravgrunnlagRepository.hentIsAktivFor(behandlingId);
-        annulerKravgrunnlagRequest(behandlingId, kravgrunnlag431.getVedtakId());
-    }
-
-    private void annulerKravgrunnlagRequest(Long behandlingId, Long vedtakId) {
-        var annullerKravgrunnlagDto = new AnnullerKravgrunnlagDto();
-        annullerKravgrunnlagDto.setSaksbehId(HentKorrigertKravgrunnlagTask.OKO_SAKSBEH_ID);
-        annullerKravgrunnlagDto.setKodeAksjon(KodeAksjon.ANNULERE_GRUNNLAG.getKode());
-        annullerKravgrunnlagDto.setVedtakId(BigInteger.valueOf(vedtakId));
-        økonomiConsumer.anullereKravgrunnlag(behandlingId, annullerKravgrunnlagDto);
+        var annullerKravgrunnlagDto = new AnnullerKravGrunnlagDto(BigInteger.valueOf(kravgrunnlag431.getVedtakId()));
+        økonomiProxyKlient.anullereKravgrunnlag(annullerKravgrunnlagDto);
     }
 
     Forvaltningsinfo hentForvaltningsinfo(String saksnummer) {

@@ -22,8 +22,12 @@
             <artifactId>domenetjenester</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>kafka-poller</artifactId>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-streams</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
+            <artifactId>kafka-properties</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -38,10 +42,6 @@
         <dependency>
             <groupId>no.nav.foreldrepenger.abakus</groupId>
             <artifactId>abakus-kontrakt</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-annotation</artifactId>
         </dependency>
         <!-- Test -->
         <dependency>

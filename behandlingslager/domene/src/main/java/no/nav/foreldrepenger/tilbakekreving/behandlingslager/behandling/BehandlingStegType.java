@@ -35,6 +35,7 @@ public enum BehandlingStegType implements Kodeverdi {
     FAKTA_FEILUTBETALING("FAKTFEILUTSTEG", "Fakta om Feilutbetaling", BehandlingStatus.UTREDES),
     FORELDELSEVURDERINGSTEG("VFORELDETSTEG", "Vurder foreldelse", BehandlingStatus.UTREDES),
     VTILBSTEG("VTILBSTEG", "Vurder tilbakekreving", BehandlingStatus.UTREDES),
+    BEREGN("BEREGN", "Beregn beløp", BehandlingStatus.UTREDES),
     FORESLÅ_VEDTAK("FORVEDSTEG", "Foreslå vedtak", BehandlingStatus.UTREDES),
     FATTE_VEDTAK( "FVEDSTEG", "Fatte Vedtak", BehandlingStatus.FATTER_VEDTAK),
     IVERKSETT_VEDTAK("IVEDSTEG", "Iverksett Vedtak", BehandlingStatus.IVERKSETTER_VEDTAK);

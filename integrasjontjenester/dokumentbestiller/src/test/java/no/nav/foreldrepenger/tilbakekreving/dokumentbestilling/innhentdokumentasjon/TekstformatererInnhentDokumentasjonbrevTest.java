@@ -159,7 +159,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
                 .medBrevMetaData(brevMetadata)
                 .build();
         String overskrift = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevOverskrift(innhentDokumentasjonBrevSamletInfo);
-        String fasit = "Vi trenger fleire opplysningar";
+        String fasit = "Vi treng fleire opplysningar";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
 

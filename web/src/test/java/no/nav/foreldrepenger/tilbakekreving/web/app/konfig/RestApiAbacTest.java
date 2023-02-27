@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.felles.testutilities.cdi.WeldContext;
-import no.nav.vedtak.isso.config.ServerInfo;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
@@ -32,13 +31,11 @@ public class RestApiAbacTest {
 
     @BeforeAll
     public static void setup() {
-        System.setProperty(ServerInfo.PROPERTY_KEY_LOADBALANCER_URL, "http://localhost:8090");
         System.setProperty("app.name", "fptilbake");
     }
 
     @AfterAll
     public static void teardown() {
-        System.clearProperty(ServerInfo.PROPERTY_KEY_LOADBALANCER_URL);
         System.clearProperty("app.name");
     }
 

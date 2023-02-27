@@ -7,7 +7,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
@@ -18,7 +17,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.vedtak.sikkerhet.context.SubjectHandler;
+import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
+import no.nav.vedtak.sikkerhet.kontekst.Systembruker;
 
 /**
  * Observerer Aksjonspunkt*Events og registrerer HistorikkInnslag for enkelte hendelser (eks. gjenoppta og behandling på vent)
@@ -27,13 +27,15 @@ import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 public class HistorikkInnslagForAksjonspunkEventObserver {
 
     private HistorikkRepository historikkRepository;
-    private String systembruker;
+    private static final String SYSTEMBRUKER = Systembruker.username();
+
+    private HistorikkInnslagForAksjonspunkEventObserver() {
+        // CDI
+    }
 
     @Inject
-    public HistorikkInnslagForAksjonspunkEventObserver(HistorikkRepository historikkRepository,
-                                                       @KonfigVerdi(value = "systembruker.username", required = false) String systembruker) {
+    public HistorikkInnslagForAksjonspunkEventObserver(HistorikkRepository historikkRepository) {
         this.historikkRepository = historikkRepository;
-        this.systembruker = systembruker;
     }
 
     public void oppretteHistorikkForBehandlingPåVent(@Observes AksjonspunktStatusEvent aksjonspunkterFunnetEvent) {
@@ -74,8 +76,8 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
             builder.medÅrsak(venteårsak);
         }
         Historikkinnslag historikkinnslag = new Historikkinnslag();
-        String brukerident = SubjectHandler.getSubjectHandler().getUid();
-        historikkinnslag.setAktør(!Objects.equals(systembruker, brukerident) ? HistorikkAktør.SAKSBEHANDLER : HistorikkAktør.VEDTAKSLØSNINGEN);
+        String brukerident = KontekstHolder.getKontekst().getUid();
+        historikkinnslag.setAktør(!Objects.equals(SYSTEMBRUKER, brukerident) ? HistorikkAktør.SAKSBEHANDLER : HistorikkAktør.VEDTAKSLØSNINGEN);
         historikkinnslag.setType(historikkinnslagType);
         historikkinnslag.setBehandlingId(behandlingId);
         historikkinnslag.setFagsakId(fagsakId);

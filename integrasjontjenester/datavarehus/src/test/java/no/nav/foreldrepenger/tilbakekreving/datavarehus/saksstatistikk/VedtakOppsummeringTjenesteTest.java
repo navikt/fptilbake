@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -24,6 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKo
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
@@ -92,11 +94,11 @@ public class VedtakOppsummeringTjenesteTest {
         vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
         behandlingVedtakRepository = repositoryProvider.getBehandlingVedtakRepository();
         kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(
-                kravgrunnlagRepository);
-        TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(
-                repositoryProvider, kravgrunnlagBeregningTjeneste);
-        vedtakOppsummeringTjeneste = new VedtakOppsummeringTjeneste(repositoryProvider, tilbakekrevingBeregningTjeneste);
+        BeregningsresultatRepository beregningsresultatRepository = new BeregningsresultatRepository(entityManager);
+        KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(kravgrunnlagRepository);
+        TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(repositoryProvider, kravgrunnlagBeregningTjeneste);
+        BeregningsresultatTjeneste beregningsresultatTjeneste = new BeregningsresultatTjeneste(tilbakekrevingBeregningTjeneste, beregningsresultatRepository, false);
+        vedtakOppsummeringTjeneste = new VedtakOppsummeringTjeneste(repositoryProvider, beregningsresultatTjeneste);
 
         entityManager.setFlushMode(FlushModeType.AUTO);
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
@@ -196,9 +198,9 @@ public class VedtakOppsummeringTjenesteTest {
         FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
         faktaFeilutbetaling.setBegrunnelse("fakta begrunnelse");
         FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode = FaktaFeilutbetalingPeriode.builder().medPeriode(periode)
-                .medFeilutbetalinger(faktaFeilutbetaling)
-                .medHendelseType(HendelseType.MEDLEMSKAP_TYPE)
-                .medHendelseUndertype(HendelseUnderType.IKKE_BOSATT).build();
+            .medFeilutbetalinger(faktaFeilutbetaling)
+            .medHendelseType(HendelseType.MEDLEMSKAP_TYPE)
+            .medHendelseUndertype(HendelseUnderType.IKKE_BOSATT).build();
         faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);
         faktaFeilutbetalingRepository.lagre(behandlingId, faktaFeilutbetaling);
     }
@@ -206,11 +208,11 @@ public class VedtakOppsummeringTjenesteTest {
     private void lagForeldelse() {
         VurdertForeldelse vurdertForeldelse = new VurdertForeldelse();
         VurdertForeldelsePeriode foreldelsePeriode = VurdertForeldelsePeriode.builder().medPeriode(periode)
-                .medForeldelseVurderingType(ForeldelseVurderingType.FORELDET)
-                .medVurdertForeldelse(vurdertForeldelse)
-                .medBegrunnelse("foreldelse begrunnelse")
-                .medForeldelsesFrist(periode.getFom().plusMonths(8))
-                .build();
+            .medForeldelseVurderingType(ForeldelseVurderingType.FORELDET)
+            .medVurdertForeldelse(vurdertForeldelse)
+            .medBegrunnelse("foreldelse begrunnelse")
+            .medForeldelsesFrist(periode.getFom().plusMonths(8))
+            .build();
         vurdertForeldelse.leggTilVurderForeldelsePerioder(foreldelsePeriode);
         foreldelseRepository.lagre(behandlingId, vurdertForeldelse);
     }
@@ -218,19 +220,19 @@ public class VedtakOppsummeringTjenesteTest {
     private void lagVilkårMedAktsomhet() {
         VilkårVurderingEntitet vilkårVurderingEntitet = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet vilkårVurderingPeriodeEntitet = VilkårVurderingPeriodeEntitet.builder().medPeriode(periode)
-                .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
-                .medBegrunnelse("vilkår begrunnelse")
-                .medVurderinger(vilkårVurderingEntitet).build();
+            .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
+            .medBegrunnelse("vilkår begrunnelse")
+            .medVurderinger(vilkårVurderingEntitet).build();
         VilkårVurderingAktsomhetEntitet vilkårVurderingAktsomhetEntitet = VilkårVurderingAktsomhetEntitet.builder()
-                .medPeriode(vilkårVurderingPeriodeEntitet)
-                .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
-                .medIleggRenter(true)
-                .medSærligGrunnerTilReduksjon(false)
-                .medBegrunnelse("aktsomhet begrunnelse").build();
+            .medPeriode(vilkårVurderingPeriodeEntitet)
+            .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
+            .medIleggRenter(true)
+            .medSærligGrunnerTilReduksjon(false)
+            .medBegrunnelse("aktsomhet begrunnelse").build();
         VilkårVurderingSærligGrunnEntitet særligGrunnEntitet = VilkårVurderingSærligGrunnEntitet.builder()
-                .medGrunn(SærligGrunn.STØRRELSE_BELØP)
-                .medVurdertAktsomhet(vilkårVurderingAktsomhetEntitet)
-                .medBegrunnelse("særlig grunner begrunnelse").build();
+            .medGrunn(SærligGrunn.STØRRELSE_BELØP)
+            .medVurdertAktsomhet(vilkårVurderingAktsomhetEntitet)
+            .medBegrunnelse("særlig grunner begrunnelse").build();
         vilkårVurderingAktsomhetEntitet.leggTilSærligGrunn(særligGrunnEntitet);
         vilkårVurderingPeriodeEntitet.setAktsomhet(vilkårVurderingAktsomhetEntitet);
         vilkårVurderingEntitet.leggTilPeriode(vilkårVurderingPeriodeEntitet);
@@ -240,14 +242,14 @@ public class VedtakOppsummeringTjenesteTest {
     private void lagVilkårMedGodTro() {
         VilkårVurderingEntitet vilkårVurderingEntitet = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet vilkårVurderingPeriodeEntitet = VilkårVurderingPeriodeEntitet.builder().medPeriode(periode)
-                .medVilkårResultat(VilkårResultat.GOD_TRO)
-                .medBegrunnelse("vilkår begrunnelse")
-                .medVurderinger(vilkårVurderingEntitet).build();
+            .medVilkårResultat(VilkårResultat.GOD_TRO)
+            .medBegrunnelse("vilkår begrunnelse")
+            .medVurderinger(vilkårVurderingEntitet).build();
         VilkårVurderingGodTroEntitet vilkårVurderingGodTroEntitet = VilkårVurderingGodTroEntitet.builder()
-                .medPeriode(vilkårVurderingPeriodeEntitet)
-                .medBeløpTilbakekreves(BigDecimal.valueOf(1000))
-                .medBeløpErIBehold(false)
-                .medBegrunnelse("god tro begrunnelse").build();
+            .medPeriode(vilkårVurderingPeriodeEntitet)
+            .medBeløpTilbakekreves(BigDecimal.valueOf(1000))
+            .medBeløpErIBehold(false)
+            .medBegrunnelse("god tro begrunnelse").build();
         vilkårVurderingPeriodeEntitet.setGodTro(vilkårVurderingGodTroEntitet);
         vilkårVurderingEntitet.leggTilPeriode(vilkårVurderingPeriodeEntitet);
         vilkårsvurderingRepository.lagre(behandlingId, vilkårVurderingEntitet);
@@ -255,48 +257,48 @@ public class VedtakOppsummeringTjenesteTest {
 
     private void lagBehandlingVedtak() {
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
-                .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
-                .medBehandling(behandling).build();
+            .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
+            .medBehandling(behandling).build();
         BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder()
-                .medIverksettingStatus(IverksettingStatus.IVERKSATT)
-                .medVedtaksdato(LocalDate.now())
-                .medAnsvarligSaksbehandler("Z12345")
-                .medBehandlingsresultat(behandlingsresultat).build();
+            .medIverksettingStatus(IverksettingStatus.IVERKSATT)
+            .medVedtaksdato(LocalDate.now())
+            .medAnsvarligSaksbehandler("Z12345")
+            .medBehandlingsresultat(behandlingsresultat).build();
         repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
         behandlingVedtakRepository.lagre(behandlingVedtak);
     }
 
     private void lagKravgrunnlag() {
         Kravgrunnlag431 kravgrunnlag431 = Kravgrunnlag431.builder().medEksternKravgrunnlagId("12345")
-                .medVedtakId(12345l)
-                .medBehandlendeEnhet("8020")
-                .medBostedEnhet("8020")
-                .medAnsvarligEnhet("8020")
-                .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
-                .medKravStatusKode(KravStatusKode.NYTT)
-                .medUtbetalesTilId("1234567890")
-                .medUtbetIdType(GjelderType.PERSON)
-                .medGjelderVedtakId("1234567890")
-                .medGjelderType(GjelderType.PERSON)
-                .medFeltKontroll("2020")
-                .medSaksBehId(ANSVARLIG_SAKSBEHANDLER)
-                .medFagSystemId(saksnummer.getVerdi() + "100")
-                .medReferanse(Henvisning.fraEksternBehandlingId(1L))
-                .build();
+            .medVedtakId(12345l)
+            .medBehandlendeEnhet("8020")
+            .medBostedEnhet("8020")
+            .medAnsvarligEnhet("8020")
+            .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
+            .medKravStatusKode(KravStatusKode.NYTT)
+            .medUtbetalesTilId("1234567890")
+            .medUtbetIdType(GjelderType.PERSON)
+            .medGjelderVedtakId("1234567890")
+            .medGjelderType(GjelderType.PERSON)
+            .medFeltKontroll("2020")
+            .medSaksBehId(ANSVARLIG_SAKSBEHANDLER)
+            .medFagSystemId(saksnummer.getVerdi() + "100")
+            .medReferanse(Henvisning.fraEksternBehandlingId(1L))
+            .build();
         KravgrunnlagPeriode432 kravgrunnlagPeriode432 = KravgrunnlagPeriode432.builder().medPeriode(periode)
-                .medKravgrunnlag431(kravgrunnlag431)
-                .medBeløpSkattMnd(BigDecimal.valueOf(100)).build();
+            .medKravgrunnlag431(kravgrunnlag431)
+            .medBeløpSkattMnd(BigDecimal.valueOf(100)).build();
         KravgrunnlagBelop433 feilPostering = KravgrunnlagBelop433.builder().medKlasseKode(KlasseKode.FPATORD)
-                .medKlasseType(KlasseType.FEIL)
-                .medNyBelop(BigDecimal.valueOf(1000))
-                .medSkattProsent(BigDecimal.valueOf(10))
-                .medKravgrunnlagPeriode432(kravgrunnlagPeriode432).build();
+            .medKlasseType(KlasseType.FEIL)
+            .medNyBelop(BigDecimal.valueOf(1000))
+            .medSkattProsent(BigDecimal.valueOf(10))
+            .medKravgrunnlagPeriode432(kravgrunnlagPeriode432).build();
         KravgrunnlagBelop433 ytelPostering = KravgrunnlagBelop433.builder().medKlasseKode(KlasseKode.FPATORD)
-                .medKlasseType(KlasseType.YTEL)
-                .medTilbakekrevesBelop(BigDecimal.valueOf(1000))
-                .medOpprUtbetBelop(BigDecimal.valueOf(1000))
-                .medSkattProsent(BigDecimal.valueOf(10))
-                .medKravgrunnlagPeriode432(kravgrunnlagPeriode432).build();
+            .medKlasseType(KlasseType.YTEL)
+            .medTilbakekrevesBelop(BigDecimal.valueOf(1000))
+            .medOpprUtbetBelop(BigDecimal.valueOf(1000))
+            .medSkattProsent(BigDecimal.valueOf(10))
+            .medKravgrunnlagPeriode432(kravgrunnlagPeriode432).build();
         kravgrunnlagPeriode432.leggTilBeløp(feilPostering);
         kravgrunnlagPeriode432.leggTilBeløp(ytelPostering);
         kravgrunnlag431.leggTilPeriode(kravgrunnlagPeriode432);

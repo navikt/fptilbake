@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+      http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
+                 version="2.1">
+
+    <sequence-generator name="seq_beregningsresultat" allocation-size="50" sequence-name="seq_beregningsresultat"/>
+    <sequence-generator name="seq_beregningsresultat_periode" allocation-size="50" sequence-name="seq_beregningsresultat_periode"/>
+    <sequence-generator name="seq_gr_beregningsresultat" allocation-size="50" sequence-name="seq_gr_beregningsresultat"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatAggregate"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatEntitet"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatPeriodeEntitet"/>
+
+</entity-mappings>

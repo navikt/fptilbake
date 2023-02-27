@@ -36,6 +36,10 @@
             <artifactId>oekonomi-tilbakekreving-klient</artifactId>
         </dependency>
         <dependency>
+            <groupId>no.nav.foreldrepenger.kontrakter</groupId>
+            <artifactId>fp-ws-proxy-v1</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>organisasjon</artifactId>
         </dependency>
@@ -46,6 +50,10 @@
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>avstemming</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>sensu-klient</artifactId>
         </dependency>
 
         <!-- Test avhengigheter -->

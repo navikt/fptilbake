@@ -27,7 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.SkjermlenkeTjeneste;
-import no.nav.vedtak.sikkerhet.context.SubjectHandler;
+import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 @ApplicationScoped
 public class FatteVedtakTjeneste {
@@ -51,7 +51,7 @@ public class FatteVedtakTjeneste {
 
     public void opprettTotrinnsVurdering(Behandling behandling, Collection<VedtakAksjonspunktData> aksjonspunkter) {
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
-        behandling.setAnsvarligBeslutter(SubjectHandler.getSubjectHandler().getUid());
+        behandling.setAnsvarligBeslutter(KontekstHolder.getKontekst().getUid());
 
         List<Totrinnsvurdering> totrinnsvurderinger = new ArrayList<>();
         List<Aksjonspunkt> skalReåpnes = new ArrayList<>();

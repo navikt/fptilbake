@@ -14,8 +14,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.codahale.metrics.annotation.Timed;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -44,7 +42,6 @@ public class HistorikkRestTjeneste {
     }
 
     @GET
-    @Timed
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Operation(tags = "historikk", description = "Henter alle historikkinnslag for gitt behandling.")
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)

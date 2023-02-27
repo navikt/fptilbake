@@ -8,8 +8,9 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
@@ -18,7 +19,7 @@ import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.Tilbakekrevingsvedt
 public class TilbakekrevingsvedtakTjeneste {
 
     private KravgrunnlagRepository kravgrunnlagRepository;
-    private TilbakekrevingBeregningTjeneste beregningTjeneste;
+    private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private TilbakekrevingVedtakPeriodeBeregner vedtakPeriodeBeregner;
 
     TilbakekrevingsvedtakTjeneste() {
@@ -26,18 +27,29 @@ public class TilbakekrevingsvedtakTjeneste {
     }
 
     @Inject
-    public TilbakekrevingsvedtakTjeneste(KravgrunnlagRepository kravgrunnlagRepository, TilbakekrevingBeregningTjeneste beregningTjeneste, TilbakekrevingVedtakPeriodeBeregner vedtakPeriodeBeregner) {
+    public TilbakekrevingsvedtakTjeneste(KravgrunnlagRepository kravgrunnlagRepository,
+                                         BeregningsresultatTjeneste beregningsresultatTjeneste,
+                                         TilbakekrevingVedtakPeriodeBeregner vedtakPeriodeBeregner) {
         this.kravgrunnlagRepository = kravgrunnlagRepository;
-        this.beregningTjeneste = beregningTjeneste;
+        this.beregningsresultatTjeneste = beregningsresultatTjeneste;
         this.vedtakPeriodeBeregner = vedtakPeriodeBeregner;
     }
 
+    @Deprecated
     public TilbakekrevingsvedtakDto lagTilbakekrevingsvedtak(Long behandlingId) {
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
-        BeregningResultat beregningResultat = beregningTjeneste.beregn(behandlingId);
+        BeregningResultat beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
         List<TilbakekrevingPeriode> tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, beregningResultat);
         validerSkattBeløp(tilbakekrevingPerioder);
         return TilbakekrevingsvedtakMapper.tilDto(kravgrunnlag, tilbakekrevingPerioder);
+    }
+
+    public TilbakekrevingVedtakDTO lagTilbakekrevingsvedtakDTOFpwsproxy(Long behandlingId) {
+        Kravgrunnlag431 kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
+        BeregningResultat beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
+        List<TilbakekrevingPeriode> tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, beregningResultat);
+        validerSkattBeløp(tilbakekrevingPerioder);
+        return TilbakekrevingsvedtakMapperFpwsproxy.tilDto(kravgrunnlag, tilbakekrevingPerioder);
     }
 
     private void validerSkattBeløp(final List<TilbakekrevingPeriode> tilbakekrevingPerioder) {

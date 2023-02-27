@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
@@ -37,12 +38,13 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
     private ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
 
     private final ØkonomiConsumer økonomiConsumer = Mockito.mock(ØkonomiConsumer.class);
+    private final ØkonomiProxyKlient økonomiProxyKlient = Mockito.mock(ØkonomiProxyKlient.class);
 
     private SendØkonomiTibakekerevingsVedtakTask task;
 
     @BeforeEach
     public void setup() {
-        task = new SendØkonomiTibakekerevingsVedtakTask(tilbakekrevingsvedtakTjeneste, økonomiConsumer, økonomiSendtXmlRepository);
+        task = new SendØkonomiTibakekerevingsVedtakTask(tilbakekrevingsvedtakTjeneste, økonomiConsumer, økonomiProxyKlient, økonomiSendtXmlRepository);
     }
 
     @Test
