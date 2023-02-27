@@ -13,62 +13,57 @@ import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.VedtakConsumer;
+import no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer.KravgrunnlagAsyncJmsConsumer;
 import no.nav.foreldrepenger.tilbakekreving.sensu.SensuKlient;
-import no.nav.vedtak.apptjeneste.AppServiceHandler;
-import no.nav.vedtak.felles.integrasjon.jms.QueueConsumerManager;
 import no.nav.vedtak.felles.prosesstask.impl.BatchTaskScheduler;
 import no.nav.vedtak.felles.prosesstask.impl.TaskManager;
+import no.nav.vedtak.log.metrics.Controllable;
 
 @ApplicationScoped
 public class ApplicationServiceStarter {
+    private static final Environment ENV = Environment.current();
+    private static final Boolean MQ_DISABLED = ENV.getProperty("test.only.disable.mq", Boolean.class);
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationServiceStarter.class);
-    private List<Class<AppServiceHandler>> services = new ArrayList<>();
+    private List<Controllable> services = new ArrayList<>();
 
     public void startServices() {
-
         start(TaskManager.class);
         start(BatchTaskScheduler.class);
         start(VedtakConsumer.class);
+
         if (ApplicationName.hvilkenTilbake() == Fagsystem.K9TILBAKE) {
             start(SensuKlient.class);
         } else {
             logger.info("Starter ikke sensu klient");
         }
 
-        if (Environment.current().isProd() || !"true".equalsIgnoreCase(Environment.current().getProperty("test.only.disable.mq"))) {
-            startQueueConsumerManager();
+        // Startes alltid i prod og dev. Lokal og autotest styres med test.only.disable.mq flagg.
+        if (!ENV.isLocal() || !Boolean.TRUE.equals(MQ_DISABLED)) {
+            start(KravgrunnlagAsyncJmsConsumer.class);
         } else {
             logger.info("Startet IKKE QueueConsumerManager, den er disablet med test.only.disable.mq=true");
         }
     }
 
     public void stopServices() {
-        for (Class<AppServiceHandler> serviceClass : services) {
-            stopp(serviceClass);
-        }
+        services.forEach(this::stopp);
     }
 
-    private void start(Class<? extends AppServiceHandler> klasse) {
-        if (services.contains(klasse)) {
-            logger.warn("Starter ikke {} siden den allerede er startet", klasse);
+    private void start(Class<? extends Controllable> klasse) {
+        var service = CDI.current().select(klasse).get();
+        if (services.contains(service)) {
+            logger.warn("Starter ikke {} siden den allerede er startet", klasse.getSimpleName());
         } else {
             logger.info("Starter {}", klasse.getSimpleName());
-            CDI.current().select(klasse).get().start();
+            service.start();
+            services.add(service);
         }
     }
 
-    private void stopp(Class<? extends AppServiceHandler> klasse) {
-        logger.info("Stopper {}", klasse.getSimpleName());
-        CDI.current().select(klasse).get().stop();
-    }
-
-    private void startQueueConsumerManager() {
-        if (services.contains(QueueConsumerManager.class)) {
-            logger.warn("Starter ikke {} siden den allerede er startet", QueueConsumerManager.class);
-        } else {
-            logger.info("Starter {}", QueueConsumerManager.class.getSimpleName());
-            CDI.current().select(QueueConsumerManager.class).get().start();
-        }
+    private void stopp(Controllable service) {
+        logger.info("Stopper {}", service.getClass().getSimpleName());
+        service.stop();
+        services.remove(service);
     }
 }

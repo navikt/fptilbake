@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.Selftests;
 
-public class NaisRestTjenesteTest {
+class NaisRestTjenesteTest {
 
     private NaisRestTjeneste restTjeneste;
 
@@ -23,10 +23,9 @@ public class NaisRestTjenesteTest {
     }
 
     @Test
-    public void test_isAlive_skal_returnere_status_200() {
+    void test_isAlive_skal_returnere_status_200() {
         when(selftestsMock.isReady()).thenReturn(true);
         when(selftestsMock.isKafkaAlive()).thenReturn(true);
-        restTjeneste.setIsContextStartupReady(true);
 
         Response response = restTjeneste.isAlive();
 
@@ -34,9 +33,8 @@ public class NaisRestTjenesteTest {
     }
 
     @Test
-    public void test_isReady_skal_returnere_service_unavailable_når_kritiske_selftester_feiler() {
+    void test_isReady_skal_returnere_service_unavailable_når_kritiske_selftester_feiler() {
         when(selftestsMock.isReady()).thenReturn(false);
-        restTjeneste.setIsContextStartupReady(true);
 
         Response response = restTjeneste.isReady();
 
@@ -44,9 +42,8 @@ public class NaisRestTjenesteTest {
     }
 
     @Test
-    public void test_isReady_skal_returnere_status_ok_når_selftester_er_ok() {
+    void test_isReady_skal_returnere_status_ok_når_selftester_er_ok() {
         when(selftestsMock.isReady()).thenReturn(true);
-        restTjeneste.setIsContextStartupReady(true);
 
         Response response = restTjeneste.isReady();
 

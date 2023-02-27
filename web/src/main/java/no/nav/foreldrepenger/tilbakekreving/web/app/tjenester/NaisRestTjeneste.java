@@ -20,8 +20,6 @@ public class NaisRestTjeneste {
 
     private Selftests selftests;
 
-    private Boolean isContextStartupReady = false;
-
     public NaisRestTjeneste() {
         // CDI
     }
@@ -35,7 +33,7 @@ public class NaisRestTjeneste {
     @Path("isAlive")
     @Operation(tags = "nais", description = "sjekker om applikasjonen er i live", hidden = true)
     public Response isAlive() {
-        if (isContextStartupReady && selftests.isKafkaAlive()) {
+        if (selftests.isKafkaAlive()) {
             return Response
                     .ok(RESPONSE_OK, MediaType.TEXT_PLAIN_TYPE)
                     .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
@@ -51,7 +49,7 @@ public class NaisRestTjeneste {
     @Path("isReady")
     @Operation(tags = "nais", description = "sjekker om applikasjonen er klar", hidden = true)
     public Response isReady() {
-        if (isContextStartupReady && selftests.isReady()) {
+        if (selftests.isReady()) {
             return Response.ok(RESPONSE_OK)
                     .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
                     .build();
@@ -60,14 +58,5 @@ public class NaisRestTjeneste {
                     .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
                     .build();
         }
-    }
-
-    /**
-     * Settes av AppstartupServletContextListener ved contextInitialized
-     *
-     * @param isContextStartupReady
-     */
-    public void setIsContextStartupReady(Boolean isContextStartupReady) {
-        this.isContextStartupReady = isContextStartupReady;
     }
 }

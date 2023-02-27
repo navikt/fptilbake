@@ -2,13 +2,13 @@ package no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import jakarta.jms.JMSException;
 
 import com.ibm.mq.jakarta.jms.MQConnectionFactory;
 import com.ibm.mq.jakarta.jms.MQQueue;
 import com.ibm.msg.client.jakarta.jms.JmsConstants;
 import com.ibm.msg.client.jakarta.wmq.compat.jms.internal.JMSC;
 
+import jakarta.jms.JMSException;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.vedtak.felles.integrasjon.jms.JmsKonfig;
 
@@ -44,7 +44,10 @@ public class KravgrunnlagJmsConsumerKonfig {
         return createConnectionFactory(host, port, channel, manager);
     }
 
-    private static MQConnectionFactory createConnectionFactory(String hostName, Integer port, String channel, String queueManagerName) throws JMSException {
+    private static MQConnectionFactory createConnectionFactory(String hostName,
+                                                               Integer port,
+                                                               String channel,
+                                                               String queueManagerName) throws JMSException {
         MQConnectionFactory connectionFactory = new MQConnectionFactory();
         connectionFactory.setHostName(hostName);
         connectionFactory.setPort(port);

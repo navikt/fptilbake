@@ -15,6 +15,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.vedtak.log.metrics.Controllable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +26,7 @@ import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.log.mdc.MDCOperations;
 
 @ApplicationScoped
-public class SensuKlient implements AppServiceHandler {
+public class SensuKlient implements AppServiceHandler, Controllable {
 
     private static final Logger LOG = LoggerFactory.getLogger(SensuKlient.class);
     private static ExecutorService executorService;
