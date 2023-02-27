@@ -15,18 +15,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.vedtak.log.metrics.Controllable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
-import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.log.mdc.MDCOperations;
+import no.nav.vedtak.log.metrics.Controllable;
 
 @ApplicationScoped
-public class SensuKlient implements AppServiceHandler, Controllable {
+public class SensuKlient implements Controllable {
 
     private static final Logger LOG = LoggerFactory.getLogger(SensuKlient.class);
     private static ExecutorService executorService;

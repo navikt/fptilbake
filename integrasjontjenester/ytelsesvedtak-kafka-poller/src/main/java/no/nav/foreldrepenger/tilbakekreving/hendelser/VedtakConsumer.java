@@ -6,8 +6,6 @@ import java.time.temporal.ChronoUnit;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.vedtak.log.metrics.Controllable;
-
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
@@ -18,11 +16,11 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.felles.KafkaIntegration;
-import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.felles.integrasjon.kafka.KafkaProperties;
+import no.nav.vedtak.log.metrics.Controllable;
 
 @ApplicationScoped
-public class VedtakConsumer implements AppServiceHandler, Controllable, KafkaIntegration {
+public class VedtakConsumer implements Controllable, KafkaIntegration {
 
     private static final Logger LOG = LoggerFactory.getLogger(VedtakConsumer.class);
     private KafkaStreams stream;
