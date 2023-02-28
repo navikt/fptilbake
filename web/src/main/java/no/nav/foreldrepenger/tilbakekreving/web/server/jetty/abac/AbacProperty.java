@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles;
+package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac;
 
 public class AbacProperty {
     public static final String APPLIKASJON = "abac.attributt.applikasjon";

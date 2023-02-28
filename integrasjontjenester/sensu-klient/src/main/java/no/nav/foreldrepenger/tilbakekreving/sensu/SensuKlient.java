@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -140,7 +141,11 @@ public class SensuKlient implements Controllable {
         if (Environment.current().isLocal()) {
             LOG.info("Kjører lokalt, kobler ikke opp mot sensu-server.");
         } else {
-            startService();
+            if (Objects.equals(Environment.current().getProperty("app.name"), "k9-tilbake")) {
+                startService();
+            } else {
+                LOG.info("Starter ikke sensu klient");
+            }
         }
     }
 
