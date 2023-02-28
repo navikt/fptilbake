@@ -51,7 +51,6 @@ public class ApplicationServiceStarter {
         LOGGER.info("Startet {} services", services.size());
     }
 
-
     public void stopServices() {
         LOGGER.info("Stopper {} services", services.size());
         CompletableFuture.allOf(services.stream().map(service -> runAsync(service::stop)).toArray(CompletableFuture[]::new))

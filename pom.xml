@@ -250,7 +250,7 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- Felles biblioteker og sikkerhet -->
+            <!-- Flytt til bom og fjern herfra -->
             <dependency>
                 <groupId>jakarta.jms</groupId>
                 <artifactId>jakarta.jms-api</artifactId>

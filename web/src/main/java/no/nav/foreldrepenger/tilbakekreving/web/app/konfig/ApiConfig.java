@@ -50,7 +50,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTje
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 
-
 @ApplicationPath(ApiConfig.API_URI)
 public class ApiConfig extends Application {
 

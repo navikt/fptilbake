@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.app.selftest.checks;
+package no.nav.foreldrepenger.tilbakekreving.web.app.healthchecks.checks;
 
 import java.sql.SQLException;
 

@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.app.selftest;
+package no.nav.foreldrepenger.tilbakekreving.web.app.healthchecks;
 
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 
