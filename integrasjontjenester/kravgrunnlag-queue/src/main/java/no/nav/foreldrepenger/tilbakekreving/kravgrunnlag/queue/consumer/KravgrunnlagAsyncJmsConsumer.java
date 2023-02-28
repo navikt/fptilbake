@@ -4,18 +4,20 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.felles.jms.QueueConsumer;
+
+import no.nav.foreldrepenger.felles.jms.precond.PreconditionChecker;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.TextMessage;
-import no.nav.vedtak.felles.integrasjon.jms.ExternalQueueConsumer;
-import no.nav.vedtak.felles.integrasjon.jms.precond.PreconditionChecker;
 import no.nav.vedtak.log.metrics.Controllable;
 
 @ApplicationScoped
-public class KravgrunnlagAsyncJmsConsumer extends ExternalQueueConsumer implements Controllable {
+public class KravgrunnlagAsyncJmsConsumer extends QueueConsumer implements Controllable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KravgrunnlagAsyncJmsConsumer.class);
 

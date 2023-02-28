@@ -5,8 +5,8 @@ import javax.inject.Inject;
 
 import jakarta.jms.JMSException;
 import jakarta.jms.JMSRuntimeException;
+import no.nav.foreldrepenger.felles.jms.QueueSelftest;
 import no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer.KravgrunnlagAsyncJmsConsumer;
-import no.nav.vedtak.felles.integrasjon.jms.QueueSelftest;
 
 import no.nav.vedtak.log.metrics.LiveAndReadinessAware;
 
@@ -32,7 +32,7 @@ public class KravgrunnlagQueueHealthCheck implements LiveAndReadinessAware {
             client.testConnection();
         } catch (JMSRuntimeException | JMSException e) { // NOSONAR
             if (LOG.isWarnEnabled()) {
-                LOG.warn("Feil ved Kravgrunnlag meldingskø helsesjekk: {}", client.getConnectionEndpoint(), e);
+                LOG.warn("Feil ved Kravgrunnlag meldingskø helsesjekk: {}", client.getConnectionEndpoint());
                 return false;
             }
         }
