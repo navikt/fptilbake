@@ -7,6 +7,7 @@
         <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
         <version>${revision}</version>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
     <artifactId>kravgrunnlag-queue</artifactId>
     <packaging>jar</packaging>
@@ -14,14 +15,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>no.nav.vedtak.felles.fp-jms-integrasjon</groupId>
+            <groupId>no.nav.foreldrepenger.felles</groupId>
             <artifactId>jms-integrasjon</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.felles</groupId>
             <artifactId>felles-log</artifactId>
         </dependency>
-
     </dependencies>
-
 </project>

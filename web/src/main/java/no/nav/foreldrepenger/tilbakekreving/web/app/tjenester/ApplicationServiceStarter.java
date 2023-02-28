@@ -12,12 +12,6 @@ import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.konfig.Environment;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
-import no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer.KravgrunnlagAsyncJmsConsumer;
-import no.nav.foreldrepenger.tilbakekreving.sensu.SensuKlient;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +22,6 @@ import no.nav.vedtak.log.metrics.Controllable;
 public class ApplicationServiceStarter {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationServiceStarter.class);
 
-    private static final Environment ENV = Environment.current();
-    private static final Boolean MQ_DISABLED = ENV.getProperty("test.only.disable.mq", Boolean.class);
     private Set<Controllable> services;
 
     ApplicationServiceStarter() {

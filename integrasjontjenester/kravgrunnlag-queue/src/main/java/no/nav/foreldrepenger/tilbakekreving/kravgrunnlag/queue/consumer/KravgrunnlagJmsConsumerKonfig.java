@@ -9,8 +9,8 @@ import com.ibm.msg.client.jakarta.jms.JmsConstants;
 import com.ibm.msg.client.jakarta.wmq.compat.jms.internal.JMSC;
 
 import jakarta.jms.JMSException;
+import no.nav.foreldrepenger.felles.jms.JmsKonfig;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
-import no.nav.vedtak.felles.integrasjon.jms.JmsKonfig;
 
 @ApplicationScoped
 public class KravgrunnlagJmsConsumerKonfig {
