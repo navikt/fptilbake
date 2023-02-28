@@ -41,7 +41,7 @@ public class XmlMottattObserver {
     }
 
     public void observer(@Observes XmlMottattEvent event) {
-        String innhold = event.getMottattXml();
+        String innhold = event.mottattXml();
         Long mottattXmlId = økonomiMottattXmlRepository.lagreMottattXml(innhold);
 
         if (innhold.contains(ROOT_ELEMENT_KRAVGRUNNLAG_XML)) {
