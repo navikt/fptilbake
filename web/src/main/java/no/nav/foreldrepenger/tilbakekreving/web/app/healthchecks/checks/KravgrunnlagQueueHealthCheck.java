@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.app.selftest.checks;
+package no.nav.foreldrepenger.tilbakekreving.web.app.healthchecks.checks;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -30,7 +30,7 @@ public class KravgrunnlagQueueHealthCheck implements LiveAndReadinessAware {
     private boolean isOK() {
         try {
             client.testConnection();
-        } catch (JMSRuntimeException | JMSException e) { // NOSONAR
+        } catch (JMSRuntimeException | JMSException e) { //NOSONAR
             if (LOG.isWarnEnabled()) {
                 LOG.warn("Feil ved Kravgrunnlag meldingskø helsesjekk: {}", client.getConnectionEndpoint());
                 return false;
