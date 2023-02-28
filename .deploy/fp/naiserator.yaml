@@ -14,16 +14,19 @@ spec:
   {{/each}}
   liveness:
     path: /fptilbake/internal/health/isAlive
-    initialDelay: 30
-    timeout: 5
+    initialDelay: 10
     periodSeconds: 10
-    failureThreshold: 27
+    failureThreshold: 20
+    timeout: 3
   readiness:
     path: /fptilbake/internal/health/isReady
-    initialDelay: 30
-    timeout: 5
+    initialDelay: 10
     periodSeconds: 10
-    failureThreshold: 27
+    failureThreshold: 20
+    timeout: 3
+  preStopHook:
+    http:
+      path: /fptilbake/internal/health/preStop
   prometheus:
     enabled: true
     path: /fptilbake/internal/metrics/prometheus

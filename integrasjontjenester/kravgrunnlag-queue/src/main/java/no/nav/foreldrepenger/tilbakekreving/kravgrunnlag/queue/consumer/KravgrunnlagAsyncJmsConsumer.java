@@ -3,36 +3,38 @@ package no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
-import jakarta.jms.JMSException;
-import jakarta.jms.Message;
-import jakarta.jms.TextMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.TextMessage;
 import no.nav.vedtak.felles.integrasjon.jms.ExternalQueueConsumer;
-import no.nav.vedtak.felles.integrasjon.jms.precond.DefaultDatabaseOppePreconditionChecker;
 import no.nav.vedtak.felles.integrasjon.jms.precond.PreconditionChecker;
+import no.nav.vedtak.log.metrics.Controllable;
 
 @ApplicationScoped
-public class KravgrunnlagAsyncJmsConsumer extends ExternalQueueConsumer {
+public class KravgrunnlagAsyncJmsConsumer extends ExternalQueueConsumer implements Controllable {
 
-    private static final Logger logger = LoggerFactory.getLogger(KravgrunnlagAsyncJmsConsumer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KravgrunnlagAsyncJmsConsumer.class);
 
-    private DefaultDatabaseOppePreconditionChecker preconditionChecker;
+    private DatabasePreconditionChecker preconditionChecker;
     private BeanManager beanManager;
 
-    public KravgrunnlagAsyncJmsConsumer() {
+    KravgrunnlagAsyncJmsConsumer() {
         // CDI
     }
 
     @Inject
-    public KravgrunnlagAsyncJmsConsumer(DefaultDatabaseOppePreconditionChecker preconditionChecker,
+    public KravgrunnlagAsyncJmsConsumer(DatabasePreconditionChecker preconditionChecker,
                                         KravgrunnlagJmsConsumerKonfig konfig,
                                         BeanManager beanManager) {
         super(konfig.getJmsKonfig());
         super.setConnectionFactory(konfig.getMqConnectionFactory());
         super.setQueue(konfig.getMqQueue());
+        super.setToggleJms(new FellesJmsToggle());
+        super.setMdcHandler(new QueueMdcLogHandler());
         this.preconditionChecker = preconditionChecker;
         this.beanManager = beanManager;
     }
@@ -44,20 +46,40 @@ public class KravgrunnlagAsyncJmsConsumer extends ExternalQueueConsumer {
 
     @Override
     public void handle(Message message) throws JMSException {
-        logger.info("Mottok en melding over MQ av type {}", message.getClass().getName());
-        if (message instanceof TextMessage) {
-            håndterMelding((TextMessage) message);
-        } else {
-            logger.warn(String.format("FPT-832935: Mottok på ikke støttet message av klasse %s. Kø-elementet ble ignorert", message.getClass().getName()));
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Mottok en melding over MQ av type {}", message.getClass().getName());
+        }
+
+        if (message instanceof TextMessage tm) {
+            håndterMelding(tm.getText());
+        } else if (LOGGER.isWarnEnabled()) {
+            LOGGER.warn("FPT-832935: Mottok en ikke støttet melding av klasse {}. Kø-elementet ble ignorert.", message.getClass().getName());
         }
     }
 
-    private void håndterMelding(TextMessage message) throws JMSException {
-        /**
-         * håndterer ved å sende videre som Event, for å unngå sirkulær avhengighet
-         */
-        String meldingsinnhold = message.getText();
-        XmlMottattEvent event = new XmlMottattEvent(meldingsinnhold);
+    /**
+     * håndterer ved å sende videre som Event, for å unngå sirkulær avhengighet
+     */
+    private void håndterMelding(String message) {
+        XmlMottattEvent event = new XmlMottattEvent(message);
         beanManager.fireEvent(event);
+    }
+
+    @Override
+    public void start() {
+        if (!isDisabled()) {
+            LOGGER.debug("Starter {}", KravgrunnlagAsyncJmsConsumer.class.getSimpleName());
+            super.start();
+            LOGGER.info("Startet: {}", KravgrunnlagAsyncJmsConsumer.class.getSimpleName());
+        }
+    }
+
+    @Override
+    public void stop() {
+        if (!isDisabled()) {
+            LOGGER.debug("Stoping {}", KravgrunnlagAsyncJmsConsumer.class.getSimpleName());
+            super.stop();
+            LOGGER.info("Stoppet: {}", KravgrunnlagAsyncJmsConsumer.class.getSimpleName());
+        }
     }
 }

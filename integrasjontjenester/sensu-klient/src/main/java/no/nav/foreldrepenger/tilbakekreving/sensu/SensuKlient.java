@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -20,11 +21,11 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
-import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.log.mdc.MDCOperations;
+import no.nav.vedtak.log.metrics.Controllable;
 
 @ApplicationScoped
-public class SensuKlient implements AppServiceHandler {
+public class SensuKlient implements Controllable {
 
     private static final Logger LOG = LoggerFactory.getLogger(SensuKlient.class);
     private static ExecutorService executorService;
@@ -140,7 +141,11 @@ public class SensuKlient implements AppServiceHandler {
         if (Environment.current().isLocal()) {
             LOG.info("Kjører lokalt, kobler ikke opp mot sensu-server.");
         } else {
-            startService();
+            if (Objects.equals(Environment.current().getProperty("app.name"), "k9-tilbake")) {
+                startService();
+            } else {
+                LOG.info("Starter ikke sensu klient");
+            }
         }
     }
 

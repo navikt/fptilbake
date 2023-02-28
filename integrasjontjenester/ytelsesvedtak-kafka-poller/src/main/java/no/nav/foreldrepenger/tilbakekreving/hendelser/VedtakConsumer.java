@@ -15,12 +15,12 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
-import no.nav.foreldrepenger.tilbakekreving.felles.KafkaIntegration;
-import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.felles.integrasjon.kafka.KafkaProperties;
+import no.nav.vedtak.log.metrics.Controllable;
+import no.nav.vedtak.log.metrics.LiveAndReadinessAware;
 
 @ApplicationScoped
-public class VedtakConsumer implements AppServiceHandler, KafkaIntegration {
+public class VedtakConsumer implements LiveAndReadinessAware, Controllable {
 
     private static final Logger LOG = LoggerFactory.getLogger(VedtakConsumer.class);
     private KafkaStreams stream;
@@ -64,6 +64,11 @@ public class VedtakConsumer implements AppServiceHandler, KafkaIntegration {
     @Override
     public boolean isAlive() {
         return stream != null && stream.state().isRunningOrRebalancing();
+    }
+
+    @Override
+    public boolean isReady() {
+        return isAlive();
     }
 
     public String getTopic() {
