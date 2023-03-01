@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -29,10 +27,11 @@ public class SensuKlient implements Controllable {
 
     private static final Logger LOG = LoggerFactory.getLogger(SensuKlient.class);
     private static ExecutorService executorService;
-    private final int maxRetrySendSensu = 2;
+    private static final int MAX_RETRY_SEND_SENSU = 2;
     private String sensuHost;
     private int sensuPort;
-    private AtomicBoolean kanKobleTilSensu = new AtomicBoolean(false);
+    private boolean lansert;
+    private final AtomicBoolean kanKobleTilSensu = new AtomicBoolean(false);
 
     SensuKlient() {
         // CDI-proxy
@@ -40,18 +39,20 @@ public class SensuKlient implements Controllable {
 
     @Inject
     public SensuKlient(@KonfigVerdi(value = "sensu.host", defaultVerdi = "sensu.nais") String sensuHost,
-                       @KonfigVerdi(value = "sensu.port", defaultVerdi = "3030") Integer sensuPort) {
+                       @KonfigVerdi(value = "sensu.port", defaultVerdi = "3030") Integer sensuPort,
+                       @KonfigVerdi(value = "toggle.enable.sensu", defaultVerdi = "false") boolean lansert) {
         this.sensuHost = sensuHost;
         this.sensuPort = sensuPort;
+        this.lansert = lansert;
     }
 
     private static String formatForException(String json, int antallEvents) {
         if (antallEvents > 1) {
             int maxSubstrLen = 1000;
             String substr = json.substring(0, Math.min(json.length(), maxSubstrLen)) + "....";
-            return String.format("events[%s]: ", antallEvents, substr);
+            return String.format("events[%s]: %s", antallEvents, substr);
         } else {
-            return String.format("events[%s]: ", antallEvents, json);
+            return String.format("events[%s]: %s", antallEvents, json);
         }
     }
 
@@ -79,21 +80,19 @@ public class SensuKlient implements Controllable {
             final String json = sensuRequest.toJson();
             final String jsonForEx = formatForException(json, sensuRequest.getAntallEvents());
             executorService.execute(() -> {
-                long startTs = System.nanoTime();
+                //long startTs = System.nanoTime(); //NOSONAR
                 try {
-                    int rounds = maxRetrySendSensu; // prøver par ganger hvis broken pipe, uten å logge første gang
+                    int rounds = MAX_RETRY_SEND_SENSU; // prøver par ganger hvis broken pipe, uten å logge første gang
                     while (rounds > 0 && kanKobleTilSensu.get() && !Thread.currentThread().isInterrupted()) {
                         rounds--;
                         // sensu har en ping/pong/heartbeat protokol, men støtter ikke det p.t., så
                         // åpner ny socket/outputstream for hver melding
-                        try (Socket socket = establishSocketConnectionIfNeeded()) {
+                        try (var socket = new Socket()) {
+                            establishSocketConnectionIfNeeded(socket);
                             try (OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8)) {
                                 writer.write(json, 0, json.length());
                                 writer.flush();
                             }
-                        } catch (UnknownHostException ex) {
-                            sjekkBroken(callId, jsonForEx, ex);
-                            break;
                         } catch (IOException ex) {
                             // ink. SocketException
                             if (rounds <= 0) {
@@ -111,8 +110,8 @@ public class SensuKlient implements Controllable {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 } finally {
-                    long tidBrukt = System.nanoTime() - startTs;
-                    // Enable ved behov LOG.debug("Ferdig med logging av metrikker for callId {}. Tid brukt: {}ms", callId, TimeUnit.NANOSECONDS.toMillis(tidBrukt));
+                    // long tidBrukt = System.nanoTime() - startTs; //NOSONAR
+                    // Enable ved behov LOG.debug("Ferdig med logging av metrikker for callId {}. Tid brukt: {}ms", callId, TimeUnit.NANOSECONDS.toMillis(tidBrukt)); //NOSONAR
                 }
             });
         } else {
@@ -124,28 +123,26 @@ public class SensuKlient implements Controllable {
         if (System.getenv("NAIS_CLUSTER_NAME") != null) {
             // broken, skrur av tilkobling så ikke flooder loggen
             kanKobleTilSensu.set(false);
-            LOG.warn("Feil ved tilkobling til metrikkendepunkt. callId[" + callId + "]. Skrur av. Forsøkte melding: " + json, ex);
+            if (LOG.isWarnEnabled()) {
+                LOG.warn(String.format("Feil ved tilkobling til metrikkendepunkt. callId[%s]. Skrur av. Forsøkte melding: %s", callId, json), ex);
+            }
         }
     }
 
-    private synchronized Socket establishSocketConnectionIfNeeded() throws Exception {
-        Socket socket = new Socket();
+    private synchronized void establishSocketConnectionIfNeeded(Socket socket) throws IOException {
         socket.setSoTimeout(60000);
         socket.setReuseAddress(true);
         socket.connect(new InetSocketAddress(sensuHost, sensuPort), 30000);
-        return socket;
     }
 
     @Override
     public synchronized void start() {
         if (Environment.current().isLocal()) {
             LOG.info("Kjører lokalt, kobler ikke opp mot sensu-server.");
+        } else if (!lansert) {
+            LOG.info("Starter ikke sensu klient.");
         } else {
-            if (Objects.equals(Environment.current().getProperty("app.name"), "k9-tilbake")) {
-                startService();
-            } else {
-                LOG.info("Starter ikke sensu klient");
-            }
+            startService();
         }
     }
 

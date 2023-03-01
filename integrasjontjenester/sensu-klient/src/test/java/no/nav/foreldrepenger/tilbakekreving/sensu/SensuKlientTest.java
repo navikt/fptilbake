@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -49,14 +48,14 @@ class SensuKlientTest {
     void init() throws IOException {
         serverSocket = new ServerSocket(0);
         serverSocket.setSoTimeout(1000);
-        sensuKlient = new SensuKlient("localhost", serverSocket.getLocalPort());
+        sensuKlient = new SensuKlient("localhost", serverSocket.getLocalPort(), true);
         sensuKlient.startService();
 
         new Thread(() -> {
             try (Socket socket = serverSocket.accept()) {
                 StringBuilder sb = new StringBuilder();
                 try (Reader reader = new BufferedReader(
-                        new InputStreamReader(socket.getInputStream(), Charset.forName(StandardCharsets.UTF_8.name())))) {
+                        new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))) {
                     int c = 0;
                     while ((c = reader.read()) != -1) {
                         sb.append((char) c);
@@ -67,7 +66,6 @@ class SensuKlientTest {
                 throw new IllegalStateException("Kunne ikke lese fra socket", e);
             }
         }).start();
-
     }
 
     @AfterEach
@@ -86,8 +84,7 @@ class SensuKlientTest {
 
         // Assert
         String resultat = readFromSocket();
-        assertThat(resultat).isNotNull();
-        assertThat(resultat).startsWith(expectedJsonBeforeTimestamp);
+        assertThat(resultat).isNotNull().startsWith(expectedJsonBeforeTimestamp);
     }
 
     private String readFromSocket() throws InterruptedException {
