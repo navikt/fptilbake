@@ -9,8 +9,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vurdering;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 class TilbakekrevingBeregnerVilkår {
@@ -44,7 +42,6 @@ class TilbakekrevingBeregnerVilkår {
 
         return BeregningResultatPeriode.builder()
             .medPeriode(periode)
-            .medErForeldet(false)
             .medRenterProsent(rentesats)
             .medFeilutbetaltBeløp(delresultat.getFeilutbetaltBeløp())
             .medRiktigYtelseBeløp(delresultat.getRiktigYtelseBeløp())
@@ -54,8 +51,6 @@ class TilbakekrevingBeregnerVilkår {
             .medTilbakekrevingBeløpEtterSkatt(nettoBeløp)
             .medSkattBeløp(skattBeløp)
             .medTilbakekrevingBeløp(tilbakekrevingBeløp)
-            .medVurdering(finnVurdering(vilkårVurdering))
-            .medAndelAvBeløp(andel)
             .build();
     }
 
@@ -121,16 +116,6 @@ class TilbakekrevingBeregnerVilkår {
             return aktsomhet.getManueltTilbakekrevesBeløp();
         } else if (godTro != null) {
             return godTro.getBeløpTilbakekreves();
-        }
-        throw new IllegalArgumentException("VVurdering skal peke til GodTro-entiet eller Aktsomhet-entitet");
-    }
-
-    private static Vurdering finnVurdering(VilkårVurderingPeriodeEntitet vurdering) {
-        if (vurdering.getAktsomhet() != null) {
-            return vurdering.getAktsomhet().getAktsomhet();
-        }
-        if (vurdering.getGodTro() != null) {
-            return AnnenVurdering.GOD_TRO;
         }
         throw new IllegalArgumentException("VVurdering skal peke til GodTro-entiet eller Aktsomhet-entitet");
     }

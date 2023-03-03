@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -142,10 +143,8 @@ public class FatteVedtakStegTest {
     }
 
     private BeregningResultat lagBeregningResultat() {
-        BeregningResultat beregningResultat = new BeregningResultat();
         BeregningResultatPeriode periode = BeregningResultatPeriode.builder()
             .medPeriode(Periode.of(LocalDate.now(), LocalDate.now()))
-            .medErForeldet(false)
             .medTilbakekrevingBeløp(BigDecimal.valueOf(5000))
             .medTilbakekrevingBeløpUtenRenter(BigDecimal.valueOf(5000))
             .medTilbakekrevingBeløpEtterSkatt(BigDecimal.valueOf(5000))
@@ -155,9 +154,7 @@ public class FatteVedtakStegTest {
             .medUtbetaltYtelseBeløp(BigDecimal.valueOf(7000))
             .medRiktigYtelseBeløp(BigDecimal.ZERO)
             .build();
-        beregningResultat.setVedtakResultatType(VedtakResultatType.DELVIS_TILBAKEBETALING);
-        beregningResultat.setBeregningResultatPerioder(Lists.newArrayList(periode));
 
-        return beregningResultat;
+        return new BeregningResultat(VedtakResultatType.DELVIS_TILBAKEBETALING, List.of(periode));
     }
 }

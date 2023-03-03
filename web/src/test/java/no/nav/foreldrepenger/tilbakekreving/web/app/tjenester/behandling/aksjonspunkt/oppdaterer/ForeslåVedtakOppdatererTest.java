@@ -40,6 +40,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
@@ -76,7 +77,7 @@ public class ForeslåVedtakOppdatererTest {
         foreslåVedtakOppdaterer = new ForeslåVedtakOppdaterer(foreslåVedtakTjeneste, totrinnTjenesteMock, behandlingskontrollTjeneste, vedtaksbrevFritekstTjeneste);
 
         when(historikkTjenesteAdapterMock.tekstBuilder()).thenReturn(new HistorikkInnslagTekstBuilder());
-        when(beregningsresultatTjenesteMock.finnEllerBeregn(anyLong())).thenReturn(new BeregningResultat());
+        when(beregningsresultatTjenesteMock.finnEllerBeregn(anyLong())).thenReturn(new BeregningResultat(VedtakResultatType.FULL_TILBAKEBETALING, List.of()));
         when(faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(anyLong())).thenReturn(Optional.of(new FaktaFeilutbetaling()));
     }
 

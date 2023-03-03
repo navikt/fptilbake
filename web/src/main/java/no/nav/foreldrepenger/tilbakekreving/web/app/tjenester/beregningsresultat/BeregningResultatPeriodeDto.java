@@ -1,38 +1,50 @@
-package no.nav.foreldrepenger.tilbakekreving.behandling.beregning;
+package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.beregningsresultat;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vurdering;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-public class BeregningResultatPeriode {
+public class BeregningResultatPeriodeDto {
 
     private Periode periode;
+    private boolean erForeldet;
     private BigDecimal tilbakekrevingBeløp;
     private BigDecimal tilbakekrevingBeløpEtterSkatt;
     private BigDecimal tilbakekrevingBeløpUtenRenter;
     private BigDecimal renterProsent;
     private BigDecimal renteBeløp;
     private BigDecimal skattBeløp;
-    private BigDecimal feilutbetaltBeløp; //lagre pga ikke-triviell utledning fra kravgrunnlag når delvis overlapp mot kravgrunnlagperioder
+    private BigDecimal feilutbetaltBeløp;
     private BigDecimal utbetaltYtelseBeløp; //rått beløp, ikke justert for evt. trekk
     private BigDecimal riktigYtelseBeløp; //rått beløp, ikke justert for evt. trekk
-
-    private BeregningResultatPeriode() {
-    }
+    private Vurdering vurdering;
+    private BigDecimal andelAvBeløp;
 
     public static Builder builder() {
         return new Builder();
     }
 
+    private BeregningResultatPeriodeDto() {
+    }
+
     public static class Builder {
-        private BeregningResultatPeriode kladd = new BeregningResultatPeriode();
+        private BeregningResultatPeriodeDto kladd = new BeregningResultatPeriodeDto();
+        private Boolean erForeldet;
 
         private Builder() {
         }
 
         public Builder medPeriode(Periode periode) {
             kladd.periode = periode;
+            return this;
+        }
+
+
+        public Builder medErForeldet(boolean erForeldet) {
+            kladd.erForeldet = erForeldet;
+            this.erForeldet = erForeldet;
             return this;
         }
 
@@ -81,7 +93,17 @@ public class BeregningResultatPeriode {
             return this;
         }
 
-        public BeregningResultatPeriode build() {
+        public Builder medVurdering(Vurdering vurdering) {
+            kladd.vurdering = vurdering;
+            return this;
+        }
+
+        public Builder medAndelAvBeløp(BigDecimal andelAvBeløp) {
+            kladd.andelAvBeløp = andelAvBeløp;
+            return this;
+        }
+
+        public BeregningResultatPeriodeDto build() {
             Objects.requireNonNull(kladd.periode, "periode");
             Objects.requireNonNull(kladd.tilbakekrevingBeløp, "tilbakekrevingBeløp");
             Objects.requireNonNull(kladd.tilbakekrevingBeløpEtterSkatt, "tilbakekrevingBeløpEtterSkatt");
@@ -91,12 +113,18 @@ public class BeregningResultatPeriode {
             Objects.requireNonNull(kladd.skattBeløp, "skattBeløp");
             Objects.requireNonNull(kladd.utbetaltYtelseBeløp, "utbetaltYtelseBeløp");
             Objects.requireNonNull(kladd.riktigYtelseBeløp, "riktigYtelseBeløp");
+            Objects.requireNonNull(kladd.vurdering, "vurdering");
+            Objects.requireNonNull(this.erForeldet, "erForeldet");
             return kladd;
         }
     }
 
     public Periode getPeriode() {
         return periode;
+    }
+
+    public boolean erForeldet() {
+        return erForeldet;
     }
 
     public BigDecimal getTilbakekrevingBeløp() {
@@ -135,10 +163,18 @@ public class BeregningResultatPeriode {
         return riktigYtelseBeløp;
     }
 
+    public Vurdering getVurdering() {
+        return vurdering;
+    }
+
+    public BigDecimal getAndelAvBeløp() {
+        return andelAvBeløp;
+    }
+
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof BeregningResultatPeriode annen) {
+        if (o instanceof BeregningResultatPeriodeDto annen) {
             return Objects.equals(periode, annen.periode);
         }
         return false;

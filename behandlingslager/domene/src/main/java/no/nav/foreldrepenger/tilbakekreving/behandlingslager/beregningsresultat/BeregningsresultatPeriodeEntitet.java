@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,7 +14,6 @@ import javax.persistence.Table;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseCreateableEntitet;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 @Entity(name = "BeregningsresultatPeriode")
 @Table(name = "BEREGNINGSRESULTAT_PERIODE")
@@ -26,14 +24,8 @@ public class BeregningsresultatPeriodeEntitet  extends BaseCreateableEntitet {
     private Long id;
 
     private Periode periode;
-
-    @Convert(converter = BooleanToStringConverter.class)
-    @Column(name = "er_foreldet", nullable = false, updatable = false)
-    private boolean erForeldet;
-
     @Column(name = "tilbakekreving_beloep")
     private BigDecimal tilbakekrevingBeløp;
-
     @Column(name = "tilbakekreving_beloep_u_skatt")
     private BigDecimal tilbakekrevingBeløpEtterSkatt;
     @Column(name = "tilbakekreving_beloep_u_rente")
@@ -60,10 +52,6 @@ public class BeregningsresultatPeriodeEntitet  extends BaseCreateableEntitet {
 
     public Periode getPeriode() {
         return periode;
-    }
-
-    public boolean erForeldet() {
-        return erForeldet;
     }
 
     public BigDecimal getTilbakekrevingBeløp() {
@@ -111,8 +99,7 @@ public class BeregningsresultatPeriodeEntitet  extends BaseCreateableEntitet {
             return false;
         }
         BeregningsresultatPeriodeEntitet that = (BeregningsresultatPeriodeEntitet) o;
-        return erForeldet == that.erForeldet
-            && Objects.equals(periode, that.periode)
+        return Objects.equals(periode, that.periode)
             && Objects.equals(tilbakekrevingBeløp, that.tilbakekrevingBeløp)
             && Objects.equals(tilbakekrevingBeløpEtterSkatt, that.tilbakekrevingBeløpEtterSkatt)
             && Objects.equals(tilbakekrevingBeløpUtenRenter, that.tilbakekrevingBeløpUtenRenter)
@@ -126,7 +113,7 @@ public class BeregningsresultatPeriodeEntitet  extends BaseCreateableEntitet {
 
     @Override
     public int hashCode() {
-        return Objects.hash(periode, erForeldet, tilbakekrevingBeløp, tilbakekrevingBeløpEtterSkatt, tilbakekrevingBeløpUtenRenter, renterProsent, renteBeløp, skattBeløp, feilutbetaltBeløp, utbetaltYtelseBeløp, riktigYtelseBeløp);
+        return Objects.hash(periode, tilbakekrevingBeløp, tilbakekrevingBeløpEtterSkatt, tilbakekrevingBeløpUtenRenter, renterProsent, renteBeløp, skattBeløp, feilutbetaltBeløp, utbetaltYtelseBeløp, riktigYtelseBeløp);
     }
 
     @Override
@@ -142,19 +129,11 @@ public class BeregningsresultatPeriodeEntitet  extends BaseCreateableEntitet {
 
     public static class Builder {
         private BeregningsresultatPeriodeEntitet kladd = new BeregningsresultatPeriodeEntitet();
-        private Boolean erForeldet;
-
         private Builder() {
         }
 
         public Builder medPeriode(Periode periode) {
             kladd.periode = periode;
-            return this;
-        }
-
-        public Builder medErForeldet(boolean erForeldet) {
-            kladd.erForeldet = erForeldet;
-            this.erForeldet = erForeldet;
             return this;
         }
 
@@ -214,7 +193,6 @@ public class BeregningsresultatPeriodeEntitet  extends BaseCreateableEntitet {
             validerPåkrevdOgScale(kladd.riktigYtelseBeløp, "riktigYtelseBeløp");
             validerPåkrevdOgScale(kladd.utbetaltYtelseBeløp, "utbetaltYtelseBeløp");
             validerScale(kladd.renterProsent, "renterProsent");
-            Objects.requireNonNull(this.erForeldet, "erForeldet");
             return kladd;
         }
 

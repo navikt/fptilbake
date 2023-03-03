@@ -11,6 +11,8 @@ import javax.inject.Inject;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
@@ -21,6 +23,7 @@ public class TilbakekrevingsvedtakTjeneste {
     private KravgrunnlagRepository kravgrunnlagRepository;
     private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private TilbakekrevingVedtakPeriodeBeregner vedtakPeriodeBeregner;
+    private VurdertForeldelseRepository vurdertForeldelseRepository;
 
     TilbakekrevingsvedtakTjeneste() {
         // for CDI
@@ -29,25 +32,31 @@ public class TilbakekrevingsvedtakTjeneste {
     @Inject
     public TilbakekrevingsvedtakTjeneste(KravgrunnlagRepository kravgrunnlagRepository,
                                          BeregningsresultatTjeneste beregningsresultatTjeneste,
-                                         TilbakekrevingVedtakPeriodeBeregner vedtakPeriodeBeregner) {
+                                         TilbakekrevingVedtakPeriodeBeregner vedtakPeriodeBeregner,
+                                         VurdertForeldelseRepository vurdertForeldelseRepository) {
         this.kravgrunnlagRepository = kravgrunnlagRepository;
         this.beregningsresultatTjeneste = beregningsresultatTjeneste;
         this.vedtakPeriodeBeregner = vedtakPeriodeBeregner;
+        this.vurdertForeldelseRepository = vurdertForeldelseRepository;
     }
 
     @Deprecated
     public TilbakekrevingsvedtakDto lagTilbakekrevingsvedtak(Long behandlingId) {
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
+        VurdertForeldelse vurdertForeldelse = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
         BeregningResultat beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
-        List<TilbakekrevingPeriode> tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, beregningResultat);
+        List<TilbakekrevingPeriode> tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, vurdertForeldelse,
+            beregningResultat);
         validerSkattBeløp(tilbakekrevingPerioder);
         return TilbakekrevingsvedtakMapper.tilDto(kravgrunnlag, tilbakekrevingPerioder);
     }
 
     public TilbakekrevingVedtakDTO lagTilbakekrevingsvedtakDTOFpwsproxy(Long behandlingId) {
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
+        VurdertForeldelse vurdertForeldelse = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
         BeregningResultat beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
-        List<TilbakekrevingPeriode> tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, beregningResultat);
+        List<TilbakekrevingPeriode> tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, vurdertForeldelse,
+            beregningResultat);
         validerSkattBeløp(tilbakekrevingPerioder);
         return TilbakekrevingsvedtakMapperFpwsproxy.tilDto(kravgrunnlag, tilbakekrevingPerioder);
     }
@@ -61,7 +70,9 @@ public class TilbakekrevingsvedtakTjeneste {
             .collect(Collectors.toSet());
 
         if (!klassekoderSomFeilaktigHarSkattebeløp.isEmpty()) {
-            throw new IllegalStateException("Skattebeløp for ikke skattepliktige ytelser skal være 0, men var ikke dette for posteringer med klassekode " + klassekoderSomFeilaktigHarSkattebeløp);
+            throw new IllegalStateException(
+                "Skattebeløp for ikke skattepliktige ytelser skal være 0, men var ikke dette for posteringer med klassekode "
+                    + klassekoderSomFeilaktigHarSkattebeløp);
         }
     }
 }
