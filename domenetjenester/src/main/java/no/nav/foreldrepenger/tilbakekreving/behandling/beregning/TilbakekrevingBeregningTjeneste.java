@@ -25,6 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
@@ -160,6 +161,7 @@ public class TilbakekrevingBeregningTjeneste {
             .medErForeldet(true)
             .medFeilutbetaltBeløp(delresultat.getFeilutbetaltBeløp())
             .medRiktigYtelseBeløp(delresultat.getRiktigYtelseBeløp())
+            .medVurdering(AnnenVurdering.FORELDET)
             .medUtbetaltYtelseBeløp(delresultat.getUtbetaltYtelseBeløp())
             .medTilbakekrevingBeløp(BigDecimal.ZERO)
             .medTilbakekrevingBeløpUtenRenter(BigDecimal.ZERO)

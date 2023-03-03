@@ -9,11 +9,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vurdering;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 class TilbakekrevingBeregnerVilkår {
     private static final BigDecimal _100_PROSENT = BigDecimal.valueOf(100);
-
     private static final BigDecimal RENTESATS = BigDecimal.valueOf(10);
     private static final BigDecimal RENTEFAKTOR = RENTESATS.divide(_100_PROSENT, 2, RoundingMode.UNNECESSARY);
 
@@ -53,6 +54,8 @@ class TilbakekrevingBeregnerVilkår {
             .medTilbakekrevingBeløpEtterSkatt(nettoBeløp)
             .medSkattBeløp(skattBeløp)
             .medTilbakekrevingBeløp(tilbakekrevingBeløp)
+            .medVurdering(finnVurdering(vilkårVurdering))
+            .medAndelAvBeløp(andel)
             .build();
     }
 
@@ -122,5 +125,14 @@ class TilbakekrevingBeregnerVilkår {
         throw new IllegalArgumentException("VVurdering skal peke til GodTro-entiet eller Aktsomhet-entitet");
     }
 
+    private static Vurdering finnVurdering(VilkårVurderingPeriodeEntitet vurdering) {
+        if (vurdering.getAktsomhet() != null) {
+            return vurdering.getAktsomhet().getAktsomhet();
+        }
+        if (vurdering.getGodTro() != null) {
+            return AnnenVurdering.GOD_TRO;
+        }
+        throw new IllegalArgumentException("VVurdering skal peke til GodTro-entiet eller Aktsomhet-entitet");
+    }
 
 }
