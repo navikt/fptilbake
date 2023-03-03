@@ -114,7 +114,7 @@ public class BeregningResultatPeriode {
             Objects.requireNonNull(kladd.skattBeløp, "skattBeløp");
             Objects.requireNonNull(kladd.utbetaltYtelseBeløp, "utbetaltYtelseBeløp");
             Objects.requireNonNull(kladd.riktigYtelseBeløp, "riktigYtelseBeløp");
-            Objects.requireNonNull(kladd.vurdering, "vurdering");
+            //Objects.requireNonNull(kladd.vurdering, "vurdering");
             Objects.requireNonNull(this.erForeldet, "erForeldet");
             return kladd;
         }
