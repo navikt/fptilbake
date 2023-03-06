@@ -32,8 +32,7 @@ public class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void lagHistorikkInnslagForForeslåVedtak() {
-        BeregningResultat beregningResultat = new BeregningResultat();
-        beregningResultat.setVedtakResultatType(VedtakResultatType.FULL_TILBAKEBETALING);
+        BeregningResultat beregningResultat = new BeregningResultat(VedtakResultatType.FULL_TILBAKEBETALING, List.of());
         when(beregningsresultatTjeneste.finnEllerBeregn(internBehandlingId)).thenReturn(beregningResultat);
 
         foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(internBehandlingId);

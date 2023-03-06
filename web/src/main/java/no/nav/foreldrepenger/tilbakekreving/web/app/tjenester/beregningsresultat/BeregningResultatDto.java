@@ -1,18 +1,19 @@
-package no.nav.foreldrepenger.tilbakekreving.behandling.beregning;
+package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.beregningsresultat;
 
 import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 
-public class BeregningResultat {
+public class BeregningResultatDto {
     private VedtakResultatType vedtakResultatType;
-    private List<BeregningResultatPeriode> beregningResultatPerioder;
-    public BeregningResultat(VedtakResultatType vedtakResultatType, List<BeregningResultatPeriode> beregningResultatPerioder) {
+    private List<BeregningResultatPeriodeDto> beregningResultatPerioder;
+
+    public BeregningResultatDto(VedtakResultatType vedtakResultatType, List<BeregningResultatPeriodeDto> beregningResultatPerioder) {
         this.vedtakResultatType = vedtakResultatType;
         this.beregningResultatPerioder = beregningResultatPerioder;
     }
 
-    public List<BeregningResultatPeriode> getBeregningResultatPerioder() {
+    public List<BeregningResultatPeriodeDto> getBeregningResultatPerioder() {
         return beregningResultatPerioder;
     }
 

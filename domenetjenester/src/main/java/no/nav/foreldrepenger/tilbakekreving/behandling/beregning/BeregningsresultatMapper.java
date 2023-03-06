@@ -1,18 +1,20 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.beregning;
 
+import java.util.List;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatPeriodeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 
 class BeregningsresultatMapper {
     private BeregningsresultatMapper() {
     }
 
     public static BeregningResultat map(BeregningsresultatEntitet entitet) {
-        BeregningResultat resultat = new BeregningResultat();
-        resultat.setVedtakResultatType(entitet.getVedtakResultatType());
-        resultat.setBeregningResultatPerioder(entitet.getPerioder().stream().map(BeregningsresultatMapper::map).toList());
-        return resultat;
+        VedtakResultatType vedtakResultatType = entitet.getVedtakResultatType();
+        List<BeregningResultatPeriode> perioder = entitet.getPerioder().stream().map(BeregningsresultatMapper::map).toList();
+        return new BeregningResultat(vedtakResultatType, perioder);
     }
 
     public static BeregningResultatPeriode map(BeregningsresultatPeriodeEntitet periode) {
@@ -21,7 +23,6 @@ class BeregningsresultatMapper {
             .medTilbakekrevingBeløp(periode.getTilbakekrevingBeløp())
             .medTilbakekrevingBeløpUtenRenter(periode.getTilbakekrevingBeløpUtenRenter())
             .medTilbakekrevingBeløpEtterSkatt(periode.getTilbakekrevingBeløpEtterSkatt())
-            .medErForeldet(periode.erForeldet())
             .medSkattBeløp(periode.getSkattBeløp())
             .medRenteBeløp(periode.getRenteBeløp())
             .medRenterProsent(periode.getRenterProsent())
@@ -44,7 +45,6 @@ class BeregningsresultatMapper {
             .medTilbakekrevingBeløp(periode.getTilbakekrevingBeløp())
             .medTilbakekrevingBeløpUtenRenter(periode.getTilbakekrevingBeløpUtenRenter())
             .medTilbakekrevingBeløpEtterSkatt(periode.getTilbakekrevingBeløpEtterSkatt())
-            .medErForeldet(periode.erForeldet())
             .medSkattBeløp(periode.getSkattBeløp())
             .medRenteBeløp(periode.getRenteBeløp())
             .medRenterProsent(periode.getRenterProsent())
