@@ -17,7 +17,7 @@ import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 import no.nav.vedtak.sikkerhet.abac.pipdata.AbacPipDto;
 
 @Dependent
-@RestClientConfig(tokenConfig = TokenFlow.STS_CC, application = FpApplication.FPSAK)
+@RestClientConfig(tokenConfig = TokenFlow.ADAPTIVE, application = FpApplication.FPSAK)
 public class FpsakPipKlient {
 
     private static final String PIP_PATH = "/api/pip";
