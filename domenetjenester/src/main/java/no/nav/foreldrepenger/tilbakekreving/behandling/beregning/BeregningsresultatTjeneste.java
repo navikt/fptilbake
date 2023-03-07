@@ -1,26 +1,22 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.beregning;
 
-import java.util.Optional;
-
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatEntitet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatRepository;
-import no.nav.foreldrepenger.tilbakekreving.sensu.SensuKlient;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatRepository;
 
 @Dependent
 public class BeregningsresultatTjeneste {
 
     private static final Logger LOG = LoggerFactory.getLogger(BeregningsresultatTjeneste.class);
 
-    private TilbakekrevingBeregningTjeneste beregningTjeneste;
-    private BeregningsresultatRepository beregningsresultatRepository;
-    private boolean lansertLagring;
+    private final TilbakekrevingBeregningTjeneste beregningTjeneste;
+    private final BeregningsresultatRepository beregningsresultatRepository;
+    private final boolean lansertLagring;
 
     @Inject
     public BeregningsresultatTjeneste(TilbakekrevingBeregningTjeneste beregningTjeneste,
@@ -33,9 +29,9 @@ public class BeregningsresultatTjeneste {
 
     public BeregningResultat finnEllerBeregn(Long behandlingId) {
         if (lansertLagring) {
-            Optional<BeregningsresultatEntitet> lagretResultat = beregningsresultatRepository.hentHvisEksisterer(behandlingId);
+            var lagretResultat = beregningsresultatRepository.hentHvisEksisterer(behandlingId);
             if (lagretResultat.isPresent()) {
-                LOG.info("BEREGNING-REST: Finner lagret beregningsgrunnlag.");
+                LOG.info("TBK-BEREGNING: Fant lagret beregningsgrunnlag.");
                 return BeregningsresultatMapper.map(lagretResultat.get());
             }
         }
@@ -44,7 +40,7 @@ public class BeregningsresultatTjeneste {
 
     public void beregnOgLagre(Long behandlingId) {
         if (lansertLagring) {
-            BeregningResultat beregnet = beregningTjeneste.beregn(behandlingId);
+            var beregnet = beregningTjeneste.beregn(behandlingId);
             beregningsresultatRepository.lagre(behandlingId, BeregningsresultatMapper.map(beregnet));
         }
     }
