@@ -93,12 +93,12 @@ public class TilbakekrevingResultatV2RestTjeneste {
                                      VurdertForeldelse vurdertForeldelse,
                                      VilkårVurderingEntitet vilkårVurdering) {
         return new BeregningResultatDto(beregningsresultat.getVedtakResultatType(),
-            mapf(beregningsresultat.getBeregningResultatPerioder(), vurdertForeldelse, vilkårVurdering));
+            mapPerioder(beregningsresultat.getBeregningResultatPerioder(), vurdertForeldelse, vilkårVurdering));
     }
 
-    private List<BeregningResultatPeriodeDto> mapf(List<BeregningResultatPeriode> beregningResultatPerioder,
-                                                   VurdertForeldelse vurdertForeldelse,
-                                                   VilkårVurderingEntitet vilkårVurdering) {
+    private List<BeregningResultatPeriodeDto> mapPerioder(List<BeregningResultatPeriode> beregningResultatPerioder,
+                                                          VurdertForeldelse vurdertForeldelse,
+                                                          VilkårVurderingEntitet vilkårVurdering) {
 
         return beregningResultatPerioder.stream().map(p -> map(p, vurdertForeldelse, vilkårVurdering)).toList();
     }
