@@ -13,17 +13,17 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class RestApiInputValideringAnnoteringTest extends RestApiTester {
+class RestApiInputValideringAnnoteringTest extends RestApiTester {
 
     private Function<Method, String> printKlasseOgMetodeNavn = (method -> String.format("%s.%s", method.getDeclaringClass(), method.getName()));
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         System.setProperty("app.name", "fptilbake");
     }
 
     @AfterEach
-    public void cleanup() {
+    void cleanup() {
         System.clearProperty("app.name");
     }
 
@@ -33,8 +33,8 @@ public class RestApiInputValideringAnnoteringTest extends RestApiTester {
      * Kontakt Team Humle hvis du trenger hjelp til å endre koden din slik at den går igjennom her
      */
     @Test
-    public void alle_felter_i_objekter_som_brukes_som_inputDTO_skal_enten_ha_valideringsannotering_eller_være_av_godkjent_type() throws Exception {
-        for (Method method : finnAlleRestMetoder()) {
+    void alle_felter_i_objekter_som_brukes_som_inputDTO_skal_enten_ha_valideringsannotering_eller_være_av_godkjent_type() throws Exception {
+        for (var method : finnAlleRestMetoder()) {
             for (int i = 0; i < method.getParameterCount(); i++) {
                 assertThat(method.getParameterTypes()[i].isAssignableFrom(String.class)).as(
                                 "REST-metoder skal ikke har parameter som er String eller mer generelt. Bruk DTO-er og valider. " + printKlasseOgMetodeNavn.apply(method))
@@ -47,12 +47,11 @@ public class RestApiInputValideringAnnoteringTest extends RestApiTester {
     }
 
     private boolean isRequiredAnnotationPresent(Parameter parameter) {
-        final Valid validAnnotation = parameter.getAnnotation(Valid.class);
+        final var validAnnotation = parameter.getAnnotation(Valid.class);
         if (validAnnotation == null) {
-            final Context contextAnnotation = parameter.getAnnotation(Context.class);
+            final var contextAnnotation = parameter.getAnnotation(Context.class);
             return contextAnnotation != null;
         }
         return true;
     }
-
 }

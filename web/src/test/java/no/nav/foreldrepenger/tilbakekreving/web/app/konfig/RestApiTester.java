@@ -19,8 +19,8 @@ public class RestApiTester {
 
     protected static Collection<Method> finnAlleRestMetoder() {
         List<Method> liste = new ArrayList<>();
-        for (Class<?> klasse : finnAlleRestTjenester()) {
-            for (Method method : klasse.getDeclaredMethods()) {
+        for (var klasse : finnAlleRestTjenester()) {
+            for (var method : klasse.getDeclaredMethods()) {
                 if (Modifier.isPublic(method.getModifiers())) {
                     liste.add(method);
                 }
@@ -30,13 +30,7 @@ public class RestApiTester {
     }
 
     static Collection<Class<?>> finnAlleRestTjenester() {
-
-
-        List<Class<?>> klasser = new ArrayList<>();
-
-        klasser.addAll(finnAlleRestTjenester(new ApiConfig()));
-
-        return klasser;
+        return new ArrayList<>(finnAlleRestTjenester(new ApiConfig()));
     }
 
     static Collection<Class<?>> finnAlleRestTjenester(Application config) {
