@@ -10,10 +10,6 @@ import java.util.stream.Collectors;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.beregningsresultat.TilbakekrevingResultatRestTjeneste;
-
-import no.nav.vedtak.exception.TekniskException;
-
 import org.glassfish.jersey.server.ServerProperties;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -36,7 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.Forelde
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.TotrinnskontrollRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.VilkårsvurderingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.AksjonspunktRestTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.beregningsresultat.TilbakekrevingResultatV2RestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.beregningsresultat.TilbakekrevingResultatRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.dokument.DokumentRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.FeilutbetalingSisteBehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.FeilutbetalingÅrsakRestTjeneste;
@@ -52,6 +48,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgru
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 
 @ApplicationPath(ApiConfig.API_URI)
@@ -103,7 +100,6 @@ public class ApiConfig extends Application {
         classes.add(FeilutbetalingÅrsakRestTjeneste.class);
         classes.add(VilkårsvurderingRestTjeneste.class);
         classes.add(TilbakekrevingResultatRestTjeneste.class);
-        classes.add(TilbakekrevingResultatV2RestTjeneste.class);
         classes.add(TotrinnskontrollRestTjeneste.class);
         classes.add(BrevRestTjeneste.class);
         classes.add(FordelRestTjeneste.class);

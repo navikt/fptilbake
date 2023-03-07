@@ -1,23 +1,20 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.beregning;
 
-import java.util.List;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatPeriodeEntitet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 
 class BeregningsresultatMapper {
     private BeregningsresultatMapper() {
     }
 
     public static BeregningResultat map(BeregningsresultatEntitet entitet) {
-        VedtakResultatType vedtakResultatType = entitet.getVedtakResultatType();
-        List<BeregningResultatPeriode> perioder = entitet.getPerioder().stream().map(BeregningsresultatMapper::map).toList();
+        var vedtakResultatType = entitet.getVedtakResultatType();
+        var perioder = entitet.getPerioder().stream().map(BeregningsresultatMapper::map).toList();
         return new BeregningResultat(vedtakResultatType, perioder);
     }
 
-    public static BeregningResultatPeriode map(BeregningsresultatPeriodeEntitet periode) {
+    private static BeregningResultatPeriode map(BeregningsresultatPeriodeEntitet periode) {
         return BeregningResultatPeriode.builder()
             .medPeriode(periode.getPeriode())
             .medTilbakekrevingBeløp(periode.getTilbakekrevingBeløp())
@@ -39,7 +36,7 @@ class BeregningsresultatMapper {
             .build();
     }
 
-    public static BeregningsresultatPeriodeEntitet map(BeregningResultatPeriode periode) {
+    private static BeregningsresultatPeriodeEntitet map(BeregningResultatPeriode periode) {
         return BeregningsresultatPeriodeEntitet.builder()
             .medPeriode(periode.getPeriode())
             .medTilbakekrevingBeløp(periode.getTilbakekrevingBeløp())
@@ -53,6 +50,4 @@ class BeregningsresultatMapper {
             .medUtbetaltYtelseBeløp(periode.getUtbetaltYtelseBeløp())
             .build();
     }
-
-
 }
