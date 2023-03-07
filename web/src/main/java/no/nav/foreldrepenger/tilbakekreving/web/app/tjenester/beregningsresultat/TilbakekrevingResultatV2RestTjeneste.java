@@ -25,7 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
@@ -74,33 +73,32 @@ public class TilbakekrevingResultatV2RestTjeneste {
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     public BeregningResultatDto hentBeregningResultat(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class) @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         var behandlingId = hentBehandlingId(behandlingReferanse);
-        BeregningResultat beregningsresultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
-        VurdertForeldelse vurdertForeldelse = hentVurdertForeldelse(behandlingId);
-        VilkårVurderingEntitet vilkårsvurdering = hentVilkårsvurdering(behandlingId);
+        var beregningsresultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
+        var vurdertForeldelse = hentVurdertForeldelse(behandlingId);
+        var vilkårsvurdering = hentVilkårsvurdering(behandlingId);
         return map(beregningsresultat, vurdertForeldelse, vilkårsvurdering);
     }
 
     private VilkårVurderingEntitet hentVilkårsvurdering(Long behandlingId) {
-        VilkårVurderingEntitet vurderingUtenPerioder = new VilkårVurderingEntitet();
+        var vurderingUtenPerioder = new VilkårVurderingEntitet();
         return vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId).orElse(vurderingUtenPerioder);
     }
 
     private VurdertForeldelse hentVurdertForeldelse(Long behandlingId) {
-        VurdertForeldelse vurderingUtenPerioder = new VurdertForeldelse();
+        var vurderingUtenPerioder = new VurdertForeldelse();
         return vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId).orElse(vurderingUtenPerioder);
     }
 
     private BeregningResultatDto map(BeregningResultat beregningsresultat,
                                      VurdertForeldelse vurdertForeldelse,
                                      VilkårVurderingEntitet vilkårVurdering) {
-        new BeregningResultatDto(beregningsresultat.getVedtakResultatType(),
-            mapf(beregningsresultat.getBeregningResultatPerioder(), vurdertForeldelse, vilkårVurdering));
-        return null;
+        return new BeregningResultatDto(beregningsresultat.getVedtakResultatType(),
+            mapPerioder(beregningsresultat.getBeregningResultatPerioder(), vurdertForeldelse, vilkårVurdering));
     }
 
-    private List<BeregningResultatPeriodeDto> mapf(List<BeregningResultatPeriode> beregningResultatPerioder,
-                                                   VurdertForeldelse vurdertForeldelse,
-                                                   VilkårVurderingEntitet vilkårVurdering) {
+    private List<BeregningResultatPeriodeDto> mapPerioder(List<BeregningResultatPeriode> beregningResultatPerioder,
+                                                          VurdertForeldelse vurdertForeldelse,
+                                                          VilkårVurderingEntitet vilkårVurdering) {
 
         return beregningResultatPerioder.stream().map(p -> map(p, vurdertForeldelse, vilkårVurdering)).toList();
     }
@@ -108,17 +106,17 @@ public class TilbakekrevingResultatV2RestTjeneste {
     private BeregningResultatPeriodeDto map(BeregningResultatPeriode resultatPeriode,
                                             VurdertForeldelse vurdertForeldelse,
                                             VilkårVurderingEntitet vilkårVurderinger) {
-        Periode p = resultatPeriode.getPeriode();
-        VurdertForeldelsePeriode foreldelsevurdering = velgAktuellVurdering(p, vurdertForeldelse.getVurdertForeldelsePerioder(),
+        var p = resultatPeriode.getPeriode();
+        var foreldelsevurdering = velgAktuellVurdering(p, vurdertForeldelse.getVurdertForeldelsePerioder(),
             VurdertForeldelsePeriode::getPeriode);
-        VilkårVurderingPeriodeEntitet vilkårsvurdering = velgAktuellVurdering(p, vilkårVurderinger.getPerioder(),
+        var vilkårsvurdering = velgAktuellVurdering(p, vilkårVurderinger.getPerioder(),
             VilkårVurderingPeriodeEntitet::getPeriode);
 
-        boolean erForeldet = foreldelsevurdering != null && foreldelsevurdering.erForeldet();
+        var erForeldet = foreldelsevurdering != null && foreldelsevurdering.erForeldet();
         valider(vilkårsvurdering, erForeldet);
 
-        BigDecimal andelAvBeløp = erForeldet ? BigDecimal.ZERO : finnAndelAvBeløp(vilkårsvurdering);
-        Vurdering vurdering = erForeldet ? AnnenVurdering.FORELDET : finnVurdering(vilkårsvurdering);
+        var andelAvBeløp = erForeldet ? BigDecimal.ZERO : finnAndelAvBeløp(vilkårsvurdering);
+        var vurdering = erForeldet ? AnnenVurdering.FORELDET : finnVurdering(vilkårsvurdering);
 
         return BeregningResultatPeriodeDto.builder()
             .medPeriode(resultatPeriode.getPeriode())
@@ -152,15 +150,15 @@ public class TilbakekrevingResultatV2RestTjeneste {
     }
 
     private static <T> T velgAktuellVurdering(Periode resultatperiode, Collection<T> vurderinger, Function<T, Periode> vurderingPeriodeFunksjon) {
-        List<T> overlappendeVurderinger = vurderinger.stream().filter(v -> vurderingPeriodeFunksjon.apply(v).overlapper(resultatperiode)).toList();
+        var overlappendeVurderinger = vurderinger.stream().filter(v -> vurderingPeriodeFunksjon.apply(v).overlapper(resultatperiode)).toList();
         if (overlappendeVurderinger.size() > 1) {
             throw new IllegalArgumentException("Forventet 0 eller 1 element, fikk " + overlappendeVurderinger.size());
         }
         if (overlappendeVurderinger.isEmpty()) {
             return null;
         }
-        T overlappendeVilkårsvurdering = overlappendeVurderinger.get(0);
-        Periode vurderingsperiode = vurderingPeriodeFunksjon.apply(overlappendeVilkårsvurdering);
+        var overlappendeVilkårsvurdering = overlappendeVurderinger.get(0);
+        var vurderingsperiode = vurderingPeriodeFunksjon.apply(overlappendeVilkårsvurdering);
         if (vurderingsperiode.equals(resultatperiode)) {
             return overlappendeVilkårsvurdering;
         }
@@ -169,8 +167,8 @@ public class TilbakekrevingResultatV2RestTjeneste {
     }
 
     private static BigDecimal finnAndelAvBeløp(VilkårVurderingPeriodeEntitet vurdering) {
-        VilkårVurderingAktsomhetEntitet aktsomhet = vurdering.getAktsomhet();
-        VilkårVurderingGodTroEntitet godTro = vurdering.getGodTro();
+        var aktsomhet = vurdering.getAktsomhet();
+        var godTro = vurdering.getGodTro();
         if (aktsomhet != null) {
             return finnAndelForAktsomhet(aktsomhet);
         } else if (godTro != null && !godTro.isBeløpErIBehold()) {
@@ -180,9 +178,9 @@ public class TilbakekrevingResultatV2RestTjeneste {
     }
 
     private static BigDecimal finnAndelForAktsomhet(VilkårVurderingAktsomhetEntitet aktsomhet) {
-        var hundre_prosent = BigDecimal.valueOf(100);
+        var hundreProsent = BigDecimal.valueOf(100);
         if (Aktsomhet.FORSETT.equals(aktsomhet.getAktsomhet()) || Boolean.FALSE.equals(aktsomhet.getSærligGrunnerTilReduksjon())) {
-            return hundre_prosent;
+            return hundreProsent;
         }
         return aktsomhet.getProsenterSomTilbakekreves();
     }

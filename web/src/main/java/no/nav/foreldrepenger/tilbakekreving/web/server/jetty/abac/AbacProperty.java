@@ -1,6 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac;
 
 public class AbacProperty {
+
+    private AbacProperty() {
+    }
+
     public static final String APPLIKASJON = "abac.attributt.applikasjon";
     public static final String BATCH = "abac.attributt.batch";
     public static final String DRIFT = "abac.attributt.drift";

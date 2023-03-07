@@ -1,13 +1,15 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk;
 
 import static java.util.Collections.singletonList;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,31 +63,31 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
     private static final AtomicLong FAKE_ID = new AtomicLong(100999L);
     private static final AtomicLong FAKE_SN = new AtomicLong(10099L);
 
-    private ArgumentCaptor<Behandling> behandlingCaptor = ArgumentCaptor.forClass(Behandling.class);
-    private ArgumentCaptor<Fagsak> fagsakCaptor = ArgumentCaptor.forClass(Fagsak.class);
+    private final ArgumentCaptor<Behandling> behandlingCaptor = ArgumentCaptor.forClass(Behandling.class);
+    private final ArgumentCaptor<Fagsak> fagsakCaptor = ArgumentCaptor.forClass(Fagsak.class);
     private Behandling behandling;
-    private Fagsak fagsak;
+    private final Fagsak fagsak;
     private BehandlingStegType startSteg;
 
-    private Long fagsakId = nyId();
-    private Saksnummer eksternSaksnummer = new Saksnummer(String.valueOf(nySN()));
+    private final Long fagsakId = nyId();
+    private final Saksnummer eksternSaksnummer = new Saksnummer(String.valueOf(nySN()));
     private BehandlingRepository mockBehandlingRepository;
     private BehandlingType behandlingType = BehandlingType.TILBAKEKREVING;
     private BehandlingRepositoryProvider repositoryProvider;
-    private Map<AksjonspunktDefinisjon, BehandlingStegType> aksjonspunktDefinisjoner = new HashMap<>();
+    private final Map<AksjonspunktDefinisjon, BehandlingStegType> aksjonspunktDefinisjoner = new EnumMap<>(AksjonspunktDefinisjon.class);
     private Map<Periode, List<KravgrunnlagTestBuilder.KgBeløp>> kravgrunnlag;
     private VilkårVurderingEntitet vilkårsvurdering;
     private BehandlingResultatType behandlingResultatType;
     private LocalDate vedtaksdato;
 
     protected AbstractTestScenario() {
-        AktørId aktørId = new AktørId(nyId());
-        NavBruker bruker = NavBruker.opprettNy(aktørId, Språkkode.nb);
+        var aktørId = new AktørId(nyId());
+        var bruker = NavBruker.opprettNy(aktørId, Språkkode.nb);
         fagsak = lagFagsak(bruker);
     }
 
     protected AbstractTestScenario(AktørId aktørId) {
-        NavBruker bruker = NavBruker.opprettNy(aktørId, Språkkode.nb);
+        var bruker = NavBruker.opprettNy(aktørId, Språkkode.nb);
         fagsak = lagFagsak(bruker);
     }
 
@@ -108,11 +110,9 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
     }
 
     public S medDefaultKravgrunnlag() {
-        Periode april2019 = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
-        return medKravgrunnlag(Map.of(april2019, List.of(
-                KravgrunnlagTestBuilder.KgBeløp.feil(23000),
-                KravgrunnlagTestBuilder.KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(23000).medTilbakekrevBeløp(23000)
-        )));
+        var april2019 = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
+        return medKravgrunnlag(Map.of(april2019, List.of(KravgrunnlagTestBuilder.KgBeløp.feil(23000),
+            KravgrunnlagTestBuilder.KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(23000).medTilbakekrevBeløp(23000))));
     }
 
     public S medKravgrunnlag(Map<Periode, List<KravgrunnlagTestBuilder.KgBeløp>> kravgrunnlag) {
@@ -121,40 +121,36 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
     }
 
     public S medFullInnkreving() {
-        Periode april2019 = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
-        VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
-        VilkårVurderingPeriodeEntitet periode = VilkårVurderingPeriodeEntitet.builder()
-                .medVurderinger(vurdering)
-                .medPeriode(april2019)
-                .medBegrunnelse("foo")
-                .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
-                .build();
-        VilkårVurderingAktsomhetEntitet aktsomhet = VilkårVurderingAktsomhetEntitet.builder()
-                .medPeriode(periode)
-                .medSærligGrunnerTilReduksjon(false)
-                .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
-                .medProsenterSomTilbakekreves(BigDecimal.valueOf(100))
-                .medBegrunnelse("foo")
-                .build();
+        var april2019 = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
+        var vurdering = new VilkårVurderingEntitet();
+        var periode = VilkårVurderingPeriodeEntitet.builder()
+            .medVurderinger(vurdering)
+            .medPeriode(april2019)
+            .medBegrunnelse("foo")
+            .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
+            .build();
+        var aktsomhet = VilkårVurderingAktsomhetEntitet.builder()
+            .medPeriode(periode)
+            .medSærligGrunnerTilReduksjon(false)
+            .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
+            .medProsenterSomTilbakekreves(BigDecimal.valueOf(100))
+            .medBegrunnelse("foo")
+            .build();
         periode.setAktsomhet(aktsomhet);
         vurdering.leggTilPeriode(periode);
         return medVilkårsvurdering(vurdering);
     }
 
     public S medIngenInnkreving() {
-        Periode april2019 = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
-        VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
-        VilkårVurderingPeriodeEntitet periode = VilkårVurderingPeriodeEntitet.builder()
-                .medVurderinger(vurdering)
-                .medPeriode(april2019)
-                .medBegrunnelse("foo")
-                .medVilkårResultat(VilkårResultat.GOD_TRO)
-                .build();
-        VilkårVurderingGodTroEntitet godTro = VilkårVurderingGodTroEntitet.builder()
-                .medPeriode(periode)
-                .medBeløpErIBehold(false)
-                .medBegrunnelse("foo")
-                .build();
+        var april2019 = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
+        var vurdering = new VilkårVurderingEntitet();
+        var periode = VilkårVurderingPeriodeEntitet.builder()
+            .medVurderinger(vurdering)
+            .medPeriode(april2019)
+            .medBegrunnelse("foo")
+            .medVilkårResultat(VilkårResultat.GOD_TRO)
+            .build();
+        var godTro = VilkårVurderingGodTroEntitet.builder().medPeriode(periode).medBeløpErIBehold(false).medBegrunnelse("foo").build();
         periode.setGodTro(godTro);
         vurdering.leggTilPeriode(periode);
         return medVilkårsvurdering(vurdering);
@@ -189,11 +185,11 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
     }
 
     private BehandlingRepository lagBasicMockBehandlingRepository(BehandlingRepositoryProvider repositoryProvider) {
-        BehandlingRepository behandlingRepository = mock(BehandlingRepository.class);
+        var behandlingRepository = mock(BehandlingRepository.class);
 
         when(repositoryProvider.getBehandlingRepository()).thenReturn(behandlingRepository);
 
-        FagsakRepository mockFagsakRepository = mockFagsakRepository();
+        var mockFagsakRepository = mockFagsakRepository();
         when(repositoryProvider.getBehandlingRepository()).thenReturn(behandlingRepository);
         when(repositoryProvider.getFagsakRepository()).thenReturn(mockFagsakRepository);
 
@@ -209,52 +205,42 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
             return mockBehandlingRepository;
         }
         repositoryProvider = mock(BehandlingRepositoryProvider.class);
-        BehandlingRepository behandlingRepository = lagBasicMockBehandlingRepository(repositoryProvider);
+        var behandlingRepository = lagBasicMockBehandlingRepository(repositoryProvider);
 
-        when(behandlingRepository.hentBehandling(Mockito.any(Long.class))).thenAnswer(a -> {
-            return behandling;
-        });
-        when(behandlingRepository.hentSisteBehandlingForFagsakId(Mockito.any(), Mockito.any(BehandlingType.class)))
-                .thenAnswer(a -> Optional.of(behandling));
+        when(behandlingRepository.hentBehandling(any(Long.class))).thenAnswer(a -> behandling);
+        when(behandlingRepository.hentSisteBehandlingForFagsakId(any(), any(BehandlingType.class))).thenAnswer(a -> Optional.of(behandling));
         when(behandlingRepository.taSkriveLås(behandlingCaptor.capture())).thenAnswer((Answer<BehandlingLås>) invocation -> {
             Behandling beh = invocation.getArgument(0);
             return new BehandlingLås(beh.getId()) {
             };
         });
 
-        when(behandlingRepository.lagre(behandlingCaptor.capture(), Mockito.any()))
-                .thenAnswer((Answer<Long>) invocation -> {
-                    Behandling beh = invocation.getArgument(0);
-                    Long id = beh.getId();
-                    if (id == null) {
-                        id = nyId();
-                        behandling.setId(id);
-                    }
+        when(behandlingRepository.lagre(behandlingCaptor.capture(), any())).thenAnswer((Answer<Long>) invocation -> {
+            Behandling beh = invocation.getArgument(0);
+            var id = beh.getId();
+            if (id == null) {
+                id = nyId();
+                behandling.setId(id);
+            }
 
-                    beh.getAksjonspunkter().forEach(punkt -> punkt.setId(nyId()));
+            beh.getAksjonspunkter().forEach(punkt -> punkt.setId(nyId()));
 
-                    return id;
-                });
+            return id;
+        });
 
         mockBehandlingRepository = behandlingRepository;
         return behandlingRepository;
     }
 
-    public BehandlingRepositoryProvider mockBehandlingRepositoryProvider() {
-        mockBehandlingRepository();
-        return repositoryProvider;
-    }
-
-
     public FagsakRepository mockFagsakRepository() {
-        FagsakRepository fagsakRepository = mock(FagsakRepository.class);
-        when(fagsakRepository.finnEksaktFagsak(Mockito.anyLong())).thenAnswer(a -> fagsak);
-        when(fagsakRepository.finnUnikFagsak(Mockito.anyLong())).thenAnswer(a -> Optional.of(fagsak));
-        when(fagsakRepository.hentSakGittSaksnummer(Mockito.any(Saksnummer.class))).thenAnswer(a -> Optional.of(fagsak));
-        when(fagsakRepository.hentForBruker(Mockito.any(AktørId.class))).thenAnswer(a -> singletonList(fagsak));
+        var fagsakRepository = mock(FagsakRepository.class);
+        when(fagsakRepository.finnEksaktFagsak(anyLong())).thenAnswer(a -> fagsak);
+        when(fagsakRepository.finnUnikFagsak(anyLong())).thenAnswer(a -> Optional.of(fagsak));
+        when(fagsakRepository.hentSakGittSaksnummer(any(Saksnummer.class))).thenAnswer(a -> Optional.of(fagsak));
+        when(fagsakRepository.hentForBruker(any(AktørId.class))).thenAnswer(a -> singletonList(fagsak));
         when(fagsakRepository.lagre(fagsakCaptor.capture())).thenAnswer(invocation -> {
             Fagsak fagsak = invocation.getArgument(0); // NOSONAR
-            Long id = fagsak.getId();
+            var id = fagsak.getId();
             if (id == null) {
                 id = fagsakId;
                 fagsak.setId(id);
@@ -264,11 +250,10 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
 
         // oppdater fagsakstatus
         Mockito.doAnswer(invocation -> {
-                    FagsakStatus status = invocation.getArgument(1);
-                    fagsak.setFagsakStatus(status);
-                    return null;
-                }).when(fagsakRepository)
-                .oppdaterFagsakStatus(eq(fagsakId), Mockito.any(FagsakStatus.class));
+            FagsakStatus status = invocation.getArgument(1);
+            fagsak.setFagsakStatus(status);
+            return null;
+        }).when(fagsakRepository).oppdaterFagsakStatus(eq(fagsakId), any(FagsakStatus.class));
 
         return fagsakRepository;
     }
@@ -306,16 +291,16 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
             throw new IllegalStateException("build allerede kalt.  Hent Behandling via getBehandling eller opprett nytt scenario.");
         }
 
-        Behandling.Builder behandlingBuilder = grunnBuild(repositoryProvider);
+        var behandlingBuilder = grunnBuild(repositoryProvider);
 
         this.behandling = behandlingBuilder.build();
 
         if (startSteg != null) {
             InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, startSteg);
         }
-        leggTilAksjonspunkter(behandling, repositoryProvider);
+        leggTilAksjonspunkter(behandling);
 
-        BehandlingLås lås = behandlingRepo.taSkriveLås(behandling);
+        var lås = behandlingRepo.taSkriveLås(behandling);
         behandlingRepo.lagre(behandling, lås);
 
         if (kravgrunnlag != null) {
@@ -325,19 +310,19 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
             repositoryProvider.getVilkårsvurderingRepository().lagre(behandling.getId(), vilkårsvurdering);
         }
         if (behandlingResultatType != null) {
-            Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
-                    .medBehandling(behandling)
-                    .medBehandlingResultatType(behandlingResultatType)
-                    .build();
+            var behandlingsresultat = Behandlingsresultat.builder()
+                .medBehandling(behandling)
+                .medBehandlingResultatType(behandlingResultatType)
+                .build();
             repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
 
             if (vedtaksdato != null) {
-                BehandlingVedtak vedtak = BehandlingVedtak.builder()
-                        .medBehandlingsresultat(behandlingsresultat)
-                        .medVedtaksdato(vedtaksdato)
-                        .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
-                        .medAnsvarligSaksbehandler("Z111111")
-                        .build();
+                var vedtak = BehandlingVedtak.builder()
+                    .medBehandlingsresultat(behandlingsresultat)
+                    .medVedtaksdato(vedtaksdato)
+                    .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
+                    .medAnsvarligSaksbehandler("Z111111")
+                    .build();
                 repositoryProvider.getBehandlingVedtakRepository().lagre(vedtak);
             }
         }
@@ -345,7 +330,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
 
 
     private Behandling.Builder grunnBuild(BehandlingRepositoryProvider repositoryProvider) {
-        FagsakRepository fagsakRepo = repositoryProvider.getFagsakRepository();
+        var fagsakRepo = repositoryProvider.getFagsakRepository();
         lagFagsak(fagsakRepo);
 
         // oppprett og lagre behandling
@@ -374,16 +359,13 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         return behandling;
     }
 
-    private void leggTilAksjonspunkter(Behandling behandling, BehandlingRepositoryProvider repositoryProvider) {
-        aksjonspunktDefinisjoner.forEach(
-                (apDef, stegType) -> {
-                    if (stegType != null) {
-                        AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, apDef, stegType);
-                    } else {
-                        AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, apDef);
-                    }
-                });
+    private void leggTilAksjonspunkter(Behandling behandling) {
+        aksjonspunktDefinisjoner.forEach((apDef, stegType) -> {
+            if (stegType != null) {
+                AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, apDef, stegType);
+            } else {
+                AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, apDef);
+            }
+        });
     }
-
-
 }
