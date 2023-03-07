@@ -8,9 +8,15 @@ import javax.inject.Inject;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatRepository;
+import no.nav.foreldrepenger.tilbakekreving.sensu.SensuKlient;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Dependent
 public class BeregningsresultatTjeneste {
+
+    private static final Logger LOG = LoggerFactory.getLogger(BeregningsresultatTjeneste.class);
 
     private TilbakekrevingBeregningTjeneste beregningTjeneste;
     private BeregningsresultatRepository beregningsresultatRepository;
@@ -29,6 +35,7 @@ public class BeregningsresultatTjeneste {
         if (lansertLagring) {
             Optional<BeregningsresultatEntitet> lagretResultat = beregningsresultatRepository.hentHvisEksisterer(behandlingId);
             if (lagretResultat.isPresent()) {
+                LOG.info("BEREGNING-REST: Finner lagret beregningsgrunnlag.");
                 return BeregningsresultatMapper.map(lagretResultat.get());
             }
         }

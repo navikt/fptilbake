@@ -10,6 +10,10 @@ import java.util.stream.Collectors;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.beregningsresultat.TilbakekrevingResultatRestTjeneste;
+
+import no.nav.vedtak.exception.TekniskException;
+
 import org.glassfish.jersey.server.ServerProperties;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -32,7 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.Forelde
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.TotrinnskontrollRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.VilkårsvurderingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.AksjonspunktRestTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.beregningsresultat.TilbakekrevingResultatRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.beregningsresultat.TilbakekrevingResultatV2RestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.dokument.DokumentRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.FeilutbetalingSisteBehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.FeilutbetalingÅrsakRestTjeneste;
@@ -58,26 +62,25 @@ public class ApiConfig extends Application {
     public static final String API_URI = "/api";
 
     public ApiConfig() {
-        OpenAPI oas = new OpenAPI();
-        Info info = new Info()
+        var oas = new OpenAPI();
+        var info = new Info()
                 .title("Vedtaksløsningen - Tilbakekreving")
                 .version("1.0")
                 .description("REST grensesnitt for tilbakekreving.");
 
         oas.info(info).addServersItem(new Server().url(JettyServer.getContextPath()));
 
-        SwaggerConfiguration oasConfig = new SwaggerConfiguration()
+        var oasConfig = new SwaggerConfiguration()
                 .openAPI(oas)
                 .prettyPrint(true)
                 .resourceClasses(getClasses().stream().map(Class::getName).collect(Collectors.toSet()));
-
         try {
             new GenericOpenApiContextBuilder<>()
                     .openApiConfiguration(oasConfig)
                     .buildContext(true)
                     .read();
         } catch (OpenApiConfigurationException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new TekniskException("OPEN-API", e.getMessage(), e);
         }
     }
 
@@ -100,6 +103,7 @@ public class ApiConfig extends Application {
         classes.add(FeilutbetalingÅrsakRestTjeneste.class);
         classes.add(VilkårsvurderingRestTjeneste.class);
         classes.add(TilbakekrevingResultatRestTjeneste.class);
+        classes.add(TilbakekrevingResultatV2RestTjeneste.class);
         classes.add(TotrinnskontrollRestTjeneste.class);
         classes.add(BrevRestTjeneste.class);
         classes.add(FordelRestTjeneste.class);
