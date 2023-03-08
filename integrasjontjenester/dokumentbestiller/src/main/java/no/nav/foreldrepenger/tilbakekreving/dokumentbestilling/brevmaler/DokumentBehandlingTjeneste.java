@@ -60,7 +60,7 @@ public class DokumentBehandlingTjeneste {
     }
 
     public List<BrevmalDto> hentBrevmalerFor(Long behandlingId) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
         List<DokumentMalType> gyldigBrevMaler = new ArrayList<>();
 
         gyldigBrevMaler.add(DokumentMalType.INNHENT_DOK);
@@ -116,12 +116,12 @@ public class DokumentBehandlingTjeneste {
     }
 
     private void håndteresManueltSendVarsel(Behandling behandling, DokumentMalType malType, String fritekst) {
-        Long behandlingId = behandling.getId();
+        var behandlingId = behandling.getId();
         if (!grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
             throw new TekniskException("FPT-612900", String.format("Kravgrunnlag finnes ikke for behandling=%s, kan ikke sende varsel", behandlingId));
         }
 
-        ProsessTaskData sendVarselbrev = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
+        var sendVarselbrev = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
         sendVarselbrev.setProperty(TaskProperty.MAL_TYPE, malType.getKode());
         sendVarselbrev.setPayload(fritekst);
         sendVarselbrev.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
