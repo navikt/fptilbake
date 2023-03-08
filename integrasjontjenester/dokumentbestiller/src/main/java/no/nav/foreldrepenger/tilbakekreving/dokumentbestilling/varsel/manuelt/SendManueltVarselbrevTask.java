@@ -8,7 +8,6 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -48,11 +47,11 @@ public class SendManueltVarselbrevTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
-        DokumentMalType malType = DokumentMalType.fraKode(prosessTaskData.getPropertyValue(TaskProperty.MAL_TYPE));
-        String friTekst = prosessTaskData.getPayloadAsString();
+        var behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
+        var malType = DokumentMalType.fraKode(prosessTaskData.getPropertyValue(TaskProperty.MAL_TYPE));
+        var friTekst = prosessTaskData.getPayloadAsString();
         // sjekk om behandlingen har verge
-        boolean finnesVerge = vergeRepository.finnesVerge(behandlingId);
+        var finnesVerge = vergeRepository.finnesVerge(behandlingId);
         if (DokumentMalType.VARSEL_DOK.equals(malType)) {
             if (finnesVerge) {
                 manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, friTekst, BrevMottaker.VERGE);
@@ -65,8 +64,8 @@ public class SendManueltVarselbrevTask implements ProsessTaskHandler {
             manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, friTekst, BrevMottaker.BRUKER);
         }
 
-        LocalDateTime fristTid = LocalDateTime.now().plus(ventefrist).plusDays(1);
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        var fristTid = LocalDateTime.now().plus(ventefrist).plusDays(1);
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
         behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
                 fristTid, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
     }
