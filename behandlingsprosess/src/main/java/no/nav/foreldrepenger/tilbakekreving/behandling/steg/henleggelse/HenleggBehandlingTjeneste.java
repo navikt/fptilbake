@@ -112,7 +112,7 @@ public class HenleggBehandlingTjeneste {
     }
 
     private void sendHenleggelsesbrev(Behandling behandling, String fritekst) {
-        ProsessTaskData henleggelseBrevTask = ProsessTaskData.forTaskType(HENLEGGELSESBREV_TASK_TYPE);
+        var henleggelseBrevTask = ProsessTaskData.forTaskType(HENLEGGELSESBREV_TASK_TYPE);
         henleggelseBrevTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         henleggelseBrevTask.setPayload(fritekst);
         henleggelseBrevTask.setCallIdFraEksisterende();
@@ -120,7 +120,7 @@ public class HenleggBehandlingTjeneste {
     }
 
     private void informerSelvbetjening(Behandling behandling) {
-        ProsessTaskData selvbetjeningTask = ProsessTaskData.forTaskType(SELVBETJENING_HENLAGT_TASKTYPE);
+        var selvbetjeningTask = ProsessTaskData.forTaskType(SELVBETJENING_HENLAGT_TASKTYPE);
         selvbetjeningTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         selvbetjeningTask.setCallIdFraEksisterende();
         taskTjeneste.lagre(selvbetjeningTask);
@@ -145,6 +145,5 @@ public class HenleggBehandlingTjeneste {
         } else {
             historikkinnslagTjeneste.opprettHistorikkinnslagForHenleggelse(behandling, HistorikkinnslagType.AVBRUTT_BEH, årsakKode, begrunnelse, HistorikkAktør.SAKSBEHANDLER);
         }
-
     }
 }

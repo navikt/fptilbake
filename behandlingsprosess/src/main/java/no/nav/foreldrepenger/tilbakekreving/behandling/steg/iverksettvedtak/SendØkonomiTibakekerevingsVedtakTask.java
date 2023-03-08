@@ -21,7 +21,6 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlReposito
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
-import no.nav.tilbakekreving.typer.v1.MmelDto;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.jpa.savepoint.RunWithSavepoint;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -34,7 +33,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(SendØkonomiTibakekerevingsVedtakTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SendØkonomiTibakekerevingsVedtakTask.class);
 
     private EntityManager entityManager;
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
@@ -62,23 +61,23 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
     public void doTask(ProsessTaskData prosessTaskData) {
         long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
 
-        TilbakekrevingsvedtakDto tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
-        TilbakekrevingsvedtakRequest request = lagRequest(tilbakekrevingsvedtak);
-        Long sendtXmlId = lagreXml(behandlingId, request);
+        var tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
+        var request = lagRequest(tilbakekrevingsvedtak);
+        var sendtXmlId = lagreXml(behandlingId, request);
         lagSavepointOgIverksett(behandlingId, sendtXmlId, request);
     }
 
     private void lagSavepointOgIverksett(long behandlingId, long sendtXmlId, TilbakekrevingsvedtakRequest tilbakekrevingsvedtak) {
-        RunWithSavepoint runWithSavepoint = new RunWithSavepoint(entityManager);
+        var runWithSavepoint = new RunWithSavepoint(entityManager);
         runWithSavepoint.doWork(() -> {
             //setter før kall til OS, slik at requesten blir lagret selv om kallet feiler
-            TilbakekrevingsvedtakResponse respons = økonomiConsumer.iverksettTilbakekrevingsvedtak(behandlingId, tilbakekrevingsvedtak);
+            var respons = økonomiConsumer.iverksettTilbakekrevingsvedtak(behandlingId, tilbakekrevingsvedtak);
             lagreRespons(behandlingId, sendtXmlId, respons);
-            MmelDto kvittering = respons.getMmel();
+            var kvittering = respons.getMmel();
             if (ØkonomiKvitteringTolk.erKvitteringOK(kvittering)) {
-                logger.info("Tilbakekrevingsvedtak sendt til oppdragsystemet. BehandlingId={} Alvorlighetsgrad='{}' infomelding='{}'", behandlingId, kvittering.getAlvorlighetsgrad(), kvittering.getBeskrMelding());
+                LOG.info("Tilbakekrevingsvedtak sendt til oppdragsystemet. BehandlingId={} Alvorlighetsgrad='{}' infomelding='{}'", behandlingId, kvittering.getAlvorlighetsgrad(), kvittering.getBeskrMelding());
             } else {
-                RunWithSavepoint rwsp = new RunWithSavepoint(entityManager);
+                var rwsp = new RunWithSavepoint(entityManager);
                 rwsp.doWork(() -> {
                     //setter savepoint før feilen kastes, slik at kvitteringen blir lagret. Kaster feil for å feile prosesstasken, samt trigge logging
                     String detaljer = kvittering != null ? ØkonomiConsumerFeil.formaterKvittering(kvittering) : " Fikk ikke kvittering fra OS";
@@ -90,15 +89,15 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
     }
 
     private TilbakekrevingsvedtakRequest lagRequest(TilbakekrevingsvedtakDto tilbakekrevingsvedtak) {
-        TilbakekrevingsvedtakRequest request = new TilbakekrevingsvedtakRequest();
+        var request = new TilbakekrevingsvedtakRequest();
         request.setTilbakekrevingsvedtak(tilbakekrevingsvedtak);
         return request;
     }
 
     private Long lagreXml(Long behandlingId, TilbakekrevingsvedtakRequest request) {
-        String xml = TilbakekrevingsvedtakMarshaller.marshall(behandlingId, request);
-        Long sendtXmlId = økonomiSendtXmlRepository.lagre(behandlingId, xml, MeldingType.VEDTAK);
-        logger.info("lagret vedtak-xml for behandling={}", behandlingId);
+        var xml = TilbakekrevingsvedtakMarshaller.marshall(behandlingId, request);
+        var sendtXmlId = økonomiSendtXmlRepository.lagre(behandlingId, xml, MeldingType.VEDTAK);
+        LOG.info("lagret vedtak-xml for behandling={}", behandlingId);
         sammenlignGenerertXMLRequestMedGenererertXMLRequestFraFpwsproxyFailSafe(xml, behandlingId);
         return sendtXmlId;
     }
@@ -108,15 +107,15 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
             var tilbakekrevingsvedtakDto = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtakDTOFpwsproxy(behandlingId);
             var tilbakekrevingVedtakDTO = økonomiProxyKlient.hentIverksettVedtakRequestXMLStrengForSammenligning(tilbakekrevingsvedtakDto);
             if (!erLik(xml, tilbakekrevingVedtakDTO.requestXml())) {
-                logger.info("""
+                LOG.info("""
                     Avvik funnet mellom request XML generert av fptilbake og fpwsproxy!
                     Orginal XML: {}
                     Fpwsproxy XML: {}
                     """, xml, tilbakekrevingVedtakDTO.requestXml());
             }
-            logger.info("Ingen avvik mellom request XML generert av fptilbake og fpwsproxy");
+            LOG.info("Ingen avvik mellom request XML generert av fptilbake og fpwsproxy");
         } catch (Exception e) {
-            logger.info("Noe gikk galt med sammenligning av tilbakekrevingsvedtaks requester", e);
+            LOG.info("Noe gikk galt med sammenligning av tilbakekrevingsvedtaks requester", e);
         }
     }
 
@@ -127,8 +126,8 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
     }
 
     private void lagreRespons(long behandlingId, long sendtXmlId, TilbakekrevingsvedtakResponse respons) {
-        String responsXml = ØkonomiResponsMarshaller.marshall(respons, behandlingId);
+        var responsXml = ØkonomiResponsMarshaller.marshall(respons, behandlingId);
         økonomiSendtXmlRepository.oppdatereKvittering(sendtXmlId, responsXml);
-        logger.info("oppdatert respons-xml for behandling={}", behandlingId);
+        LOG.info("oppdatert respons-xml for behandling={}", behandlingId);
     }
 }

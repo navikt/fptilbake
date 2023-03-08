@@ -8,7 +8,6 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 
 @ApplicationScoped
 public class BrevSporingRepository {
@@ -40,7 +39,10 @@ public class BrevSporingRepository {
     }
 
     public List<BrevSporing> hentBrevData(Long behandlingId, BrevType brevType) {
-        TypedQuery<BrevSporing> query = entityManager.createQuery("from BrevSporing where behandling_id = :behandlingId and brevType=:brevType", BrevSporing.class);
+        var query = entityManager.createQuery("""
+        from BrevSporing
+        where behandling_id = :behandlingId
+        and brevType = :brevType""", BrevSporing.class);
         query.setParameter("behandlingId", behandlingId);
         query.setParameter("brevType", brevType);
         return query.getResultList();
