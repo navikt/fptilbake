@@ -25,29 +25,29 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 
 @CdiDbAwareTest
-public class TilbakekrevingsvedtakTjenesteTest {
+class TilbakekrevingsvedtakTjenesteTest {
 
     private final ScenarioSimple simple = ScenarioSimple.simple();
 
     @Inject
-    public BehandlingRepositoryProvider behandlingRepositoryProvider;
+    private BehandlingRepositoryProvider behandlingRepositoryProvider;
     @Inject
-    public KravgrunnlagRepository kravgrunnlagRepository;
+    private KravgrunnlagRepository kravgrunnlagRepository;
     @Inject
-    public VilkårsvurderingRepository vilkårsvurderingRepository;
+    private VilkårsvurderingRepository vilkårsvurderingRepository;
     @Inject
-    public TilbakekrevingsvedtakTjeneste tjeneste;
+    private TilbakekrevingsvedtakTjeneste tjeneste;
     @Inject
-    public EntityManager entityManager;
+    private EntityManager entityManager;
 
     private final Periode uke = Periode.of(LocalDate.of(2019, 6, 24), LocalDate.of(2019, 6, 30));
 
     @Test
-    public void skal_sende_regne_ut_perioder_og_konvertere_til_dto() {
-        Behandling behandling = simple.lagre(behandlingRepositoryProvider);
-        Long behandlingId = behandling.getId();
+    void skal_sende_regne_ut_perioder_og_konvertere_til_dto() {
+        var behandling = simple.lagre(behandlingRepositoryProvider);
+        var behandlingId = behandling.getId();
 
-        Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
+        var kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
                         uke, List.of(
                                 KravgrunnlagTestBuilder.KgBeløp.feil(9000),
                                 KravgrunnlagTestBuilder.KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medTilbakekrevBeløp(9000),
@@ -60,7 +60,7 @@ public class TilbakekrevingsvedtakTjenesteTest {
 
         flushAndClear();
 
-        TilbakekrevingsvedtakDto resultat = tjeneste.lagTilbakekrevingsvedtak(behandlingId);
+        var resultat = tjeneste.lagTilbakekrevingsvedtak(behandlingId);
 
         assertThat(resultat.getVedtakId().longValue()).isEqualTo(kravgrunnlag.getVedtakId());
         assertThat(resultat.getKodeAksjon()).isEqualTo("8"); //Fast verdi

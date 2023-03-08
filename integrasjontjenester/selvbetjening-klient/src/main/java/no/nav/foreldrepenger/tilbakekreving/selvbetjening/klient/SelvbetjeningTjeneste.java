@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -15,11 +14,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.Hendelse;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.SelvbetjeningMelding;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.producer.SelvbetjeningMeldingProducer;
@@ -50,16 +47,19 @@ public class SelvbetjeningTjeneste {
     }
 
     public void sendMelding(Long behandlingId, Hendelse hendelse) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        BrevSporing varselSporing = brevSporingRepository.hentSistSendtVarselbrev(behandlingId).orElseThrow();
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
+        var varselSporing = brevSporingRepository.hentSistSendtVarselbrev(behandlingId).orElseThrow();
 
-        AktørId aktørId = behandling.getAktørId();
-        Optional<String> personIdent = aktørConsumer.hentFnrForAktør(aktørId).map(PersonIdent::getIdent);
-        SelvbetjeningMelding svInfo = lagSelvbetjeningMelding(behandling, varselSporing, aktørId, personIdent.get(), hendelse);
+        var aktørId = behandling.getAktørId();
+        var personIdent = aktørConsumer.hentFnrForAktør(aktørId).map(PersonIdent::getIdent);
 
-        logMelding("Sender", hendelse, personIdent.get());
+        var ident = personIdent.orElseThrow();
+
+        var svInfo = lagSelvbetjeningMelding(behandling, varselSporing, aktørId, ident, hendelse);
+
+        logMelding("Sender", hendelse, ident);
         meldingProducer.sendMelding(svInfo);
-        logMelding("Sendte", hendelse, personIdent.get());
+        logMelding("Sendte", hendelse, ident);
     }
 
     private SelvbetjeningMelding lagSelvbetjeningMelding(Behandling behandling,
@@ -67,14 +67,14 @@ public class SelvbetjeningTjeneste {
                                                          AktørId aktørId,
                                                          String personIdent,
                                                          Hendelse hendelse) {
-        Fagsak fagsak = behandling.getFagsak();
-        Saksnummer saksnummer = fagsak.getSaksnummer();
+        var fagsak = behandling.getFagsak();
+        var saksnummer = fagsak.getSaksnummer();
         if (personIdent.isEmpty()) {
             throw new IllegalArgumentException("Klarer ikke å finne norsk ident for aktørId");
         }
 
-        LocalDateTime nå = LocalDateTime.now();
-        SelvbetjeningMelding.Builder meldingsBuilder = SelvbetjeningMelding.builder()
+        var nå = LocalDateTime.now();
+        var meldingsBuilder = SelvbetjeningMelding.builder()
             .medAktørId(aktørId)
             .medNorskIdent(personIdent)
             .medSaksnummer(saksnummer)

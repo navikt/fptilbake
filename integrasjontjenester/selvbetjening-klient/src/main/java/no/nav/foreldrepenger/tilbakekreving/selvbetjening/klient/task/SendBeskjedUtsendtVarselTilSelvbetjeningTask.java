@@ -29,7 +29,7 @@ public class SendBeskjedUtsendtVarselTilSelvbetjeningTask implements ProsessTask
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
+        var behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         selvbetjeningTjeneste.sendMelding(behandlingId, Hendelse.TILBAKEKREVING_SPM);
     }
 

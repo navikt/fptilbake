@@ -38,19 +38,19 @@ public class LosKafkaProducerAiven extends AivenMeldingProducer {
 
 
     public void sendHendelse(UUID uuid, TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto) throws IOException {
-        String nøkkel = uuid.toString();
-        String verdi = TilbakebetalingBehandlingProsessEventMapper.getJson(behandlingProsessEventDto);
-        String callId = MDCOperations.getCallId() != null ? MDCOperations.getCallId() : MDCOperations.generateCallId();
+        var nøkkel = uuid.toString();
+        var verdi = TilbakebetalingBehandlingProsessEventMapper.getJson(behandlingProsessEventDto);
+        var callId = MDCOperations.getCallId() != null ? MDCOperations.getCallId() : MDCOperations.generateCallId();
 
-        ProducerRecord<String, String> melding = new ProducerRecord<>(getTopic(), null, nøkkel, verdi, new RecordHeaders().add(CALLID_NAME, callId.getBytes()));
+        var melding = new ProducerRecord<String, String>(getTopic(), null, nøkkel, verdi, new RecordHeaders().add(CALLID_NAME, callId.getBytes()));
 
-        RecordMetadata recordMetadata = runProducerWithSingleJson(melding);
+        var recordMetadata = runProducerWithSingleJson(melding);
         LOG.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandlingId {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), nøkkel);
     }
 
     public void sendHendelseFplos(Saksnummer saksnummer, BehandlingHendelseV1 dto)  {
-        String nøkkel = saksnummer.getVerdi();
-        String verdi = DefaultJsonMapper.toJson(dto);
+        var nøkkel = saksnummer.getVerdi();
+        var verdi = DefaultJsonMapper.toJson(dto);
 
         runProducerWithSingleJson(new ProducerRecord<>(getTopic(), nøkkel, verdi));
         LOG.info("Melding sendt til Aiven på {} for behandlingId {}", getTopic(), nøkkel);

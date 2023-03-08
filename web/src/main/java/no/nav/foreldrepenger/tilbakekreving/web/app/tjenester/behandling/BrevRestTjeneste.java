@@ -39,7 +39,7 @@ import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 @Transactional
 public class BrevRestTjeneste {
 
-    public static final String PATH_FRAGMENT = "/brev"; // NOSONAR
+    public static final String PATH_FRAGMENT = "/brev";
 
     private DokumentBehandlingTjeneste dokumentBehandlingTjeneste;
     private BehandlingTjeneste behandlingTjeneste;
@@ -55,28 +55,25 @@ public class BrevRestTjeneste {
         this.behandlingTjeneste = behandlingTjeneste;
     }
 
-
     @GET
     @Path("/maler")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @Produces(MediaType.APPLICATION_JSON)
     @Operation(tags = "brev", description = "Henter liste over tilgjengelige brevtyper")
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK, sporingslogg = false)
-    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<BrevmalDto> hentMaler(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                       @Valid @QueryParam("uuid") BehandlingReferanse behandlingReferanse) {
-        long behandlingId = hentBehandlingId(behandlingReferanse);
+        var behandlingId = hentBehandlingId(behandlingReferanse);
         return dokumentBehandlingTjeneste.hentBrevmalerFor(behandlingId);
     }
 
     @POST
     @Path("/bestill")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @Produces(MediaType.APPLICATION_JSON)
     @Operation(tags = "brev", description = "bestiller brev")
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK, sporingslogg = false)
-    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response bestillBrev(@NotNull @Valid BestillBrevDto bestillBrevDto) {
-        DokumentMalType malType = DokumentMalType.fraKode(bestillBrevDto.getBrevmalkode());
-        long behandlingId = hentBehandlingId(bestillBrevDto.getBehandlingReferanse());
+        var malType = DokumentMalType.fraKode(bestillBrevDto.getBrevmalkode());
+        var behandlingId = hentBehandlingId(bestillBrevDto.getBehandlingReferanse());
         dokumentBehandlingTjeneste.bestillBrev(behandlingId, malType, bestillBrevDto.getFritekst());
         return Response.ok().build();
     }
@@ -86,14 +83,13 @@ public class BrevRestTjeneste {
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "brev", description = "Returnerer en pdf som er en forhåndsvisning av brevet")
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
-    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response forhåndsvisBrev(@Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @NotNull @Valid BestillBrevDto forhåndsvisBestillBrevDto) {
-        DokumentMalType malType = DokumentMalType.fraKode(forhåndsvisBestillBrevDto.getBrevmalkode());
-        String fritekst = forhåndsvisBestillBrevDto.getFritekst();
-        long behandlingId = hentBehandlingId(forhåndsvisBestillBrevDto.getBehandlingReferanse());
-        byte[] dokument = dokumentBehandlingTjeneste.forhåndsvisBrev(behandlingId, malType, fritekst);
+        var malType = DokumentMalType.fraKode(forhåndsvisBestillBrevDto.getBrevmalkode());
+        var fritekst = forhåndsvisBestillBrevDto.getFritekst();
+        var behandlingId = hentBehandlingId(forhåndsvisBestillBrevDto.getBehandlingReferanse());
+        var dokument = dokumentBehandlingTjeneste.forhåndsvisBrev(behandlingId, malType, fritekst);
 
-        Response.ResponseBuilder responseBuilder = Response.ok(dokument);
+        var responseBuilder = Response.ok(dokument);
         responseBuilder.type("application/pdf");
         responseBuilder.header("Content-Disposition", "filename=dokument.pdf");
         return responseBuilder.build();

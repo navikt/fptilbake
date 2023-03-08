@@ -28,10 +28,10 @@ public class AivenVedtakKafkaProducer extends AivenMeldingProducer {
     }
 
     public void sendMelding(VedtakOppsummering vedtakOppsummering) {
-        String nøkkel = vedtakOppsummering.getBehandlingUuid().toString();
-        String verdi = VedtakOppsummeringMapper.tilJsonString(vedtakOppsummering);
+        var nøkkel = vedtakOppsummering.getBehandlingUuid().toString();
+        var verdi = VedtakOppsummeringMapper.tilJsonString(vedtakOppsummering);
         var melding = new ProducerRecord<>(getTopic(), nøkkel, verdi);
-        RecordMetadata recordMetadata = runProducerWithSingleJson(melding);
+        var recordMetadata = runProducerWithSingleJson(melding);
         LOG.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandling {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), vedtakOppsummering.getBehandlingUuid());
     }
 

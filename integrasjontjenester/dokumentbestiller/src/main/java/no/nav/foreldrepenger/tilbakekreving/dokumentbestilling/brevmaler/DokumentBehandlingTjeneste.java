@@ -126,7 +126,7 @@ public class DokumentBehandlingTjeneste {
         sendVarselbrev.setPayload(fritekst);
         sendVarselbrev.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
         sendVarselbrev.setCallIdFraEksisterende();
-
+        
         taskTjeneste.lagre(sendVarselbrev);
     }
 

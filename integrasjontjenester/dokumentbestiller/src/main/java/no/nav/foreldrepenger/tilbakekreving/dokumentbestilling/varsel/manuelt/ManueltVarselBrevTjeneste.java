@@ -68,12 +68,12 @@ public class ManueltVarselBrevTjeneste {
     }
 
     public void sendManueltVarselBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, false);
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
+        var varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, false);
 
-        FritekstbrevData data = lagManueltVarselBrev(varselbrevSamletInfo);
+        var data = lagManueltVarselBrev(varselbrevSamletInfo);
 
-        Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
+        var varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
         pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VARSEL, varsletFeilutbetaling, fritekst, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setMetadata(data.getBrevMetadata())
@@ -106,13 +106,13 @@ public class ManueltVarselBrevTjeneste {
     }
 
     public void sendKorrigertVarselBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, true);
-        VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
+        var varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, true);
+        var varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
 
-        FritekstbrevData data = lagKorrigertVarselBrev(varselbrevSamletInfo, varselInfo);
+        var data = lagKorrigertVarselBrev(varselbrevSamletInfo, varselInfo);
 
-        Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
+        var varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
         pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.KORRIGERT_VARSEL, varsletFeilutbetaling, fritekst, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setOverskrift(data.getOverskrift())
