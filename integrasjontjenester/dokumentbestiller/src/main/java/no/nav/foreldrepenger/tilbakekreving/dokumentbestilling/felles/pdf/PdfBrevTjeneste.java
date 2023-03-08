@@ -50,7 +50,7 @@ public class PdfBrevTjeneste {
     }
 
     public byte[] genererForhåndsvisning(BrevData data) {
-        String html = lagHtml(data);
+        var html = lagHtml(data);
         return pdfGenerator.genererPDFMedLogo(html, DokumentVariant.UTKAST);
     }
 
@@ -62,13 +62,13 @@ public class PdfBrevTjeneste {
         valider(detaljertBrevType, varsletBeløp);
         valider(detaljertBrevType, data);
 
-        JournalpostIdOgDokumentId dokumentreferanse = lagOgJournalførBrev(behandlingId, detaljertBrevType, data);
+        var dokumentreferanse = lagOgJournalførBrev(behandlingId, detaljertBrevType, data);
         lagTaskerForUtsendingOgSporing(behandlingId, detaljertBrevType, varsletBeløp, fritekst, data, dokumentreferanse);
     }
 
     private void lagTaskerForUtsendingOgSporing(Long behandlingId, DetaljertBrevType detaljertBrevType, Long varsletBeløp, String fritekst, BrevData data, JournalpostIdOgDokumentId dokumentreferanse) {
-        ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        var taskGruppe = new ProsessTaskGruppe();
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
         taskGruppe.addNesteSekvensiell(lagPubliserJournalpostTask(behandling, data, dokumentreferanse, detaljertBrevType.getBrevType()));
         taskGruppe.addNesteSekvensiell(lagSporingBrevTask(behandling, detaljertBrevType, data, dokumentreferanse));
         if (detaljertBrevType.gjelderVarsel() && data.getMottaker() == BrevMottaker.BRUKER) {
@@ -79,8 +79,8 @@ public class PdfBrevTjeneste {
     }
 
     private JournalpostIdOgDokumentId lagOgJournalførBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, BrevData data) {
-        String html = lagHtml(data);
-        byte[] pdf = pdfGenerator.genererPDFMedLogo(html, DokumentVariant.ENDELIG);
+        var html = lagHtml(data);
+        var pdf = pdfGenerator.genererPDFMedLogo(html, DokumentVariant.ENDELIG);
         return journalføringTjeneste.journalførUtgåendeBrev(behandlingId, mapBrevTypeTilDokumentKategori(detaljertBrevType), data.getMetadata(), data.getMottaker(), pdf);
     }
 
@@ -94,7 +94,7 @@ public class PdfBrevTjeneste {
     }
 
     private ProsessTaskData lagSporingBrevTask(Behandling behandling, DetaljertBrevType detaljertBrevType, BrevData brevdata, JournalpostIdOgDokumentId dokumentreferanse) {
-        ProsessTaskData data = ProsessTaskData.forProsessTask(LagreBrevSporingTask.class);
+        var data = ProsessTaskData.forProsessTask(LagreBrevSporingTask.class);
         ProsessTaskBehandlingUtil.setBehandling(data, behandling);
         data.setProperty(LagreBrevSporingTask.JOURNALPOST_ID, dokumentreferanse.getJournalpostId().getVerdi());
         data.setProperty(LagreBrevSporingTask.DOKUMENT_ID, dokumentreferanse.getDokumentId());
@@ -107,7 +107,7 @@ public class PdfBrevTjeneste {
     }
 
     private ProsessTaskData lagSporingVarselBrevTask(Behandling behandling, Long varsletBeløp, String fritekst) {
-        ProsessTaskData data = ProsessTaskData.forProsessTask(LagreVarselBrevSporingTask.class);
+        var data = ProsessTaskData.forProsessTask(LagreVarselBrevSporingTask.class);
         ProsessTaskBehandlingUtil.setBehandling(data, behandling);
         data.setProperty(LagreVarselBrevSporingTask.VARSLET_BELOEP, Long.toString(varsletBeløp));
         data.setPayload(fritekst);
@@ -116,7 +116,7 @@ public class PdfBrevTjeneste {
 
     private Optional<ProsessTaskData> lagSendBeskjedTilSelvbetjeningTask(Behandling behandling) {
         if (SelvbetjeningTilbakekrevingStøtte.harStøtteFor(behandling)) {
-            ProsessTaskData data = ProsessTaskData.forProsessTask(SendBeskjedUtsendtVarselTilSelvbetjeningTask.class);
+            var data = ProsessTaskData.forProsessTask(SendBeskjedUtsendtVarselTilSelvbetjeningTask.class);
             ProsessTaskBehandlingUtil.setBehandling(data, behandling);
             return Optional.of(data);
         } else {

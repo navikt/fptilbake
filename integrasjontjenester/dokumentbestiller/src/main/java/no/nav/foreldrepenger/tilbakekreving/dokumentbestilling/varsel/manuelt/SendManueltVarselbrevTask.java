@@ -26,12 +26,12 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendManueltVarselbrevTask implements ProsessTaskHandler {
 
-    private BehandlingRepository behandlingRepository;
-    private VergeRepository vergeRepository;
+    private final BehandlingRepository behandlingRepository;
+    private final VergeRepository vergeRepository;
 
-    private ManueltVarselBrevTjeneste manueltVarselBrevTjeneste;
-    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
-    private Period ventefrist;
+    private final ManueltVarselBrevTjeneste manueltVarselBrevTjeneste;
+    private final BehandlingskontrollTjeneste behandlingskontrollTjeneste;
+    private final Period ventefrist;
 
     @Inject
     public SendManueltVarselbrevTask(BehandlingRepositoryProvider repositoryProvider,

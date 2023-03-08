@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -42,27 +43,27 @@ public class TilbakekrevingsvedtakTjeneste {
 
     @Deprecated
     public TilbakekrevingsvedtakDto lagTilbakekrevingsvedtak(Long behandlingId) {
-        Kravgrunnlag431 kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
-        VurdertForeldelse vurdertForeldelse = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
-        BeregningResultat beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
-        List<TilbakekrevingPeriode> tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, vurdertForeldelse,
+        var kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
+        var vurdertForeldelse = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
+        var beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
+        var tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, vurdertForeldelse,
             beregningResultat);
         validerSkattBeløp(tilbakekrevingPerioder);
         return TilbakekrevingsvedtakMapper.tilDto(kravgrunnlag, tilbakekrevingPerioder);
     }
 
     public TilbakekrevingVedtakDTO lagTilbakekrevingsvedtakDTOFpwsproxy(Long behandlingId) {
-        Kravgrunnlag431 kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
-        VurdertForeldelse vurdertForeldelse = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
-        BeregningResultat beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
-        List<TilbakekrevingPeriode> tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, vurdertForeldelse,
+        var kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
+        var vurdertForeldelse = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
+        var beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
+        var tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, vurdertForeldelse,
             beregningResultat);
         validerSkattBeløp(tilbakekrevingPerioder);
         return TilbakekrevingsvedtakMapperFpwsproxy.tilDto(kravgrunnlag, tilbakekrevingPerioder);
     }
 
     private void validerSkattBeløp(final List<TilbakekrevingPeriode> tilbakekrevingPerioder) {
-        Set<String> klassekoderSomFeilaktigHarSkattebeløp = tilbakekrevingPerioder.stream()
+        var klassekoderSomFeilaktigHarSkattebeløp = tilbakekrevingPerioder.stream()
             .flatMap(periode -> periode.getBeløp().stream())
             .filter(TilbakekrevingBeløp::erIkkeSkattepliktig)
             .filter(beløp -> beløp.getSkattBeløp().compareTo(BigDecimal.ZERO) != 0)
@@ -71,8 +72,8 @@ public class TilbakekrevingsvedtakTjeneste {
 
         if (!klassekoderSomFeilaktigHarSkattebeløp.isEmpty()) {
             throw new IllegalStateException(
-                "Skattebeløp for ikke skattepliktige ytelser skal være 0, men var ikke dette for posteringer med klassekode "
-                    + klassekoderSomFeilaktigHarSkattebeløp);
+                String.format("Skattebeløp for ikke skattepliktige ytelser skal være 0, men var ikke dette for posteringer med klassekode %s"
+                    , String.join(", ", klassekoderSomFeilaktigHarSkattebeløp)));
         }
     }
 }

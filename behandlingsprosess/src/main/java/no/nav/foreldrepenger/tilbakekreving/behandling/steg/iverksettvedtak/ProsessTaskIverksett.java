@@ -32,7 +32,7 @@ public class ProsessTaskIverksett {
     }
 
     public void opprettIverksettingstasker(Behandling behandling, boolean sendVedtaksbrev) {
-        ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
+        var taskGruppe = new ProsessTaskGruppe();
         if (lansertLagringBeregningsresultat) {
             taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(SendVedtakTilOppdragsystemetTask.class));
         } else {
@@ -46,7 +46,7 @@ public class ProsessTaskIverksett {
         taskGruppe.setCallIdFraEksisterende();
 
         if (SelvbetjeningTilbakekrevingStøtte.harStøtteFor(behandling) && brevSporingRepository.harVarselBrevSendtForBehandlingId(behandling.getId())) {
-            ProsessTaskData selvbetjeningTask = ProsessTaskData.forProsessTask(SendVedtakFattetTilSelvbetjeningTask.class);
+            var selvbetjeningTask = ProsessTaskData.forProsessTask(SendVedtakFattetTilSelvbetjeningTask.class);
             selvbetjeningTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
             taskGruppe.addNesteSekvensiell(selvbetjeningTask);
         }

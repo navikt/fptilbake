@@ -37,7 +37,7 @@ public class VedtakConsumer implements LiveAndReadinessAware, Controllable {
 
         final Consumed<String, String> consumed = Consumed.with(Topology.AutoOffsetReset.EARLIEST);
 
-        final StreamsBuilder builder = new StreamsBuilder();
+        final var builder = new StreamsBuilder();
         builder.stream(topic, consumed)
             .foreach(vedtaksHendelseHåndterer::handleMessage);
 
