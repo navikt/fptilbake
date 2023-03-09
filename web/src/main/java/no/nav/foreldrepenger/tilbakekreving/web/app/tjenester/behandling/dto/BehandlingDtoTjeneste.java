@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -18,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -29,7 +26,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
@@ -121,17 +117,17 @@ public class BehandlingDtoTjeneste {
     }
 
     public List<BehandlingDto> hentAlleBehandlinger(Saksnummer saksnummer) {
-        List<Behandling> behandlinger = behandlingTjeneste.hentBehandlinger(saksnummer);
+        var behandlinger = behandlingTjeneste.hentBehandlinger(saksnummer);
 
         return behandlinger.stream()
                 .map(this::lagBehandlingDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private BehandlingDto lagBehandlingDto(Behandling behandling) {
-        UUID uuid = behandling.getUuid();
-        UuidDto uuidDto = new UuidDto(uuid);
-        BehandlingDto dto = new BehandlingDto();
+        var uuid = behandling.getUuid();
+        var uuidDto = new UuidDto(uuid);
+        var dto = new BehandlingDto();
         settStandardFelter(behandling, dto);
         dto.setBehandlingsresultat(lagBehandlingsresultat(behandling));
 
@@ -157,15 +153,14 @@ public class BehandlingDtoTjeneste {
     }
 
     private BehandlingsresultatDto lagBehandlingsresultat(Behandling behandling) {
-        BehandlingsresultatDto dto = new BehandlingsresultatDto();
+        var dto = new BehandlingsresultatDto();
         if (behandling.erAvsluttet()) {
-            Optional<Behandlingsresultat> behandlingResultatData = behandlingresultatRepository.hent(behandling);
+            var behandlingResultatData = behandlingresultatRepository.hent(behandling);
             behandlingResultatData.ifPresent(value -> {
-                Behandlingsresultat behandlingsresultat = value;
-                if (behandlingsresultat.erBehandlingHenlagt()) {
+                if (value.erBehandlingHenlagt()) {
                     dto.setType(BehandlingResultatType.HENLAGT);
                 } else {
-                    dto.setType(behandlingsresultat.getBehandlingResultatType());
+                    dto.setType(value.getBehandlingResultatType());
                 }
             });
         }
@@ -176,7 +171,7 @@ public class BehandlingDtoTjeneste {
         if (behandling.erAvsluttet()) {
             return lagBehandlingsresultat(behandling);
         }
-        BehandlingsresultatDto dto = new BehandlingsresultatDto();
+        var dto = new BehandlingsresultatDto();
         var type = behandlingresultatRepository.hent(behandling)
             .map(Behandlingsresultat::getBehandlingResultatType)
             .or(() -> Optional.ofNullable(beregningsresultatTjeneste.finnEllerBeregn(behandling.getId()))
@@ -188,12 +183,12 @@ public class BehandlingDtoTjeneste {
     }
 
     public UtvidetBehandlingDto hentUtvidetBehandlingResultat(long behandlingId, AsyncPollingStatus taskStatus) {
-        Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
+        var behandling = behandlingTjeneste.hentBehandling(behandlingId);
 
-        UtvidetBehandlingDto dto = new UtvidetBehandlingDto();
+        var dto = new UtvidetBehandlingDto();
         settStandardFelter(behandling, dto);
         dto.setBehandlingsresultat(lagBehandlingsresultat(behandling));
-        boolean behandlingHenlagt = behandlingTjeneste.erBehandlingHenlagt(behandling);
+        var behandlingHenlagt = behandlingTjeneste.erBehandlingHenlagt(behandling);
         dto.setBehandlingHenlagt(behandlingHenlagt);
         var aksjonspunkt = AksjonspunktDtoMapper.lagAksjonspunktDto(behandling, totrinnTjeneste.hentTotrinnsvurderinger(behandling));
         dto.setAksjonspunktene(aksjonspunkt);
@@ -245,11 +240,11 @@ public class BehandlingDtoTjeneste {
         if (b.erSaksbehandlingAvsluttet()) {
             return BehandlingOperasjonerDto.builder(b.getUuid()).build(); // Skal ikke foreta menyvalg lenger
         } else if (BehandlingStatus.FATTER_VEDTAK.equals(b.getStatus())) {
-            boolean tilgokjenning = b.getAnsvarligSaksbehandler() != null &&
+            var tilgokjenning = b.getAnsvarligSaksbehandler() != null &&
                 !b.getAnsvarligSaksbehandler().equalsIgnoreCase(KontekstHolder.getKontekst().getUid());
             return BehandlingOperasjonerDto.builder(b.getUuid()).medTilGodkjenning(tilgokjenning).build();
         } else {
-            boolean totrinnRetur = totrinnTjeneste.hentTotrinnsvurderinger(b).stream().anyMatch(tt -> !tt.isGodkjent());
+            var totrinnRetur = totrinnTjeneste.hentTotrinnsvurderinger(b).stream().anyMatch(tt -> !tt.isGodkjent());
             return BehandlingOperasjonerDto.builder(b.getUuid())
                 .medTilGodkjenning(false)
                 .medFraBeslutter(!b.isBehandlingPåVent() && totrinnRetur)
@@ -265,7 +260,7 @@ public class BehandlingDtoTjeneste {
     }
 
     private VergeBehandlingsmenyEnum viseVerge(Behandling behandling, boolean finnesVerge) {
-        boolean kanBehandlingEndres = !behandling.erSaksbehandlingAvsluttet() && !behandling.isBehandlingPåVent();
+        var kanBehandlingEndres = !behandling.erSaksbehandlingAvsluttet() && !behandling.isBehandlingPåVent();
         if (kanBehandlingEndres) {
             return finnesVerge ? VergeBehandlingsmenyEnum.FJERN : VergeBehandlingsmenyEnum.OPPRETT;
         }
@@ -274,7 +269,7 @@ public class BehandlingDtoTjeneste {
 
     private List<BehandlingÅrsakDto> lagBehandlingÅrsakDto(Behandling behandling) {
         if (!behandling.getBehandlingÅrsaker().isEmpty()) {
-            return behandling.getBehandlingÅrsaker().stream().map(this::lagBehandlingÅrsakDto).collect(Collectors.toList());
+            return behandling.getBehandlingÅrsaker().stream().map(this::lagBehandlingÅrsakDto).toList();
         }
         return Collections.emptyList();
     }
@@ -287,7 +282,7 @@ public class BehandlingDtoTjeneste {
     }
 
     private BehandlingÅrsakDto lagBehandlingÅrsakDto(BehandlingÅrsak behandlingÅrsak) {
-        BehandlingÅrsakDto dto = new BehandlingÅrsakDto();
+        var dto = new BehandlingÅrsakDto();
         dto.setBehandlingÅrsakType(behandlingÅrsak.getBehandlingÅrsakType());
         return dto;
     }
@@ -320,17 +315,17 @@ public class BehandlingDtoTjeneste {
     }
 
     private void settResourceLinks(Behandling behandling, UtvidetBehandlingDto dto, boolean behandlingHenlagt) {
-        Long behandlingId = behandling.getId();
-        UuidDto uuidDto = new UuidDto(behandling.getUuid());
-        BehandlingModell behandlingModell = behandlingModellRepository.getModell(behandling.getType());
-        BehandlingStegType bst = behandling.getAktivtBehandlingSteg();
+        var behandlingId = behandling.getId();
+        var uuidDto = new UuidDto(behandling.getUuid());
+        var behandlingModell = behandlingModellRepository.getModell(behandling.getType());
+        var bst = behandling.getAktivtBehandlingSteg();
 
-        boolean iEllerEtterForeslåVedtakSteg = bst == null || !behandlingModell.erStegAFørStegB(bst, BehandlingStegType.FORESLÅ_VEDTAK);
-        boolean iVilkårSteg = BehandlingStegType.VTILBSTEG.equals(bst);
-        boolean harDataForFaktaFeilutbetaling = faktaFeilutbetalingRepository.harDataForFaktaFeilutbetaling(behandlingId);
-        boolean harVurdertForeldelse = vurdertForeldelseTjeneste.harVurdertForeldelse(behandlingId);
-        boolean harDataForVilkårsvurdering = vilkårsvurderingRepository.harDataForVilkårsvurdering(behandlingId);
-        boolean harVergeAksjonspunkt = behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.AVKLAR_VERGE).isPresent();
+        var iEllerEtterForeslåVedtakSteg = bst == null || !behandlingModell.erStegAFørStegB(bst, BehandlingStegType.FORESLÅ_VEDTAK);
+        var iVilkårSteg = BehandlingStegType.VTILBSTEG.equals(bst);
+        var harDataForFaktaFeilutbetaling = faktaFeilutbetalingRepository.harDataForFaktaFeilutbetaling(behandlingId);
+        var harVurdertForeldelse = vurdertForeldelseTjeneste.harVurdertForeldelse(behandlingId);
+        var harDataForVilkårsvurdering = vilkårsvurderingRepository.harDataForVilkårsvurdering(behandlingId);
+        var harVergeAksjonspunkt = behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.AVKLAR_VERGE).isPresent();
         leggTilLenkerForBehandlingsoperasjoner(dto);
 
         dto.leggTil(get(kontekstPath + AKSJONSPUNKT_API, "aksjonspunkter", uuidDto));
@@ -363,7 +358,7 @@ public class BehandlingDtoTjeneste {
     }
 
     private Optional<String> getVenteÅrsak(Behandling behandling) {
-        Venteårsak venteårsak = behandling.getVenteårsak();
+        var venteårsak = behandling.getVenteårsak();
         if (venteårsak != null) {
             return Optional.of(venteårsak.getKode());
         }
@@ -371,7 +366,7 @@ public class BehandlingDtoTjeneste {
     }
 
     private Optional<String> getFristDatoBehandlingPåVent(Behandling behandling) {
-        LocalDate frist = behandling.getFristDatoBehandlingPåVent();
+        var frist = behandling.getFristDatoBehandlingPåVent();
         if (frist != null) {
             return Optional.of(frist.format(DateTimeFormatter.ofPattern(DATO_PATTERN)));
         }

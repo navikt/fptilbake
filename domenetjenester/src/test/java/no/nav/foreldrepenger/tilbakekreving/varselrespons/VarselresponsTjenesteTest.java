@@ -22,7 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Vars
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 
 @ExtendWith(JpaExtension.class)
-public class VarselresponsTjenesteTest {
+class VarselresponsTjenesteTest {
 
     private static Long BEHANDLING_ID;
     private static final ResponsKanal RESPONS_KANAL = ResponsKanal.SELVBETJENING;
@@ -32,7 +32,7 @@ public class VarselresponsTjenesteTest {
     private VarselresponsTjeneste varselresponsTjeneste;
 
     @BeforeEach
-    public void setup(EntityManager entityManager) {
+    void setup(EntityManager entityManager) {
         behandlingRepository = new BehandlingRepository(entityManager);
         fagsakRepository = new FagsakRepository(entityManager);
         VarselresponsRepository repository = new VarselresponsRepository(entityManager);
@@ -50,7 +50,7 @@ public class VarselresponsTjenesteTest {
     }
 
     @Test
-    public void test_skal_lagre_respons() {
+    void test_skal_lagre_respons() {
         Boolean akseptertFaktagrunnlag = true;
 
         varselresponsTjeneste.lagreRespons(BEHANDLING_ID, RESPONS_KANAL, akseptertFaktagrunnlag);
@@ -63,7 +63,7 @@ public class VarselresponsTjenesteTest {
     }
 
     @Test
-    public void test_skal_ikke_kunne_oppdatere_eksisterende_respons() {
+    void test_skal_ikke_kunne_oppdatere_eksisterende_respons() {
         varselresponsTjeneste.lagreRespons(BEHANDLING_ID, RESPONS_KANAL, false);
         Optional<Varselrespons> result1 = varselresponsTjeneste.hentRespons(BEHANDLING_ID);
 
@@ -78,7 +78,7 @@ public class VarselresponsTjenesteTest {
     }
 
     @Test
-    public void test_skal_returnere_tom_optional_ved_ukjent_saksnummer() {
+    void test_skal_returnere_tom_optional_ved_ukjent_saksnummer() {
         Optional<Varselrespons> result = varselresponsTjeneste.hentRespons(99999L);
 
         assertThat(result).isEmpty();

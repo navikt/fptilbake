@@ -34,7 +34,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodev
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 
 @ExtendWith(JpaExtension.class)
-public class BehandlingModellTest {
+class BehandlingModellTest {
 
     private static final LocalDateTime FRIST_TID = LocalDateTime.now().plusWeeks(4);
 
@@ -59,14 +59,14 @@ public class BehandlingModellTest {
             AksjonspunktResultat.opprettForAksjonspunktMedFrist(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, Venteårsak.AVVENTER_DOKUMENTASJON, FRIST_TID));
 
     @BeforeEach
-    public void setup(EntityManager em) {
+    void setup(EntityManager em) {
         serviceProvider = new BehandlingskontrollServiceProvider(em, new BehandlingModellRepository(), null);
         repositoryProvider = new BehandlingRepositoryProvider(em);
         kontrollTjeneste = new BehandlingskontrollTjeneste(serviceProvider);
     }
 
     @Test
-    public void skal_finne_aksjonspunkter_som_ligger_etter_et_gitt_steg() {
+    void skal_finne_aksjonspunkter_som_ligger_etter_et_gitt_steg() {
         // Arrange - noen utvalge, tilfeldige aksjonspunkter
         var a0_0 = AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING;
         var a0_1 = AksjonspunktDefinisjon.AVKLAR_VERGE;
@@ -113,7 +113,7 @@ public class BehandlingModellTest {
 
     }
 
-    public void skal_finne_aksjonspunkter_ved_inngang_eller_utgang_av_steg() {
+    void skal_finne_aksjonspunkter_ved_inngang_eller_utgang_av_steg() {
         // Arrange - noen utvalge, tilfeldige aksjonspunkter
         var a0_0 = AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING;
         var a0_1 = AksjonspunktDefinisjon.AVKLAR_VERGE;
@@ -143,7 +143,7 @@ public class BehandlingModellTest {
     }
 
     @Test
-    public void skal_stoppe_på_steg_2_når_får_aksjonspunkt() throws Exception {
+    void skal_stoppe_på_steg_2_når_får_aksjonspunkt() throws Exception {
         // Arrange
         var modellData = List.of(
                 new TestStegKonfig(STEG_1, behandlingType, nullSteg, ap(), ap()),
@@ -162,12 +162,12 @@ public class BehandlingModellTest {
         assertThat(visitor.kjørteSteg).isEqualTo(List.of(STEG_1, STEG_2, STEG_3));
     }
 
-    public List<AksjonspunktDefinisjon> ap(AksjonspunktDefinisjon... aksjonspunktDefinisjoner) {
+    List<AksjonspunktDefinisjon> ap(AksjonspunktDefinisjon... aksjonspunktDefinisjoner) {
         return Arrays.asList(aksjonspunktDefinisjoner);
     }
 
     @Test
-    public void skal_kjøre_til_siste_når_ingen_gir_aksjonspunkt() {
+    void skal_kjøre_til_siste_når_ingen_gir_aksjonspunkt() {
         // Arrange
         List<TestStegKonfig> modellData = List.of(
                 new TestStegKonfig(STEG_1, behandlingType, nullSteg, ap(), ap()),
@@ -186,7 +186,7 @@ public class BehandlingModellTest {
     }
 
     @Test
-    public void skal_stoppe_når_settes_på_vent_deretter_fortsette() {
+    void skal_stoppe_når_settes_på_vent_deretter_fortsette() {
         // Arrange
         List<TestStegKonfig> modellData = List.of(
                 new TestStegKonfig(STEG_1, behandlingType, nullSteg, ap(), ap()),
@@ -226,7 +226,7 @@ public class BehandlingModellTest {
     }
 
     @Test
-    public void skal_feile_ved_gjenopptak_vanlig_steg() {
+    void skal_feile_ved_gjenopptak_vanlig_steg() {
         // Arrange
         List<TestStegKonfig> modellData = List.of(
                 new TestStegKonfig(STEG_1, behandlingType, nullSteg, ap(), ap()),
@@ -243,7 +243,7 @@ public class BehandlingModellTest {
     }
 
     @Test
-    public void tilbakefører_til_tidligste_steg_med_åpent_aksjonspunkt() {
+    void tilbakefører_til_tidligste_steg_med_åpent_aksjonspunkt() {
         AksjonspunktDefinisjon aksjonspunktDefinisjon = AksjonspunktDefinisjon.AVKLAR_VERGE;
         DummySteg tilbakeføringssteg = new DummySteg(true, opprettForAksjonspunkt(aksjonspunktDefinisjon));
         // Arrange
@@ -268,7 +268,7 @@ public class BehandlingModellTest {
     }
 
     @Test
-    public void finner_tidligste_steg_for_aksjonspunkter() {
+    void finner_tidligste_steg_for_aksjonspunkter() {
         var aksjonspunktDefinisjon = STEG_2.getAksjonspunktDefinisjonerUtgang().get(0);
         List<TestStegKonfig> modellData = List.of(
                 new TestStegKonfig(STEG_2, behandlingType, nullSteg, ap(aksjonspunktDefinisjon), ap()),
@@ -281,7 +281,7 @@ public class BehandlingModellTest {
     }
 
     @Test
-    public void skal_modifisere_aksjonspunktet_ved_å_kalle_funksjon_som_legger_til_frist() throws Exception {
+    void skal_modifisere_aksjonspunktet_ved_å_kalle_funksjon_som_legger_til_frist() throws Exception {
         // Arrange
         List<TestStegKonfig> modellData = List.of(
                 new TestStegKonfig(STEG_1, behandlingType, aksjonspunktModifisererSteg, ap(), ap()),
@@ -297,8 +297,8 @@ public class BehandlingModellTest {
         modell.prosesserFra(STEG_1, visitor);
 
         // Assert
-        Behandling beh = hentBehandling(behandling.getId());
-        assertThat(beh.getÅpneAksjonspunkter().size()).isEqualTo(1);
+        var beh = hentBehandling(behandling.getId());
+        assertThat(beh.getÅpneAksjonspunkter()).hasSize(1);
         assertThat(beh.getÅpneAksjonspunkter().get(0).getFristTid()).isEqualTo(FRIST_TID);
     }
 
@@ -339,7 +339,7 @@ public class BehandlingModellTest {
     static class BehandlingStegVisitorVenterUtenLagring extends TekniskBehandlingStegVenterVisitor {
         List<BehandlingStegType> kjørteSteg = new ArrayList<>();
 
-        BehandlingStegVisitorVenterUtenLagring(BehandlingskontrollServiceProvider serviceProvider,
+        public BehandlingStegVisitorVenterUtenLagring(BehandlingskontrollServiceProvider serviceProvider,
                                                BehandlingskontrollKontekst kontekst) {
             super(serviceProvider, kontekst);
         }

@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
-public class FagsystemIdTest {
+class FagsystemIdTest {
     @Test
-    public void skal_håndtere_gammelt_format() {
+    void skal_håndtere_gammelt_format() {
         String fagsakId = "141243251101";
 
         FagsystemId fagsystemId = FagsystemId.parse(fagsakId);
@@ -16,7 +16,7 @@ public class FagsystemIdTest {
     }
 
     @Test
-    public void skal_håndtere_nytt_format() {
+    void skal_håndtere_nytt_format() {
         String fagsakId = "SEGAB-1";
 
         FagsystemId fagsystemId = FagsystemId.parse(fagsakId);
@@ -26,7 +26,7 @@ public class FagsystemIdTest {
     }
 
     @Test
-    public void skal_håndtere_nytt_format_også_med_bindestrek() {
+    void skal_håndtere_nytt_format_også_med_bindestrek() {
         String saksnummer = "FAG-FP-123";
         String fagsakId = "FAG-FP-123-1";
 

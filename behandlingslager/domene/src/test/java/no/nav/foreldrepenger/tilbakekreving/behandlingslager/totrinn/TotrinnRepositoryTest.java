@@ -26,7 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 
 @ExtendWith(JpaExtension.class)
-public class TotrinnRepositoryTest {
+class TotrinnRepositoryTest {
 
     private BehandlingRepositoryProvider repositoryProvider;
     private TotrinnRepository totrinnRepository;
@@ -34,7 +34,7 @@ public class TotrinnRepositoryTest {
     private BehandlingRepository behandlingRepository;
 
     @BeforeEach
-    public void setup(EntityManager entityManager) {
+    void setup(EntityManager entityManager) {
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         fagsakRepository = repositoryProvider.getFagsakRepository();
         behandlingRepository = repositoryProvider.getBehandlingRepository();
@@ -42,7 +42,7 @@ public class TotrinnRepositoryTest {
     }
 
     @Test
-    public void skal_finne_flere_inaktive_totrinnsvurderinger_og_flere_aktive_totrinnsvurdering(EntityManager entityManager) {
+    void skal_finne_flere_inaktive_totrinnsvurderinger_og_flere_aktive_totrinnsvurdering(EntityManager entityManager) {
 
         Fagsak fagsak = TestFagsakUtil.opprettFagsak();
         fagsakRepository.lagre(fagsak);

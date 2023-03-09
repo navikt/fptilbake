@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser;
 
+import static org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.SHUTDOWN_CLIENT;
+
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
@@ -54,9 +56,9 @@ public class VedtakConsumer implements LiveAndReadinessAware, Controllable {
                 stop();
             }
         });
-        stream.setUncaughtExceptionHandler((t, e) -> {
-            LOG.error(topic + " :: Caught exception in stream, exiting", e);
-            stop();
+        stream.setUncaughtExceptionHandler(ex -> {
+            LOG.error(topic + " :: Caught exception in stream, exiting", ex);
+            return SHUTDOWN_CLIENT;
         });
     }
 
@@ -84,7 +86,7 @@ public class VedtakConsumer implements LiveAndReadinessAware, Controllable {
 
     @Override
     public void stop() {
-        int timeoutSekunder = 30;
+        var timeoutSekunder = 30;
         LOG.info("Starter shutdown av topic={}, tilstand={} med {} sekunder timeout", topic, stream.state(), timeoutSekunder);
         stream.close(Duration.of(timeoutSekunder, ChronoUnit.SECONDS));
         LOG.info("Shutdown av topic={}, tilstand={} med {} sekunder timeout", topic, stream.state(), timeoutSekunder);

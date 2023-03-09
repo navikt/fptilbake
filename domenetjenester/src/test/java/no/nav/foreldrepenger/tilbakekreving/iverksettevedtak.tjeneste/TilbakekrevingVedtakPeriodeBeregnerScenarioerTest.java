@@ -29,25 +29,25 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
  * tester her er basert på regneark med eksempler for tilbakekreving
  */
 @CdiDbAwareTest
-public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
+class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
 
     private ScenarioSimple simple = ScenarioSimple.simple();
 
     @Inject
-    public BehandlingRepositoryProvider behandlingRepositoryProvider;
+    BehandlingRepositoryProvider behandlingRepositoryProvider;
     @Inject
-    public KravgrunnlagRepository kravgrunnlagRepository;
+    KravgrunnlagRepository kravgrunnlagRepository;
     @Inject
-    public VilkårsvurderingRepository vilkårsvurderingRepository;
+    VilkårsvurderingRepository vilkårsvurderingRepository;
     @Inject
-    public TilbakekrevingVedtakPeriodeBeregner beregner;
+    TilbakekrevingVedtakPeriodeBeregner beregner;
     @Inject
-    public EntityManager entityManager;
+    EntityManager entityManager;
 
     private static final PeriodeParser PP2018 = new PeriodeParser(2018);
 
     @Test
-    public void scenario_oppør_med_flere_vurderinger() {
+    void scenario_oppør_med_flere_vurderinger() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
@@ -92,7 +92,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
 
 
     @Test
-    public void scenario_gradering_og_utsettelse() {
+    void scenario_gradering_og_utsettelse() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 

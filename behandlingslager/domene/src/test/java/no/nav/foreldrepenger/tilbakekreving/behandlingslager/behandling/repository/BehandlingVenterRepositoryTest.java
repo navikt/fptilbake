@@ -28,7 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 @ExtendWith(JpaExtension.class)
-public class BehandlingVenterRepositoryTest {
+class BehandlingVenterRepositoryTest {
 
     private BehandlingVenterRepository repository;
 
@@ -37,7 +37,7 @@ public class BehandlingVenterRepositoryTest {
     private FagsakRepository fagsakRepository;
 
     @BeforeEach
-    public void setUp(EntityManager entityManager) {
+    void setUp(EntityManager entityManager) {
         var fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(entityManager);
         repository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
         var repositoryProvider = new BehandlingRepositoryProvider(entityManager);
@@ -47,7 +47,7 @@ public class BehandlingVenterRepositoryTest {
     }
 
     @Test
-    public void test_skalHenteBehandlingHvisVenterPåBrukerrespons() {
+    void test_skalHenteBehandlingHvisVenterPåBrukerrespons() {
         Behandling behandling1 = opprettBehandling("325235", "5235235", BehandlingType.TILBAKEKREVING);
         Behandling behandling2 = opprettBehandling("423523", "523543", BehandlingType.TILBAKEKREVING);
 
@@ -65,7 +65,7 @@ public class BehandlingVenterRepositoryTest {
     }
 
     @Test
-    public void test_skalHenteBehandlingHvisVenterPåØkonomiGrunnlag() {
+    void test_skalHenteBehandlingHvisVenterPåØkonomiGrunnlag() {
         Behandling behandling1 = opprettBehandling("325235", "5235235", BehandlingType.TILBAKEKREVING);
         Behandling behandling2 = opprettBehandling("423523", "523543", BehandlingType.TILBAKEKREVING);
 
@@ -83,7 +83,7 @@ public class BehandlingVenterRepositoryTest {
     }
 
     @Test
-    public void test_skalHenteBehandlingHvisVenterPåØkonomiGrunnlagOgPåBrukerSamtidig() {
+    void test_skalHenteBehandlingHvisVenterPåØkonomiGrunnlagOgPåBrukerSamtidig() {
         Behandling behandling = opprettBehandling("325235", "5235235", BehandlingType.TILBAKEKREVING);
 
         Long behandlingId = behandling.getId();

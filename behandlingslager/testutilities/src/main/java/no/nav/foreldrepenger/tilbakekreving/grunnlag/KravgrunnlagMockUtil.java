@@ -16,7 +16,7 @@ public class KravgrunnlagMockUtil {
     }
 
     public static Kravgrunnlag431 lagMockObject(List<KravgrunnlagMock> kravgrunnlagMocker) {
-        Kravgrunnlag431 kravgrunnlag431 = Kravgrunnlag431.builder()
+        var kravgrunnlag431 = Kravgrunnlag431.builder()
                 .medVedtakId(100000l)
                 .medEksternKravgrunnlagId("12123")
                 .medKravStatusKode(KravStatusKode.NYTT)
@@ -33,14 +33,14 @@ public class KravgrunnlagMockUtil {
                 .medSaksBehId("Z991035")
                 .medReferanse(Henvisning.fraEksternBehandlingId(100000000L))
                 .build();
-        for (KravgrunnlagMock mock : kravgrunnlagMocker) {
+        for (var mock : kravgrunnlagMocker) {
             kravgrunnlag431.leggTilPeriode(lagMockPeriode(mock, kravgrunnlag431));
         }
         return kravgrunnlag431;
     }
 
     public static KravgrunnlagPeriode432 lagMockPeriode(KravgrunnlagMock mock, Kravgrunnlag431 kravgrunnlag431) {
-        KravgrunnlagPeriode432 kravgrunnlagPeriode432 = KravgrunnlagPeriode432.builder()
+        var kravgrunnlagPeriode432 = KravgrunnlagPeriode432.builder()
                 .medPeriode(mock.getPeriode())
                 .medKravgrunnlag431(kravgrunnlag431).build();
         kravgrunnlagPeriode432.leggTilBeløp(lagBeløp(mock, kravgrunnlagPeriode432));
@@ -54,6 +54,4 @@ public class KravgrunnlagMockUtil {
                 .medNyBelop(mock.getNyBelop())
                 .medTilbakekrevesBelop(mock.getTilbakekrevesBelop()).build();
     }
-
-
 }

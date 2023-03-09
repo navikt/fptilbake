@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.DokprodTilHtml;
 
-public class DokprodTilHtmlTest {
+class DokprodTilHtmlTest {
 
     @Test
-    public void skal_konvertere_overskrift_og_avsnitt() {
+    void skal_konvertere_overskrift_og_avsnitt() {
         String resultat = DokprodTilHtml.dokprodInnholdTilHtml(
                 "_Overskrift\nFørste avsnitt\n\nAndre avsnitt\n\nTredje avsnitt"
         );
@@ -18,7 +18,7 @@ public class DokprodTilHtmlTest {
     }
 
     @Test
-    public void skal_konvertere_non_break_space() {
+    void skal_konvertere_non_break_space() {
         // utf8nonBreakingSpace = "\u00A0";
         String resultat = DokprodTilHtml.dokprodInnholdTilHtml("10\u00A0000\u00A0kroner");
 
@@ -26,19 +26,19 @@ public class DokprodTilHtmlTest {
     }
 
     @Test
-    public void skal_konvertere_bullet_points() {
+    void skal_konvertere_bullet_points() {
         String resultat = DokprodTilHtml.dokprodInnholdTilHtml("*-bulletpoint 1\nbulletpoint 2\nsiste bulletpoint-*");
         Assertions.assertThat(resultat).isEqualTo("<ul><li>bulletpoint 1</li><li>bulletpoint 2</li><li>siste bulletpoint</li></ul>");
     }
 
     @Test
-    public void skal_konvertere_bullet_points_når_første_linje_er_tom() {
+    void skal_konvertere_bullet_points_når_første_linje_er_tom() {
         String resultat = DokprodTilHtml.dokprodInnholdTilHtml("*-\nbulletpoint 1\nbulletpoint 2\nsiste bulletpoint-*");
         Assertions.assertThat(resultat).isEqualTo("<ul><li>bulletpoint 1</li><li>bulletpoint 2</li><li>siste bulletpoint</li></ul>");
     }
 
     @Test
-    public void skal_konvertere_halvhjertede_avsnitt() {
+    void skal_konvertere_halvhjertede_avsnitt() {
         //halvhjertet avsnitt er hvor det er tatt kun ett linjeskift.
         String resultat = DokprodTilHtml.dokprodInnholdTilHtml(
                 "Foo\nBar"
@@ -49,7 +49,7 @@ public class DokprodTilHtmlTest {
     }
 
     @Test
-    public void skal_spesialbehandle_hilsen() {
+    void skal_spesialbehandle_hilsen() {
         //halvhjertet avsnitt er hvor det er tatt kun ett linjeskift.
         String resultat = DokprodTilHtml.dokprodInnholdTilHtml(
                 "Med vennlig hilsen\nNAV Familie- og pensjonsytelser"

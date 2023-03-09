@@ -38,66 +38,66 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
  * FRISINN: https://confluence.adeo.no/display/MODNAV/Generert+dokumentasjon
  */
 @Disabled("Kjøres ved behov for å regenerere dokumentasjon")
-public class DokumentasjonGeneratorPeriodeSærligeGrunner {
+class DokumentasjonGeneratorPeriodeSærligeGrunnerTest {
 
     private final Periode januar = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 31));
 
     @Test
-    public void list_ut_særlige_grunner_simpel_uaktsomhet_forstod() {
-        HbVedtaksbrevFelles felles = lagFellesdel(null);
+    void list_ut_særlige_grunner_simpel_uaktsomhet_forstod() {
+        var felles = lagFellesdel(null);
         lagSærligeGrunnerTekster(felles, VilkårResultat.FORSTO_BURDE_FORSTÅTT, Aktsomhet.SIMPEL_UAKTSOM);
     }
 
     @Test
-    public void list_ut_særlige_grunner_simpel_uaktsomhet_forstod_nynorsk() {
-        HbVedtaksbrevFelles felles = lagFellesdel(Språkkode.nn);
+    void list_ut_særlige_grunner_simpel_uaktsomhet_forstod_nynorsk() {
+        var felles = lagFellesdel(Språkkode.nn);
         lagSærligeGrunnerTekster(felles, VilkårResultat.FORSTO_BURDE_FORSTÅTT, Aktsomhet.SIMPEL_UAKTSOM);
     }
 
     @Test
-    public void list_ut_særlige_grunner_grov_uaktsomhet_forstod() {
-        HbVedtaksbrevFelles felles = lagFellesdel(null);
+    void list_ut_særlige_grunner_grov_uaktsomhet_forstod() {
+        var felles = lagFellesdel(null);
         lagSærligeGrunnerTekster(felles, VilkårResultat.FORSTO_BURDE_FORSTÅTT, Aktsomhet.GROVT_UAKTSOM);
     }
 
     @Test
-    public void list_ut_særlige_grunner_grov_uaktsomhet_forstod_nynorsk() {
-        HbVedtaksbrevFelles felles = lagFellesdel(Språkkode.nn);
+    void list_ut_særlige_grunner_grov_uaktsomhet_forstod_nynorsk() {
+        var felles = lagFellesdel(Språkkode.nn);
         lagSærligeGrunnerTekster(felles, VilkårResultat.FORSTO_BURDE_FORSTÅTT, Aktsomhet.GROVT_UAKTSOM);
     }
 
     @Test
-    public void list_ut_særlige_grunner_simpel_uaktsomhet_feil_mangelfulle_opplysninger() {
-        HbVedtaksbrevFelles felles = lagFellesdel(null);
+    void list_ut_særlige_grunner_simpel_uaktsomhet_feil_mangelfulle_opplysninger() {
+        var felles = lagFellesdel(null);
         lagSærligeGrunnerTekster(felles, VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.SIMPEL_UAKTSOM);
     }
 
     @Test
-    public void list_ut_særlige_grunner_simpel_uaktsomhet_feil_mangelfulle_opplysninger_nynorsk() {
-        HbVedtaksbrevFelles felles = lagFellesdel(Språkkode.nn);
+    void list_ut_særlige_grunner_simpel_uaktsomhet_feil_mangelfulle_opplysninger_nynorsk() {
+        var felles = lagFellesdel(Språkkode.nn);
         lagSærligeGrunnerTekster(felles, VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.SIMPEL_UAKTSOM);
     }
 
     @Test
-    public void list_ut_særlige_grunner_grov_uaktsomhet_feil_mangelfulle_opplysninger() {
-        HbVedtaksbrevFelles felles = lagFellesdel(null);
+    void list_ut_særlige_grunner_grov_uaktsomhet_feil_mangelfulle_opplysninger() {
+        var felles = lagFellesdel(null);
         lagSærligeGrunnerTekster(felles, VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.GROVT_UAKTSOM);
     }
 
     @Test
-    public void list_ut_særlige_grunner_grov_uaktsomhet_feil_mangelfulle_opplysninger_nynorsk() {
-        HbVedtaksbrevFelles felles = lagFellesdel(Språkkode.nn);
+    void list_ut_særlige_grunner_grov_uaktsomhet_feil_mangelfulle_opplysninger_nynorsk() {
+        var felles = lagFellesdel(Språkkode.nn);
         lagSærligeGrunnerTekster(felles, VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.GROVT_UAKTSOM);
     }
 
     private void lagSærligeGrunnerTekster(HbVedtaksbrevFelles felles, VilkårResultat forstoBurdeForstått, Aktsomhet simpelUaktsom) {
-        boolean[] boolske = {false, true};
+        var boolske = new boolean[]{false, true};
 
-        for (boolean sgNav : boolske) {
-            for (boolean sgBeløp : boolske) {
-                for (boolean sgTid : boolske) {
-                    for (boolean reduksjon : boolske) {
-                        for (boolean sgAnnet : boolske) {
+        for (var sgNav : boolske) {
+            for (var sgBeløp : boolske) {
+                for (var sgTid : boolske) {
+                    for (var reduksjon : boolske) {
+                        for (var sgAnnet : boolske) {
                             lagSærligeGrunnerTekster(felles, forstoBurdeForstått, simpelUaktsom, sgNav, sgBeløp, sgTid, reduksjon, sgAnnet);
                         }
                     }
@@ -114,10 +114,10 @@ public class DokumentasjonGeneratorPeriodeSærligeGrunner {
                                           boolean sgTid,
                                           boolean reduksjon,
                                           boolean sgAnnet) {
-        HbVedtaksbrevPeriode periode = lagPeriodeDel(vilkårResultat, aktsomhet, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-        String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
-        String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-        String prettyprint = prettyprint(s, overskrift);
+        var periode = lagPeriodeDel(vilkårResultat, aktsomhet, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
+        var s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
+        var overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
+        var prettyprint = prettyprint(s, overskrift);
 
         System.out.println();
         System.out.println(prettyprint);
@@ -159,7 +159,7 @@ public class DokumentasjonGeneratorPeriodeSærligeGrunner {
             sg.add(SærligGrunn.ANNET);
         }
 
-        String fritekstSærligeGrunnerAnnet = "[fritekst her]";
+        var fritekstSærligeGrunnerAnnet = "[fritekst her]";
         return HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medVurderinger(HbVurderinger.builder()

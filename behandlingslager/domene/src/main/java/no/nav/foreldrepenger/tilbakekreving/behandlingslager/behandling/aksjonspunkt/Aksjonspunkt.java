@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -190,7 +189,7 @@ public class Aksjonspunkt extends BaseEntitet {
      * Returner liste av abstraktpunkt definisjon koder.
      */
     public static List<String> getKoder(List<Aksjonspunkt> abstraktpunkter) {
-        return abstraktpunkter.stream().map(ap -> ap.getAksjonspunktDefinisjon().getKode()).collect(Collectors.toList());
+        return abstraktpunkter.stream().map(ap -> ap.getAksjonspunktDefinisjon().getKode()).toList();
     }
 
     @Override
@@ -201,7 +200,7 @@ public class Aksjonspunkt extends BaseEntitet {
         if (!(object instanceof Aksjonspunkt)) {
             return false;
         }
-        Aksjonspunkt kontrollpunkt = (Aksjonspunkt) object;
+        var kontrollpunkt = (Aksjonspunkt) object;
         return Objects.equals(getAksjonspunktDefinisjon(), kontrollpunkt.getAksjonspunktDefinisjon())
                 && Objects.equals(getBehandling(), kontrollpunkt.getBehandling())
                 && Objects.equals(getStatus(), kontrollpunkt.getStatus())
@@ -229,7 +228,6 @@ public class Aksjonspunkt extends BaseEntitet {
 
     private void validerIkkeUtførtAvbruttAllerede() {
         if (erUtført() || erAvbrutt()) {
-            // TODO (FC): håndteres av låsing allerede? Kaster exception nå for å se om GUI kan være ute av synk.
             throw new IllegalStateException("Forsøkte å bekrefte et allerede lukket aksjonspunkt:" + this); //$NON-NLS-1$
         }
     }
@@ -278,17 +276,17 @@ public class Aksjonspunkt extends BaseEntitet {
         }
 
         Aksjonspunkt buildFor(Behandling behandling) {
-            Aksjonspunkt ap = this.aksjonspunkt;
+            var ap = this.aksjonspunkt;
             if (this.opprinneligAp != null) {
                 kopierAlleFelter(opprinneligAp, ap, true);
             }
-            Optional<Aksjonspunkt> eksisterende = finnEksisterende(behandling, ap.aksjonspunktDefinisjon);
+            var eksisterende = finnEksisterende(behandling, ap.aksjonspunktDefinisjon);
             if (slettet) {
                 InternalUtil.fjernAksjonspunkt(behandling, ap);
                 return ap;
             } else if (eksisterende.isPresent()) {
                 // Oppdater eksisterende. Aktiver dersom ikke allerede aktivt.
-                Aksjonspunkt eksisterendeAksjonspunkt = eksisterende.get();
+                var eksisterendeAksjonspunkt = eksisterende.get();
                 kopierBasisfelter(ap, eksisterendeAksjonspunkt);
                 return eksisterendeAksjonspunkt;
             } else {
@@ -305,7 +303,7 @@ public class Aksjonspunkt extends BaseEntitet {
                 til.setToTrinnsBehandling(fra.isToTrinnsBehandling());
             }
             if (fra.getVurderPåNyttÅrsaker() != null) {
-                for (VurderPåNyttÅrsak årsak : fra.getVurderPåNyttÅrsaker()) {
+                for (var årsak : fra.getVurderPåNyttÅrsaker()) {
                     til.getVurderPåNyttÅrsaker().add(new VurderPåNyttÅrsak(årsak.getÅrsaksType(), til));
                 }
             }

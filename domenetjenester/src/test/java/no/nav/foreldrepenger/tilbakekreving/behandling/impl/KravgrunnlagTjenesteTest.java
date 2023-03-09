@@ -44,7 +44,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
-public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
+class KravgrunnlagTjenesteTest extends FellesTestOppsett {
 
     private static final String SSN = "11112222333";
     private static final String ENHET = "8020";
@@ -60,7 +60,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     private static final LocalDate tom = LocalDate.of(2016, 3, 18);
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         entityManager.setFlushMode(FlushModeType.AUTO);
         when(mockTpsTjeneste.hentAktørForFnr(new PersonIdent(SSN))).thenReturn(Optional.of(aktørId));
         when(behandlingskontrollTjeneste.erStegPassert(any(Behandling.class), any(BehandlingStegType.class))).thenReturn(true);
@@ -68,7 +68,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void lagreTilbakekrevingsgrunnlagFraØkonomi() {
+    void lagreTilbakekrevingsgrunnlagFraØkonomi() {
         Kravgrunnlag431 kravgrunnlag = lagKravgrunnlagDto(KravStatusKode.NYTT);
         formPerioder(fom, tom, kravgrunnlag);
         kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, true);
@@ -77,7 +77,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void lagreTilbakekrevingsgrunnlagFraØkonomi_medEndretGrunnlag() {
+    void lagreTilbakekrevingsgrunnlagFraØkonomi_medEndretGrunnlag() {
         Kravgrunnlag431 kravgrunnlag = lagKravgrunnlagDto(KravStatusKode.ENDRET);
         formPerioder(fom, tom, kravgrunnlag);
         kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, true);
@@ -86,7 +86,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void lagreTilbakekrevingsgrunnlagFraØkonomi_med_ugyldig_endret_grunnlag() {
+    void lagreTilbakekrevingsgrunnlagFraØkonomi_med_ugyldig_endret_grunnlag() {
         Kravgrunnlag431 kravgrunnlag = lagKravgrunnlagDto(KravStatusKode.ENDRET);
         formPerioder(fom, tom, kravgrunnlag);
         kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, false);
@@ -96,7 +96,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void lagreTilbakekrevingsgrunnlagFraØkonomi_medEndretGrunnlag_med_allerede_har_grunnlag() {
+    void lagreTilbakekrevingsgrunnlagFraØkonomi_medEndretGrunnlag_med_allerede_har_grunnlag() {
         Kravgrunnlag431 kravgrunnlag = lagKravgrunnlagDto(KravStatusKode.NYTT);
         formPerioder(fom, tom, kravgrunnlag);
         kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, true);

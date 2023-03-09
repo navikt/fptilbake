@@ -37,7 +37,7 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
  * FRISINN: https://confluence.adeo.no/display/MODNAV/Generert+dokumentasjon
  */
 @Disabled("Kjøres ved behov for å regenerere dokumentasjon")
-public class DokumentasjonGeneratorPeriodeVilkår {
+class DokumentasjonGeneratorPeriodeVilkårTest {
 
     private final Periode JANUAR = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 16));
     private final LocalDate FORELDELSESFRIST = LocalDate.of(2019, 12, 1);
@@ -61,42 +61,42 @@ public class DokumentasjonGeneratorPeriodeVilkår {
     private static boolean[] trueFalse = new boolean[]{true, false};
 
     @Test
-    public void generer_vilkår_for_fp() {
+    void generer_vilkår_for_fp() {
         lagVilkårstekster(FagsakYtelseType.FORELDREPENGER, Språkkode.nb);
     }
 
     @Test
-    public void generer_vilkår_for_fp_nynorsk() {
+    void generer_vilkår_for_fp_nynorsk() {
         lagVilkårstekster(FagsakYtelseType.FORELDREPENGER, Språkkode.nn);
     }
 
     @Test
-    public void generer_vilkår_for_svp() {
+    void generer_vilkår_for_svp() {
         lagVilkårstekster(FagsakYtelseType.SVANGERSKAPSPENGER, Språkkode.nb);
     }
 
     @Test
-    public void generer_vilkår_for_svp_nynorsk() {
+    void generer_vilkår_for_svp_nynorsk() {
         lagVilkårstekster(FagsakYtelseType.SVANGERSKAPSPENGER, Språkkode.nn);
     }
 
     @Test
-    public void generer_vilkår_for_es() {
+    void generer_vilkår_for_es() {
         lagVilkårstekster(FagsakYtelseType.ENGANGSTØNAD, Språkkode.nb);
     }
 
     @Test
-    public void generer_vilkår_for_es_nynorsk() {
+    void generer_vilkår_for_es_nynorsk() {
         lagVilkårstekster(FagsakYtelseType.ENGANGSTØNAD, Språkkode.nn);
     }
 
     @Test
-    public void generer_vilkår_for_frisinn() {
+    void generer_vilkår_for_frisinn() {
         lagVilkårstekster(FagsakYtelseType.FRISINN, Språkkode.nb);
     }
 
     @Test
-    public void generer_vilkår_for_frisinn_nynorsk() {
+    void generer_vilkår_for_frisinn_nynorsk() {
         lagVilkårstekster(FagsakYtelseType.FRISINN, Språkkode.nn);
     }
 

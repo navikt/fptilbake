@@ -39,7 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @CdiDbAwareTest
-public class VarselStegTest {
+class VarselStegTest {
 
     @Inject
     private ProsessTaskTjeneste taskTjeneste;
@@ -61,7 +61,7 @@ public class VarselStegTest {
     private Behandling behandling;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         fagsak = TestFagsakUtil.opprettFagsak();
         fagsakRepository.lagre(fagsak);
         behandling = lagBehandling(fagsak, false);
@@ -70,7 +70,7 @@ public class VarselStegTest {
     }
 
     @Test
-    public void skal_sette_behandling_på_vent() {
+    void skal_sette_behandling_på_vent() {
 
         varselRepository.lagre(behandling.getId(), "hello", 23000l);
 
@@ -93,7 +93,7 @@ public class VarselStegTest {
     }
 
     @Test
-    public void skal_ikke_sette_behandling_på_vent_når_varseltekst_ikke_finnes() {
+    void skal_ikke_sette_behandling_på_vent_når_varseltekst_ikke_finnes() {
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
         assertThat(stegResultat.getAksjonspunktListe()).isEmpty();
@@ -101,7 +101,7 @@ public class VarselStegTest {
     }
 
     @Test
-    public void skal_ikke_sette_behandling_på_vent_når_behandling_er_manuelt_opprettet() {
+    void skal_ikke_sette_behandling_på_vent_når_behandling_er_manuelt_opprettet() {
         Behandling behandling = lagBehandling(fagsak, true);
         varselRepository.lagre(behandling.getId(), "hello", 23000l);
 

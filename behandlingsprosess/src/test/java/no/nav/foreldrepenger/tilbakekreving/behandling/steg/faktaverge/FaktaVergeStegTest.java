@@ -13,7 +13,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktTestSupport;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 
-public class FaktaVergeStegTest extends FellesTestOppsett {
+class FaktaVergeStegTest extends FellesTestOppsett {
 
     private FaktaVergeSteg faktaVergeSteg;
 
@@ -23,7 +23,7 @@ public class FaktaVergeStegTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_utføre_steg_hvis_verge_aksjonspunkt_finnes() {
+    void skal_utføre_steg_hvis_verge_aksjonspunkt_finnes() {
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE);
         BehandlingskontrollKontekst kontekst = new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), behandlingLås);
@@ -35,7 +35,7 @@ public class FaktaVergeStegTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_ikke_utføre_steg_hvis_verge_aksjonspunkt_ikke_finnes() {
+    void skal_ikke_utføre_steg_hvis_verge_aksjonspunkt_ikke_finnes() {
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         BehandlingskontrollKontekst kontekst = new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), behandlingLås);
         BehandleStegResultat stegResultat = faktaVergeSteg.utførSteg(kontekst);

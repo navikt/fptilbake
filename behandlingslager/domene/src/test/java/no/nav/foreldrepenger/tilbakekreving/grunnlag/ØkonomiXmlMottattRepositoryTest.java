@@ -14,7 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlReposi
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 
 @ExtendWith(JpaExtension.class)
-public class ØkonomiXmlMottattRepositoryTest {
+class ØkonomiXmlMottattRepositoryTest {
 
     private ØkonomiMottattXmlRepository repository;
     private EntityManager em;
@@ -26,7 +26,7 @@ public class ØkonomiXmlMottattRepositoryTest {
     }
 
     @Test
-    public void skal_lagre_grunnlag_xml() {
+    void skal_lagre_grunnlag_xml() {
         String xml = "foo";
         Long xmlId = repository.lagreMottattXml(xml);
 
@@ -35,7 +35,7 @@ public class ØkonomiXmlMottattRepositoryTest {
     }
 
     @Test
-    public void skal_slette_grunnlag() {
+    void skal_slette_grunnlag() {
         String xml = "foo";
         Long xmlId = repository.lagreMottattXml(xml);
         repository.slettMottattXml(xmlId);
@@ -47,7 +47,7 @@ public class ØkonomiXmlMottattRepositoryTest {
     }
 
     @Test
-    public void skal_oppdatere_med_eksernBehandlingId_og_versjon() {
+    void skal_oppdatere_med_eksernBehandlingId_og_versjon() {
         String xml1 = "foo1";
         String xml2 = "foo2";
         String saksnummer = "1234345";

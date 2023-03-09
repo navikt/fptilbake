@@ -18,13 +18,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselReposi
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 
-public class InnhentOpplysningStegTest extends FellesTestOppsett {
+class InnhentOpplysningStegTest extends FellesTestOppsett {
 
     private InnhentOpplysningSteg innhentOpplysningSteg;
     private VarselRepository varselRepository;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         innhentOpplysningSteg = new InnhentOpplysningSteg(repositoryProvider, fagsystemKlientMock);
         varselRepository = repositoryProvider.getVarselRepository();
 
@@ -33,7 +33,7 @@ public class InnhentOpplysningStegTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_hente_varseltekst_fra_fpsak_og_lagre() {
+    void skal_hente_varseltekst_fra_fpsak_og_lagre() {
         final String varselTekst = "Dette er varselTekst";
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = SamletEksternBehandlingInfo
                 .builder(Tillegsinformasjon.VARSELTEKST)
@@ -50,7 +50,7 @@ public class InnhentOpplysningStegTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_forsøke_å_hente_varseltekst_fra_fpsak_og_ikke_lagre_varsel_når_varseltekst_ikke_finnes() {
+    void skal_forsøke_å_hente_varseltekst_fra_fpsak_og_ikke_lagre_varsel_når_varseltekst_ikke_finnes() {
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = SamletEksternBehandlingInfo
                 .builder(Tillegsinformasjon.VARSELTEKST)
                 .setVarseltekst("").build();

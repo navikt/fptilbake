@@ -19,6 +19,7 @@ public class AksjonspunktDto {
     private Boolean erAktivt;
 
     public AksjonspunktDto() {
+        // Jackson
     }
 
     public void setDefinisjon(AksjonspunktDefinisjon definisjon) {

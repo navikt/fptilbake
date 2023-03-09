@@ -27,7 +27,7 @@ import no.nav.vedtak.sikkerhet.abac.pipdata.PipAktørId;
 import no.nav.vedtak.sikkerhet.abac.pipdata.PipBehandlingStatus;
 import no.nav.vedtak.sikkerhet.abac.pipdata.PipFagsakStatus;
 
-public class FPPdpRequestBuilderTest {
+class FPPdpRequestBuilderTest {
 
     private static final String DUMMY_ID_TOKEN = "dummyheader.dymmypayload.dummysignaturee";
     private static final String SAKSNUMMER = "5555";
@@ -46,7 +46,7 @@ public class FPPdpRequestBuilderTest {
     private final FPPdpRequestBuilder requestBuilder = new FPPdpRequestBuilder(pipRepository, fpsakPipKlient);
 
     @Test
-    public void skal_hente_behandling_og_fagsak_informasjon_når_input_er_behandling_id() {
+    void skal_hente_behandling_og_fagsak_informasjon_når_input_er_behandling_id() {
         var attributter = AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID);
 
         when(pipRepository.hentBehandlingData(BEHANDLING_ID))
@@ -60,7 +60,7 @@ public class FPPdpRequestBuilderTest {
     }
 
     @Test
-    public void skal_hente_behandling_og_fagsak_informasjon_når_input_er_behandlinguuid() {
+    void skal_hente_behandling_og_fagsak_informasjon_når_input_er_behandlinguuid() {
         var attributter = AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID);
 
         when(pipRepository.hentBehandlingData(BEHANDLING_UUID))
@@ -74,7 +74,7 @@ public class FPPdpRequestBuilderTest {
     }
 
     @Test
-    public void skal_hente_behandlinginfo_fra_fpsak_når_input_er_fpsak_behandlingid() {
+    void skal_hente_behandlinginfo_fra_fpsak_når_input_er_fpsak_behandlingid() {
         var attributter = AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID);
 
         var pipDto = new AbacPipDto(Set.of(new PipAktørId(PERSON1)), PipFagsakStatus.OPPRETTET, PipBehandlingStatus.OPPRETTET);
@@ -88,7 +88,7 @@ public class FPPdpRequestBuilderTest {
     }
 
     @Test
-    public void skal_hente_behandlinginfo_fra_fpsak_når_input_er_fpsak_behandlingid_avsluttet_sak() {
+    void skal_hente_behandlinginfo_fra_fpsak_når_input_er_fpsak_behandlingid_avsluttet_sak() {
         var attributter = AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID);
 
         var pipDto = new AbacPipDto(Set.of(new PipAktørId(PERSON1)), null, null);
@@ -103,7 +103,7 @@ public class FPPdpRequestBuilderTest {
 
 
     @Test
-    public void skal_hente_aktører_fra_fpsak_når_input_er_saksnummer() {
+    void skal_hente_aktører_fra_fpsak_når_input_er_saksnummer() {
         var attributter = AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.SAKSNUMMER, SAKSNUMMER);
 
         when(fpsakPipKlient.hentAktørIderSomString(new Saksnummer(SAKSNUMMER))).thenReturn(Set.of(PERSON2));
@@ -114,7 +114,7 @@ public class FPPdpRequestBuilderTest {
     }
 
     @Test
-    public void skal_hente_behandling_og_fagsak_informasjon_når_saksnummer_er_input_uten_saksbehandler() {
+    void skal_hente_behandling_og_fagsak_informasjon_når_saksnummer_er_input_uten_saksbehandler() {
         var attributter = AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID);
 
         when(pipRepository.hentBehandlingData(BEHANDLING_ID))
@@ -128,7 +128,7 @@ public class FPPdpRequestBuilderTest {
     }
 
     @Test
-    public void skal_kaste_feil_ved_flere_behandlingIder() {
+    void skal_kaste_feil_ved_flere_behandlingIder() {
         var attributter = AbacDataAttributter.opprett()
                         .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
                         .leggTil(StandardAbacAttributtType.BEHANDLING_ID, 85392L);
@@ -139,7 +139,7 @@ public class FPPdpRequestBuilderTest {
     }
 
     @Test
-    public void skal_kaste_feil_ved_både_behandlingId_og_fpsak_behandlingUuid() {
+    void skal_kaste_feil_ved_både_behandlingId_og_fpsak_behandlingUuid() {
         var attributter = AbacDataAttributter.opprett()
                         .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
                         .leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID);
@@ -150,7 +150,7 @@ public class FPPdpRequestBuilderTest {
     }
 
     @Test
-    public void skal_kaste_feil_ved_både_behandlingId_og_behandlingUuid() {
+    void skal_kaste_feil_ved_både_behandlingId_og_behandlingUuid() {
         var attributter = AbacDataAttributter.opprett()
                         .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
                         .leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID);
@@ -161,7 +161,7 @@ public class FPPdpRequestBuilderTest {
     }
 
     @Test
-    public void skal_kaste_feil_ved_både_behandlingUuid_og_fpsak_behandlingUuid() {
+    void skal_kaste_feil_ved_både_behandlingUuid_og_fpsak_behandlingUuid() {
         var attributter = AbacDataAttributter.opprett()
                         .leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID)
                         .leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID);

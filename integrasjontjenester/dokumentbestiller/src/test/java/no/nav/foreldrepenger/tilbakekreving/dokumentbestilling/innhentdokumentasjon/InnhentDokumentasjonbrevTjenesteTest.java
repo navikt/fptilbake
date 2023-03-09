@@ -25,7 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBre
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 
-public class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestOppsett {
+class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     private static final String FLERE_OPPLYSNINGER = "Vi trenger flere opplysninger";
 
@@ -36,7 +36,7 @@ public class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestO
     private Long behandlingId;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         innhentDokumentasjonBrevTjeneste = new InnhentDokumentasjonbrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste, mockPdfBrevTjeneste);
 
         behandlingId = behandling.getId();
@@ -61,14 +61,14 @@ public class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestO
     }
 
     @Test
-    public void skal_sende_innhent_dokumentasjonbrev() {
+    void skal_sende_innhent_dokumentasjonbrev() {
         innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, FLERE_OPPLYSNINGER, BrevMottaker.BRUKER);
 
         Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.INNHENT_DOKUMETASJON), any(BrevData.class));
     }
 
     @Test
-    public void skal_forhåndsvise_innhent_dokumentasjonbrev() {
+    void skal_forhåndsvise_innhent_dokumentasjonbrev() {
         byte[] data = innhentDokumentasjonBrevTjeneste.hentForhåndsvisningInnhentDokumentasjonBrev(behandlingId, FLERE_OPPLYSNINGER);
         assertThat(data).isNotEmpty();
     }

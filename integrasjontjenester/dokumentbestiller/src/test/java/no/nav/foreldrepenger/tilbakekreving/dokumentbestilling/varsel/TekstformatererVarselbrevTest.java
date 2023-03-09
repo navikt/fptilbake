@@ -20,7 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.pe
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 
-public class TekstformatererVarselbrevTest {
+class TekstformatererVarselbrevTest {
 
     private FagsakYtelseType foreldrepengerkode = FagsakYtelseType.FORELDREPENGER;
     private FagsakYtelseType engangsstønadkode = FagsakYtelseType.ENGANGSTØNAD;
@@ -32,7 +32,7 @@ public class TekstformatererVarselbrevTest {
     private final LocalDate FRIST_DATO = LocalDate.of(2020, 4, 4);
 
     @Test
-    public void skal_generere_varseltekst_for_flere_perioder() throws Exception {
+    void skal_generere_varseltekst_for_flere_perioder() throws Exception {
         BrevMetadata metadata = new BrevMetadata.Builder()
                 .medFagsaktype(svangerskapspengerkode)
                 .medSprakkode(Språkkode.nn)
@@ -57,7 +57,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_generere_varseltekst_for_engangsstønad() throws IOException {
+    void skal_generere_varseltekst_for_engangsstønad() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
                 .medFagsaktype(engangsstønadkode)
                 .medSprakkode(Språkkode.nb)
@@ -82,7 +82,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_generere_varseltekst_for_foreldrepenger_med_enkelt_periode() throws IOException {
+    void skal_generere_varseltekst_for_foreldrepenger_med_enkelt_periode() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
                 .medFagsaktype(foreldrepengerkode)
                 .medSprakkode(Språkkode.nb)
@@ -107,7 +107,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_generere_varseltekst_for_frisinn_med_enkelt_periode() throws IOException {
+    void skal_generere_varseltekst_for_frisinn_med_enkelt_periode() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FRISINN)
                 .medSprakkode(Språkkode.nb)
@@ -132,7 +132,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_mappe_verdier_fra_dtoer_til_komplett_tilbakekrevingsvarsel() {
+    void skal_mappe_verdier_fra_dtoer_til_komplett_tilbakekrevingsvarsel() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medSprakkode(Språkkode.nn)
                 .medFagsaktype(foreldrepengerkode)
@@ -163,7 +163,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_ikke_sette_tidligste_og_seneste_dato_når_det_foreligger_flere_perioder() {
+    void skal_ikke_sette_tidligste_og_seneste_dato_når_det_foreligger_flere_perioder() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(foreldrepengerkode)
                 .medSprakkode(Språkkode.en)
@@ -184,13 +184,13 @@ public class TekstformatererVarselbrevTest {
         assertThat(varselbrev.getDatoerHvisSammenhengendePeriode()).isNull();
     }
 
-    public List<HbPeriode> mockFeilutbetalingerMedKunEnPeriode() {
+    List<HbPeriode> mockFeilutbetalingerMedKunEnPeriode() {
         return List.of(HbPeriode.of(LocalDate.of(2019, 3, 3),
                 LocalDate.of(2020, 3, 3)));
     }
 
     @Test
-    public void skal_kontrollere_at_alle_nødvendige_verdier_for_komplett_brev_er_satt_for_engangsstønad() {
+    void skal_kontrollere_at_alle_nødvendige_verdier_for_komplett_brev_er_satt_for_engangsstønad() {
         VarselbrevDokument varselbrevDokument = lagTilbakekrevingvarselMedObligatoriskeVerdier();
         varselbrevDokument.setDatoerHvisSammenhengendePeriode(HbPeriode.of(LocalDate.of(2019, 12, 12), LocalDate.of(2020, 1, 1)));
         varselbrevDokument.setFeilutbetaltePerioder(mockUtbetalingEnPeriode());
@@ -200,7 +200,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_kaste_feil_dersom_ikke_nødvendige_verdier_for_komplett_brev_er_satt_for_engangsstønad() {
+    void skal_kaste_feil_dersom_ikke_nødvendige_verdier_for_komplett_brev_er_satt_for_engangsstønad() {
         VarselbrevDokument varselbrevDokument = lagTilbakekrevingvarselMedObligatoriskeVerdier();
         varselbrevDokument.setYtelsetype(FagsakYtelseType.ENGANGSTØNAD);
         varselbrevDokument.setFeilutbetaltePerioder(mockUtbetalingEnPeriode());
@@ -210,7 +210,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_kontrollere_at_alle_nødvendige_verdier_for_komplett_brev_er_satt_for_foreldrepenger_sammenhengende_periode() {
+    void skal_kontrollere_at_alle_nødvendige_verdier_for_komplett_brev_er_satt_for_foreldrepenger_sammenhengende_periode() {
         VarselbrevDokument varselbrevDokument = lagTilbakekrevingvarselMedObligatoriskeVerdier();
         varselbrevDokument.setFeilutbetaltePerioder(mockUtbetalingEnPeriode());
         varselbrevDokument.setFagsaktypeNavn("foreldrepenger");
@@ -220,7 +220,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_generere_varselbrev_overskrift() {
+    void skal_generere_varselbrev_overskrift() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
                 .medSprakkode(Språkkode.nb)
@@ -232,7 +232,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_generere_varselbrev_overskrift_nynorsk() {
+    void skal_generere_varselbrev_overskrift_nynorsk() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktypenavnPåSpråk("foreldrepengar")
                 .medSprakkode(Språkkode.nb)
@@ -244,7 +244,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_generere_korrigert_varselbrev_overskrift() {
+    void skal_generere_korrigert_varselbrev_overskrift() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
                 .medSprakkode(Språkkode.nb)
@@ -256,7 +256,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_generere_korrigert_varselbrev_overskrift_nynorsk() {
+    void skal_generere_korrigert_varselbrev_overskrift_nynorsk() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktypenavnPåSpråk("foreldrepengar")
                 .medSprakkode(Språkkode.nn)
@@ -268,7 +268,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_generere_korrigert_varselbrev_overskrift_engangstønad() {
+    void skal_generere_korrigert_varselbrev_overskrift_engangstønad() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.ENGANGSTØNAD)
                 .medFagsaktypenavnPåSpråk("engangstønad")
@@ -281,7 +281,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_generere_korrigert_varselbrev_overskrift_engangstønad_nynorsk() {
+    void skal_generere_korrigert_varselbrev_overskrift_engangstønad_nynorsk() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.ENGANGSTØNAD)
                 .medFagsaktypenavnPåSpråk("eingongstønad")
@@ -294,7 +294,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_generere_varselbrev_for_verge() throws IOException {
+    void skal_generere_varselbrev_for_verge() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
                 .medFagsaktype(foreldrepengerkode)
                 .medSprakkode(Språkkode.nb)

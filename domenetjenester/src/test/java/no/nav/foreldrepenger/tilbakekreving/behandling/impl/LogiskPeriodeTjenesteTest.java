@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-public class LogiskPeriodeTjenesteTest {
+class LogiskPeriodeTjenesteTest {
 
     private LocalDate uke_1_onsdag = LocalDate.of(2020, 1, 1);
     private LocalDate uke_1_torsdag = uke_1_onsdag.plusDays(1);
@@ -22,13 +22,13 @@ public class LogiskPeriodeTjenesteTest {
     private LocalDate uke_2_mandag = uke_1_onsdag.plusDays(5);
 
     @Test
-    public void tom_input_skal_gi_tom_output() {
+    void tom_input_skal_gi_tom_output() {
         List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.utledLogiskPeriode(InputBuilder.builder().build());
         Assertions.assertThat(resultat).isEmpty();
     }
 
     @Test
-    public void en_periode_skal_fortsette_som_samme_periode() {
+    void en_periode_skal_fortsette_som_samme_periode() {
         Periode periode1 = Periode.of(uke_1_onsdag, uke_1_lørdag);
         SortedMap<Periode, BigDecimal> input = InputBuilder.builder().leggTil(periode1, BigDecimal.ONE).build();
         List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.utledLogiskPeriode(input);
@@ -37,7 +37,7 @@ public class LogiskPeriodeTjenesteTest {
     }
 
     @Test
-    public void intilliggende_perioder_skal_slås_sammen_og_summere_verdi() {
+    void intilliggende_perioder_skal_slås_sammen_og_summere_verdi() {
         Periode periode1 = Periode.of(uke_1_onsdag, uke_1_onsdag);
         Periode periode2 = Periode.of(uke_1_torsdag, uke_1_torsdag);
         Periode periode3 = Periode.of(uke_1_fredag, uke_2_mandag);
@@ -52,7 +52,7 @@ public class LogiskPeriodeTjenesteTest {
     }
 
     @Test
-    public void perioder_som_er_skilt_med_ukedag_skal_ikke_slås_sammen() {
+    void perioder_som_er_skilt_med_ukedag_skal_ikke_slås_sammen() {
         Periode periode1 = Periode.of(uke_1_onsdag, uke_1_onsdag);
         Periode periode2 = Periode.of(uke_1_fredag, uke_2_mandag);
         SortedMap<Periode, BigDecimal> input = InputBuilder.builder()
@@ -66,7 +66,7 @@ public class LogiskPeriodeTjenesteTest {
     }
 
     @Test
-    public void perioder_som_er_skilt_med_helg_skal_slås_sammen() {
+    void perioder_som_er_skilt_med_helg_skal_slås_sammen() {
         Periode periode1 = Periode.of(uke_1_onsdag, uke_1_fredag);
         Periode periode2 = Periode.of(uke_2_mandag, uke_2_mandag);
         SortedMap<Periode, BigDecimal> input = InputBuilder.builder()
@@ -79,7 +79,7 @@ public class LogiskPeriodeTjenesteTest {
     }
 
     @Test
-    public void perioder_som_er_skilt_med_en_lørdag_skal_slås_sammen() {
+    void perioder_som_er_skilt_med_en_lørdag_skal_slås_sammen() {
         Periode periode1 = Periode.of(uke_1_onsdag, uke_1_fredag);
         Periode periode2 = Periode.of(uke_1_søndag, uke_2_mandag);
         SortedMap<Periode, BigDecimal> input = InputBuilder.builder()
@@ -92,7 +92,7 @@ public class LogiskPeriodeTjenesteTest {
     }
 
     @Test
-    public void perioder_som_er_skilt_med_en_søndag_skal_slås_sammen() {
+    void perioder_som_er_skilt_med_en_søndag_skal_slås_sammen() {
         Periode periode1 = Periode.of(uke_1_onsdag, uke_1_lørdag);
         Periode periode2 = Periode.of(uke_2_mandag, uke_2_mandag);
         SortedMap<Periode, BigDecimal> input = InputBuilder.builder()

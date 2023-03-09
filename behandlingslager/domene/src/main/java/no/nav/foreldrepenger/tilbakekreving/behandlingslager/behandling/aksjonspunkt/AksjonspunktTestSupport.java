@@ -39,35 +39,4 @@ public final class AksjonspunktTestSupport {
         return adBuilder.buildFor(behandling);
 
     }
-
-    public static void setToTrinnsBehandlingKreves(Aksjonspunkt aksjonspunkt) {
-        var apDef = aksjonspunkt.getAksjonspunktDefinisjon();
-        if (!aksjonspunkt.isToTrinnsBehandling()) {
-            if (!aksjonspunkt.erÅpentAksjonspunkt()) {
-                setReåpnet(aksjonspunkt);
-            }
-            aksjonspunkt.settToTrinnsFlag();
-        }
-    }
-
-    public static void fjernToTrinnsBehandlingKreves(Aksjonspunkt aksjonspunkt) {
-        aksjonspunkt.fjernToTrinnsFlagg();
-    }
-
-    public static boolean setTilUtført(Aksjonspunkt aksjonspunkt, String begrunnelse) {
-        return aksjonspunkt.setStatus(AksjonspunktStatus.UTFØRT);
-    }
-
-    public static void setTilAvbrutt(Aksjonspunkt aksjonspunkt) {
-        aksjonspunkt.setStatus(AksjonspunktStatus.AVBRUTT);
-    }
-
-    public static void setReåpnet(Aksjonspunkt aksjonspunkt) {
-        aksjonspunkt.setStatus(AksjonspunktStatus.OPPRETTET);
-    }
-
-    public static void setFrist(Aksjonspunkt ap, LocalDateTime fristTid, Venteårsak venteårsak) {
-        ap.setFristTid(fristTid);
-        ap.setVenteårsak(venteårsak);
-    }
 }

@@ -39,7 +39,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @CdiDbAwareTest
-public class GjenopptaBehandlingTjenesteTest {
+class GjenopptaBehandlingTjenesteTest {
 
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
 
@@ -60,7 +60,7 @@ public class GjenopptaBehandlingTjenesteTest {
     private VarselresponsTjeneste mockVarselResponsTjeneste = mock(VarselresponsTjeneste.class);
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(mockTaskTjeneste,
                 behandlingKandidaterRepository,
                 behandlingVenterRepository,
@@ -69,7 +69,7 @@ public class GjenopptaBehandlingTjenesteTest {
     }
 
     @Test
-    public void skal_lage_prosess_task_behandling() {
+    void skal_lage_prosess_task_behandling() {
         final String gruppe = "66";
 
         Behandling behandling = lagBehandling();
@@ -93,7 +93,7 @@ public class GjenopptaBehandlingTjenesteTest {
     }
 
     @Test
-    public void skal_lage_forsett_behandling_prosess_task_når_behandling_er_manuelt_gjenopptatt() {
+    void skal_lage_forsett_behandling_prosess_task_når_behandling_er_manuelt_gjenopptatt() {
         final String gruppe = "44";
         Behandling behandling = lagBehandling();
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
@@ -111,7 +111,7 @@ public class GjenopptaBehandlingTjenesteTest {
     }
 
     @Test
-    public void skal_lage_prosess_tasks_for_behandlinger_som_skal_gjenopptas() {
+    void skal_lage_prosess_tasks_for_behandlinger_som_skal_gjenopptas() {
         final String gruppe = "55";
 
         Behandling behandling1 = lagBehandling();
@@ -140,7 +140,7 @@ public class GjenopptaBehandlingTjenesteTest {
     }
 
     @Test
-    public void skal_lage_prosess_tasks_for_behandlinger_med_aktiv_kravgrunnlag_som_skal_gjenopptas() {
+    void skal_lage_prosess_tasks_for_behandlinger_med_aktiv_kravgrunnlag_som_skal_gjenopptas() {
         final String gruppe = "56";
         ScenarioSimple scenario = ScenarioSimple.simple();
         scenario.medBehandlingType(BehandlingType.TILBAKEKREVING);
@@ -158,7 +158,7 @@ public class GjenopptaBehandlingTjenesteTest {
     }
 
     @Test
-    public void skal_ikke_lage_prosess_tasks_for_behandlinger_med_sperret_kravgrunnlag_som_skal_gjenopptas() {
+    void skal_ikke_lage_prosess_tasks_for_behandlinger_med_sperret_kravgrunnlag_som_skal_gjenopptas() {
         final String gruppe = "56";
         ScenarioSimple scenario = ScenarioSimple.simple();
         scenario.medBehandlingType(BehandlingType.TILBAKEKREVING);
@@ -177,7 +177,7 @@ public class GjenopptaBehandlingTjenesteTest {
     }
 
     @Test
-    public void skal_ikke_fortsette_behandling_med_grunnlag_for_behandling_i_varsel_steg_og_fristen_ikke_gått_ut() {
+    void skal_ikke_fortsette_behandling_med_grunnlag_for_behandling_i_varsel_steg_og_fristen_ikke_gått_ut() {
         Behandling behandling = lagBehandling();
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
         internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().plusDays(20));
@@ -187,7 +187,7 @@ public class GjenopptaBehandlingTjenesteTest {
     }
 
     @Test
-    public void skal_fortsette_behandling_med_grunnlag_for_behandling_i_tbk_steg() {
+    void skal_fortsette_behandling_med_grunnlag_for_behandling_i_tbk_steg() {
         Behandling behandling = lagBehandling();
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
         internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(20));
@@ -197,7 +197,7 @@ public class GjenopptaBehandlingTjenesteTest {
     }
 
     @Test
-    public void skal_fortsette_behandling_med_grunnlag_for_behandling_i_fakta_steg() {
+    void skal_fortsette_behandling_med_grunnlag_for_behandling_i_fakta_steg() {
         Behandling behandling = lagBehandling();
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
         internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(20));

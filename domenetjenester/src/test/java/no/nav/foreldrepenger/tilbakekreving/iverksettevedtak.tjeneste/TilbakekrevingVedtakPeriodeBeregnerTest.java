@@ -37,22 +37,22 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.vedtak.exception.TekniskException;
 
 @CdiDbAwareTest
-public class TilbakekrevingVedtakPeriodeBeregnerTest {
+class TilbakekrevingVedtakPeriodeBeregnerTest {
 
-    public static final DateTimeFormatter DATO_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    static final DateTimeFormatter DATO_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private final ScenarioSimple simple = ScenarioSimple.simple();
 
     @Inject
-    public BehandlingRepositoryProvider behandlingRepositoryProvider;
+    BehandlingRepositoryProvider behandlingRepositoryProvider;
     @Inject
-    public KravgrunnlagRepository kravgrunnlagRepository;
+    KravgrunnlagRepository kravgrunnlagRepository;
     @Inject
-    public VilkårsvurderingRepository vilkårsvurderingRepository;
+    VilkårsvurderingRepository vilkårsvurderingRepository;
     @Inject
-    public TilbakekrevingVedtakPeriodeBeregner beregner;
+    TilbakekrevingVedtakPeriodeBeregner beregner;
     @Inject
-    public VurdertForeldelseRepository foreldelseRepository;
+    VurdertForeldelseRepository foreldelseRepository;
     @Inject
     private EntityManager entityManager;
 
@@ -63,7 +63,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     private final Periode uke1og2 = Periode.omsluttende(uke1, uke2);
 
     @Test
-    public void skal_sende_tilbake_perioder_fra_grunnlag_ved_full_innkreving_og_ingen_splitting() {
+    void skal_sende_tilbake_perioder_fra_grunnlag_ved_full_innkreving_og_ingen_splitting() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
@@ -87,7 +87,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_sende_tilbake_perioder_fra_grunnlag_og_ikke_kreve_noe_tilbake_ved_foreldelse() {
+    void skal_sende_tilbake_perioder_fra_grunnlag_og_ikke_kreve_noe_tilbake_ved_foreldelse() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
@@ -118,7 +118,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_fordele_en_lang_vedtaksperiode_ut_på_2_grunnlagsperioder() {
+    void skal_fordele_en_lang_vedtaksperiode_ut_på_2_grunnlagsperioder() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
@@ -152,7 +152,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_fordele_en_lang_grunnlagsperiode_ut_på_to_vedtaksperioder() {
+    void skal_fordele_en_lang_grunnlagsperiode_ut_på_to_vedtaksperioder() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
@@ -185,7 +185,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_fordele_på_ulike_klassekoder_med_ulik_skatt() {
+    void skal_fordele_på_ulike_klassekoder_med_ulik_skatt() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
@@ -212,7 +212,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_tilpasse_avrunding_slik_at_tilbakekrevingsbeløp_fra_vedtaket_blir_eksakt_riktig() {
+    void skal_tilpasse_avrunding_slik_at_tilbakekrevingsbeløp_fra_vedtaket_blir_eksakt_riktig() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
@@ -257,7 +257,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_tilpasse_avrunding_slik_at_summer_fra_kravgrunnlagperioder_har_samme_summer_i_vedtaket() {
+    void skal_tilpasse_avrunding_slik_at_summer_fra_kravgrunnlagperioder_har_samme_summer_i_vedtaket() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
@@ -296,7 +296,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_beregne_skatt_beløp_for_grunnlag_med_skatt_prosent_for_full_tilbakekreving() {
+    void skal_beregne_skatt_beløp_for_grunnlag_med_skatt_prosent_for_full_tilbakekreving() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
@@ -327,7 +327,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_beregne_skatt_beløp_for_grunnlag_med_skatt_prosent_for_ingen_tilbakekreving() {
+    void skal_beregne_skatt_beløp_for_grunnlag_med_skatt_prosent_for_ingen_tilbakekreving() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
@@ -358,7 +358,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_beregne_skatt_beløp_for_grunnlag_med_skatt_prosent_for_delvis_tilbakekreving() {
+    void skal_beregne_skatt_beløp_for_grunnlag_med_skatt_prosent_for_delvis_tilbakekreving() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
@@ -389,7 +389,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_beregne_skatt_beløp_for_grunnlag_med_skatt_prosent_for_full_tilbakekreving_når_total_skatt_beløp_blir_høyere_enn_skattBeløpMnd() {
+    void skal_beregne_skatt_beløp_for_grunnlag_med_skatt_prosent_for_full_tilbakekreving_når_total_skatt_beløp_blir_høyere_enn_skattBeløpMnd() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
         Periode uke1 = Periode.of(LocalDate.of(2019, 8, 5), LocalDate.of(2019, 8, 11));
@@ -430,7 +430,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_begrense_avrunding_av_skatt_slik_at_skatt_ikke_går_over_maksgrensen_for_måneden_selv_når_måneden_er_splittet_i_flere_kravgrunnlagperioder() {
+    void skal_begrense_avrunding_av_skatt_slik_at_skatt_ikke_går_over_maksgrensen_for_måneden_selv_når_måneden_er_splittet_i_flere_kravgrunnlagperioder() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
         Periode janDel1 = Periode.of(LocalDate.of(2019, 1, 18), LocalDate.of(2019, 1, 24));
@@ -507,7 +507,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_ikke_kreve_høyere_skatt_i_måneden_enn_grensen_case_fra_testmiljø_som_trigget_en_feil_her() {
+    void skal_ikke_kreve_høyere_skatt_i_måneden_enn_grensen_case_fra_testmiljø_som_trigget_en_feil_her() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
         List<KravgrunnlagTestBuilder.KgPeriode> kgData = Arrays.asList(
@@ -560,7 +560,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_feile_når_det_finnes_kgperiode_som_ikke_helt_overlapper_med_brPerioder() {
+    void skal_feile_når_det_finnes_kgperiode_som_ikke_helt_overlapper_med_brPerioder() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
@@ -584,7 +584,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_feile_når_det_finnes_brperiode_som_ikke_helt_overlapper_med_kgPerioder() {
+    void skal_feile_når_det_finnes_brperiode_som_ikke_helt_overlapper_med_kgPerioder() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
@@ -608,7 +608,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_beregne_riktig_beløp_for_engangsstønad_i_helgen() {
+    void skal_beregne_riktig_beløp_for_engangsstønad_i_helgen() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
         var dag = LocalDate.of(2020, 11, 8);
@@ -633,7 +633,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     @Test
-    public void skal_ikke_kreve_høyere_midre_skatt_enn_spesifisert_i_kravgrunnlag() {
+    void skal_ikke_kreve_høyere_midre_skatt_enn_spesifisert_i_kravgrunnlag() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
         List<KravgrunnlagTestBuilder.KgPeriode> kgData = Arrays.asList(

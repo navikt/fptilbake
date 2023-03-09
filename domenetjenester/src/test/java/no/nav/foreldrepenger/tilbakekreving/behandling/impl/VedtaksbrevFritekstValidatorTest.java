@@ -36,7 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 @CdiDbAwareTest
-public class VedtaksbrevFritekstValidatorTest {
+class VedtaksbrevFritekstValidatorTest {
 
     @Inject
     private BehandlingRepository behandlingRepository;
@@ -63,7 +63,7 @@ public class VedtaksbrevFritekstValidatorTest {
     private Long revurderingEtterKlageBehandlingId;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         fagsakRepository.lagre(fagsak);
         behandlingId = behandlingRepository.lagre(behandling, new BehandlingLås(null));
         revurderingBehandlingId = behandlingRepository.lagre(revurderingBehandling, new BehandlingLås(null));
@@ -71,7 +71,7 @@ public class VedtaksbrevFritekstValidatorTest {
     }
 
     @Test
-    public void skal_feile_når_påkrevet_fritekst_mangler() {
+    void skal_feile_når_påkrevet_fritekst_mangler() {
         FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
         fakta.setBegrunnelse("foo");
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
@@ -87,7 +87,7 @@ public class VedtaksbrevFritekstValidatorTest {
     }
 
     @Test
-    public void skal_feile_når_påkrevet_fritekst_mangler_for_deler_av_periode() {
+    void skal_feile_når_påkrevet_fritekst_mangler_for_deler_av_periode() {
         FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
         fakta.setBegrunnelse("foo");
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
@@ -107,7 +107,7 @@ public class VedtaksbrevFritekstValidatorTest {
     }
 
     @Test
-    public void skal_feile_når_påkrevet_fritekst_mangler_for_deler_av_periode_2() {
+    void skal_feile_når_påkrevet_fritekst_mangler_for_deler_av_periode_2() {
         FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
         fakta.setBegrunnelse("foo");
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
@@ -128,7 +128,7 @@ public class VedtaksbrevFritekstValidatorTest {
     }
 
     @Test
-    public void skal_feile_når_påkrevet_oppsummering_fritekst_mangler_for_revurdering() {
+    void skal_feile_når_påkrevet_oppsummering_fritekst_mangler_for_revurdering() {
         FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
         fakta.setBegrunnelse("foo");
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
@@ -144,7 +144,7 @@ public class VedtaksbrevFritekstValidatorTest {
     }
 
     @Test
-    public void skal_feile_når_påkrevet_oppsummering_fritekst_mangler_for_revurdering_2() {
+    void skal_feile_når_påkrevet_oppsummering_fritekst_mangler_for_revurdering_2() {
         FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
         fakta.setBegrunnelse("foo");
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
@@ -160,7 +160,7 @@ public class VedtaksbrevFritekstValidatorTest {
     }
 
     @Test
-    public void skal_ikke_feile_på_påkrevet_oppsummering_fritekst_mangler_for_revurdering_etter_klage() {
+    void skal_ikke_feile_på_påkrevet_oppsummering_fritekst_mangler_for_revurdering_etter_klage() {
         FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
         fakta.setBegrunnelse("foo");
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
@@ -175,7 +175,7 @@ public class VedtaksbrevFritekstValidatorTest {
     }
 
     @Test
-    public void skal_ikke_feile_når_alle_påkrevet_fritekst_er_utfylt() {
+    void skal_ikke_feile_når_alle_påkrevet_fritekst_er_utfylt() {
         FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
         fakta.setBegrunnelse("foo");
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
@@ -190,7 +190,7 @@ public class VedtaksbrevFritekstValidatorTest {
     }
 
     @Test
-    public void skal_feile_når_fritekst_er_for_lang_for_ordinær() {
+    void skal_feile_når_fritekst_er_for_lang_for_ordinær() {
         FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
         fakta.setBegrunnelse("foo");
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
@@ -216,7 +216,7 @@ public class VedtaksbrevFritekstValidatorTest {
     }
 
     @Test
-    public void skal_feile_når_fritekst_er_for_lang_for_feilutbetaling_bortfalt() {
+    void skal_feile_når_fritekst_er_for_lang_for_feilutbetaling_bortfalt() {
         FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
         fakta.setBegrunnelse("foo");
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()

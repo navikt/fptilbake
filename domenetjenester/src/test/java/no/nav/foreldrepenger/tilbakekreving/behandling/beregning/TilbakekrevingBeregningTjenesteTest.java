@@ -30,7 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
-public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
+class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
 
     private TilbakekrevingBeregningTjeneste tjeneste;
 
@@ -40,7 +40,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet() {
+    void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.ZERO);
@@ -63,7 +63,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_gjelder_ikke_er_foreldelse() {
+    void skal_beregne_tilbakekrevingsbeløp_for_periode_som_gjelder_ikke_er_foreldelse() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.ZERO);
@@ -85,7 +85,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_er_foreldet() {
+    void skal_beregne_tilbakekrevingsbeløp_for_periode_som_er_foreldet() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.ZERO);
@@ -109,7 +109,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet_medSkattProsent() {
+    void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet_medSkattProsent() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.valueOf(10));
@@ -134,7 +134,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_beregne_rigtig_beløp_og_utbetalt_beløp_for_periode() {
+    void skal_beregne_rigtig_beløp_og_utbetalt_beløp_for_periode() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.valueOf(10));
@@ -153,7 +153,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_beregne_rigtig_beløp_og_utbetalt_beløp_ved_delvis_feilutbetaling_for_perioder_som_slås_sammen_i_logisk_periode() {
+    void skal_beregne_rigtig_beløp_og_utbetalt_beløp_ved_delvis_feilutbetaling_for_perioder_som_slås_sammen_i_logisk_periode() {
         BigDecimal skatteprosent = BigDecimal.valueOf(10);
         Periode periode1 = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
         Periode periode2 = new Periode(LocalDate.of(2019, 5, 4), LocalDate.of(2019, 5, 6));
@@ -194,7 +194,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet_medSkattProsent_når_beregnet_periode_er_på_tvers_av_grunnlag_periode() {
+    void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet_medSkattProsent_når_beregnet_periode_er_på_tvers_av_grunnlag_periode() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
         Periode periode1 = new Periode(LocalDate.of(2019, 5, 4), LocalDate.of(2019, 5, 6));
         Periode logiskPeriode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 6));
@@ -232,7 +232,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_ikke_overskyte_maks_skatt_pr_måned_selv_om_vurderingen_splitter_kravgrunnlaget() {
+    void skal_ikke_overskyte_maks_skatt_pr_måned_selv_om_vurderingen_splitter_kravgrunnlaget() {
         LocalDate onsdag = LocalDate.of(2020, 1, 15);
         LocalDate torsdag = onsdag.plusDays(1);
         Periode kgPeriode = new Periode(onsdag, torsdag);
@@ -259,7 +259,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_ha_riktig_skatt_når_skatt_for_første_periode_er_høyere_enn_maks_skatt_for_første_måned_siden_første_periode_er_lang() {
+    void skal_ha_riktig_skatt_når_skatt_for_første_periode_er_høyere_enn_maks_skatt_for_første_måned_siden_første_periode_er_lang() {
         Periode kgPeriode0 = new Periode(LocalDate.of(2019, 3, 18), LocalDate.of(2019, 3, 29));
         Periode kgPeriode1 = new Periode(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
         Periode vurderingPeriode0 = new Periode(LocalDate.of(2019, 3, 18), LocalDate.of(2019, 4, 22));

@@ -34,7 +34,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.PeriodeDto;
 
-public class VarselbrevUtilTest {
+class VarselbrevUtilTest {
 
     private static final String BEHANDLENDE_ENHET_NAVN = "behandlende enhet i Rogaland";
     private static final String BEHANDLENDE_ENHET_ID = "behandlendeEnhetId 1234";
@@ -43,7 +43,7 @@ public class VarselbrevUtilTest {
     private FagsakYtelseType svangerskapspengerkode = FagsakYtelseType.SVANGERSKAPSPENGER;
 
     @Test
-    public void skal_sammenstille_data_fra_fpsak_fpoppdrag_og_tps_for_forhåndsvisning() {
+    void skal_sammenstille_data_fra_fpsak_fpoppdrag_og_tps_for_forhåndsvisning() {
         Saksnummer saksnummer = new Saksnummer("11111111");
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = lagFeilutbetaltePerioderMock(9999999999L);
 
@@ -98,7 +98,7 @@ public class VarselbrevUtilTest {
     }
 
     @Test
-    public void skal_sammenstille_data_fra_fpsak_fpoppdrag_og_tps_for_sending() {
+    void skal_sammenstille_data_fra_fpsak_fpoppdrag_og_tps_for_sending() {
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = lagFeilutbetaltePerioderMock(9999999999L);
         Adresseinfo adresseinfo = lagStandardNorskAdresse();
         Personinfo personinfo = byggStandardPerson("Fiona", PERSONNUMMER);
@@ -149,14 +149,14 @@ public class VarselbrevUtilTest {
     }
 
     @Test
-    public void skal_sette_fristdato() {
+    void skal_sette_fristdato() {
         Period ventetid = Period.ofWeeks(3);
         LocalDateTime dagensDato = LocalDateTime.of(2020, 1, 1, 12, 0);
         assertThat(VarselbrevUtil.finnFristForTilbakemeldingFraBruker(dagensDato, ventetid)).isEqualTo(LocalDate.of(2020, 1, 22));
     }
 
     @Test
-    public void skal_sammenstille_data_fra_grunnlag_og_tps_for_åsende_manuelt_varselbrev() {
+    void skal_sammenstille_data_fra_grunnlag_og_tps_for_åsende_manuelt_varselbrev() {
         LogiskPeriodeMedFaktaDto logiskPeriodeMedFaktaDto = LogiskPeriodeMedFaktaDto.lagPeriode(LocalDate.of(2019, 10, 1),
                 LocalDate.of(2019, 10, 30),
                 BigDecimal.valueOf(9000));

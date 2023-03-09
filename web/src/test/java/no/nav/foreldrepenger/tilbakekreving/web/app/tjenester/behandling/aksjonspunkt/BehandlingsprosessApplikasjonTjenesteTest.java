@@ -18,20 +18,20 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
-public class BehandlingsprosessApplikasjonTjenesteTest {
+class BehandlingsprosessApplikasjonTjenesteTest {
 
     private static final String GRUPPE_1 = "gruppe1";
 
     private final ProsessTaskData taskData = ProsessTaskData.forTaskType(new TaskType("taskType1"));
     private final Behandling behandling;
 
-    public BehandlingsprosessApplikasjonTjenesteTest() {
+    BehandlingsprosessApplikasjonTjenesteTest() {
         this.taskData.setGruppe(GRUPPE_1);
         this.behandling = ScenarioSimple.simple().lagMocked();
     }
 
     @Test
-    public void skal_returnere_gruppe_når_ikke_er_kjørt() {
+    void skal_returnere_gruppe_når_ikke_er_kjørt() {
 
         BehandlingsprosessApplikasjonTjenesteImpl sut = initSut(GRUPPE_1, taskData);
         Optional<AsyncPollingStatus> status = sut.sjekkProsessTaskPågårForBehandling(behandling, null);
@@ -42,7 +42,7 @@ public class BehandlingsprosessApplikasjonTjenesteTest {
     }
 
     @Test
-    public void skal_ikke_returnere_gruppe_når_er_kjørt() {
+    void skal_ikke_returnere_gruppe_når_er_kjørt() {
         markerFerdig(taskData);
 
         BehandlingsprosessApplikasjonTjenesteImpl sut = initSut(GRUPPE_1, taskData);
@@ -55,7 +55,7 @@ public class BehandlingsprosessApplikasjonTjenesteTest {
     }
 
     @Test
-    public void skal_kaste_exception_når_task_har_feilet_null_gruppe() {
+    void skal_kaste_exception_når_task_har_feilet_null_gruppe() {
         markerFeilet(taskData);
 
         BehandlingsprosessApplikasjonTjenesteImpl sut = initSut(GRUPPE_1, taskData);
@@ -65,7 +65,7 @@ public class BehandlingsprosessApplikasjonTjenesteTest {
     }
 
     @Test
-    public void skal_kaste_exception_når_task_har_feilet_angitt_gruppe() {
+    void skal_kaste_exception_når_task_har_feilet_angitt_gruppe() {
         markerFeilet(taskData);
 
         BehandlingsprosessApplikasjonTjenesteImpl sut = initSut(GRUPPE_1, taskData);
@@ -76,7 +76,7 @@ public class BehandlingsprosessApplikasjonTjenesteTest {
     }
 
     @Test
-    public void skal_kaste_exception_når_task_neste_kjøring_er_utsatt() {
+    void skal_kaste_exception_når_task_neste_kjøring_er_utsatt() {
         taskData.medNesteKjøringEtter(LocalDateTime.now().plusHours(1));
 
         BehandlingsprosessApplikasjonTjenesteImpl sut = initSut(GRUPPE_1, taskData);

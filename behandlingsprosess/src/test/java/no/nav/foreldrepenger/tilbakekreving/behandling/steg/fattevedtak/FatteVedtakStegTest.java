@@ -45,7 +45,7 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonver
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
 @ExtendWith(JpaExtension.class)
-public class FatteVedtakStegTest {
+class FatteVedtakStegTest {
 
     private BehandlingRepositoryProvider repositoryProvider;
 
@@ -60,7 +60,7 @@ public class FatteVedtakStegTest {
     private Behandling behandling;
 
     @BeforeEach
-    public void setup(EntityManager em) {
+    void setup(EntityManager em) {
         repositoryProvider = new BehandlingRepositoryProvider(em);
         behandlingRepository = repositoryProvider.getBehandlingRepository();
         totrinnRepository = new TotrinnRepository(em);
@@ -81,7 +81,7 @@ public class FatteVedtakStegTest {
     }
 
     @Test
-    public void utførSteg_medAlleGodkjenneAksjonspunkter() {
+    void utførSteg_medAlleGodkjenneAksjonspunkter() {
         Map<AksjonspunktDefinisjon, Boolean> aksjonspunktMedGodkjentMap = new HashMap<>();
         aksjonspunktMedGodkjentMap.put(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, true);
         aksjonspunktMedGodkjentMap.put(AksjonspunktDefinisjon.VURDER_FORELDELSE, true);
@@ -101,7 +101,7 @@ public class FatteVedtakStegTest {
     }
 
     @Test
-    public void utførSteg_medAvviseAksjonspunkter() {
+    void utførSteg_medAvviseAksjonspunkter() {
         Map<AksjonspunktDefinisjon, Boolean> aksjonspunktMedGodkjentMap = new HashMap<>();
         aksjonspunktMedGodkjentMap.put(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, true);
         aksjonspunktMedGodkjentMap.put(AksjonspunktDefinisjon.VURDER_FORELDELSE, false);

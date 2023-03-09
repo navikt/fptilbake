@@ -70,14 +70,14 @@ public abstract class DokumentBestillerTestOppsett {
         fagsak = TestFagsakUtil.opprettFagsak();
         fagsakRepository.lagre(fagsak);
         behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
-        BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
+        var behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
         eksternBehandling = new EksternBehandling(behandling, HENVISNING, FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 
     protected YtelseNavn lagYtelseNavn(String navnPåBrukersSpråk, String navnPåBokmål) {
-        YtelseNavn ytelseNavn = new YtelseNavn();
+        var ytelseNavn = new YtelseNavn();
         ytelseNavn.setNavnPåBrukersSpråk(navnPåBrukersSpråk);
         ytelseNavn.setNavnPåBokmål(navnPåBokmål);
         return ytelseNavn;

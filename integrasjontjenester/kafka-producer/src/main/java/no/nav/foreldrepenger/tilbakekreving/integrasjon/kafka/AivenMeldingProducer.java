@@ -42,9 +42,9 @@ public abstract class AivenMeldingProducer {
         producer.flush();
     }
 
-    protected RecordMetadata runProducerWithSingleJson(ProducerRecord<String, String> record) {
+    protected RecordMetadata runProducerWithSingleJson(ProducerRecord<String, String> producerRecord) {
         try {
-            return producer.send(record)
+            return producer.send(producerRecord)
                 .get();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

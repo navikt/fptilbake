@@ -67,12 +67,12 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandl
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
-public class BehandlingRestTjenesteTest {
+class BehandlingRestTjenesteTest {
 
-    public static final String GYLDIG_AKTØR_ID = "12345678901";
-    public static final String GYLDIG_SAKSNR = "123456";
-    public static final String UGYLDIG_SAKSNR = "(#2141##";
-    public static final String EKSTERN_BEHANDLING_UUID = UUID.randomUUID().toString();
+    static final String GYLDIG_AKTØR_ID = "12345678901";
+    static final String GYLDIG_SAKSNR = "123456";
+    static final String UGYLDIG_SAKSNR = "(#2141##";
+    static final String EKSTERN_BEHANDLING_UUID = UUID.randomUUID().toString();
     private static final FagsakYtelseType FP_YTELSE_TYPE = FagsakYtelseType.FORELDREPENGER;
 
     private ProsessTaskTjeneste taskTjeneste = mock(ProsessTaskTjeneste.class);
@@ -100,7 +100,7 @@ public class BehandlingRestTjenesteTest {
     private static UuidDto uuidDto = new UuidDto(UUID.randomUUID());
 
     @Test
-    public void test_opprett_behandling_skal_feile_med_ugyldig_saksnummer() {
+    void test_opprett_behandling_skal_feile_med_ugyldig_saksnummer() {
         OpprettBehandlingDto dto = opprettBehandlingDto(UGYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE);
 
         assertThatThrownBy(() -> behandlingRestTjeneste.opprettBehandling(mock(HttpServletRequest.class), dto)) // ved rest-kall vil jax validering slå inn og resultere i en FeltFeil
@@ -109,7 +109,7 @@ public class BehandlingRestTjenesteTest {
     }
 
     @Test
-    public void test_skal_opprette_ny_behandling() throws URISyntaxException {
+    void test_skal_opprette_ny_behandling() throws URISyntaxException {
         var behandling = mockBehandling();
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
         when(behandlingTjenesteMock.opprettKunBehandlingManuell(any(), any(), any(), any())).thenReturn(behandling);
@@ -120,7 +120,7 @@ public class BehandlingRestTjenesteTest {
     }
 
     @Test
-    public void test_skal_opprette_ny_behandling_for_revurdering() throws URISyntaxException {
+    void test_skal_opprette_ny_behandling_for_revurdering() throws URISyntaxException {
         when(behandlingskontrollAsynkTjenesteMock.asynkProsesserBehandling(any(Behandling.class))).thenReturn("1");
         when(behandlingTjenesteMock.hentEnhetForEksternBehandling(any())).thenReturn(new OrganisasjonsEnhet("9999", "Generisk"));
         when(revurderingTjenesteMock.opprettRevurdering(any(Long.class), any(BehandlingÅrsakType.class), any(OrganisasjonsEnhet.class)))
@@ -138,7 +138,7 @@ public class BehandlingRestTjenesteTest {
     }
 
     @Test
-    public void test_skal_kalle_på_henlegg_behandling() {
+    void test_skal_kalle_på_henlegg_behandling() {
         long versjon = 2L;
         BehandlingResultatType årsak = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
         String begrunnelse = "begrunnelse";
@@ -150,7 +150,7 @@ public class BehandlingRestTjenesteTest {
     }
 
     @Test
-    public void test_kan_behandling_opprettes_med_tilbakekreving() {
+    void test_kan_behandling_opprettes_med_tilbakekreving() {
         when(behandlingTjenesteMock.kanOppretteBehandling(any(Saksnummer.class), any(UUID.class))).thenReturn(true);
 
         Response response = behandlingRestTjeneste.kanOpprettesBehandling(saksnummerDto, fpsakUuidDto);
@@ -160,7 +160,7 @@ public class BehandlingRestTjenesteTest {
     }
 
     @Test
-    public void test_kan_behandling_opprettes_med_revurdering() {
+    void test_kan_behandling_opprettes_med_revurdering() {
         when(behandlingTjenesteMock.kanOppretteBehandling(any(Saksnummer.class), any(UUID.class))).thenReturn(false);
         when(revurderingTjenesteMock.hentEksternBehandling(anyLong())).thenReturn(opprettEksternBehandling());
         when(revurderingTjenesteMock.kanOppretteRevurdering(any(UUID.class))).thenReturn(true);
@@ -172,7 +172,7 @@ public class BehandlingRestTjenesteTest {
     }
 
     @Test
-    public void skal_ha_åpen_tilbakekreving_hvis_tilbakekreving_ikke_er_avsluttet() {
+    void skal_ha_åpen_tilbakekreving_hvis_tilbakekreving_ikke_er_avsluttet() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(Lists.newArrayList(behandling));
         Response response = behandlingRestTjeneste.harÅpenTilbakekrevingBehandling(saksnummerDto);
@@ -181,7 +181,7 @@ public class BehandlingRestTjenesteTest {
     }
 
     @Test
-    public void skal_ikke_ha_åpen_tilbakekreving_hvis_tilbakekreving_er_avsluttet() {
+    void skal_ikke_ha_åpen_tilbakekreving_hvis_tilbakekreving_er_avsluttet() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         behandling.avsluttBehandling();
         when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(Lists.newArrayList(behandling));
@@ -192,7 +192,7 @@ public class BehandlingRestTjenesteTest {
     }
 
     @Test
-    public void skal_gi_rettigheter_for_vise_verge() {
+    void skal_gi_rettigheter_for_vise_verge() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(Lists.newArrayList(behandling));
         when(behandlingTjenesteMock.hentBehandling(any(UUID.class))).thenReturn(behandling);
@@ -234,7 +234,7 @@ public class BehandlingRestTjenesteTest {
     }
 
     @Test
-    public void skal_ikke_returnere_vedtak_info_hvis_tilbakekreving_ikke_er_avsluttet() {
+    void skal_ikke_returnere_vedtak_info_hvis_tilbakekreving_ikke_er_avsluttet() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         when(behandlingTjenesteMock.hentBehandling(any(UUID.class))).thenReturn(behandling);
         var e = assertThrows(TekniskException.class, () -> behandlingRestTjeneste.hentTilbakekrevingsVedtakInfo(uuidDto));
@@ -242,7 +242,7 @@ public class BehandlingRestTjenesteTest {
     }
 
     @Test
-    public void skal_ikke_returnere_vedtak_info_hvis_vedtak_info_ikke_finnes() {
+    void skal_ikke_returnere_vedtak_info_hvis_vedtak_info_ikke_finnes() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         behandling.avsluttBehandling();
         when(behandlingTjenesteMock.hentBehandling(any(UUID.class))).thenReturn(behandling);
@@ -251,7 +251,7 @@ public class BehandlingRestTjenesteTest {
     }
 
     @Test
-    public void skal_returnere_vedtak_info_hvis_tilbakekreving_er_avsluttet_og_vedtak_info_finnes() {
+    void skal_returnere_vedtak_info_hvis_tilbakekreving_er_avsluttet_og_vedtak_info_finnes() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
                 .medBehandling(behandling)

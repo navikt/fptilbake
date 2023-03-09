@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -50,7 +49,7 @@ class AksjonspunktResultatOppretter {
     private List<Aksjonspunkt> leggTilResultatPåBehandling(BehandlingStegType behandlingStegType, List<AksjonspunktResultat> resultat) {
         return resultat.stream()
                 .map(ar -> oppdaterAksjonspunktMedResultat(behandlingStegType, ar))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private Aksjonspunkt oppdaterAksjonspunktMedResultat(BehandlingStegType behandlingStegType, AksjonspunktResultat resultat) {

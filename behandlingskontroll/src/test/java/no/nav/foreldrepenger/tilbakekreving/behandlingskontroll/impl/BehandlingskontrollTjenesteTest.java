@@ -34,7 +34,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodev
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 
 @ExtendWith(JpaExtension.class)
-public class BehandlingskontrollTjenesteTest {
+class BehandlingskontrollTjenesteTest {
 
     private final class BehandlingskontrollEventPublisererForTest extends BehandlingskontrollEventPubliserer {
 
@@ -66,7 +66,7 @@ public class BehandlingskontrollTjenesteTest {
     private AksjonspunktDefinisjon steg2Aksjonspunkt;
 
     @BeforeEach
-    public void setup(EntityManager em) {
+    void setup(EntityManager em) {
         serviceProvider = new BehandlingskontrollServiceProvider(em, new BehandlingModellRepository(), eventPubliserer);
         repositoryProvider = new BehandlingRepositoryProvider(em);
         var modell = serviceProvider.getBehandlingModellRepository().getModell(BehandlingType.TILBAKEKREVING);
@@ -91,7 +91,7 @@ public class BehandlingskontrollTjenesteTest {
     }
 
     @Test
-    public void skal_rykke_tilbake_til_utgang_vurderingspunkt_av_steg() {
+    void skal_rykke_tilbake_til_utgang_vurderingspunkt_av_steg() {
 
         kontrollTjeneste.behandlingTilbakeføringTilTidligsteAksjonspunkt(kontekst, List.of(steg2Aksjonspunkt));
 
@@ -109,7 +109,7 @@ public class BehandlingskontrollTjenesteTest {
     }
 
     @Test
-    public void skal_rykke_tilbake_til_start_av_tidligere_steg_ved_tilbakeføring() {
+    void skal_rykke_tilbake_til_start_av_tidligere_steg_ved_tilbakeføring() {
 
         kontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, steg2);
 
@@ -127,7 +127,7 @@ public class BehandlingskontrollTjenesteTest {
     }
 
     @Test
-    public void skal_tolerere_tilbakehopp_til_senere_steg_enn_inneværende() {
+    void skal_tolerere_tilbakehopp_til_senere_steg_enn_inneværende() {
 
         kontrollTjeneste.behandlingTilbakeføringHvisTidligereBehandlingSteg(kontekst, steg4);
 
@@ -142,7 +142,7 @@ public class BehandlingskontrollTjenesteTest {
     }
 
     @Test
-    public void skal_flytte_til__inngang_av_senere_steg_ved_framføring() {
+    void skal_flytte_til__inngang_av_senere_steg_ved_framføring() {
 
         kontrollTjeneste.behandlingFramføringTilSenereBehandlingSteg(kontekst, steg5);
 
@@ -164,7 +164,7 @@ public class BehandlingskontrollTjenesteTest {
     }
 
     @Test
-    public void skal_kaste_exception_dersom_ugyldig_tilbakeføring() {
+    void skal_kaste_exception_dersom_ugyldig_tilbakeføring() {
         assertThatThrownBy(() -> kontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, steg4))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Kan ikke angi steg ")
@@ -172,7 +172,7 @@ public class BehandlingskontrollTjenesteTest {
     }
 
     @Test
-    public void skal_rykke_tilbake_til_inngang_vurderingspunkt_av_samme_steg() {
+    void skal_rykke_tilbake_til_inngang_vurderingspunkt_av_samme_steg() {
 
         // Arrange
         var steg = BehandlingStegType.FATTE_VEDTAK;
@@ -200,7 +200,7 @@ public class BehandlingskontrollTjenesteTest {
     }
 
     @Test
-    public void skal_ha_guard_mot_nøstet_behandlingskontroll_ved_prossesering_tilbakeføring_og_framføring() throws Exception {
+    void skal_ha_guard_mot_nøstet_behandlingskontroll_ved_prossesering_tilbakeføring_og_framføring() throws Exception {
 
         this.kontrollTjeneste = new BehandlingskontrollTjeneste(serviceProvider) {
             @Override
@@ -217,18 +217,18 @@ public class BehandlingskontrollTjenesteTest {
     }
 
     @Test
-    public void skal_returnere_true_når_aksjonspunktet_skal_løses_etter_angitt_steg() {
+    void skal_returnere_true_når_aksjonspunktet_skal_løses_etter_angitt_steg() {
         assertThat(kontrollTjeneste.skalAksjonspunktLøsesIEllerEtterSteg(
                 behandling.getType(), steg3, AksjonspunktDefinisjon.FATTE_VEDTAK)).isTrue();
     }
 
     @Test
-    public void skal_returnere_true_når_aksjonspunktet_skal_løses_i_angitt_steg() {
+    void skal_returnere_true_når_aksjonspunktet_skal_løses_i_angitt_steg() {
         assertThat(kontrollTjeneste.skalAksjonspunktLøsesIEllerEtterSteg(behandling.getType(), steg2, AksjonspunktDefinisjon.AVKLAR_VERGE)).isTrue();
     }
 
     @Test
-    public void skal_returnere_false_når_aksjonspunktet_skal_løses_før_angitt_steg() {
+    void skal_returnere_false_når_aksjonspunktet_skal_løses_før_angitt_steg() {
         assertThat(kontrollTjeneste.skalAksjonspunktLøsesIEllerEtterSteg(behandling.getType(), steg4, AksjonspunktDefinisjon.AVKLAR_VERGE)).isFalse();
     }
 

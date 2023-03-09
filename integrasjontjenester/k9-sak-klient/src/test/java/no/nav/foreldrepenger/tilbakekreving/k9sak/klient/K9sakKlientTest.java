@@ -25,7 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.simulering.K9oppdragRes
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.integrasjon.rest.RestClient;
 
-public class K9sakKlientTest {
+class K9sakKlientTest {
 
     private static final String SAKSNUMMER = "1256436";
     private static final UUID BEHANDLING_UUID = UUID.randomUUID();
@@ -39,7 +39,7 @@ public class K9sakKlientTest {
     private final K9sakKlient klient = new K9sakKlient(restClientMock, k9oppdragRestKlientMock);
 
     @Test
-    public void skal_hente_behandlingInfoDto() {
+    void skal_hente_behandlingInfoDto() {
         K9sakBehandlingInfoDto returnDto = k9sakBehandlingInfoDto();
 
         when(restClientMock.sendReturnOptional(any(), eq(K9sakBehandlingInfoDto.class))).thenReturn(Optional.of(returnDto));
@@ -52,14 +52,14 @@ public class K9sakKlientTest {
     }
 
     @Test
-    public void skal_kaste_exception_når_k9sak_behandling_ikke_finnes() {
+    void skal_kaste_exception_når_k9sak_behandling_ikke_finnes() {
         when(restClientMock.sendReturnOptional(any(), any())).thenReturn(Optional.empty());
 
         Assertions.assertThrows(IntegrasjonException.class, () -> klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER));
     }
 
     @Test
-    public void skal_returnere_hvis_finnes_behandling_i_k9sak() {
+    void skal_returnere_hvis_finnes_behandling_i_k9sak() {
         K9sakBehandlingInfoDto eksternBehandlingInfo = k9sakBehandlingInfoDto();
         K9sakKlient.ListeAvK9sakBehandlingInfoDto liste = new K9sakKlient.ListeAvK9sakBehandlingInfoDto();
         liste.add(eksternBehandlingInfo);
@@ -70,7 +70,7 @@ public class K9sakKlientTest {
     }
 
     @Test
-    public void skal_returnere_tom_hvis_finnes_ikke_behandling_i_k9sak() {
+    void skal_returnere_tom_hvis_finnes_ikke_behandling_i_k9sak() {
         when(restClientMock.send(any(), eq(K9sakKlient.ListeAvK9sakBehandlingInfoDto.class))).thenReturn(new K9sakKlient.ListeAvK9sakBehandlingInfoDto());
 
         boolean erFinnesIK9sak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
@@ -78,7 +78,7 @@ public class K9sakKlientTest {
     }
 
     @Test
-    public void skal_returnere_tilbakekreving_valg() {
+    void skal_returnere_tilbakekreving_valg() {
         TilbakekrevingValgDto tilbakekrevingValgDto = new TilbakekrevingValgDto(VidereBehandling.TILBAKEKR_OPPRETT);
         when(restClientMock.sendReturnOptional(any(), eq(K9sakBehandlingInfoDto.class))).thenReturn(Optional.of(k9sakBehandlingInfoDto()));
         when(restClientMock.sendReturnOptional(any(), eq(TilbakekrevingValgDto.class))).thenReturn(Optional.of(tilbakekrevingValgDto));
@@ -89,7 +89,7 @@ public class K9sakKlientTest {
     }
 
     @Test
-    public void skal_returnere_tom_tilbakekreving_valg() {
+    void skal_returnere_tom_tilbakekreving_valg() {
         when(restClientMock.sendReturnOptional(any(), eq(K9sakBehandlingInfoDto.class))).thenReturn(Optional.of(k9sakBehandlingInfoDto()));
         when(restClientMock.sendReturnOptional(any(), eq(TilbakekrevingValgDto.class))).thenReturn(Optional.empty());
 

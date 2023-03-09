@@ -17,7 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
-public class OpprettBehandlingTaskTest {
+class OpprettBehandlingTaskTest {
     private static final Long EKSTERN_BEHANDLING_ID = 123L;
     private static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(EKSTERN_BEHANDLING_ID);
     private static final Saksnummer SAKSNUMMER = new Saksnummer("1234");
@@ -29,12 +29,12 @@ public class OpprettBehandlingTaskTest {
     OpprettBehandlingTask opprettBehandlingTask;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         opprettBehandlingTask = new OpprettBehandlingTask(mockBehandlingTjeneste);
     }
 
     @Test
-    public void test_skal_kalle_opprettBehandlingAutomatisk() {
+    void test_skal_kalle_opprettBehandlingAutomatisk() {
         HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID, HENVISNING,
                 AKTØR_ID, SAKSNUMMER);
         taskDataWrapper.setFagsakYtelseType(FAGSAK_YTELSE_TYPE);
@@ -49,7 +49,7 @@ public class OpprettBehandlingTaskTest {
     }
 
     @Test
-    public void test_skal_feile_på_manglende_task_property() {
+    void test_skal_feile_på_manglende_task_property() {
         HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID, HENVISNING,
                 AKTØR_ID, SAKSNUMMER);
 

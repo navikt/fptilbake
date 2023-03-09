@@ -33,7 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
-public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
+class LesKravgrunnlagTaskTest extends FellesTestOppsett {
 
     private Long kravgrunnlagId;
     private static final long REFERANSE = 100000001l;
@@ -41,7 +41,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     private String saksnummer;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
         when(personinfoAdapterMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(fagsak.getAktørId()));
         behandling = lagBehandling();
@@ -49,7 +49,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_utføre_leskravgrunnlag_task_forGyldigBehandling() {
+    void skal_utføre_leskravgrunnlag_task_forGyldigBehandling() {
         when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(lagResponsFraFagsystemKlient());
         lesKravgrunnlagTask.doTask(lagProsessTaskData());
 
@@ -60,7 +60,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_ikke_utføre_leskravgrunnlag_task_når_grunnlag_referanse_ikke_finnes_i_fagsystem() {
+    void skal_ikke_utføre_leskravgrunnlag_task_når_grunnlag_referanse_ikke_finnes_i_fagsystem() {
         when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(Collections.emptyList());
 
         var e = assertThrows(TekniskException.class, () -> lesKravgrunnlagTask.doTask(lagProsessTaskData()));
@@ -68,7 +68,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_ikke_utføre_leskravgrunnlag_task_nårBehandlingFinnesIkkeIFpsak() {
+    void skal_ikke_utføre_leskravgrunnlag_task_nårBehandlingFinnesIkkeIFpsak() {
         when(fagsystemKlientMock.finnesBehandlingIFagsystem(fagsak.getSaksnummer().getVerdi(), HENVISNING)).thenReturn(false);
 
         assertThatThrownBy(() -> lesKravgrunnlagTask.doTask(lagProsessTaskData()))
@@ -76,7 +76,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_ikke_utføre_leskravgrunnlag_task_forUgyldigBehandling() {
+    void skal_ikke_utføre_leskravgrunnlag_task_forUgyldigBehandling() {
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ugyldig_referanse.xml"));
 
         assertThatThrownBy(() -> lesKravgrunnlagTask.doTask(lagProsessTaskData()))
@@ -86,7 +86,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_utføre_les_kravgrunnlag_task_for_ugyldig_kravgrunnlag() {
+    void skal_utføre_les_kravgrunnlag_task_for_ugyldig_kravgrunnlag() {
         when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(lagResponsFraFagsystemKlient());
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_ugyldig_ENDR_negativ_beløp.xml"));
         lesKravgrunnlagTask.doTask(lagProsessTaskData());

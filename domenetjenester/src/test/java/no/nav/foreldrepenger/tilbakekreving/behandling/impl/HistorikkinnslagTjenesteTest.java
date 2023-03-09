@@ -23,7 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Journalpo
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 
-public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
+class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
 
     private static final JournalpostId JOURNALPOST_ID = new JournalpostId("389426448");
     private static final String DOKUMENT_ID = "417743491";
@@ -37,7 +37,7 @@ public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_opprette_historikkinnslag_for_utsendt_brev() {
+    void skal_opprette_historikkinnslag_for_utsendt_brev() {
         historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(behandling, JOURNALPOST_ID, DOKUMENT_ID, "Vedtaksbrev");
 
         List<Historikkinnslag> historikkinnslagene = historikkRepository.hentHistorikk(behandling.getId());
@@ -52,7 +52,7 @@ public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void opprettHistorikkinnslagForOpprettetTilbakekreving() {
+    void opprettHistorikkinnslagForOpprettetTilbakekreving() {
         historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling);
 
         List<Historikkinnslag> historikkinnslagene = historikkRepository.hentHistorikk(behandling.getId());
@@ -65,7 +65,7 @@ public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void opprettHistorikkinnslagForOpprettetTilbakekreving_med_manuelt() {
+    void opprettHistorikkinnslagForOpprettetTilbakekreving_med_manuelt() {
         Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, FagsakYtelseType.FORELDREPENGER, Språkkode.DEFAULT);
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).medManueltOpprettet(true).build();
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);

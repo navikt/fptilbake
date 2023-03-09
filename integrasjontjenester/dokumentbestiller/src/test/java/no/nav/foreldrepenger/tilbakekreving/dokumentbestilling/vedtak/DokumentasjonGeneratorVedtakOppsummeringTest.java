@@ -28,7 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
  * FRISINN: https://confluence.adeo.no/display/MODNAV/Generert+dokumentasjon
  */
 @Disabled("Kjøres ved behov for å regenerere dokumentasjon")
-public class DokumentasjonGeneratorVedtakOppsummering {
+class DokumentasjonGeneratorVedtakOppsummeringTest {
 
     private final static LocalDate JANUAR_15 = LocalDate.of(2020, 1, 15);
 
@@ -43,11 +43,11 @@ public class DokumentasjonGeneratorVedtakOppsummering {
     private static boolean[] trueFalse = new boolean[]{true, false};
 
     @Test
-    public void list_ut_vedtak_start_for_fp() {
-        FagsakYtelseType ytelseType = FagsakYtelseType.FORELDREPENGER;
-        Språkkode nb = Språkkode.nb;
-        for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse) {
+    void list_ut_vedtak_start_for_fp() {
+        var ytelseType = FagsakYtelseType.FORELDREPENGER;
+        var nb = Språkkode.nb;
+        for (var resultatType : tilbakekrevingsResultat) {
+            for (var medVarsel : trueFalse) {
                 listVedtakStartAllePermutasjoner(ytelseType, nb, resultatType, medVarsel);
             }
             listVedtakStartMedKorrigertBeløpAllePermutasjoner(ytelseType, nb, resultatType);
@@ -55,10 +55,10 @@ public class DokumentasjonGeneratorVedtakOppsummering {
     }
 
     @Test
-    public void list_ut_vedtak_start_for_fp_nynorsk() {
-        FagsakYtelseType ytelseType = FagsakYtelseType.FORELDREPENGER;
-        Språkkode språkkode = Språkkode.nn;
-        for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
+    void list_ut_vedtak_start_for_fp_nynorsk() {
+        var ytelseType = FagsakYtelseType.FORELDREPENGER;
+        var språkkode = Språkkode.nn;
+        for (var resultatType : tilbakekrevingsResultat) {
             for (boolean medVarsel : trueFalse) {
                 listVedtakStartAllePermutasjoner(ytelseType, språkkode, resultatType, medVarsel);
             }
@@ -67,11 +67,11 @@ public class DokumentasjonGeneratorVedtakOppsummering {
     }
 
     @Test
-    public void list_ut_vedtak_start_for_es() {
-        FagsakYtelseType ytelseType = FagsakYtelseType.ENGANGSTØNAD;
-        Språkkode nb = Språkkode.nb;
-        for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse) {
+    void list_ut_vedtak_start_for_es() {
+        var ytelseType = FagsakYtelseType.ENGANGSTØNAD;
+        var nb = Språkkode.nb;
+        for (var resultatType : tilbakekrevingsResultat) {
+            for (var medVarsel : trueFalse) {
                 listVedtakStartUtenSkatt(ytelseType, nb, resultatType, medVarsel);
             }
             listVedtakStartMedKorrigertBeløpUtenSkatt(ytelseType, nb, resultatType);
@@ -79,11 +79,11 @@ public class DokumentasjonGeneratorVedtakOppsummering {
     }
 
     @Test
-    public void list_ut_vedtak_start_for_es_nynorsk() {
-        FagsakYtelseType ytelseType = FagsakYtelseType.ENGANGSTØNAD;
-        Språkkode språkkode = Språkkode.nn;
-        for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse) {
+    void list_ut_vedtak_start_for_es_nynorsk() {
+        var ytelseType = FagsakYtelseType.ENGANGSTØNAD;
+        var språkkode = Språkkode.nn;
+        for (var resultatType : tilbakekrevingsResultat) {
+            for (var medVarsel : trueFalse) {
                 listVedtakStartUtenSkatt(ytelseType, språkkode, resultatType, medVarsel);
             }
             listVedtakStartMedKorrigertBeløpUtenSkatt(ytelseType, språkkode, resultatType);
@@ -91,11 +91,11 @@ public class DokumentasjonGeneratorVedtakOppsummering {
     }
 
     @Test
-    public void list_ut_vedtak_start_for_svp() {
-        FagsakYtelseType ytelseType = FagsakYtelseType.SVANGERSKAPSPENGER;
-        Språkkode nb = Språkkode.nb;
-        for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse) {
+    void list_ut_vedtak_start_for_svp() {
+        var ytelseType = FagsakYtelseType.SVANGERSKAPSPENGER;
+        var nb = Språkkode.nb;
+        for (var resultatType : tilbakekrevingsResultat) {
+            for (var medVarsel : trueFalse) {
                 listVedtakStartAllePermutasjoner(ytelseType, nb, resultatType, medVarsel);
             }
             listVedtakStartMedKorrigertBeløpAllePermutasjoner(ytelseType, nb, resultatType);
@@ -103,11 +103,11 @@ public class DokumentasjonGeneratorVedtakOppsummering {
     }
 
     @Test
-    public void list_ut_vedtak_start_for_svp_nynorsk() {
-        FagsakYtelseType ytelseType = FagsakYtelseType.SVANGERSKAPSPENGER;
-        Språkkode språkkode = Språkkode.nn;
-        for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse) {
+    void list_ut_vedtak_start_for_svp_nynorsk() {
+        var ytelseType = FagsakYtelseType.SVANGERSKAPSPENGER;
+        var språkkode = Språkkode.nn;
+        for (var resultatType : tilbakekrevingsResultat) {
+            for (var medVarsel : trueFalse) {
                 listVedtakStartAllePermutasjoner(ytelseType, språkkode, resultatType, medVarsel);
             }
             listVedtakStartMedKorrigertBeløpAllePermutasjoner(ytelseType, språkkode, resultatType);
@@ -115,11 +115,11 @@ public class DokumentasjonGeneratorVedtakOppsummering {
     }
 
     @Test
-    public void list_ut_vedtak_start_for_frisinn() {
-        FagsakYtelseType ytelseType = FagsakYtelseType.FRISINN;
-        Språkkode nb = Språkkode.nb;
-        for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse) {
+    void list_ut_vedtak_start_for_frisinn() {
+        var ytelseType = FagsakYtelseType.FRISINN;
+        var nb = Språkkode.nb;
+        for (var resultatType : tilbakekrevingsResultat) {
+            for (var medVarsel : trueFalse) {
                 listVedtakStartUtenRenter(ytelseType, nb, resultatType, medVarsel);
             }
             listVedtakStartMedKorrigertBeløpUtenRenter(ytelseType, nb, resultatType);
@@ -127,11 +127,11 @@ public class DokumentasjonGeneratorVedtakOppsummering {
     }
 
     @Test
-    public void list_ut_vedtak_start_for_frisinn_nynorsk() {
-        FagsakYtelseType ytelseType = FagsakYtelseType.FRISINN;
-        Språkkode språkkode = Språkkode.nn;
-        for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse) {
+    void list_ut_vedtak_start_for_frisinn_nynorsk() {
+        var ytelseType = FagsakYtelseType.FRISINN;
+        var språkkode = Språkkode.nn;
+        for (var resultatType : tilbakekrevingsResultat) {
+            for (var medVarsel : trueFalse) {
                 listVedtakStartUtenRenter(ytelseType, språkkode, resultatType, medVarsel);
             }
             listVedtakStartMedKorrigertBeløpUtenRenter(ytelseType, språkkode, resultatType);
@@ -199,24 +199,24 @@ public class DokumentasjonGeneratorVedtakOppsummering {
                                     int renter,
                                     int skatt,
                                     boolean medKorrigertBeløp) {
-        HbSak.Builder sakBuilder = HbSak.build()
+        var sakBuilder = HbSak.build()
                 .medYtelsetype(ytelseType)
                 .medAntallBarn(1)
                 .medErFødsel(true);
         if (!medVarsel) {
             sakBuilder.medDatoFagsakvedtak(JANUAR_15);
         }
-        HbSak sak = sakBuilder.build();
+        var sak = sakBuilder.build();
 
-        int totaltMedRenter = totalt + renter;
-        HbTotalresultat resultat = HbTotalresultat.builder()
+        var totaltMedRenter = totalt + renter;
+        var resultat = HbTotalresultat.builder()
                 .medHovedresultat(tilbakebetaling)
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(totalt))
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(totaltMedRenter))
                 .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(totaltMedRenter - skatt))
                 .medTotaltRentebeløp(BigDecimal.valueOf(renter))
                 .build();
-        HbVedtaksbrevFelles.Builder fellesBuilder = HbVedtaksbrevFelles.builder()
+        var fellesBuilder = HbVedtaksbrevFelles.builder()
                 .medSak(sak)
                 .medVedtakResultat(resultat)
                 .medSøker(HbPerson.builder()
@@ -240,9 +240,9 @@ public class DokumentasjonGeneratorVedtakOppsummering {
                     .medVarsletDato(JANUAR_15)
                     .build());
         }
-        HbVedtaksbrevFelles felles = fellesBuilder
+        var felles = fellesBuilder
                 .medSpråkkode(språkkode).build();
-        String vedtakStart = TekstformatererVedtaksbrev.lagVedtakStart(felles);
+        var vedtakStart = TekstformatererVedtaksbrev.lagVedtakStart(felles);
 
         prettyPrint(tilbakebetaling, medVarsel, renter, skatt, vedtakStart, medKorrigertBeløp);
     }
@@ -260,7 +260,7 @@ public class DokumentasjonGeneratorVedtakOppsummering {
                 + (renter != 0 ? "med renter" : "uten renter")
                 + (medKorrigertBeløp ? " - med korrigert beløp" : "")
                 + " ]*");
-        String parametrisertTekst = generertTekst
+        var parametrisertTekst = generertTekst
                 .replaceAll(" 1\u00A0010\u00A0kroner", " <skyldig beløp> kroner")
                 .replaceAll(" 1\u00A0000\u00A0kroner", " <skyldig beløp> kroner")
                 .replaceAll(" 910\u00A0kroner", " <skyldig beløp uten skatt> kroner")
