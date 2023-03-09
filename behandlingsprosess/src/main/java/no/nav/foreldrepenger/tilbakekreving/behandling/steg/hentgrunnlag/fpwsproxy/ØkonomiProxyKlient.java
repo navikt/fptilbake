@@ -33,7 +33,7 @@ import no.nav.vedtak.felles.integrasjon.rest.RestRequest;
 import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 
 @ApplicationScoped
-@RestClientConfig(tokenConfig = TokenFlow.STS_CC, endpointProperty = "fpwsproxy.override.url", endpointDefault = "http://fpwsproxy.teamforeldrepenger/fpwsproxy")
+@RestClientConfig(tokenConfig = TokenFlow.AZUREAD_CC, endpointProperty = "fpwsproxy.override.url", endpointDefault = "http://fpwsproxy.teamforeldrepenger/fpwsproxy")
 public class ØkonomiProxyKlient {
     private static final String PATH_TILBAKEKREVING_KONTROLLER = "/tilbakekreving";
 
