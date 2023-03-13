@@ -79,7 +79,7 @@ public enum HendelseUnderType implements Kodeverdi {
     ES_FORELDREANSVAR_BARN_OVER_15("ES_FORELDREANSVAR_BARN_OVER_15", "Barn over 15 år", 3),
     ES_FAR_IKKE_OMSORG("ES_FAR_IKKE_OMSORG", "Far ikke omsorg for barnet", 0),
     ES_STONADEN_ALLEREDE_UTBETALT("ES_STONADEN_ALLEREDE_UTBETALT", "Stønaden allerede utbetalt til mor", 1),
-    ES_FAR_IKKE_ALENE("ES_FAR_IKKE_ALENE", "Far overtar ikke foreldreansvar alene", 0),
+    ES_FAR_IKKE_ALENE("ES_FAR_IKKE_ALENE", "Far overtar ikke\u00A0foreldreansvar alene", 0),
     ES_FAR_IKKE_INNEN_STONADSPERIODE("ES_FAR_IKKE_INNEN_STONADSPERIODE", "Far overtar ikke innen stønadsperioden", 1),
     ES_BRUKER_RETT_FORELDREPENGER("ES_BRUKER_RETT_FORELDREPENGER", "Bruker har likevel rett på foreldrepenger", 0),
     ES_STONAD_FLERE_GANGER("ES_STONAD_FLERE_GANGER", "Stønad gitt for samme barn flere ganger", 0),
