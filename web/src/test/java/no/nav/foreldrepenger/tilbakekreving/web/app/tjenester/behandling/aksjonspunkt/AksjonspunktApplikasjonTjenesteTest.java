@@ -27,7 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.VurderForeldelseDto;
 
 @CdiDbAwareTest
-public class AksjonspunktApplikasjonTjenesteTest {
+class AksjonspunktApplikasjonTjenesteTest {
 
     private static final String BEGRUNNELSE = "begrunnelse";
     private static final LocalDate FOM = LocalDate.now().minusDays(40);
@@ -50,7 +50,7 @@ public class AksjonspunktApplikasjonTjenesteTest {
     }
 
     @Test
-    public void test_skal_sette_aksjonspunkt_til_utført_og_lagre_behandling() {
+    void test_skal_sette_aksjonspunkt_til_utført_og_lagre_behandling() {
         AbstractTestScenario<?> scenario = lagScenarioMedAksjonspunkt(AksjonspunktDefinisjon.VURDER_FORELDELSE);
         Behandling behandling = scenario.lagre(repositoryProvider);
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), UUID.randomUUID());

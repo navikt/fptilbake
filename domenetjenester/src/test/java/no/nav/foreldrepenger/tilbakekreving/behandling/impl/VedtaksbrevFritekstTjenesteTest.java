@@ -37,7 +37,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 @CdiDbAwareTest
-public class VedtaksbrevFritekstTjenesteTest {
+class VedtaksbrevFritekstTjenesteTest {
 
     @Inject
     private BehandlingRepository behandlingRepository;
@@ -63,13 +63,13 @@ public class VedtaksbrevFritekstTjenesteTest {
     private Long behandlingId;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         fagsakRepository.lagre(fagsak);
         behandlingId = behandlingRepository.lagre(behandling, new BehandlingLås(null));
     }
 
     @Test
-    public void skal_lagre_påkrevet_fritekst() {
+    void skal_lagre_påkrevet_fritekst() {
         FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
         fakta.setBegrunnelse("foo");
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
@@ -104,7 +104,7 @@ public class VedtaksbrevFritekstTjenesteTest {
     }
 
     @Test
-    public void skal_feile_når_påkrevet_fritekst_mangler() {
+    void skal_feile_når_påkrevet_fritekst_mangler() {
         FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
         fakta.setBegrunnelse("foo");
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()

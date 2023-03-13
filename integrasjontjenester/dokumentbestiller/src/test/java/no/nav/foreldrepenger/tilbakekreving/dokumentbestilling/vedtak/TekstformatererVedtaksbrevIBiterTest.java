@@ -38,14 +38,14 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVurderinger;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-public class TekstformatererVedtaksbrevIBiterTest {
+class TekstformatererVedtaksbrevIBiterTest {
 
     private final Periode januar = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 31));
     private final Periode februar = Periode.of(LocalDate.of(2019, 2, 1), LocalDate.of(2019, 2, 28));
 
     @Test
-    public void skal_generere_brev_delt_i_avsnitt_og_underavsnitt() {
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+    void skal_generere_brev_delt_i_avsnitt_og_underavsnitt() {
+        var vedtaksbrevData = lagTestBuilder()
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                         .medErFødsel(true)
@@ -68,7 +68,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                         .build())
                 .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
                 .build();
-        List<HbVedtaksbrevPeriode> perioder = List.of(
+        var perioder = List.of(
                 HbVedtaksbrevPeriode.builder()
                         .medPeriode(januar)
                         .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
@@ -99,15 +99,15 @@ public class TekstformatererVedtaksbrevIBiterTest {
                         .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(3000))
                         .build()
         );
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+        var data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        List<Avsnitt> resultat = TekstformatererVedtaksbrev.lagVedtaksbrevDeltIAvsnitt(data, "Du må betale tilbake foreldrepengene");
+        var resultat = TekstformatererVedtaksbrev.lagVedtaksbrevDeltIAvsnitt(data, "Du må betale tilbake foreldrepengene");
         //FIXME fullfør test
     }
 
     @Test
-    public void skal_generere_tekst_for_faktaperiode() {
-        HbVedtaksbrevFelles felles = lagTestBuilder()
+    void skal_generere_tekst_for_faktaperiode() {
+        var felles = lagTestBuilder()
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                         .medErFødsel(true)
@@ -126,7 +126,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                         .medVarsletDato(LocalDate.of(2020, 4, 4))
                         .build())
                 .build();
-        HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
+        var periode = HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
                 .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
@@ -138,9 +138,9 @@ public class TekstformatererVedtaksbrevIBiterTest {
                         .build())
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(20002))
                 .build();
-        HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
+        var data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
 
-        String generertTekst = TekstformatererVedtaksbrev.lagFaktaTekst(data);
+        var generertTekst = TekstformatererVedtaksbrev.lagFaktaTekst(data);
         assertThat(generertTekst).isEqualTo("Du har jobbet samtidig som at du har fått utbetalt foreldrepenger. Fordi du har fått endret hvor mye du skal jobbe og hvor mye du tar ut i foreldrepenger, er deler av beløpet du har fått utbetalt feil. Du har derfor fått 30 001 kroner for mye utbetalt.");
     }
 
@@ -157,8 +157,8 @@ public class TekstformatererVedtaksbrevIBiterTest {
     }
 
     @Test
-    public void skal_si_at_du_ikke_trenger_betale_tilbake_når_det_er_god_tro_og_beløp_ikke_er_i_behold() {
-        HbVedtaksbrevFelles felles = lagTestBuilder()
+    void skal_si_at_du_ikke_trenger_betale_tilbake_når_det_er_god_tro_og_beløp_ikke_er_i_behold() {
+        var felles = lagTestBuilder()
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                         .medErFødsel(true)
@@ -177,7 +177,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                         .medVarsletDato(LocalDate.of(2020, 4, 4))
                         .build())
                 .build();
-        HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
+        var periode = HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
                 .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
@@ -189,15 +189,15 @@ public class TekstformatererVedtaksbrevIBiterTest {
                         .build())
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(0))
                 .build();
-        HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
+        var data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
 
-        String generertTekst = TekstformatererVedtaksbrev.lagVilkårTekst(data);
+        var generertTekst = TekstformatererVedtaksbrev.lagVilkårTekst(data);
         assertThat(generertTekst).contains("_Hvordan har vi kommet fram til at du ikke må betale tilbake?");
     }
 
     @Test
-    public void skal_ha_riktig_tekst_for_særlige_grunner_når_det_ikke_er_reduksjon_av_beløp() {
-        HbVedtaksbrevFelles felles = lagTestBuilder()
+    void skal_ha_riktig_tekst_for_særlige_grunner_når_det_ikke_er_reduksjon_av_beløp() {
+        var felles = lagTestBuilder()
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                         .medErFødsel(true)
@@ -216,7 +216,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                         .medVarsletDato(LocalDate.of(2020, 4, 4))
                         .build())
                 .build();
-        HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
+        var periode = HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
                 .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
@@ -233,13 +233,13 @@ public class TekstformatererVedtaksbrevIBiterTest {
                         .build())
                 .build();
 
-        String generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
+        var generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
         assertThat(generertTekst).contains("Vi har vurdert om det er grunner til å redusere beløpet. Vi har lagt vekt på at du ikke har gitt oss alle nødvendige opplysninger tidsnok til at vi kunne unngå feilutbetalingen. Derfor må du betale tilbake hele beløpet.");
     }
 
     @Test
-    public void skal_ha_riktig_tekst_for_særlige_grunner_når_det_er_reduksjon_av_beløp() {
-        HbVedtaksbrevFelles felles = lagTestBuilder()
+    void skal_ha_riktig_tekst_for_særlige_grunner_når_det_er_reduksjon_av_beløp() {
+        var felles = lagTestBuilder()
                 .medSpråkkode(Språkkode.nn)
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
@@ -259,7 +259,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                         .medVarsletDato(LocalDate.of(2020, 4, 4))
                         .build())
                 .build();
-        HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
+        var periode = HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
                 .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
@@ -276,17 +276,17 @@ public class TekstformatererVedtaksbrevIBiterTest {
                         .build())
                 .build();
 
-        String generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
+        var generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
         assertThat(generertTekst)
                 .contains("Vi har lagt vekt på at du ikkje har gitt oss alle nødvendige opplysningar tidsnok til at vi kunne unngå feilutbetalinga. Vi vurderer likevel at aktløysa di har vore så lita at vi har redusert beløpet du må betale tilbake.")
                 .contains("Du må betale 500 kroner");
     }
 
     @Test
-    public void skal_parse_tekst_til_avsnitt() {
-        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_Hovedoverskrift i brevet\n\nBrødtekst første avsnitt\n\nBrødtekst andre avsnitt\n\n_underoverskrift\n\nBrødtekst tredje avsnitt\n\n_Avsluttende overskrift uten etterfølgende tekst\n" + VedtaksbrevFritekst.markerValgfriFritekst(null), new Avsnitt.Builder(), null).build();
+    void skal_parse_tekst_til_avsnitt() {
+        var resultat = TekstformatererVedtaksbrev.parseTekst("_Hovedoverskrift i brevet\n\nBrødtekst første avsnitt\n\nBrødtekst andre avsnitt\n\n_underoverskrift\n\nBrødtekst tredje avsnitt\n\n_Avsluttende overskrift uten etterfølgende tekst\n" + VedtaksbrevFritekst.markerValgfriFritekst(null), new Avsnitt.Builder(), null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift i brevet");
-        List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
+        var underavsnitt = resultat.getUnderavsnittsliste();
         assertThat(underavsnitt).hasSize(4);
         assertThat(underavsnitt.get(0).getOverskrift()).isNull();
         assertThat(underavsnitt.get(0).getBrødtekst()).isEqualTo("Brødtekst første avsnitt");
@@ -303,10 +303,10 @@ public class TekstformatererVedtaksbrevIBiterTest {
     }
 
     @Test
-    public void skal_plassere_fritekstfelt_etter_første_avsnitt_når_det_er_valgt() {
-        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_Hovedoverskrift i brevet\n\nBrødtekst første avsnitt\n" + VedtaksbrevFritekst.markerValgfriFritekst(null) + "\nBrødtekst andre avsnitt\n\n_underoverskrift\n\nBrødtekst tredje avsnitt\n\n_Avsluttende overskrift uten etterfølgende tekst", new Avsnitt.Builder(), null).build();
+    void skal_plassere_fritekstfelt_etter_første_avsnitt_når_det_er_valgt() {
+        var resultat = TekstformatererVedtaksbrev.parseTekst("_Hovedoverskrift i brevet\n\nBrødtekst første avsnitt\n" + VedtaksbrevFritekst.markerValgfriFritekst(null) + "\nBrødtekst andre avsnitt\n\n_underoverskrift\n\nBrødtekst tredje avsnitt\n\n_Avsluttende overskrift uten etterfølgende tekst", new Avsnitt.Builder(), null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift i brevet");
-        List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
+        var underavsnitt = resultat.getUnderavsnittsliste();
         assertThat(underavsnitt).hasSize(4);
         assertThat(underavsnitt.get(0).getOverskrift()).isNull();
         assertThat(underavsnitt.get(0).getBrødtekst()).isEqualTo("Brødtekst første avsnitt");
@@ -323,11 +323,11 @@ public class TekstformatererVedtaksbrevIBiterTest {
     }
 
     @Test
-    public void skal_plassere_fritekstfelt_etter_overskriften_når_det_er_valgt() {
-        Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
-        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n" + VedtaksbrevFritekst.markerValgfriFritekst(null) + "\nBrødtekst første avsnitt\n\n_underoverskrift 2\n\nBrødtekst andre avsnitt", avsnittbuilder, null).build();
+    void skal_plassere_fritekstfelt_etter_overskriften_når_det_er_valgt() {
+        var avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
+        var resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n" + VedtaksbrevFritekst.markerValgfriFritekst(null) + "\nBrødtekst første avsnitt\n\n_underoverskrift 2\n\nBrødtekst andre avsnitt", avsnittbuilder, null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
-        List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
+        var underavsnitt = resultat.getUnderavsnittsliste();
         assertThat(underavsnitt).hasSize(3);
         assertThat(underavsnitt.get(0).getOverskrift()).isEqualTo("underoverskrift 1");
         assertThat(underavsnitt.get(0).getBrødtekst()).isNull();
@@ -341,14 +341,13 @@ public class TekstformatererVedtaksbrevIBiterTest {
     }
 
     @Test
-    public void skal_parse_fritekstfelt_med_eksisterende_fritekst() {
-        Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
-        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
+    void skal_parse_fritekstfelt_med_eksisterende_fritekst() {
+        var avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
+        var resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
                         + VedtaksbrevFritekst.markerValgfriFritekst("fritekst linje 1\n\nfritekst linje2")
                 , avsnittbuilder, null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
-        List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
-        //assertThat(underavsnitt).hasSize(1);
+        var underavsnitt = resultat.getUnderavsnittsliste();
         assertThat(underavsnitt.get(0).getOverskrift()).isEqualTo("underoverskrift 1");
         assertThat(underavsnitt.get(0).getBrødtekst()).isNull();
         assertThat(underavsnitt.get(0).isFritekstTillatt()).isTrue();
@@ -356,15 +355,15 @@ public class TekstformatererVedtaksbrevIBiterTest {
     }
 
     @Test
-    public void skal_skille_mellom_påkrevet_og_valgfritt_fritekstfelt() {
-        Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
-        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
+    void skal_skille_mellom_påkrevet_og_valgfritt_fritekstfelt() {
+        var avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
+        var resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
                         + VedtaksbrevFritekst.markerPåkrevetFritekst(null, null)
                         + "\n_underoverskrift 2\n"
                         + VedtaksbrevFritekst.markerValgfriFritekst(null)
                 , avsnittbuilder, null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
-        List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
+        var underavsnitt = resultat.getUnderavsnittsliste();
         assertThat(underavsnitt).hasSize(2);
         assertThat(underavsnitt.get(0).getOverskrift()).isEqualTo("underoverskrift 1");
         assertThat(underavsnitt.get(0).getBrødtekst()).isNull();
@@ -380,16 +379,16 @@ public class TekstformatererVedtaksbrevIBiterTest {
     }
 
     @Test
-    public void skal_utlede_underavsnittstype_fra_fritekstmarkering_slik_at_det_er_mulig_å_skille_mellom_særlige_grunner_og_andre_særlige_grunner() {
-        Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
-        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
+    void skal_utlede_underavsnittstype_fra_fritekstmarkering_slik_at_det_er_mulig_å_skille_mellom_særlige_grunner_og_andre_særlige_grunner() {
+        var avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
+        var resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
                         + VedtaksbrevFritekst.markerValgfriFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER)
                         + "\n_underoverskrift 2\n"
                         + "brødtekst " + VedtaksbrevFritekst.markerValgfriFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET)
                         + "\n_underoverskrift 3\n"
                 , avsnittbuilder, null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
-        List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
+        var underavsnitt = resultat.getUnderavsnittsliste();
         assertThat(underavsnitt).hasSize(3);
         assertThat(underavsnitt.get(0).getUnderavsnittstype()).isEqualTo(Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER);
         assertThat(underavsnitt.get(1).getUnderavsnittstype()).isEqualTo(Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET);

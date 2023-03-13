@@ -10,7 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
@@ -106,16 +105,6 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
 
     AksjonspunktDefinisjon() {
         // for CDI
-    }
-
-    /**
-     * Brukes for utgåtte aksjonspunkt. Disse skal ikke kunne gjenoppstå.
-     */
-    private AksjonspunktDefinisjon(String kode, AksjonspunktType type, String navn) {
-        this.kode = kode;
-        this.aksjonspunktType = type;
-        this.navn = navn;
-        erUtgått = true;
     }
 
     // Bruk for ordinære aksjonspunkt og overstyring
@@ -234,7 +223,7 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
     public static List<AksjonspunktDefinisjon> finnAksjonspunktDefinisjoner(BehandlingStegType behandlingStegType, VurderingspunktType vurderingspunktType) {
         return KODER.values().stream()
                 .filter(ad -> Objects.equals(ad.getBehandlingSteg(), behandlingStegType) && Objects.equals(ad.getVurderingspunktType(), vurderingspunktType))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Converter(autoApply = true)

@@ -22,7 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
-public class HåndterHendelseTaskTest {
+class HåndterHendelseTaskTest {
 
     private static final AktørId AKTØR_ID = new AktørId("1234567898765");
     private static final UUID EKSTERN_BEHANDLING_UUID = UUID.randomUUID();
@@ -32,7 +32,7 @@ public class HåndterHendelseTaskTest {
 
 
     @Test
-    public void test_skal_kalle_hendelseHåndterer() {
+    void test_skal_kalle_hendelseHåndterer() {
         //
         ProsessTaskData prosessTaskData = lagProsessTaskData(opprettTilkjentYtelseMelding());
         when(hendelseHåndterer.hentHenvisning(any(UUID.class))).thenReturn(new Henvisning("123"));
@@ -53,7 +53,7 @@ public class HåndterHendelseTaskTest {
         return td;
     }
 
-    public static YtelseV1 opprettTilkjentYtelseMelding() {
+    static YtelseV1 opprettTilkjentYtelseMelding() {
         var melding = new YtelseV1();
         var aktør = new Aktør();
         aktør.setVerdi(AKTØR_ID.getId());

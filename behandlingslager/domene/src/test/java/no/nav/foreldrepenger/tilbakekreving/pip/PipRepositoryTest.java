@@ -22,7 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 
 @ExtendWith(JpaExtension.class)
-public class PipRepositoryTest {
+class PipRepositoryTest {
 
     private static final String SAKSBEHANDLER = "Z12345";
 
@@ -31,7 +31,7 @@ public class PipRepositoryTest {
     private Behandling behandling;
 
     @BeforeEach
-    public void setup(EntityManager entityManager) {
+    void setup(EntityManager entityManager) {
         BehandlingRepository behandlingRepository = new BehandlingRepository(entityManager);
         pipRepository = new PipRepository(entityManager);
 
@@ -44,7 +44,7 @@ public class PipRepositoryTest {
     }
 
     @Test
-    public void skal_hentBehandlingData_medGyldigBehandlingId() {
+    void skal_hentBehandlingData_medGyldigBehandlingId() {
         Optional<PipBehandlingData> pipBehandlingData = pipRepository.hentBehandlingData(behandling.getId());
         assertThat(pipBehandlingData).isPresent();
         PipBehandlingData behandlingData = pipBehandlingData.get();
@@ -54,7 +54,7 @@ public class PipRepositoryTest {
     }
 
     @Test
-    public void skal_hentBehandlingData_medGyldigBehandlingUuid() {
+    void skal_hentBehandlingData_medGyldigBehandlingUuid() {
         Optional<PipBehandlingData> pipBehandlingData = pipRepository.hentBehandlingData(behandling.getUuid());
         assertThat(pipBehandlingData).isPresent();
         PipBehandlingData behandlingData = pipBehandlingData.get();
@@ -65,7 +65,7 @@ public class PipRepositoryTest {
 
 
     @Test
-    public void skal_hentBehandlingData_medUgyldigBehandlingId() {
+    void skal_hentBehandlingData_medUgyldigBehandlingId() {
         Optional<PipBehandlingData> pipBehandlingData = pipRepository.hentBehandlingData(1234l);
         assertThat(pipBehandlingData).isEmpty();
     }

@@ -9,19 +9,19 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 
-public class AvstemmingCsvFormatterTest {
+class AvstemmingCsvFormatterTest {
 
     private static final String FORVENTET_HEADER = "avsender;vedtakId;fnr;vedtaksdato;fagsakYtelseType;tilbakekrevesBruttoUtenRenter;skatt;tilbakekrevesNettoUtenRenter;renter;erOmgjøringTilIngenTilbakekreving\n";
 
     @Test
-    public void skal_liste_ut_med_forventet_format_for_datoer_og_tall_skal_multipliseres_med_100() {
+    void skal_liste_ut_med_forventet_format_for_datoer_og_tall_skal_multipliseres_med_100() {
         AvstemmingCsvFormatter formatter = new AvstemmingCsvFormatter();
         formatter.leggTilRad(testRad());
         assertThat(formatter.getData()).isEqualTo(FORVENTET_HEADER + "fptilbake;1234;12345678901;20191231;FP;1000;200;800;100;");
     }
 
     @Test
-    public void skal_ha_newline_for_å_skille_rader() {
+    void skal_ha_newline_for_å_skille_rader() {
         AvstemmingCsvFormatter formatter = new AvstemmingCsvFormatter();
         formatter.leggTilRad(testRad());
         formatter.leggTilRad(testRad());
@@ -31,7 +31,7 @@ public class AvstemmingCsvFormatterTest {
     }
 
     @Test
-    public void skal_bruke_kode_i_siste_kolonne_når_det_er_omgjøring_til_ingen_tilbakekreving() {
+    void skal_bruke_kode_i_siste_kolonne_når_det_er_omgjøring_til_ingen_tilbakekreving() {
         AvstemmingCsvFormatter formatter = new AvstemmingCsvFormatter();
         formatter.leggTilRad(testRad()
                 .medTilbakekrevesBruttoUtenRenter(BigDecimal.ZERO)

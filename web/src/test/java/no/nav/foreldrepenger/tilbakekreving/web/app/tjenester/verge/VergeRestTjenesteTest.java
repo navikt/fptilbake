@@ -38,7 +38,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.vedtak.exception.TekniskException;
 
 @ExtendWith(JpaExtension.class)
-public class VergeRestTjenesteTest {
+class VergeRestTjenesteTest {
 
     private final VergeTjeneste vergeTjenesteMock = mock(VergeTjeneste.class);
     private final BehandlingTjeneste behandlingTjenesteMock = mock(BehandlingTjeneste.class);
@@ -52,7 +52,7 @@ public class VergeRestTjenesteTest {
     }
 
     @Test
-    public void kan_ikke_opprette_verge_når_behandling_er_avsluttet() {
+    void kan_ikke_opprette_verge_når_behandling_er_avsluttet() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         behandling.avsluttBehandling();
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
@@ -62,7 +62,7 @@ public class VergeRestTjenesteTest {
     }
 
     @Test
-    public void kan_ikke_opprette_verge_når_behandling_er_på_vent() {
+    void kan_ikke_opprette_verge_når_behandling_er_på_vent() {
         ScenarioSimple scenario = ScenarioSimple.simple();
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG);
         Behandling behandling = scenario.lagre(repositoryProvider);
@@ -73,7 +73,7 @@ public class VergeRestTjenesteTest {
     }
 
     @Test
-    public void kan_ikke_opprette_verge_når_behandling_har_allerede_verge_aksjonspunkt() {
+    void kan_ikke_opprette_verge_når_behandling_har_allerede_verge_aksjonspunkt() {
         ScenarioSimple scenario = ScenarioSimple.simple();
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLAR_VERGE, BehandlingStegType.FAKTA_FEILUTBETALING);
         Behandling behandling = scenario.lagre(repositoryProvider);
@@ -84,7 +84,7 @@ public class VergeRestTjenesteTest {
     }
 
     @Test
-    public void skal_opprette_verge_når_behandling_er_i_fakta_steg() throws URISyntaxException {
+    void skal_opprette_verge_når_behandling_er_i_fakta_steg() throws URISyntaxException {
         ScenarioSimple scenario = ScenarioSimple.simple();
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
         Behandling behandling = scenario.lagre(repositoryProvider);
@@ -94,7 +94,7 @@ public class VergeRestTjenesteTest {
     }
 
     @Test
-    public void kan_ikke_fjerne_verge_når_behandling_er_avsluttet() {
+    void kan_ikke_fjerne_verge_når_behandling_er_avsluttet() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         behandling.avsluttBehandling();
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
@@ -104,7 +104,7 @@ public class VergeRestTjenesteTest {
     }
 
     @Test
-    public void kan_ikke_fjerne_verge_når_behandling_er_på_vent() {
+    void kan_ikke_fjerne_verge_når_behandling_er_på_vent() {
         ScenarioSimple scenario = ScenarioSimple.simple();
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG);
         Behandling behandling = scenario.lagre(repositoryProvider);
@@ -115,7 +115,7 @@ public class VergeRestTjenesteTest {
     }
 
     @Test
-    public void skal_fjerne_verge() throws URISyntaxException {
+    void skal_fjerne_verge() throws URISyntaxException {
         ScenarioSimple scenario = ScenarioSimple.simple();
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLAR_VERGE, BehandlingStegType.FAKTA_VERGE);
         Behandling behandling = scenario.lagre(repositoryProvider);
@@ -125,7 +125,7 @@ public class VergeRestTjenesteTest {
     }
 
     @Test
-    public void skal_hente_behandlingsmenyvalg_når_behandling_er_aktiv_og_har_ingen_verge() {
+    void skal_hente_behandlingsmenyvalg_når_behandling_er_aktiv_og_har_ingen_verge() {
         ScenarioSimple scenario = ScenarioSimple.simple();
         Behandling behandling = scenario.lagre(repositoryProvider);
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
@@ -136,7 +136,7 @@ public class VergeRestTjenesteTest {
     }
 
     @Test
-    public void skal_hente_behandlingsmenyvalg_når_behandling_er_aktiv_og_har_verge() {
+    void skal_hente_behandlingsmenyvalg_når_behandling_er_aktiv_og_har_verge() {
         ScenarioSimple scenario = ScenarioSimple.simple();
         Behandling behandling = scenario.lagre(repositoryProvider);
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
@@ -153,7 +153,7 @@ public class VergeRestTjenesteTest {
     }
 
     @Test
-    public void skal_hente_behandlingsmenyvalg_når_behandling_er_på_vent() {
+    void skal_hente_behandlingsmenyvalg_når_behandling_er_på_vent() {
         ScenarioSimple scenario = ScenarioSimple.simple();
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG);
         Behandling behandling = scenario.lagre(repositoryProvider);

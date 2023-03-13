@@ -42,7 +42,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVurderinger;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-public class TekstformatererVedtaksbrevTest {
+class TekstformatererVedtaksbrevTest {
 
     private final Periode januar = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 31));
     private final Periode februar = Periode.of(LocalDate.of(2019, 2, 1), LocalDate.of(2019, 2, 28));
@@ -52,25 +52,25 @@ public class TekstformatererVedtaksbrevTest {
     private final Periode førsteNyttårsdag = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 1));
 
     @Test
-    public void skal_generere_vedtaksbrev_for_FP_og_tvillinger_og_simpel_uaktsomhet() throws Exception {
-        HbVedtaksbrevData data = getVedtaksbrevDataTvilling(FagsakYtelseType.FORELDREPENGER, HendelseType.FP_ANNET_HENDELSE_TYPE, null);
+    void skal_generere_vedtaksbrev_for_FP_og_tvillinger_og_simpel_uaktsomhet() throws Exception {
+        var data = getVedtaksbrevDataTvilling(FagsakYtelseType.FORELDREPENGER, HendelseType.FP_ANNET_HENDELSE_TYPE, null);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/FP_tvillinger.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/FP_tvillinger.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_FP_og_tvillinger_og_simpel_uaktsomhet_nynorsk() throws Exception {
-        HbVedtaksbrevData data = getVedtaksbrevDataTvilling(FagsakYtelseType.FORELDREPENGER, HendelseType.FP_ANNET_HENDELSE_TYPE, Språkkode.nn);
+    void skal_generere_vedtaksbrev_for_FP_og_tvillinger_og_simpel_uaktsomhet_nynorsk() throws Exception {
+        var data = getVedtaksbrevDataTvilling(FagsakYtelseType.FORELDREPENGER, HendelseType.FP_ANNET_HENDELSE_TYPE, Språkkode.nn);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/FP_tvillinger_nn.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/FP_tvillinger_nn.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     private HbVedtaksbrevData getVedtaksbrevDataTvilling(FagsakYtelseType ytelseType, HendelseType hendelseType, Språkkode språkkode) {
-        HbVedtaksbrevFelles.Builder vedtaksBrevBuilder = lagTestBuilder()
+        var vedtaksBrevBuilder = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(ytelseType)
                 .medErFødsel(true)
@@ -102,7 +102,7 @@ public class TekstformatererVedtaksbrevTest {
             .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = List.of(
+        var perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
@@ -133,12 +133,12 @@ public class TekstformatererVedtaksbrevTest {
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(3000))
                 .build()
         );
-        HbVedtaksbrevFelles vedtaksbrevData = vedtaksBrevBuilder.build();
+        var vedtaksbrevData = vedtaksBrevBuilder.build();
         return new HbVedtaksbrevData(vedtaksbrevData, perioder);
     }
 
     private HbVedtaksbrevData getVedtaksbrevDataOmp() {
-        HbVedtaksbrevFelles.Builder vedtaksBrevBuilder = lagTestBuilder()
+        var vedtaksBrevBuilder = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.OMSORGSPENGER)
                 .medAntallBarn(1)
@@ -162,7 +162,7 @@ public class TekstformatererVedtaksbrevTest {
             .medSpråkkode(Språkkode.nb)
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = List.of(
+        var perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(Periode.of(LocalDate.of(2021, 4, 5), LocalDate.of(2021, 4, 6)))
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(2000)))
@@ -188,13 +188,13 @@ public class TekstformatererVedtaksbrevTest {
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(1000))
                 .build()
         );
-        HbVedtaksbrevFelles vedtaksbrevData = vedtaksBrevBuilder.build();
+        var vedtaksbrevData = vedtaksBrevBuilder.build();
         return new HbVedtaksbrevData(vedtaksbrevData, perioder);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_FP_og_god_tro_uten_tilbakekreving_uten_varsel() throws Exception {
-        List<HbVedtaksbrevPeriode> perioder = List.of(
+    void skal_generere_vedtaksbrev_for_FP_og_god_tro_uten_tilbakekreving_uten_varsel() throws Exception {
+        var perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.builder()
@@ -210,7 +210,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(0))
                 .build()
         );
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+        var vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErFødsel(true)
@@ -230,16 +230,16 @@ public class TekstformatererVedtaksbrevTest {
                 .build())
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+        var data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/FP_ingen_tilbakekreving.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/FP_ingen_tilbakekreving.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_FP_uten_tilbakekreving_med_tekst_feil_feriepenger() throws Exception {
-        List<HbVedtaksbrevPeriode> perioder = List.of(
+    void skal_generere_vedtaksbrev_for_FP_uten_tilbakekreving_med_tekst_feil_feriepenger() throws Exception {
+        var perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.builder()
@@ -255,7 +255,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(0))
                 .build()
         );
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+        var vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErFødsel(true)
@@ -276,17 +276,17 @@ public class TekstformatererVedtaksbrevTest {
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .medSkalFjerneTekstFeriepenger(skalFjerneTekstFeriepenger(perioder))
             .build();
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+        var data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/FP_ingen_tilbakekreving_feil_feriepenger.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/FP_ingen_tilbakekreving_feil_feriepenger.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
 
     @Test
-    public void skal_generere_vedtaksbrev_SVP_ingenTilbakebetaling_feilFeriepenger() throws Exception {
-        List<HbVedtaksbrevPeriode> perioder = List.of(
+    void skal_generere_vedtaksbrev_SVP_ingenTilbakebetaling_feilFeriepenger() throws Exception {
+        var perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(mai)
                 .medKravgrunnlag(HbKravgrunnlag.builder()
@@ -302,7 +302,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(0))
                 .build()
         );
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+        var vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
                 .medErFødsel(true)
@@ -328,35 +328,35 @@ public class TekstformatererVedtaksbrevTest {
             .medSkalFjerneTekstFeriepenger(true)
             .build();
 
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+        var data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/SVP_ingen_tilbakekreving_feil_feriepenger.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/SVP_ingen_tilbakekreving_feil_feriepenger.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
 
     @Test
-    public void skal_generere_vedtaksbrev_for_revurdering_med_SVP_og_tvillinger_og_simpel_uaktsomhet() throws Exception {
-        HbVedtaksbrevData data = getVedtaksbrevDataTvilling(FagsakYtelseType.SVANGERSKAPSPENGER, HendelseType.SVP_ANNET_TYPE, null);
+    void skal_generere_vedtaksbrev_for_revurdering_med_SVP_og_tvillinger_og_simpel_uaktsomhet() throws Exception {
+        var data = getVedtaksbrevDataTvilling(FagsakYtelseType.SVANGERSKAPSPENGER, HendelseType.SVP_ANNET_TYPE, null);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/SVP_tvillinger.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/SVP_tvillinger.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_revurdering_med_SVP_og_tvillinger_og_simpel_uaktsomhet_nynorsk() throws Exception {
-        HbVedtaksbrevData data = getVedtaksbrevDataTvilling(FagsakYtelseType.SVANGERSKAPSPENGER, HendelseType.SVP_ANNET_TYPE, Språkkode.nn);
+    void skal_generere_vedtaksbrev_for_revurdering_med_SVP_og_tvillinger_og_simpel_uaktsomhet_nynorsk() throws Exception {
+        var data = getVedtaksbrevDataTvilling(FagsakYtelseType.SVANGERSKAPSPENGER, HendelseType.SVP_ANNET_TYPE, Språkkode.nn);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/SVP_tvillinger_nn.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/SVP_tvillinger_nn.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_revurdering_med_FP_og_adopsjon_med_mye_fritekst() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+    void skal_generere_vedtaksbrev_for_revurdering_med_FP_og_adopsjon_med_mye_fritekst() throws Exception {
+        var vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErAdopsjon(true)
@@ -382,7 +382,7 @@ public class TekstformatererVedtaksbrevTest {
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
 
-        List<HbVedtaksbrevPeriode> perioder = List.of(
+        var perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.builder()
@@ -449,16 +449,16 @@ public class TekstformatererVedtaksbrevTest {
                 .build()
         );
 
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+        var data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/FP_fritekst_overalt.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/FP_fritekst_overalt.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_SVP_og_ett_barn_forstod_at_beløp_var_feil() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+    void skal_generere_vedtaksbrev_for_SVP_og_ett_barn_forstod_at_beløp_var_feil() throws Exception {
+        var vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
                 .medErFødsel(true)
@@ -481,7 +481,7 @@ public class TekstformatererVedtaksbrevTest {
                 .build())
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = List.of(
+        var perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(10000)))
@@ -495,16 +495,16 @@ public class TekstformatererVedtaksbrevTest {
                 .build()
         );
 
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+        var data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/SVP_forstod.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/SVP_forstod.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_FRISINN_og_forsett() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+    void skal_generere_vedtaksbrev_for_FRISINN_og_forsett() throws Exception {
+        var vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FRISINN)
                 .build())
@@ -525,7 +525,7 @@ public class TekstformatererVedtaksbrevTest {
                 .build())
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = List.of(
+        var perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(10000)))
@@ -543,16 +543,16 @@ public class TekstformatererVedtaksbrevTest {
                 .build()
         );
 
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+        var data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/FRISINN_forsett.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/FRISINN_forsett.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_ES_god_tro_og_ingen_tilbakebetaling() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+    void skal_generere_vedtaksbrev_for_ES_god_tro_og_ingen_tilbakebetaling() throws Exception {
+        var vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.ENGANGSTØNAD)
                 .medErFødsel(true)
@@ -573,7 +573,7 @@ public class TekstformatererVedtaksbrevTest {
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
 
-        List<HbVedtaksbrevPeriode> perioder = List.of(
+        var perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(førsteNyttårsdag)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(10000)))
@@ -588,16 +588,16 @@ public class TekstformatererVedtaksbrevTest {
                 .build()
         );
 
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+        var data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/ES_fødsel_god_tro.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/ES_fødsel_god_tro.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_ES_adopsjon_og_grov_uaktsomhet() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+    void skal_generere_vedtaksbrev_for_ES_adopsjon_og_grov_uaktsomhet() throws Exception {
+        var vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medErAdopsjon(true)
                 .medAntallBarn(5)
@@ -617,7 +617,7 @@ public class TekstformatererVedtaksbrevTest {
                 .build())
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        var perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(førsteNyttårsdag)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(500000)))
@@ -636,16 +636,16 @@ public class TekstformatererVedtaksbrevTest {
                 .build()
         );
 
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+        var data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/ES_adopsjon_grovt_uaktsom.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/ES_adopsjon_grovt_uaktsom.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_FP_med_og_uten_foreldelse_og_uten_skatt() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+    void skal_generere_vedtaksbrev_for_FP_med_og_uten_foreldelse_og_uten_skatt() throws Exception {
+        var vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErFødsel(true)
@@ -662,7 +662,7 @@ public class TekstformatererVedtaksbrevTest {
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        var perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
@@ -694,16 +694,16 @@ public class TekstformatererVedtaksbrevTest {
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(1000))
                 .build()
         );
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+        var data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/FP_delvis_foreldelse_uten_varsel.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/FP_delvis_foreldelse_uten_varsel.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_FP_ingen_tilbakekreving_pga_lavt_beløp() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+    void skal_generere_vedtaksbrev_for_FP_ingen_tilbakekreving_pga_lavt_beløp() throws Exception {
+        var vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medErFødsel(true)
                 .medAntallBarn(5)
@@ -723,7 +723,7 @@ public class TekstformatererVedtaksbrevTest {
                 .build())
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        var perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(førsteNyttårsdag)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(500)))
@@ -738,16 +738,16 @@ public class TekstformatererVedtaksbrevTest {
                 .build()
         );
 
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+        var data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/FP_ikke_tilbakekreves_pga_lavt_beløp.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/FP_ikke_tilbakekreves_pga_lavt_beløp.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_FP_ingen_tilbakekreving_pga_lavt_beløp_med_korrigert_beløp() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+    void skal_generere_vedtaksbrev_for_FP_ingen_tilbakekreving_pga_lavt_beløp_med_korrigert_beløp() throws Exception {
+        var vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medErFødsel(true)
                 .medAntallBarn(5)
@@ -769,7 +769,7 @@ public class TekstformatererVedtaksbrevTest {
             .medTotaltFeilutbetaltBeløp(BigDecimal.valueOf(1000))
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        var perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(førsteNyttårsdag)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(500)))
@@ -784,62 +784,62 @@ public class TekstformatererVedtaksbrevTest {
                 .build()
         );
 
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+        var data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/FP_ikke_tilbakekreves_med_korrigert_beløp.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var fasit = les("/vedtaksbrev/FP_ikke_tilbakekreves_med_korrigert_beløp.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_overskrift_foreldrepenger_full_tilbakebetaling() {
-        HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, null);
+    void skal_generere_vedtaksbrev_overskrift_foreldrepenger_full_tilbakebetaling() {
+        var data = lagBrevOverskriftTestoppsett(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, null);
 
-        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data, null);
-        String fasit = "Du må betale tilbake foreldrepengene";
+        var overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data, null);
+        var fasit = "Du må betale tilbake foreldrepengene";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_overskrift_foreldrepenger_full_tilbakebetaling_nynorsk() {
-        HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, Språkkode.nn);
+    void skal_generere_vedtaksbrev_overskrift_foreldrepenger_full_tilbakebetaling_nynorsk() {
+        var data = lagBrevOverskriftTestoppsett(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, Språkkode.nn);
 
-        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data, Språkkode.nn);
-        String fasit = "Du må betale tilbake foreldrepengane";
+        var overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data, Språkkode.nn);
+        var fasit = "Du må betale tilbake foreldrepengane";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_overskrift_engangstønad_ingen_tilbakebetaling() {
-        HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.ENGANGSTØNAD, VedtakResultatType.INGEN_TILBAKEBETALING, null);
+    void skal_generere_vedtaksbrev_overskrift_engangstønad_ingen_tilbakebetaling() {
+        var data = lagBrevOverskriftTestoppsett(FagsakYtelseType.ENGANGSTØNAD, VedtakResultatType.INGEN_TILBAKEBETALING, null);
 
-        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data, null);
-        String fasit = "Du må ikke betale tilbake engangsstønaden";
+        var overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data, null);
+        var fasit = "Du må ikke betale tilbake engangsstønaden";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_fritekst_og_uten_perioder_vedtaksbrev_for_FP_med_full_tilbakebetaling() throws IOException {
-        HbVedtaksbrevData fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, Språkkode.nb);
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(fritekstVedtaksbrevData);
+    void skal_generere_fritekst_og_uten_perioder_vedtaksbrev_for_FP_med_full_tilbakebetaling() throws IOException {
+        var fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, Språkkode.nb);
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(fritekstVedtaksbrevData);
         assertThat(generertBrev).isNotEmpty();
-        String fasit = les("/vedtaksbrev/Fritekst_Vedtaksbrev_FP_full_tilbakebetaling.txt");
+        var fasit = les("/vedtaksbrev/Fritekst_Vedtaksbrev_FP_full_tilbakebetaling.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_fritekst_og_uten_perioder_vedtaksbrev_for_ES_med_ingen_tilbakebetaling() throws IOException {
-        HbVedtaksbrevData fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(FagsakYtelseType.ENGANGSTØNAD, VedtakResultatType.INGEN_TILBAKEBETALING, Språkkode.nb);
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(fritekstVedtaksbrevData);
+    void skal_generere_fritekst_og_uten_perioder_vedtaksbrev_for_ES_med_ingen_tilbakebetaling() throws IOException {
+        var fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(FagsakYtelseType.ENGANGSTØNAD, VedtakResultatType.INGEN_TILBAKEBETALING, Språkkode.nb);
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(fritekstVedtaksbrevData);
         assertThat(generertBrev).isNotEmpty();
-        String fasit = les("/vedtaksbrev/Fritekst_Vedtaksbrev_ES_ingen_tilbakebetaling.txt");
+        var fasit = les("/vedtaksbrev/Fritekst_Vedtaksbrev_ES_ingen_tilbakebetaling.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     private HbVedtaksbrevData lagBrevOverskriftTestoppsett(FagsakYtelseType ytelsetype,
                                                            VedtakResultatType hovedresultat,
                                                            Språkkode språkkode) {
-        HbVedtaksbrevFelles vedtaksbrevFelles = lagTestBuilder()
+        var vedtaksbrevFelles = lagTestBuilder()
             .medVedtakResultat(HbTotalresultat.builder()
                 .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
@@ -860,10 +860,10 @@ public class TekstformatererVedtaksbrevTest {
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_OMS() {
-        HbVedtaksbrevData data = getVedtaksbrevDataOmp();
+    void skal_generere_vedtaksbrev_for_OMS() {
+        var data = getVedtaksbrevDataOmp();
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         assertThat(generertBrev).isEqualToNormalizingNewlines("""
 Du fikk varsel fra oss 4. april 2020 om at du har fått 3 000 kroner for mye.
 
@@ -911,10 +911,10 @@ Vedlegg: Resultatet av tilbakebetalingssaken""");
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_OLP() {
-        HbVedtaksbrevData data = getVedtaksbrevDataOlp();
+    void skal_generere_vedtaksbrev_for_OLP() {
+        var data = getVedtaksbrevDataOlp();
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         assertThat(generertBrev).isEqualToNormalizingNewlines("""
 Du fikk varsel fra oss 4. april 2020 om at du har fått 3 000 kroner for mye.
 
@@ -964,7 +964,7 @@ Vedlegg: Resultatet av tilbakebetalingssaken""");
     }
 
     private HbVedtaksbrevData getVedtaksbrevDataOlp() {
-        HbVedtaksbrevFelles.Builder vedtaksBrevBuilder = lagTestBuilder()
+        var vedtaksBrevBuilder = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.OPPLÆRINGSPENGER)
                 .medAntallBarn(1)
@@ -988,7 +988,7 @@ Vedlegg: Resultatet av tilbakebetalingssaken""");
             .medSpråkkode(Språkkode.nb)
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = List.of(
+        var perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(Periode.of(LocalDate.of(2021, 4, 5), LocalDate.of(2021, 4, 6)))
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(2000)))
@@ -1014,14 +1014,14 @@ Vedlegg: Resultatet av tilbakebetalingssaken""");
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(1000))
                 .build()
         );
-        HbVedtaksbrevFelles vedtaksbrevData = vedtaksBrevBuilder.build();
+        var vedtaksbrevData = vedtaksBrevBuilder.build();
         return new HbVedtaksbrevData(vedtaksbrevData, perioder);
     }
 
     private HbVedtaksbrevData lagFritekstVedtaksbrevData(FagsakYtelseType ytelsetype,
                                                          VedtakResultatType hovedresultat,
                                                          Språkkode språkkode) {
-        HbVedtaksbrevFelles vedtaksbrevFelles = lagTestBuilder()
+        var vedtaksbrevFelles = lagTestBuilder()
             .medSak(HbSak.build()
                 .medErFødsel(true)
                 .medYtelsetype(ytelsetype)
@@ -1060,8 +1060,7 @@ Vedlegg: Resultatet av tilbakebetalingssaken""");
     }
 
     private String les(String filnavn) throws IOException {
-        try (InputStream resource = getClass().getResourceAsStream(filnavn);
-             Scanner scanner = new Scanner(resource, StandardCharsets.UTF_8)) {
+        try (var resource = getClass().getResourceAsStream(filnavn); var scanner = new Scanner(resource, StandardCharsets.UTF_8)) {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : null;
         }

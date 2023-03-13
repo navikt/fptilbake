@@ -37,7 +37,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBre
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 
-public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett {
+class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     private static final String VARSEL_TEKST = "Sender manuelt varselbrev";
     private final String KORRIGERT_VARSEL_TEKST = "Sender korrigert varselbrev";
@@ -54,7 +54,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     private Long behandlingId;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         manueltVarselBrevTjeneste = new ManueltVarselBrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste, mockFeilutbetalingTjeneste, mockPdfBrevTjeneste);
 
         behandlingId = behandling.getId();
@@ -77,14 +77,14 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     }
 
     @Test
-    public void skal_sende_manuelt_varselbrev() {
+    void skal_sende_manuelt_varselbrev() {
         manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.BRUKER);
 
         Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.VARSEL), eq(Long.valueOf(9000L)), anyString(), any(BrevData.class));
     }
 
     @Test
-    public void skal_sende_korrigert_varselbrev() {
+    void skal_sende_korrigert_varselbrev() {
         //arrange
         manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.BRUKER);
         varselRepository.lagre(behandlingId, VARSEL_TEKST, 100L);
@@ -98,7 +98,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     }
 
     @Test
-    public void skal_sende_korrigert_varselbrev_med_verge() {
+    void skal_sende_korrigert_varselbrev_med_verge() {
         //arrange
         manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.BRUKER);
         varselRepository.lagre(behandlingId, VARSEL_TEKST, 100L);
@@ -113,7 +113,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     }
 
     @Test
-    public void skal_forhåndsvise_manuelt_varselbrev() {
+    void skal_forhåndsvise_manuelt_varselbrev() {
         when(mockPdfBrevTjeneste.genererForhåndsvisning(any(BrevData.class))).thenReturn(VARSEL_TEKST.getBytes());
         byte[] data = manueltVarselBrevTjeneste.hentForhåndsvisningManueltVarselbrev(behandlingId, DokumentMalType.VARSEL_DOK, VARSEL_TEKST);
 
@@ -121,7 +121,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     }
 
     @Test
-    public void skal_forhåndsvise_korrigert_varselbrev() {
+    void skal_forhåndsvise_korrigert_varselbrev() {
         when(mockPdfBrevTjeneste.genererForhåndsvisning(any(BrevData.class))).thenReturn(VARSEL_TEKST.getBytes());
         varselRepository.lagre(behandlingId, KORRIGERT_VARSEL_TEKST, 32000l);
         byte[] data = manueltVarselBrevTjeneste.hentForhåndsvisningManueltVarselbrev(behandlingId, DokumentMalType.KORRIGERT_VARSEL_DOK, VARSEL_TEKST);

@@ -21,7 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestiller
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
-public class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppsett {
+class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppsett {
 
     private InnhentDokumentasjonbrevTjeneste mockInnhentDokumentasjonbrevTjeneste;
 
@@ -29,7 +29,7 @@ public class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppse
     private InnhentDokumentasjonbrevTask innhentDokumentasjonBrevTask;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         mockInnhentDokumentasjonbrevTjeneste = mock(InnhentDokumentasjonbrevTjeneste.class);
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
 
@@ -40,7 +40,7 @@ public class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppse
     }
 
     @Test
-    public void skal_sende_innhent_dokumentasjonbrev_og_sett_behandling_på_vent() {
+    void skal_sende_innhent_dokumentasjonbrev_og_sett_behandling_på_vent() {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Ber om flere opplysninger");
@@ -51,7 +51,7 @@ public class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppse
     }
 
     @Test
-    public void skal_sende_innhent_dokumentasjonbrev_og_sett_behandling_på_vent_når_verge_finnes() {
+    void skal_sende_innhent_dokumentasjonbrev_og_sett_behandling_på_vent_når_verge_finnes() {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Ber om flere opplysninger");

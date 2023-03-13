@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-public class BeregnBeløpUtilTest {
+class BeregnBeløpUtilTest {
 
     @Test
-    public void skal_normalt_ikke_telle_helgedager_som_overlapper_mellom_kravgrunnlag_og_periode() {
+    void skal_normalt_ikke_telle_helgedager_som_overlapper_mellom_kravgrunnlag_og_periode() {
         BeregnBeløpUtil beløpUtil = BeregnBeløpUtil.forFagområde(FagOmrådeKode.FORELDREPENGER);
 
         LocalDate mandag = LocalDate.of(2020, 9, 7);
@@ -31,7 +31,7 @@ public class BeregnBeløpUtilTest {
     }
 
     @Test
-    public void skal_telle_engangstønad_selv_om_den_er_i_helg() {
+    void skal_telle_engangstønad_selv_om_den_er_i_helg() {
         BeregnBeløpUtil beløpUtil = BeregnBeløpUtil.forFagområde(FagOmrådeKode.ENGANGSSTØNAD);
 
         LocalDate mandag = LocalDate.of(2020, 9, 7);
@@ -47,7 +47,7 @@ public class BeregnBeløpUtilTest {
     }
 
     @Test
-    public void skal_telle_engangstønad_selv_om_den_er_på_søndag() {
+    void skal_telle_engangstønad_selv_om_den_er_på_søndag() {
         BeregnBeløpUtil beløpUtil = BeregnBeløpUtil.forFagområde(FagOmrådeKode.ENGANGSSTØNAD);
 
         LocalDate fom = LocalDate.of(2020, 11, 8);

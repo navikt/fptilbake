@@ -22,7 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestiller
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
-public class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
+class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
 
     private ManueltVarselBrevTjeneste mockManueltVarselBrevTjeneste = mock(ManueltVarselBrevTjeneste.class);
 
@@ -30,7 +30,7 @@ public class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett 
     private SendManueltVarselbrevTask varselbrevTask;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
 
         varselbrevTask = new SendManueltVarselbrevTask(repositoryProvider,
@@ -40,7 +40,7 @@ public class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett 
     }
 
     @Test
-    public void skal_sende_manuelt_varselbrev_og_sett_behandling_på_vent() {
+    void skal_sende_manuelt_varselbrev_og_sett_behandling_på_vent() {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Sender manuelt varsel brev");
@@ -52,7 +52,7 @@ public class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett 
     }
 
     @Test
-    public void skal_sende_korrigert_varselbrev_og_sett_behandling_på_vent() {
+    void skal_sende_korrigert_varselbrev_og_sett_behandling_på_vent() {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Sender korrigert varsel brev");
@@ -64,7 +64,7 @@ public class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett 
     }
 
     @Test
-    public void skal_sende_manuelt_varselbrev_med_verge() {
+    void skal_sende_manuelt_varselbrev_med_verge() {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Sender manuelt varsel brev");

@@ -19,7 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 
-public class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
+class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
 
     private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private ForeslåVedtakTjeneste foreslåVedtakTjeneste;
@@ -31,7 +31,7 @@ public class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void lagHistorikkInnslagForForeslåVedtak() {
+    void lagHistorikkInnslagForForeslåVedtak() {
         BeregningResultat beregningResultat = new BeregningResultat(VedtakResultatType.FULL_TILBAKEBETALING, List.of());
         when(beregningsresultatTjeneste.finnEllerBeregn(internBehandlingId)).thenReturn(beregningResultat);
 

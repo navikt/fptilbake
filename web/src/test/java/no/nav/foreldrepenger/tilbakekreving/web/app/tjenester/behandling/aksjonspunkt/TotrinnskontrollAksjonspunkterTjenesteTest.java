@@ -25,7 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.tot
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.totrinn.TotrinnskontrollSkjermlenkeContextDto;
 
 @CdiDbAwareTest
-public class TotrinnskontrollAksjonspunkterTjenesteTest {
+class TotrinnskontrollAksjonspunkterTjenesteTest {
 
     @Inject
     private TotrinnTjeneste totrinnTjeneste;
@@ -39,7 +39,7 @@ public class TotrinnskontrollAksjonspunkterTjenesteTest {
     private Behandling behandling;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         ScenarioSimple scenario = ScenarioSimple.simple();
         scenario.medBehandlingType(BehandlingType.TILBAKEKREVING);
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING, BehandlingStegType.TBKGSTEG);
@@ -48,7 +48,7 @@ public class TotrinnskontrollAksjonspunkterTjenesteTest {
     }
 
     @Test
-    public void hentTotrinnsSkjermlenkeContext() {
+    void hentTotrinnsSkjermlenkeContext() {
         Totrinnsvurdering totrinnsvurdering = Totrinnsvurdering.builder().medBehandling(behandling)
                 .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING)
                 .medGodkjent(true)
@@ -67,7 +67,7 @@ public class TotrinnskontrollAksjonspunkterTjenesteTest {
     }
 
     @Test
-    public void hentTotrinnsSkjermlenkeContext_nårIkkegodkjent() {
+    void hentTotrinnsSkjermlenkeContext_nårIkkegodkjent() {
         Totrinnsvurdering totrinnsvurdering = Totrinnsvurdering.builder().medBehandling(behandling)
                 .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING)
                 .medGodkjent(false)
@@ -92,7 +92,7 @@ public class TotrinnskontrollAksjonspunkterTjenesteTest {
     }
 
     @Test
-    public void hentTotrinnsvurderingSkjermlenkeContext() {
+    void hentTotrinnsvurderingSkjermlenkeContext() {
         Totrinnsvurdering totrinnsvurdering = Totrinnsvurdering.builder().medBehandling(behandling)
                 .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING)
                 .medGodkjent(true)

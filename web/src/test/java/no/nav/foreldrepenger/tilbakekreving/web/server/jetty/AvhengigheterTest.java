@@ -11,14 +11,14 @@ import no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer.Kravgrun
 import no.nav.foreldrepenger.tilbakekreving.los.klient.observer.LosEventObserver;
 import no.nav.vedtak.felles.testutilities.cdi.WeldContext;
 
-public class AvhengigheterTest {
+class AvhengigheterTest {
 
     static {
         WeldContext.getInstance(); // init cdi container
     }
 
     @Test
-    public void skal_ha_følgende_tjenester_på_classpath_slik_at_de_kjører() {
+    void skal_ha_følgende_tjenester_på_classpath_slik_at_de_kjører() {
         //har test for dette, siden dersom avhengighetene blir borte, er det ikke sikkert at det umiddelbart oppdages
 
         Assertions.assertThat(CDI.current().select(SakshendelserEventObserver.class).isResolvable()).isTrue();

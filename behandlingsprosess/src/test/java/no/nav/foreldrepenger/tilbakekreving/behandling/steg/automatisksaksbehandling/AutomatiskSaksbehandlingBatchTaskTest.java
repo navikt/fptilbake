@@ -51,7 +51,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ExtendWith(JpaExtension.class)
-public class AutomatiskSaksbehandlingBatchTaskTest {
+class AutomatiskSaksbehandlingBatchTaskTest {
 
     private static final String ENHET = "8020";
 
@@ -65,7 +65,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
     private AutomatiskSaksbehandlingBatchTask automatiskSaksbehandlingBatchTask;
 
     @BeforeEach
-    public void setup(EntityManager entityManager) {
+    void setup(EntityManager entityManager) {
         entityManager.setFlushMode(FlushModeType.AUTO);
         scenarioSimple.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
@@ -79,37 +79,37 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
     }
 
     @Test
-    public void skal_opprette_prosess_task_for_å_saksbehandle_behandling_automatisk() {
+    void skal_opprette_prosess_task_for_å_saksbehandle_behandling_automatisk() {
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
         verify(taskTjeneste, times(1)).lagre(captor.capture());
         var prosessTasker = captor.getAllValues();
-        assertThat(prosessTasker.size()).isEqualTo(1);
-        ProsessTaskData prosessTaskData = prosessTasker.get(0);
+        assertThat(prosessTasker).hasSize(1);
+        var prosessTaskData = prosessTasker.get(0);
         assertThat(Long.valueOf(prosessTaskData.getBehandlingId())).isEqualTo(behandling.getId());
         assertThat(prosessTaskData.getSekvens()).isEqualTo("10");
     }
 
     @Test
-    public void skal_ikke_kjøre_batch_i_helgen() {
-        Clock helgeClock = Clock.fixed(Instant.parse("2020-05-03T12:00:00.00Z"), ZoneId.systemDefault());
-        AutomatiskSaksbehandlingBatchTask automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, helgeClock, Period.ofWeeks(-1));
+    void skal_ikke_kjøre_batch_i_helgen() {
+        var helgeClock = Clock.fixed(Instant.parse("2020-05-03T12:00:00.00Z"), ZoneId.systemDefault());
+        var automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, helgeClock, Period.ofWeeks(-1));
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
         verifyNoInteractions(taskTjeneste);
     }
 
     @Test
-    public void skal_ikke_kjøre_batch_hvis_hellidag() {
-        Clock helgeClock = Clock.fixed(Instant.parse("2021-05-17T12:00:00.00Z"), ZoneId.systemDefault());
-        AutomatiskSaksbehandlingBatchTask automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, helgeClock, Period.ofWeeks(-1));
+    void skal_ikke_kjøre_batch_hvis_hellidag() {
+        var helgeClock = Clock.fixed(Instant.parse("2021-05-17T12:00:00.00Z"), ZoneId.systemDefault());
+        var automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, helgeClock, Period.ofWeeks(-1));
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
         verifyNoInteractions(taskTjeneste);
     }
 
     @Test
-    public void skal_ikke_opprette_prosess_tasker_for_behandlinger_med_større_feilutbetalt_beløp() {
+    void skal_ikke_opprette_prosess_tasker_for_behandlinger_med_større_feilutbetalt_beløp() {
         lagKravgrunnlag(behandling.getId(), BigDecimal.valueOf(1500L), behandling.getFagsak().getSaksnummer().getVerdi(), 123L);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
@@ -117,7 +117,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
     }
 
     @Test
-    public void skal_ikke_opprette_prosess_tasker_for_avsluttet_behandling() {
+    void skal_ikke_opprette_prosess_tasker_for_avsluttet_behandling() {
         behandling.avsluttBehandling();
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
@@ -125,7 +125,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
     }
 
     @Test
-    public void skal_ikke_opprette_prosess_tasker_når_behandling_er_allerede_saksbehandlet() {
+    void skal_ikke_opprette_prosess_tasker_når_behandling_er_allerede_saksbehandlet() {
         behandling.setAnsvarligSaksbehandler("124");
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
@@ -133,7 +133,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
     }
 
     @Test
-    public void skal_ikke_opprette_prosess_tasker_når_behandling_er_sett_på_vent() {
+    void skal_ikke_opprette_prosess_tasker_når_behandling_er_sett_på_vent() {
         AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.FAKTA_FEILUTBETALING);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
@@ -141,8 +141,8 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
     }
 
     @Test
-    public void skal_ikke_opprette_prosess_tasker_når_behandling_er_allerede_varslet() {
-        BrevSporing brevSporing = new BrevSporing.Builder()
+    void skal_ikke_opprette_prosess_tasker_når_behandling_er_allerede_varslet() {
+        var brevSporing = new BrevSporing.Builder()
                 .medBehandlingId(behandling.getId())
                 .medDokumentId("sdfkjsdlfsd")
                 .medJournalpostId(new JournalpostId("dkasfjsklfsd"))

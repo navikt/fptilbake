@@ -62,7 +62,16 @@ public class HealthCheckRestService {
     @Path("/isAlive")
     @Operation(description = "Sjekker om poden lever", tags = "nais", hidden = true)
     public Response isAlive() {
-        if (live.stream().allMatch(LivenessAware::isAlive)) {
+        boolean alleOK = true;
+        for (LivenessAware livenessAware : live) {
+            long t0 = System.currentTimeMillis();
+            alleOK &= livenessAware.isAlive();
+            long t = System.currentTimeMillis() - t0;
+            if (t > 100) {
+                LOG.warn("is-alive sjekk {} brukte {} ms", livenessAware.getClass().getName(), t);
+            }
+        }
+        if (alleOK) {
             return Response.ok(RESPONSE_OK).cacheControl(CC).build();
         }
         LOG.info("/isAlive NOK.");
@@ -73,7 +82,17 @@ public class HealthCheckRestService {
     @Path("/isReady")
     @Operation(description = "Sjekker om poden er klar", tags = "nais", hidden = true)
     public Response isReady() {
-        if (ready.stream().allMatch(ReadinessAware::isReady)) {
+        boolean alleOK = true;
+        for (ReadinessAware readinessAware : ready) {
+            long t0 = System.currentTimeMillis();
+            alleOK &= readinessAware.isReady();
+            long t = System.currentTimeMillis() - t0;
+            if (t > 100) {
+                LOG.warn("is-ready sjekk {} brukte {} ms", readinessAware.getClass().getName(), t);
+            }
+        }
+
+        if (alleOK) {
             return Response.ok(RESPONSE_OK).cacheControl(CC).build();
         }
         LOG.info("/isReady NOK.");

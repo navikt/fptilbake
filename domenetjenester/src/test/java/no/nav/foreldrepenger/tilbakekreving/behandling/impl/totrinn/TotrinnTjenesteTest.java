@@ -28,7 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 
-public class TotrinnTjenesteTest extends FellesTestOppsett {
+class TotrinnTjenesteTest extends FellesTestOppsett {
 
     private TotrinnTjeneste totrinnTjeneste;
 
@@ -38,7 +38,7 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void settNyttTotrinnsgrunnlag() {
+    void settNyttTotrinnsgrunnlag() {
 
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM, TOM, KlasseType.FEIL,
                 BigDecimal.valueOf(11000), BigDecimal.ZERO);
@@ -69,7 +69,7 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void settNyeTotrinnaksjonspunktvurderinger() {
+    void settNyeTotrinnaksjonspunktvurderinger() {
         Totrinnsvurdering totrinnsvurdering = Totrinnsvurdering.builder().medGodkjent(true)
                 .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING)
                 .medBehandling(behandling)
@@ -88,7 +88,7 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void slettGammelTotrinndata() {
+    void slettGammelTotrinndata() {
         Totrinnsvurdering totrinnsvurdering = Totrinnsvurdering.builder().medGodkjent(true)
                 .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING)
                 .medBehandling(behandling)

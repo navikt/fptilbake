@@ -5,21 +5,17 @@ import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.han
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseTypePrYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUndertypePrHendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
@@ -48,26 +44,26 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
  * FRISINN: https://confluence.adeo.no/display/MODNAV/Generert+dokumentasjon
  */
 @Disabled("Kjøres ved behov for å regenerere dokumentasjon")
-public class DokumentasjonGeneratorPeriodeFakta {
+class DokumentasjonGeneratorPeriodeFaktaTest {
 
     private final Periode januar = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 31));
 
     @Test
-    public void list_ut_permutasjoner_for_FP() {
-        HbVedtaksbrevFelles felles = lagFellesBuilder()
+    void list_ut_permutasjoner_for_FP() {
+        var felles = lagFellesBuilder()
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                         .medErFødsel(true)
                         .medAntallBarn(1)
                         .build())
                 .build();
-        Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
+        var resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
     }
 
     @Test
-    public void list_ut_permutasjoner_for_FP_nynorsk() {
-        HbVedtaksbrevFelles felles = lagFellesBuilder()
+    void list_ut_permutasjoner_for_FP_nynorsk() {
+        var felles = lagFellesBuilder()
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                         .medErFødsel(true)
@@ -75,26 +71,26 @@ public class DokumentasjonGeneratorPeriodeFakta {
                         .build())
                 .medSpråkkode(Språkkode.nn)
                 .build();
-        Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
+        var resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
     }
 
     @Test
-    public void list_ut_permutasjoner_for_SVP() {
-        HbVedtaksbrevFelles felles = lagFellesBuilder()
+    void list_ut_permutasjoner_for_SVP() {
+        var felles = lagFellesBuilder()
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
                         .medErFødsel(true)
                         .medAntallBarn(1)
                         .build())
                 .build();
-        Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
+        var resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
     }
 
     @Test
-    public void list_ut_permutasjoner_for_SVP_nynorsk() {
-        HbVedtaksbrevFelles felles = lagFellesBuilder()
+    void list_ut_permutasjoner_for_SVP_nynorsk() {
+        var felles = lagFellesBuilder()
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
                         .medErFødsel(true)
@@ -102,26 +98,26 @@ public class DokumentasjonGeneratorPeriodeFakta {
                         .build())
                 .medSpråkkode(Språkkode.nn)
                 .build();
-        Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
+        var resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
     }
 
     @Test
-    public void list_ut_permutasjoner_for_ES() {
-        HbVedtaksbrevFelles felles = lagFellesBuilder()
+    void list_ut_permutasjoner_for_ES() {
+        var felles = lagFellesBuilder()
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.ENGANGSTØNAD)
                         .medErFødsel(true)
                         .medAntallBarn(1)
                         .build())
                 .build();
-        Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
+        var resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
     }
 
     @Test
-    public void list_ut_permutasjoner_for_ES_nynorsk() {
-        HbVedtaksbrevFelles felles = lagFellesBuilder()
+    void list_ut_permutasjoner_for_ES_nynorsk() {
+        var felles = lagFellesBuilder()
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.ENGANGSTØNAD)
                         .medErFødsel(true)
@@ -129,26 +125,26 @@ public class DokumentasjonGeneratorPeriodeFakta {
                         .build())
                 .medSpråkkode(Språkkode.nn)
                 .build();
-        Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
+        var resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
     }
 
     @Test
-    public void list_ut_permutasjoner_for_FRISINN() {
-        HbVedtaksbrevFelles felles = lagFellesBuilder()
+    void list_ut_permutasjoner_for_FRISINN() {
+        var felles = lagFellesBuilder()
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.FRISINN)
                         .medErFødsel(true)
                         .medAntallBarn(1)
                         .build())
                 .build();
-        Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
+        var resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
     }
 
     @Test
-    public void list_ut_permutasjoner_for_FRISINN_nynorsk() {
-        HbVedtaksbrevFelles felles = lagFellesBuilder()
+    void list_ut_permutasjoner_for_FRISINN_nynorsk() {
+        var felles = lagFellesBuilder()
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.FRISINN)
                         .medErFødsel(true)
@@ -156,16 +152,16 @@ public class DokumentasjonGeneratorPeriodeFakta {
                         .build())
                 .medSpråkkode(Språkkode.nn)
                 .build();
-        Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
+        var resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
     }
 
     private void prettyPrint(Map<HendelseMedUndertype, String> resultat) {
-        for (Map.Entry<HendelseMedUndertype, String> entry : resultat.entrySet()) {
-            HendelseMedUndertype typer = entry.getKey();
-            System.out.println("*[ " + typer.getHendelseType().getNavn() + " - " + typer.getHendelseUnderType().getNavn() + " ]*");
-            String generertTekst = entry.getValue();
-            String parametrisertTekst = generertTekst
+        for (var entry : resultat.entrySet()) {
+            var typer = entry.getKey();
+            System.out.println("*[ " + typer.hendelseType().getNavn() + " - " + typer.hendelseUnderType().getNavn() + " ]*");
+            var generertTekst = entry.getValue();
+            var parametrisertTekst = generertTekst
                     .replaceAll(" 10\u00A0000\u00A0kroner", " <feilutbetalt beløp> kroner")
                     .replaceAll(" 33\u00A0333\u00A0kroner", " <utbetalt beløp> kroner")
                     .replaceAll(" 23\u00A0333\u00A0kroner", " <riktig beløp> kroner")
@@ -184,12 +180,12 @@ public class DokumentasjonGeneratorPeriodeFakta {
 
     private Map<HendelseMedUndertype, String> lagFaktatekster(HbVedtaksbrevFelles felles) {
         Map<HendelseMedUndertype, String> resultat = new LinkedHashMap<>();
-        for (HendelseMedUndertype undertype : getFeilutbetalingsårsaker(felles.getYtelsetype())) {
-            HbVedtaksbrevPeriode periode = lagPeriodeBuilder()
-                    .medFakta(undertype.getHendelseType(), undertype.getHendelseUnderType())
+        for (var undertype : getFeilutbetalingsårsaker(felles.getYtelsetype())) {
+            var periode = lagPeriodeBuilder()
+                    .medFakta(undertype.hendelseType(), undertype.hendelseUnderType())
                     .build();
-            HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
-            String tekst = TekstformatererVedtaksbrev.lagFaktaTekst(data);
+            var data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
+            var tekst = TekstformatererVedtaksbrev.lagFaktaTekst(data);
             resultat.put(undertype, tekst);
         }
         return resultat;
@@ -218,7 +214,7 @@ public class DokumentasjonGeneratorPeriodeFakta {
     }
 
     private HbVedtaksbrevFelles.Builder lagFellesBuilder() {
-        HbVedtaksbrevDatoer datoer = HbVedtaksbrevDatoer.builder().medDatoer(
+        var datoer = HbVedtaksbrevDatoer.builder().medDatoer(
                         LocalDate.of(2018, 3, 2)
                         , LocalDate.of(2018, 3, 3)
                         , LocalDate.of(2018, 3, 4)
@@ -248,17 +244,17 @@ public class DokumentasjonGeneratorPeriodeFakta {
     }
 
     private List<HendelseMedUndertype> getFeilutbetalingsårsaker(FagsakYtelseType ytelseType) {
-        Set<HendelseType> hendelseTyper = HendelseTypePrYtelseType.getHendelsetyper(ytelseType);
-        Map<HendelseType, Set<HendelseUnderType>> hendelseUndertypePrHendelseType = HendelseUndertypePrHendelseType.getHendelsetypeHierarki();
+        var hendelseTyper = HendelseTypePrYtelseType.getHendelsetyper(ytelseType);
+        var hendelseUndertypePrHendelseType = HendelseUndertypePrHendelseType.getHendelsetypeHierarki();
 
         List<HendelseMedUndertype> resultat = new ArrayList<>();
-        for (HendelseType hendelseType : hendelseTyper) {
-            for (HendelseUnderType hendelseUnderType : hendelseUndertypePrHendelseType.get(hendelseType)) {
+        for (var hendelseType : hendelseTyper) {
+            for (var hendelseUnderType : hendelseUndertypePrHendelseType.get(hendelseType)) {
                 resultat.add(new HendelseMedUndertype(hendelseType, hendelseUnderType));
             }
         }
 
-        Collections.sort(resultat, new HendelseMedUndertypeComparator());
+        resultat.sort(new HendelseMedUndertypeComparator());
         return resultat;
     }
 
@@ -266,15 +262,15 @@ public class DokumentasjonGeneratorPeriodeFakta {
 
         @Override
         public int compare(HendelseMedUndertype o1, HendelseMedUndertype o2) {
-            int hendelseCompare = Long.compare(
-                    o1.getHendelseType().getSortering(),
-                    o2.getHendelseType().getSortering());
+            var hendelseCompare = Long.compare(
+                    o1.hendelseType().getSortering(),
+                    o2.hendelseType().getSortering());
             if (hendelseCompare != 0) {
                 return hendelseCompare;
             }
             return Long.compare(
-                    o1.getHendelseUnderType().getSortering(),
-                    o2.getHendelseUnderType().getSortering()
+                    o1.hendelseUnderType().getSortering(),
+                    o2.hendelseUnderType().getSortering()
             );
         }
     }

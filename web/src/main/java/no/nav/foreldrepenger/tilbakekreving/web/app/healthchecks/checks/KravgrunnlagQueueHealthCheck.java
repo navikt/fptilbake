@@ -3,15 +3,16 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.healthchecks.checks;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jakarta.jms.JMSException;
 import jakarta.jms.JMSRuntimeException;
 import no.nav.foreldrepenger.felles.jms.QueueSelftest;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer.KravgrunnlagAsyncJmsConsumer;
-
 import no.nav.vedtak.log.metrics.LiveAndReadinessAware;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class KravgrunnlagQueueHealthCheck implements LiveAndReadinessAware {
@@ -28,6 +29,10 @@ public class KravgrunnlagQueueHealthCheck implements LiveAndReadinessAware {
     }
 
     private boolean isOK() {
+        if (ApplicationName.hvilkenTilbake() == Fagsystem.K9TILBAKE){
+            //ignorerer sjekken. sjekken tar ofte lang tid, som skaper støy i overvåkningen.
+            return true;
+        }
         try {
             client.testConnection();
         } catch (JMSRuntimeException | JMSException e) { //NOSONAR

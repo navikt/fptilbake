@@ -24,6 +24,7 @@ public class AksjonspunktKontrollRepository {
 
     @Inject
     public AksjonspunktKontrollRepository() {
+        // Hibernate
     }
 
     public Aksjonspunkt settBehandlingPåVent(Behandling behandling, AksjonspunktDefinisjon aksjonspunktDefinisjon,

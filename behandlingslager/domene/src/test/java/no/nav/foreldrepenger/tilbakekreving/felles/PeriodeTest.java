@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 
-public class PeriodeTest {
+class PeriodeTest {
 
     private LocalDate d1 = LocalDate.of(2019, 1, 1);
     private LocalDate d2 = LocalDate.of(2019, 1, 2);
@@ -14,7 +14,7 @@ public class PeriodeTest {
     private LocalDate d4 = LocalDate.of(2019, 1, 4);
 
     @Test
-    public void test_av_overlapp() {
+    void test_av_overlapp() {
         assertThat(Periode.of(d1, d2).overlapper(Periode.of(d1, d2))).isTrue();
         assertThat(Periode.of(d1, d2).overlapper(Periode.of(d1, d3))).isTrue();
         assertThat(Periode.of(d2, d3).overlapper(Periode.of(d1, d4))).isTrue();
@@ -26,7 +26,7 @@ public class PeriodeTest {
     }
 
     @Test
-    public void test_av_omslutter() {
+    void test_av_omslutter() {
         assertThat(Periode.of(d1, d2).omslutter(Periode.of(d1, d2))).isTrue();
         assertThat(Periode.of(d1, d3).omslutter(Periode.of(d1, d2))).isTrue();
         assertThat(Periode.of(d1, d2).omslutter(Periode.of(d1, d3))).isFalse();

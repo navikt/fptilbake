@@ -57,7 +57,7 @@ import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 @ExtendWith(JpaExtension.class)
-public class HentKorrigertKravgrunnlagTaskTest {
+class HentKorrigertKravgrunnlagTaskTest {
 
     private final PersoninfoAdapter tpsAdapterMock = mock(PersoninfoAdapter.class);
     private final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(tpsAdapterMock);
@@ -72,7 +72,7 @@ public class HentKorrigertKravgrunnlagTaskTest {
     private long behandlingId;
 
     @BeforeEach
-    public void setup(EntityManager entityManager) {
+    void setup(EntityManager entityManager) {
         BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
@@ -90,7 +90,7 @@ public class HentKorrigertKravgrunnlagTaskTest {
     }
 
     @Test
-    public void skal_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_er_samme_i_hentet_grunnlaget() {
+    void skal_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_er_samme_i_hentet_grunnlaget() {
         ProsessTaskData prosessTaskData = lagProsessTaskData();
         assertThat(kravgrunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).isFalse();
         hentKorrigertGrunnlagTask.doTask(prosessTaskData);
@@ -103,7 +103,7 @@ public class HentKorrigertKravgrunnlagTaskTest {
     }
 
     @Test
-    public void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_hentet_grunnlaget_er_ugyldig() {
+    void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_hentet_grunnlaget_er_ugyldig() {
         when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlagNY(false));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
         var e = assertThrows(IntegrasjonException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
@@ -111,7 +111,7 @@ public class HentKorrigertKravgrunnlagTaskTest {
     }
 
     @Test
-    public void skal_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_ikke_er_samme_i_hentet_grunnlaget_men_finnes_i_fpsak() {
+    void skal_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_ikke_er_samme_i_hentet_grunnlaget_men_finnes_i_fpsak() {
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(2L), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
         when(fagsystemKlient.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(
@@ -131,7 +131,7 @@ public class HentKorrigertKravgrunnlagTaskTest {
     }
 
     @Test
-    public void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_ikke_er_samme_i_hentet_grunnlaget_og_ikke_finnes_i_fpsak() {
+    void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_ikke_er_samme_i_hentet_grunnlaget_og_ikke_finnes_i_fpsak() {
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(2L), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
         when(fagsystemKlient.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(lagEksternBehandlingsInfo(2L)));
@@ -156,7 +156,7 @@ public class HentKorrigertKravgrunnlagTaskTest {
     }
 
 
-    public static Kravgrunnlag431Dto lagKravgrunnlagNY(boolean erGyldig) {
+    static Kravgrunnlag431Dto lagKravgrunnlagNY(boolean erGyldig) {
         return new Kravgrunnlag431Dto.Builder()
             .vedtakId(207406L)
             .eksternKravgrunnlagId("123456789")

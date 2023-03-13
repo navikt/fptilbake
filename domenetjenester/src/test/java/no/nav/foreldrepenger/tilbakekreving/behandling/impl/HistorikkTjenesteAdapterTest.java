@@ -18,10 +18,10 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDelDto
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagEndretFeltDto;
 
-public class HistorikkTjenesteAdapterTest extends FellesTestOppsett {
+class HistorikkTjenesteAdapterTest extends FellesTestOppsett {
 
     @Test
-    public void opprettHistorikkInnslag() {
+    void opprettHistorikkInnslag() {
         HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
         tekstBuilder.medSkjermlenke(SkjermlenkeType.UDEFINERT).medBegrunnelse(HistorikkBegrunnelseType.SAKSBEH_START_PA_NYTT)
                 .medHendelse(HistorikkinnslagType.FAKTA_ENDRET, internBehandlingId)

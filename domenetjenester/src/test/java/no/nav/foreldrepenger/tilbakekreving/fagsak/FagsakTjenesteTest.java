@@ -11,10 +11,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
-public class FagsakTjenesteTest extends FellesTestOppsett {
+class FagsakTjenesteTest extends FellesTestOppsett {
 
     @Test
-    public void skal_opprettFagsak_med_alleredeFinnes_fagsak() {
+    void skal_opprettFagsak_med_alleredeFinnes_fagsak() {
         Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, FagsakYtelseType.FORELDREPENGER, Språkkode.DEFAULT);
         assertThat(fagsak).isNotNull();
         // vi må sammenligne det med fagsak fra behandling fordi fagsakId generert automatisk
@@ -23,7 +23,7 @@ public class FagsakTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_opprettFagsak_med_ingen_fagsak_finnes() {
+    void skal_opprettFagsak_med_ingen_fagsak_finnes() {
         Saksnummer nyeSaksnummer = new Saksnummer("100001");
         Fagsak fagsak = fagsakTjeneste.opprettFagsak(nyeSaksnummer, aktørId, FagsakYtelseType.FORELDREPENGER, Språkkode.DEFAULT);
         assertThat(fagsak).isNotNull();

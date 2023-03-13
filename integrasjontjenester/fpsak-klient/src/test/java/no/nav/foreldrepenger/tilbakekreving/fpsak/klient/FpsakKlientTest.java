@@ -26,7 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering.FpoppdragRes
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.integrasjon.rest.RestClient;
 
-public class FpsakKlientTest {
+class FpsakKlientTest {
 
     private static final Long BEHANDLING_ID = 123456L;
     private static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(BEHANDLING_ID);
@@ -41,7 +41,7 @@ public class FpsakKlientTest {
     private FpsakKlient klient = new FpsakKlient(restClientMock, fpoppdragRestKlient);
 
     @Test
-    public void skal_hente_DokumentinfoDto() {
+    void skal_hente_DokumentinfoDto() {
         FpsakBehandlingInfoDto returnDto = dokumentinfoDto();
 
         when(restClientMock.sendReturnOptional(any(), eq(FpsakBehandlingInfoDto.class))).thenReturn(Optional.of(returnDto));
@@ -54,14 +54,14 @@ public class FpsakKlientTest {
     }
 
     @Test
-    public void skal_kaste_exception_når_fpsak_behandling_ikke_finnes() {
+    void skal_kaste_exception_når_fpsak_behandling_ikke_finnes() {
         when(restClientMock.sendReturnOptional(any(), any())).thenReturn(Optional.empty());
 
         Assertions.assertThrows(IntegrasjonException.class, () -> klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER));
     }
 
     @Test
-    public void skal_returnere_hvis_finnes_behandling_i_fpsak() {
+    void skal_returnere_hvis_finnes_behandling_i_fpsak() {
         FpsakBehandlingInfoDto eksternBehandlingInfo = dokumentinfoDto();
         FpsakKlient.ListeAvFpsakBehandlingInfoDto liste = new FpsakKlient.ListeAvFpsakBehandlingInfoDto();
         liste.add(eksternBehandlingInfo);
@@ -72,7 +72,7 @@ public class FpsakKlientTest {
     }
 
     @Test
-    public void skal_returnere_tom_hvis_finnes_ikke_behandling_i_fpsak() {
+    void skal_returnere_tom_hvis_finnes_ikke_behandling_i_fpsak() {
         when(restClientMock.send(any(), eq(FpsakKlient.ListeAvFpsakBehandlingInfoDto.class))).thenReturn(new FpsakKlient.ListeAvFpsakBehandlingInfoDto());
 
         boolean erFinnesIFpsak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
@@ -80,7 +80,7 @@ public class FpsakKlientTest {
     }
 
     @Test
-    public void skal_returnere_tilbakekreving_valg() {
+    void skal_returnere_tilbakekreving_valg() {
         TilbakekrevingValgDto tilbakekrevingValgDto = new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD);
         when(restClientMock.sendReturnOptional(any(), eq(FpsakBehandlingInfoDto.class))).thenReturn(Optional.of(dokumentinfoDto()));
         when(restClientMock.sendReturnOptional(any(), eq(TilbakekrevingValgDto.class))).thenReturn(Optional.of(tilbakekrevingValgDto));
@@ -91,7 +91,7 @@ public class FpsakKlientTest {
     }
 
     @Test
-    public void skal_returnere_tom_tilbakekreving_valg() {
+    void skal_returnere_tom_tilbakekreving_valg() {
         when(restClientMock.sendReturnOptional(any(), eq(FpsakBehandlingInfoDto.class))).thenReturn(Optional.of(dokumentinfoDto()));
         when(restClientMock.sendReturnOptional(any(), eq(TilbakekrevingValgDto.class))).thenReturn(Optional.empty());
 

@@ -11,18 +11,18 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class UkedagerTest {
+class UkedagerTest {
     private Map<DayOfWeek, LocalDate> uke;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         LocalDate iDag = LocalDate.now();
         LocalDate mandag = iDag.minusDays(iDag.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
         uke = Stream.of(DayOfWeek.values()).collect(Collectors.toMap(day -> day, day -> mandag.plusDays(day.ordinal())));
     }
 
     @Test
-    public void skalBeregneAntallVirkedager() {
+    void skalBeregneAntallVirkedager() {
         LocalDate mandag = getDayOfWeek(DayOfWeek.MONDAY);
         LocalDate søndag = getDayOfWeek(DayOfWeek.SUNDAY);
 
@@ -41,7 +41,7 @@ public class UkedagerTest {
     }
 
     @Test
-    public void skalLeggeTilVirkedager() {
+    void skalLeggeTilVirkedager() {
         LocalDate mandag = getDayOfWeek(DayOfWeek.MONDAY);
         LocalDate tirsdag = getDayOfWeek(DayOfWeek.TUESDAY);
         LocalDate onsdag = getDayOfWeek(DayOfWeek.WEDNESDAY);

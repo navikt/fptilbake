@@ -28,7 +28,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 
 @CdiDbAwareTest
-public class SendØkonomiTibakekerevingsVedtakTaskTest {
+class SendØkonomiTibakekerevingsVedtakTaskTest {
 
     @Inject
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
@@ -43,12 +43,12 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
     private SendØkonomiTibakekerevingsVedtakTask task;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         task = new SendØkonomiTibakekerevingsVedtakTask(tilbakekrevingsvedtakTjeneste, økonomiConsumer, økonomiProxyKlient, økonomiSendtXmlRepository);
     }
 
     @Test
-    public void skal_lagre_xml_og_sende_vedtak_til_os() {
+    void skal_lagre_xml_og_sende_vedtak_til_os() {
         when(økonomiConsumer.iverksettTilbakekrevingsvedtak(any(), any())).thenReturn(responseMedPositivKvittering());
 
         ScenarioSimple scenario = ScenarioSimple
@@ -65,7 +65,7 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
     }
 
     @Test
-    public void skal_få_exception_når_kvittering_ikke_er_OK() {
+    void skal_få_exception_når_kvittering_ikke_er_OK() {
         when(økonomiConsumer.iverksettTilbakekrevingsvedtak(any(), any())).thenReturn(responseMedNegativKvittering());
 
         ScenarioSimple scenario = ScenarioSimple

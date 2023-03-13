@@ -26,7 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.S�
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
+class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
 
     private static final LocalDate PERIOD_FØRSTE_SISTE_DATO = LocalDate.of(2016, 3, 31);
     private static final LocalDate PERIODE_ANDRE_FØRSTE_DATO = LocalDate.of(2016, 4, 1);
@@ -40,7 +40,7 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
     private static final String NEI = "Nei";
 
     @Test
-    public void lagHistorikkInnslag_nårForrigePeriodeFinnesIkke() {
+    void lagHistorikkInnslag_nårForrigePeriodeFinnesIkke() {
         VilkårVurderingEntitet vurderingEntitet = new VilkårVurderingEntitet();
         vurderingEntitet.leggTilPeriode(formGodTroPeriode(vurderingEntitet, FOM, PERIOD_FØRSTE_SISTE_DATO));
         vurderingEntitet.leggTilPeriode(formAktsomhetPeriode(vurderingEntitet, PERIODE_ANDRE_FØRSTE_DATO, TOM));
@@ -54,7 +54,7 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
     }
 
     @Test
-    public void lagHistorikInnslag_medForrigePeriode_medIngenEndringer() {
+    void lagHistorikInnslag_medForrigePeriode_medIngenEndringer() {
         VilkårVurderingEntitet vurderingEntitet = new VilkårVurderingEntitet();
         vurderingEntitet.leggTilPeriode(formGodTroPeriode(vurderingEntitet, FOM, TOM));
 
@@ -65,7 +65,7 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
     }
 
     @Test
-    public void lagHistorikInnslag_medForrigePeriode_medEndringer() {
+    void lagHistorikInnslag_medForrigePeriode_medEndringer() {
         VilkårVurderingEntitet nyVurdering = new VilkårVurderingEntitet();
         nyVurdering.leggTilPeriode(formAktsomhetPeriode(nyVurdering, FOM, TOM));
 
@@ -111,7 +111,7 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
     }
 
     @Test
-    public void lagHistorikInnslag_nårPerioderErDeltOpp() {
+    void lagHistorikInnslag_nårPerioderErDeltOpp() {
         VilkårVurderingEntitet gammelVurdering = new VilkårVurderingEntitet();
         gammelVurdering.leggTilPeriode(formAktsomhetPeriode(gammelVurdering, FOM, TOM));
 
@@ -128,7 +128,7 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
     }
 
     @Test
-    public void lagHistorikInnslag_nårVilkårResultatHarEndretFraGodTroTilAktsomhet() {
+    void lagHistorikInnslag_nårVilkårResultatHarEndretFraGodTroTilAktsomhet() {
         VilkårVurderingEntitet nyVurdering = new VilkårVurderingEntitet();
         nyVurdering.leggTilPeriode(formAktsomhetPeriode(nyVurdering, FOM, TOM));
 
@@ -159,7 +159,7 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
     }
 
     @Test
-    public void lagHistorikInnslag_nårVilkårResultatHarEndretFraAktsomhetTilGodTro() {
+    void lagHistorikInnslag_nårVilkårResultatHarEndretFraAktsomhetTilGodTro() {
         VilkårVurderingEntitet nyVurdering = new VilkårVurderingEntitet();
         nyVurdering.leggTilPeriode(formGodTroPeriode(nyVurdering, FOM, TOM));
 

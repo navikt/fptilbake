@@ -18,7 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbe
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriodeMedFaktaDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingFeilutbetalingFaktaDto;
 
-public class BehandlingFaktaRestTjenesteTest {
+class BehandlingFaktaRestTjenesteTest {
 
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = mock(FaktaFeilutbetalingTjeneste.class);
     private BehandlingTjeneste behandlingTjeneste = mock(BehandlingTjeneste.class);
@@ -26,7 +26,7 @@ public class BehandlingFaktaRestTjenesteTest {
     private BehandlingFaktaRestTjeneste restTjeneste = new BehandlingFaktaRestTjeneste(faktaFeilutbetalingTjeneste, behandlingTjeneste);
 
     @Test
-    public void skalHenteFeilutbetalingFakta() {
+    void skalHenteFeilutbetalingFakta() {
         when(faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(anyLong())).thenReturn(lagBehandlingFeilutbetalingFakta());
         BehandlingReferanse dto = new BehandlingReferanse(123455L);
 

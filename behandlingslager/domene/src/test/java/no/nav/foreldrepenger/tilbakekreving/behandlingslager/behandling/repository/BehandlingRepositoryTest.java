@@ -23,7 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 @ExtendWith(JpaExtension.class)
-public class BehandlingRepositoryTest {
+class BehandlingRepositoryTest {
 
     private final NavBruker bruker = TestFagsakUtil.genererBruker();
     private final Fagsak fagsak = TestFagsakUtil.opprettFagsak(bruker);
@@ -39,7 +39,7 @@ public class BehandlingRepositoryTest {
     }
 
     @Test
-    public void skal_finne_behandling_gitt_id() {
+    void skal_finne_behandling_gitt_id() {
 
         // Arrange
         Behandling behandling = opprettBuilderForBehandling().build();
@@ -53,7 +53,7 @@ public class BehandlingRepositoryTest {
     }
 
     @Test
-    public void skal_finne_behandlinger_på_saksnummer() {
+    void skal_finne_behandlinger_på_saksnummer() {
         Fagsak fagsak1 = Fagsak.opprettNy(new Saksnummer("GSAK1000"), bruker);
         Fagsak fagsak2 = Fagsak.opprettNy(new Saksnummer("GSAK1001"), bruker);
         fagsakRepository.lagre(fagsak1);
@@ -85,7 +85,7 @@ public class BehandlingRepositoryTest {
 
 
     @Test
-    public void skal_hente_siste_behandling_basert_på_fagsakId() {
+    void skal_hente_siste_behandling_basert_på_fagsakId() {
 
         Behandling.Builder builder = opprettBuilderForBehandling();
 
@@ -100,7 +100,7 @@ public class BehandlingRepositoryTest {
     }
 
     @Test
-    public void skal_hente_behandlinger_som_ikke_er_avsluttet() {
+    void skal_hente_behandlinger_som_ikke_er_avsluttet() {
         Map<String, Object> map = opprettBuilderForBehandlingMedFagsakId();
 
         Behandling.Builder builder = ((Behandling.Builder) map.get("builder"));
@@ -114,7 +114,7 @@ public class BehandlingRepositoryTest {
     }
 
     @Test
-    public void skal_ikke_hente_avsluttede_behandlinger() {
+    void skal_ikke_hente_avsluttede_behandlinger() {
         Map<String, Object> map = opprettBuilderForBehandlingMedFagsakId();
         Behandling.Builder builder = ((Behandling.Builder) map.get("builder"));
         Long fagsakId = ((Long) map.get("fagsakId"));
@@ -129,7 +129,7 @@ public class BehandlingRepositoryTest {
     }
 
     @Test
-    public void skal_opprette_ny_behandling_basert_på_tidligere() {
+    void skal_opprette_ny_behandling_basert_på_tidligere() {
         Behandling.Builder builder = opprettBuilderForBehandling();
         Behandling behandling = builder.build();
         behandling.avsluttBehandling();

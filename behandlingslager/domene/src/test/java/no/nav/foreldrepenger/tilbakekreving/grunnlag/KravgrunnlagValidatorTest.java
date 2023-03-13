@@ -17,13 +17,13 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
-public class KravgrunnlagValidatorTest {
+class KravgrunnlagValidatorTest {
 
     private Kravgrunnlag431 kravgrunnlag = lagKravgrunnlag(Henvisning.fraEksternBehandlingId(1000000L));
     private BigDecimal maxSkattJanuar = BigDecimal.valueOf(100);
 
     @Test
-    public void skal_godta_kravgrunnlag_som_er_OK() {
+    void skal_godta_kravgrunnlag_som_er_OK() {
         Periode periode = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 15));
         KravgrunnlagPeriode432 kgPeriode = leggTilKravgrunnlagPeriode(kravgrunnlag, periode, maxSkattJanuar);
         BigDecimal skatteprosent = BigDecimal.valueOf(10);
@@ -33,7 +33,7 @@ public class KravgrunnlagValidatorTest {
     }
 
     @Test
-    public void skal_gi_feilmelding_ved_manglende_referanse_felt() {
+    void skal_gi_feilmelding_ved_manglende_referanse_felt() {
         kravgrunnlag = lagKravgrunnlag(null);
 
         var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
@@ -41,7 +41,7 @@ public class KravgrunnlagValidatorTest {
     }
 
     @Test
-    public void skal_gi_feilmelding_ved_overlappende_perioder() {
+    void skal_gi_feilmelding_ved_overlappende_perioder() {
         Periode periode1 = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 10));
         Periode periode2 = Periode.of(LocalDate.of(2020, 1, 6), LocalDate.of(2020, 1, 31));
         KravgrunnlagPeriode432 kgPeriode1 = leggTilKravgrunnlagPeriode(kravgrunnlag, periode1, maxSkattJanuar);
@@ -54,7 +54,7 @@ public class KravgrunnlagValidatorTest {
     }
 
     @Test
-    public void skal_gi_feilmelding_når_utregnet_skatt_kan_bli_høyere_enn_maxSkatt_for_måneden() {
+    void skal_gi_feilmelding_når_utregnet_skatt_kan_bli_høyere_enn_maxSkatt_for_måneden() {
         BigDecimal maxSkattJanuar = BigDecimal.valueOf(299);
         BigDecimal skatteprosent = BigDecimal.valueOf(30);
         Periode periode1 = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 15));
@@ -69,7 +69,7 @@ public class KravgrunnlagValidatorTest {
     }
 
     @Test
-    public void skal_gi_feilmelding_når_feilutbetaling_i_ytel_er_ulik_nytt_beløp_i_feilposteringen() {
+    void skal_gi_feilmelding_når_feilutbetaling_i_ytel_er_ulik_nytt_beløp_i_feilposteringen() {
         Periode periode1 = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 15));
         KravgrunnlagPeriode432 kgPeriode = leggTilKravgrunnlagPeriode(kravgrunnlag, periode1, maxSkattJanuar);
 
@@ -84,7 +84,7 @@ public class KravgrunnlagValidatorTest {
     }
 
     @Test
-    public void skal_gi_feilmelding_når_perioden_ikke_har_postering_av_klasseType_FEIL() {
+    void skal_gi_feilmelding_når_perioden_ikke_har_postering_av_klasseType_FEIL() {
         Periode periode1 = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 15));
         KravgrunnlagPeriode432 kgPeriode = leggTilKravgrunnlagPeriode(kravgrunnlag, periode1, maxSkattJanuar);
 
@@ -98,7 +98,7 @@ public class KravgrunnlagValidatorTest {
     }
 
     @Test
-    public void skal_gi_feilmelding_når_perioden_ikke_har_postering_av_klasseType_YTEL() {
+    void skal_gi_feilmelding_når_perioden_ikke_har_postering_av_klasseType_YTEL() {
         Periode periode1 = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 15));
         KravgrunnlagPeriode432 kgPeriode = leggTilKravgrunnlagPeriode(kravgrunnlag, periode1, maxSkattJanuar);
 
@@ -110,7 +110,7 @@ public class KravgrunnlagValidatorTest {
     }
 
     @Test
-    public void skal_gi_feilmelding_når_perioden_har_FEIL_postering_med_negativt_beløp() {
+    void skal_gi_feilmelding_når_perioden_har_FEIL_postering_med_negativt_beløp() {
         Periode periode1 = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 15));
         KravgrunnlagPeriode432 kgPeriode = leggTilKravgrunnlagPeriode(kravgrunnlag, periode1, maxSkattJanuar);
 
@@ -123,7 +123,7 @@ public class KravgrunnlagValidatorTest {
     }
 
     @Test
-    public void skal_gi_feilmelding_når_tilbakekreves_beløp_er_høyere_enn_differanse_mellom_nytt_og_gammelt_beløp() {
+    void skal_gi_feilmelding_når_tilbakekreves_beløp_er_høyere_enn_differanse_mellom_nytt_og_gammelt_beløp() {
         Periode periode = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 10));
         KravgrunnlagPeriode432 kgPeriode = leggTilKravgrunnlagPeriode(kravgrunnlag, periode, BigDecimal.ZERO);
         leggTilFeil(kgPeriode, 1000, BigDecimal.ZERO);

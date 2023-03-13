@@ -31,7 +31,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 
-public class VergeTjenesteTest extends FellesTestOppsett {
+class VergeTjenesteTest extends FellesTestOppsett {
 
     private VergeTjeneste vergeTjeneste;
     private VergeRepository vergeRepository;
@@ -46,7 +46,7 @@ public class VergeTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_opprette_verge_når_behandling_er_i_fakta_steg() {
+    void skal_opprette_verge_når_behandling_er_i_fakta_steg() {
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING);
         vergeTjeneste.opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(behandling);
         assertThat(behandling.getAktivtBehandlingSteg()).isEqualTo(BehandlingStegType.FAKTA_VERGE);
@@ -55,7 +55,7 @@ public class VergeTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_opprette_verge_når_behandling_er_etter_fakta_steg() {
+    void skal_opprette_verge_når_behandling_er_etter_fakta_steg() {
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VTILBSTEG);
         vergeTjeneste.opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(behandling);
         assertThat(behandling.getAktivtBehandlingSteg()).isEqualTo(BehandlingStegType.FAKTA_VERGE);
@@ -64,7 +64,7 @@ public class VergeTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_fjerne_verge() {
+    void skal_fjerne_verge() {
         entityManager.setFlushMode(FlushModeType.AUTO);
         VergeEntitet vergeEntitet = VergeEntitet.builder()
                 .medVergeAktørId(behandling.getAktørId())

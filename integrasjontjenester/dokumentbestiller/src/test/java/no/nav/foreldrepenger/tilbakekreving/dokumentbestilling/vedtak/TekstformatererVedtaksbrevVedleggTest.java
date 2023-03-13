@@ -3,8 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -35,36 +35,36 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVurderinger;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-public class TekstformatererVedtaksbrevVedleggTest {
+class TekstformatererVedtaksbrevVedleggTest {
 
     private final Periode januar = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 31));
     private final Periode februar = Periode.of(LocalDate.of(2019, 2, 1), LocalDate.of(2019, 2, 28));
     private final Periode mars = Periode.of(LocalDate.of(2019, 3, 1), LocalDate.of(2019, 3, 31));
 
     @Test
-    public void skal_generere_vedlegg_med_en_periode_uten_renter() throws Exception {
-        HbVedtaksbrevData data = getVedtaksbrevData(null);
+    void skal_generere_vedlegg_med_en_periode_uten_renter() throws Exception {
+        var data = getVedtaksbrevData(null);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
-        String fasit = les("/vedtaksbrev/vedlegg/vedlegg_uten_renter.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
+        var fasit = les("/vedtaksbrev/vedlegg/vedlegg_uten_renter.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedlegg_med_en_periode_uten_renter_nynorsk() throws Exception {
-        HbVedtaksbrevData data = getVedtaksbrevData(Språkkode.nn);
+    void skal_generere_vedlegg_med_en_periode_uten_renter_nynorsk() throws Exception {
+        var data = getVedtaksbrevData(Språkkode.nn);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
-        String fasit = les("/vedtaksbrev/vedlegg/vedlegg_uten_renter_nn.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
+        var fasit = les("/vedtaksbrev/vedlegg/vedlegg_uten_renter_nn.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_vedlegg_med_en_periode_uten_skatt() throws Exception {
-        HbVedtaksbrevData data = getVedtaksbrevData(Språkkode.nb, 10000, 30001, 30001, 0, 0);
+    void skal_generere_vedlegg_med_en_periode_uten_skatt() throws Exception {
+        var data = getVedtaksbrevData(Språkkode.nb, 10000, 30001, 30001, 0, 0);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
-        String fasit = les("/vedtaksbrev/vedlegg/vedlegg_uten_skatt.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
+        var fasit = les("/vedtaksbrev/vedlegg/vedlegg_uten_skatt.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
@@ -73,7 +73,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
     }
 
     private HbVedtaksbrevData getVedtaksbrevData(Språkkode språkkode, int varslet, int feilutbetalt, int tilbakekreves, int renter, int skatt) {
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+        var vedtaksbrevData = lagTestBuilder()
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                         .medErFødsel(true)
@@ -93,7 +93,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
                         .build())
                 .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
                 .build();
-        List<HbVedtaksbrevPeriode> perioder = List.of(
+        var perioder = List.of(
                 HbVedtaksbrevPeriode.builder()
                         .medPeriode(januar)
                         .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(feilutbetalt)))
@@ -116,8 +116,8 @@ public class TekstformatererVedtaksbrevVedleggTest {
     }
 
     @Test
-    public void skal_generere_vedlegg_med_flere_perioder_og_med_renter() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+    void skal_generere_vedlegg_med_flere_perioder_og_med_renter() throws Exception {
+        var vedtaksbrevData = lagTestBuilder()
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                         .medErFødsel(true)
@@ -136,7 +136,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
                         .medVarsletDato(LocalDate.of(2020, 4, 4))
                         .build())
                 .build();
-        List<HbVedtaksbrevPeriode> perioder = List.of(
+        var perioder = List.of(
                 HbVedtaksbrevPeriode.builder()
                         .medPeriode(januar)
                         .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
@@ -196,10 +196,10 @@ public class TekstformatererVedtaksbrevVedleggTest {
                         )
                         .build()
         );
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+        var data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
-        String fasit = les("/vedtaksbrev/vedlegg/vedlegg_med_og_uten_renter.txt");
+        var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
+        var fasit = les("/vedtaksbrev/vedlegg/vedlegg_med_og_uten_renter.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
@@ -216,8 +216,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
     }
 
     private String les(String filnavn) throws IOException {
-        try (InputStream resource = getClass().getResourceAsStream(filnavn);
-             Scanner scanner = new Scanner(resource, "UTF-8")) {
+        try (var resource = getClass().getResourceAsStream(filnavn); var scanner = new Scanner(resource, StandardCharsets.UTF_8)) {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : null;
         }

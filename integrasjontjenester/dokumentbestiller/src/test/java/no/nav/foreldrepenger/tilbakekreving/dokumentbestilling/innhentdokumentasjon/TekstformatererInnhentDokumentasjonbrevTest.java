@@ -16,10 +16,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 
-public class TekstformatererInnhentDokumentasjonbrevTest {
+class TekstformatererInnhentDokumentasjonbrevTest {
 
     @Test
-    public void skal_generere_innhentdokumentasjonbrev() throws Exception {
+    void skal_generere_innhentdokumentasjonbrev() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
@@ -40,7 +40,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     }
 
     @Test
-    public void skal_generere_innhentdokumentasjonbrev_frisinn() throws Exception {
+    void skal_generere_innhentdokumentasjonbrev_frisinn() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
                 .medFagsaktype(FagsakYtelseType.FRISINN)
@@ -61,7 +61,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     }
 
     @Test
-    public void skal_generere_innhentdokumentasjonbrev_for_verge() throws Exception {
+    void skal_generere_innhentdokumentasjonbrev_for_verge() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
@@ -85,7 +85,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     }
 
     @Test
-    public void skal_generere_innhentdokumentasjonbrev_for_verge_organisasjon() throws Exception {
+    void skal_generere_innhentdokumentasjonbrev_for_verge_organisasjon() throws Exception {
         Adresseinfo orgAdresse = new Adresseinfo.Builder(new PersonIdent("12345678901"), "Semba AS c/o John Doe")
                 .build();
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
@@ -111,7 +111,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     }
 
     @Test
-    public void skal_generere_innhentdokumentasjonbrev_nynorsk() throws Exception {
+    void skal_generere_innhentdokumentasjonbrev_nynorsk() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
@@ -132,7 +132,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     }
 
     @Test
-    public void skal_generere_innhentdokumentasjonbrev_overskrift() {
+    void skal_generere_innhentdokumentasjonbrev_overskrift() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
@@ -148,7 +148,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     }
 
     @Test
-    public void skal_generere_innhentdokumentasjonbrev_overskrift_nynorsk() {
+    void skal_generere_innhentdokumentasjonbrev_overskrift_nynorsk() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")

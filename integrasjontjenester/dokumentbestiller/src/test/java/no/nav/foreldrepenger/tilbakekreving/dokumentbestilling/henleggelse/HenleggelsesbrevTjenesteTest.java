@@ -39,7 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.exception.FunksjonellException;
 
-public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
+class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     private static final String REVURDERING_HENLEGGELSESBREV_FRITEKST = "Revurderingen ble henlagt";
 
@@ -52,7 +52,7 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     private Long behandlingId;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, null);
 
         henleggelsesbrevTjeneste = new HenleggelsesbrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste, historikkinnslagTjeneste, mockPdfBrevTjeneste);
@@ -86,7 +86,7 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     }
 
     @Test
-    public void skal_sende_henleggelsesbrev() {
+    void skal_sende_henleggelsesbrev() {
         lagreVarselBrevSporing();
         henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, null, BrevMottaker.BRUKER);
 
@@ -94,26 +94,26 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     }
 
     @Test
-    public void skal_forhåndsvise_henleggelsebrev() {
+    void skal_forhåndsvise_henleggelsebrev() {
         lagreVarselBrevSporing();
         assertThat(henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(behandlingId, null)).isNotEmpty();
     }
 
     @Test
-    public void skal_forhåndsvise_henleggelsebrev_for_tilbakekreving_revurdering() {
+    void skal_forhåndsvise_henleggelsebrev_for_tilbakekreving_revurdering() {
         Long revurderingBehandlingId = opprettOgForberedTilbakekrevingRevurdering();
         assertThat(henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(revurderingBehandlingId, REVURDERING_HENLEGGELSESBREV_FRITEKST)).isNotEmpty();
     }
 
     @Test
-    public void skal_ikke_sende_henleggelsesbrev_hvis_varselbrev_ikke_sendt() {
+    void skal_ikke_sende_henleggelsesbrev_hvis_varselbrev_ikke_sendt() {
         var e = assertThrows(FunksjonellException.class, () ->
                 henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, null, BrevMottaker.BRUKER));
         assertThat(e.getMessage()).contains("FPT-110801");
     }
 
     @Test
-    public void skal_ikke_sende_henleggelsesbrev_for_tilbakekreving_revurdering_uten_fritekst() {
+    void skal_ikke_sende_henleggelsesbrev_for_tilbakekreving_revurdering_uten_fritekst() {
         Long revurderingBehandlingId = opprettOgForberedTilbakekrevingRevurdering();
         var e = assertThrows(FunksjonellException.class, () ->
                 henleggelsesbrevTjeneste.sendHenleggelsebrev(revurderingBehandlingId, null, BrevMottaker.BRUKER));

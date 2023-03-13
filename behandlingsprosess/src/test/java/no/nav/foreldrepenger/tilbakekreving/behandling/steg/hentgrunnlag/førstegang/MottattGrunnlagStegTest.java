@@ -20,13 +20,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 
-public class MottattGrunnlagStegTest extends FellesTestOppsett {
+class MottattGrunnlagStegTest extends FellesTestOppsett {
 
     private BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer utløptEventPublisererMock =
             Mockito.mock(BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer.class);
 
     @Test
-    public void skal_sette_behandling_på_vent() {
+    void skal_sette_behandling_på_vent() {
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
 
@@ -37,7 +37,7 @@ public class MottattGrunnlagStegTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_utføre_steg_uten_aksjonspunkt() {
+    void skal_utføre_steg_uten_aksjonspunkt() {
         grunnlagRepository.lagre(behandling.getId(), KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList()));
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
@@ -49,7 +49,7 @@ public class MottattGrunnlagStegTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_fortsatt_på_vent_hvis_grunnlag_er_sperret() {
+    void skal_fortsatt_på_vent_hvis_grunnlag_er_sperret() {
         grunnlagRepository.lagre(behandling.getId(), KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList()));
         grunnlagRepository.sperrGrunnlag(behandling.getId());
 

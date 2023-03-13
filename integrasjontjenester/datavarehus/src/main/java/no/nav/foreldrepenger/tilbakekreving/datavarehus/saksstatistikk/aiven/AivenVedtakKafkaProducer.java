@@ -4,7 +4,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +31,9 @@ public class AivenVedtakKafkaProducer extends AivenMeldingProducer {
         var verdi = VedtakOppsummeringMapper.tilJsonString(vedtakOppsummering);
         var melding = new ProducerRecord<>(getTopic(), nøkkel, verdi);
         var recordMetadata = runProducerWithSingleJson(melding);
-        LOG.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandling {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), vedtakOppsummering.getBehandlingUuid());
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandling {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), vedtakOppsummering.getBehandlingUuid());
+        }
     }
 
 }

@@ -33,7 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 @ExtendWith(JpaExtension.class)
-public class FordelRestTjenesteTest {
+class FordelRestTjenesteTest {
 
     private static final Saksnummer SAKSNUMMER = new Saksnummer("123456");
     private static final AktørId AKTØR_ID = new AktørId("123456");
@@ -54,7 +54,7 @@ public class FordelRestTjenesteTest {
     }
 
     @Test
-    public void mottaJournalpost_når_saksnummer_ikke_finnes() {
+    void mottaJournalpost_når_saksnummer_ikke_finnes() {
         Long behandlingId = lagBehandling();
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto("10000", JOURNAL_POST_ID, FORSENDELSE_ID,
                 UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
@@ -63,7 +63,7 @@ public class FordelRestTjenesteTest {
     }
 
     @Test
-    public void mottaJournalpost_når_dokument_type_id_ikke_gyldig() {
+    void mottaJournalpost_når_dokument_type_id_ikke_gyldig() {
         Long behandlingId = lagBehandling();
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
                 "XYZS", LocalDateTime.now(), null);
@@ -72,7 +72,7 @@ public class FordelRestTjenesteTest {
     }
 
     @Test
-    public void mottaJournalpost_når_behandling_er_avsluttet() {
+    void mottaJournalpost_når_behandling_er_avsluttet() {
         Long behandlingId = lagBehandling();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         behandling.avsluttBehandling();
@@ -84,7 +84,7 @@ public class FordelRestTjenesteTest {
     }
 
     @Test
-    public void mottaJournalpost_når_behandling_er_på_vent() {
+    void mottaJournalpost_når_behandling_er_på_vent() {
         Long behandlingId = lagBehandling();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.FAKTA_FEILUTBETALING);

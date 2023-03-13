@@ -19,14 +19,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-public class TilbakekrevingBeregnerVilkårTest {
+class TilbakekrevingBeregnerVilkårTest {
 
     private VilkårVurderingPeriodeEntitet vurdering;
     private GrunnlagPeriodeMedSkattProsent grunnlagPeriodeMedSkattProsent;
     private VilkårVurderingPeriodeEntitet forstoBurdeForstattVurdering;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         vurdering = new VilkårVurderingPeriodeEntitet.Builder()
                 .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
                 .medPeriode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3))
@@ -41,7 +41,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
-    public void skal_kreve_tilbake_alt_med_renter_ved_forsett_og_illeggRenter_ikke_satt() {
+    void skal_kreve_tilbake_alt_med_renter_ved_forsett_og_illeggRenter_ikke_satt() {
         vurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
                 .medAktsomhet(Aktsomhet.FORSETT)
                 .medBegrunnelse("foo")
@@ -62,7 +62,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
-    public void skal_kreve_tilbake_alt_med_renter_ved_forsett_og_illeggRenter_satt_true() {
+    void skal_kreve_tilbake_alt_med_renter_ved_forsett_og_illeggRenter_satt_true() {
         forstoBurdeForstattVurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
                 .medAktsomhet(Aktsomhet.FORSETT)
                 .medBegrunnelse("foo")
@@ -83,7 +83,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
-    public void skal_kreve_tilbake_alt_uten_renter_ved_forsett_og_illeggRenter_satt_false() {
+    void skal_kreve_tilbake_alt_uten_renter_ved_forsett_og_illeggRenter_satt_false() {
         forstoBurdeForstattVurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
                 .medAktsomhet(Aktsomhet.FORSETT)
                 .medBegrunnelse("foo")
@@ -104,7 +104,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
-    public void skal_kreve_tilbake_alt_ved_grov_uaktsomhet_når_ikke_annet_er_valgt() {
+    void skal_kreve_tilbake_alt_ved_grov_uaktsomhet_når_ikke_annet_er_valgt() {
         vurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
                 .medAktsomhet(Aktsomhet.GROVT_UAKTSOM)
                 .medBegrunnelse("foo")
@@ -120,7 +120,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
-    public void skal_ikke_kreve_noe_når_sjette_ledd_benyttes_for_å_ikke_gjøre_innkreving_av_småbeløp() {
+    void skal_ikke_kreve_noe_når_sjette_ledd_benyttes_for_å_ikke_gjøre_innkreving_av_småbeløp() {
         vurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
                 .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
                 .medBegrunnelse("foo")
@@ -135,7 +135,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
-    public void skal_kreve_tilbake_deler_ved_grov_uaktsomhet_når_særlige_grunner_er_valgt_og_ilegge_renter_når_det_er_valgt() {
+    void skal_kreve_tilbake_deler_ved_grov_uaktsomhet_når_særlige_grunner_er_valgt_og_ilegge_renter_når_det_er_valgt() {
         vurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
                 .medAktsomhet(Aktsomhet.GROVT_UAKTSOM)
                 .medBegrunnelse("foo")
@@ -152,7 +152,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
-    public void skal_kreve_tilbake_deler_ved_grov_uaktsomhet_når_særlige_grunner_er_valgt_og_ikke_ilegge_renter_når_det_er_valgt() {
+    void skal_kreve_tilbake_deler_ved_grov_uaktsomhet_når_særlige_grunner_er_valgt_og_ikke_ilegge_renter_når_det_er_valgt() {
         vurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
                 .medAktsomhet(Aktsomhet.GROVT_UAKTSOM)
                 .medBegrunnelse("foo")
@@ -170,7 +170,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
-    public void skal_takle_desimaler_på_prosenter_som_tilbakekreves() {
+    void skal_takle_desimaler_på_prosenter_som_tilbakekreves() {
         vurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
                 .medAktsomhet(Aktsomhet.GROVT_UAKTSOM)
                 .medBegrunnelse("foo")
@@ -188,7 +188,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
-    public void skal_kreve_tilbake_manuelt_beløp_når_det_er_satt() {
+    void skal_kreve_tilbake_manuelt_beløp_når_det_er_satt() {
         vurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
                 .medAktsomhet(Aktsomhet.GROVT_UAKTSOM)
                 .medBegrunnelse("foo")
@@ -205,7 +205,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
-    public void skal_kreve_tilbake_manuelt_beløp_med_renter_når_det_er_satt() {
+    void skal_kreve_tilbake_manuelt_beløp_med_renter_når_det_er_satt() {
         vurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
                 .medAktsomhet(Aktsomhet.GROVT_UAKTSOM)
                 .medBegrunnelse("foo")
@@ -223,7 +223,7 @@ public class TilbakekrevingBeregnerVilkårTest {
 
 
     @Test
-    public void skal_kreve_tilbake_beløp_som_er_i_behold_uten_renter_ved_god_tro() {
+    void skal_kreve_tilbake_beløp_som_er_i_behold_uten_renter_ved_god_tro() {
         vurdering.setGodTro(VilkårVurderingGodTroEntitet.builder()
                 .medBeløpErIBehold(true)
                 .medBeløpTilbakekreves(BigDecimal.valueOf(8991))
@@ -238,7 +238,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
-    public void skal_kreve_tilbake_ingenting_når_det_er_god_tro_og_beløp_ikke_er_i_behold() {
+    void skal_kreve_tilbake_ingenting_når_det_er_god_tro_og_beløp_ikke_er_i_behold() {
         vurdering.setGodTro(VilkårVurderingGodTroEntitet.builder()
                 .medBeløpErIBehold(false)
                 .medBegrunnelse("foo")
@@ -252,7 +252,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
-    public void skal_kreve_tilbake_beløp_som_er_i_behold_uten_renter_ved_god_tro_med_skatt_prosent() {
+    void skal_kreve_tilbake_beløp_som_er_i_behold_uten_renter_ved_god_tro_med_skatt_prosent() {
         vurdering.setGodTro(VilkårVurderingGodTroEntitet.builder()
                 .medBeløpErIBehold(true)
                 .medBeløpTilbakekreves(BigDecimal.valueOf(8991))
@@ -271,7 +271,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
-    public void skal_kreve_tilbake_alt_med_renter_ved_forsett_med_skatt_prosent() {
+    void skal_kreve_tilbake_alt_med_renter_ved_forsett_med_skatt_prosent() {
         vurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
                 .medAktsomhet(Aktsomhet.FORSETT)
                 .medBegrunnelse("foo")
@@ -295,7 +295,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
-    public void skal_kreve_tilbake_alt_uten_renter_ved_forsett_men_frisinn_med_skatt_prosent() {
+    void skal_kreve_tilbake_alt_uten_renter_ved_forsett_men_frisinn_med_skatt_prosent() {
         vurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
                 .medAktsomhet(Aktsomhet.FORSETT)
                 .medBegrunnelse("foo")

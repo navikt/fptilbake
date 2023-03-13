@@ -39,7 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 
-public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
+class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
     private static final String AKTIVITET_FISKER = "Fisker";
     private static final String AKTIVITET_ARBEIDSLEDIG = "Arbeidsledig";
@@ -52,7 +52,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     private static final LocalDate OPPDAGELSES_DATO = FellesTestOppsett.FOM.plusYears(2);
 
     @Test
-    public void hentDetaljertFeilutbetalingPerioder_nårPerioderErForeldet() {
+    void hentDetaljertFeilutbetalingPerioder_nårPerioderErForeldet() {
         formGrunnlag();
         lagreFaktaTestdata();
 
@@ -120,7 +120,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void hentDetaljertFeilutbetalingPerioder_nårPerioderErIkkeVurderesForForeldet() {
+    void hentDetaljertFeilutbetalingPerioder_nårPerioderErIkkeVurderesForForeldet() {
         formGrunnlag();
         lagreFaktaTestdata();
 
@@ -148,7 +148,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void hentDetaljertFeilutbetalingPerioder_nårPerioderErIkkeVurderesForForeldet_medRedusertBeløp() {
+    void hentDetaljertFeilutbetalingPerioder_nårPerioderErIkkeVurderesForForeldet_medRedusertBeløp() {
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31), KlasseType.FEIL,
                 BigDecimal.valueOf(11000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
@@ -191,7 +191,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void hentDetaljertFeilutbetalingPerioder_medFlereYtelserMedSammeInntekstKategori() {
+    void hentDetaljertFeilutbetalingPerioder_medFlereYtelserMedSammeInntekstKategori() {
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31), KlasseType.FEIL,
                 BigDecimal.valueOf(11000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
@@ -225,7 +225,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
 
     @Test
-    public void lagreVilkårsvurdering_medGodTroOgForsettAktsomhet() {
+    void lagreVilkårsvurdering_medGodTroOgForsettAktsomhet() {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
                 formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
                 formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
@@ -251,7 +251,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void lagreVilkårsvurdering_medSimpelOgGrøvtAktsomhet() {
+    void lagreVilkårsvurdering_medSimpelOgGrøvtAktsomhet() {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
                 formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, LocalDate.of(2016, 3, 31), Aktsomhet.SIMPEL_UAKTSOM),
                 formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.GROVT_UAKTSOM));
@@ -295,7 +295,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void lagreVilkårsvurdering_medSimpelOgGrøvtAktsomhet_nårEnPeriodeErForeldet() {
+    void lagreVilkårsvurdering_medSimpelOgGrøvtAktsomhet_nårEnPeriodeErForeldet() {
         formGrunnlag();
         lagreFaktaTestdata();
 
@@ -327,7 +327,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void hentVilkårsvurdering_medGodTroOgForsettAktsomhet() {
+    void hentVilkårsvurdering_medGodTroOgForsettAktsomhet() {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
                 formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
                 formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
@@ -365,7 +365,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void hentVilkårsvurdering_medSimpelOgGrøvtAktsomhet() {
+    void hentVilkårsvurdering_medSimpelOgGrøvtAktsomhet() {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
                 formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, LocalDate.of(2016, 3, 31), Aktsomhet.SIMPEL_UAKTSOM),
                 formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.GROVT_UAKTSOM));
@@ -406,7 +406,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void hentVilkårsvurdering_medForstBurdeForstattOgForsettAktsomhet_skalTilleggesRenter() {
+    void hentVilkårsvurdering_medForstBurdeForstattOgForsettAktsomhet_skalTilleggesRenter() {
         VilkårsvurderingPerioderDto vilkårsvurderingPerioderDto = formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT);
         VilkårResultatAnnetDto vilkarResultatInfo = (VilkårResultatAnnetDto) vilkårsvurderingPerioderDto.getVilkarResultatInfo();
         vilkarResultatInfo.getAktsomhetInfo().setIleggRenter(true);
@@ -432,7 +432,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void hentVilkårsvurdering_medForstBurdeForstattOgForsettAktsomhet_skalIkkeTilleggesRenter() {
+    void hentVilkårsvurdering_medForstBurdeForstattOgForsettAktsomhet_skalIkkeTilleggesRenter() {
         VilkårsvurderingPerioderDto vilkårsvurderingPerioderDto = formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT);
         VilkårResultatAnnetDto vilkarResultatInfo = (VilkårResultatAnnetDto) vilkårsvurderingPerioderDto.getVilkarResultatInfo();
         vilkarResultatInfo.getAktsomhetInfo().setIleggRenter(false);

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import com.jcraft.jsch.JSchException;
 
 @Disabled("Må starte docker-kontaineren sftp-test manuelt. Testen brukt under utvikling og til eksempel ved seinere implementering av sftp-tjenester")
-public class AvstemmingSftpBatchTjenesteTest {
+class AvstemmingSftpBatchTjenesteTest {
 
     private static final String HOST = "localhost";
     private static final int TEST_PORT = 50522;
@@ -24,7 +24,7 @@ public class AvstemmingSftpBatchTjenesteTest {
     private String keyDir = testDir + "keys/";
 
     @Test
-    public void lagreAvstemmingsfil() throws Exception {
+    void lagreAvstemmingsfil() throws Exception {
         String username = "fptilbake";
         String tmpDir = testDir + "tmp/" + username + "/";
         String privkeyFileUrl = keyDir + "fptilbake_key";
@@ -45,7 +45,7 @@ public class AvstemmingSftpBatchTjenesteTest {
     }
 
     @Test
-    public void lagreAvstemmingsfil_base64_encoded_cmd() throws Exception {
+    void lagreAvstemmingsfil_base64_encoded_cmd() throws Exception {
         String username = "fptilbake2";
         String passphrase = "test123";
 
@@ -68,7 +68,7 @@ public class AvstemmingSftpBatchTjenesteTest {
     }
 
     @Test
-    public void lagreAvstemmingsfil_feiler_med_feil_port() throws Exception {
+    void lagreAvstemmingsfil_feiler_med_feil_port() throws Exception {
         String privkeyFileUrl = keyDir + "fptilbake_key";
 
         Path privKeyPath = Paths.get(privkeyFileUrl);

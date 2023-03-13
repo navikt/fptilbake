@@ -16,7 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 
-public class BehandlendeEnhetTest extends FellesTestOppsett {
+class BehandlendeEnhetTest extends FellesTestOppsett {
 
     private static final String NY_ENHET_ID = "4849";
     private static final String NY_ENHET_NAVN = "NAV Familie- og pensjonsytelser Tromsø";
@@ -30,7 +30,7 @@ public class BehandlendeEnhetTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_byttBehandlendeEnhet_med_gyldig_behandling() {
+    void skal_byttBehandlendeEnhet_med_gyldig_behandling() {
         assertThat(behandling.getBehandlendeEnhetId()).isEqualTo(BEHANDLENDE_ENHET_ID);
         assertThat(behandling.getBehandlendeEnhetNavn()).isEqualTo(BEHANDLENDE_ENHET_NAVN);
 

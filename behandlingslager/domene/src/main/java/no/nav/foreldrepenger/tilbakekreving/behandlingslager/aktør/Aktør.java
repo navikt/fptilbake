@@ -23,7 +23,7 @@ public abstract class Aktør extends BaseEntitet {
         // For Hibernate
     }
 
-    public Aktør(AktørId aktørId) {
+    protected Aktør(AktørId aktørId) {
         this.aktørId = aktørId;
     }
 

@@ -54,7 +54,7 @@ public enum AksjonspunktStatus implements Kodeverdi {
         if (node == null) {
             return null;
         }
-        String kode = TempAvledeKode.getVerdi(AksjonspunktStatus.class, node, "kode");
+        var kode = TempAvledeKode.getVerdi(AksjonspunktStatus.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent AksjonspunktStatus: " + kode);

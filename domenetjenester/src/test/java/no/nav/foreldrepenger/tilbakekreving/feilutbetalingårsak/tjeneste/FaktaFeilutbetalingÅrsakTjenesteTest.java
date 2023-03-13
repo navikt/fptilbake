@@ -14,12 +14,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertyperDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyperPrYtelseTypeDto;
 
-public class FaktaFeilutbetalingÅrsakTjenesteTest {
+class FaktaFeilutbetalingÅrsakTjenesteTest {
 
     private FeilutbetalingÅrsakTjeneste feilutbetalingÅrsakTjeneste = new FeilutbetalingÅrsakTjeneste();
 
     @Test
-    public void skal_ha_riktige_årsaker_og_underårsaker_for_foreldrepenger() {
+    void skal_ha_riktige_årsaker_og_underårsaker_for_foreldrepenger() {
         Map<HendelseType, List<HendelseUnderType>> mapAvResultat = hentÅrsakerForYtelseType(FagsakYtelseType.FORELDREPENGER);
 
         assertThat(mapAvResultat.keySet()).containsExactly(
@@ -115,7 +115,7 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
     }
 
     @Test
-    public void skal_ha_riktige_årsaker_og_underårsaker_for_svangerskapspenger() {
+    void skal_ha_riktige_årsaker_og_underårsaker_for_svangerskapspenger() {
         Map<HendelseType, List<HendelseUnderType>> mapAvResultat = hentÅrsakerForYtelseType(FagsakYtelseType.SVANGERSKAPSPENGER);
 
         assertThat(mapAvResultat.keySet()).containsExactly(
@@ -175,7 +175,7 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
     }
 
     @Test
-    public void skal_ha_riktige_årsaker_og_underårsaker_for_engangstønad() {
+    void skal_ha_riktige_årsaker_og_underårsaker_for_engangstønad() {
         Map<HendelseType, List<HendelseUnderType>> mapAvResultat = hentÅrsakerForYtelseType(FagsakYtelseType.ENGANGSTØNAD);
 
         assertThat(mapAvResultat.keySet()).containsExactly(

@@ -21,7 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTje
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-public class ForeldelseRestTjenesteTest {
+class ForeldelseRestTjenesteTest {
 
     private static final long behandlingId = 123456;
     private static final BehandlingReferanse idDto = new BehandlingReferanse(behandlingId);
@@ -33,21 +33,21 @@ public class ForeldelseRestTjenesteTest {
     private ForeldelseRestTjeneste restTjeneste = new ForeldelseRestTjeneste(vurdertForeldelseTjenesteMock, kravgrunnlagBeregningTjenesteMock, behandlingTjeneste);
 
     @Test
-    public void skal_kalle_hentLogiskePerioder() {
+    void skal_kalle_hentLogiskePerioder() {
         restTjeneste.hentLogiskePerioder(idDto);
 
         verify(vurdertForeldelseTjenesteMock).hentFaktaPerioder(behandlingId);
     }
 
     @Test
-    public void skal_kalle_henteVurdertPerioder() {
+    void skal_kalle_henteVurdertPerioder() {
         restTjeneste.hentVurdertPerioder(idDto);
 
         verify(vurdertForeldelseTjenesteMock).henteVurdertForeldelse(behandlingId);
     }
 
     @Test
-    public void skal_få_med_feilutbetalt_beløp() {
+    void skal_få_med_feilutbetalt_beløp() {
         ForeldelsePeriodeMedBeløpDto foreldelsePeriodeMedBeløpDto = new ForeldelsePeriodeMedBeløpDto();
         foreldelsePeriodeMedBeløpDto.setFom(LocalDate.now().minusDays(10));
         foreldelsePeriodeMedBeløpDto.setTom(LocalDate.now().minusDays(2));
