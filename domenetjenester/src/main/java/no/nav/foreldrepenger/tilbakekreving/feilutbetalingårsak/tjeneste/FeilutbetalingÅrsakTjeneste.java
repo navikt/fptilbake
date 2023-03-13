@@ -3,11 +3,14 @@ package no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseTypePrYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
@@ -21,17 +24,17 @@ public class FeilutbetalingÅrsakTjeneste {
     public List<HendelseTyperPrYtelseTypeDto> hentFeilutbetalingårsaker() {
         List<HendelseTyperPrYtelseTypeDto> resultat = new ArrayList<>();
 
-        var hendelseTypePrYtelseType = HendelseTypePrYtelseType.getHendelsetypeHierarki();
-        var hendelseUndertypePrHendelseType = HendelseUndertypePrHendelseType.getHendelsetypeHierarki();
+        Map<FagsakYtelseType, Set<HendelseType>> hendelseTypePrYtelseType = HendelseTypePrYtelseType.getHendelsetypeHierarki();
+        Map<HendelseType, Set<HendelseUnderType>> hendelseUndertypePrHendelseType = HendelseUndertypePrHendelseType.getHendelsetypeHierarki();
 
-        for (var entry : hendelseTypePrYtelseType.entrySet()) {
-            var ytelseType = entry.getKey();
-            var hendelseTyper = sortereHendelseTypeBasertPåEkstradata2(entry.getValue());
+        for (Map.Entry<FagsakYtelseType, Set<HendelseType>> entry : hendelseTypePrYtelseType.entrySet()) {
+            FagsakYtelseType ytelseType = entry.getKey();
+            List<HendelseType> hendelseTyper = sortereHendelseTypeBasertPåEkstradata2(entry.getValue());
 
             List<HendelseTypeMedUndertyperDto> dtoer = new ArrayList<>();
-            for (var hendelseType : hendelseTyper) {
-                var undertyper = hendelseUndertypePrHendelseType.get(hendelseType);
-                var sorterteUndertyper = sortereHendelseUnderTypeBasertPåEkstradata(undertyper);
+            for (HendelseType hendelseType : hendelseTyper) {
+                Set<HendelseUnderType> undertyper = hendelseUndertypePrHendelseType.get(hendelseType);
+                List<HendelseUnderType> sorterteUndertyper = sortereHendelseUnderTypeBasertPåEkstradata(undertyper);
                 dtoer.add(new HendelseTypeMedUndertyperDto(hendelseType, sorterteUndertyper));
             }
             resultat.add(new HendelseTyperPrYtelseTypeDto(ytelseType, dtoer));
@@ -48,7 +51,7 @@ public class FeilutbetalingÅrsakTjeneste {
         return kodelistene
                 .stream()
                 .sorted(Comparator.comparing(HendelseUnderType::getSortering))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private static List<HendelseType> sortereHendelseTypeBasertPåEkstradata2(Set<HendelseType> kodelistene) {
@@ -58,7 +61,7 @@ public class FeilutbetalingÅrsakTjeneste {
         return kodelistene
                 .stream()
                 .sorted(Comparator.comparing(HendelseType::getSortering))
-                .toList();
+                .collect(Collectors.toList());
     }
 
 }
