@@ -48,7 +48,7 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjeneste
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.ForeslåVedtakDto;
 
 @ExtendWith(JpaExtension.class)
-public class ForeslåVedtakOppdatererTest {
+class ForeslåVedtakOppdatererTest {
 
     private EntityManager entityManager;
     private BehandlingRepositoryProvider repositoryProvider;
@@ -58,7 +58,7 @@ public class ForeslåVedtakOppdatererTest {
     private ForeslåVedtakOppdaterer foreslåVedtakOppdaterer;
 
     @BeforeEach
-    public void setup(EntityManager entityManager) {
+    void setup(EntityManager entityManager) {
         this.entityManager = entityManager;
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         behandlingRepository = repositoryProvider.getBehandlingRepository();
@@ -82,7 +82,7 @@ public class ForeslåVedtakOppdatererTest {
     }
 
     @Test
-    public void oppdater_medFaktaAvsnitt() {
+    void oppdater_medFaktaAvsnitt() {
         Behandling behandling = lagMockBehandling();
         foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak("fakta", null, null), behandling);
         entityManager.flush();
@@ -98,7 +98,7 @@ public class ForeslåVedtakOppdatererTest {
     }
 
     @Test
-    public void oppdater_medVilkårAvsnitt() {
+    void oppdater_medVilkårAvsnitt() {
         Behandling behandling = lagMockBehandling();
         foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak(null, null, "vilkår"), behandling);
         entityManager.flush();
@@ -114,7 +114,7 @@ public class ForeslåVedtakOppdatererTest {
     }
 
     @Test
-    public void oppdater_medSærligGrunnerAvsnitt() {
+    void oppdater_medSærligGrunnerAvsnitt() {
         Behandling behandling = lagMockBehandling();
         foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak(null, "særligGrunner", null), behandling);
         entityManager.flush();

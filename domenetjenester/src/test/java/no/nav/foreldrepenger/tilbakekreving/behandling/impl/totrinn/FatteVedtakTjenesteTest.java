@@ -18,7 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.VurderÅrsakTotrinnsvurdering;
 
-public class FatteVedtakTjenesteTest extends FellesTestOppsett {
+class FatteVedtakTjenesteTest extends FellesTestOppsett {
 
     private TotrinnTjeneste totrinnTjeneste;
     private FatteVedtakTjeneste fatteVedtakTjeneste;
@@ -31,7 +31,7 @@ public class FatteVedtakTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void opprettTotrinnsVurdering_nårAksjonspunktErGodkjent() {
+    void opprettTotrinnsVurdering_nårAksjonspunktErGodkjent() {
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, List.of(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
         VedtakAksjonspunktData vedtakAksjonspunktData = new VedtakAksjonspunktData(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, true, null, null);
@@ -51,7 +51,7 @@ public class FatteVedtakTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void opprettTotrinnsVurdering_nårAksjonspunktErIkkeGodkjent() {
+    void opprettTotrinnsVurdering_nårAksjonspunktErIkkeGodkjent() {
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, List.of(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
         VedtakAksjonspunktData vedtakAksjonspunktData = new VedtakAksjonspunktData(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, false,

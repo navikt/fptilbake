@@ -28,7 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 @ExtendWith(JpaExtension.class)
-public class BehandlingKandidaterRepositoryTest {
+class BehandlingKandidaterRepositoryTest {
 
     private BehandlingKandidaterRepository behandlingKandidaterRepository;
 
@@ -48,7 +48,7 @@ public class BehandlingKandidaterRepositoryTest {
     }
 
     @Test
-    public void test_skalHenteBehandlingerSomVenterPåBrukerResponsHvorTidsfristUtgåttEllerTilbakekrevinggrunnlag() {
+    void test_skalHenteBehandlingerSomVenterPåBrukerResponsHvorTidsfristUtgåttEllerTilbakekrevinggrunnlag() {
         Behandling behandling1 = opprettBehandling("2124325", "35423523", BehandlingType.TILBAKEKREVING);
         Behandling behandling2 = opprettBehandling("5345345", "32532523", BehandlingType.TILBAKEKREVING);
         Behandling behandling3 = opprettBehandling("6322436", "64352676", BehandlingType.TILBAKEKREVING);

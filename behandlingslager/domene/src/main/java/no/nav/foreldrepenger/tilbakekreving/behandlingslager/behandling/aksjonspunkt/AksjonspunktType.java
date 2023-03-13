@@ -53,7 +53,7 @@ public enum AksjonspunktType implements Kodeverdi {
         if (node == null) {
             return null;
         }
-        String kode = TempAvledeKode.getVerdi(AksjonspunktType.class, node, "kode");
+        var kode = TempAvledeKode.getVerdi(AksjonspunktType.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent AksjonspunktType: " + kode);

@@ -13,10 +13,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 
-public class HentgrunnlagStegTest extends FellesTestOppsett {
+class HentgrunnlagStegTest extends FellesTestOppsett {
 
     @Test
-    public void utførSteg_medUtenAksjonspunkter() {
+    void utførSteg_medUtenAksjonspunkter() {
         BehandlingÅrsak.Builder behandlingÅrsakBuilder = BehandlingÅrsak.builder(BehandlingÅrsakType.RE_KLAGE_KA).medOriginalBehandling(behandling);
         Behandling revurdering = lagBehandling(behandlingÅrsakBuilder);
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(revurdering);

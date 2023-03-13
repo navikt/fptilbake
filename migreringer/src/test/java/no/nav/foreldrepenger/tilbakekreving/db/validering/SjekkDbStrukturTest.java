@@ -18,7 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.Databaseskjemainitialiseri
 /**
  * Tester at alle migreringer følger standarder for navn og god praksis.
  */
-public class SjekkDbStrukturTest {
+class SjekkDbStrukturTest {
 
     private static final String HJELP = "\n\nDu har nylig lagt til en ny tabell eller kolonne som ikke er dokumentert ihht. gjeldende regler for dokumentasjon."
             + "\nVennligst gå over sql scriptene og dokumenter tabellene på korrekt måte.";
@@ -27,14 +27,14 @@ public class SjekkDbStrukturTest {
     private static String schema;
 
     @BeforeAll
-    public static void setup() {
+    static void setup() {
         Databaseskjemainitialisering.migrerUnittestSkjemaer();
         ds = Databaseskjemainitialisering.initUnitTestDataSource();
         schema = Databaseskjemainitialisering.USER;
     }
 
     @Test
-    public void sjekk_at_alle_tabeller_er_dokumentert() throws Exception {
+    void sjekk_at_alle_tabeller_er_dokumentert() throws Exception {
         String sql = "SELECT table_name FROM all_tab_comments WHERE (comments IS NULL OR comments in ('', 'MISSING COLUMN COMMENT')) AND owner=sys_context('userenv', 'current_schema') AND table_name NOT LIKE 'schema_%' AND table_name not like '%_MOCK'";
         List<String> avvik = new ArrayList<>();
         try (Connection conn = ds.getConnection();
@@ -51,7 +51,7 @@ public class SjekkDbStrukturTest {
     }
 
     @Test
-    public void sjekk_at_alle_relevant_kolonner_er_dokumentert() throws Exception {
+    void sjekk_at_alle_relevant_kolonner_er_dokumentert() throws Exception {
         List<String> avvik = new ArrayList<>();
 
         String sql = "SELECT t.table_name||'.'||t.column_name "
@@ -84,7 +84,7 @@ public class SjekkDbStrukturTest {
     }
 
     @Test
-    public void sjekk_at_alle_FK_kolonner_har_fornuftig_indekser() throws Exception {
+    void sjekk_at_alle_FK_kolonner_har_fornuftig_indekser() throws Exception {
         String sql = "SELECT "
                 + "  uc.table_name, uc.constraint_name, LISTAGG(dcc.column_name, ',') WITHIN GROUP (ORDER BY dcc.position) as columns" +
                 " FROM all_Constraints Uc" +
@@ -132,7 +132,7 @@ public class SjekkDbStrukturTest {
     }
 
     @Test
-    public void skal_ha_primary_key_i_hver_tabell_som_begynner_med_PK() throws Exception {
+    void skal_ha_primary_key_i_hver_tabell_som_begynner_med_PK() throws Exception {
         String sql = "SELECT table_name FROM all_tables at "
                 + " WHERE table_name "
                 + " NOT IN ( SELECT ac.table_name FROM all_constraints ac "
@@ -165,7 +165,7 @@ public class SjekkDbStrukturTest {
     }
 
     @Test
-    public void skal_ha_alle_foreign_keys_begynne_med_FK() throws Exception {
+    void skal_ha_alle_foreign_keys_begynne_med_FK() throws Exception {
         String sql = "SELECT ac.table_name, ac.constraint_name FROM all_constraints ac"
                 + " WHERE ac.constraint_type ='R' and ac.owner=upper(?) and constraint_name NOT LIKE 'FK_%'";
 
@@ -195,7 +195,7 @@ public class SjekkDbStrukturTest {
     }
 
     @Test
-    public void skal_ha_korrekt_index_navn() throws Exception {
+    void skal_ha_korrekt_index_navn() throws Exception {
         String sql = "select table_name, index_name, column_name"
                 + " from all_ind_columns"
                 + " where table_owner=upper(?)"
@@ -228,7 +228,7 @@ public class SjekkDbStrukturTest {
     }
 
     @Test
-    public void skal_ha_samme_data_type_for_begge_sider_av_en_FK() throws Exception {
+    void skal_ha_samme_data_type_for_begge_sider_av_en_FK() throws Exception {
         String sql = "SELECT T.TABLE_NAME\n" +
                 ", TCC.COLUMN_NAME AS KOL_A\n" +
                 ", ATT.DATA_TYPE AS KOL_A_DATA_TYPE\n" +
@@ -278,7 +278,7 @@ public class SjekkDbStrukturTest {
     }
 
     @Test
-    public void skal_deklarere_VARCHAR2_kolonner_som_CHAR_ikke_BYTE_semantikk() throws Exception {
+    void skal_deklarere_VARCHAR2_kolonner_som_CHAR_ikke_BYTE_semantikk() throws Exception {
         String sql = "SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, CHAR_USED, CHAR_LENGTH\n"
                 + "FROM ALL_TAB_COLS\n"
                 + "WHERE DATA_TYPE = 'VARCHAR2'\n"
@@ -312,7 +312,7 @@ public class SjekkDbStrukturTest {
     }
 
     @Test
-    public void skal_ikke_bruke_FLOAT_eller_DOUBLE() throws Exception {
+    void skal_ikke_bruke_FLOAT_eller_DOUBLE() throws Exception {
         String sql = "select table_name, column_name, data_type from all_tab_cols where owner=upper(?) and data_type in ('FLOAT', 'DOUBLE') order by 1, 2";
 
         List<String> avvik = new ArrayList<>();
@@ -341,7 +341,7 @@ public class SjekkDbStrukturTest {
     }
 
     @Test
-    public void sjekk_at_status_verdiene_i_prosess_task_tabellen_er_også_i_pollingSQL() throws Exception {
+    void sjekk_at_status_verdiene_i_prosess_task_tabellen_er_også_i_pollingSQL() throws Exception {
         String sql = "SELECT SEARCH_CONDITION\n" +
                 "FROM all_constraints\n" +
                 "WHERE table_name = 'PROSESS_TASK'\n" +

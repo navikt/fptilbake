@@ -60,7 +60,7 @@ import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEv
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 @ExtendWith(JpaExtension.class)
-public class LosPubliserEventTaskAivenTest {
+class LosPubliserEventTaskAivenTest {
 
     private static final LocalDate FOM_1 = LocalDate.of(2019, 12, 1);
     private static final LocalDate TOM_1 = LocalDate.of(2019, 12, 31);
@@ -79,7 +79,7 @@ public class LosPubliserEventTaskAivenTest {
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
     @BeforeEach
-    public void setup(EntityManager entityManager) throws IOException {
+    void setup(EntityManager entityManager) throws IOException {
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         GjenopptaBehandlingTjeneste mockGjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingTjeneste.class);
         BehandlingskontrollTjeneste mockBehandlingskontrollTjeneste = mock(BehandlingskontrollTjeneste.class);
@@ -107,7 +107,7 @@ public class LosPubliserEventTaskAivenTest {
     }
 
     @Test
-    public void skal_publisere_fplos_data_til_kafka() throws IOException {
+    void skal_publisere_fplos_data_til_kafka() throws IOException {
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, List.of(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING);
@@ -139,7 +139,7 @@ public class LosPubliserEventTaskAivenTest {
     }
 
     @Test
-    public void skal_publisere_fplos_data_til_kafka_for_henleggelse_når_kravgrunnlag_ikke_finnes() throws IOException {
+    void skal_publisere_fplos_data_til_kafka_for_henleggelse_når_kravgrunnlag_ikke_finnes() throws IOException {
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.VARSEL, List.of(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING));
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
@@ -167,7 +167,7 @@ public class LosPubliserEventTaskAivenTest {
     }
 
     @Test
-    public void skal_publisere_fplos_data_til_kafka_når_behandling_venter_på_kravgrunnlag_og_fristen_går_ut() throws IOException {
+    void skal_publisere_fplos_data_til_kafka_når_behandling_venter_på_kravgrunnlag_og_fristen_går_ut() throws IOException {
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.TBKGSTEG, List.of(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG));
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
@@ -198,7 +198,7 @@ public class LosPubliserEventTaskAivenTest {
     }
 
     @Test
-    public void skal_publisere_fplos_data_til_kafka_når_behandling_venter_på_kravgrunnlag_og_fristen_er_endret() throws IOException {
+    void skal_publisere_fplos_data_til_kafka_når_behandling_venter_på_kravgrunnlag_og_fristen_er_endret() throws IOException {
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.TBKGSTEG, List.of(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG));
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);

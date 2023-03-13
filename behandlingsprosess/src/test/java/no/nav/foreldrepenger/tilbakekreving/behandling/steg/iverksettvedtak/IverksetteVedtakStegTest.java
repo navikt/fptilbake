@@ -51,7 +51,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 @ExtendWith(JpaExtension.class)
-public class IverksetteVedtakStegTest {
+class IverksetteVedtakStegTest {
 
     private BehandlingRepositoryProvider repoProvider;
     private ProsessTaskTjeneste taskTjeneste;
@@ -67,7 +67,7 @@ public class IverksetteVedtakStegTest {
     private BehandlingskontrollKontekst behandlingskontrollKontekst;
 
     @BeforeEach
-    public void setup(EntityManager entityManager) {
+    void setup(EntityManager entityManager) {
         this.entityManager = entityManager;
         repoProvider = new BehandlingRepositoryProvider(entityManager);
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
@@ -86,20 +86,20 @@ public class IverksetteVedtakStegTest {
     }
 
     @Test
-    public void skal_ikke_utføre_iverksette_vedtak_steg_hvis_vedtak_ikke_finnes() {
+    void skal_ikke_utføre_iverksette_vedtak_steg_hvis_vedtak_ikke_finnes() {
         var e = assertThrows(TekniskException.class, () -> iverksetteVedtakSteg.utførSteg(behandlingskontrollKontekst));
         assertThat(e.getMessage()).contains("FPT-131240");
     }
 
     @Test
-    public void skal_utføre_iverksette_vedtak_steg_uten_aksjonpunkter_hvis_behandling_er_allerede_iverksett() {
+    void skal_utføre_iverksette_vedtak_steg_uten_aksjonpunkter_hvis_behandling_er_allerede_iverksett() {
         opprettBehandlingVedtak(behandling, IverksettingStatus.IVERKSATT);
         BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(behandlingskontrollKontekst);
         assertThat(stegResultat.getAksjonspunktListe()).isEmpty();
     }
 
     @Test
-    public void skal_utføre_iverksette_vedtak_steg_for_tilbakekreving_behandling() {
+    void skal_utføre_iverksette_vedtak_steg_for_tilbakekreving_behandling() {
         opprettBehandlingVedtak(behandling, IverksettingStatus.IKKE_IVERKSATT);
         lagreInfoOmVarselbrev(behandling.getId(), "jpi1", "did2");
         BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(behandlingskontrollKontekst);
@@ -117,7 +117,7 @@ public class IverksetteVedtakStegTest {
     }
 
     @Test
-    public void skal_utføre_iverksette_vedtak_steg_uten_å_sende_vedtaksbrev_for_tilbakekreving_revurdering_hvis_behandling_opprettet_for_klage() {
+    void skal_utføre_iverksette_vedtak_steg_uten_å_sende_vedtaksbrev_for_tilbakekreving_revurdering_hvis_behandling_opprettet_for_klage() {
         Behandling revurdering = Behandling.nyBehandlingFor(behandling.getFagsak(), BehandlingType.REVURDERING_TILBAKEKREVING).build();
         List<BehandlingÅrsak> behandlingÅrsaker = BehandlingÅrsak.builder(BehandlingÅrsakType.RE_KLAGE_NFP)
             .medOriginalBehandling(behandling)
@@ -143,7 +143,7 @@ public class IverksetteVedtakStegTest {
     }
 
     @Test
-    public void skal_utføre_iverksette_vedtak_steg_med_å_sende_vedtaksbrev_for_tilbakekreving_revurdering_hvis_behandling_ikke_opprettet_for_klage() {
+    void skal_utføre_iverksette_vedtak_steg_med_å_sende_vedtaksbrev_for_tilbakekreving_revurdering_hvis_behandling_ikke_opprettet_for_klage() {
         Behandling revurdering = Behandling.nyBehandlingFor(behandling.getFagsak(), BehandlingType.REVURDERING_TILBAKEKREVING).build();
         List<BehandlingÅrsak> behandlingÅrsaker = BehandlingÅrsak.builder(BehandlingÅrsakType.RE_OPPLYSNINGER_OM_FORELDELSE)
             .medOriginalBehandling(behandling)

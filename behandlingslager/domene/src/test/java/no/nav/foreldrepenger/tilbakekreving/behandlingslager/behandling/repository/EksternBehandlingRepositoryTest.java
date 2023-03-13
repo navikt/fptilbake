@@ -21,7 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 
 @ExtendWith(JpaExtension.class)
-public class EksternBehandlingRepositoryTest {
+class EksternBehandlingRepositoryTest {
 
     private static final UUID EKSTERN_UUID = UUID.randomUUID();
 
@@ -38,7 +38,7 @@ public class EksternBehandlingRepositoryTest {
     }
 
     @Test
-    public void skal_lagre_ned_ekstern_behandling_data() {
+    void skal_lagre_ned_ekstern_behandling_data() {
         Behandling behandling = opprettBehandling();
         Long behandlingId = behandling.getId();
 
@@ -54,7 +54,7 @@ public class EksternBehandlingRepositoryTest {
     }
 
     @Test
-    public void skal_hente_ekstern_data_med_ekstern_behandling_id() {
+    void skal_hente_ekstern_data_med_ekstern_behandling_id() {
         Behandling behandling = opprettBehandling();
         Henvisning henvisning = Henvisning.fraEksternBehandlingId(5555L);
 

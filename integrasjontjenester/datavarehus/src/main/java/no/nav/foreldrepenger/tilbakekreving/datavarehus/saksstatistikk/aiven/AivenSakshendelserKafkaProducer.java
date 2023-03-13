@@ -7,7 +7,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +32,12 @@ public class AivenSakshendelserKafkaProducer extends AivenMeldingProducer {
     public void sendMelding(BehandlingTilstand hendelse) {
         hendelse.setTekniskTid(OffsetDateTime.now(ZoneOffset.UTC)); //tidspunkt for sending
 
-        String nøkkel = hendelse.getBehandlingUuid().toString();
-        String verdi = BehandlingTilstandMapper.tilJsonString(hendelse);
+        var nøkkel = hendelse.getBehandlingUuid().toString();
+        var verdi = BehandlingTilstandMapper.tilJsonString(hendelse);
         var melding = new ProducerRecord<>(getTopic(), nøkkel, verdi);
-        RecordMetadata recordMetadata = runProducerWithSingleJson(melding);
-        LOG.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandling {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), hendelse.getBehandlingUuid());
+        var recordMetadata = runProducerWithSingleJson(melding);
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Melding sendt til Aiven på {} partisjon {} offset {} for behandling {}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), hendelse.getBehandlingUuid());
+        }
     }
 }

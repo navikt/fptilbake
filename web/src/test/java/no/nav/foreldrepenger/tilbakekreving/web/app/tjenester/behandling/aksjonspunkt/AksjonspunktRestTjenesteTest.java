@@ -47,7 +47,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.VurderForeldelseDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
-public class AksjonspunktRestTjenesteTest {
+class AksjonspunktRestTjenesteTest {
 
     private static final Saksnummer SAKSNUMMER = new Saksnummer("12345");
     private static final NavBruker NAV_BRUKER = NavBruker.opprettNy(new AktørId(12345L), Språkkode.nb);
@@ -69,7 +69,7 @@ public class AksjonspunktRestTjenesteTest {
     private Behandling behandling;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         when(repositoryProviderMock.getBehandlingRepository()).thenReturn(behandlingRepositoryMock);
 
         BehandlingTjeneste behandlingTjeneste = new BehandlingTjeneste(repositoryProviderMock,
@@ -89,7 +89,7 @@ public class AksjonspunktRestTjenesteTest {
     }
 
     @Test
-    public void test_skal_hente_aksjonspunkter() throws URISyntaxException {
+    void test_skal_hente_aksjonspunkter() throws URISyntaxException {
         when(behandlingRepositoryMock.hentBehandling(anyLong())).thenReturn(behandling);
 
         Totrinnsvurdering ttv = Totrinnsvurdering.builder()
@@ -104,7 +104,7 @@ public class AksjonspunktRestTjenesteTest {
     }
 
     @Test
-    public void test_skal_kalle_bekreftAksjonspunktert() throws URISyntaxException {
+    void test_skal_kalle_bekreftAksjonspunktert() throws URISyntaxException {
         long behandlingId = 12345L;
         Behandling behandlingSpy = spy(behandling);
         when(behandlingSpy.getId()).thenReturn(behandlingId);

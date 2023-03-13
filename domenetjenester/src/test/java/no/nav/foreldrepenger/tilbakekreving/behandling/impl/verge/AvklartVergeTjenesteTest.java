@@ -26,7 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
 
-public class AvklartVergeTjenesteTest extends FellesTestOppsett {
+class AvklartVergeTjenesteTest extends FellesTestOppsett {
 
     private VergeRepository vergeRepository;
     private VirksomhetTjeneste virksomhetTjenesteMock;
@@ -40,7 +40,7 @@ public class AvklartVergeTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_lagre_verge_informasjon_når_verge_er_advokat() {
+    void skal_lagre_verge_informasjon_når_verge_er_advokat() {
         VergeDto vergeDto = lagVergeDto(VergeType.ADVOKAT);
         when(virksomhetTjenesteMock.validerOrganisasjon(anyString())).thenReturn(true);
         avklartVergeTjeneste.lagreVergeInformasjon(internBehandlingId, vergeDto);
@@ -54,7 +54,7 @@ public class AvklartVergeTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_lagre_verge_informasjon_når_verge_er_ikke_advokat() {
+    void skal_lagre_verge_informasjon_når_verge_er_ikke_advokat() {
         VergeDto vergeDto = lagVergeDto(VergeType.FBARN);
         when(mockTpsTjeneste.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getAktørId()));
         avklartVergeTjeneste.lagreVergeInformasjon(internBehandlingId, vergeDto);
@@ -68,7 +68,7 @@ public class AvklartVergeTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_ikke_lagre_verge_informasjon_når_verge_er_advokat_men_orgnummer_ikke_finnes() {
+    void skal_ikke_lagre_verge_informasjon_når_verge_er_advokat_men_orgnummer_ikke_finnes() {
         VergeDto vergeDto = lagVergeDto(VergeType.ADVOKAT);
         when(virksomhetTjenesteMock.validerOrganisasjon(anyString())).thenReturn(false);
         var e = assertThrows(IllegalStateException.class,

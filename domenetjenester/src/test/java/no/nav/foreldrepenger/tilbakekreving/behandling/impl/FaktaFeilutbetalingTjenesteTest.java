@@ -39,12 +39,12 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
-public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
+class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
     private static final LocalDate NOW = LocalDate.now();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         entityManager.setFlushMode(FlushModeType.AUTO);
         EksternBehandlingsinfoDto behandlingsinfoDto = lagEksternBehandlingsInfo();
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = new SamletEksternBehandlingInfo.Builder(Set.of(Tillegsinformasjon.TILBAKEKREVINGSVALG))
@@ -56,7 +56,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_hente_feilutbetalingfakta_når_varselBeløp_ikke_finnes() {
+    void skal_hente_feilutbetalingfakta_når_varselBeløp_ikke_finnes() {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, TOM, KlasseType.FEIL, BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(10000));
 
@@ -70,7 +70,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_hente_feilutbetalingFakta_med_enkel_periode() {
+    void skal_hente_feilutbetalingFakta_med_enkel_periode() {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, TOM, KlasseType.FEIL, BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(10000));
 
@@ -88,7 +88,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_hente_feilutbetalingFakta_med_enkel_periode_når_behandling_er_henlagt() {
+    void skal_hente_feilutbetalingFakta_med_enkel_periode_når_behandling_er_henlagt() {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, TOM, KlasseType.FEIL, BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(10000));
         //TODO
@@ -144,7 +144,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_hente_feilutbetalingFakta_med_flere_perioder() {
+    void skal_hente_feilutbetalingFakta_med_flere_perioder() {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, LocalDate.of(2016, 03, 31), KlasseType.FEIL,
                 BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering2 = lagKravgrunnlag(LocalDate.of(2016, 04, 01), LocalDate.of(2016, 04, 15),
@@ -174,7 +174,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_hente_feilutbetalingFakta_med_flere_perioder_og_sistedag_i_helgen() {
+    void skal_hente_feilutbetalingFakta_med_flere_perioder_og_sistedag_i_helgen() {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, LocalDate.of(2016, 03, 26), KlasseType.FEIL,
                 BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering2 = lagKravgrunnlag(LocalDate.of(2016, 03, 28), LocalDate.of(2016, 04, 15),

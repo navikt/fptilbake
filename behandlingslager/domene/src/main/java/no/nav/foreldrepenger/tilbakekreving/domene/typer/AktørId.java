@@ -52,7 +52,7 @@ public class AktørId implements Serializable, Comparable<AktørId>, IndexKey {
 
     @Override
     public String getIndexKey() {
-        return aktørId;
+        return getId();
     }
 
     public String getId() {

@@ -18,7 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 @ExtendWith(JpaExtension.class)
-public class FagsakRepositoryTest {
+class FagsakRepositoryTest {
 
     private FagsakRepository fagsakRepository;
     private EntityManager entityManager;
@@ -30,7 +30,7 @@ public class FagsakRepositoryTest {
     }
 
     @Test
-    public void skal_finne_eksakt_fagsak_gitt_id() {
+    void skal_finne_eksakt_fagsak_gitt_id() {
         AktørId aktørId = new AktørId("100");
         Saksnummer saksnummer = new Saksnummer("200");
         Fagsak fagsak = opprettFagsak(saksnummer, aktørId);
@@ -41,7 +41,7 @@ public class FagsakRepositoryTest {
     }
 
     @Test
-    public void skal_finne_unik_fagsak_gitt_id() {
+    void skal_finne_unik_fagsak_gitt_id() {
         AktørId aktørId = new AktørId("100");
         Saksnummer saksnummer = new Saksnummer("200");
         Fagsak fagsak = opprettFagsak(saksnummer, aktørId);
@@ -52,7 +52,7 @@ public class FagsakRepositoryTest {
     }
 
     @Test
-    public void skal_finne_fagsak_gitt_saksnummer() {
+    void skal_finne_fagsak_gitt_saksnummer() {
         AktørId aktørId = new AktørId("100");
         Saksnummer saksnummer = new Saksnummer("200");
 
@@ -63,7 +63,7 @@ public class FagsakRepositoryTest {
     }
 
     @Test
-    public void skal_finne_fagsak_gitt_aktør_id() {
+    void skal_finne_fagsak_gitt_aktør_id() {
         AktørId aktørId = new AktørId("1000");
         Saksnummer saksnummer = new Saksnummer("200");
 

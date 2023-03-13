@@ -31,7 +31,7 @@ import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.Tilbakekrevingsvedt
 import no.nav.tilbakekreving.typer.v1.MmelDto;
 
 @CdiDbAwareTest
-public class AvstemFraXmlSendtTjenesteTest {
+class AvstemFraXmlSendtTjenesteTest {
 
     @Inject
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
@@ -45,19 +45,19 @@ public class AvstemFraXmlSendtTjenesteTest {
     private ScenarioSimple scenario = ScenarioSimple.simple();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         avstemFraXmlSendtTjeneste = new AvstemFraXmlSendtTjeneste("fptilbake", sendtXmlRepository, behandlingRepositoryProvider, aktørConsumerMock);
         when(aktørConsumerMock.hentFnrForAktør(Mockito.any())).thenReturn(Optional.of(new PersonIdent("12345678901")));
     }
 
     @Test
-    public void skal_returnere_tomt_når_det_ikke_finnes_vedtak() {
+    void skal_returnere_tomt_når_det_ikke_finnes_vedtak() {
         Optional<String> oppsummer = avstemFraXmlSendtTjeneste.oppsummer(LocalDate.now());
         assertThat(oppsummer).isEmpty();
     }
 
     @Test
-    public void skal_ha_med_vedtak_om_tilbakekreving_som_er_sendt_og_har_OK_kvittering() {
+    void skal_ha_med_vedtak_om_tilbakekreving_som_er_sendt_og_har_OK_kvittering() {
         Behandling behandling = scenario
                 .medDefaultKravgrunnlag()
                 .medFullInnkreving()
@@ -75,7 +75,7 @@ public class AvstemFraXmlSendtTjenesteTest {
     }
 
     @Test
-    public void skal_ikke_ha_med_vedtak_om_tilbakekreving_som_er_sendt_og_har_feilet() {
+    void skal_ikke_ha_med_vedtak_om_tilbakekreving_som_er_sendt_og_har_feilet() {
         Behandling behandling = scenario
                 .medDefaultKravgrunnlag()
                 .medFullInnkreving()
@@ -93,7 +93,7 @@ public class AvstemFraXmlSendtTjenesteTest {
     }
 
     @Test
-    public void skal_ikke_ha_med_førstegangsvedtak_som_har_ingen_innkreving() {
+    void skal_ikke_ha_med_førstegangsvedtak_som_har_ingen_innkreving() {
         Behandling behandling = scenario
                 .medDefaultKravgrunnlag()
                 .medIngenInnkreving()
@@ -117,7 +117,7 @@ public class AvstemFraXmlSendtTjenesteTest {
     }
 
     @Test
-    public void skal_ha_med_revurderingsvedtak_som_har_ingen_innkreving() {
+    void skal_ha_med_revurderingsvedtak_som_har_ingen_innkreving() {
         Behandling behandling = scenario
                 .medBehandlingType(BehandlingType.REVURDERING_TILBAKEKREVING)
                 .medDefaultKravgrunnlag()

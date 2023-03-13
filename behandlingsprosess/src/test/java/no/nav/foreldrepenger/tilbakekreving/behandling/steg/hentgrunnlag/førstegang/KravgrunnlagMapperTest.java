@@ -19,10 +19,10 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 
-public class KravgrunnlagMapperTest extends FellesTestOppsett {
+class KravgrunnlagMapperTest extends FellesTestOppsett {
 
     @Test
-    public void skal_mappe_om_til_egen_domenemodell_og_konvertere_fnr_til_aktørId() {
+    void skal_mappe_om_til_egen_domenemodell_og_konvertere_fnr_til_aktørId() {
         String xml = getInputXML("xml/kravgrunnlag_periode_FEIL.xml");
         DetaljertKravgrunnlag input = KravgrunnlagXmlUnmarshaller.unmarshall(0L, xml);
 
@@ -47,7 +47,7 @@ public class KravgrunnlagMapperTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_ha_med_klassekode_når_det_mappes_for_ytelsePeriode() {
+    void skal_ha_med_klassekode_når_det_mappes_for_ytelsePeriode() {
         String xml = getInputXML("xml/kravgrunnlag_periode_YTEL.xml");
         DetaljertKravgrunnlag input = KravgrunnlagXmlUnmarshaller.unmarshall(0L, xml);
 
@@ -73,7 +73,7 @@ public class KravgrunnlagMapperTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_ignorere_belop_postering_med_positiv_ytel() {
+    void skal_ignorere_belop_postering_med_positiv_ytel() {
         String xml = getInputXML("xml/kravgrunnlag_periode_POSITIV_YTEL.xml");
         DetaljertKravgrunnlag input = KravgrunnlagXmlUnmarshaller.unmarshall(0L, xml);
 

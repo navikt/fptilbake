@@ -41,7 +41,7 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
  * FRISINN: https://confluence.adeo.no/display/MODNAV/Generert+dokumentasjon
  */
 @Disabled("Kjøres ved behov for å regenerere dokumentasjon")
-public class DokumentasjonGeneratorVedtakSlutt {
+class DokumentasjonGeneratorVedtakSluttTest {
 
     private static final Periode PERIODE1 = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 16));
     private static final Periode PERIODE2 = Periode.of(LocalDate.of(2019, 1, 17), LocalDate.of(2019, 1, 31));
@@ -49,52 +49,52 @@ public class DokumentasjonGeneratorVedtakSlutt {
     private static final boolean[] trueFalse = new boolean[]{true, false};
 
     @Test
-    public void list_ut_vedtak_slutt() {
+    void list_ut_vedtak_slutt() {
         lagVedtakSluttTekster(FagsakYtelseType.FORELDREPENGER, null, VedtakResultatType.FULL_TILBAKEBETALING);
         lagVedtakSluttTekster(FagsakYtelseType.FORELDREPENGER, null, VedtakResultatType.INGEN_TILBAKEBETALING);
     }
 
     @Test
-    public void list_ut_vedtak_slutt_nn() {
+    void list_ut_vedtak_slutt_nn() {
         lagVedtakSluttTekster(FagsakYtelseType.FORELDREPENGER, Språkkode.nn, VedtakResultatType.FULL_TILBAKEBETALING);
         lagVedtakSluttTekster(FagsakYtelseType.FORELDREPENGER, Språkkode.nn, VedtakResultatType.INGEN_TILBAKEBETALING);
     }
 
     @Test
-    public void list_ut_vedtak_slutt_es() {
+    void list_ut_vedtak_slutt_es() {
         lagVedtakSluttTekster(FagsakYtelseType.ENGANGSTØNAD, null, VedtakResultatType.FULL_TILBAKEBETALING, false);
         lagVedtakSluttTekster(FagsakYtelseType.ENGANGSTØNAD, null, VedtakResultatType.INGEN_TILBAKEBETALING, false);
     }
 
     @Test
-    public void list_ut_vedtak_slutt_es_nn() {
+    void list_ut_vedtak_slutt_es_nn() {
         lagVedtakSluttTekster(FagsakYtelseType.ENGANGSTØNAD, Språkkode.nn, VedtakResultatType.FULL_TILBAKEBETALING, false);
         lagVedtakSluttTekster(FagsakYtelseType.ENGANGSTØNAD, Språkkode.nn, VedtakResultatType.INGEN_TILBAKEBETALING, false);
     }
 
     @Test
-    public void list_ut_vedtak_slutt_frisinn() {
+    void list_ut_vedtak_slutt_frisinn() {
         lagVedtakSluttTekster(FagsakYtelseType.FRISINN, null, VedtakResultatType.FULL_TILBAKEBETALING, false);
         lagVedtakSluttTekster(FagsakYtelseType.FRISINN, null, VedtakResultatType.INGEN_TILBAKEBETALING, false);
     }
 
     @Test
-    public void list_ut_vedtak_slutt_frisinn_nn() {
+    void list_ut_vedtak_slutt_frisinn_nn() {
         lagVedtakSluttTekster(FagsakYtelseType.FRISINN, Språkkode.nn, VedtakResultatType.FULL_TILBAKEBETALING, false);
         lagVedtakSluttTekster(FagsakYtelseType.FRISINN, Språkkode.nn, VedtakResultatType.INGEN_TILBAKEBETALING, false);
     }
 
     private void lagVedtakSluttTekster(FagsakYtelseType ytelsetype, Språkkode språkkode, VedtakResultatType resultatType) {
-        for (boolean medSkattetrekk : trueFalse) {
+        for (var medSkattetrekk : trueFalse) {
             lagVedtakSluttTekster(ytelsetype, språkkode, resultatType, medSkattetrekk);
         }
     }
 
     private void lagVedtakSluttTekster(FagsakYtelseType ytelsetype, Språkkode språkkode, VedtakResultatType resultatType, boolean medSkattetrekk) {
-        for (boolean flerePerioder : trueFalse) {
-            for (boolean flereLovhjemler : trueFalse) {
-                for (boolean medVerge : trueFalse) {
-                    for (boolean feilutbetaltBeløpBortfalt : trueFalse) {
+        for (var flerePerioder : trueFalse) {
+            for (var flereLovhjemler : trueFalse) {
+                for (var medVerge : trueFalse) {
+                    for (var feilutbetaltBeløpBortfalt : trueFalse) {
                         lagVedtakSluttTekster(ytelsetype, språkkode, resultatType, flerePerioder, medSkattetrekk, flereLovhjemler, medVerge, feilutbetaltBeløpBortfalt, false);
                         if (!VedtakResultatType.INGEN_TILBAKEBETALING.equals(resultatType)) {
                             lagVedtakSluttTekster(ytelsetype, språkkode, resultatType, flerePerioder, medSkattetrekk, flereLovhjemler, medVerge, feilutbetaltBeløpBortfalt, true);
@@ -113,9 +113,9 @@ public class DokumentasjonGeneratorVedtakSlutt {
                                        boolean flereLovhjemler,
                                        boolean medVerge,
                                        boolean feilutbetaltBeløpBortfalt, boolean erRevurdering) {
-        HbVedtaksbrevFelles felles = lagFellesdel(ytelsetype, språkkode, resultatType, medSkattetrekk, flereLovhjemler, medVerge, feilutbetaltBeløpBortfalt, erRevurdering);
-        List<HbVedtaksbrevPeriode> perioder = lagPerioder(flerePerioder);
-        String sluttTekst = TekstformatererVedtaksbrev.lagVedtakSluttTekst(new HbVedtaksbrevData(felles, perioder));
+        var felles = lagFellesdel(ytelsetype, språkkode, resultatType, medSkattetrekk, flereLovhjemler, medVerge, feilutbetaltBeløpBortfalt, erRevurdering);
+        var perioder = lagPerioder(flerePerioder);
+        var sluttTekst = TekstformatererVedtaksbrev.lagVedtakSluttTekst(new HbVedtaksbrevData(felles, perioder));
 
         System.out.println();
         System.out.println(overskrift(flerePerioder, medSkattetrekk, flereLovhjemler, medVerge, feilutbetaltBeløpBortfalt, erRevurdering));
@@ -130,7 +130,7 @@ public class DokumentasjonGeneratorVedtakSlutt {
                                              boolean medVerge,
                                              boolean feilutbetaltBeløpBortfalt,
                                              boolean erRevurdering) {
-        HbVedtaksbrevFelles.Builder builder = HbVedtaksbrevFelles.builder()
+        var builder = HbVedtaksbrevFelles.builder()
                 .medSak(HbSak.build()
                         .medYtelsetype(ytelsetype)
                         .medErFødsel(true)
@@ -174,7 +174,7 @@ public class DokumentasjonGeneratorVedtakSlutt {
 
     private List<HbVedtaksbrevPeriode> lagPerioder(boolean flerePerioder) {
         List<HbVedtaksbrevPeriode> perioder = new ArrayList<>();
-        HbVedtaksbrevPeriode hbVedtaksbrevPeriode = lagPeriode(PERIODE1);
+        var hbVedtaksbrevPeriode = lagPeriode(PERIODE1);
         perioder.add(hbVedtaksbrevPeriode);
         if (flerePerioder) {
             hbVedtaksbrevPeriode = lagPeriode(PERIODE2);

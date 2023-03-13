@@ -20,7 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 
 @ExtendWith(JpaExtension.class)
-public class VarselresponsRepositoryTest {
+class VarselresponsRepositoryTest {
 
     private static Long BEHANDLING_ID;
     private static final String KILDE = "MANU";
@@ -30,7 +30,7 @@ public class VarselresponsRepositoryTest {
     private VarselresponsRepository repository;
 
     @BeforeEach
-    public void setup(EntityManager entityManager) {
+    void setup(EntityManager entityManager) {
         behandlingRepository = new BehandlingRepository(entityManager);
         fagsakRepository = new FagsakRepository(entityManager);
         repository = new VarselresponsRepository(entityManager);
@@ -47,7 +47,7 @@ public class VarselresponsRepositoryTest {
     }
 
     @Test
-    public void test_skal_lagre_og_hente_respons_med_saksnummer() {
+    void test_skal_lagre_og_hente_respons_med_saksnummer() {
         Boolean grunnlagAkseptert = true;
         Varselrespons input = Varselrespons.builder()
                 .medBehandlingId(BEHANDLING_ID)
@@ -65,7 +65,7 @@ public class VarselresponsRepositoryTest {
     }
 
     @Test
-    public void test_skal_oppdatere_respons_ikke_legge_til_ny_for_saksnummer() {
+    void test_skal_oppdatere_respons_ikke_legge_til_ny_for_saksnummer() {
         Varselrespons input1 = Varselrespons.builder()
                 .medBehandlingId(BEHANDLING_ID)
                 .setKilde(KILDE)
@@ -89,7 +89,7 @@ public class VarselresponsRepositoryTest {
     }
 
     @Test
-    public void skal_returnere_tom_optional_når_saksnummer_ikke_finnes() {
+    void skal_returnere_tom_optional_når_saksnummer_ikke_finnes() {
         Optional<Varselrespons> resultat = repository.hentRespons(8383838L);
 
         assertThat(resultat).isEmpty();

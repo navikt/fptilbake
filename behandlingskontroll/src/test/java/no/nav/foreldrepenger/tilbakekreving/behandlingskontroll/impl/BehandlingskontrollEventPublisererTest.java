@@ -28,7 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodev
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 
 @CdiDbAwareTest
-public class BehandlingskontrollEventPublisererTest {
+class BehandlingskontrollEventPublisererTest {
     private final BehandlingType behandlingType = BehandlingType.TILBAKEKREVING;
 
     private static final BehandlingStegType STEG_1 = BehandlingStegType.FAKTA_VERGE;
@@ -45,7 +45,7 @@ public class BehandlingskontrollEventPublisererTest {
     private BehandlingskontrollTjeneste kontrollTjeneste;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         BehandlingModellImpl behandlingModell = byggModell();
 
         kontrollTjeneste = new BehandlingskontrollTjeneste(serviceProvider) {
@@ -59,12 +59,12 @@ public class BehandlingskontrollEventPublisererTest {
     }
 
     @AfterEach
-    public void after() {
+    void after() {
         TestEventObserver.reset();
     }
 
     @Test
-    public void skal_fyre_event_for_aksjonspunkt_funnet_ved_prosessering() {
+    void skal_fyre_event_for_aksjonspunkt_funnet_ved_prosessering() {
         ScenarioSimple scenario = ScenarioSimple.simple();
         Behandling behandling = scenario.lagre(repositoryProvider);
 
@@ -81,7 +81,7 @@ public class BehandlingskontrollEventPublisererTest {
     }
 
     @Test
-    public void skal_fyre_event_for_behandlingskontroll_startet_stoppet_ved_prosessering() {
+    void skal_fyre_event_for_behandlingskontroll_startet_stoppet_ved_prosessering() {
         // Arrange
         ScenarioSimple scenario = nyttScenario(STEG_1);
 
@@ -101,7 +101,7 @@ public class BehandlingskontrollEventPublisererTest {
     }
 
     @Test
-    public void skal_fyre_event_for_behandlingskontroll_behandlingsteg_status_endring_ved_prosessering() {
+    void skal_fyre_event_for_behandlingskontroll_behandlingsteg_status_endring_ved_prosessering() {
         // Arrange
         ScenarioSimple scenario = nyttScenario(STEG_1);
 
@@ -130,7 +130,7 @@ public class BehandlingskontrollEventPublisererTest {
     }
 
     @Test
-    public void skal_fyre_event_for_behandlingskontroll_tilbakeføring_ved_prosessering() {
+    void skal_fyre_event_for_behandlingskontroll_tilbakeføring_ved_prosessering() {
         // Arrange
         ScenarioSimple scenario = nyttScenario(STEG_3);
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING, STEG_4);
@@ -150,7 +150,7 @@ public class BehandlingskontrollEventPublisererTest {
     }
 
     @Test
-    public void skal_fyre_event_for_behandlingskontroll_behandlingsteg_overgang_ved_prosessering() {
+    void skal_fyre_event_for_behandlingskontroll_behandlingsteg_overgang_ved_prosessering() {
         // Arrange
         ScenarioSimple scenario = nyttScenario(STEG_1);
 

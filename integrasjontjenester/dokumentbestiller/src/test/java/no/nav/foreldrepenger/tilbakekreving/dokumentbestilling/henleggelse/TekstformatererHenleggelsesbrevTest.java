@@ -17,13 +17,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 
-public class TekstformatererHenleggelsesbrevTest {
+class TekstformatererHenleggelsesbrevTest {
 
     private final LocalDate niendeMars = LocalDate.of(2019, 3, 9);
     private static final String REVURDERING_HENLEGGELSESBREV_FRITEKST = "Revurderingen ble henlagt";
 
     @Test
-    public void skal_generere_henleggelsesbrev() throws Exception {
+    void skal_generere_henleggelsesbrev() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
@@ -41,7 +41,7 @@ public class TekstformatererHenleggelsesbrevTest {
     }
 
     @Test
-    public void skal_generere_henleggelsesbrev_frisinn() throws Exception {
+    void skal_generere_henleggelsesbrev_frisinn() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
                 .medFagsaktype(FagsakYtelseType.FRISINN)
@@ -59,7 +59,7 @@ public class TekstformatererHenleggelsesbrevTest {
     }
 
     @Test
-    public void skal_generere_henleggelsesbrev_for_tilbakekreving_revurdering() throws Exception {
+    void skal_generere_henleggelsesbrev_for_tilbakekreving_revurdering() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
@@ -78,7 +78,7 @@ public class TekstformatererHenleggelsesbrevTest {
     }
 
     @Test
-    public void skal_generere_henleggelsesbrev_for_tilbakekreving_revurdering_frisinn() throws Exception {
+    void skal_generere_henleggelsesbrev_for_tilbakekreving_revurdering_frisinn() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
                 .medFagsaktype(FagsakYtelseType.FRISINN)
@@ -97,7 +97,7 @@ public class TekstformatererHenleggelsesbrevTest {
     }
 
     @Test
-    public void skal_generere_henleggelsesbrev_med_verge() throws Exception {
+    void skal_generere_henleggelsesbrev_med_verge() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
@@ -118,7 +118,7 @@ public class TekstformatererHenleggelsesbrevTest {
     }
 
     @Test
-    public void skal_generere_henleggelsesbrev_for_tilbakekreving_revurdering_med_verge() throws Exception {
+    void skal_generere_henleggelsesbrev_for_tilbakekreving_revurdering_med_verge() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
@@ -140,7 +140,7 @@ public class TekstformatererHenleggelsesbrevTest {
     }
 
     @Test
-    public void skal_generere_henleggelsesbrev_nynorsk() throws Exception {
+    void skal_generere_henleggelsesbrev_nynorsk() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepengar")
@@ -158,7 +158,7 @@ public class TekstformatererHenleggelsesbrevTest {
     }
 
     @Test
-    public void skal_generere_henleggelsesbrev_nynorsk_for_tilbakekreving_revurderning() throws Exception {
+    void skal_generere_henleggelsesbrev_nynorsk_for_tilbakekreving_revurderning() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepengar")
@@ -177,7 +177,7 @@ public class TekstformatererHenleggelsesbrevTest {
     }
 
     @Test
-    public void skal_generere_henleggelsesbrev_overskrift() throws Exception {
+    void skal_generere_henleggelsesbrev_overskrift() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
@@ -193,7 +193,7 @@ public class TekstformatererHenleggelsesbrevTest {
     }
 
     @Test
-    public void skal_generere_henleggelsesbrev_overskrift_for_tilbakekreving_revurdering() throws Exception {
+    void skal_generere_henleggelsesbrev_overskrift_for_tilbakekreving_revurdering() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
@@ -210,7 +210,7 @@ public class TekstformatererHenleggelsesbrevTest {
     }
 
     @Test
-    public void skal_generere_henleggelsesbrev_overskrift_nynorsk() throws Exception {
+    void skal_generere_henleggelsesbrev_overskrift_nynorsk() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")

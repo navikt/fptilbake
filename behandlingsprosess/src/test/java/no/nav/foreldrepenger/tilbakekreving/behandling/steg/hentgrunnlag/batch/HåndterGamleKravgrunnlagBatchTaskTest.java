@@ -35,7 +35,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 @ExtendWith(JpaExtension.class)
-public class HåndterGamleKravgrunnlagBatchTaskTest {
+class HåndterGamleKravgrunnlagBatchTaskTest {
 
     private ProsessTaskTjeneste taskTjeneste;
     private ØkonomiMottattXmlRepository mottattXmlRepository;
@@ -44,7 +44,7 @@ public class HåndterGamleKravgrunnlagBatchTaskTest {
     Long mottattXmlId = null;
 
     @BeforeEach
-    public void setup(EntityManager entityManager) {
+    void setup(EntityManager entityManager) {
         entityManager.setFlushMode(FlushModeType.AUTO);
         mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML());
@@ -54,7 +54,7 @@ public class HåndterGamleKravgrunnlagBatchTaskTest {
     }
 
     @Test
-    public void skal_ikke_kjøre_batch_i_helgen() {
+    void skal_ikke_kjøre_batch_i_helgen() {
         Clock clock = Clock.fixed(Instant.parse("2020-05-03T12:00:00.00Z"), ZoneId.systemDefault());
         HåndterGamleKravgrunnlagBatchTask gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
                 taskTjeneste, clock, Period.ofWeeks(-1));
@@ -63,7 +63,7 @@ public class HåndterGamleKravgrunnlagBatchTaskTest {
     }
 
     @Test
-    public void skal_ikke_kjøre_batch_på_helligdager() {
+    void skal_ikke_kjøre_batch_på_helligdager() {
         Clock clock = Clock.fixed(Instant.parse("2020-12-25T12:00:00.00Z"), ZoneId.systemDefault());
         HåndterGamleKravgrunnlagBatchTask gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
                 taskTjeneste, clock, Period.ofWeeks(-1));
@@ -72,7 +72,7 @@ public class HåndterGamleKravgrunnlagBatchTaskTest {
     }
 
     @Test
-    public void skal_kjøre_batch_og_opprette_prosess_task_for_grunnlag() {
+    void skal_kjøre_batch_og_opprette_prosess_task_for_grunnlag() {
         gamleKravgrunnlagBatchTjeneste.doTask(lagProsessTaskData());
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
         verify(taskTjeneste, times(1)).lagre(captor.capture());

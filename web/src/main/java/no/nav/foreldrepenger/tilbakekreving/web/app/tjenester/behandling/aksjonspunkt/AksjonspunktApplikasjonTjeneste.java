@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +17,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.Behandlings
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AksjonspunktKode;
@@ -49,9 +46,9 @@ public class AksjonspunktApplikasjonTjeneste {
     }
 
     public void bekreftAksjonspunkter(Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer, Long behandlingId) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
 
-        BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
+        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
         setAnsvarligSaksbehandler(bekreftedeAksjonspunktDtoer, behandling);
 
         spolTilbakeTilTidligsteAksjonspunkt(bekreftedeAksjonspunktDtoer, kontekst);
@@ -69,9 +66,8 @@ public class AksjonspunktApplikasjonTjeneste {
                                                      BehandlingskontrollKontekst kontekst) {
         // Her sikres at behandlingskontroll hopper tilbake til aksjonspunktenes tidligste "løsesteg" dersom aktivt
         // behandlingssteg er lenger fremme i sekvensen
-        List<AksjonspunktDefinisjon> bekreftedeApKoder = aksjonspunktDtoer.stream()
-                .map(AksjonspunktKode::getAksjonspunktDefinisjon)
-                .collect(toList());
+        var bekreftedeApKoder = aksjonspunktDtoer.stream()
+                .map(AksjonspunktKode::getAksjonspunktDefinisjon).toList();
 
         behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligsteAksjonspunkt(kontekst, bekreftedeApKoder);
     }
@@ -89,22 +85,21 @@ public class AksjonspunktApplikasjonTjeneste {
     }
 
     private void bekreftAksjonspunkt(Behandling behandling, List<Aksjonspunkt> utførteAksjonspunkter, BekreftetAksjonspunktDto dto) {
-        AksjonspunktDefinisjon aksjonspunktDefinisjon = dto.getAksjonspunktDefinisjon();
-        Aksjonspunkt aksjonspunkt = behandling.getAksjonspunktFor(aksjonspunktDefinisjon);
+        var aksjonspunktDefinisjon = dto.getAksjonspunktDefinisjon();
+        var aksjonspunkt = behandling.getAksjonspunktFor(aksjonspunktDefinisjon);
 
-        Instance<Object> instance = finnAksjonspunktOppdaterer(dto.getClass());
+        var instance = finnAksjonspunktOppdaterer(dto.getClass());
 
         if (instance.isUnsatisfied()) {
             throw new TekniskException("FPT-770743", String.format("Finner ikke håndtering for aksjonspunkt med kode: %s", dto.getAksjonspunktDefinisjon().getKode()));
         } else {
-            Object minInstans = instance.get();
+            var minInstans = instance.get();
             if (minInstans.getClass().isAnnotationPresent(Dependent.class)) {
                 throw new IllegalStateException(
                         "Kan ikke ha @Dependent scope bean ved Instance lookup dersom en ikke også håndtere lifecycle selv: " + minInstans.getClass());
             }
 
-            @SuppressWarnings("unchecked")
-            AksjonspunktOppdaterer<BekreftetAksjonspunktDto> oppdaterer = (AksjonspunktOppdaterer<BekreftetAksjonspunktDto>) minInstans;
+            @SuppressWarnings("unchecked") var oppdaterer = (AksjonspunktOppdaterer<BekreftetAksjonspunktDto>) minInstans;
             oppdaterer.oppdater(dto, behandling);
         }
 
@@ -114,17 +109,17 @@ public class AksjonspunktApplikasjonTjeneste {
     }
 
     private Instance<Object> finnAksjonspunktOppdaterer(Class<?> dtoClass) {
-        return finnAdapter(dtoClass, AksjonspunktOppdaterer.class);
+        return finnAdapter(dtoClass);
     }
 
-    private Instance<Object> finnAdapter(Class<?> cls, final Class<?> targetAdapter) {
-        CDI<Object> cdi = CDI.current();
-        Instance<Object> instance = cdi.select(new DtoTilServiceAdapter.Literal(cls, targetAdapter));
+    private Instance<Object> finnAdapter(Class<?> cls) {
+        var cdi = CDI.current();
+        var instance = cdi.select(new DtoTilServiceAdapter.Literal(cls, AksjonspunktOppdaterer.class));
 
         // hvis unsatisfied, søk parent
         while (instance.isUnsatisfied() && !Objects.equals(Object.class, cls)) {
             cls = cls.getSuperclass();
-            instance = cdi.select(new DtoTilServiceAdapter.Literal(cls, targetAdapter));
+            instance = cdi.select(new DtoTilServiceAdapter.Literal(cls, AksjonspunktOppdaterer.class));
             if (!instance.isUnsatisfied()) {
                 return instance;
             }
@@ -134,7 +129,7 @@ public class AksjonspunktApplikasjonTjeneste {
 
 
     private void setAnsvarligSaksbehandler(Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer, Behandling behandling) {
-        if (bekreftedeAksjonspunktDtoer.stream().anyMatch(dto -> dto instanceof FatteVedtakDto)) {
+        if (bekreftedeAksjonspunktDtoer.stream().anyMatch(FatteVedtakDto.class::isInstance)) {
             return;
         }
         behandling.setAnsvarligSaksbehandler(getCurrentUserId());

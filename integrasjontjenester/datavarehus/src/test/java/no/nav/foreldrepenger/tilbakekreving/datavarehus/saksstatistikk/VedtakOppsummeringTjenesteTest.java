@@ -66,7 +66,7 @@ import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.VedtakOppsummering
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.VedtakPeriode;
 
 @ExtendWith(JpaExtension.class)
-public class VedtakOppsummeringTjenesteTest {
+class VedtakOppsummeringTjenesteTest {
 
     private static final String ANSVARLIG_SAKSBEHANDLER = "Z13456";
     private static final String ANSVARLIG_BESLUTTER = "Z12456";
@@ -86,7 +86,7 @@ public class VedtakOppsummeringTjenesteTest {
     private Saksnummer saksnummer;
 
     @BeforeEach
-    public void setup(EntityManager entityManager) {
+    void setup(EntityManager entityManager) {
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         EksternBehandlingRepository eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
@@ -116,7 +116,7 @@ public class VedtakOppsummeringTjenesteTest {
     }
 
     @Test
-    public void skal_hente_vedtak_oppsummering_for_foreldelse_perioder() {
+    void skal_hente_vedtak_oppsummering_for_foreldelse_perioder() {
         lagForeldelse();
         lagBehandlingVedtak();
         VedtakOppsummering vedtakOppsummering = vedtakOppsummeringTjeneste.hentVedtakOppsummering(behandlingId);
@@ -133,7 +133,7 @@ public class VedtakOppsummeringTjenesteTest {
     }
 
     @Test
-    public void skal_hente_vedtak_oppsummering_for_perioder_med_god_tro() {
+    void skal_hente_vedtak_oppsummering_for_perioder_med_god_tro() {
         lagVilkårMedGodTro();
         lagBehandlingVedtak();
         VedtakOppsummering vedtakOppsummering = vedtakOppsummeringTjeneste.hentVedtakOppsummering(behandlingId);
@@ -150,7 +150,7 @@ public class VedtakOppsummeringTjenesteTest {
     }
 
     @Test
-    public void skal_hente_vedtak_oppsummering_for_perioder_med_aktsomhet() {
+    void skal_hente_vedtak_oppsummering_for_perioder_med_aktsomhet() {
         lagVilkårMedAktsomhet();
         lagBehandlingVedtak();
         VedtakOppsummering vedtakOppsummering = vedtakOppsummeringTjeneste.hentVedtakOppsummering(behandlingId);

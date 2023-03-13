@@ -23,17 +23,15 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingResultat;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.YtelseType;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
 
 @CdiDbAwareTest
-public class BehandlingTilstandTjenesteTest {
+class BehandlingTilstandTjenesteTest {
 
     @Inject
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
@@ -50,15 +48,15 @@ public class BehandlingTilstandTjenesteTest {
     private static final UUID EKSTERN_UUID = UUID.randomUUID();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         behandling = ScenarioSimple.simple().lagre(behandlingRepositoryProvider);
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), EKSTERN_UUID);
+        var eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), EKSTERN_UUID);
         behandlingRepositoryProvider.getEksternBehandlingRepository().lagre(eksternBehandling);
     }
 
     @Test
-    public void skal_utlede_behandlingtilstand_for_nyopprettet_behandling() {
-        BehandlingTilstand tilstand = tjeneste.hentBehandlingensTilstand(behandling.getId());
+    void skal_utlede_behandlingtilstand_for_nyopprettet_behandling() {
+        var tilstand = tjeneste.hentBehandlingensTilstand(behandling.getId());
 
         assertThat(tilstand.getYtelseType()).isEqualTo(YtelseType.FP);
         assertThat(tilstand.getSaksnummer()).isEqualTo(behandling.getFagsak().getSaksnummer().getVerdi());
@@ -78,7 +76,7 @@ public class BehandlingTilstandTjenesteTest {
     }
 
     @Test
-    public void skal_utlede_behandlingtilstand_for_fattet_behandling() {
+    void skal_utlede_behandlingtilstand_for_fattet_behandling() {
         behandlingresultatRepository.lagre(Behandlingsresultat.builder()
                 .medBehandling(behandling)
                 .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING).build());
@@ -91,7 +89,7 @@ public class BehandlingTilstandTjenesteTest {
         entityManager.flush();
         entityManager.clear();
 
-        BehandlingTilstand tilstand = tjeneste.hentBehandlingensTilstand(behandling.getId());
+        var tilstand = tjeneste.hentBehandlingensTilstand(behandling.getId());
 
         assertThat(tilstand.getYtelseType()).isEqualTo(YtelseType.FP);
         assertThat(tilstand.getSaksnummer()).isEqualTo(behandling.getFagsak().getSaksnummer().getVerdi());
@@ -111,13 +109,13 @@ public class BehandlingTilstandTjenesteTest {
     }
 
     @Test
-    public void skal_utlede_behandlingstilstand_for_behandling_på_vent() {
+    void skal_utlede_behandlingstilstand_for_behandling_på_vent() {
         System.setProperty("frist.brukerrespons.varsel", "P3W");
         behandlingTjeneste.settBehandlingPaVent(behandling.getId(), LocalDate.now().plusDays(1), Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
         entityManager.flush();
         entityManager.clear();
 
-        BehandlingTilstand tilstand = tjeneste.hentBehandlingensTilstand(behandling.getId());
+        var tilstand = tjeneste.hentBehandlingensTilstand(behandling.getId());
 
         assertThat(tilstand.getYtelseType()).isEqualTo(YtelseType.FP);
         assertThat(tilstand.getSaksnummer()).isEqualTo(behandling.getFagsak().getSaksnummer().getVerdi());
@@ -129,9 +127,5 @@ public class BehandlingTilstandTjenesteTest {
         assertThat(tilstand.venterPåBruker()).isTrue();
         assertThat(tilstand.venterPåØkonomi()).isFalse();
         assertThat(tilstand.getFunksjonellTid()).isBetween(OffsetDateTime.now().minusMinutes(1), OffsetDateTime.now());
-
-
-        System.out.println(BehandlingTilstandMapper.tilJsonString(tilstand));
-
     }
 }

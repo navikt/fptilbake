@@ -20,7 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Vars
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 
-public class VarselresponsRestTjenesteTest {
+class VarselresponsRestTjenesteTest {
 
     private static Long BEHANDLING_ID = 1242364L;
     private static ResponsKanal RESPONS_KANAL = ResponsKanal.SELVBETJENING;
@@ -32,14 +32,14 @@ public class VarselresponsRestTjenesteTest {
     private VarselresponsTjeneste varselresponsTjeneste;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         varselresponsTjeneste = mock(VarselresponsTjeneste.class);
         gjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingTjeneste.class);
         restTjeneste = new VarselresponsRestTjeneste(varselresponsTjeneste, gjenopptaBehandlingTjeneste);
     }
 
     @Test
-    public void test_skal_kalle_gjenoppta_behandling() {
+    void test_skal_kalle_gjenoppta_behandling() {
         VarselresponsDto input = new VarselresponsDto(BEHANDLING_ID, RESPONS_KANAL, AKSEPTERT_GRUNNLAG);
         restTjeneste.registrerBrukerrespons(input);
 
@@ -47,7 +47,7 @@ public class VarselresponsRestTjenesteTest {
     }
 
     @Test
-    public void test_skal_hente_lagret_respons() {
+    void test_skal_hente_lagret_respons() {
         when(varselresponsTjeneste.hentRespons(anyLong())).thenReturn(Optional.of(Varselrespons.builder()
                 .medBehandlingId(BEHANDLING_ID)
                 .setKilde(RESPONS_KANAL.getDbKode())

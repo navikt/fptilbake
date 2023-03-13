@@ -7,9 +7,9 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 
-public class CustomHelpersTest {
+class CustomHelpersTest {
     @Test
-    public void skal_ha_riktig_tusenskille() {
+    void skal_ha_riktig_tusenskille() {
         assertThat(medTusenskille(BigDecimal.valueOf(1), " ")).isEqualTo("1");
         assertThat(medTusenskille(BigDecimal.valueOf(12), " ")).isEqualTo("12");
         assertThat(medTusenskille(BigDecimal.valueOf(123), " ")).isEqualTo("123");

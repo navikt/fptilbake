@@ -10,7 +10,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 
-public class BehandlingModellEnkelTest {
+class BehandlingModellEnkelTest {
 
     private static final BehandlingStegType STEG_1 = BehandlingStegType.FAKTA_VERGE;
     private static final BehandlingStegType STEG_2 = BehandlingStegType.FAKTA_FEILUTBETALING;
@@ -29,7 +29,7 @@ public class BehandlingModellEnkelTest {
                     new TestStegKonfig(STEG_3, BEHANDLING_TYPE, dummyBehandlingSteg_3)));
 
     @Test
-    public void skal_bygge_behandlingskontroll_med_ett_steg() throws Exception {
+    void skal_bygge_behandlingskontroll_med_ett_steg() throws Exception {
         try (var modell = new BehandlingModellImpl(BehandlingType.TILBAKEKREVING, finnSteg)) {
             modell.leggTil(STEG_1, BEHANDLING_TYPE);
 
@@ -42,7 +42,7 @@ public class BehandlingModellEnkelTest {
     }
 
     @Test
-    public void skal_bygge_behandlingskontroll_med_3_steg() throws Exception {
+    void skal_bygge_behandlingskontroll_med_3_steg() throws Exception {
         // Arrange
         try (var modell = new BehandlingModellImpl(BehandlingType.TILBAKEKREVING, finnSteg)) {
             modell.leggTil(STEG_1, BEHANDLING_TYPE);

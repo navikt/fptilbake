@@ -60,8 +60,8 @@ public class DokumentBehandlingTjeneste {
     }
 
     public List<BrevmalDto> hentBrevmalerFor(Long behandlingId) {
-        var behandling = behandlingRepository.hentBehandling(behandlingId);
         List<DokumentMalType> gyldigBrevMaler = new ArrayList<>();
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
 
         gyldigBrevMaler.add(DokumentMalType.INNHENT_DOK);
 

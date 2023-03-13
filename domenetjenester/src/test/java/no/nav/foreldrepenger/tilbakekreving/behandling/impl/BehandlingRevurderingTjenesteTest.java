@@ -29,7 +29,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.vedtak.exception.FunksjonellException;
 
-public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
+class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
 
     private VergeRepository vergeRepository;
 
@@ -41,7 +41,7 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void opprettRevurdering_nårTbkBehandlingErIkkeAvsluttet() {
+    void opprettRevurdering_nårTbkBehandlingErIkkeAvsluttet() {
         assertThatThrownBy(() -> revurderingTjeneste.opprettRevurdering(behandling.getId(), BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR))
                 .isInstanceOf(FunksjonellException.class)
                 .hasMessageContaining("FPT-663487");
@@ -49,7 +49,7 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void opprettRevurdering_nårTbkBehandlingErAvsluttet() {
+    void opprettRevurdering_nårTbkBehandlingErAvsluttet() {
         behandling.avsluttBehandling();
         BehandlingLås behandlingLås = repoProvider.getBehandlingRepository().taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
@@ -81,7 +81,7 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void opprettRevurdering_nårTbkBehandlingErAvsluttet_medverge() {
+    void opprettRevurdering_nårTbkBehandlingErAvsluttet_medverge() {
         VergeEntitet vergeEntitet = VergeEntitet.builder().medGyldigPeriode(FOM, TOM)
                 .medNavn("John Doe")
                 .medKilde(KildeType.FPTILBAKE.name())

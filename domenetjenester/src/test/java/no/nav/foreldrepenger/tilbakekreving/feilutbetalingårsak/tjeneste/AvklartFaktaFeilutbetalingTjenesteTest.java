@@ -32,7 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagEndretFeltDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
-public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
+class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
     private HistorikkTjenesteAdapter historikkTjenesteAdapter;
 
@@ -41,7 +41,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     private Behandling nyBehandling;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         var scenario = ScenarioSimple.simple();
         scenario.medBehandlingType(BehandlingType.TILBAKEKREVING);
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
@@ -52,7 +52,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void lagreÅrsakForFeilutbetalingPeriode_medUnderÅrsak() {
+    void lagreÅrsakForFeilutbetalingPeriode_medUnderÅrsak() {
         FaktaFeilutbetalingDto faktaFeilutbetalingDto = formFaktaFeilutbetaling();
 
         avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling, List.of(faktaFeilutbetalingDto), BEGRUNNELSE);
@@ -72,7 +72,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void lagreÅrsakForFeilutbetalingPeriode_medUnderÅrsakOgFlerePeriode() {
+    void lagreÅrsakForFeilutbetalingPeriode_medUnderÅrsakOgFlerePeriode() {
         FaktaFeilutbetalingDto faktaFeilutbetalingDto = formFaktaFeilutbetaling();
 
         LocalDate sisteDagIPeriode = LocalDate.now();
@@ -106,7 +106,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void lagreÅrsakForFeilutbetalingPeriode_nårForrigeÅrsakAlleredeFinnes() {
+    void lagreÅrsakForFeilutbetalingPeriode_nårForrigeÅrsakAlleredeFinnes() {
 
         faktaFeilutbetalingRepository.lagre(internBehandlingId, lagFaktaFeilutbetaling());
 

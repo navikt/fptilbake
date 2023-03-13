@@ -26,4 +26,7 @@ public class AksjonspunktKodeDefinisjon {
     public static final boolean ENTRINN = false;
     public static final boolean TILBAKE = true;
     public static final boolean FORBLI = false;
+
+    private AksjonspunktKodeDefinisjon() {
+    }
 }

@@ -38,68 +38,68 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVurderinger;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-public class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
+class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
 
     private final Periode januar = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 31));
 
     @Test
-    public void skal_støtte_alle_permutasjoner_av_fakta_for_FP() {
+    void skal_støtte_alle_permutasjoner_av_fakta_for_FP() {
         lagTeksterOgValider(FagsakYtelseType.FORELDREPENGER, Språkkode.nb);
     }
 
     @Test
-    public void skal_støtte_alle_permutasjoner_av_fakta_for_FP_nynorsk() {
+    void skal_støtte_alle_permutasjoner_av_fakta_for_FP_nynorsk() {
         lagTeksterOgValider(FagsakYtelseType.FORELDREPENGER, Språkkode.nn);
     }
 
     @Test
-    public void skal_støtte_alle_permutasjoner_av_fakta_for_SVP() {
-        Set<HendelseMedUndertype> unntak1 = Set.of(new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, HendelseUnderType.SVP_TILRETTELEGGING_FULLT_MULIG), new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, HendelseUnderType.SVP_TILRETTELEGGING_DELVIS_MULIG));
+    void skal_støtte_alle_permutasjoner_av_fakta_for_SVP() {
+        var unntak1 = Set.of(new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, HendelseUnderType.SVP_TILRETTELEGGING_FULLT_MULIG), new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, HendelseUnderType.SVP_TILRETTELEGGING_DELVIS_MULIG));
 
         lagTeksterOgValider(FagsakYtelseType.SVANGERSKAPSPENGER, Språkkode.nb, unntak1);
     }
 
     @Test
-    public void skal_støtte_alle_permutasjoner_av_fakta_for_SVP_nynorsk() {
-        Set<HendelseMedUndertype> unntak1 = Set.of(new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, HendelseUnderType.SVP_TILRETTELEGGING_FULLT_MULIG), new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, HendelseUnderType.SVP_TILRETTELEGGING_DELVIS_MULIG));
+    void skal_støtte_alle_permutasjoner_av_fakta_for_SVP_nynorsk() {
+        var unntak1 = Set.of(new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, HendelseUnderType.SVP_TILRETTELEGGING_FULLT_MULIG), new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, HendelseUnderType.SVP_TILRETTELEGGING_DELVIS_MULIG));
 
         lagTeksterOgValider(FagsakYtelseType.SVANGERSKAPSPENGER, Språkkode.nn, unntak1);
     }
 
     @Test
-    public void skal_støtte_alle_permutasjoner_av_fakta_for_ES() {
-        Set<HendelseMedUndertype> unntak1 = Set.of(new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_IKKE_TILDELT), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_ANDRE_FORELDRE_DODD));
-        Set<HendelseMedUndertype> unntak2 = Set.of(new HendelseMedUndertype(HendelseType.ES_ADOPSJONSVILKAARET_TYPE, HendelseUnderType.ES_BARN_OVER_15), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_FORELDREANSVAR_BARN_OVER_15));
+    void skal_støtte_alle_permutasjoner_av_fakta_for_ES() {
+        var unntak1 = Set.of(new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_IKKE_TILDELT), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_ANDRE_FORELDRE_DODD));
+        var unntak2 = Set.of(new HendelseMedUndertype(HendelseType.ES_ADOPSJONSVILKAARET_TYPE, HendelseUnderType.ES_BARN_OVER_15), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_FORELDREANSVAR_BARN_OVER_15));
 
         lagTeksterOgValider(FagsakYtelseType.ENGANGSTØNAD, Språkkode.nb, unntak1, unntak2);
     }
 
     @Test
-    public void skal_støtte_alle_permutasjoner_av_fakta_for_ES_nynorsk() {
-        Set<HendelseMedUndertype> unntak1 = Set.of(new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_IKKE_TILDELT), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_ANDRE_FORELDRE_DODD));
-        Set<HendelseMedUndertype> unntak2 = Set.of(new HendelseMedUndertype(HendelseType.ES_ADOPSJONSVILKAARET_TYPE, HendelseUnderType.ES_BARN_OVER_15), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_FORELDREANSVAR_BARN_OVER_15));
+    void skal_støtte_alle_permutasjoner_av_fakta_for_ES_nynorsk() {
+        var unntak1 = Set.of(new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_IKKE_TILDELT), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_ANDRE_FORELDRE_DODD));
+        var unntak2 = Set.of(new HendelseMedUndertype(HendelseType.ES_ADOPSJONSVILKAARET_TYPE, HendelseUnderType.ES_BARN_OVER_15), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_FORELDREANSVAR_BARN_OVER_15));
 
         lagTeksterOgValider(FagsakYtelseType.ENGANGSTØNAD, Språkkode.nn, unntak1, unntak2);
     }
 
     @SafeVarargs
     private void lagTeksterOgValider(FagsakYtelseType ytelsetype, Språkkode språkkode, Set<HendelseMedUndertype>... unntak) {
-        HbVedtaksbrevFelles felles = lagFellesBuilder(språkkode)
+        var felles = lagFellesBuilder(språkkode)
                 .medSak(HbSak.build()
                         .medYtelsetype(ytelsetype)
                         .medErFødsel(true)
                         .medAntallBarn(1)
                         .build())
                 .build();
-        Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
+        var resultat = lagFaktatekster(felles);
         sjekkVerdier(resultat, unntak);
     }
 
     void sjekkVerdier(Map<HendelseMedUndertype, String> verdier, Set<HendelseMedUndertype>... unntatUnikhet) {
         Map<String, Set<HendelseMedUndertype>> tekstTilHendelseType = new TreeMap<>();
-        for (Map.Entry<HendelseMedUndertype, String> entry : verdier.entrySet()) {
-            HendelseMedUndertype key = entry.getKey();
-            String value = entry.getValue();
+        for (var entry : verdier.entrySet()) {
+            var key = entry.getKey();
+            var value = entry.getValue();
             if (tekstTilHendelseType.containsKey(value)) {
                 tekstTilHendelseType.get(value).add(key);
             } else {
@@ -110,16 +110,16 @@ public class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
         }
 
         Map<Set<HendelseMedUndertype>, String> hendelseTypeTilTeskst = new HashMap<>();
-        for (Map.Entry<String, Set<HendelseMedUndertype>> entry : tekstTilHendelseType.entrySet()) {
+        for (var entry : tekstTilHendelseType.entrySet()) {
             hendelseTypeTilTeskst.put(entry.getValue(), entry.getKey());
         }
 
-        for (Set<HendelseMedUndertype> unntak : unntatUnikhet) {
+        for (var unntak : unntatUnikhet) {
             hendelseTypeTilTeskst.remove(unntak);
         }
 
-        String feilmelding = "";
-        for (Map.Entry<Set<HendelseMedUndertype>, String> entry : hendelseTypeTilTeskst.entrySet()) {
+        var feilmelding = "";
+        for (var entry : hendelseTypeTilTeskst.entrySet()) {
             if (entry.getKey().size() > 2) {
                 feilmelding += entry.getValue() + " mapper alle til " + entry.getKey() + "\n";
             }
@@ -132,12 +132,12 @@ public class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
 
     private Map<HendelseMedUndertype, String> lagFaktatekster(HbVedtaksbrevFelles felles) {
         Map<HendelseMedUndertype, String> resultat = new LinkedHashMap<>();
-        for (HendelseMedUndertype undertype : getFeilutbetalingsårsaker(felles.getYtelsetype())) {
-            HbVedtaksbrevPeriode periode = lagPeriodeBuilder()
-                    .medFakta(undertype.getHendelseType(), undertype.getHendelseUnderType())
+        for (var undertype : getFeilutbetalingsårsaker(felles.getYtelsetype())) {
+            var periode = lagPeriodeBuilder()
+                    .medFakta(undertype.hendelseType(), undertype.hendelseUnderType())
                     .build();
-            HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
-            String tekst = TekstformatererVedtaksbrev.lagFaktaTekst(data);
+            var data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
+            var tekst = TekstformatererVedtaksbrev.lagFaktaTekst(data);
             resultat.put(undertype, tekst);
         }
         return resultat;
@@ -191,12 +191,12 @@ public class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
     }
 
     private List<HendelseMedUndertype> getFeilutbetalingsårsaker(FagsakYtelseType ytelseType) {
-        Set<HendelseType> hendelseTyper = HendelseTypePrYtelseType.getHendelsetyper(ytelseType);
-        Map<HendelseType, Set<HendelseUnderType>> hendelseUndertypePrHendelseType = HendelseUndertypePrHendelseType.getHendelsetypeHierarki();
+        var hendelseTyper = HendelseTypePrYtelseType.getHendelsetyper(ytelseType);
+        var hendelseUndertypePrHendelseType = HendelseUndertypePrHendelseType.getHendelsetypeHierarki();
 
         List<HendelseMedUndertype> resultat = new ArrayList<>();
-        for (HendelseType hendelseType : hendelseTyper) {
-            for (HendelseUnderType hendelseUnderType : hendelseUndertypePrHendelseType.get(hendelseType)) {
+        for (var hendelseType : hendelseTyper) {
+            for (var hendelseUnderType : hendelseUndertypePrHendelseType.get(hendelseType)) {
                 resultat.add(new HendelseMedUndertype(hendelseType, hendelseUnderType));
             }
         }

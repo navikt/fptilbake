@@ -36,14 +36,14 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 
-public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
+class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
 
-    public static final LocalDate FØRSTE_DATO = LocalDate.of(2019, 1, 31);
+    static final LocalDate FØRSTE_DATO = LocalDate.of(2019, 1, 31);
     private static final LocalDate FOM_1 = LocalDate.of(2016, 3, 10);
     private static final LocalDate TOM_1 = LocalDate.of(2016, 4, 06);
 
     @Test
-    public void skal_lagreVurdertForeldelseGrunnlag() {
+    void skal_lagreVurdertForeldelseGrunnlag() {
         LocalDate sisteDato = LocalDate.of(2019, 2, 19);
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Collections.singletonList(
                 new ForeldelsePeriodeDto(FØRSTE_DATO, sisteDato,
@@ -73,7 +73,7 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_lagreVurdertForeldelseGrunnlag_medflereManueltPeriode() {
+    void skal_lagreVurdertForeldelseGrunnlag_medflereManueltPeriode() {
         LocalDate førstePeriodeSisteDato = LocalDate.of(2019, 2, 4);
         LocalDate andrePeriodeFørsteDato = LocalDate.of(2019, 2, 4);
         LocalDate andrePeriodeSisteDato = LocalDate.of(2019, 2, 11);
@@ -124,7 +124,7 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void henteVurdertForeldelse_nårForeldretPeriode_dekkerMellomToGrunnlagPeriode() {
+    void henteVurdertForeldelse_nårForeldretPeriode_dekkerMellomToGrunnlagPeriode() {
 
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM_1, LocalDate.of(2016, 3, 23), KlasseType.FEIL,
                 BigDecimal.valueOf(10000), BigDecimal.ZERO);
@@ -150,7 +150,7 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void henteVurdertForeldelse_nårForeldretPeriode_dekkerMellomEnGrunnlagPeriode() {
+    void henteVurdertForeldelse_nårForeldretPeriode_dekkerMellomEnGrunnlagPeriode() {
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM_1, LocalDate.of(2016, 3, 23), KlasseType.FEIL,
                 BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 3, 24),
@@ -174,7 +174,7 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void henteVurdertForeldelse_medFlereForeldretPeriode() {
+    void henteVurdertForeldelse_medFlereForeldretPeriode() {
         KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM_1, LocalDate.of(2016, 3, 15), KlasseType.FEIL,
                 BigDecimal.valueOf(4000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 3, 16),
@@ -220,7 +220,7 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void hentInitPerioder() {
+    void hentInitPerioder() {
 
         LocalDate sisteDagFørstePeriode = LocalDate.of(2016, 3, 28);
         LocalDate førsteDagAndrePeriode = LocalDate.of(2016, 3, 30);
