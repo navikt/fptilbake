@@ -98,7 +98,7 @@ public class BeregningsresultatPeriodeEntitet  extends BaseCreateableEntitet {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BeregningsresultatPeriodeEntitet that = (BeregningsresultatPeriodeEntitet) o;
+        var that = (BeregningsresultatPeriodeEntitet) o;
         return Objects.equals(periode, that.periode)
             && Objects.equals(tilbakekrevingBeløp, that.tilbakekrevingBeløp)
             && Objects.equals(tilbakekrevingBeløpEtterSkatt, that.tilbakekrevingBeløpEtterSkatt)

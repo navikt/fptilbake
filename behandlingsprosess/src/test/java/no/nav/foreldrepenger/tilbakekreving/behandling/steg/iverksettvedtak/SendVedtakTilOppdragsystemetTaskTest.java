@@ -5,13 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
-
-import java.util.Optional;
+import static org.mockito.Mockito.verify;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-
-import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.Beregningsresul
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
@@ -60,21 +56,21 @@ class SendVedtakTilOppdragsystemetTaskTest {
 
     @Test
     void skal_lagre_iverksettingstatus_og_sende_vedtak_til_os() {
-        ScenarioSimple scenario = ScenarioSimple
+        var scenario = ScenarioSimple
             .simple()
             .medDefaultKravgrunnlag()
             .medFullInnkreving();
-        Behandling behandling = scenario.lagre(behandlingRepositoryProvider);
+        var behandling = scenario.lagre(behandlingRepositoryProvider);
 
-        ProsessTaskData data = lagProsessTaskKonfigurasjon(behandling);
+        var data = lagProsessTaskKonfigurasjon(behandling);
 
         task.doTask(data);
 
         //har sendt til OS:
-        Mockito.verify(økonomiProxyKlient).iverksettTilbakekrevingsvedtak(any(TilbakekrevingVedtakDTO.class));
+        verify(økonomiProxyKlient).iverksettTilbakekrevingsvedtak(any(TilbakekrevingVedtakDTO.class));
 
         //har lagret status riktig
-        Optional<OppdragIverksettingStatusEntitet> status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
+        var status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
         assertThat(status).isPresent();
         assertThat(status.get().getKvitteringOk()).isTrue();
 
@@ -87,16 +83,16 @@ class SendVedtakTilOppdragsystemetTaskTest {
         doThrow(new UkjentKvitteringFraOSException("FPT-539080", "Fikk feil fra OS ved iverksetting av tilbakekrevginsvedtak. Sjekk loggen til fpwsproxy for mer info."))
             .when(økonomiProxyKlient).iverksettTilbakekrevingsvedtak(any());
 
-        ScenarioSimple scenario = ScenarioSimple
+        var scenario = ScenarioSimple
             .simple()
             .medDefaultKravgrunnlag()
             .medFullInnkreving();
-        Behandling behandling = scenario.lagre(behandlingRepositoryProvider);
-        ProsessTaskData data = lagProsessTaskKonfigurasjon(behandling);
+        var behandling = scenario.lagre(behandlingRepositoryProvider);
+        var data = lagProsessTaskKonfigurasjon(behandling);
 
         assertThatThrownBy(() -> task.doTask(data)).hasMessageContaining("Fikk feil fra OS ved iverksetting av behandling");
         //har lagret status riktig
-        Optional<OppdragIverksettingStatusEntitet> status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
+        var status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
         assertThat(status).isPresent();
         assertThat(status.get().getKvitteringOk()).isFalse();
 
@@ -105,7 +101,7 @@ class SendVedtakTilOppdragsystemetTaskTest {
     }
 
     private ProsessTaskData lagProsessTaskKonfigurasjon(Behandling behandling) {
-        ProsessTaskData data = ProsessTaskData.forProsessTask(SendVedtakTilOppdragsystemetTask.class);
+        var data = ProsessTaskData.forProsessTask(SendVedtakTilOppdragsystemetTask.class);
         data.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         return data;
     }

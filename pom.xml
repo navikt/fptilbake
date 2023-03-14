@@ -29,7 +29,7 @@
     </modules>
 
     <properties>
-        <revision>2.0-SNAPSHOT</revision>
+        <revision>1.0-SNAPSHOT</revision>
 
         <felles.version>4.2.33</felles.version>
         <prosesstask.version>3.1.24</prosesstask.version>
