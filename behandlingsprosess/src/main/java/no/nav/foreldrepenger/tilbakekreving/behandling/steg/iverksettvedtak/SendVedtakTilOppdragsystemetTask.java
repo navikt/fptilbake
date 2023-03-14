@@ -7,7 +7,6 @@ import javax.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
@@ -28,7 +27,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
 
-    private static final Environment ENV = Environment.current();
     private static final Logger logger = LoggerFactory.getLogger(SendVedtakTilOppdragsystemetTask.class);
 
     private EntityManager entityManager;
@@ -60,7 +58,7 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         if (!lansertLagringBeregningsresultat) {
-            throw new IllegalArgumentException("Toggle ble skrudd av etter at task ble opprettet. Tasken må fjernes og en " + SendØkonomiTibakekerevingsVedtakTask.class + "-task opprettes idstedet");
+            throw new IllegalArgumentException("Toggle ble skrudd av etter at task ble opprettet. Tasken må fjernes og en SendØkonomiTibakekerevingsVedtakTask-task opprettes idstedet");
         }
         long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
 
