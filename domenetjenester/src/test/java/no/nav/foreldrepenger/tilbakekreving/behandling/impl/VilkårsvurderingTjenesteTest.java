@@ -12,8 +12,6 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
-import com.google.common.collect.Lists;
-
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.DetaljertFeilutbetalingPeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeDto;
@@ -56,7 +54,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         formGrunnlag();
         lagreFaktaTestdata();
 
-        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, List.of(
                 new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDET_PERIODE,
                         ForeldelseVurderingType.FORELDET, FORELDELSESFRIST, null, "ABC"),
                 new ForeldelsePeriodeDto(FØRSTE_DAG_I_TILLEGGSFRIST_PERIODE, SISTE_DAG_I_TILLEGGSFRIST_PERIODE,
@@ -167,7 +165,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
                 KlasseType.YTEL, BigDecimal.valueOf(3000), BigDecimal.ZERO);
         mockMedYtelPostering2.setKlasseKode(KlasseKode.FPADSNDFI);
 
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering1,
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(List.of(mockMedFeilPostering, mockMedFeilPostering1,
                 mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2, mockMedJustPostering));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
@@ -207,7 +205,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
                 KlasseType.YTEL, BigDecimal.valueOf(3000), BigDecimal.ZERO);
         mockMedYtelPostering2.setKlasseKode(KlasseKode.FPADATAL);
 
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering1,
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(List.of(mockMedFeilPostering, mockMedFeilPostering1,
                 mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
@@ -226,7 +224,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
     @Test
     void lagreVilkårsvurdering_medGodTroOgForsettAktsomhet() {
-        List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = List.of(
                 formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
                 formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
@@ -252,7 +250,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
     @Test
     void lagreVilkårsvurdering_medSimpelOgGrøvtAktsomhet() {
-        List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = List.of(
                 formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, LocalDate.of(2016, 3, 31), Aktsomhet.SIMPEL_UAKTSOM),
                 formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.GROVT_UAKTSOM));
 
@@ -299,13 +297,13 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         formGrunnlag();
         lagreFaktaTestdata();
 
-        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, List.of(
                 new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDET_PERIODE,
                         ForeldelseVurderingType.FORELDET, FORELDELSESFRIST, null, "ABC"),
                 new ForeldelsePeriodeDto(FØRSTE_DAG_I_IKKE_FORELDET_PERIODE, TOM,
                         ForeldelseVurderingType.IKKE_FORELDET, null, null, "CDE")));
 
-        List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = List.of(
                 formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, SISTE_DAG_I_FORELDET_PERIODE, Aktsomhet.SIMPEL_UAKTSOM),
                 formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, FØRSTE_DAG_I_IKKE_FORELDET_PERIODE, TOM, Aktsomhet.GROVT_UAKTSOM));
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
@@ -328,7 +326,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
     @Test
     void hentVilkårsvurdering_medGodTroOgForsettAktsomhet() {
-        List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = List.of(
                 formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
                 formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
@@ -366,7 +364,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
     @Test
     void hentVilkårsvurdering_medSimpelOgGrøvtAktsomhet() {
-        List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = List.of(
                 formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, LocalDate.of(2016, 3, 31), Aktsomhet.SIMPEL_UAKTSOM),
                 formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.GROVT_UAKTSOM));
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
@@ -476,7 +474,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
                 KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(19000));
         mockMedYtelPostering2.setKlasseKode(KlasseKode.FPADATSJO);
 
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering1, mockMedFeilPostering2,
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(List.of(mockMedFeilPostering, mockMedFeilPostering1, mockMedFeilPostering2,
                 mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
     }

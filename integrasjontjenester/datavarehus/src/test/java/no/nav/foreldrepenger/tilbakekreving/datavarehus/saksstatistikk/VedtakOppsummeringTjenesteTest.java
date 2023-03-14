@@ -97,7 +97,7 @@ class VedtakOppsummeringTjenesteTest {
         BeregningsresultatRepository beregningsresultatRepository = new BeregningsresultatRepository(entityManager);
         KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(kravgrunnlagRepository);
         TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(repositoryProvider, kravgrunnlagBeregningTjeneste);
-        BeregningsresultatTjeneste beregningsresultatTjeneste = new BeregningsresultatTjeneste(tilbakekrevingBeregningTjeneste, beregningsresultatRepository, false);
+        BeregningsresultatTjeneste beregningsresultatTjeneste = new BeregningsresultatTjeneste(tilbakekrevingBeregningTjeneste, beregningsresultatRepository);
         vedtakOppsummeringTjeneste = new VedtakOppsummeringTjeneste(repositoryProvider, beregningsresultatTjeneste);
 
         entityManager.setFlushMode(FlushModeType.AUTO);

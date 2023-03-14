@@ -16,33 +16,27 @@ public class BeregningsresultatTjeneste {
 
     private final TilbakekrevingBeregningTjeneste beregningTjeneste;
     private final BeregningsresultatRepository beregningsresultatRepository;
-    private final boolean lansertLagring;
 
     @Inject
     public BeregningsresultatTjeneste(TilbakekrevingBeregningTjeneste beregningTjeneste,
-                                      BeregningsresultatRepository beregningsresultatRepository,
-                                      @KonfigVerdi(value = "toggle.enable.lagre.beregningsresultat", defaultVerdi = "false") boolean lansertLagring) {
+                                      BeregningsresultatRepository beregningsresultatRepository) {
         this.beregningTjeneste = beregningTjeneste;
         this.beregningsresultatRepository = beregningsresultatRepository;
-        this.lansertLagring = lansertLagring;
     }
 
     public BeregningResultat finnEllerBeregn(Long behandlingId) {
-        if (lansertLagring) {
-            var lagretResultat = beregningsresultatRepository.hentHvisEksisterer(behandlingId);
-            if (lagretResultat.isPresent()) {
-                LOG.info("TBK-BEREGNING: Fant lagret beregningsgrunnlag.");
-                return BeregningsresultatMapper.map(lagretResultat.get());
-            }
+        var lagretResultat = beregningsresultatRepository.hentHvisEksisterer(behandlingId);
+        if (lagretResultat.isPresent()) {
+            LOG.info("TBK-BEREGNING: Fant lagret beregningsgrunnlag.");
+            return BeregningsresultatMapper.map(lagretResultat.get());
         }
+
         return beregningTjeneste.beregn(behandlingId);
     }
 
     public void beregnOgLagre(Long behandlingId) {
-        if (lansertLagring) {
-            var beregnet = beregningTjeneste.beregn(behandlingId);
-            beregningsresultatRepository.lagre(behandlingId, BeregningsresultatMapper.map(beregnet));
-        }
+        var beregnet = beregningTjeneste.beregn(behandlingId);
+        beregningsresultatRepository.lagre(behandlingId, BeregningsresultatMapper.map(beregnet));
     }
 
 }

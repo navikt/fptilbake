@@ -18,26 +18,20 @@ public class ProsessTaskIverksett {
 
     private ProsessTaskTjeneste taskTjeneste;
     private BrevSporingRepository brevSporingRepository;
-    private boolean lansertLagringBeregningsresultat;
 
     ProsessTaskIverksett() {
         // for CDI
     }
 
     @Inject
-    public ProsessTaskIverksett(ProsessTaskTjeneste taskTjeneste, BrevSporingRepository brevSporingRepository, @KonfigVerdi(value = "toggle.enable.lagre.beregningsresultat", defaultVerdi = "false") boolean lansertLagringBeregningsresultat) {
+    public ProsessTaskIverksett(ProsessTaskTjeneste taskTjeneste, BrevSporingRepository brevSporingRepository) {
         this.taskTjeneste = taskTjeneste;
         this.brevSporingRepository = brevSporingRepository;
-        this.lansertLagringBeregningsresultat = lansertLagringBeregningsresultat;
     }
 
     public void opprettIverksettingstasker(Behandling behandling, boolean sendVedtaksbrev) {
         var taskGruppe = new ProsessTaskGruppe();
-        if (lansertLagringBeregningsresultat) {
-            taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(SendVedtakTilOppdragsystemetTask.class));
-        } else {
-            taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class));
-        }
+        taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(SendVedtakTilOppdragsystemetTask.class));
         if (sendVedtaksbrev) {
             taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(SendVedtaksbrevTask.class));
         }

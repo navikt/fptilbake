@@ -8,6 +8,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,8 +17,6 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
@@ -210,7 +210,7 @@ class FinnGrunnlagTaskTest extends FellesTestOppsett {
         EksternBehandlingsinfoDto førsteVedtak = new EksternBehandlingsinfoDto();
         førsteVedtak.setHenvisning(HENVISNING);
         førsteVedtak.setUuid(FPSAK_BEHANDLING_UUID);
-        when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(Lists.newArrayList(førsteVedtak));
+        when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(List.of(førsteVedtak));
 
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
         mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(ANNEN_HENVISNING, saksnummer, mottattXmlId);
@@ -346,7 +346,7 @@ class FinnGrunnlagTaskTest extends FellesTestOppsett {
         førsteVedtak.setHenvisning(ANNEN_HENVISNING);
         andreVedtak.setUuid(UUID.randomUUID());
 
-        when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(Lists.newArrayList(førsteVedtak, andreVedtak));
+        when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(List.of(førsteVedtak, andreVedtak));
     }
 
 }

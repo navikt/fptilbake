@@ -12,6 +12,8 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.FlushModeType;
@@ -21,8 +23,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-
-import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
@@ -249,8 +249,7 @@ class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
                 BigDecimal.ZERO, BigDecimal.valueOf(11000));
         mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
 
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(
-                Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(List.of(mockMedFeilPostering, mockMedYtelPostering));
         grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
     }
 

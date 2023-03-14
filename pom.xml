@@ -186,11 +186,6 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-                <artifactId>oekonomi-tilbakekreving-klient</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>sensu-klient</artifactId>
                 <version>${project.version}</version>
             </dependency>

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -12,8 +13,6 @@ import javax.persistence.FlushModeType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
@@ -60,7 +59,7 @@ class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, TOM, KlasseType.FEIL, BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(10000));
 
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(List.of(mockMedFeilPostering, mockMedYtelPostering));
 
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
@@ -74,7 +73,7 @@ class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, TOM, KlasseType.FEIL, BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(10000));
 
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(List.of(mockMedFeilPostering, mockMedYtelPostering));
 
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
         varselRepository.lagre(internBehandlingId, "hello", 23000l);
@@ -153,7 +152,7 @@ class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
                 KlasseType.FEIL, BigDecimal.valueOf(15000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(37000));
 
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2,
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(List.of(mockMedFeilPostering, mockMedFeilPostering2,
                 mockMedFeilPostering3, mockMedYtelPostering));
 
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
@@ -183,7 +182,7 @@ class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
                 KlasseType.FEIL, BigDecimal.valueOf(15000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(37000));
 
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2,
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(List.of(mockMedFeilPostering, mockMedFeilPostering2,
                 mockMedFeilPostering3, mockMedYtelPostering));
 
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);

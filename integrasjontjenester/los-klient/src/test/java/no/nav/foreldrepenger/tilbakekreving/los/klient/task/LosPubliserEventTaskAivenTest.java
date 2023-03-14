@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -20,8 +22,6 @@ import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
@@ -236,7 +236,7 @@ class LosPubliserEventTaskAivenTest {
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(10000));
         KravgrunnlagMock mockMedYtelPostering1 = new KravgrunnlagMock(FOM_2, TOM_2, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(12000));
 
-        Kravgrunnlag431 kravgrunnlag = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering, mockMedYtelPostering1));
+        Kravgrunnlag431 kravgrunnlag = KravgrunnlagMockUtil.lagMockObject(List.of(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering, mockMedYtelPostering1));
         repositoryProvider.getGrunnlagRepository().lagre(behandling.getId(), kravgrunnlag);
         return kravgrunnlag;
     }

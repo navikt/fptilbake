@@ -5,6 +5,8 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +18,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-
-import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
@@ -139,7 +139,7 @@ class FatteVedtakStegTest {
                 .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING)
                 .medGodkjent(aksjonspunktMedGodkjentMap.get(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING))
                 .build();
-        totrinnRepository.lagreOgFlush(behandling, Lists.newArrayList(avklartTotrinnsvurdering, foreldelseTotrinnsvurdering, vilkårTotrinnsvurdering));
+        totrinnRepository.lagreOgFlush(behandling, List.of(avklartTotrinnsvurdering, foreldelseTotrinnsvurdering, vilkårTotrinnsvurdering));
     }
 
     private BeregningResultat lagBeregningResultat() {

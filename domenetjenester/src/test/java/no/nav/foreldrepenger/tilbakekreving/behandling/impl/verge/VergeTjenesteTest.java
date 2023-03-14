@@ -11,8 +11,6 @@ import javax.persistence.FlushModeType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.google.common.collect.Lists;
-
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
@@ -51,7 +49,7 @@ class VergeTjenesteTest extends FellesTestOppsett {
         vergeTjeneste.opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(behandling);
         assertThat(behandling.getAktivtBehandlingSteg()).isEqualTo(BehandlingStegType.FAKTA_VERGE);
         assertThat(
-                behandling.getÅpneAksjonspunkter(Lists.newArrayList(AksjonspunktDefinisjon.AVKLAR_VERGE))).isNotEmpty();
+                behandling.getÅpneAksjonspunkter(List.of(AksjonspunktDefinisjon.AVKLAR_VERGE))).isNotEmpty();
     }
 
     @Test
@@ -60,7 +58,7 @@ class VergeTjenesteTest extends FellesTestOppsett {
         vergeTjeneste.opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(behandling);
         assertThat(behandling.getAktivtBehandlingSteg()).isEqualTo(BehandlingStegType.FAKTA_VERGE);
         assertThat(
-                behandling.getÅpneAksjonspunkter(Lists.newArrayList(AksjonspunktDefinisjon.AVKLAR_VERGE))).isNotEmpty();
+                behandling.getÅpneAksjonspunkter(List.of(AksjonspunktDefinisjon.AVKLAR_VERGE))).isNotEmpty();
     }
 
     @Test
@@ -78,11 +76,11 @@ class VergeTjenesteTest extends FellesTestOppsett {
         AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE, BehandlingStegType.FAKTA_VERGE);
         assertThat(vergeRepository.finnVergeInformasjon(internBehandlingId)).isNotEmpty();
         assertThat(
-                behandling.getÅpneAksjonspunkter(Lists.newArrayList(AksjonspunktDefinisjon.AVKLAR_VERGE))).isNotEmpty();
+                behandling.getÅpneAksjonspunkter(List.of(AksjonspunktDefinisjon.AVKLAR_VERGE))).isNotEmpty();
         vergeTjeneste.fjernVergeGrunnlagOgAksjonspunkt(behandling);
 
         assertThat(vergeRepository.finnVergeInformasjon(internBehandlingId)).isEmpty();
-        assertThat(behandling.getÅpneAksjonspunkter(Lists.newArrayList(AksjonspunktDefinisjon.AVKLAR_VERGE))).isEmpty();
+        assertThat(behandling.getÅpneAksjonspunkter(List.of(AksjonspunktDefinisjon.AVKLAR_VERGE))).isEmpty();
         Optional<Aksjonspunkt> aksjonspunkt = behandling.getAksjonspunktMedDefinisjonOptional(
                 AksjonspunktDefinisjon.AVKLAR_VERGE);
         assertThat(aksjonspunkt).isPresent();

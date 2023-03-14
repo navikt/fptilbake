@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,8 +24,6 @@ import javax.persistence.FlushModeType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.FagOmrådeKode;
@@ -114,7 +113,7 @@ class HentKorrigertKravgrunnlagTaskTest {
     void skal_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_ikke_er_samme_i_hentet_grunnlaget_men_finnes_i_fpsak() {
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(2L), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
-        when(fagsystemKlient.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(
+        when(fagsystemKlient.hentBehandlingForSaksnummer(anyString())).thenReturn(List.of(
                 lagEksternBehandlingsInfo(1L),
                 lagEksternBehandlingsInfo(2L)));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
@@ -134,7 +133,7 @@ class HentKorrigertKravgrunnlagTaskTest {
     void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_ikke_er_samme_i_hentet_grunnlaget_og_ikke_finnes_i_fpsak() {
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(2L), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
-        when(fagsystemKlient.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(lagEksternBehandlingsInfo(2L)));
+        when(fagsystemKlient.hentBehandlingForSaksnummer(anyString())).thenReturn(List.of(lagEksternBehandlingsInfo(2L)));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
         var e = assertThrows(TekniskException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
         assertThat(e.getMessage()).contains("FPT-587197");

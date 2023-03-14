@@ -4,17 +4,17 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.UkjentKvitteringFraOSException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
-import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.UkjentKvitteringFraOSException;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.jpa.savepoint.RunWithSavepoint;
@@ -34,8 +34,6 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
     private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private ØkonomiProxyKlient økonomiProxyKlient;
-    private boolean lansertLagringBeregningsresultat;
-
     SendVedtakTilOppdragsystemetTask() {
         // CDI krav
     }
@@ -45,26 +43,19 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
                                             OppdragIverksettingStatusRepository oppdragIverksettingStatusRepository,
                                             BeregningsresultatTjeneste beregningsresultatTjeneste,
                                             TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste,
-                                            ØkonomiProxyKlient økonomiProxyKlient,
-                                            @KonfigVerdi(value = "toggle.enable.lagre.beregningsresultat", defaultVerdi = "false") boolean lansertLagringBeregningsresultat) {
+                                            ØkonomiProxyKlient økonomiProxyKlient) {
         this.entityManager = entityManager;
         this.oppdragIverksettingStatusRepository = oppdragIverksettingStatusRepository;
         this.beregningsresultatTjeneste = beregningsresultatTjeneste;
         this.tilbakekrevingsvedtakTjeneste = tilbakekrevingsvedtakTjeneste;
         this.økonomiProxyKlient = økonomiProxyKlient;
-        this.lansertLagringBeregningsresultat = lansertLagringBeregningsresultat;
     }
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        if (!lansertLagringBeregningsresultat) {
-            throw new IllegalArgumentException("Toggle ble skrudd av etter at task ble opprettet. Tasken må fjernes og en SendØkonomiTibakekerevingsVedtakTask-task opprettes idstedet");
-        }
         long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
-
         beregningsresultatTjeneste.beregnOgLagre(behandlingId); //midlertidig her for å raskere kunne fase ut håndtering av lagret XML
-
-        var tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtakDTOFpwsproxy(behandlingId);
+        var tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
         oppdragIverksettingStatusRepository.registrerStarterIverksetting(behandlingId, tilbakekrevingsvedtak.vedtakId().toString());
         lagSavepointOgIverksettViaFpWsProxy(behandlingId, tilbakekrevingsvedtak);
     }

@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,8 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 import org.junit.jupiter.api.Test;
-
-import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingsTjenesteProvider;
@@ -174,7 +173,7 @@ class BehandlingRestTjenesteTest {
     @Test
     void skal_ha_åpen_tilbakekreving_hvis_tilbakekreving_ikke_er_avsluttet() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
-        when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(Lists.newArrayList(behandling));
+        when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(List.of(behandling));
         Response response = behandlingRestTjeneste.harÅpenTilbakekrevingBehandling(saksnummerDto);
         assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
         assertThat(response.getEntity()).isEqualTo(true);
@@ -184,7 +183,7 @@ class BehandlingRestTjenesteTest {
     void skal_ikke_ha_åpen_tilbakekreving_hvis_tilbakekreving_er_avsluttet() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         behandling.avsluttBehandling();
-        when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(Lists.newArrayList(behandling));
+        when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(List.of(behandling));
 
         Response response = behandlingRestTjeneste.harÅpenTilbakekrevingBehandling(saksnummerDto);
         assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
@@ -194,7 +193,7 @@ class BehandlingRestTjenesteTest {
     @Test
     void skal_gi_rettigheter_for_vise_verge() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
-        when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(Lists.newArrayList(behandling));
+        when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(List.of(behandling));
         when(behandlingTjenesteMock.hentBehandling(any(UUID.class))).thenReturn(behandling);
         var behandlingUuid = new UuidDto(behandling.getUuid());
         var response = behandlingRestTjeneste.hentMenyOpsjoner(behandlingUuid);

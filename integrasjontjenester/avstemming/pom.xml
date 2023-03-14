@@ -34,11 +34,5 @@
             <artifactId>domene-testutilities</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <!-- brukes av avstemming tjeneste test -->
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>oekonomi-tilbakekreving-klient</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 </project>

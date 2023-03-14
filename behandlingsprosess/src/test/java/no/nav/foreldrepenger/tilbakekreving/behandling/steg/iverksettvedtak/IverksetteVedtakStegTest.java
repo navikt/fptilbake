@@ -72,7 +72,7 @@ class IverksetteVedtakStegTest {
         repoProvider = new BehandlingRepositoryProvider(entityManager);
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         brevSporingRepository = new BrevSporingRepository(entityManager);
-        var prosessTaskIverksett = new ProsessTaskIverksett(taskTjeneste, brevSporingRepository, false);
+        var prosessTaskIverksett = new ProsessTaskIverksett(taskTjeneste, brevSporingRepository);
         iverksetteVedtakSteg = new IverksetteVedtakSteg(repoProvider, prosessTaskIverksett);
         behandlingVedtakRepository = repoProvider.getBehandlingVedtakRepository();
         behandlingRepository = repoProvider.getBehandlingRepository();
@@ -109,7 +109,7 @@ class IverksetteVedtakStegTest {
         var captor = ArgumentCaptor.forClass(ProsessTaskGruppe.class);
         verify(taskTjeneste, times(1)).lagre(captor.capture());
         var tasker = captor.getValue().getTasks().stream().map(ProsessTaskGruppe.Entry::task).toList();
-        assertThat(tasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class));
+        assertThat(tasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtakTilOppdragsystemetTask.class));
         assertThat(tasker.get(1).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtaksbrevTask.class));
         assertThat(tasker.get(2).taskType()).isEqualTo(TaskType.forProsessTask(AvsluttBehandlingTask.class));
         assertThat(tasker.get(3).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtakFattetTilSelvbetjeningTask.class));
@@ -137,7 +137,7 @@ class IverksetteVedtakStegTest {
         verify(taskTjeneste, times(1)).lagre(captor.capture());
         var tasker = captor.getValue().getTasks().stream().map(ProsessTaskGruppe.Entry::task).toList();
         assertThat(tasker.size()).isEqualTo(3);
-        assertThat(tasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class));
+        assertThat(tasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtakTilOppdragsystemetTask.class));
         assertThat(tasker.get(1).taskType()).isEqualTo(TaskType.forProsessTask(AvsluttBehandlingTask.class));
         assertThat(tasker.get(2).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtakHendelserTilDvhTask.class));
     }
@@ -162,7 +162,7 @@ class IverksetteVedtakStegTest {
         verify(taskTjeneste, times(1)).lagre(captor.capture());
         var tasker = captor.getValue().getTasks().stream().map(ProsessTaskGruppe.Entry::task).toList();
         assertThat(tasker.size()).isEqualTo(4);
-        assertThat(tasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class));
+        assertThat(tasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtakTilOppdragsystemetTask.class));
         assertThat(tasker.get(1).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtaksbrevTask.class));
         assertThat(tasker.get(2).taskType()).isEqualTo(TaskType.forProsessTask(AvsluttBehandlingTask.class));
         assertThat(tasker.get(3).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtakHendelserTilDvhTask.class));

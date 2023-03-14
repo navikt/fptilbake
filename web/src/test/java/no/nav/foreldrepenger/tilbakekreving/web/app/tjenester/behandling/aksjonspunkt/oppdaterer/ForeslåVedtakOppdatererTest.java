@@ -11,7 +11,6 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -154,7 +153,7 @@ class ForeslåVedtakOppdatererTest {
         periodeMedTekstDto.setVilkårAvsnitt(vilkårAvsnitt);
         periodeMedTekstDto.setFom(LocalDate.of(2016, 3, 16));
         periodeMedTekstDto.setTom(LocalDate.of(2016, 5, 26));
-        foreslåVedtakDto.setPerioderMedTekst(Lists.newArrayList(periodeMedTekstDto));
+        foreslåVedtakDto.setPerioderMedTekst(List.of(periodeMedTekstDto));
         return foreslåVedtakDto;
     }
 

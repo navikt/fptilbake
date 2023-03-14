@@ -17,7 +17,6 @@ import com.jcraft.jsch.SftpException;
 
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemFraResultatOgIverksettingStatusTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemFraXmlSendtTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemmingCsvFormatter;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.vedtak.exception.IntegrasjonException;
@@ -37,7 +36,6 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
 
     private static final String FILNAVN_MAL = "%s-%s-%s-%s.csv";
 
-    private AvstemFraXmlSendtTjeneste avstemFraXmlSendtTjeneste;
     private AvstemFraResultatOgIverksettingStatusTjeneste avstemFraResultatOgIverksettingStatusTjeneste;
     private AvstemmingSftpBatchTjeneste sftpBatchTjeneste;
 
@@ -48,10 +46,8 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
     }
 
     @Inject
-    public AvstemmingBatchTask(AvstemFraXmlSendtTjeneste avstemFraXmlSendtTjeneste,
-                               AvstemFraResultatOgIverksettingStatusTjeneste avstemFraResultatOgIverksettingStatusTjeneste,
+    public AvstemmingBatchTask(AvstemFraResultatOgIverksettingStatusTjeneste avstemFraResultatOgIverksettingStatusTjeneste,
                                AvstemmingSftpBatchTjeneste sftpBatchTjeneste) {
-        this.avstemFraXmlSendtTjeneste = avstemFraXmlSendtTjeneste;
         this.avstemFraResultatOgIverksettingStatusTjeneste = avstemFraResultatOgIverksettingStatusTjeneste;
         this.sftpBatchTjeneste = sftpBatchTjeneste;
 
@@ -82,7 +78,6 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
     public Optional<String> oppsummer(LocalDate dato) {
         AvstemmingCsvFormatter avstemmingCsvFormatter = new AvstemmingCsvFormatter();
 
-        avstemFraXmlSendtTjeneste.leggTilOppsummering(dato, avstemmingCsvFormatter);
         avstemFraResultatOgIverksettingStatusTjeneste.leggTilOppsummering(dato, avstemmingCsvFormatter);
 
         logger.info("Sender {} vedtak til avstemming for {}", avstemmingCsvFormatter.getAntallRader(), dato);
