@@ -24,21 +24,21 @@ class TilbakekrevingBeregnerVilkår {
                                            FordeltKravgrunnlagBeløp delresultat,
                                            List<GrunnlagPeriodeMedSkattProsent> perioderMedSkattProsent,
                                            boolean beregnRenter) {
-        Periode periode = vilkårVurdering.getPeriode();
+        var periode = vilkårVurdering.getPeriode();
 
-        boolean leggPåRenter = beregnRenter && finnRenter(vilkårVurdering);
-        BigDecimal andel = finnAndelAvBeløp(vilkårVurdering);
-        BigDecimal manueltBeløp = finnManueltSattBeløp(vilkårVurdering);
-        boolean ignoreresPgaLavtBeløp = Boolean.FALSE.equals(vilkårVurdering.tilbakekrevesSmåbeløp());
+        var leggPåRenter = beregnRenter && finnRenter(vilkårVurdering);
+        var andel = finnAndelAvBeløp(vilkårVurdering);
+        var manueltBeløp = finnManueltSattBeløp(vilkårVurdering);
+        var ignoreresPgaLavtBeløp = Boolean.FALSE.equals(vilkårVurdering.tilbakekrevesSmåbeløp());
 
-        BigDecimal beløpUtenRenter = ignoreresPgaLavtBeløp
+        var beløpUtenRenter = ignoreresPgaLavtBeløp
             ? BigDecimal.ZERO
             : finnBeløpUtenRenter(delresultat.getFeilutbetaltBeløp(), andel, manueltBeløp);
-        BigDecimal rentesats = leggPåRenter ? RENTESATS : null;
-        BigDecimal rentebeløp = beregnRentebeløp(beløpUtenRenter, leggPåRenter);
-        BigDecimal tilbakekrevingBeløp = beløpUtenRenter.add(rentebeløp);
-        BigDecimal skattBeløp = beregnSkattBeløp(periode, beløpUtenRenter, perioderMedSkattProsent).setScale(0, RoundingMode.DOWN); //skatt beregnet alltid uten leggPåRenter
-        BigDecimal nettoBeløp = tilbakekrevingBeløp.subtract(skattBeløp);
+        var rentesats = leggPåRenter ? RENTESATS : null;
+        var rentebeløp = beregnRentebeløp(beløpUtenRenter, leggPåRenter);
+        var tilbakekrevingBeløp = beløpUtenRenter.add(rentebeløp);
+        var skattBeløp = beregnSkattBeløp(periode, beløpUtenRenter, perioderMedSkattProsent).setScale(0, RoundingMode.DOWN); //skatt beregnet alltid uten leggPåRenter
+        var nettoBeløp = tilbakekrevingBeløp.subtract(skattBeløp);
 
         return BeregningResultatPeriode.builder()
             .medPeriode(periode)
@@ -82,9 +82,9 @@ class TilbakekrevingBeregnerVilkår {
     }
 
     private static boolean finnRenter(VilkårVurderingPeriodeEntitet vurdering) {
-        VilkårVurderingAktsomhetEntitet aktsomhet = vurdering.getAktsomhet();
+        var aktsomhet = vurdering.getAktsomhet();
         if (aktsomhet != null) {
-            boolean erForsett = Aktsomhet.FORSETT.equals(aktsomhet.getAktsomhet());
+            var erForsett = Aktsomhet.FORSETT.equals(aktsomhet.getAktsomhet());
             return (erForsett && (aktsomhet.getIleggRenter() == null || aktsomhet.getIleggRenter())) ||
                 (aktsomhet.getIleggRenter() != null && aktsomhet.getIleggRenter());
         }
@@ -92,8 +92,8 @@ class TilbakekrevingBeregnerVilkår {
     }
 
     private static BigDecimal finnAndelAvBeløp(VilkårVurderingPeriodeEntitet vurdering) {
-        VilkårVurderingAktsomhetEntitet aktsomhet = vurdering.getAktsomhet();
-        VilkårVurderingGodTroEntitet godTro = vurdering.getGodTro();
+        var aktsomhet = vurdering.getAktsomhet();
+        var godTro = vurdering.getGodTro();
         if (aktsomhet != null) {
             return finnAndelForAktsomhet(aktsomhet);
         } else if (godTro != null && !godTro.isBeløpErIBehold()) {
@@ -110,8 +110,8 @@ class TilbakekrevingBeregnerVilkår {
     }
 
     private static BigDecimal finnManueltSattBeløp(VilkårVurderingPeriodeEntitet vurdering) {
-        VilkårVurderingAktsomhetEntitet aktsomhet = vurdering.getAktsomhet();
-        VilkårVurderingGodTroEntitet godTro = vurdering.getGodTro();
+        var aktsomhet = vurdering.getAktsomhet();
+        var godTro = vurdering.getGodTro();
         if (aktsomhet != null) {
             return aktsomhet.getManueltTilbakekrevesBeløp();
         } else if (godTro != null) {

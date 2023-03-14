@@ -7,7 +7,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>0.4.5</version>
+        <version>0.4.6</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -29,7 +29,7 @@
     </modules>
 
     <properties>
-        <revision>2.0-SNAPSHOT</revision>
+        <revision>1.0-SNAPSHOT</revision>
 
         <felles.version>4.2.33</felles.version>
         <prosesstask.version>3.1.24</prosesstask.version>
@@ -84,7 +84,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>fp-bom</artifactId>
-                <version>0.4.5</version>
+                <version>0.4.6</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
