@@ -51,11 +51,15 @@ public class ApiConfig extends Application {
 
     public ApiConfig() {
         var oas = new OpenAPI();
-        var info = new Info().title("Vedtaksløsningen - Tilbakekreving").version("1.0").description("REST grensesnitt for tilbakekreving.");
+        var info = new Info()
+            .title("Vedtaksløsningen - Tilbakekreving")
+            .version("1.0")
+            .description("REST grensesnitt for tilbakekreving.");
 
         oas.info(info).addServersItem(new Server().url(JettyServer.getContextPath()));
 
-        var oasConfig = new SwaggerConfiguration().openAPI(oas)
+        var oasConfig = new SwaggerConfiguration()
+            .openAPI(oas)
             .prettyPrint(true)
             .resourceClasses(getClasses().stream().map(Class::getName).collect(Collectors.toSet()));
         try {
