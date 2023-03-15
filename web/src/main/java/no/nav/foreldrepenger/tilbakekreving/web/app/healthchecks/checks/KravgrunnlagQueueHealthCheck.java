@@ -12,10 +12,10 @@ import no.nav.foreldrepenger.felles.jms.QueueSelftest;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer.KravgrunnlagAsyncJmsConsumer;
-import no.nav.vedtak.log.metrics.LiveAndReadinessAware;
+import no.nav.vedtak.log.metrics.ReadinessAware;
 
 @ApplicationScoped
-public class KravgrunnlagQueueHealthCheck implements LiveAndReadinessAware {
+public class KravgrunnlagQueueHealthCheck implements ReadinessAware {
     private static final Logger LOG = LoggerFactory.getLogger(KravgrunnlagQueueHealthCheck.class);
     private QueueSelftest client;
 
@@ -46,11 +46,6 @@ public class KravgrunnlagQueueHealthCheck implements LiveAndReadinessAware {
 
     @Override
     public boolean isReady() {
-        return isOK();
-    }
-
-    @Override
-    public boolean isAlive() {
         return isOK();
     }
 }
