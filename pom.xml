@@ -32,7 +32,7 @@
         <revision>1.0-SNAPSHOT</revision>
 
         <felles.version>4.2.35</felles.version>
-        <prosesstask.version>3.1.24</prosesstask.version>
+        <prosesstask.version>3.1.25</prosesstask.version>
         <fp-tidsserie.version>2.6.6</fp-tidsserie.version>
 
         <fpkontrakter.version>6.2.13</fpkontrakter.version>
