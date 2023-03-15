@@ -76,7 +76,7 @@ public class AvstemFraResultatOgIverksettingStatusTjeneste {
         var antallFørstegangsvedtakUtenTilbakekreving = 0;
         var iverksettingStatuser = oppdragIverksettingStatusRepository.finnForDato(dato);
         for (var iverksettingStatus : iverksettingStatuser) {
-            if (!iverksettingStatus.erSendtOk()) {
+            if (!iverksettingStatus.getKvitteringOk()) {
                 antallFeilet++;
                 continue;
             }
