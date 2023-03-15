@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.avstemming;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -14,11 +13,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -63,7 +59,7 @@ public class AvstemFraResultatOgIverksettingStatusTjeneste {
     }
 
     public Optional<String> oppsummer(LocalDate dato) {
-        AvstemmingCsvFormatter avstemmingCsvFormatter = new AvstemmingCsvFormatter();
+        var avstemmingCsvFormatter = new AvstemmingCsvFormatter();
 
         leggTilOppsummering(dato, avstemmingCsvFormatter);
 
@@ -76,18 +72,18 @@ public class AvstemFraResultatOgIverksettingStatusTjeneste {
     }
 
     public void leggTilOppsummering(LocalDate dato, AvstemmingCsvFormatter avstemmingCsvFormatter) {
-        int antallFeilet = 0;
-        int antallFørstegangsvedtakUtenTilbakekreving = 0;
-        List<OppdragIverksettingStatusEntitet> iverksettingStatuser = oppdragIverksettingStatusRepository.finnForDato(dato);
-        for (OppdragIverksettingStatusEntitet iverksettingStatus : iverksettingStatuser) {
+        var antallFeilet = 0;
+        var antallFørstegangsvedtakUtenTilbakekreving = 0;
+        var iverksettingStatuser = oppdragIverksettingStatusRepository.finnForDato(dato);
+        for (var iverksettingStatus : iverksettingStatuser) {
             if (!iverksettingStatus.erSendtOk()) {
                 antallFeilet++;
                 continue;
             }
-            Long behandlingId = iverksettingStatus.getBehandlingId();
-            Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-            BeregningsresultatEntitet beregningsresultat = beregningsresultatRepository.hentHvisEksisterer(behandlingId).orElseThrow();
-            TilbakekrevingsvedtakOppsummering oppsummering = TilbakekrevingsvedtakOppsummering.oppsummer(iverksettingStatus, beregningsresultat);
+            var behandlingId = iverksettingStatus.getBehandlingId();
+            var behandling = behandlingRepository.hentBehandling(behandlingId);
+            var beregningsresultat = beregningsresultatRepository.hentHvisEksisterer(behandlingId).orElseThrow();
+            var oppsummering = TilbakekrevingsvedtakOppsummering.oppsummer(iverksettingStatus, beregningsresultat);
             if (erFørstegangsvedtakUtenTilbakekreving(behandling, oppsummering)) {
                 antallFørstegangsvedtakUtenTilbakekreving++;
                 continue;
@@ -109,10 +105,10 @@ public class AvstemFraResultatOgIverksettingStatusTjeneste {
     }
 
     private void leggTilAvstemmingsdataForVedtaket(AvstemmingCsvFormatter avstemmingCsvFormatter, Behandling behandling, TilbakekrevingsvedtakOppsummering oppsummering) {
-        Long behandlingId = behandling.getId();
-        BehandlingVedtak behandlingVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandlingId).orElseThrow();
+        var behandlingId = behandling.getId();
+        var behandlingVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandlingId).orElseThrow();
 
-        String fnr = aktørConsumer.hentFnrForAktør(behandling.getAktørId()).map(PersonIdent::getIdent)
+        var fnr = aktørConsumer.hentFnrForAktør(behandling.getAktørId()).map(PersonIdent::getIdent)
             .orElseThrow(() -> new IllegalArgumentException("Avstemming feilet, fant ikke ident. Gjelder behandlingId=" + behandlingId));
 
         avstemmingCsvFormatter.leggTilRad(AvstemmingCsvFormatter.radBuilder()

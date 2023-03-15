@@ -32,8 +32,9 @@ public class OppdragIverksettingStatusEntitet extends BaseEntitet {
     @Column(name = "kvittert_tid")
     private LocalDateTime kvittertTidspunkt;
 
+    @Convert(converter = MidlertidigBooleanToStringConverter.class)
     @Column(name = "kvittert_ok")
-    private Boolean kvitteringOk;
+    private boolean kvitteringOk;
 
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "aktiv", nullable = false)
@@ -76,11 +77,11 @@ public class OppdragIverksettingStatusEntitet extends BaseEntitet {
         return vedtakId;
     }
 
-    public Boolean getKvitteringOk() {
+    public boolean getKvitteringOk() {
         return kvitteringOk;
     }
 
     public boolean erSendtOk() {
-        return kvitteringOk != null && kvitteringOk;
+        return kvitteringOk;
     }
 }
