@@ -167,6 +167,11 @@
             <artifactId>hendelser-behandling</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>no.nav.foreldrepenger.kontrakter</groupId>
+            <artifactId>fordel-v1</artifactId>
+        </dependency>
+
         <!-- REST + WebService -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
@@ -328,15 +333,6 @@
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>domene-testutilities</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.kontrakter</groupId>
-            <artifactId>fordel-v1</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.bytebuddy</groupId>
-            <artifactId>byte-buddy</artifactId>
-            <scope>runtime</scope>
         </dependency>
     </dependencies>
 </project>
