@@ -89,12 +89,6 @@
                 <type>pom</type>
             </dependency>
 
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>2.10.0</version>
-            </dependency>
-
             <!-- moduler i dette prosjektet -->
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -259,12 +253,6 @@
                 <type>pom</type>
             </dependency>
 
-            <dependency>
-                <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
-                <artifactId>felles-integrasjon-webservice</artifactId>
-                <version>${felles.version}</version>
-            </dependency>
-
             <!-- Klienter -->
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
@@ -329,40 +317,11 @@
                 <version>${abakus-kontrakt.version}</version>
             </dependency>
 
-            <!-- NAV -->
-            <dependency>
-                <groupId>no.nav.tjenestespesifikasjoner</groupId>
-                <artifactId>nav-fim-kodeverk-v2-tjenestespesifikasjon</artifactId>
-                <version>1.2021.02.22-10.45-4201aaea72fb</version>
-            </dependency>
-
             <!-- Eksterne -->
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>swagger-ui</artifactId>
                 <version>4.18.1</version>
-            </dependency>
-
-            <dependency>
-                <!-- velger en transitiv avhengighet - felles ikke enig med seg selv, velger den som blir brukt i prod-scope i felles -->
-                <groupId>org.checkerframework</groupId>
-                <artifactId>checker-qual</artifactId>
-                <version>3.32.0</version>
-            </dependency>
-
-            <!-- transitiv avhengighet, sikrer konsistent versjon -->
-            <!-- https://mvnrepository.com/artifact/org.codehaus.woodstox/stax2-api -->
-            <dependency>
-                <groupId>org.codehaus.woodstox</groupId>
-                <artifactId>stax2-api</artifactId>
-                <version>4.2.1</version>
-            </dependency>
-
-            <!-- Sikkerhet -->
-            <dependency>
-                <groupId>org.apache.ws.xmlschema</groupId>
-                <artifactId>xmlschema-core</artifactId>
-                <version>2.2.5</version>
             </dependency>
 
             <!-- 3dje parts biblioteker -->

@@ -167,11 +167,6 @@
             <artifactId>hendelser-behandling</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http-jetty</artifactId>
-        </dependency>
-
         <!-- REST + WebService -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
@@ -203,14 +198,6 @@
             <groupId>org.jboss.weld.servlet</groupId>
             <artifactId>weld-servlet-core</artifactId>
         </dependency>
-
-
-        <!-- For Status side -->
-        <dependency>
-            <groupId>com.fasterxml.woodstox</groupId>
-            <artifactId>woodstox-core</artifactId>
-        </dependency>
-
 
         <!-- Server -->
         <dependency>
