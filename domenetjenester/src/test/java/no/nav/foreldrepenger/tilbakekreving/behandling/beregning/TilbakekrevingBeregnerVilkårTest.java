@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FordeltKravgrunnlagBeløp;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
@@ -50,7 +50,7 @@ class TilbakekrevingBeregnerVilkårTest {
 
 
         //act
-        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), true);
+        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), List.of(grunnlagPeriodeMedSkattProsent), true);
 
         //assert
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(11000));
@@ -71,7 +71,7 @@ class TilbakekrevingBeregnerVilkårTest {
                 .build());
 
         //act
-        BeregningResultatPeriode resultat = beregn(forstoBurdeForstattVurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), true);
+        BeregningResultatPeriode resultat = beregn(forstoBurdeForstattVurdering, BigDecimal.valueOf(10000), List.of(grunnlagPeriodeMedSkattProsent), true);
 
         //assert
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(11000));
@@ -92,7 +92,7 @@ class TilbakekrevingBeregnerVilkårTest {
                 .build());
 
         //act
-        BeregningResultatPeriode resultat = beregn(forstoBurdeForstattVurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), true);
+        BeregningResultatPeriode resultat = beregn(forstoBurdeForstattVurdering, BigDecimal.valueOf(10000), List.of(grunnlagPeriodeMedSkattProsent), true);
 
         //assert
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
@@ -114,7 +114,7 @@ class TilbakekrevingBeregnerVilkårTest {
                 .build());
 
         //assert
-        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), true);
+        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), List.of(grunnlagPeriodeMedSkattProsent), true);
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(11000));
         assertThat(resultat.getRenterProsent()).isEqualByComparingTo(BigDecimal.valueOf(10));
     }
@@ -130,7 +130,7 @@ class TilbakekrevingBeregnerVilkårTest {
                 .build());
 
         //assert
-        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(522), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), true);
+        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(522), List.of(grunnlagPeriodeMedSkattProsent), true);
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.ZERO);
     }
 
@@ -146,7 +146,7 @@ class TilbakekrevingBeregnerVilkårTest {
                 .build());
 
         //assert
-        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), true);
+        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), List.of(grunnlagPeriodeMedSkattProsent), true);
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(7700));
         assertThat(resultat.getRenterProsent()).isEqualByComparingTo(BigDecimal.valueOf(10));
     }
@@ -163,7 +163,7 @@ class TilbakekrevingBeregnerVilkårTest {
                 .build());
 
         //assert
-        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), true);
+        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), List.of(grunnlagPeriodeMedSkattProsent), true);
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(7000));
         assertThat(resultat.getRenterProsent()).isNull();
         assertThat(resultat.getRenteBeløp()).isZero();
@@ -181,7 +181,7 @@ class TilbakekrevingBeregnerVilkårTest {
                 .build());
 
         //assert
-        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(70000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), true);
+        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(70000), List.of(grunnlagPeriodeMedSkattProsent), true);
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(7));
         assertThat(resultat.getRenterProsent()).isNull();
         assertThat(resultat.getRenteBeløp()).isZero();
@@ -199,7 +199,7 @@ class TilbakekrevingBeregnerVilkårTest {
                 .build());
 
         //assert
-        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), true);
+        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), List.of(grunnlagPeriodeMedSkattProsent), true);
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(6556));
         assertThat(resultat.getRenterProsent()).isNull();
     }
@@ -216,7 +216,7 @@ class TilbakekrevingBeregnerVilkårTest {
                 .build());
 
         //assert
-        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), true);
+        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), List.of(grunnlagPeriodeMedSkattProsent), true);
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(6600));
         assertThat(resultat.getRenterProsent()).isEqualByComparingTo(BigDecimal.valueOf(10));
     }
@@ -232,7 +232,7 @@ class TilbakekrevingBeregnerVilkårTest {
                 .build());
 
         //assert
-        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), true);
+        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), List.of(grunnlagPeriodeMedSkattProsent), true);
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(8991));
         assertThat(resultat.getRenterProsent()).isNull();
     }
@@ -246,7 +246,7 @@ class TilbakekrevingBeregnerVilkårTest {
                 .build());
 
         //assert
-        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), true);
+        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), List.of(grunnlagPeriodeMedSkattProsent), true);
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(resultat.getRenterProsent()).isNull();
     }
@@ -263,7 +263,7 @@ class TilbakekrevingBeregnerVilkårTest {
         GrunnlagPeriodeMedSkattProsent grunnlagPeriodeMedSkattProsent = new GrunnlagPeriodeMedSkattProsent(vurdering.getPeriode(), BigDecimal.valueOf(10000), BigDecimal.valueOf(10));
 
         //assert
-        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), true);
+        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), List.of(grunnlagPeriodeMedSkattProsent), true);
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(8991));
         assertThat(resultat.getRenterProsent()).isNull();
         assertThat(resultat.getSkattBeløp()).isEqualByComparingTo(BigDecimal.valueOf(899));
@@ -281,7 +281,7 @@ class TilbakekrevingBeregnerVilkårTest {
         GrunnlagPeriodeMedSkattProsent grunnlagPeriodeMedSkattProsent = new GrunnlagPeriodeMedSkattProsent(vurdering.getPeriode(), BigDecimal.valueOf(10000), BigDecimal.valueOf(10));
 
         //act
-        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), true);
+        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), List.of(grunnlagPeriodeMedSkattProsent), true);
 
         //assert
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(11000));
@@ -305,7 +305,7 @@ class TilbakekrevingBeregnerVilkårTest {
         GrunnlagPeriodeMedSkattProsent grunnlagPeriodeMedSkattProsent = new GrunnlagPeriodeMedSkattProsent(vurdering.getPeriode(), BigDecimal.valueOf(10000), BigDecimal.valueOf(10));
 
         //act
-        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent), false);
+        BeregningResultatPeriode resultat = beregn(vurdering, BigDecimal.valueOf(10000), List.of(grunnlagPeriodeMedSkattProsent), false);
 
         //assert
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));

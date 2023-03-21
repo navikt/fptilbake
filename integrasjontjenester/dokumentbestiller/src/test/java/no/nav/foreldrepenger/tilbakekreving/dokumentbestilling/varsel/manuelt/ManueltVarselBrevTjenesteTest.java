@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -17,8 +18,6 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
@@ -134,7 +133,7 @@ class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett {
                 LocalDate.of(2019, 10, 30),
                 BigDecimal.valueOf(9000));
         return BehandlingFeilutbetalingFakta.builder().medAktuellFeilUtbetaltBeløp(BigDecimal.valueOf(9000))
-                .medPerioder(Lists.newArrayList(logiskPeriodeMedFaktaDto))
+                .medPerioder(List.of(logiskPeriodeMedFaktaDto))
                 .medDatoForRevurderingsvedtak(LocalDate.now()).build();
     }
 }

@@ -6,11 +6,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-
-import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriodeMedFaktaDto;
@@ -162,7 +162,7 @@ class VarselbrevUtilTest {
                 BigDecimal.valueOf(9000));
         BehandlingFeilutbetalingFakta feilutbetalingFakta = BehandlingFeilutbetalingFakta.builder()
                 .medAktuellFeilUtbetaltBeløp(BigDecimal.valueOf(9000))
-                .medPerioder(Lists.newArrayList(logiskPeriodeMedFaktaDto))
+                .medPerioder(List.of(logiskPeriodeMedFaktaDto))
                 .build();
 
         Saksnummer saksnummer = new Saksnummer("11111111");

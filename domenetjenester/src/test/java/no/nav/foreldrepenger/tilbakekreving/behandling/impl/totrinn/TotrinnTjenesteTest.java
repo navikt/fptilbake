@@ -3,14 +3,14 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeDto;
@@ -46,15 +46,14 @@ class TotrinnTjenesteTest extends FellesTestOppsett {
                 KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
         mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
 
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(List.of(mockMedFeilPostering, mockMedYtelPostering));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
         repoProvider.getFaktaFeilutbetalingRepository().lagre(internBehandlingId, lagFaktaFeilutbetaling());
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Collections.singletonList(
                 new ForeldelsePeriodeDto(FOM, TOM,
                         ForeldelseVurderingType.FORELDET, FOM.plusYears(3), null, "ABC")));
-        List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
-                formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, TOM, Aktsomhet.FORSETT));
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = List.of(formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, TOM, Aktsomhet.FORSETT));
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
         totrinnTjeneste.settNyttTotrinnsgrunnlag(behandling);

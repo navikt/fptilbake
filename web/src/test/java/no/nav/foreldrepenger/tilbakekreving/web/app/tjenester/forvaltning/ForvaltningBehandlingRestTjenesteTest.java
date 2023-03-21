@@ -84,10 +84,6 @@ class ForvaltningBehandlingRestTjenesteTest {
     @Inject
     HistorikkRepository historikkRepository;
     @Inject
-    ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
-    @Inject
-    TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
-    @Inject
     KravgrunnlagTjeneste kravgrunnlagTjeneste;
     @Inject
     BehandlingModellRepository behandlingModellRepository;
@@ -108,7 +104,7 @@ class ForvaltningBehandlingRestTjenesteTest {
         BehandlingskontrollEventPubliserer eventPubliserer = mock(BehandlingskontrollEventPubliserer.class);
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, behandlingModellRepository, eventPubliserer));
 
-        forvaltningBehandlingRestTjeneste = new ForvaltningBehandlingRestTjeneste(repositoryProvider, taskTjeneste, behandlingresultatRepository, mottattXmlRepository, kravgrunnlagMapper, økonomiSendtXmlRepository, tilbakekrevingsvedtakTjeneste, kravgrunnlagTjeneste, eksternBehandlingRepository);
+        forvaltningBehandlingRestTjeneste = new ForvaltningBehandlingRestTjeneste(repositoryProvider, taskTjeneste, behandlingresultatRepository, mottattXmlRepository, kravgrunnlagMapper, kravgrunnlagTjeneste, eksternBehandlingRepository);
         behandling = scenario.lagre(repositoryProvider);
     }
 

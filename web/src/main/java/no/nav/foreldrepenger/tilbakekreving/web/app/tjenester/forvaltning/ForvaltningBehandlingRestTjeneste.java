@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,19 +40,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
-import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
-import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KobleBehandlingTilGrunnlagDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KorrigertHenvisningDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
-import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
-import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
-import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
-import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.log.util.LoggerUtils;
@@ -76,8 +69,6 @@ public class ForvaltningBehandlingRestTjeneste {
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private KravgrunnlagMapper kravgrunnlagMapper;
-    private ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
-    private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
     private EksternBehandlingRepository eksternBehandlingRepository;
 
@@ -91,8 +82,6 @@ public class ForvaltningBehandlingRestTjeneste {
                                              BehandlingresultatRepository behandlingresultatRepository,
                                              ØkonomiMottattXmlRepository mottattXmlRepository,
                                              KravgrunnlagMapper kravgrunnlagMapper,
-                                             ØkonomiSendtXmlRepository økonomiSendtXmlRepository,
-                                             TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste,
                                              KravgrunnlagTjeneste kravgrunnlagTjeneste,
                                              EksternBehandlingRepository eksternBehandlingRepository) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
@@ -101,8 +90,6 @@ public class ForvaltningBehandlingRestTjeneste {
         this.mottattXmlRepository = mottattXmlRepository;
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.kravgrunnlagMapper = kravgrunnlagMapper;
-        this.økonomiSendtXmlRepository = økonomiSendtXmlRepository;
-        this.tilbakekrevingsvedtakTjeneste = tilbakekrevingsvedtakTjeneste;
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
         this.eksternBehandlingRepository = eksternBehandlingRepository;
     }
@@ -251,59 +238,6 @@ public class ForvaltningBehandlingRestTjeneste {
         return Response.ok().build();
     }
 
-
-    @POST
-    @Path("/hent-oko-xml-feilet-iverksetting")
-    @Operation(
-        tags = "FORVALTNING-behandling",
-        description = "Tjeneste for å hente xml til økonomi ved feilet iverksetting",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Hent xml til økonomi"),
-            @ApiResponse(responseCode = "400", description = "Behandling eksisterer ikke")
-        })
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.DRIFT)
-    public Response hentOkoXmlForFeiletIverksetting(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                                    @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
-        String behandlingRef = behandlingReferanse.erInternBehandlingId()
-            ? behandlingReferanse.getBehandlingId().toString()
-            : behandlingReferanse.getBehandlingUuid().toString();
-        logger.info("Henter xml til økonomi for behandling: {}", behandlingRef);
-
-        Behandling behandling = hentBehandling(behandlingReferanse);
-        if (behandling == null) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-
-        Long behandlingId = behandling.getId();
-        Collection<String> meldinger = økonomiSendtXmlRepository.finnXml(behandlingId, MeldingType.VEDTAK);
-        if (meldinger.isEmpty()) {
-            logger.info("Xml til økonomi ikke lagret i databasen for behandling: {}", behandlingRef);
-            String xml = lagXmlTilØkonomi(behandlingId);
-            return Response.ok()
-                .type(MediaType.APPLICATION_XML)
-                .entity(xml)
-                .build();
-        } else if (meldinger.size() == 1) {
-            logger.info("Fant lagret xml til økonomi for behandling: {}", behandlingRef);
-            return Response.ok()
-                .type(MediaType.APPLICATION_XML)
-                .entity(meldinger.toArray()[0])
-                .build();
-        } else {
-            logger.info("Fant {} lagrede xmler til økonomi for behandling: {}", meldinger.size(), behandlingRef);
-            return Response.ok()
-                .entity(meldinger)
-                .build();
-        }
-    }
-
-    private String lagXmlTilØkonomi(Long behandlingId) {
-        TilbakekrevingsvedtakDto tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
-        TilbakekrevingsvedtakRequest request = new TilbakekrevingsvedtakRequest();
-        request.setTilbakekrevingsvedtak(tilbakekrevingsvedtak);
-        return TilbakekrevingsvedtakMarshaller.marshall(behandlingId, request);
-    }
-
     private void kobleBehandling(KobleBehandlingTilGrunnlagDto dto) {
         Long mottattXmlId = dto.getMottattXmlId();
         Long behandlingId = dto.getBehandlingId();
@@ -386,13 +320,6 @@ public class ForvaltningBehandlingRestTjeneste {
     private void opprettHenleggBehandlingTask(Behandling behandling) {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(TvingHenlegglBehandlingTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        taskTjeneste.lagre(prosessTaskData);
-    }
-
-    private void opprettHentKorrigertGrunnlagTask(Behandling behandling, String kravgrunnlagId) {
-        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(HentKorrigertKravgrunnlagTask.class);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        prosessTaskData.setProperty("KRAVGRUNNLAG_ID", kravgrunnlagId);
         taskTjeneste.lagre(prosessTaskData);
     }
 

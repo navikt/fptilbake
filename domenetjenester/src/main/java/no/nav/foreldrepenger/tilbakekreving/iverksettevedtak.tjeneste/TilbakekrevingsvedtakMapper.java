@@ -1,83 +1,103 @@
 package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 
-import java.math.BigInteger;
+import static no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.KodeSkyld.IKKE_FORDELT;
+import static no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.KodeÅrsak.ANNET;
+
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.KodeResultat;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingsbelopDTO;
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingsperiodeDTO;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
-import no.nav.foreldrepenger.xmlutils.DateUtil;
-import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsbelopDto;
-import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsperiodeDto;
-import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
-import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
-@Deprecated
 public class TilbakekrevingsvedtakMapper {
 
     private TilbakekrevingsvedtakMapper() {
         //hindrer instansiering
     }
 
-    static TilbakekrevingsvedtakDto tilDto(Kravgrunnlag431 kravgrunnlag, List<TilbakekrevingPeriode> tilbakekrevingPerioder) {
-        TilbakekrevingsvedtakDto tilbakekrevingsvedtak = TilbakekrevingsvedtakMapper.tilDto(kravgrunnlag);
-        for (TilbakekrevingPeriode tilbakekrevingPeriode : tilbakekrevingPerioder) {
-            tilbakekrevingsvedtak.getTilbakekrevingsperiode().add(TilbakekrevingsvedtakMapper.tilDto(tilbakekrevingPeriode));
-        }
-        return tilbakekrevingsvedtak;
+    static TilbakekrevingVedtakDTO tilDto(Kravgrunnlag431 kravgrunnlag, List<TilbakekrevingPeriode> tilbakekrevingPerioder) {
+        return new TilbakekrevingVedtakDTO.Builder()
+            .vedtakId(kravgrunnlag.getVedtakId())
+            .datoVedtakFagsystem(vedatkFagsystemDato(kravgrunnlag))
+            .enhetAnsvarlig(kravgrunnlag.getAnsvarligEnhet())
+            .kontrollfelt(kravgrunnlag.getKontrollFelt())
+            .saksbehId(KontekstHolder.getKontekst().getUid())
+            .tilbakekrevingsperiode(tilTilbakekrevingsperiodeDTOer(tilbakekrevingPerioder))
+            .build();
     }
-
-    private static TilbakekrevingsvedtakDto tilDto(Kravgrunnlag431 kravgrunnlag) {
-        TilbakekrevingsvedtakDto tilbakekrevingsvedtak = new TilbakekrevingsvedtakDto();
-        tilbakekrevingsvedtak.setKodeAksjon(KodeAksjon.FATTE_VEDTAK.getKode()); // fast verdi, Fatte Vedtak(8)
-        tilbakekrevingsvedtak.setVedtakId(BigInteger.valueOf(kravgrunnlag.getVedtakId()));
-        LocalDate vedtakFagsystemDato = kravgrunnlag.getVedtakFagSystemDato();
+    private static LocalDate vedatkFagsystemDato(Kravgrunnlag431 kravgrunnlag) {
+        var vedtakFagsystemDato = kravgrunnlag.getVedtakFagSystemDato();
         if (vedtakFagsystemDato == null) {
             vedtakFagsystemDato = LocalDate.now();
         }
-        tilbakekrevingsvedtak.setDatoVedtakFagsystem(DateUtil.convertToXMLGregorianCalendar(vedtakFagsystemDato));
-        tilbakekrevingsvedtak.setKodeHjemmel("22-15"); // fast verdi
-        tilbakekrevingsvedtak.setEnhetAnsvarlig(kravgrunnlag.getAnsvarligEnhet());
-        tilbakekrevingsvedtak.setKontrollfelt(kravgrunnlag.getKontrollFelt());
-        tilbakekrevingsvedtak.setSaksbehId(KontekstHolder.getKontekst().getUid());
-        return tilbakekrevingsvedtak;
+        return vedtakFagsystemDato;
     }
 
-    private static TilbakekrevingsperiodeDto tilDto(TilbakekrevingPeriode tilbakekrevingPeriode) {
-        TilbakekrevingsperiodeDto dto = new TilbakekrevingsperiodeDto();
-        PeriodeDto periodeDto = lagPeriodeDto(tilbakekrevingPeriode.getPeriode());
-        dto.setPeriode(periodeDto);
-        dto.setBelopRenter(tilbakekrevingPeriode.getRenter());
-        tilbakekrevingPeriode.getBeløp().forEach(
-                b -> dto.getTilbakekrevingsbelop().add(lagDto(b)));
-        return dto;
+    private static List<TilbakekrevingsperiodeDTO> tilTilbakekrevingsperiodeDTOer(List<TilbakekrevingPeriode> tilbakekrevingPerioder) {
+        return safeStream(tilbakekrevingPerioder)
+            .map(TilbakekrevingsvedtakMapper::tilDto)
+            .toList();
     }
 
-    private static TilbakekrevingsbelopDto lagDto(TilbakekrevingBeløp b) {
-        TilbakekrevingsbelopDto dto = new TilbakekrevingsbelopDto();
-        dto.setKodeKlasse(b.getKlassekode());
-        dto.setBelopTilbakekreves(b.getTilbakekrevBeløp());
-        dto.setBelopUinnkrevd(b.getUinnkrevdBeløp());
-        dto.setBelopOpprUtbet(b.getUtbetaltBeløp());
-        dto.setBelopNy(b.getNyttBeløp());
-        dto.setBelopSkatt(b.getSkattBeløp());
+    private static TilbakekrevingsperiodeDTO tilDto(TilbakekrevingPeriode tilbakekrevingPeriode) {
+        return new TilbakekrevingsperiodeDTO.Builder()
+            .periode(lagPeriodeDto(tilbakekrevingPeriode.getPeriode()))
+            .belopRenter(tilbakekrevingPeriode.getRenter())
+            .tilbakekrevingsbelop(lagTilbakekrevignsbelopDTOPerioder(tilbakekrevingPeriode.getBeløp()))
+            .build();
+    }
+
+    private static List<TilbakekrevingsbelopDTO> lagTilbakekrevignsbelopDTOPerioder(List<TilbakekrevingBeløp> beløp) {
+        return safeStream(beløp)
+            .map(TilbakekrevingsvedtakMapper::lagTilbakekrevignsbelopDTOPeriode)
+            .toList();
+    }
+
+    private static TilbakekrevingsbelopDTO lagTilbakekrevignsbelopDTOPeriode(TilbakekrevingBeløp b) {
+        var builder = new TilbakekrevingsbelopDTO.Builder()
+            .kodeKlasse(b.getKlassekode())
+            .belopTilbakekreves(b.getTilbakekrevBeløp())
+            .belopUinnkrevd(b.getUinnkrevdBeløp())
+            .belopOpprUtbet(b.getUtbetaltBeløp())
+            .belopNy(b.getNyttBeløp())
+            .belopSkatt(b.getSkattBeløp());
         if (KlasseType.YTEL.equals(b.getKlasseType())) {
-            dto.setKodeResultat(b.getKodeResultat().getKode());
-            dto.setKodeAarsak("ANNET"); // fast verdi
-            dto.setKodeSkyld("IKKE_FORDELT"); // fast verdi
+            builder.kodeResultat(tilKodeResultat(b.getKodeResultat()));
+            builder.kodeAarsak(ANNET);
+            builder.kodeSkyld(IKKE_FORDELT);
         }
-        //FIXME setKlasseType mangler
-        return dto;
+        return builder.build();
+
     }
 
-    private static PeriodeDto lagPeriodeDto(Periode periode) {
-        PeriodeDto periodeDto = new PeriodeDto();
-        periodeDto.setFom(DateUtil.convertToXMLGregorianCalendar(periode.getFom()));
-        periodeDto.setTom(DateUtil.convertToXMLGregorianCalendar(periode.getTom()));
-        return periodeDto;
+    private static KodeResultat tilKodeResultat(no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeResultat kodeResultat) {
+        if (kodeResultat == null) return null;
+        return switch (kodeResultat) {
+            case FORELDET -> KodeResultat.FORELDET;
+            case FEILREGISTRERT -> KodeResultat.FEILREGISTRERT;
+            case INGEN_TILBAKEKREVING -> KodeResultat.INGEN_TILBAKEKREV;
+            case DELVIS_TILBAKEKREVING -> KodeResultat.DELVIS_TILBAKEKREV;
+            case FULL_TILBAKEKREVING -> KodeResultat.FULL_TILBAKEKREV;
+
+        };
+    }
+
+    private static no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.Periode lagPeriodeDto(Periode periode) {
+        return new no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.Periode(periode.getFom(), periode.getTom());
+    }
+
+    public static <T> Stream<T> safeStream(List<T> list) {
+        return Optional.ofNullable(list)
+            .orElseGet(List::of)
+            .stream();
     }
 
 }

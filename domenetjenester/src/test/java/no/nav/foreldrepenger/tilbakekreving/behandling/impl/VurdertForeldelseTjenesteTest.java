@@ -4,14 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-
-import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
@@ -51,7 +51,7 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
 
         Optional<VurdertForeldelse> vurdertForeldelseOptional = vurdertForeldelseRepository.finnVurdertForeldelse(internBehandlingId);
         assertThat(vurdertForeldelseOptional).isPresent();
-        List<VurdertForeldelsePeriode> vurdertForeldelsePerioder = Lists.newArrayList(vurdertForeldelseOptional.get().getVurdertForeldelsePerioder());
+        List<VurdertForeldelsePeriode> vurdertForeldelsePerioder = new ArrayList<>(vurdertForeldelseOptional.get().getVurdertForeldelsePerioder());
         assertThat(vurdertForeldelsePerioder).isNotEmpty();
         assertThat(vurdertForeldelsePerioder.size()).isEqualTo(1);
         assertThat(vurdertForeldelsePerioder.get(0).getForeldelseVurderingType()).isEqualByComparingTo(ForeldelseVurderingType.FORELDET);
@@ -78,7 +78,7 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         LocalDate andrePeriodeFørsteDato = LocalDate.of(2019, 2, 4);
         LocalDate andrePeriodeSisteDato = LocalDate.of(2019, 2, 11);
 
-        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, List.of(
                 new ForeldelsePeriodeDto(FØRSTE_DATO, førstePeriodeSisteDato,
                         ForeldelseVurderingType.FORELDET, FØRSTE_DATO.plusMonths(8), null, "ABC"),
                 new ForeldelsePeriodeDto(andrePeriodeFørsteDato, andrePeriodeSisteDato,
@@ -86,7 +86,7 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
 
         Optional<VurdertForeldelse> vurdertForeldelseOptional = vurdertForeldelseRepository.finnVurdertForeldelse(internBehandlingId);
         assertThat(vurdertForeldelseOptional).isPresent();
-        List<VurdertForeldelsePeriode> vurdertForeldelsePerioder = Lists.newArrayList(vurdertForeldelseOptional.get().getVurdertForeldelsePerioder());
+        List<VurdertForeldelsePeriode> vurdertForeldelsePerioder = new ArrayList<>(vurdertForeldelseOptional.get().getVurdertForeldelsePerioder());
         assertThat(vurdertForeldelsePerioder).isNotEmpty();
         vurdertForeldelsePerioder.sort(Comparator.comparing(VurdertForeldelsePeriode::getFom));
         assertThat(vurdertForeldelsePerioder.size()).isEqualTo(2);
@@ -132,10 +132,10 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
                 TOM_1, KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(22000));
 
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering));
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(List.of(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering));
 
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
-        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, List.of(
                 new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 28),
                         ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3), null, "ABC")));
 
@@ -157,9 +157,9 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
                 TOM_1, KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(22000));
 
-        Kravgrunnlag431 kravgrunnlag = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering));
+        Kravgrunnlag431 kravgrunnlag = KravgrunnlagMockUtil.lagMockObject(List.of(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag);
-        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, List.of(
                 new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 20),
                         ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3), null, "ABC")));
 
@@ -187,11 +187,11 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
 
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(29000));
 
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2,
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(List.of(mockMedFeilPostering, mockMedFeilPostering2,
                 mockMedFeilPostering3, mockMedFeilPostering4, mockMedYtelPostering));
 
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
-        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, List.of(
                 new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 20),
                         ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3), null, "ABC"),
                 new ForeldelsePeriodeDto(LocalDate.of(2016, 3, 21), LocalDate.of(2016, 3, 24),
@@ -234,7 +234,7 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
 
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(37000));
 
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedFeilPostering3, mockMedYtelPostering));
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(List.of(mockMedFeilPostering, mockMedFeilPostering2, mockMedFeilPostering3, mockMedYtelPostering));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
         FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();

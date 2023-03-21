@@ -9,12 +9,13 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.SendVedtakTilOppdragsystemetTask;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.AvsluttBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.SendVedtaksbrevTask;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.SendØkonomiTibakekerevingsVedtakTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
@@ -101,7 +102,7 @@ class AutomatiskSaksbehandlingProsessTaskTest {
 
         assertThat(prosessTaskNavn).doesNotContain(TaskType.forProsessTask(SendVedtaksbrevTask.class))
             .contains(TaskType.forProsessTask(AvsluttBehandlingTask.class))
-            .contains(TaskType.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class))
+            .contains(TaskType.forProsessTask(SendVedtakTilOppdragsystemetTask.class))
             .contains(TaskType.forProsessTask(SendVedtakHendelserTilDvhTask.class));
 
         var faktaFeilutbetalingData = repositoryProvider.getFaktaFeilutbetalingRepository()

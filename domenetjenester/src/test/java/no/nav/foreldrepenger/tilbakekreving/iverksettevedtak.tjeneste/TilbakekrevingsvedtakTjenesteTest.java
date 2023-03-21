@@ -11,7 +11,6 @@ import javax.persistence.EntityManager;
 
 import org.junit.jupiter.api.Test;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.KravgrunnlagTestBuilder;
@@ -20,9 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodev
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 
 @CdiDbAwareTest
 class TilbakekrevingsvedtakTjenesteTest {
@@ -62,12 +59,10 @@ class TilbakekrevingsvedtakTjenesteTest {
 
         var resultat = tjeneste.lagTilbakekrevingsvedtak(behandlingId);
 
-        assertThat(resultat.getVedtakId().longValue()).isEqualTo(kravgrunnlag.getVedtakId());
-        assertThat(resultat.getKodeAksjon()).isEqualTo("8"); //Fast verdi
-        assertThat(resultat.getKodeHjemmel()).isEqualTo("22-15");
-        assertThat(resultat.getKontrollfelt()).isEqualTo(kravgrunnlag.getKontrollFelt());
-        assertThat(resultat.getEnhetAnsvarlig()).isEqualTo(kravgrunnlag.getAnsvarligEnhet());
-        assertThat(resultat.getSaksbehId()).isEqualTo(behandling.getAnsvarligSaksbehandler());
+        assertThat(resultat.vedtakId().longValue()).isEqualTo(kravgrunnlag.getVedtakId());
+        assertThat(resultat.kontrollfelt()).isEqualTo(kravgrunnlag.getKontrollFelt());
+        assertThat(resultat.enhetAnsvarlig()).isEqualTo(kravgrunnlag.getAnsvarligEnhet());
+        assertThat(resultat.saksbehId()).isEqualTo(behandling.getAnsvarligSaksbehandler());
 
     }
 

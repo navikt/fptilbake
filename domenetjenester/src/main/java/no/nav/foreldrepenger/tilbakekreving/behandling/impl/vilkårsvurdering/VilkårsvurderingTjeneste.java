@@ -18,8 +18,6 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
-import org.apache.cxf.common.util.CollectionUtils;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.DetaljertFeilutbetalingPeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeMedBeløpDto;
@@ -189,7 +187,7 @@ public class VilkårsvurderingTjeneste {
         FeilutbetalingPerioderDto feilutbetalingPerioderDto = foreldelseTjeneste.henteVurdertForeldelse(behandlingId);
 
         //TODO unødvendig if
-        if (!CollectionUtils.isEmpty(feilutbetalingPerioderDto.getPerioder())) {
+        if (feilutbetalingPerioderDto.getPerioder() != null && !feilutbetalingPerioderDto.getPerioder().isEmpty()) {
             Optional<ForeldelsePeriodeMedBeløpDto> periode = feilutbetalingPerioderDto.getPerioder().stream()
                     //TODO bruk en Periode-implementasjon og overlap-funksjon
                     .filter(periodeDto -> fom.equals(periodeDto.getFom()) && tom.equals(periodeDto.getTom()))

@@ -4,11 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
@@ -38,7 +37,7 @@ class MottattGrunnlagStegTest extends FellesTestOppsett {
 
     @Test
     void skal_utføre_steg_uten_aksjonspunkt() {
-        grunnlagRepository.lagre(behandling.getId(), KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList()));
+        grunnlagRepository.lagre(behandling.getId(), KravgrunnlagMockUtil.lagMockObject(new ArrayList<>()));
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
@@ -50,7 +49,7 @@ class MottattGrunnlagStegTest extends FellesTestOppsett {
 
     @Test
     void skal_fortsatt_på_vent_hvis_grunnlag_er_sperret() {
-        grunnlagRepository.lagre(behandling.getId(), KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList()));
+        grunnlagRepository.lagre(behandling.getId(), KravgrunnlagMockUtil.lagMockObject(new ArrayList<>()));
         grunnlagRepository.sperrGrunnlag(behandling.getId());
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);

@@ -2,21 +2,15 @@ package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 
 @ApplicationScoped
 public class TilbakekrevingsvedtakTjeneste {
@@ -41,8 +35,7 @@ public class TilbakekrevingsvedtakTjeneste {
         this.vurdertForeldelseRepository = vurdertForeldelseRepository;
     }
 
-    @Deprecated
-    public TilbakekrevingsvedtakDto lagTilbakekrevingsvedtak(Long behandlingId) {
+    public TilbakekrevingVedtakDTO lagTilbakekrevingsvedtak(Long behandlingId) {
         var kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
         var vurdertForeldelse = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
         var beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
@@ -50,16 +43,6 @@ public class TilbakekrevingsvedtakTjeneste {
             beregningResultat);
         validerSkattBeløp(tilbakekrevingPerioder);
         return TilbakekrevingsvedtakMapper.tilDto(kravgrunnlag, tilbakekrevingPerioder);
-    }
-
-    public TilbakekrevingVedtakDTO lagTilbakekrevingsvedtakDTOFpwsproxy(Long behandlingId) {
-        var kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
-        var vurdertForeldelse = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
-        var beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
-        var tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, vurdertForeldelse,
-            beregningResultat);
-        validerSkattBeløp(tilbakekrevingPerioder);
-        return TilbakekrevingsvedtakMapperFpwsproxy.tilDto(kravgrunnlag, tilbakekrevingPerioder);
     }
 
     private void validerSkattBeløp(final List<TilbakekrevingPeriode> tilbakekrevingPerioder) {
