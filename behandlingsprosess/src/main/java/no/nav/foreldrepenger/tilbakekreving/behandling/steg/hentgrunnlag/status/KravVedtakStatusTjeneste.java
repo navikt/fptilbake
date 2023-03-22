@@ -1,13 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status;
 
-import java.time.LocalDateTime;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
@@ -25,6 +17,14 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import java.time.LocalDateTime;
 
 @ApplicationScoped
 public class KravVedtakStatusTjeneste {
@@ -65,7 +65,9 @@ public class KravVedtakStatusTjeneste {
         } else if (KravStatusKode.ENDRET.equals(statusKode)) {
             håndteresEndretStatusMelding(behandlingId, statusKode.getKode());
         } else {
-            throw new TekniskException("FPT-107928", String.format("Har fått ugyldig status kode %s fra økonomisystem, kan ikke aksepterer for behandlingId '%s'", statusKode.getKode(), behandlingId));
+            throw new TekniskException("FPT-107928",
+                String.format("Har fått ugyldig status kode %s fra økonomisystem, kan ikke akseptere for behandlingId '%s'", statusKode.getKode(),
+                    behandlingId));
         }
         kravVedtakStatusRepository.lagre(behandlingId, kravVedtakStatus437);
     }
@@ -86,7 +88,8 @@ public class KravVedtakStatusTjeneste {
     private void settBehandlingPåVent(Long behandlingId) {
         var fristDato = LocalDateTime.now().plusMonths(3);
         var behandling = behandlingRepository.hentBehandling(behandlingId);
-        behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
+            BehandlingStegType.TBKGSTEG, fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
     }
 
     private void sperrGrunnlag(Long behandlingId) {
@@ -118,6 +121,8 @@ public class KravVedtakStatusTjeneste {
     }
 
     static TekniskException kanIkkeFinnesSperretGrunnlagForBehandling(String status, long behandlingId) {
-        return new TekniskException("FPT-107929", String.format("Har fått ENDR status kode %s fra økonomisystem for behandlingId '%s', men ikke finnes sperret grunnlag", status, behandlingId));
+        return new TekniskException("FPT-107929",
+            String.format("Har fått ENDR status kode %s fra økonomisystem for behandlingId '%s', men ikke finnes sperret grunnlag", status,
+                behandlingId));
     }
 }
