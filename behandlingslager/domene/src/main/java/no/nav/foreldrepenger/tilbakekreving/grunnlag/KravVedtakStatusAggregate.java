@@ -72,7 +72,7 @@ class KravVedtakStatusAggregate extends BaseEntitet {
     }
 
     public static class Builder {
-        private KravVedtakStatusAggregate kladd = new KravVedtakStatusAggregate();
+        private final KravVedtakStatusAggregate kladd = new KravVedtakStatusAggregate();
 
         public Builder medBehandlingId(Long behandlingId) {
             this.kladd.behandlingId = behandlingId;

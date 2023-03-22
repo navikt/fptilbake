@@ -21,7 +21,7 @@ public abstract class FellesTask {
         // for CDI proxy
     }
 
-    public FellesTask(BehandlingRepository behandlingRepository,
+    protected FellesTask(BehandlingRepository behandlingRepository,
                       FagsystemKlient fagsystemKlient) {
         this.behandlingRepository = behandlingRepository;
         this.fagsystemKlient = fagsystemKlient;
@@ -40,10 +40,11 @@ public abstract class FellesTask {
     }
 
     protected Optional<Behandling> finnÅpenTilbakekrevingBehandling(String saksnummer) {
-        List<Behandling> behandlinger = hentBehandlingerForSaksnummer(saksnummer);
-        List<Behandling> åpneBehandlinger = behandlinger.stream()
-                .filter(beh -> BehandlingType.TILBAKEKREVING.equals(beh.getType()))
-                .filter(beh -> !beh.erAvsluttet()).collect(Collectors.toList());
+        var behandlinger = hentBehandlingerForSaksnummer(saksnummer);
+        var åpneBehandlinger = behandlinger.stream()
+            .filter(beh -> BehandlingType.TILBAKEKREVING.equals(beh.getType()))
+            .filter(beh -> !beh.erAvsluttet())
+            .toList();
         if (åpneBehandlinger.size() > 1) {
             throw new IllegalArgumentException("Utvikler feil: Kan ikke ha flere åpne behandling for saksnummer=" + saksnummer);
         }

@@ -8,8 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -109,7 +107,7 @@ class FinnGrunnlagTaskTest extends FellesTestOppsett {
         assertThat(behandlingsresultat).isNotEmpty();
         assertThat(behandlingsresultat.get().getBehandlingResultatType()).isEqualByComparingTo(BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT);
 
-        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isNotEmpty();
+        assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isNotEmpty();
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
         assertTilkobling();
         assertThat(behandling.erAvsluttet()).isTrue();
@@ -128,7 +126,7 @@ class FinnGrunnlagTaskTest extends FellesTestOppsett {
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
-        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isNotEmpty();
+        assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isNotEmpty();
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isTrue();
         assertTilkobling();
@@ -229,7 +227,7 @@ class FinnGrunnlagTaskTest extends FellesTestOppsett {
         finnGrunnlagTask.doTask(prosessTaskData);
 
         assertThat(behandling.isBehandlingPåVent()).isFalse();
-        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEmpty();
+        assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isEmpty();
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isFalse();
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isFalse();
     }
@@ -243,7 +241,7 @@ class FinnGrunnlagTaskTest extends FellesTestOppsett {
         finnGrunnlagTask.doTask(prosessTaskData);
 
         assertThat(behandling.isBehandlingPåVent()).isFalse();
-        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEmpty();
+        assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isEmpty();
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isFalse();
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isFalse();
     }
@@ -262,7 +260,7 @@ class FinnGrunnlagTaskTest extends FellesTestOppsett {
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
 
-        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isNotEmpty();
+        assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isNotEmpty();
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isFalse();
 

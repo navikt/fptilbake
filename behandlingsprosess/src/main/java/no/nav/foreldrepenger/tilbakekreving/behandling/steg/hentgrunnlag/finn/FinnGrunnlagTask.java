@@ -106,8 +106,8 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
                     kobleGrunnlagMedBehandling(behandling, mottattXmlId, mottattXml);
                 } else if (mottattXml.contains(ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML) && grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
                     logger.info("xml er status xml med mottattXmlId={}", mottattXmlId);
-                    boolean erAvsluttMelding = mottattXml.contains(KravStatusKode.AVSLUTTET.getKode());
-                    boolean finnesFlereMeldingerEtterAvsluttMelding = erAvsluttMelding &&
+                    var erAvsluttMelding = mottattXml.contains(KravStatusKode.AVSLUTTET.getKode());
+                    var finnesFlereMeldingerEtterAvsluttMelding = erAvsluttMelding &&
                             (alleXmlMeldinger.size() > alleXmlMeldinger.indexOf(økonomiXmlMottatt) + 1);
                     håndtereGrunnlagStatusForBehandling(behandlingId, mottattXmlId, mottattXml, finnesFlereMeldingerEtterAvsluttMelding);
                 } else {
@@ -125,8 +125,8 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
 
 
     private void håndtereGrunnlagStatusForBehandling(Long behandlingId, Long mottattXmlId, String mottattXml, boolean finnesFlereMeldingerEtterAvsluttMelding) {
-        KravOgVedtakstatus kravOgVedtakstatus = KravVedtakStatusXmlUnmarshaller.unmarshall(mottattXmlId, mottattXml);
-        KravVedtakStatus437 kravVedtakStatus437 = kravVedtakStatusMapper.mapTilDomene(kravOgVedtakstatus);
+        var kravOgVedtakstatus = KravVedtakStatusXmlUnmarshaller.unmarshall(mottattXmlId, mottattXml);
+        var kravVedtakStatus437 = kravVedtakStatusMapper.mapTilDomene(kravOgVedtakstatus);
         // Hvis det finner flere meldinger etter AVSL melding, unngår vi AVSLUTT melding. Behandling kan ikke henlegges fordi det kan koble til et annet grunnlag.
         if (!KravStatusKode.AVSLUTTET.equals(kravVedtakStatus437.getKravStatusKode()) || !finnesFlereMeldingerEtterAvsluttMelding) {
             kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(behandlingId, kravVedtakStatus437);

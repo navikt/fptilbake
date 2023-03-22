@@ -7,7 +7,6 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
@@ -26,32 +25,33 @@ public class KravVedtakStatusRepository {
     }
 
     public void lagre(Long behandlingId, KravVedtakStatus437 kravVedtakStatus) {
-        Optional<KravVedtakStatusAggregate> forrigeGrunnlagStatus = finnKravStatusForBehaandlingId(behandlingId);
+        var forrigeGrunnlagStatus = finnKravStatusForBehandlingId(behandlingId);
         if (forrigeGrunnlagStatus.isPresent()) {
             forrigeGrunnlagStatus.get().disable();
             entityManager.persist(forrigeGrunnlagStatus.get());
         }
-        KravVedtakStatusAggregate aggregate = new KravVedtakStatusAggregate.Builder()
-                .medKravVedtakStatus(kravVedtakStatus)
-                .medBehandlingId(behandlingId)
-                .medAktiv(true)
-                .build();
+        var aggregate = new KravVedtakStatusAggregate.Builder()
+            .medKravVedtakStatus(kravVedtakStatus)
+            .medBehandlingId(behandlingId)
+            .medAktiv(true)
+            .build();
         entityManager.persist(kravVedtakStatus);
         entityManager.persist(aggregate);
         entityManager.flush();
     }
 
 
-    public Optional<KravStatusKode> finnKravstatus(Long behandlingId) {
-        return finnKravStatusForBehaandlingId(behandlingId)
-                .map(ks -> ks.getKravVedtakStatus().getKravStatusKode());
+    public Optional<KravStatusKode> finnKravStatus(Long behandlingId) {
+        return finnKravStatusForBehandlingId(behandlingId)
+            .map(ks -> ks.getKravVedtakStatus().getKravStatusKode());
     }
 
-    private Optional<KravVedtakStatusAggregate> finnKravStatusForBehaandlingId(Long behandlingId) {
-        TypedQuery<KravVedtakStatusAggregate> query = entityManager.createQuery("from KravVedtakStatusAggregate aggr " +
-                "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", KravVedtakStatusAggregate.class);
+    private Optional<KravVedtakStatusAggregate> finnKravStatusForBehandlingId(Long behandlingId) {
+        var query = entityManager.createQuery("""
+            FROM KravVedtakStatusAggregate aggr
+            WHERE aggr.behandlingId = :behandlingId
+            AND aggr.aktiv = true""", KravVedtakStatusAggregate.class);
         query.setParameter("behandlingId", behandlingId);
-        query.setParameter("aktiv", true);
         return hentUniktResultat(query);
     }
 }
