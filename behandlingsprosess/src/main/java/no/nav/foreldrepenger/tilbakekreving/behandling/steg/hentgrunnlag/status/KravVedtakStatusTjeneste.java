@@ -1,5 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status;
 
+import java.time.LocalDateTime;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
@@ -8,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -17,14 +24,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import java.time.LocalDateTime;
 
 @ApplicationScoped
 public class KravVedtakStatusTjeneste {
@@ -45,29 +44,28 @@ public class KravVedtakStatusTjeneste {
     @Inject
     public KravVedtakStatusTjeneste(KravVedtakStatusRepository kravVedtakStatusRepository,
                                     ProsessTaskTjeneste taskTjeneste,
-                                    BehandlingRepositoryProvider repositoryProvider,
+                                    BehandlingRepository behandlingRepository,
+                                    KravgrunnlagRepository kravgrunnlagRepository,
                                     HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.kravVedtakStatusRepository = kravVedtakStatusRepository;
         this.taskTjeneste = taskTjeneste;
-        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
+        this.behandlingRepository = behandlingRepository;
+        this.grunnlagRepository = kravgrunnlagRepository;
         this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }
 
     public void håndteresMottakAvKravVedtakStatus(Long behandlingId, KravVedtakStatus437 kravVedtakStatus437) {
         var statusKode = kravVedtakStatus437.getKravStatusKode();
-        if (KravStatusKode.AVSLUTTET.equals(statusKode)) {
-            henleggBehandlingTjeneste.henleggBehandling(behandlingId, BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT);
-        } else if (KravStatusKode.MANUELL.equals(statusKode) || KravStatusKode.SPERRET.equals(statusKode)) {
-            sperrGrunnlagOgSettPåVent(behandlingId, statusKode);
-        } else if (KravStatusKode.ENDRET.equals(statusKode)) {
-            håndteresEndretStatusMelding(behandlingId, statusKode.getKode());
-        } else {
-            throw new TekniskException("FPT-107928",
-                String.format("Har fått ugyldig status kode %s fra økonomisystem, kan ikke akseptere for behandlingId '%s'", statusKode.getKode(),
-                    behandlingId));
+
+        switch (statusKode) {
+            case MANUELL, SPERRET -> sperrGrunnlagOgSettPåVent(behandlingId, statusKode);
+            case ENDRET -> håndteresEndretStatusMelding(behandlingId, statusKode.getKode());
+            case AVSLUTTET -> getHenleggBehandling(behandlingId);
+            default -> throw new TekniskException("FPT-107928",
+                String.format("Har fått ugyldig status kode %s fra økonomisystem, kan ikke akseptere for behandlingId '%s'",
+                    statusKode.getKode(), behandlingId));
         }
         kravVedtakStatusRepository.lagre(behandlingId, kravVedtakStatus437);
     }
@@ -118,6 +116,10 @@ public class KravVedtakStatusTjeneste {
         taskData.setCallIdFraEksisterende();
         taskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
         taskTjeneste.lagre(taskData);
+    }
+
+    private void getHenleggBehandling(Long behandlingId) {
+        henleggBehandlingTjeneste.henleggBehandling(behandlingId, BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT);
     }
 
     static TekniskException kanIkkeFinnesSperretGrunnlagForBehandling(String status, long behandlingId) {

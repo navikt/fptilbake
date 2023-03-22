@@ -53,7 +53,7 @@ class FinnGrunnlagTaskTest extends FellesTestOppsett {
         HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider,
                 taskTjeneste, behandlingskontrollTjeneste, historikkinnslagTjeneste);
         KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
-                taskTjeneste, repositoryProvider, henleggBehandlingTjeneste,
+                taskTjeneste, repositoryProvider.getBehandlingRepository(), repositoryProvider.getGrunnlagRepository(), henleggBehandlingTjeneste,
                 behandlingskontrollTjeneste);
         KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
         finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository,
