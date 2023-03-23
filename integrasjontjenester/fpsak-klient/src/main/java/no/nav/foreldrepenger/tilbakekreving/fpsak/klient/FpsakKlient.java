@@ -58,7 +58,7 @@ public class FpsakKlient implements FagsystemKlient {
 
     @Override
     public boolean finnesBehandlingIFagsystem(String saksnummer, Henvisning henvisning) {
-        List<EksternBehandlingsinfoDto> eksternBehandlinger = hentBehandlingForSaksnummer(saksnummer);
+        var eksternBehandlinger = hentBehandlingForSaksnummer(saksnummer);
         if (!eksternBehandlinger.isEmpty()) {
             return eksternBehandlinger.stream()
                     .anyMatch(eksternBehandlingsinfoDto -> henvisning.equals(eksternBehandlingsinfoDto.getHenvisning()));
@@ -159,9 +159,9 @@ public class FpsakKlient implements FagsystemKlient {
     }
 
     public List<FpsakBehandlingInfoDto> hentFpsakBehandlingForSaksnummer(String saksnummer) {
-        URI endpoint = createUri("/api/behandlinger/alle", "saksnummer", saksnummer);
+        var endpoint = createUri("/api/behandlinger/alle", "saksnummer", saksnummer);
         List<FpsakBehandlingInfoDto> behandlinger = restClient.send(RestRequest.newGET(endpoint, restConfig), ListeAvFpsakBehandlingInfoDto.class);
-        for (FpsakBehandlingInfoDto dto : behandlinger) {
+        for (var dto : behandlinger) {
             dto.setHenvisning(Henvisning.fraEksternBehandlingId(dto.getId()));
         }
         return behandlinger;

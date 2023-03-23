@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.domene.typer;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -10,7 +11,7 @@ import no.nav.vedtak.log.util.LoggerUtils;
 
 
 @Embeddable
-public class Henvisning {
+public class Henvisning implements Serializable {
     private static final String CHARS = "a-zA-Z0-9+/";
 
     //tall som passer i en long
@@ -62,7 +63,7 @@ public class Henvisning {
         } else if (obj == null || !getClass().equals(obj.getClass())) {
             return false;
         }
-        Henvisning other = (Henvisning) obj;
+        var other = (Henvisning) obj;
         return Objects.equals(henvisning, other.henvisning);
     }
 

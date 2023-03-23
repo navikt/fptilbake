@@ -5,15 +5,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import javax.persistence.TypedQuery;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,16 +25,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -72,11 +66,11 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         kravVedtakStatusRepository = new KravVedtakStatusRepository(entityManager);
         behandlingresultatRepository = new BehandlingresultatRepository(entityManager);
         henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, taskTjeneste, behandlingskontrollTjeneste, historikkinnslagTjeneste);
-        KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
-                taskTjeneste, repositoryProvider, henleggBehandlingTjeneste,
+        var kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
+                taskTjeneste, repositoryProvider.getBehandlingRepository(), repositoryProvider.getGrunnlagRepository(), henleggBehandlingTjeneste,
                 behandlingskontrollTjeneste);
-        KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
-        lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider,
+        var kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
+        lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider.getBehandlingRepository(),
                 kravVedtakStatusTjeneste, kravVedtakStatusMapper, fagsystemKlientMock);
 
         behandling = lagBehandling();
@@ -98,7 +92,7 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).isNotNull();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
-        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.SPERRET));
+        assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.SPERRET));
     }
 
     @Test
@@ -111,7 +105,7 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).isNotNull();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
-        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.MANUELL));
+        assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.MANUELL));
     }
 
     @Test
@@ -121,15 +115,15 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
         assertTrue(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId));
         assertThat(behandling.erAvsluttet()).isTrue();
-        Optional<Behandlingsresultat> resultat = behandlingresultatRepository.hent(behandling);
+        var resultat = behandlingresultatRepository.hent(behandling);
         assertThat(resultat).isPresent();
         assertThat(resultat.get().getBehandlingResultatType()).isEqualByComparingTo(BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT);
 
-        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.AVSLUTTET));
+        assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.AVSLUTTET));
 
-        List<Historikkinnslag> historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandling.getId());
-        assertThat(historikkinnslager.size()).isEqualTo(1);
-        Historikkinnslag historikkinnslag = historikkinnslager.get(0);
+        var historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandling.getId());
+        assertThat(historikkinnslager).hasSize(1);
+        var historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.AVBRUTT_BEH);
     }
 
@@ -143,7 +137,7 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
     @Test
     void skal_utføre_leskravvedtakstatus_task_for_behandling_som_finnes_ikke_iFpsak() {
-        // den xml-en har behandlngId som finnes ikke i EksternBehandling
+        // den xml-en har behandlingId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldig.xml"));
         when(fagsystemKlientMock.finnesBehandlingIFagsystem(anyString(), any(Henvisning.class))).thenReturn(false);
 
@@ -153,18 +147,18 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
     @Test
     void skal_utføre_leskravvedtakstatus_task_når_fptilbake_har_ingen_åpenBehandling() {
-        // den xml-en har behandlngId som finnes ikke i EksternBehandling
+        // den xml-en har behandlingId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldig.xml"));
         when(fagsystemKlientMock.finnesBehandlingIFagsystem(anyString(), any(Henvisning.class))).thenReturn(true);
 
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LES_KRAV_STATUS_TASK));
 
-        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEmpty();
+        assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isEmpty();
     }
 
     @Test
     void skal_utføre_leskravvedtakstatus_task_for_behandling_som_er_ugyldig() {
-        // den xml-en har behandlngId som finnes ikke i EksternBehandling
+        // den xml-en har behandlingId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldigreferanse.xml"));
 
         assertThatThrownBy(() -> lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LES_KRAV_STATUS_TASK)))
@@ -180,17 +174,17 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LES_KRAV_STATUS_TASK));
 
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
+        var eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
         assertThat(eksternBehandling.getHenvisning()).isEqualTo(HENVISNING);
 
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         assertThat(behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).isNotNull();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
-        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.SPERRET));
+        assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.SPERRET));
 
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isTrue();
-        List<ØkonomiXmlMottatt> mottattMeldinger = finnAlleForHenvisning(HENVISNING);
+        var mottattMeldinger = finnAlleForHenvisning(HENVISNING);
         assertThat(mottattMeldinger).isNotEmpty();
         assertThat(mottattMeldinger.stream().filter(økonomiXmlMottatt -> !økonomiXmlMottatt.isTilkoblet()).findAny()).isEmpty();
     }
@@ -200,16 +194,16 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LES_KRAV_STATUS_TASK));
 
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
+        var eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
         assertThat(eksternBehandling.getHenvisning()).isEqualTo(HENVISNING);
 
-        List<ØkonomiXmlMottatt> xmlMottatt = finnAlleForHenvisning(HENVISNING);
-        assertThat(xmlMottatt.size()).isEqualTo(2);
+        var xmlMottatt = finnAlleForHenvisning(HENVISNING);
+        assertThat(xmlMottatt).hasSize(2);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         assertThat(behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).isNotNull();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
-        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.SPERRET));
+        assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.SPERRET));
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isTrue();
     }
 
@@ -221,27 +215,27 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR_samme_referanse.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LES_KRAV_STATUS_TASK));
 
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
+        var eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
         assertThat(eksternBehandling.getHenvisning()).isEqualTo(HENVISNING);
 
-        List<ØkonomiXmlMottatt> xmlMottatt = finnAlleForHenvisning(HENVISNING);
-        assertThat(xmlMottatt.size()).isEqualTo(3);
+        var xmlMottatt = finnAlleForHenvisning(HENVISNING);
+        assertThat(xmlMottatt).hasSize(3);
 
-        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.ENDRET));
+        assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.ENDRET));
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isFalse();
 
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        verify(taskTjeneste).lagre(captor.capture());
         var prosessTasker = captor.getAllValues();
-        assertThat(prosessTasker).isNotEmpty();
-        assertThat(prosessTasker.size()).isEqualTo(1);
+        assertThat(prosessTasker).isNotEmpty().hasSize(1);
         assertThat(prosessTasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(FortsettBehandlingTask.class));
     }
 
     @Test
     void skal_ikke_utføre_leskravvedtakststatustask_for_mottatt_endr_melding_når_grunnlag_ikke_sperret() {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR_samme_referanse.xml"));
-        assertThatThrownBy(() -> lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LES_KRAV_STATUS_TASK)))
+        var prosessTaskData = lagProsessTaskData(mottattXmlId, LES_KRAV_STATUS_TASK);
+        assertThatThrownBy(() -> lesKravvedtakStatusTask.doTask(prosessTaskData))
                 .isInstanceOf(TekniskException.class)
                 .hasMessageContaining("FPT-107929");
     }
@@ -271,7 +265,7 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER_annen_referanse.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LES_KRAV_STATUS_TASK));
 
-        Optional<ØkonomiXmlMottatt> xmlMottatt = mottattXmlRepository.finnForHenvisning(Henvisning.fraEksternBehandlingId(100000001L));
+        var xmlMottatt = mottattXmlRepository.finnForHenvisning(Henvisning.fraEksternBehandlingId(100000001L));
         assertThat(xmlMottatt).isPresent();
         assertThat(xmlMottatt.get().getSaksnummer()).isEqualTo("139015144");
         assertThat(xmlMottatt.get().isTilkoblet()).isFalse();
@@ -279,31 +273,33 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
 
     private List<ØkonomiXmlMottatt> finnAlleForHenvisning(Henvisning henvisning) {
-        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where henvisning=:henvisning", ØkonomiXmlMottatt.class);
+        var query = entityManager.createQuery("""
+            FROM ØkonomiXmlMottatt
+            WHERE henvisning=:henvisning
+            """, ØkonomiXmlMottatt.class);
         query.setParameter("henvisning", henvisning);
         return query.getResultList();
     }
 
     private Behandling lagBehandling() {
-        NavBruker navBruker = NavBruker.opprettNy(TestFagsakUtil.genererBruker().getAktørId(), Språkkode.nb);
-        Fagsak fagsak = Fagsak.opprettNy(new Saksnummer("139015144"), navBruker);
+        var navBruker = NavBruker.opprettNy(TestFagsakUtil.genererBruker().getAktørId(), Språkkode.nb);
+        var fagsak = Fagsak.opprettNy(new Saksnummer("139015144"), navBruker);
         fagsakRepository.lagre(fagsak);
-        Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
-        BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
+        var behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
+        var behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
         return behandling;
     }
 
     private void lagEksternBehandling(Behandling behandling) {
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(REFERANSE), UUID.randomUUID());
+        var eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(REFERANSE), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 
     private List<EksternBehandlingsinfoDto> lagResponsFraFagsystemKlient() {
-        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
+        var eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setUuid(UUID.randomUUID());
         eksternBehandlingsinfoDto.setHenvisning(Henvisning.fraEksternBehandlingId(REFERANSE));
         return List.of(eksternBehandlingsinfoDto);
     }
-
 }

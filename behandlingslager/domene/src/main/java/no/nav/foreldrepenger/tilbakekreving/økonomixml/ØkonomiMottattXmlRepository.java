@@ -10,8 +10,6 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 
@@ -37,53 +35,53 @@ public class ØkonomiMottattXmlRepository {
     }
 
     public Long lagreMottattXml(String xml) {
-        ØkonomiXmlMottatt entity = new ØkonomiXmlMottatt(xml);
+        var entity = new ØkonomiXmlMottatt(xml);
         entityManager.persist(entity);
         return entity.getId();
     }
 
     public void slettMottattXml(Long xmlId) {
-        ØkonomiXmlMottatt entity = finnMottattXml(xmlId);
+        var entity = finnMottattXml(xmlId);
         entityManager.remove(entity);
         entityManager.flush();
     }
 
     public Optional<ØkonomiXmlMottatt> finnForHenvisning(Henvisning henvisning) {
-        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where henvisning=:henvisning", ØkonomiXmlMottatt.class);
+        var query = entityManager.createQuery("from ØkonomiXmlMottatt where henvisning=:henvisning", ØkonomiXmlMottatt.class);
         query.setParameter("henvisning", henvisning);
         return hentUniktResultat(query);
     }
 
     public List<ØkonomiXmlMottatt> finnAlleForSaksnummerSomIkkeErKoblet(String saksnummer) {
-        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer=:saksnummer and tilkoblet='N'", ØkonomiXmlMottatt.class);
+        var query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer=:saksnummer and tilkoblet='N'", ØkonomiXmlMottatt.class);
         query.setParameter("saksnummer", saksnummer);
         return query.getResultList();
     }
 
     public List<ØkonomiXmlMottatt> finnAlleForSaksnummer(String saksnummer) {
-        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer=:saksnummer", ØkonomiXmlMottatt.class);
+        var query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer=:saksnummer", ØkonomiXmlMottatt.class);
         query.setParameter("saksnummer", saksnummer);
         return query.getResultList();
     }
 
     public void oppdaterMedHenvisningOgSaksnummer(Henvisning henvisning, String saksnummer, Long kravgrunnlagXmlId) {
-        ØkonomiXmlMottatt entity = finnMottattXml(kravgrunnlagXmlId);
-        Long eksisterendeVersjon = finnHøyesteVersjonsnummer(henvisning);
-        long nyVersjon = eksisterendeVersjon == null ? 1 : eksisterendeVersjon + 1;
+        var entity = finnMottattXml(kravgrunnlagXmlId);
+        var eksisterendeVersjon = finnHøyesteVersjonsnummer(henvisning);
+        var nyVersjon = eksisterendeVersjon == null ? 1 : eksisterendeVersjon + 1;
         entity.setHenvisning(henvisning, nyVersjon);
         entity.setSaksnummer(saksnummer);
         entityManager.persist(entity);
     }
 
     public void opprettTilkobling(Long mottattXmlId) {
-        ØkonomiXmlMottatt entity = finnMottattXml(mottattXmlId);
+        var entity = finnMottattXml(mottattXmlId);
         entity.lagTilkobling();
         entityManager.persist(entity);
         entityManager.flush();
     }
 
     public void fjernTilkobling(Long mottattXmlId) {
-        ØkonomiXmlMottatt entity = finnMottattXml(mottattXmlId);
+        var entity = finnMottattXml(mottattXmlId);
         entity.fjernKobling();
         entityManager.persist(entity);
         entityManager.flush();
@@ -94,14 +92,17 @@ public class ØkonomiMottattXmlRepository {
     }
 
     public List<Long> hentGamleUkobledeKravgrunnlagXmlIds(LocalDateTime dato) {
-        TypedQuery<Long> query = entityManager.createQuery("select id from ØkonomiXmlMottatt where tilkoblet='N' and opprettetTidspunkt < :dato" +
-                " and melding like '%detaljertKravgrunnlagMelding%'", Long.class);
+        var query = entityManager.createQuery("""
+                select id from ØkonomiXmlMottatt
+                where tilkoblet = false
+                and opprettetTidspunkt < :dato
+                and mottattXml like '%detaljertKravgrunnlagMelding%'""", Long.class);
         query.setParameter("dato", dato);
         return query.getResultList();
     }
 
     public void arkiverMottattXml(Long mottattXmlId, String xml) {
-        ØkonomiXmlMottattArkiv økonomiXmlMottattArkiv = new ØkonomiXmlMottattArkiv(mottattXmlId, xml);
+        var økonomiXmlMottattArkiv = new ØkonomiXmlMottattArkiv(mottattXmlId, xml);
         entityManager.persist(økonomiXmlMottattArkiv);
         entityManager.flush();
     }
@@ -111,15 +112,15 @@ public class ØkonomiMottattXmlRepository {
     }
 
     public boolean erMottattXmlArkivert(Long mottattXmlId) {
-        TypedQuery<Long> query = entityManager.createQuery("select count(1) from ØkonomiXmlMottattArkiv arkiv where arkiv.id=:mottattXmlId", Long.class);
+        var query = entityManager.createQuery("select count(1) from ØkonomiXmlMottattArkiv arkiv where arkiv.id=:mottattXmlId", Long.class);
         query.setParameter("mottattXmlId", mottattXmlId);
         return query.getSingleResult() == 1;
     }
 
     private Long finnHøyesteVersjonsnummer(Henvisning henvisning) {
-        Query query = entityManager.createNativeQuery("select max(sekvens) from oko_xml_mottatt where henvisning=:henvisning");
+        var query = entityManager.createNativeQuery("select max(sekvens) from oko_xml_mottatt where henvisning=:henvisning");
         query.setParameter("henvisning", henvisning.getVerdi());
-        Object resultat = query.getSingleResult();
+        var resultat = query.getSingleResult();
         return resultat != null ? ((BigDecimal) resultat).longValue() : null;
     }
 }

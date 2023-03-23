@@ -108,7 +108,7 @@ public abstract class FellesTestOppsett {
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
         eksternBehandlingRepository = new EksternBehandlingRepository(entityManager);
-        FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
+        var fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
                 entityManager);
         behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
         behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);

@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.grunnlag;
 import java.util.Objects;
 
 import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -47,9 +46,7 @@ public class KravVedtakStatus437 extends BaseEntitet {
     @Column(name = "gjelder_type", nullable = false, updatable = false)
     private GjelderType gjelderType;
 
-    @AttributeOverrides({
-            @AttributeOverride(name = "henvisning", column = @Column(name = "referanse"))
-    })
+    @AttributeOverride(name = "henvisning", column = @Column(name = "referanse"))
     private Henvisning referanse;
 
     public Long getId() {
@@ -96,7 +93,7 @@ public class KravVedtakStatus437 extends BaseEntitet {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        KravVedtakStatus437 that = (KravVedtakStatus437) o;
+        var that = (KravVedtakStatus437) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(vedtakId, that.vedtakId) &&
                 Objects.equals(kravStatusKode, that.kravStatusKode);

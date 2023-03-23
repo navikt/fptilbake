@@ -41,8 +41,8 @@ public class XmlMottattObserver {
     }
 
     public void observer(@Observes XmlMottattEvent event) {
-        String innhold = event.mottattXml();
-        Long mottattXmlId = økonomiMottattXmlRepository.lagreMottattXml(innhold);
+        var innhold = event.mottattXml();
+        var mottattXmlId = økonomiMottattXmlRepository.lagreMottattXml(innhold);
 
         if (innhold.contains(ROOT_ELEMENT_KRAVGRUNNLAG_XML)) {
             lagreProsesTask(mottattXmlId, TaskType.forProsessTask(LesKravgrunnlagTask.class));
@@ -51,13 +51,11 @@ public class XmlMottattObserver {
         } else {
             log.error("Mottok XML som ikke ble forstått, mottattXmlId={}", mottattXmlId);
         }
-
     }
 
     private void lagreProsesTask(Long mottattXmlId, TaskType taskType) {
-        ProsessTaskData lesXmlTask = ProsessTaskData.forTaskType(taskType);
+        var lesXmlTask = ProsessTaskData.forTaskType(taskType);
         lesXmlTask.setProperty(TaskProperty.PROPERTY_MOTTATT_XML_ID, Long.toString(mottattXmlId));
         taskTjeneste.lagre(lesXmlTask);
     }
-
 }
