@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -29,7 +28,6 @@ import no.nav.vedtak.hendelser.behandling.los.LosBehandlingDto;
 
 /**
  * Returnerer behandlingsinformasjon tilpasset behov i FP-LOS
- *
  */
 
 @ApplicationScoped
@@ -101,11 +99,11 @@ public class LosBehandlingDtoTjeneste {
     private static List<LosBehandlingDto.LosAksjonspunktDto> mapAksjonspunkter(Behandling behandling, Kravgrunnlag431 kravgrunnlag431, LocalDateTime kravgrunnlagManglerFrist) {
         if (!behandling.erAvsluttet() && kravgrunnlag431 == null && kravgrunnlagManglerFrist != null) {
             return List.of(new LosBehandlingDto.LosAksjonspunktDto(AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG,
-                Aksjonspunktstatus.OPPRETTET, null, kravgrunnlagManglerFrist));
+                Aksjonspunktstatus.OPPRETTET, kravgrunnlagManglerFrist));
         } else {
             return behandling.getAksjonspunkter().stream()
                 .map(LosBehandlingDtoTjeneste::mapTilLosAksjonspunkt)
-                .collect(Collectors.toList());
+                .toList();
         }
 
     }
@@ -113,7 +111,6 @@ public class LosBehandlingDtoTjeneste {
     private static LosBehandlingDto.LosAksjonspunktDto mapTilLosAksjonspunkt(Aksjonspunkt aksjonspunkt) {
         return new LosBehandlingDto.LosAksjonspunktDto(aksjonspunkt.getAksjonspunktDefinisjon().getKode(),
             mapAksjonspunktstatus(aksjonspunkt),
-            null,
             aksjonspunkt.getFristTid());
     }
 
