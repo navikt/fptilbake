@@ -64,7 +64,7 @@ public class KravVedtakStatusTjeneste {
             case ENDRET -> håndteresEndretStatusMelding(behandlingId, statusKode.getKode());
             case AVSLUTTET -> getHenleggBehandling(behandlingId);
             default -> throw new TekniskException("FPT-107928",
-                String.format("Har fått ugyldig status kode %s fra økonomisystem, kan ikke akseptere for behandlingId '%s'",
+                String.format("Har fått ugyldig status kode %s fra økonomisystem, kan ikke aksepteres for behandlingId '%s'",
                     statusKode.getKode(), behandlingId));
         }
         kravVedtakStatusRepository.lagre(behandlingId, kravVedtakStatus437);

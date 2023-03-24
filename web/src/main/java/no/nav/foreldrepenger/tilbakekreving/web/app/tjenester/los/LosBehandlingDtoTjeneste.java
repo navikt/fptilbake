@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -29,7 +28,6 @@ import no.nav.vedtak.hendelser.behandling.los.LosBehandlingDto;
 
 /**
  * Returnerer behandlingsinformasjon tilpasset behov i FP-LOS
- *
  */
 
 @ApplicationScoped
@@ -105,7 +103,7 @@ public class LosBehandlingDtoTjeneste {
         } else {
             return behandling.getAksjonspunkter().stream()
                 .map(LosBehandlingDtoTjeneste::mapTilLosAksjonspunkt)
-                .collect(Collectors.toList());
+                .toList();
         }
 
     }

@@ -50,7 +50,7 @@ class ForvaltningTjeneste {
     void annullerKravgrunnlag(Long behandlingId) {
         var kravgrunnlag431 = kravgrunnlagRepository.hentIsAktivFor(behandlingId);
         var annullerKravgrunnlagDto = new AnnullerKravGrunnlagDto(BigInteger.valueOf(kravgrunnlag431.getVedtakId()));
-        økonomiProxyKlient.anullereKravgrunnlag(annullerKravgrunnlagDto);
+        økonomiProxyKlient.anullerKravgrunnlag(annullerKravgrunnlagDto);
     }
 
     Forvaltningsinfo hentForvaltningsinfo(String saksnummer) {

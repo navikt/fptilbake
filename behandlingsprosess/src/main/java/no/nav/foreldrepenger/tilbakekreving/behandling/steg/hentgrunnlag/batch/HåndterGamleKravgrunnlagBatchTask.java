@@ -61,9 +61,9 @@ public class HåndterGamleKravgrunnlagBatchTask implements ProsessTaskHandler {
         var batchRun = this.getClass().getSimpleName() + "-" + UUID.randomUUID();
         var iDag = LocalDate.now(clock);
 
-        // oppdragssystemtet er nede i helger og heilagdagar
+        // oppdragssystemtet er nede i helger og helligdager
         if (Helligdager.erHelligdagEllerHelg(iDag)) {
-            LOG.info("I dag er helg/helligdag, kan ikke kjøre batched {}", batchRun);
+            LOG.info("I dag er helg/helligdag, kan ikke kjøre batch {}", batchRun);
         } else {
             var bestemtDato = iDag.minus(grunnlagAlder);
             LOG.info("Håndterer kravgrunnlag som er eldre enn {} i batch {}", bestemtDato, batchRun);
