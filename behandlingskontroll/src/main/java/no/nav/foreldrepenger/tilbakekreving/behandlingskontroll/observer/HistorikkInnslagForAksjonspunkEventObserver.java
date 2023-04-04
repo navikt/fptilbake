@@ -19,7 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.vedtak.sikkerhet.kontekst.IdentType;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
-import no.nav.vedtak.sikkerhet.kontekst.Systembruker;
+import no.nav.vedtak.sikkerhet.kontekst.SikkerhetContext;
 
 /**
  * Observerer Aksjonspunkt*Events og registrerer HistorikkInnslag for enkelte hendelser (eks. gjenoppta og behandling på vent)
@@ -28,7 +28,6 @@ import no.nav.vedtak.sikkerhet.kontekst.Systembruker;
 public class HistorikkInnslagForAksjonspunkEventObserver {
 
     private HistorikkRepository historikkRepository;
-    private static final String SYSTEMBRUKER = Systembruker.username();
 
     private HistorikkInnslagForAksjonspunkEventObserver() {
         // CDI
@@ -77,7 +76,8 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
             builder.medÅrsak(venteårsak);
         }
         Historikkinnslag historikkinnslag = new Historikkinnslag();
-        var erSystemBruker = Optional.ofNullable(KontekstHolder.getKontekst().getIdentType()).filter(IdentType::erSystem).isPresent() ||
+        var erSystemBruker = SikkerhetContext.SYSTEM.equals(KontekstHolder.getKontekst().getContext()) ||
+            Optional.ofNullable(KontekstHolder.getKontekst().getIdentType()).filter(IdentType::erSystem).isPresent() ||
             Optional.ofNullable(KontekstHolder.getKontekst().getUid()).map(String::toLowerCase).filter(s -> s.startsWith("srv")).isPresent();
         historikkinnslag.setAktør(erSystemBruker ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER);
         historikkinnslag.setType(historikkinnslagType);
