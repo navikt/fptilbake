@@ -25,12 +25,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.vedtak.exception.FunksjonellException;
 import no.nav.vedtak.exception.TekniskException;
 
@@ -59,10 +61,11 @@ public class BehandlingRevurderingTjeneste {
 
     public Behandling opprettRevurdering(Long tilbakekrevingBehandlingId, BehandlingÅrsakType behandlingÅrsakType) {
         Behandling tbkBehandling = behandlingRepository.hentBehandling(tilbakekrevingBehandlingId);
-        return opprettRevurdering(tilbakekrevingBehandlingId, behandlingÅrsakType, tbkBehandling.getBehandlendeOrganisasjonsEnhet());
+        return opprettRevurdering(tilbakekrevingBehandlingId, behandlingÅrsakType, tbkBehandling.getBehandlendeOrganisasjonsEnhet(), null);
     }
 
-    public Behandling opprettRevurdering(Long tilbakekrevingBehandlingId, BehandlingÅrsakType behandlingÅrsakType, OrganisasjonsEnhet enhet) {
+    public Behandling opprettRevurdering(Long tilbakekrevingBehandlingId, BehandlingÅrsakType behandlingÅrsakType, OrganisasjonsEnhet enhet,
+                                         String opprettetAv) {
         Behandling tbkBehandling = behandlingRepository.hentBehandling(tilbakekrevingBehandlingId);
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(tbkBehandling.getId());
         Fagsak fagsak = tbkBehandling.getFagsak();
@@ -72,7 +75,7 @@ public class BehandlingRevurderingTjeneste {
         validerHarIkkeÅpenBehandling(saksnummer, eksternUuid);
 
         repositoryProvider.getFagsakRepository().oppdaterFagsakStatus(fagsak.getId(), FagsakStatus.UNDER_BEHANDLING);
-        return opprettManuellRevurdering(fagsak, behandlingÅrsakType, eksternUuid, enhet);
+        return opprettManuellRevurdering(fagsak, behandlingÅrsakType, eksternUuid, enhet, opprettetAv);
     }
 
     public boolean kanOppretteRevurdering(UUID eksternUuid) {
@@ -94,7 +97,8 @@ public class BehandlingRevurderingTjeneste {
         return eksternBehandlingRepository.hentOptionalFraInternId(behandlingId);
     }
 
-    private Behandling opprettManuellRevurdering(Fagsak fagsak, BehandlingÅrsakType behandlingÅrsakType, UUID eksternUuid, OrganisasjonsEnhet enhet) {
+    private Behandling opprettManuellRevurdering(Fagsak fagsak, BehandlingÅrsakType behandlingÅrsakType, UUID eksternUuid,
+                                                 OrganisasjonsEnhet enhet, String opprettetAv) {
         EksternBehandling eksternBehandlingForSisteTbkBehandling = eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternUuid)
                 .orElseThrow(() -> tjenesteFinnerIkkeBehandlingForRevurdering(fagsak.getId()));
 
@@ -103,6 +107,9 @@ public class BehandlingRevurderingTjeneste {
         Henvisning henvisning = eksternBehandlingForSisteTbkBehandling.getHenvisning(); // henvisning må være samme som siste når vi opprette revurdering
 
         Behandling revurdering = opprettRevurderingsBehandling(behandlingÅrsakType, origBehandling, BehandlingType.REVURDERING_TILBAKEKREVING, enhet);
+        if (opprettetAv != null && Fagsystem.FPTILBAKE.equals(ApplicationName.hvilkenTilbake())) {
+            revurdering.setAnsvarligSaksbehandler(opprettetAv);
+        }
         BehandlingLås lås = behandlingRepository.taSkriveLås(revurdering);
         behandlingRepository.lagre(revurdering, lås);
 

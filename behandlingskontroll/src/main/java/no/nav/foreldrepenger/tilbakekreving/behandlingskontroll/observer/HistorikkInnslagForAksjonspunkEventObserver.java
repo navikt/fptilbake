@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.observer;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -17,8 +17,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.vedtak.sikkerhet.kontekst.IdentType;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
-import no.nav.vedtak.sikkerhet.kontekst.Systembruker;
+import no.nav.vedtak.sikkerhet.kontekst.SikkerhetContext;
 
 /**
  * Observerer Aksjonspunkt*Events og registrerer HistorikkInnslag for enkelte hendelser (eks. gjenoppta og behandling på vent)
@@ -27,7 +28,6 @@ import no.nav.vedtak.sikkerhet.kontekst.Systembruker;
 public class HistorikkInnslagForAksjonspunkEventObserver {
 
     private HistorikkRepository historikkRepository;
-    private static final String SYSTEMBRUKER = Systembruker.username();
 
     private HistorikkInnslagForAksjonspunkEventObserver() {
         // CDI
@@ -76,8 +76,10 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
             builder.medÅrsak(venteårsak);
         }
         Historikkinnslag historikkinnslag = new Historikkinnslag();
-        String brukerident = KontekstHolder.getKontekst().getUid();
-        historikkinnslag.setAktør(!Objects.equals(SYSTEMBRUKER, brukerident) ? HistorikkAktør.SAKSBEHANDLER : HistorikkAktør.VEDTAKSLØSNINGEN);
+        var erSystemBruker = SikkerhetContext.SYSTEM.equals(KontekstHolder.getKontekst().getContext()) ||
+            Optional.ofNullable(KontekstHolder.getKontekst().getIdentType()).filter(IdentType::erSystem).isPresent() ||
+            Optional.ofNullable(KontekstHolder.getKontekst().getUid()).map(String::toLowerCase).filter(s -> s.startsWith("srv")).isPresent();
+        historikkinnslag.setAktør(erSystemBruker ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER);
         historikkinnslag.setType(historikkinnslagType);
         historikkinnslag.setBehandlingId(behandlingId);
         historikkinnslag.setFagsakId(fagsakId);

@@ -15,6 +15,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -65,6 +66,9 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.Saksnum
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.sikkerhet.kontekst.IdentType;
+import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
+import no.nav.vedtak.sikkerhet.kontekst.RequestKontekst;
 
 class BehandlingRestTjenesteTest {
 
@@ -122,9 +126,9 @@ class BehandlingRestTjenesteTest {
     void test_skal_opprette_ny_behandling_for_revurdering() throws URISyntaxException {
         when(behandlingskontrollAsynkTjenesteMock.asynkProsesserBehandling(any(Behandling.class))).thenReturn("1");
         when(behandlingTjenesteMock.hentEnhetForEksternBehandling(any())).thenReturn(new OrganisasjonsEnhet("9999", "Generisk"));
-        when(revurderingTjenesteMock.opprettRevurdering(any(Long.class), any(BehandlingÅrsakType.class), any(OrganisasjonsEnhet.class)))
+        when(revurderingTjenesteMock.opprettRevurdering(any(Long.class), any(BehandlingÅrsakType.class), any(OrganisasjonsEnhet.class), any(String.class)))
                 .thenReturn(mockBehandling());
-
+        KontekstHolder.setKontekst(RequestKontekst.forRequest("bruker", "bruker", IdentType.InternBruker, null, Set.of()));
         OpprettBehandlingDto opprettBehandlingDto = opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE);
         opprettBehandlingDto.setBehandlingType(BehandlingType.REVURDERING_TILBAKEKREVING);
         opprettBehandlingDto.setBehandlingArsakType(BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
@@ -132,8 +136,9 @@ class BehandlingRestTjenesteTest {
 
         Response response = behandlingRestTjeneste.opprettBehandling(mock(HttpServletRequest.class), opprettBehandlingDto);
 
-        verify(revurderingTjenesteMock, atLeastOnce()).opprettRevurdering(any(Long.class), any(BehandlingÅrsakType.class), any(OrganisasjonsEnhet.class));
+        verify(revurderingTjenesteMock, atLeastOnce()).opprettRevurdering(any(Long.class), any(BehandlingÅrsakType.class), any(OrganisasjonsEnhet.class), any(String.class));
         assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_ACCEPTED);
+        KontekstHolder.fjernKontekst();
     }
 
     @Test
