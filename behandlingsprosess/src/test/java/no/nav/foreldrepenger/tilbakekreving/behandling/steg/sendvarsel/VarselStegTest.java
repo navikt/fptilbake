@@ -37,6 +37,10 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.sikkerhet.kontekst.BasisKontekst;
+import no.nav.vedtak.sikkerhet.kontekst.IdentType;
+import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
+import no.nav.vedtak.sikkerhet.kontekst.SikkerhetContext;
 
 @CdiDbAwareTest
 class VarselStegTest {
@@ -73,6 +77,7 @@ class VarselStegTest {
     void skal_sette_behandling_på_vent() {
 
         varselRepository.lagre(behandling.getId(), "hello", 23000l);
+        KontekstHolder.setKontekst(BasisKontekst.forProsesstaskUtenSystembruker());
 
         //act
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
@@ -90,6 +95,7 @@ class VarselStegTest {
         Historikkinnslag historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BEH_VENT);
+        KontekstHolder.fjernKontekst();
     }
 
     @Test
