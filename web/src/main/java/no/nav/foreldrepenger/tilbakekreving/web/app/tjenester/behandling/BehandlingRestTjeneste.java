@@ -87,6 +87,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
+import no.nav.vedtak.sikkerhet.kontekst.Kontekst;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 @Path(BehandlingRestTjeneste.PATH_FRAGMENT)
@@ -193,7 +194,8 @@ public class BehandlingRestTjeneste {
             Long tbkBehandlingId = opprettBehandlingDto.getBehandlingId() == null ? behandlingTjeneste.hentBehandlingId(opprettBehandlingDto.getBehandlingUuid())
                     : opprettBehandlingDto.getBehandlingId();
             var enhet = behandlingTjeneste.hentEnhetForEksternBehandling(opprettBehandlingDto.getEksternUuid());
-            Behandling revurdering = revurderingTjeneste.opprettRevurdering(tbkBehandlingId, opprettBehandlingDto.getBehandlingArsakType(), enhet);
+            Behandling revurdering = revurderingTjeneste.opprettRevurdering(tbkBehandlingId, opprettBehandlingDto.getBehandlingArsakType(), enhet,
+                Optional.ofNullable(KontekstHolder.getKontekst()).map(Kontekst::getUid).orElse(null));
             String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(revurdering);
             return Redirect.tilBehandlingPollStatus(request, revurdering.getUuid(), Optional.of(gruppe));
         }
