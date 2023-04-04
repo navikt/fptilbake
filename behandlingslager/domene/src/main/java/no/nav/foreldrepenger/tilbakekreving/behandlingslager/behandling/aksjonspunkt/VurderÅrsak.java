@@ -24,7 +24,9 @@ public enum VurderÅrsak implements Kodeverdi {
 
     FEIL_FAKTA("FEIL_FAKTA", "Feil fakta"),
     FEIL_LOV("FEIL_LOV", "Feil lovanvendelse"),
-    FEIL_REGEL("FEIL_REGEL", "Feil regelforståelse"),
+    FEIL_REGEL("FEIL_REGEL", "Feil regelforståelse"), // UTGÅTT, beholdes pga historikk og K9
+    SKJØNN("SKJØNN", "Skjønn"),
+    UTREDNING("UTREDNING", "Utredning"),
     ANNET("ANNET", "Annet"),
     UDEFINERT("-", "Ikke definert"); //$NON-NLS-1$
 
