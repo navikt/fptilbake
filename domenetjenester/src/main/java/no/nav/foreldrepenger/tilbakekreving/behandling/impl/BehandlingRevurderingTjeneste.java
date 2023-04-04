@@ -25,12 +25,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.vedtak.exception.FunksjonellException;
 import no.nav.vedtak.exception.TekniskException;
 
@@ -105,7 +107,7 @@ public class BehandlingRevurderingTjeneste {
         Henvisning henvisning = eksternBehandlingForSisteTbkBehandling.getHenvisning(); // henvisning må være samme som siste når vi opprette revurdering
 
         Behandling revurdering = opprettRevurderingsBehandling(behandlingÅrsakType, origBehandling, BehandlingType.REVURDERING_TILBAKEKREVING, enhet);
-        if (opprettetAv != null) {
+        if (opprettetAv != null && Fagsystem.FPTILBAKE.equals(ApplicationName.hvilkenTilbake())) {
             revurdering.setAnsvarligSaksbehandler(opprettetAv);
         }
         BehandlingLås lås = behandlingRepository.taSkriveLås(revurdering);
