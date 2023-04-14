@@ -229,4 +229,18 @@ public class BehandlingRepository {
     private static Optional<Behandling> optionalFirst(List<Behandling> behandlinger) {
         return behandlinger.isEmpty() ? Optional.empty() : Optional.of(behandlinger.get(0));
     }
+
+    public List<Behandling> finnBehandlingerIkkeAvsluttetPåAngittEnhet(String enhetId) {
+
+        var query = entityManager.createQuery(
+            "FROM Behandling behandling " +
+                "WHERE behandling.status <> :status " +
+                "  AND behandling.behandlendeEnhetId = :enhet ",
+            Behandling.class);
+
+        query.setParameter("enhet", enhetId);
+        query.setParameter("status", BehandlingStatus.AVSLUTTET);
+        query.setHint(QueryHints.HINT_READONLY, "true");
+        return query.getResultList();
+    }
 }

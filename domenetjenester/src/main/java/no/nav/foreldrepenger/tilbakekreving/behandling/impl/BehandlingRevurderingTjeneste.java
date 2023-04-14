@@ -59,11 +59,6 @@ public class BehandlingRevurderingTjeneste {
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }
 
-    public Behandling opprettRevurdering(Long tilbakekrevingBehandlingId, BehandlingÅrsakType behandlingÅrsakType) {
-        Behandling tbkBehandling = behandlingRepository.hentBehandling(tilbakekrevingBehandlingId);
-        return opprettRevurdering(tilbakekrevingBehandlingId, behandlingÅrsakType, tbkBehandling.getBehandlendeOrganisasjonsEnhet(), null);
-    }
-
     public Behandling opprettRevurdering(Long tilbakekrevingBehandlingId, BehandlingÅrsakType behandlingÅrsakType, OrganisasjonsEnhet enhet,
                                          String opprettetAv) {
         Behandling tbkBehandling = behandlingRepository.hentBehandling(tilbakekrevingBehandlingId);
@@ -185,5 +180,10 @@ public class BehandlingRevurderingTjeneste {
         return new TekniskException("FPT-317517", String.format("finner ingen behandling som kan revurderes for fagsak: %s", fagsakId));
     }
 
+    // TEST ONLY
+    public Behandling opprettRevurdering(Long tilbakekrevingBehandlingId, BehandlingÅrsakType behandlingÅrsakType) {
+        Behandling tbkBehandling = behandlingRepository.hentBehandling(tilbakekrevingBehandlingId);
+        return opprettRevurdering(tilbakekrevingBehandlingId, behandlingÅrsakType, tbkBehandling.getBehandlendeOrganisasjonsEnhet(), null);
+    }
 
 }
