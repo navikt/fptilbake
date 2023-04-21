@@ -57,7 +57,7 @@ jobs:
     secrets: inherit
 
   deploy-dev-teamforeldrepenger:
-    name: Deploy dev
+    name: Deploy dev fp
     if: github.ref_name == 'master'
     needs: [build-app, fptilbake-tester, verdikjede-tester]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
@@ -68,7 +68,7 @@ jobs:
     secrets: inherit
 
   deploy-prod-teamforeldrepenger:
-    name: Deploy prod
+    name: Deploy prod fp
     if: github.ref_name == 'master'
     needs: [build-app, fptilbake-tester, verdikjede-tester, deploy-dev-teamforeldrepenger]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
@@ -79,7 +79,7 @@ jobs:
     secrets: inherit
 
   deploy-dev-k9saksbehandling:
-    name: Deploy dev
+    name: Deploy dev k9
     if: github.ref_name == 'master'
     needs: [build-app, fptilbake-tester, verdikjede-tester]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
@@ -90,7 +90,7 @@ jobs:
     secrets: inherit
 
   deploy-prod-k9saksbehandling:
-    name: Deploy prod
+    name: Deploy prod k9
     if: github.ref_name == 'master'
     needs: [build-app, fptilbake-tester, verdikjede-tester, deploy-dev-k9saksbehandling]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
