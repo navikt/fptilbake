@@ -27,7 +27,7 @@ jobs:
     secrets: inherit
 
   fptilbake-tester:
-    name: Fpsak tester
+    name: Fptilbake tester
     if: github.ref_name == 'master'
     needs: build-app
     uses: navikt/fp-autotest/.github/workflows/autotest.yml@master
