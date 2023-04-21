@@ -33,7 +33,7 @@ jobs:
         uses: nais/deploy/actions/deploy@v1
         env:
           PRINT_PAYLOAD: true
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_FP }}
           CLUSTER: ${{ inputs.cluster }}
           RESOURCE: .deploy/fp/naiserator.yaml
           VARS: .deploy/fp/${{ inputs.cluster }}-${{ inputs.namespace }}.json
@@ -43,7 +43,7 @@ jobs:
         uses: nais/deploy/actions/deploy@v1
         env:
           PRINT_PAYLOAD: true
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_K9 }}
           CLUSTER: ${{ inputs.cluster }}
           RESOURCE: .deploy/k9/naiserator.yaml
           VARS: .deploy/k9/${{ inputs.cluster }}-${{ inputs.namespace }}.json
