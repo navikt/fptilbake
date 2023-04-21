@@ -25,50 +25,78 @@ jobs:
       push-image: ${{ github.ref_name == 'master' }} # default: false
     secrets: inherit
 
-  create-issue:
-    name: Issues
+  fptilbake-tester:
+    name: Fpsak tester
     if: github.ref_name == 'master'
     needs: build-app
-    uses: navikt/fp-gha-workflows/.github/workflows/issues.yml@main
+    uses: navikt/fp-autotest/.github/workflows/autotest.yml@master
     with:
       build-version: ${{ needs.build-app.outputs.build-version }}
+      test-suite: fptilbake
     secrets: inherit
 
-  comment-issue:
-    name: Issues
+  verdikjede-tester:
+    name: Verdikjedetester
     if: github.ref_name == 'master'
-    needs: create-issue
-    uses: navikt/fptilbake/.github/workflows/comment.yml@master
-    with:
-      issue-number: ${{ needs.create-issue.outputs.issue-number }}
-    secrets: inherit
-
-  trigger-autotest:
-    name: Autotest
-    if: github.ref_name == 'master'
-    needs: [ build-app, create-issue ]
-    uses: navikt/fp-gha-workflows/.github/workflows/autotest.yml@main
-    with:
-      build-version: ${{ needs.build-app.outputs.build-version }}
-      issue-number: ${{ needs.create-issue.outputs.issue-number }}
-    secrets: inherit
-
-  snyk:
-    name: Snyk
     needs: build-app
-    uses: navikt/fp-gha-workflows/.github/workflows/snyk.yml@main
+    uses: navikt/fp-autotest/.github/workflows/autotest.yml@master
     with:
       build-version: ${{ needs.build-app.outputs.build-version }}
-      upload-sarif: false # internal repo
+      test-suite: verdikjede
     secrets: inherit
 
-  promote:
-    name: Deploy til K9 dev
-    if: github.ref_name == 'master'
-    needs: [ build-app, create-issue ]
-    uses: navikt/fptilbake/.github/workflows/promote-manuelt.yml@master
+  notify:
+    name: Notify
+    if: github.ref_name == 'master' && (success() || failure()) && !contains(needs.*.result, 'skipped')
+    needs: [build-app, fptilbake-tester, verdikjede-tester]
+    uses: navikt/fp-autotest/.github/workflows/report-and-notify.yml@master
     with:
-      issue-number: ${{ needs.create-issue.outputs.issue-number }}
+      fptilbake: ${{ needs.fptilbake-tester.outputs.resultat }}
+      verdikjede: ${{ needs.verdikjede-tester.outputs.resultat }}
+      build-version: ${{ needs.build-app.outputs.build-version }}
+    secrets: inherit
+
+  deploy-dev-teamforeldrepenger:
+    name: Deploy dev
+    if: github.ref_name == 'master'
+    needs: [build-app, fptilbake-tester, verdikjede-tester]
+    uses: navikt/fptilbake/.github/workflows/deploy.yml@master
+    with:
+      image: ghcr.io/${{ github.repository }}:${{ needs.build-app.outputs.build-version }}
+      cluster: dev-fss
+      namespace: teamforeldrepenger
+    secrets: inherit
+
+  deploy-prod-teamforeldrepenger:
+    name: Deploy prod
+    if: github.ref_name == 'master'
+    needs: [build-app, fptilbake-tester, verdikjede-tester, deploy-dev-teamforeldrepenger]
+    uses: navikt/fptilbake/.github/workflows/deploy.yml@master
+    with:
+      image: ghcr.io/${{ github.repository }}:${{ needs.build-app.outputs.build-version }}
+      cluster: prod-fss
+      namespace: teamforeldrepenger
+    secrets: inherit
+
+  deploy-dev-k9saksbehandling:
+    name: Deploy dev
+    if: github.ref_name == 'master'
+    needs: [build-app, fptilbake-tester, verdikjede-tester]
+    uses: navikt/fptilbake/.github/workflows/deploy.yml@master
+    with:
+      image: ghcr.io/${{ github.repository }}:${{ needs.build-app.outputs.build-version }}
       cluster: dev-fss
       namespace: k9saksbehandling
     secrets: inherit
+
+  deploy-prod-k9saksbehandling:
+    name: Deploy prod
+    if: github.ref_name == 'master'
+    needs: [build-app, fptilbake-tester, verdikjede-tester, deploy-dev-k9saksbehandling]
+    uses: navikt/fptilbake/.github/workflows/deploy.yml@master
+    with:
+      image: ghcr.io/${{ github.repository }}:${{ needs.build-app.outputs.build-version }}
+      cluster: prod-fss
+      namespace: k9saksbehandling
+    secrets: inherit
+
