@@ -389,6 +389,12 @@
                 <artifactId>jsch</artifactId>
                 <version>0.1.55</version>
             </dependency>
+            <dependency>
+                <!-- denne tas inn av com.ibm.mq.jakarta.client, overstyrer med nyere versjon -->
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>20230227</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
