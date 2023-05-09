@@ -101,7 +101,6 @@ class RestApiAbacTest {
         }
         var godkjenteProperties = List.of(
                 AbacProperty.APPLIKASJON,
-                AbacProperty.BATCH,
                 AbacProperty.DRIFT,
                 AbacProperty.FAGSAK,
                 AbacProperty.VENTEFRIST

@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import javax.enterprise.context.ApplicationScoped;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -27,12 +26,8 @@ import no.nav.pdl.IdentInformasjon;
 import no.nav.pdl.IdentInformasjonResponseProjection;
 import no.nav.pdl.Identliste;
 import no.nav.pdl.IdentlisteResponseProjection;
-import no.nav.pdl.Kjoenn;
-import no.nav.pdl.KjoennResponseProjection;
-import no.nav.pdl.KjoennType;
 import no.nav.pdl.Navn;
 import no.nav.pdl.NavnResponseProjection;
-import no.nav.pdl.Person;
 import no.nav.pdl.PersonResponseProjection;
 import no.nav.pdl.Sivilstand;
 import no.nav.pdl.SivilstandResponseProjection;
@@ -145,17 +140,6 @@ public class AktørTjeneste {
         return ident;
     }
 
-    public NavBrukerKjønn hentKjønnForAktør(AktørId aktørId) {
-        var query = new HentPersonQueryRequest();
-        query.setIdent(aktørId.getId());
-        var projection = new PersonResponseProjection()
-                .kjoenn(new KjoennResponseProjection().kjoenn());
-
-        var person = pdlKlient.hentPerson(query, projection);
-
-        return mapKjønn(person);
-    }
-
     public Personinfo hentPersoninfo(AktørId aktørId, PersonIdent personIdent) {
         var query = new HentPersonQueryRequest();
         query.setIdent(aktørId.getId());
@@ -194,16 +178,6 @@ public class AktørTjeneste {
         if (navn.getForkortetNavn() != null)
             return navn.getForkortetNavn();
         return navn.getEtternavn() + " " + navn.getFornavn() + (navn.getMellomnavn() == null ? "" : " " + navn.getMellomnavn());
-    }
-
-    private static NavBrukerKjønn mapKjønn(Person person) {
-        var kode = person.getKjoenn().stream()
-                .map(Kjoenn::getKjoenn)
-                .filter(Objects::nonNull)
-                .findFirst().orElse(KjoennType.UKJENT);
-        if (KjoennType.MANN.equals(kode))
-            return NavBrukerKjønn.MANN;
-        return KjoennType.KVINNE.equals(kode) ? NavBrukerKjønn.KVINNE : NavBrukerKjønn.UDEFINERT;
     }
 
 }
