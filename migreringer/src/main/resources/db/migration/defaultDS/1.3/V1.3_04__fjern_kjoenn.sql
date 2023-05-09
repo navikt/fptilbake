@@ -1,1 +1,1 @@
-alter table historikkinnslag drop column BRUKER_KJOENN;
+alter table historikkinnslag set unused (BRUKER_KJOENN);
