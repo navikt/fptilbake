@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
@@ -20,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 
 class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
@@ -28,12 +26,11 @@ class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
     private static final JournalpostId JOURNALPOST_ID = new JournalpostId("389426448");
     private static final String DOKUMENT_ID = "417743491";
 
-    private final PersoninfoAdapter personinfoAdapter = mock(PersoninfoAdapter.class);
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
     @BeforeEach
     void setUp() {
-        historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, personinfoAdapter);
+        historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository);
     }
 
     @Test

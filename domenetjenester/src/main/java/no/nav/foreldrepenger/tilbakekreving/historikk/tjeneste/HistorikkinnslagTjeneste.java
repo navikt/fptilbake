@@ -8,7 +8,6 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
@@ -17,27 +16,22 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 
 @ApplicationScoped
 public class HistorikkinnslagTjeneste {
 
     private HistorikkRepository historikkRepository;
-    private PersoninfoAdapter personinfoAdapter;
 
     HistorikkinnslagTjeneste() {
         // for CDI proxy
     }
 
     @Inject
-    public HistorikkinnslagTjeneste(HistorikkRepository historikkRepository, PersoninfoAdapter personinfoAdapter) {
+    public HistorikkinnslagTjeneste(HistorikkRepository historikkRepository) {
         this.historikkRepository = historikkRepository;
-        this.personinfoAdapter = personinfoAdapter;
     }
 
     private void opprettHistorikkinnslag(Long behandlingId,
-                                         AktørId aktørId,
                                          Long fagsakId,
                                          HistorikkinnslagType historikkinnslagType,
                                          HistorikkAktør historikkAktør,
@@ -45,7 +39,6 @@ public class HistorikkinnslagTjeneste {
 
         Historikkinnslag historikkinnslag = new Historikkinnslag.Builder()
                 .medAktør(historikkAktør)
-                .medKjoenn(setKjønn(aktørId, historikkAktør))
                 .medType(historikkinnslagType)
                 .medBehandlingId(behandlingId)
                 .medFagsakId(fagsakId)
@@ -77,8 +70,7 @@ public class HistorikkinnslagTjeneste {
 
         opprettHistorikkinnslag(
                 behandling.getId(),
-                behandling.getAktørId(),
-                behandling.getFagsakId(),
+            behandling.getFagsakId(),
                 HistorikkinnslagType.BREV_SENT,
                 HistorikkAktør.VEDTAKSLØSNINGEN,
                 Collections.singletonList(dokumentLink));
@@ -87,7 +79,6 @@ public class HistorikkinnslagTjeneste {
     public void opprettHistorikkinnslagForBrevBestilt(Behandling behandling, DokumentMalType malType) {
         Historikkinnslag historikkinnslag = new Historikkinnslag.Builder()
                 .medAktør(HistorikkAktør.SAKSBEHANDLER)
-                .medKjoenn(setKjønn(behandling.getAktørId(), HistorikkAktør.SAKSBEHANDLER))
                 .medType(HistorikkinnslagType.BREV_BESTILT)
                 .medBehandlingId(behandling.getId())
                 .medFagsakId(behandling.getFagsakId()).build();
@@ -108,17 +99,10 @@ public class HistorikkinnslagTjeneste {
 
         opprettHistorikkinnslag(
                 behandling.getId(),
-                behandling.getAktørId(),
-                behandling.getFagsakId(),
+            behandling.getFagsakId(),
                 HistorikkinnslagType.TBK_OPPR,
                 historikkAktør,
                 Collections.emptyList());
-    }
-
-    private NavBrukerKjønn setKjønn(AktørId aktørId, HistorikkAktør historikkAktør) {
-        if (!HistorikkAktør.SØKER.equals(historikkAktør))
-            return NavBrukerKjønn.UDEFINERT;
-        return personinfoAdapter.hentKjønnForAktør(aktørId);
     }
 
     private boolean historikkinnslagForBehandlingStartetErLoggetTidligere(Long behandlingId, HistorikkinnslagType historikkinnslagType) {

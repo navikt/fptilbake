@@ -54,7 +54,7 @@ class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {
     @BeforeEach
     void setup() {
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
-        var historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, null);
+        var historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository);
         dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, taskTjeneste, historikkinnslagTjeneste,
                 mockManueltVarselBrevTjeneste, mockInnhentDokumentasjonbrevTjeneste);
     }

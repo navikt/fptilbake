@@ -16,7 +16,6 @@ import javax.persistence.Table;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 
 @Entity(name = "Historikkinnslag")
 @Table(name = "HISTORIKKINNSLAG")
@@ -48,10 +47,6 @@ public class Historikkinnslag extends BaseEntitet {
 
     @OneToMany(mappedBy = "historikkinnslag")
     private List<HistorikkinnslagDel> historikkinnslagDeler = new ArrayList<>();
-
-    @Convert(converter = NavBrukerKjønn.KodeverdiConverter.class)
-    @Column(name = "bruker_kjoenn", nullable = false)
-    private NavBrukerKjønn kjoenn = NavBrukerKjønn.UDEFINERT;
 
     public Long getId() {
         return id;
@@ -114,14 +109,6 @@ public class Historikkinnslag extends BaseEntitet {
         this.dokumentLinker = dokumentLinker;
     }
 
-    public NavBrukerKjønn getKjoenn() {
-        return kjoenn;
-    }
-
-    public void setKjoenn(NavBrukerKjønn kjoenn) {
-        this.kjoenn = kjoenn;
-    }
-
     public Long getFagsakId() {
         return fagsakId;
     }
@@ -140,7 +127,7 @@ public class Historikkinnslag extends BaseEntitet {
     }
 
     public static class Builder {
-        private Historikkinnslag historikkinnslag;
+        private final Historikkinnslag historikkinnslag;
 
         public Builder() {
             historikkinnslag = new Historikkinnslag();
@@ -163,11 +150,6 @@ public class Historikkinnslag extends BaseEntitet {
 
         public Builder medType(HistorikkinnslagType type) {
             historikkinnslag.type = type;
-            return this;
-        }
-
-        public Builder medKjoenn(NavBrukerKjønn kjoenn) {
-            historikkinnslag.kjoenn = kjoenn;
             return this;
         }
 
@@ -199,12 +181,11 @@ public class Historikkinnslag extends BaseEntitet {
                 Objects.equals(getFagsakId(), that.getFagsakId()) &&
                 Objects.equals(getAktør(), that.getAktør()) &&
                 Objects.equals(getType(), that.getType()) &&
-                Objects.equals(getDokumentLinker(), that.getDokumentLinker()) &&
-                Objects.equals(getKjoenn(), that.getKjoenn());
+                Objects.equals(getDokumentLinker(), that.getDokumentLinker());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getBehandlingId(), getFagsakId(), getAktør(), getType(), getDokumentLinker(), getKjoenn());
+        return Objects.hash(getId(), getBehandlingId(), getFagsakId(), getAktør(), getType(), getDokumentLinker());
     }
 }
