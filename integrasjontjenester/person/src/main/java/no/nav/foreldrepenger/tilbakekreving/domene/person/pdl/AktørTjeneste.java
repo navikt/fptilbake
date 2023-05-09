@@ -72,7 +72,12 @@ public class AktørTjeneste {
             case K9TILBAKE -> Tema.OMS;
             default -> throw new IllegalStateException("applikasjonsnavn er satt til " + ApplicationName.hvilkenTilbake() + " som ikke er en støttet verdi");
         };
-        this.pdlKlient = new PdlKlient(tema);
+        var behandling = switch (ApplicationName.hvilkenTilbake()) {
+            case FPTILBAKE -> Persondata.Ytelse.FORELDREPENGER;
+            case K9TILBAKE -> Persondata.Ytelse.PLEIEPENGER;
+            default -> throw new IllegalStateException("applikasjonsnavn er satt til " + ApplicationName.hvilkenTilbake() + " som ikke er en støttet verdi");
+        };
+        this.pdlKlient = new PdlKlient(tema, behandling);
         this.cacheAktørIdTilIdent = new LRUCache<>(DEFAULT_CACHE_SIZE, DEFAULT_CACHE_TIMEOUT);
         this.cacheIdentTilAktørId = new LRUCache<>(DEFAULT_CACHE_SIZE, DEFAULT_CACHE_TIMEOUT);
     }
