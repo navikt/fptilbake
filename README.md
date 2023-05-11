@@ -2,7 +2,6 @@
 Applikasjonene fptilbake og k9-tilbake
 ===============
 [![Bygg og deploy](https://github.com/navikt/fptilbake/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/navikt/fptilbake/actions/workflows/build.yml)
-[![Promote](https://github.com/navikt/fptilbake/actions/workflows/promote.yml/badge.svg?branch=master)](https://github.com/navikt/fptilbake/actions/workflows/promote.yml)
 
 Dette er repository for applikasjonene:  
  * fptilbake, en tilbakekrevingsapplikasjon for foreldrepenger, svangerskapspenger og engangsstønad.
