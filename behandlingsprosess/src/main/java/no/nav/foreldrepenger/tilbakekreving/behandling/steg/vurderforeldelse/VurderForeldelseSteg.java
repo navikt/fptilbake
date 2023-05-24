@@ -2,8 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.vurderforeldelse;
 
 import static java.util.Collections.singletonList;
 
-import java.util.Optional;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -20,7 +18,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 
@@ -56,9 +53,9 @@ public class VurderForeldelseSteg implements BehandlingSteg {
             utførStegAutomatisk(behandling);
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         } else {
-            Optional<AksjonspunktDefinisjon> aksjonspunktDefinisjon = vurderForeldelseAksjonspunktUtleder.utledAksjonspunkt(kontekst.getBehandlingId());
-            return aksjonspunktDefinisjon.map(ap -> BehandleStegResultat.utførtMedAksjonspunkter(singletonList(ap)))
-                    .orElseGet(BehandleStegResultat::utførtUtenAksjonspunkter);
+            return vurderForeldelseAksjonspunktUtleder.utledAksjonspunkt(kontekst.getBehandlingId())
+                .map(ap -> BehandleStegResultat.utførtMedAksjonspunkter(singletonList(ap)))
+                .orElseGet(BehandleStegResultat::utførtUtenAksjonspunkter);
         }
     }
 

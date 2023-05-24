@@ -52,6 +52,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandli
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VergeDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
+import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 @ApplicationScoped
 @Transactional
@@ -144,6 +145,16 @@ public class BehandlingTjeneste {
         Boolean kanEndreBehandling = behandlingRepository.erVersjonUendret(behandlingId, versjon);
         if (!kanEndreBehandling) {
             throw BehandlingFeil.endringerHarForekommetPåSøknaden();
+        }
+    }
+
+    public void setAnsvarligSaksbehandlerFraKontekst(Behandling behandling) {
+        var kontekst = KontekstHolder.getKontekst();
+        var bruker = kontekst.getIdentType().erSystem() ? null : kontekst.getUid();
+        if (bruker != null) {
+            var lås = behandlingRepository.taSkriveLås(behandling);
+            behandling.setAnsvarligSaksbehandler(bruker);
+            behandlingRepository.lagre(behandling, lås);
         }
     }
 

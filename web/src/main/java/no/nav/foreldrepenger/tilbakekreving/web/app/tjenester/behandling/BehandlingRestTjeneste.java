@@ -285,6 +285,9 @@ public class BehandlingRestTjeneste {
 
         // gjenoppta behandling
         Optional<String> gruppeOpt = gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), HistorikkAktør.SAKSBEHANDLER);
+        if (gruppeOpt.isPresent()) {
+            behandlingTjeneste.setAnsvarligSaksbehandlerFraKontekst(behandling);
+        }
 
         return Redirect.tilBehandlingPollStatus(request, behandling.getUuid(), gruppeOpt);
     }

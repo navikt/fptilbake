@@ -444,6 +444,7 @@ public class BehandlingskontrollTjeneste {
     public Aksjonspunkt settBehandlingPåVent(Behandling behandling, AksjonspunktDefinisjon aksjonspunktDefinisjonIn,
                                              BehandlingStegType stegType, LocalDateTime fristTid, Venteårsak venteårsak) {
         var kontekst = initBehandlingskontroll(behandling);
+        behandling.setAnsvarligSaksbehandler(null);
         var aksjonspunkt = aksjonspunktKontrollRepository.settBehandlingPåVent(behandling, aksjonspunktDefinisjonIn, stegType, fristTid,
                 venteårsak);
         behandlingRepository.lagre(behandling, kontekst.getSkriveLås());

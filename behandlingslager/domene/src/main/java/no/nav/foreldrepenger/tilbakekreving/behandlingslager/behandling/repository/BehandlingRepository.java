@@ -243,4 +243,15 @@ public class BehandlingRepository {
         query.setHint(QueryHints.HINT_READONLY, "true");
         return query.getResultList();
     }
+
+    public List<Behandling> finnÅpneBehandlinger() {
+
+        var query = entityManager.createQuery(
+            "FROM Behandling behandling " +
+                "WHERE behandling.status <> :status ",
+            Behandling.class);
+
+        query.setParameter("status", BehandlingStatus.AVSLUTTET);
+        return query.getResultList();
+    }
 }
