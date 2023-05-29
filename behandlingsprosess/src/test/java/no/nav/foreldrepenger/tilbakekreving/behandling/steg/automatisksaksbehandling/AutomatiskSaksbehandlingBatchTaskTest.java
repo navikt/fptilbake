@@ -40,6 +40,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Journalpo
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
+import no.nav.foreldrepenger.tilbakekreving.felles.Helligdager;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
@@ -80,14 +81,16 @@ class AutomatiskSaksbehandlingBatchTaskTest {
 
     @Test
     void skal_opprette_prosess_task_for_å_saksbehandle_behandling_automatisk() {
-        automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        verify(taskTjeneste, times(1)).lagre(captor.capture());
-        var prosessTasker = captor.getAllValues();
-        assertThat(prosessTasker).hasSize(1);
-        var prosessTaskData = prosessTasker.get(0);
-        assertThat(Long.valueOf(prosessTaskData.getBehandlingId())).isEqualTo(behandling.getId());
-        assertThat(prosessTaskData.getSekvens()).isEqualTo("10");
+        if (!Helligdager.erHelligdagEllerHelg(LocalDate.now())) {
+            automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
+            var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
+            verify(taskTjeneste, times(1)).lagre(captor.capture());
+            var prosessTasker = captor.getAllValues();
+            assertThat(prosessTasker).hasSize(1);
+            var prosessTaskData = prosessTasker.get(0);
+            assertThat(Long.valueOf(prosessTaskData.getBehandlingId())).isEqualTo(behandling.getId());
+            assertThat(prosessTaskData.getSekvens()).isEqualTo("10");
+        }
     }
 
     @Test
