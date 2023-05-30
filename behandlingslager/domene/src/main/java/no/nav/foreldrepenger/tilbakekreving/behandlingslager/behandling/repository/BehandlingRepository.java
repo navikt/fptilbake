@@ -80,17 +80,6 @@ public class BehandlingRepository {
         return hentUniktResultat(query);
     }
 
-    public List<Long> hentAlleBehandlingIder() {
-        TypedQuery<Long> query = getEntityManager().createQuery("select id from Behandling", Long.class); //$NON-NLS-1$
-        return query.getResultList();
-    }
-
-    public List<Long> hentAlleAvsluttetBehandlingIder() {
-        TypedQuery<Long> query = getEntityManager().createQuery("select id from Behandling where status=:status", Long.class); //$NON-NLS-1$
-        query.setParameter("status", BehandlingStatus.AVSLUTTET);
-        return query.getResultList();
-    }
-
     /**
      * Hent alle behandlinger som ikke er avsluttet på fagsak.
      */
@@ -244,14 +233,4 @@ public class BehandlingRepository {
         return query.getResultList();
     }
 
-    public List<Behandling> finnÅpneBehandlinger() {
-
-        var query = entityManager.createQuery(
-            "FROM Behandling behandling " +
-                "WHERE behandling.status <> :status ",
-            Behandling.class);
-
-        query.setParameter("status", BehandlingStatus.AVSLUTTET);
-        return query.getResultList();
-    }
 }
