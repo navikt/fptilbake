@@ -16,6 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -95,9 +96,10 @@ public class KravVedtakStatusTjeneste {
     }
 
     private void håndteresEndretStatusMelding(Long behandlingId, String statusKode) {
+        var saksnummer = behandlingRepository.hentBehandling(behandlingId).getFagsak().getSaksnummer();
         if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
             if (!grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
-                throw kanIkkeFinnesSperretGrunnlagForBehandling(statusKode, behandlingId);
+                throw kanIkkeHåndtereGrunnlagForBehandling(", men eksisterende grunnlag er ikke sperret", statusKode, behandlingId, saksnummer);
             }
             var kravgrunnlag431 = grunnlagRepository.finnKravgrunnlag(behandlingId);
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
@@ -105,8 +107,13 @@ public class KravVedtakStatusTjeneste {
             taBehandlingAvventOgFortsettBehandling(behandlingId);
             grunnlagRepository.opphevGrunnlag(behandlingId);
         } else {
-            throw kanIkkeFinnesSperretGrunnlagForBehandling(statusKode, behandlingId);
+            throw kanIkkeHåndtereGrunnlagForBehandling(", men det finnes ikke noe grunnlag", statusKode, behandlingId, saksnummer);
         }
+    }
+
+    static TekniskException kanIkkeHåndtereGrunnlagForBehandling(String suffix, String statusKode, Long behandlingId, Saksnummer saksnummer) {
+        var message = String.format("Mottok statusmelding med kode %s fra oppdrag for behandlingId %d, sak %s", statusKode, behandlingId, saksnummer);
+        return new TekniskException("FPT-107929", message + suffix);
     }
 
     private void taBehandlingAvventOgFortsettBehandling(long behandlingId) {
@@ -122,9 +129,4 @@ public class KravVedtakStatusTjeneste {
         henleggBehandlingTjeneste.henleggBehandling(behandlingId, BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT);
     }
 
-    static TekniskException kanIkkeFinnesSperretGrunnlagForBehandling(String status, long behandlingId) {
-        return new TekniskException("FPT-107929",
-            String.format("Har fått ENDR status kode %s fra økonomisystem for behandlingId '%s', men ikke finnes sperret grunnlag", status,
-                behandlingId));
-    }
 }

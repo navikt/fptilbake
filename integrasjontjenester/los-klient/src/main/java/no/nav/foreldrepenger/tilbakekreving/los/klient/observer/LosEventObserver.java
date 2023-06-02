@@ -21,10 +21,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.Behandlings
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.los.klient.task.LosPubliserEventTask;
 import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -36,6 +39,8 @@ public class LosEventObserver {
 
     private static final Logger logger = LoggerFactory.getLogger(LosEventObserver.class);
     private static final String LOGGER_OPPRETTER_PROSESS_TASK = "Oppretter prosess task for å publisere event={} til los for aksjonspunkt={}";
+
+    private Fagsystem fagsystem;
 
     private ProsessTaskTjeneste taskTjeneste;
     private BehandlingRepository behandlingRepository;
@@ -50,21 +55,40 @@ public class LosEventObserver {
     public LosEventObserver(BehandlingRepository behandlingRepository,
                             ProsessTaskTjeneste taskTjeneste,
                             BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
+        this(behandlingRepository, taskTjeneste, behandlingskontrollTjeneste, ApplicationName.hvilkenTilbake());
+    }
+
+    public LosEventObserver(BehandlingRepository behandlingRepository,
+                            ProsessTaskTjeneste taskTjeneste,
+                            BehandlingskontrollTjeneste behandlingskontrollTjeneste,
+                            Fagsystem fagsystem) {
         this.behandlingRepository = behandlingRepository;
         this.taskTjeneste = taskTjeneste;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
+        this.fagsystem = fagsystem;
     }
 
     public void observerAksjonpunktStatusEvent(@Observes AksjonspunktStatusEvent event) {
-        Long behandlingId = event.getBehandlingId();
-        for (Aksjonspunkt aksjonspunkt : event.getAksjonspunkter()) {
-            if (AksjonspunktStatus.OPPRETTET.equals(aksjonspunkt.getStatus()) && (aksjonspunkt.erManuell() || erBehandlingIFaktaEllerSenereSteg(behandlingId))) {
-                logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_OPPRETTET, aksjonspunkt.getAksjonspunktDefinisjon().getKode());
-                opprettProsessTask(event.getFagsakId(), behandlingId, event.getAktørId(), EventHendelse.AKSJONSPUNKT_OPPRETTET);
+        if (Fagsystem.FPTILBAKE.equals(fagsystem)) {
+            var manueltPåVent = event.getAksjonspunkter().stream()
+                .anyMatch(e -> e.erOpprettet() && AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING.equals(e.getAksjonspunktDefinisjon()));
+            if (manueltPåVent) {
+                opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.AKSJONSPUNKT_OPPRETTET);
             }
-            if (!AksjonspunktStatus.OPPRETTET.equals(aksjonspunkt.getStatus()) && aksjonspunkt.erAutopunkt() && erBehandlingIFaktaEllerSenereSteg(behandlingId)) {
-                logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_UTFØRT, aksjonspunkt.getAksjonspunktDefinisjon().getKode());
-                opprettProsessTask(event.getFagsakId(), behandlingId, event.getAktørId(), EventHendelse.AKSJONSPUNKT_UTFØRT);
+        } else {
+            Long behandlingId = event.getBehandlingId();
+            for (Aksjonspunkt aksjonspunkt : event.getAksjonspunkter()) {
+                if (AksjonspunktStatus.OPPRETTET.equals(aksjonspunkt.getStatus()) && (aksjonspunkt.erManuell() || erBehandlingIFaktaEllerSenereSteg(
+                    behandlingId))) {
+                    logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_OPPRETTET,
+                        aksjonspunkt.getAksjonspunktDefinisjon().getKode());
+                    opprettProsessTask(event.getFagsakId(), behandlingId, event.getAktørId(), EventHendelse.AKSJONSPUNKT_OPPRETTET);
+                }
+                if (!AksjonspunktStatus.OPPRETTET.equals(aksjonspunkt.getStatus()) && aksjonspunkt.erAutopunkt() && erBehandlingIFaktaEllerSenereSteg(
+                    behandlingId)) {
+                    logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_UTFØRT, aksjonspunkt.getAksjonspunktDefinisjon().getKode());
+                    opprettProsessTask(event.getFagsakId(), behandlingId, event.getAktørId(), EventHendelse.AKSJONSPUNKT_UTFØRT);
+                }
             }
         }
     }
@@ -78,23 +102,31 @@ public class LosEventObserver {
     }
 
     public void observerStoppetEvent(@Observes BehandlingskontrollEvent.StoppetEvent event) {
-        if (event.getStegStatus().equals(BehandlingStegStatus.INNGANG)) {
+        if (Fagsystem.FPTILBAKE.equals(fagsystem)) {
             opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.BEHANDLINGSKONTROLL_EVENT);
+        } else {
+            if (event.getStegStatus().equals(BehandlingStegStatus.INNGANG)) {
+                opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.BEHANDLINGSKONTROLL_EVENT);
+            }
         }
     }
 
     public void observerBehandlingFristenUtløptEvent(@Observes BehandlingManglerKravgrunnlagFristenUtløptEvent utløptEvent) {
-        logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_OPPRETTET,
+        if (!Fagsystem.FPTILBAKE.equals(fagsystem)) {
+            logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_OPPRETTET,
                 AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG);
-        opprettProsessTask(utløptEvent.getFagsakId(), utløptEvent.getBehandlingId(), utløptEvent.getAktørId(),
+            opprettProsessTask(utløptEvent.getFagsakId(), utløptEvent.getBehandlingId(), utløptEvent.getAktørId(),
                 EventHendelse.AKSJONSPUNKT_OPPRETTET, AksjonspunktStatus.OPPRETTET, utløptEvent.getFristDato());
+        }
     }
 
     public void observerBehandlingFristenEndretEvent(@Observes BehandlingManglerKravgrunnlagFristenEndretEvent fristenEndretEvent) {
-        logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_AVBRUTT,
+        if (!Fagsystem.FPTILBAKE.equals(fagsystem)) {
+            logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_AVBRUTT,
                 AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG);
-        opprettProsessTask(fristenEndretEvent.getFagsakId(), fristenEndretEvent.getBehandlingId(), fristenEndretEvent.getAktørId(),
+            opprettProsessTask(fristenEndretEvent.getFagsakId(), fristenEndretEvent.getBehandlingId(), fristenEndretEvent.getAktørId(),
                 EventHendelse.AKSJONSPUNKT_AVBRUTT, AksjonspunktStatus.AVBRUTT, fristenEndretEvent.getFristDato());
+        }
     }
 
     private void opprettProsessTask(long fagsakId, long behandlingId, AktørId aktørId, EventHendelse eventHendelse) {

@@ -22,6 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 @ApplicationScoped
@@ -231,6 +232,20 @@ public class BehandlingRepository {
         query.setParameter("status", BehandlingStatus.AVSLUTTET);
         query.setHint(QueryHints.HINT_READONLY, "true");
         return query.getResultList();
+    }
+
+    public void avbrytÅpentAksjonspunktForAvsluttetBehandling() {
+        var antall = entityManager.createNativeQuery("""
+                    update aksjonspunkt
+                    set aksjonspunkt_status = :avbrutt
+                    where aksjonspunkt_status = :opprettet and behandling_id in (select id from behandling where behandling_status = :avsluttet)
+                    """)
+            .setParameter("avbrutt", AksjonspunktStatus.AVBRUTT.getKode())
+            .setParameter("opprettet", AksjonspunktStatus.OPPRETTET.getKode())
+            .setParameter("avsluttet", BehandlingStatus.AVSLUTTET.getKode())
+            .executeUpdate();
+        entityManager.flush();
+
     }
 
 }
