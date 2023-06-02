@@ -96,10 +96,10 @@ public class KravVedtakStatusTjeneste {
     }
 
     private void håndteresEndretStatusMelding(Long behandlingId, String statusKode) {
-        Saksnummer saksnummer = behandlingRepository.hentBehandling(behandlingId).getFagsak().getSaksnummer();
+        var saksnummer = behandlingRepository.hentBehandling(behandlingId).getFagsak().getSaksnummer();
         if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
             if (!grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
-                throw new IllegalStateException(String.format("Har fått statusmelding med kode %s fra oppdragsystemet for behandlingId %d, sak %s, men eksisterende grunnlag er ikke sperret", statusKode, behandlingId, saksnummer));
+                throw kanIkkeHåndtereGrunnlagForBehandling(", men eksisterende grunnlag er ikke sperret", statusKode, behandlingId, saksnummer);
             }
             var kravgrunnlag431 = grunnlagRepository.finnKravgrunnlag(behandlingId);
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
@@ -107,8 +107,13 @@ public class KravVedtakStatusTjeneste {
             taBehandlingAvventOgFortsettBehandling(behandlingId);
             grunnlagRepository.opphevGrunnlag(behandlingId);
         } else {
-            throw new IllegalStateException(String.format("Har fått statusmelding med kode %s fra oppdragsystemet for behandlingId %d, sak %s, men det finnes ikke noe grunnlag", statusKode, behandlingId, saksnummer));
+            throw kanIkkeHåndtereGrunnlagForBehandling(", men det finnes ikke noe grunnlag", statusKode, behandlingId, saksnummer);
         }
+    }
+
+    static TekniskException kanIkkeHåndtereGrunnlagForBehandling(String suffix, String statusKode, Long behandlingId, Saksnummer saksnummer) {
+        var message = String.format("Mottok statusmelding med kode %s fra oppdrag for behandlingId %d, sak %s", statusKode, behandlingId, saksnummer);
+        return new TekniskException("FPT-107929", message + suffix);
     }
 
     private void taBehandlingAvventOgFortsettBehandling(long behandlingId) {
