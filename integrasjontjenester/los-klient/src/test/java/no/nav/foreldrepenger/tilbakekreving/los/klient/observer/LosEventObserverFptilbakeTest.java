@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.los.klient.observer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -32,7 +33,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
@@ -44,7 +44,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 @ExtendWith(JpaExtension.class)
-class LosEventObserverTest {
+class LosEventObserverFptilbakeTest {
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
@@ -62,19 +62,19 @@ class LosEventObserverTest {
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager,
                 new BehandlingModellRepository(), mock(BehandlingskontrollEventPubliserer.class)));
         losEventObserver = new LosEventObserver(repositoryProvider.getBehandlingRepository(),
-                taskTjeneste, behandlingskontrollTjeneste, Fagsystem.K9TILBAKE);
+                taskTjeneste, behandlingskontrollTjeneste, Fagsystem.FPTILBAKE);
 
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
         behandlingskontrollKontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
     }
 
     @Test
-    void skal_publisere_data_når_manuell_aksjonspunkt_er_opprettet() {
+    void skal_ikke_publisere_data_når_manuell_aksjonspunkt_er_opprettet() {
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(behandlingskontrollKontekst, BehandlingStegType.FAKTA_FEILUTBETALING, List.of(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
         var aksjonspunkterFunnetEvent = new AksjonspunktStatusEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(), BehandlingStegType.FAKTA_FEILUTBETALING);
 
         losEventObserver.observerAksjonpunktStatusEvent(aksjonspunkterFunnetEvent);
-        fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_OPPRETTET);
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
@@ -99,24 +99,24 @@ class LosEventObserverTest {
     }
 
     @Test
-    void skal_ikke_publisere_data_for_autopunkter_når_behandling_er_før_fakta_steg() {
+    void skal_publisere_data_for_autopunkter_når_behandling_er_før_fakta_steg() {
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(behandlingskontrollKontekst, BehandlingStegType.VARSEL, List.of(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING));
         var aksjonspunkterFunnetEvent = new AksjonspunktStatusEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(), BehandlingStegType.VARSEL);
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
 
         losEventObserver.observerAksjonpunktStatusEvent(aksjonspunkterFunnetEvent);
-        verifyNoInteractions(taskTjeneste);
+        verify(taskTjeneste, times(1)).lagre(any(ProsessTaskData.class));
     }
 
     @Test
-    void skal_publisere_data_når_autopunkter_er_utført_og_behandling_er_i_fakta_steg() {
+    void skal_ikke_publisere_data_når_autopunkter_er_utført_og_behandling_er_i_fakta_steg() {
         var apa = behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(behandlingskontrollKontekst, BehandlingStegType.VARSEL, List.of(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING)).get(0);
         behandlingskontrollTjeneste.lagreAksjonspunkterUtført(behandlingskontrollKontekst, BehandlingStegType.VARSEL, List.of(apa));
         var aksjonspunktUtførtEvent = new AksjonspunktStatusEvent(behandlingskontrollKontekst, List.of(apa), BehandlingStegType.FAKTA_FEILUTBETALING);
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VTILBSTEG);
 
         losEventObserver.observerAksjonpunktStatusEvent(aksjonspunktUtførtEvent);
-        fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_UTFØRT);
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
@@ -127,18 +127,18 @@ class LosEventObserverTest {
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VTILBSTEG);
 
         losEventObserver.observerAksjonpunktStatusEvent(aksjonspunktUtførtEvent);
-        fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_UTFØRT);
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
-    void skal_ikke_publisere_data_når_autopunkter_er_utført_og_behandling_er_før_fakta_steg() {
+    void skal_publisere_data_når_autopunkter_er_utført_og_behandling_er_før_fakta_steg() {
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(behandlingskontrollKontekst, BehandlingStegType.VARSEL, List.of(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING)).get(0);
 
         var aksjonspunktUtførtEvent = new AksjonspunktStatusEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(), BehandlingStegType.VARSEL);
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
 
         losEventObserver.observerAksjonpunktStatusEvent(aksjonspunktUtførtEvent);
-        verifyNoInteractions(taskTjeneste);
+        verify(taskTjeneste, times(1)).lagre(any(ProsessTaskData.class));
     }
 
     @Test
@@ -154,13 +154,13 @@ class LosEventObserverTest {
     }
 
     @Test
-    void skal_publisere_data_når_behandling_er_tilbakeført_til_fakta_steg() {
+    void skal_ikke_publisere_data_når_behandling_er_tilbakeført_til_fakta_steg() {
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(behandlingskontrollKontekst, BehandlingStegType.FAKTA_FEILUTBETALING, List.of(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
         var aksjonspunktTilbakeførtEvent = new AksjonspunktStatusEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(), BehandlingStegType.VTILBSTEG);
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VTILBSTEG);
 
         losEventObserver.observerAksjonpunktStatusEvent(aksjonspunktTilbakeførtEvent);
-        fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_OPPRETTET);
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
@@ -180,25 +180,21 @@ class LosEventObserverTest {
     }
 
     @Test
-    void skal_publisere_data_når_behandling_sett_på_vent_og_fristen_er_utløpt() {
+    void skal_ikke_publisere_data_når_behandling_sett_på_vent_og_fristen_er_utløpt() {
         var fristTid = LocalDateTime.now();
         var utløptEvent = new BehandlingManglerKravgrunnlagFristenUtløptEvent(behandling, fristTid);
 
         losEventObserver.observerBehandlingFristenUtløptEvent(utløptEvent);
-        var publisherEventProsessTask = fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_OPPRETTET);
-        assertThat(publisherEventProsessTask.getPropertyValue(LosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID)).isEqualTo(fristTid.toString());
-        assertThat(publisherEventProsessTask.getPropertyValue(LosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE)).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
-    void skal_publisere_data_når_behandling_sett_på_vent_og_fristen_er_endret() {
+    void skal_ikke_publisere_data_når_behandling_sett_på_vent_og_fristen_er_endret() {
         var fristTid = LocalDateTime.now();
         var fristenEndretEvent = new BehandlingManglerKravgrunnlagFristenEndretEvent(behandling, fristTid);
 
         losEventObserver.observerBehandlingFristenEndretEvent(fristenEndretEvent);
-        var publisherEventProsessTask = fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_AVBRUTT);
-        assertThat(publisherEventProsessTask.getPropertyValue(LosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID)).isEqualTo(fristTid.toString());
-        assertThat(publisherEventProsessTask.getPropertyValue(LosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE)).isEqualTo(AksjonspunktStatus.AVBRUTT.getKode());
+        verifyNoInteractions(taskTjeneste);
     }
 
     private ProsessTaskData fellesAssertProsessTask(EventHendelse eventHendelse) {

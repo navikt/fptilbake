@@ -238,6 +238,21 @@ public class ForvaltningBehandlingRestTjeneste {
         return Response.ok().build();
     }
 
+    @POST
+    @Path("/avbryt-aapent-ap-avsluttet-behandling")
+    @Operation(
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å avbryte åpne aksjonspunkt når behandling er avsluttet!",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Aksjonspunkt avbrut"),
+            @ApiResponse(responseCode = "500", description = "ukjent feil.")
+        })
+    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
+    public Response avbrytÅpentAksjonspunktForAvsluttetBehandling() {
+        behandlingRepository.avbrytÅpentAksjonspunktForAvsluttetBehandling();
+        return Response.ok().build();
+    }
+
     private void kobleBehandling(KobleBehandlingTilGrunnlagDto dto) {
         Long mottattXmlId = dto.getMottattXmlId();
         Long behandlingId = dto.getBehandlingId();
