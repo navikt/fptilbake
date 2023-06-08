@@ -353,18 +353,20 @@ public class VedtaksbrevTjeneste {
     }
 
     private List<HbVedtaksbrevPeriode> lagHbVedtaksbrevPerioder(Long behandlingId, List<PeriodeMedTekstDto> perioderFritekst, List<BeregningResultatPeriode> resulatPerioder, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, VedtaksbrevType vedtaksbrevType) {
-        List<Periode> perioder = utledPerioder(resulatPerioder, vilkårPerioder, foreldelse, perioderFritekst);
-        FaktaFeilutbetaling fakta = faktaRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
+        var fakta = faktaRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
+        var perioder = utledPerioder(resulatPerioder, vilkårPerioder, foreldelse, fakta);
         return vedtaksbrevType.equals(VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT)
                 ? Collections.emptyList()
                 : perioder.stream()
                 .map(periode -> lagBrevdataPeriode(periode, resulatPerioder, fakta, vilkårPerioder, foreldelse, perioderFritekst))
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    private List<Periode> utledPerioder(List<BeregningResultatPeriode> beregningResultatPerioder, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, List<PeriodeMedTekstDto> perioderFritekst) {
-        VedtaksbrevPeriodeSammenslåer sammenslåer = new VedtaksbrevPeriodeSammenslåer(vilkårPerioder, foreldelse, perioderFritekst);
-        return sammenslåer.utledPerioder(beregningResultatPerioder);
+    private List<Periode> utledPerioder(List<BeregningResultatPeriode> beregningResultatPerioder,
+                                        List<VilkårVurderingPeriodeEntitet> vilkårPerioder,
+                                        VurdertForeldelse foreldelse,
+                                        FaktaFeilutbetaling fakta) {
+        return new VedtaksbrevPeriodeSammenslåer(vilkårPerioder, foreldelse, fakta).utledPerioder(beregningResultatPerioder);
     }
 
     private VedtakHjemmel.EffektForBruker hentEffektForBruker(Behandling behandling, BigDecimal totaltTilbakekrevesMedRenter) {
@@ -478,11 +480,11 @@ public class VedtaksbrevTjeneste {
                 .map(BeregningResultatPeriode::getPeriode)
                 .filter(periode::omslutter)
                 .filter(drp -> !drp.equals(periode))
-                .collect(Collectors.toList());
+                .toList();
 
         List<HbVedtaksbrevPeriode> delperioder = delresultatPerioder.stream()
                 .map(drp -> lagBrevdataPeriode(drp, resultatPerioder, fakta, vilkårPerioder, foreldelse, perioderFritekst))
-                .collect(Collectors.toList());
+                .toList();
 
         return HbVedtaksbrevPeriode.builder()
                 .medPeriode(periode)

@@ -3,32 +3,30 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingSærligGrunnEntitet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class VedtaksbrevPeriodeSammenslåer {
 
     private final List<VilkårVurderingPeriodeEntitet> vilkårsvurderinger;
     private final VurdertForeldelse foreldelse;
-    private List<PeriodeMedTekstDto> perioderFritekst;
+    private final FaktaFeilutbetaling fakta;
 
-    public VedtaksbrevPeriodeSammenslåer(List<VilkårVurderingPeriodeEntitet> vilkårsvurderinger, VurdertForeldelse foreldelse, List<PeriodeMedTekstDto> perioderFritekst) {
+    public VedtaksbrevPeriodeSammenslåer(List<VilkårVurderingPeriodeEntitet> vilkårsvurderinger, VurdertForeldelse foreldelse, FaktaFeilutbetaling fakta) {
         this.vilkårsvurderinger = vilkårsvurderinger;
         this.foreldelse = foreldelse;
-        this.perioderFritekst = perioderFritekst;
+        this.fakta = fakta;
     }
 
     public List<Periode> utledPerioder(List<BeregningResultatPeriode> beregningResultatPerioder) {
@@ -39,7 +37,7 @@ public class VedtaksbrevPeriodeSammenslåer {
         for (BeregningResultatPeriode beregningResultatPeriode : beregningResultatPerioder) {
             Periode malPeriode = mal.getPeriode();
             Periode brPeriode = beregningResultatPeriode.getPeriode();
-            if (harLikVurdering(malPeriode, brPeriode) && harLikFritekst(malPeriode, beregningResultatPeriode.getPeriode())) {
+            if (harLikVurdering(malPeriode, brPeriode)) {
                 periode = Periode.omsluttende(periode, beregningResultatPeriode.getPeriode());
             } else {
                 resultat.add(periode);
@@ -51,32 +49,37 @@ public class VedtaksbrevPeriodeSammenslåer {
         return resultat;
     }
 
-    private boolean harLikFritekst(Periode periode1, Periode periode2) {
-        //denne sjekken er for å støtte tilfellet hvor saksbehandler har lagt inn fritekst før funksjonalitet
-        //for sammenslåing lanseres, og vedtaksbrev sendes ut etter at sammenslåing er lansert.
-        //dette vil da unngå sammenslåing i dette tilfellet, slik at brevet blir som saksbehandler forventer
-        //TODO denne funksjonen kan fjernes en stund etter lansering er gjort for alle ytelser som skal bruke sammenslåing
-        return sammeFritekst(periode1, periode2, PeriodeMedTekstDto::getFaktaAvsnitt, "fakta")
-                && sammeFritekst(periode1, periode2, PeriodeMedTekstDto::getForeldelseAvsnitt, "foreldelse")
-                && sammeFritekst(periode1, periode2, PeriodeMedTekstDto::getVilkårAvsnitt, "vilkår")
-                && sammeFritekst(periode1, periode2, PeriodeMedTekstDto::getSærligeGrunnerAvsnitt, "særlige grunner")
-                && sammeFritekst(periode1, periode2, PeriodeMedTekstDto::getSærligeGrunnerAnnetAvsnitt, "særlige grunner annet");
-    }
-
     private boolean harLikVurdering(Periode periode1, Periode periode2) {
         return erBeggeForeldetPåSammeMåte(periode1, periode2)
-                || likForeldelse(periode1, periode2) && likVilkårsvurdering(periode1, periode2);
+                || likForeldelse(periode1, periode2) && likVilkårsvurdering(periode1, periode2) && likeFakta(periode1, periode2);
+    }
+
+    private boolean likeFakta(Periode periode1, Periode periode2) {
+        var f1 = finnFaktaFeilutbetaling(periode1);
+        var f2 = finnFaktaFeilutbetaling(periode2);
+        return like(f1, f2);
+    }
+
+    private FaktaFeilutbetalingPeriode finnFaktaFeilutbetaling(Periode periode) {
+        return fakta.getFeilutbetaltPerioder().stream()
+            .filter(vp -> vp.getPeriode().overlapper(periode))
+            .findFirst()
+            .orElseThrow();
+    }
+
+    private boolean like(FaktaFeilutbetalingPeriode f1, FaktaFeilutbetalingPeriode f2) {
+        return f1.getHendelseType().equals(f2.getHendelseType()) && f1.getHendelseUndertype().equals(f2.getHendelseUndertype());
     }
 
     private boolean erBeggeForeldetPåSammeMåte(Periode periode1, Periode periode2) {
-        ForeldelseVurderingType f1 = finnForeldelseResultat(periode1);
-        ForeldelseVurderingType f2 = finnForeldelseResultat(periode2);
+        var f1 = finnForeldelseResultat(periode1);
+        var f2 = finnForeldelseResultat(periode2);
         return f1 == f2 && (f1 == ForeldelseVurderingType.FORELDET || f1 == ForeldelseVurderingType.TILLEGGSFRIST);
     }
 
     private boolean likVilkårsvurdering(Periode periode1, Periode periode2) {
-        VilkårVurderingPeriodeEntitet v1 = finnVilkårsvurdering(periode1);
-        VilkårVurderingPeriodeEntitet v2 = finnVilkårsvurdering(periode2);
+        var v1 = finnVilkårsvurdering(periode1);
+        var v2 = finnVilkårsvurdering(periode2);
         return like(v1, v2);
     }
 
@@ -104,8 +107,8 @@ public class VedtaksbrevPeriodeSammenslåer {
     }
 
     private boolean like(List<VilkårVurderingSærligGrunnEntitet> sg1, List<VilkårVurderingSærligGrunnEntitet> sg2) {
-        Set<SærligGrunn> særligeGrunner1 = sg1.stream().map(VilkårVurderingSærligGrunnEntitet::getGrunn).collect(Collectors.toSet());
-        Set<SærligGrunn> særligeGrunner2 = sg2.stream().map(VilkårVurderingSærligGrunnEntitet::getGrunn).collect(Collectors.toSet());
+        var særligeGrunner1 = sg1.stream().map(VilkårVurderingSærligGrunnEntitet::getGrunn).collect(Collectors.toSet());
+        var særligeGrunner2 = sg2.stream().map(VilkårVurderingSærligGrunnEntitet::getGrunn).collect(Collectors.toSet());
         return særligeGrunner1.equals(særligeGrunner2);
     }
 
@@ -131,25 +134,4 @@ public class VedtaksbrevPeriodeSammenslåer {
                 .orElse(ForeldelseVurderingType.UDEFINERT);
     }
 
-    private boolean sammeFritekst(Periode periode1, Periode periode2, Function<PeriodeMedTekstDto, String> fritekstTypeFunksjon, String fritekstType) {
-        return Objects.equals(
-                finnFritekst(periode1, fritekstTypeFunksjon, fritekstType),
-                finnFritekst(periode2, fritekstTypeFunksjon, fritekstType)
-        );
-    }
-
-    private String finnFritekst(Periode periode, Function<PeriodeMedTekstDto, String> fritekstTypeFunksjon, String fritekstType) {
-        List<String> resultat = perioderFritekst.stream()
-                .filter(fritekst -> fritekst.getPeriode().overlapper(periode))
-                .map(fritekstTypeFunksjon)
-                .distinct()
-                .toList();
-        if (resultat.isEmpty()) {
-            return null;
-        }
-        if (resultat.size() == 1) {
-            return resultat.get(0);
-        }
-        throw new IllegalStateException("Fant " + resultat.size() + " ulike fritekster for " + periode + "og type " + fritekstType);
-    }
 }
