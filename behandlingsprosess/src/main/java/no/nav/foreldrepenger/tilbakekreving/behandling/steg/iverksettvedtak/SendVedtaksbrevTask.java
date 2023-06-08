@@ -14,6 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.Vedtaksbre
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
+import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 @ApplicationScoped
 @ProsessTask("iverksetteVedtak.sendVedtaksbrev")
@@ -21,6 +22,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 public class SendVedtaksbrevTask implements ProsessTaskHandler {
 
     private static final Logger log = LoggerFactory.getLogger(SendVedtaksbrevTask.class);
+    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private VergeRepository vergeRepository;
     private VedtaksbrevTjeneste vedtaksbrevTjeneste;
@@ -39,6 +41,7 @@ public class SendVedtaksbrevTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
+        LOG_CONTEXT.add("behandling", behandlingId);
         if (vergeRepository.finnesVerge(behandlingId)) {
             vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId, BrevMottaker.VERGE);
         }

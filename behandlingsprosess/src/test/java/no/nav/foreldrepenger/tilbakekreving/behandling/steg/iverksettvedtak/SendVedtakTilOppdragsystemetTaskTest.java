@@ -19,6 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.Beregningsresul
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.UkjentKvitteringFraOSException;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
@@ -34,6 +35,8 @@ class SendVedtakTilOppdragsystemetTaskTest {
 
     @Inject
     private EntityManager entityManager;
+    @Inject
+    private BehandlingRepository behandlingRepository;
     @Inject
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
     @Inject
@@ -51,7 +54,7 @@ class SendVedtakTilOppdragsystemetTaskTest {
 
     @BeforeEach
     void setup() {
-        task = new SendVedtakTilOppdragsystemetTask(entityManager, oppdragIverksettingStatusRepository, beregningsresultatTjeneste, tilbakekrevingsvedtakTjeneste, økonomiProxyKlient);
+        task = new SendVedtakTilOppdragsystemetTask(entityManager, behandlingRepository, oppdragIverksettingStatusRepository, beregningsresultatTjeneste, tilbakekrevingsvedtakTjeneste, økonomiProxyKlient);
     }
 
     @Test

@@ -4,14 +4,15 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.UkjentKvitteringFraOSException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.UkjentKvitteringFraOSException;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
@@ -21,6 +22,7 @@ import no.nav.vedtak.felles.jpa.savepoint.RunWithSavepoint;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
+import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 @ApplicationScoped
 @ProsessTask("iverksetteVedtak.sendVedtakTilOppdragsystemet")
@@ -28,23 +30,29 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(SendVedtakTilOppdragsystemetTask.class);
+    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private EntityManager entityManager;
+    private BehandlingRepository behandlingRepository;
     private OppdragIverksettingStatusRepository oppdragIverksettingStatusRepository;
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
     private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private ØkonomiProxyKlient økonomiProxyKlient;
+
+
     SendVedtakTilOppdragsystemetTask() {
         // CDI krav
     }
 
     @Inject
     public SendVedtakTilOppdragsystemetTask(EntityManager entityManager,
+                                            BehandlingRepository behandlingRepository,
                                             OppdragIverksettingStatusRepository oppdragIverksettingStatusRepository,
                                             BeregningsresultatTjeneste beregningsresultatTjeneste,
                                             TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste,
                                             ØkonomiProxyKlient økonomiProxyKlient) {
         this.entityManager = entityManager;
+        this.behandlingRepository = behandlingRepository;
         this.oppdragIverksettingStatusRepository = oppdragIverksettingStatusRepository;
         this.beregningsresultatTjeneste = beregningsresultatTjeneste;
         this.tilbakekrevingsvedtakTjeneste = tilbakekrevingsvedtakTjeneste;
@@ -54,6 +62,9 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        LOG_CONTEXT.add("behandling", behandlingId);
+        LOG_CONTEXT.add("saksnummer", behandling.getFagsak().getSaksnummer().getVerdi());
         beregningsresultatTjeneste.beregnOgLagre(behandlingId); //midlertidig her for å raskere kunne fase ut håndtering av lagret XML
         var tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
         oppdragIverksettingStatusRepository.registrerStarterIverksetting(behandlingId, tilbakekrevingsvedtak.vedtakId().toString());

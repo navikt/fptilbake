@@ -162,7 +162,7 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldigreferanse.xml"));
 
         assertThatThrownBy(() -> lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LES_KRAV_STATUS_TASK)))
-                .hasMessageContaining("Mottok et kravOgVedtakStatus fra Økonomi med henvisning i ikke-støttet format, henvisning=ABC. KravOgVedtakStatus "
+                .hasMessageContaining("Mottok en statusmelding fra Økonomi med henvisning i ikke-støttet format, henvisning=ABC. Statusmeldingen "
                         + "skulle kanskje til et annet system. Si i fra til Økonomi!");
     }
 
