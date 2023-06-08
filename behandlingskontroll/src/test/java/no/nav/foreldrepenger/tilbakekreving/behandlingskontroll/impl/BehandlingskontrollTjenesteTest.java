@@ -86,6 +86,7 @@ class BehandlingskontrollTjenesteTest {
         kontekst = mock(BehandlingskontrollKontekst.class);
         lenient().when(kontekst.getBehandlingId()).thenReturn(behandling.getId());
         lenient().when(kontekst.getFagsakId()).thenReturn(behandling.getFagsakId());
+        lenient().when(kontekst.getSaksnummer()).thenReturn(behandling.getFagsak().getSaksnummer());
 
         this.kontrollTjeneste = new BehandlingskontrollTjeneste(serviceProvider);
     }

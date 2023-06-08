@@ -33,6 +33,7 @@ public class TekniskBehandlingStegVisitor implements BehandlingModellVisitor {
     @Override
     public StegProsesseringResultat prosesser(BehandlingStegModell steg) {
         LOG_CONTEXT.add("fagsak", kontekst.getFagsakId()); // NOSONAR //$NON-NLS-1$
+        LOG_CONTEXT.add("saksnummer", kontekst.getSaksnummer().getVerdi()); // NOSONAR //$NON-NLS-1$
         LOG_CONTEXT.add("behandling", kontekst.getBehandlingId()); // NOSONAR //$NON-NLS-1$
         LOG_CONTEXT.add("steg", steg.getBehandlingStegType().getKode()); // NOSONAR //$NON-NLS-1$
 

@@ -81,7 +81,7 @@ class IverksetteVedtakStegTest {
         entityManager.setFlushMode(FlushModeType.AUTO);
         behandling = simple.lagre(repoProvider);
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
-        behandlingskontrollKontekst = new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), behandlingLås);
+        behandlingskontrollKontekst = new BehandlingskontrollKontekst(behandling.getFagsak().getSaksnummer(), behandling.getFagsakId(), behandling.getAktørId(), behandlingLås);
         opprettEksternBehandling(behandling);
     }
 
@@ -129,7 +129,7 @@ class IverksetteVedtakStegTest {
 
         opprettBehandlingVedtak(revurdering, IverksettingStatus.IKKE_IVERKSATT);
 
-        BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(new BehandlingskontrollKontekst(revurdering.getFagsakId(), revurdering.getAktørId(), revurderingBehandlingLås));
+        BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(new BehandlingskontrollKontekst(revurdering.getFagsak().getSaksnummer(), revurdering.getFagsakId(), revurdering.getAktørId(), revurderingBehandlingLås));
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
         assertBehandlingVedtak(revurdering);
 
@@ -154,7 +154,7 @@ class IverksetteVedtakStegTest {
         opprettEksternBehandling(revurdering);
         opprettBehandlingVedtak(revurdering, IverksettingStatus.IKKE_IVERKSATT);
 
-        BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(new BehandlingskontrollKontekst(revurdering.getFagsakId(), revurdering.getAktørId(), revurderingBehandlingLås));
+        BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(new BehandlingskontrollKontekst(revurdering.getFagsak().getSaksnummer(), revurdering.getFagsakId(), revurdering.getAktørId(), revurderingBehandlingLås));
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
         assertBehandlingVedtak(revurdering);
 

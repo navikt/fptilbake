@@ -164,7 +164,7 @@ class FremoverhoppTest {
         // BehandlingStegTilstand tilTilstand = new BehandlingStegTilstand(behandling,
         // til, BehandlingStegStatus.VENTER);
         var fagsak = behandling.getFagsak();
-        var kontekst = new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), behandlingLås);
+        var kontekst = new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), fagsak.getAktørId(), behandlingLås);
         /*
          * BehandlingStegOvergangEvent.BehandlingStegOverhoppEvent behandlingEvent = new
          * BehandlingStegOvergangEvent.BehandlingStegOverhoppEvent(kontekst,
