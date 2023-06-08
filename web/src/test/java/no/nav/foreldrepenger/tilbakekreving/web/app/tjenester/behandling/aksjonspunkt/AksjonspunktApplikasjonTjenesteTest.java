@@ -8,6 +8,8 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeDto;
@@ -47,6 +49,16 @@ class AksjonspunktApplikasjonTjenesteTest {
         scenario.medBehandlingType(BehandlingType.TILBAKEKREVING);
         scenario.leggTilAksjonspunkt(aksjonspunktDefinisjon, BehandlingStegType.FORELDELSEVURDERINGSTEG);
         return scenario;
+    }
+
+    @BeforeAll
+    public static void settAppName() {
+        System.setProperty("app.name", "fptilbake");
+    }
+
+    @AfterAll
+    public static void clearAppName() {
+        System.clearProperty("app.name");
     }
 
     @Test
