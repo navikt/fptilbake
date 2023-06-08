@@ -28,12 +28,14 @@ import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
+import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 @ApplicationScoped
 @ProsessTask("kravgrunnlag.les")
 public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(LesKravgrunnlagTask.class);
+    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
@@ -61,15 +63,19 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long mottattXmlId = Long.valueOf(prosessTaskData.getPropertyValue(TaskProperty.PROPERTY_MOTTATT_XML_ID));
+        LOG_CONTEXT.add("mottattXmlId", mottattXmlId);
 
         String råXml = økonomiMottattXmlRepository.hentMottattXml(mottattXmlId);
         DetaljertKravgrunnlag kravgrunnlagDto = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, råXml);
         Henvisning henvisning = kravgrunnlagMapper.finnHenvisning(kravgrunnlagDto);
         String saksnummer = FagsystemId.parse(kravgrunnlagDto.getFagsystemId()).getSaksnummer().getVerdi();
+        LOG_CONTEXT.add("henvisning", henvisning.getVerdi());
+        LOG_CONTEXT.add("saksnummer", saksnummer);
         //TODO k9-tilbake bytt String->Saksnummer
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagMapper.mapTilDomene(kravgrunnlagDto);
+        LOG_CONTEXT.add("kravgrunnlagId", kravgrunnlag.getEksternKravgrunnlagId());
 
-        boolean kravgrunnlagetErGyldig = validerKravgrunnlag(mottattXmlId, henvisning, saksnummer, kravgrunnlag);
+        boolean kravgrunnlagetErGyldig = validerKravgrunnlag(henvisning, saksnummer, kravgrunnlag);
         økonomiMottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(henvisning, saksnummer, mottattXmlId);
 
         Optional<Behandling> åpenTilbakekrevingBehandling = finnÅpenTilbakekrevingBehandling(saksnummer);
@@ -77,18 +83,19 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         if (åpenTilbakekrevingBehandling.isPresent()) {
             Behandling behandling = åpenTilbakekrevingBehandling.get();
             long behandlingId = behandling.getId();
-            logger.info("Leste kravgrunnlag med mottattXmlId={} kravgrunnlagId={} saksnummer={} internBehandlingId={}", mottattXmlId, kravgrunnlagId, saksnummer, behandlingId);
+            LOG_CONTEXT.add("behandling", behandlingId);
+            logger.info("Leste kravgrunnlag {}", kravgrunnlagId);
             kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(behandlingId, kravgrunnlag, kravgrunnlagetErGyldig);
             økonomiMottattXmlRepository.opprettTilkobling(mottattXmlId);
-            logger.info("Behandling med internBehandlingId={} koblet med grunnlag mottattXmlId={} kravgrunnlagId={}", behandlingId, mottattXmlId, kravgrunnlagId);
+            logger.info("Behandling {} koblet med kravgrunnlag {}", behandlingId, kravgrunnlagId);
             oppdaterHenvisningFraGrunnlag(behandling, saksnummer, henvisning);
         } else {
             validerBehandlingsEksistens(henvisning, saksnummer);
-            logger.info("Ignorerte kravgrunnlag med mottattXmlId={} kravgrunnlagId={} saksnummer={}. Fantes ikke en åpen tilbakekrevingsbehandling", mottattXmlId, kravgrunnlagId, saksnummer);
+            logger.info("Ignorerte kravgrunnlag {} for sak {}. Fantes ikke en åpen tilbakekrevingsbehandling", kravgrunnlagId, saksnummer);
         }
     }
 
-    private static boolean validerKravgrunnlag(Long mottattXmlId, Henvisning henvisning, String saksnummer, Kravgrunnlag431 kravgrunnlag) {
+    private static boolean validerKravgrunnlag(Henvisning henvisning, String saksnummer, Kravgrunnlag431 kravgrunnlag) {
         validerHenvisning(henvisning);
         try {
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
@@ -96,7 +103,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
             //logger feilen i kravgrunnlaget sammen med metainformasjon slik at feilen kan følges opp
             //prosessen får fortsette, slik at prosessen hopper tilbake hvis den er i fakta-steget eller senere
-            logger.warn(String.format("FPT-839288: Mottok et ugyldig kravgrunnlag for saksnummer=%s henvisning=%s mottattXmlId=%s kravgrunnlagId=%s", saksnummer, henvisning, mottattXmlId, kravgrunnlag.getEksternKravgrunnlagId()), e);
+            logger.warn(String.format("FPT-839288: Mottok et ugyldig kravgrunnlag for sak %s, kravgrunnlagId er %s", saksnummer, kravgrunnlag.getEksternKravgrunnlagId()), e);
             return false;
         }
     }

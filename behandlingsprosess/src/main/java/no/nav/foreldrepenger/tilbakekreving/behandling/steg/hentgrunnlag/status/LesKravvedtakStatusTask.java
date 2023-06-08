@@ -17,12 +17,14 @@ import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
+import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 @ApplicationScoped
 @ProsessTask("kravvedtakstatus.les")
 public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(LesKravvedtakStatusTask.class);
+    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste;
@@ -48,32 +50,37 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         var mottattXmlId = Long.valueOf(prosessTaskData.getPropertyValue(TaskProperty.PROPERTY_MOTTATT_XML_ID));
+        LOG_CONTEXT.add("mottattXmlId", mottattXmlId);
         var råXml = økonomiMottattXmlRepository.hentMottattXml(mottattXmlId);
 
         var kravOgVedtakstatus = KravVedtakStatusXmlUnmarshaller.unmarshall(mottattXmlId, råXml);
         var kravVedtakStatus437 = statusMapper.mapTilDomene(kravOgVedtakstatus);
-        var saksnummer = FagsystemId.parse(kravOgVedtakstatus.getFagsystemId()).getSaksnummer().getVerdi();
         //TODO k9-tilbake bytt String->Saksnummer
+        var saksnummer = FagsystemId.parse(kravOgVedtakstatus.getFagsystemId()).getSaksnummer().getVerdi();
+        LOG_CONTEXT.add("saksnummer", saksnummer);
+
         var henvisning = kravVedtakStatus437.getReferanse();
         validerHenvisning(henvisning);
+        LOG_CONTEXT.add("henvisning", henvisning);
         økonomiMottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(henvisning, saksnummer, mottattXmlId);
 
         var åpenTilbakekrevingBehandling = finnÅpenTilbakekrevingBehandling(saksnummer);
         if (åpenTilbakekrevingBehandling.isPresent()) {
             var behandlingId = åpenTilbakekrevingBehandling.get().getId();
+            LOG_CONTEXT.add("behandling", behandlingId);
             kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(behandlingId, kravVedtakStatus437);
             økonomiMottattXmlRepository.opprettTilkobling(mottattXmlId);
-            LOG.info("Tilkoblet kravVedtakStatus med id={} saksnummer={} behandlingId={}", mottattXmlId, saksnummer, behandlingId);
+            LOG.info("Koblet statusmelding til behandling {}", behandlingId);
         } else {
             validerBehandlingsEksistens(henvisning, saksnummer);
-            LOG.info("Ignorerte kravVedtakStatus med id={} saksnummer={}. Fantes ikke tilbakekrevingsbehandling", mottattXmlId, saksnummer);
+            LOG.info("Ignorerte statusmelding for sak {}. Fantes ikke tilbakekrevingsbehandling", saksnummer);
         }
     }
 
     private void validerHenvisning(Henvisning henvisning) {
         if (!Henvisning.erGyldig(henvisning)) {
             throw new TekniskException("FPT-675364",
-                    String.format("Mottok et kravOgVedtakStatus fra Økonomi med henvisning i ikke-støttet format, henvisning=%s. KravOgVedtakStatus skulle kanskje til et annet system. Si i fra til Økonomi!",
+                    String.format("Mottok en statusmelding fra Økonomi med henvisning i ikke-støttet format, henvisning=%s. Statusmeldingen skulle kanskje til et annet system. Si i fra til Økonomi!",
                             henvisning));
         }
     }
@@ -81,7 +88,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
     private void validerBehandlingsEksistens(Henvisning henvisning, String saksnummer) {
         if (!finnesYtelsesbehandling(saksnummer, henvisning)) {
             throw new TekniskException("FPT-587196",
-                    String.format("Mottok et kravOgVedtakStatus fra Økonomi for en behandling som ikke finnes i fpsak. henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!", henvisning));
+                    String.format("Mottok en statusmelding fra Økonomi for en behandling som ikke finnes i k9/fpsak. henvisning=%s. Statusmeldingen skulle kanskje til et annet system. Si i fra til Økonomi!", henvisning));
         }
     }
 }
