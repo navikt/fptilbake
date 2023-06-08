@@ -73,17 +73,18 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         økonomiMottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(henvisning, saksnummer, mottattXmlId);
 
         Optional<Behandling> åpenTilbakekrevingBehandling = finnÅpenTilbakekrevingBehandling(saksnummer);
+        String kravgrunnlagId = kravgrunnlag.getEksternKravgrunnlagId();
         if (åpenTilbakekrevingBehandling.isPresent()) {
             Behandling behandling = åpenTilbakekrevingBehandling.get();
             long behandlingId = behandling.getId();
-            logger.info("Leste kravgrunnlag med id={} saksnummer={} internBehandlingId={}", mottattXmlId, saksnummer, behandlingId);
+            logger.info("Leste kravgrunnlag med mottattXmlId={} kravgrunnlagId={} saksnummer={} internBehandlingId={}", mottattXmlId, kravgrunnlagId, saksnummer, behandlingId);
             kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(behandlingId, kravgrunnlag, kravgrunnlagetErGyldig);
             økonomiMottattXmlRepository.opprettTilkobling(mottattXmlId);
-            logger.info("Behandling med internBehandlingId={} koblet med grunnlag id={}", behandlingId, mottattXmlId);
+            logger.info("Behandling med internBehandlingId={} koblet med grunnlag mottattXmlId={} kravgrunnlagId={}", behandlingId, mottattXmlId, kravgrunnlagId);
             oppdaterHenvisningFraGrunnlag(behandling, saksnummer, henvisning);
         } else {
             validerBehandlingsEksistens(henvisning, saksnummer);
-            logger.info("Ignorerte kravgrunnlag med id={} saksnummer={}. Fantes ikke en åpen tilbakekrevingsbehandling", mottattXmlId, saksnummer);
+            logger.info("Ignorerte kravgrunnlag med mottattXmlId={} kravgrunnlagId={} saksnummer={}. Fantes ikke en åpen tilbakekrevingsbehandling", mottattXmlId, kravgrunnlagId, saksnummer);
         }
     }
 
@@ -95,7 +96,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
             //logger feilen i kravgrunnlaget sammen med metainformasjon slik at feilen kan følges opp
             //prosessen får fortsette, slik at prosessen hopper tilbake hvis den er i fakta-steget eller senere
-            logger.warn(String.format("FPT-839288: Mottok et ugyldig kravgrunnlag for saksnummer=%s henvisning=%s mottattXmlId=%s", saksnummer, henvisning, mottattXmlId), e);
+            logger.warn(String.format("FPT-839288: Mottok et ugyldig kravgrunnlag for saksnummer=%s henvisning=%s mottattXmlId=%s kravgrunnlagId=%s", saksnummer, henvisning, mottattXmlId, kravgrunnlag.getEksternKravgrunnlagId()), e);
             return false;
         }
     }
