@@ -51,7 +51,7 @@ public class VedtaksbrevPeriodeSammenslåer {
 
     private boolean harLikVurdering(Periode periode1, Periode periode2) {
         return erBeggeForeldetPåSammeMåte(periode1, periode2)
-                || (likForeldelse(periode1, periode2) && likVilkårsvurdering(periode1, periode2) && likeFakta(periode1, periode2));
+                || likForeldelse(periode1, periode2) && likVilkårsvurdering(periode1, periode2) && likeFakta(periode1, periode2);
     }
 
     private boolean likeFakta(Periode periode1, Periode periode2) {
