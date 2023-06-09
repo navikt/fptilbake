@@ -86,7 +86,7 @@ public class BeregningResultatPeriode {
             Objects.requireNonNull(kladd.tilbakekrevingBeløp, "tilbakekrevingBeløp");
             Objects.requireNonNull(kladd.tilbakekrevingBeløpEtterSkatt, "tilbakekrevingBeløpEtterSkatt");
             Objects.requireNonNull(kladd.tilbakekrevingBeløpUtenRenter, "tilbakekrevingBeløpUtenRenter");
-            Objects.requireNonNull(kladd.feilutbetaltBeløp, "periode");
+            Objects.requireNonNull(kladd.feilutbetaltBeløp, "feilutbetaltBeløp");
             Objects.requireNonNull(kladd.renteBeløp, "renteBeløp");
             Objects.requireNonNull(kladd.skattBeløp, "skattBeløp");
             Objects.requireNonNull(kladd.utbetaltYtelseBeløp, "utbetaltYtelseBeløp");
