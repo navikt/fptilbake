@@ -168,8 +168,8 @@ public class KravgrunnlagTjeneste {
             """);
         query.setParameter("behandlingId", behandlingId);
         int antallStoppet = query.executeUpdate();
-        if (antallStoppet > 3){
-            throw new IllegalStateException("Var forventet å stoppe 3 tasker, men forsøker å stoppe " + antallStoppet);
+        if (antallStoppet > 4){
+            throw new IllegalStateException("Var forventet å stoppe 4 tasker, men forsøker å stoppe " + antallStoppet);
         }
         LOG.info("Stoppet {} planlagte tasker for behandling {}", antallStoppet, behandlingId);
     }
