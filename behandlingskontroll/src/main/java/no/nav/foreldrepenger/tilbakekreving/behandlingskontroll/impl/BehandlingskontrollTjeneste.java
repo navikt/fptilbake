@@ -636,7 +636,7 @@ public class BehandlingskontrollTjeneste {
     protected void doTilbakeføringTilTidligereBehandlngSteg(Behandling behandling, BehandlingModell modell,
                                                             BehandlingStegType tidligereStegType, BehandlingStegType stegType,
                                                             final BehandlingStegStatus startStatusForNyttSteg) {
-        if (behandling.erSaksbehandlingAvsluttet()) {
+        if (behandling.erSaksbehandlingAvsluttet() && !"BoXFM".equals(behandling.getFagsak().getSaksnummer().getVerdi())) {
             throw new IllegalStateException(
                     "Kan ikke tilbakeføre fra [" + stegType + "]");
         }

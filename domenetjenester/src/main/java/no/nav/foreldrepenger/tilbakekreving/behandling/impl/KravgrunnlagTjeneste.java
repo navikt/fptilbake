@@ -12,6 +12,8 @@ import java.util.TreeMap;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +53,7 @@ public class KravgrunnlagTjeneste {
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
     private SlettGrunnlagEventPubliserer kravgrunnlagEventPubliserer;
+    private EntityManager entityManager;
 
 
     KravgrunnlagTjeneste() {
@@ -61,7 +64,8 @@ public class KravgrunnlagTjeneste {
     public KravgrunnlagTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                 GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
                                 BehandlingskontrollTjeneste behandlingskontrollTjeneste,
-                                SlettGrunnlagEventPubliserer slettGrunnlagEventPubliserer) {
+                                SlettGrunnlagEventPubliserer slettGrunnlagEventPubliserer,
+                                EntityManager entityManager) {
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.historikkRepository = repositoryProvider.getHistorikkRepository();
@@ -69,6 +73,7 @@ public class KravgrunnlagTjeneste {
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
 
         this.kravgrunnlagEventPubliserer = slettGrunnlagEventPubliserer;
+        this.entityManager = entityManager;
     }
 
 
@@ -140,14 +145,33 @@ public class KravgrunnlagTjeneste {
         // forutsatt at FPTILBAKE allerede har fått SPER melding for den behandlingen og sett behandling på vent med VenteÅrsak VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
         if (erForbiFaktaSteg) {
             LOG.info("Hopper tilbake til {} pga endret kravgrunnlag for behandlingId={}", FAKTA_FEILUTBETALING.getKode(), behandlingId);
+            if (behandling.getFagsak().getSaksnummer().getVerdi().equals("BoXFM")){
+                //avbryter planlagte tasker for å unngå doble iverksett-tasker når prosessen kjøres på nytt
+                avbrytPlanlagteTasker(behandling.getId());
+            }
             var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
             behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
             behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, FAKTA_FEILUTBETALING);
             opprettHistorikkinnslagForBehandlingStartetForfra(behandling);
+
         }
         slettVLAnsvarlingSaksbehandler(behandling); // Hvis AS er ikke null vil den aldri bli plukket opp av automatisk saksbehandling igjen.
         fyrKravgrunnlagEndretEvent(behandlingId);
         gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
+    }
+
+    private void avbrytPlanlagteTasker(Long behandlingId) {
+        Query query = entityManager.createNativeQuery("""
+                        update prosess_task pt set status = 'FERDIG'
+                            where pt.id in (select prosess_task_id from FAGSAK_PROSESS_TASK fpt where behandling_id = :behandlingId)
+                            and status in ('FEILET', 'KLAR')
+            """);
+        query.setParameter("behandlingId", behandlingId);
+        int antallStoppet = query.executeUpdate();
+        if (antallStoppet > 3){
+            throw new IllegalStateException("Var forventet å stoppe 3 tasker, men forsøker å stoppe " + antallStoppet);
+        }
+        LOG.info("Stoppet {} planlagte tasker for behandling {}", antallStoppet, behandlingId);
     }
 
     private void slettVLAnsvarlingSaksbehandler(Behandling behandling) {
