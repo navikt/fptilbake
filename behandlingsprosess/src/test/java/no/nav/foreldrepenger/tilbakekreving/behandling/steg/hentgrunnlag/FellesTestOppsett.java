@@ -119,7 +119,7 @@ public abstract class FellesTestOppsett {
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager,
                 new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste,
-                behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
+                behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer, entityManager);
         kravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
         lesKravgrunnlagTask = new LesKravgrunnlagTask(mottattXmlRepository, kravgrunnlagTjeneste, kravgrunnlagMapper,
                 repositoryProvider, fagsystemKlientMock);
