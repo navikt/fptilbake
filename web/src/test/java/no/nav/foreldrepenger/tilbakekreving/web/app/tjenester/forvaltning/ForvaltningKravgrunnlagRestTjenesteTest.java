@@ -46,7 +46,7 @@ class ForvaltningKravgrunnlagRestTjenesteTest {
     void setup() {
         var forvaltningTjeneste = new ForvaltningTjeneste(mock(ProsessTaskTjeneste.class), mottattXmlRepository, repositoryProvider.getBehandlingRepository(), kravgrunnlagRepository, mock(ØkonomiProxyKlient.class));
 
-        forvaltningKravgrunnlagRestTjeneste = new ForvaltningKravgrunnlagRestTjeneste(repositoryProvider.getBehandlingRepository(), forvaltningTjeneste);
+        forvaltningKravgrunnlagRestTjeneste = new ForvaltningKravgrunnlagRestTjeneste(repositoryProvider.getBehandlingRepository(), forvaltningTjeneste, kravgrunnlagRepository);
         behandling = scenario.lagre(repositoryProvider);
     }
 

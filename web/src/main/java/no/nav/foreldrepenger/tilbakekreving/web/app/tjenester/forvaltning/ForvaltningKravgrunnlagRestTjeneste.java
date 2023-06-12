@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
+import java.util.Optional;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -22,6 +24,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.HentKorrigertKravgrunnlagDto;
@@ -41,6 +45,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private ForvaltningTjeneste forvaltningTjeneste;
+    private KravgrunnlagRepository kravgrunnlagRepository;
 
     public ForvaltningKravgrunnlagRestTjeneste() {
         // for CDI
@@ -48,9 +53,11 @@ public class ForvaltningKravgrunnlagRestTjeneste {
 
     @Inject
     public ForvaltningKravgrunnlagRestTjeneste(BehandlingRepository behandlingRepository,
-                                               ForvaltningTjeneste forvaltningTjeneste) {
+                                               ForvaltningTjeneste forvaltningTjeneste,
+                                               KravgrunnlagRepository kravgrunnlagRepository) {
         this.behandlingRepository = behandlingRepository;
         this.forvaltningTjeneste = forvaltningTjeneste;
+        this.kravgrunnlagRepository = kravgrunnlagRepository;
     }
 
     @POST
@@ -68,8 +75,23 @@ public class ForvaltningKravgrunnlagRestTjeneste {
         if (behandling.erAvsluttet()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Kan ikke hente korrigert kravgrunnlag, behandlingen er avsluttet").build();
         }
-        logger.info("Oppretter task for å hente korrigert kravgrunnlag for behandlingId={}", behandling.getId());
-        forvaltningTjeneste.hentKorrigertKravgrunnlag(behandling, hentKorrigertKravgrunnlagDto.getKravgrunnlagId());
+
+        String kravgrunnlagId;
+        if (hentKorrigertKravgrunnlagDto.getKravgrunnlagId() != null) {
+            kravgrunnlagId = hentKorrigertKravgrunnlagDto.getKravgrunnlagId();
+        } else {
+            Optional<Kravgrunnlag431> eksisterendeKravgrunnlag = kravgrunnlagRepository.finnKravgrunnlagOpt(behandling.getId());
+            if (eksisterendeKravgrunnlag.isPresent()) {
+                kravgrunnlagId = eksisterendeKravgrunnlag.get().getEksternKravgrunnlagId();
+            } else {
+                return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Behandlingen har ikke eksisterende kravgrunnlag. kravgrunnlagId kreves da for å hente kravgrunnlag.")
+                    .build();
+            }
+        }
+
+        logger.info("Oppretter task for å hente korrigert kravgrunnlag {} for behandlingId={}", kravgrunnlagId, behandling.getId());
+        forvaltningTjeneste.hentKorrigertKravgrunnlag(behandling, kravgrunnlagId);
         return Response.ok().build();
     }
 
