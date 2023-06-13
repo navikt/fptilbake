@@ -5,11 +5,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
-import no.nav.vedtak.sikkerhet.abac.AbacDto;
-import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
-
-public class HentKorrigertKravgrunnlagDto implements AbacDto {
+public class HentKorrigertKravgrunnlagDto  {
 
     @NotNull
     @Min(0)
@@ -42,10 +38,5 @@ public class HentKorrigertKravgrunnlagDto implements AbacDto {
 
     public void setKravgrunnlagId(String kravgrunnlagId) {
         this.kravgrunnlagId = kravgrunnlagId;
-    }
-
-    @Override
-    public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, getBehandlingId());
     }
 }
