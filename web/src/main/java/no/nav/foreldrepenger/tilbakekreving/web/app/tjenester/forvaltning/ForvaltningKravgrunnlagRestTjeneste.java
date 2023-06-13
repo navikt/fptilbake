@@ -146,7 +146,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
      * rent tekniske tjenester som ikke returnerer persondata. Kan brukes på for eksempel:
      * Rekjøre prosesstask, trigge innhenting av oppdatert kravgrunnlag
      */
-    static class AbacIngen implements Function<Object, AbacDataAttributter> {
+    public static class AbacIngen implements Function<Object, AbacDataAttributter> {
 
         @Override
         public AbacDataAttributter apply(Object obj) {
@@ -154,7 +154,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
         }
     }
 
-    static class AbacBehandlingId implements Function<Object, AbacDataAttributter> {
+    public class AbacBehandlingId implements Function<Object, AbacDataAttributter> {
 
         @Override
         public AbacDataAttributter apply(Object obj) {
