@@ -19,8 +19,9 @@ import no.nav.vedtak.felles.integrasjon.rest.RestRequest;
 import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 
 @ApplicationScoped
-@RestClientConfig(tokenConfig = TokenFlow.STS_CC, endpointProperty = "dokdist.rest.distribuer.journalpost",
-    endpointDefault = "http://dokdistfordeling.teamdokumenthandtering/rest/v1/distribuerjournalpost")
+@RestClientConfig(tokenConfig = TokenFlow.AZUREAD_CC, endpointProperty = "dokdist.rest.distribuer.journalpost",
+    endpointDefault = "http://dokdistfordeling.teamdokumenthandtering/rest/v1/distribuerjournalpost",
+    scopesProperty = "dokdist.scopes", scopesDefault = "api://prod-fss.teamdokumenthandtering.saf/.default")
 public class DokdistKlient {
 
     private static final Logger logger = LoggerFactory.getLogger(DokdistKlient.class);

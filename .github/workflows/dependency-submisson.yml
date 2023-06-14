@@ -1,4 +1,4 @@
-name: Monitor dependencies with Dependabot
+name: Dependency Submission
 on:
   push:
     branches:
@@ -9,44 +9,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  scan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: temurin
-          cache: maven
-
-      - name: Create m2-settings with private repository access
-        uses: whelk-io/maven-settings-xml-action@7c60eb95b2d5ec18f2e0e29f34c9ed69475e7a96
-        with:
-          repositories: |
-            [
-              {
-                "id": "central",
-                "name": "Maven Central",
-                "url": "https://repo.maven.apache.org/maven2"
-              },
-              {
-                "id": "github",
-                "name": "github",
-                "url": "https://maven.pkg.github.com/${{ github.repository }}"
-              }
-            ]
-          servers: |
-            [
-              {
-                "id": "github",
-                "password": "${{ secrets.READER_TOKEN }}",
-                "username": "${{ github.actor }}"
-              }
-            ]
-          output_file: m2-settings.xml
-
-      - name: Submit Dependency Snapshot to Github Security
-        uses: advanced-security/maven-dependency-submission-action@c5ad0fd6b977364190852883b46728f25a9617c3
-        with:
-          settings-file: m2-settings.xml
-          maven-args: -DskipTests
+  deps:
+    permissions:
+      contents: write
+    uses: navikt/fp-gha-workflows/.github/workflows/mvn-dependency-submission.yml@main
+    secrets: inherit
