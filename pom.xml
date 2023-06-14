@@ -7,7 +7,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>0.5.3</version>
+        <version>0.5.5</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -31,11 +31,11 @@
     <properties>
         <revision>1.0-SNAPSHOT</revision>
 
-        <felles.version>4.2.46</felles.version>
+        <felles.version>4.2.47</felles.version>
         <prosesstask.version>3.1.29</prosesstask.version>
         <fp-tidsserie.version>2.6.7</fp-tidsserie.version>
 
-        <fpkontrakter.version>6.2.20</fpkontrakter.version>
+        <fpkontrakter.version>6.2.21</fpkontrakter.version>
         <abakus-kontrakt.version>1.3.42</abakus-kontrakt.version>
 
         <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
@@ -84,7 +84,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>fp-bom</artifactId>
-                <version>0.5.3</version>
+                <version>0.5.5</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
