@@ -1,5 +1,6 @@
-package no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste;
+package no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatiskgjenoppta;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
@@ -9,9 +10,12 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingKandidaterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
@@ -33,7 +37,7 @@ import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 public class GjenopptaBehandlingTjeneste {
 
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
-    private static final Logger logger = LoggerFactory.getLogger(GjenopptaBehandlingTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GjenopptaBehandlingTjeneste.class);
 
     private ProsessTaskTjeneste taskTjeneste;
     private BehandlingKandidaterRepository behandlingKandidaterRepository;
@@ -82,12 +86,18 @@ public class GjenopptaBehandlingTjeneste {
         long behandlingId = behandling.getId();
         String nyCallId = callId + behandlingId;
         KravgrunnlagTilstand status = kanGjennopptaStatus(behandlingId);
-        if (status == KravgrunnlagTilstand.OK || status == KravgrunnlagTilstand.KRAVGRUNNLAG_MANGLER) {
+        var venterPåKravgrunnlagFristPassert = behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+            .filter(Aksjonspunkt::erOpprettet)
+            .filter(a -> a.getFristTid() != null && LocalDate.now().isAfter(a.getFristTid().toLocalDate()))
+            .isPresent();
+        if (status == KravgrunnlagTilstand.KRAVGRUNNLAG_MANGLER && venterPåKravgrunnlagFristPassert) {
+            opprettHenleggBehandlingTask(behandling, nyCallId);
+        } else if (status == KravgrunnlagTilstand.OK || status == KravgrunnlagTilstand.KRAVGRUNNLAG_MANGLER) {
             opprettFortsettBehandlingTask(behandling, nyCallId);
         } else if (status == KravgrunnlagTilstand.KRAVGRUNNLAG_ER_SPERRET) {
-            logger.info("Behandling med id={} har et sperret kravgrunnlag, kan ikke gjenopptas,", behandlingId);
+            LOG.info("Behandling med id={} har et sperret kravgrunnlag, kan ikke gjenopptas,", behandlingId);
         } else if (status == KravgrunnlagTilstand.KRAVGRUNNLAG_ER_UGYLDIG) {
-            logger.info("Behandling med id={} har et ugyldig kravgrunnlag, kan ikke gjenopptas,", behandlingId);
+            LOG.info("Behandling med id={} har et ugyldig kravgrunnlag, kan ikke gjenopptas,", behandlingId);
         } else {
             throw new IllegalArgumentException("Ikke-støttet status: " + status);
         }
@@ -110,28 +120,12 @@ public class GjenopptaBehandlingTjeneste {
                 return Optional.empty();
             }
         }
-        Optional<String> callId = fortsettBehandling(behandlingId);
-        if (callId.isPresent()) {
+        var callId = behandlingOpt.map(behandling -> hentCallId() + behandling.getId()).orElse(null);
+        behandlingOpt.ifPresent(behandling -> {
+            opprettFortsettBehandlingTask(behandling, callId);
             opprettHistorikkInnslagForManueltGjenopptaBehandling(behandlingId, historikkAktør);
-        }
-        return callId;
-    }
-
-    /**
-     * Fortsetter behandling ved registrering av grunnlag dersom behandling er i TBKGSTEG.
-     *
-     * @param behandlingId
-     * @return
-     */
-    public Optional<String> fortsettBehandlingMedGrunnlag(long behandlingId) {
-        Optional<Behandling> behandlingOpt = behandlingVenterRepository.hentBehandlingPåVent(behandlingId);
-        if (behandlingOpt.isPresent()) {
-            BehandlingStegType bst = behandlingOpt.get().getAktivtBehandlingSteg();
-            if (BehandlingStegType.TBKGSTEG.equals(bst) || BehandlingStegType.FAKTA_FEILUTBETALING.equals(bst)) {
-                return fortsettBehandling(behandlingId);
-            }
-        }
-        return Optional.empty();
+        });
+        return Optional.ofNullable(callId);
     }
 
     /**
@@ -140,18 +134,9 @@ public class GjenopptaBehandlingTjeneste {
      * @param behandlingId
      * @return prosesstask gruppe ID
      */
-    public Optional<String> fortsettBehandling(long behandlingId) {
-        Optional<Behandling> behandlingOpt = behandlingVenterRepository.hentBehandlingPåVent(behandlingId);
-
-        if (!behandlingOpt.isPresent()) {
-            return Optional.empty();
-        }
-
-        final String callId = hentCallId();
-        Behandling behandling = behandlingOpt.get();
-
-        String nyCallId = callId + behandling.getId();
-        return Optional.ofNullable(opprettFortsettBehandlingTask(behandling, nyCallId));
+    public void fortsettBehandling(long behandlingId) {
+        behandlingVenterRepository.hentBehandlingPåVent(behandlingId)
+            .ifPresent(behandling -> opprettFortsettBehandlingTask(behandling, hentCallId() + behandling.getId()));
     }
 
     /**
@@ -165,7 +150,7 @@ public class GjenopptaBehandlingTjeneste {
         if (status == KravgrunnlagTilstand.OK) {
             return true;
         } else {
-            logger.info("Kan ikke gjenoppta steg, status er {} ", status);
+            LOG.info("Kan ikke gjenoppta steg, status er {} ", status);
             return false;
         }
     }
@@ -205,7 +190,20 @@ public class GjenopptaBehandlingTjeneste {
         // unik per task da det gjelder ulike behandlinger, gjenbruker derfor ikke
         prosessTaskData.setCallId(callId);
 
-        logger.info("Gjenopptar behandling av behandlingId={}, oppretter {}-prosesstask med callId={}", behandling.getId(), prosessTaskData.getTaskType(), callId);
+        LOG.info("Gjenopptar behandling av behandlingId={}, oppretter {}-prosesstask med callId={}", behandling.getId(), prosessTaskData.getTaskType(), callId);
+        return taskTjeneste.lagre(prosessTaskData);
+    }
+
+    private String opprettHenleggBehandlingTask(Behandling behandling, String callId) {
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(HenleggBehandlingTask.class);
+        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setSekvens("1");
+        prosessTaskData.setPrioritet(100);
+
+        // unik per task da det gjelder ulike behandlinger, gjenbruker derfor ikke
+        prosessTaskData.setCallId(callId);
+
+        LOG.info("Henlegger behandling med behandlingId={}", behandling.getId());
         return taskTjeneste.lagre(prosessTaskData);
     }
 

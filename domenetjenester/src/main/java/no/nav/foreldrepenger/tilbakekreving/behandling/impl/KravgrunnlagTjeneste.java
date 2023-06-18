@@ -18,7 +18,6 @@ import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -49,7 +48,7 @@ public class KravgrunnlagTjeneste {
     private KravgrunnlagRepository kravgrunnlagRepository;
     private BehandlingRepository behandlingRepository;
     private HistorikkRepository historikkRepository;
-    private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
+    private GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
     private SlettGrunnlagEventPubliserer kravgrunnlagEventPubliserer;
@@ -62,7 +61,7 @@ public class KravgrunnlagTjeneste {
 
     @Inject
     public KravgrunnlagTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
+                                GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste,
                                 BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                 SlettGrunnlagEventPubliserer slettGrunnlagEventPubliserer,
                                 EntityManager entityManager) {

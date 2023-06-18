@@ -20,7 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
-import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.GjenopptaBehandlingMedGrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.LesKravgrunnlagTask;
@@ -51,7 +51,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
@@ -69,7 +68,6 @@ public abstract class FellesTestOppsett {
     protected PersoninfoAdapter personinfoAdapterMock = mock(PersoninfoAdapter.class);
     protected final FagsystemKlient fagsystemKlientMock = mock(FagsystemKlient.class);
     protected final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(personinfoAdapterMock);
-    private final VarselresponsTjeneste varselresponsTjenesteMock = mock(VarselresponsTjeneste.class);
     private final SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(
             SlettGrunnlagEventPubliserer.class);
 
@@ -83,7 +81,7 @@ public abstract class FellesTestOppsett {
     protected BehandlingVenterRepository behandlingVenterRepository;
     protected BehandlingKandidaterRepository behandlingKandidaterRepository;
 
-    protected GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
+    protected GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste;
     protected HistorikkinnslagTjeneste historikkinnslagTjeneste;
     protected BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     protected KravgrunnlagTjeneste kravgrunnlagTjeneste;
@@ -112,8 +110,7 @@ public abstract class FellesTestOppsett {
                 entityManager);
         behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
         behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
-        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskTjeneste,
-                behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjenesteMock);
+        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingMedGrunnlagTjeneste(taskTjeneste, behandlingVenterRepository);
         historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository()
         );
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager,

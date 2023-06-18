@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatiskgjenoppta.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
@@ -85,7 +85,7 @@ public class FordelRestTjeneste {
         if (!behandlinger.isEmpty()) {
             return behandlinger.stream()
                     .filter(beh -> !beh.erAvsluttet())
-                    .filter(beh -> beh.isBehandlingPåVent()).findAny();
+                    .filter(Behandling::isBehandlingPåVent).findAny();
         }
         return Optional.empty();
     }

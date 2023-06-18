@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,19 +29,17 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
-import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingsTjenesteProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatiskgjenoppta.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.finn.FinnGrunnlagTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.observer.BehandlingManglerKravgrunnlagFristenEndretEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -125,7 +122,6 @@ public class BehandlingRestTjeneste {
     private BehandlingRevurderingTjeneste revurderingTjeneste;
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private BehandlendeEnhetTjeneste behandlendeEnhetTjeneste;
-    private BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer;
     private TotrinnTjeneste totrinnTjeneste;
     private DokumentBehandlingTjeneste dokumentBehandlingTjeneste;
     private VergeTjeneste vergeTjeneste;
@@ -136,7 +132,10 @@ public class BehandlingRestTjeneste {
     }
 
     @Inject
-    public BehandlingRestTjeneste(BehandlingsTjenesteProvider behandlingsTjenesteProvider,
+    public BehandlingRestTjeneste(BehandlingTjeneste behandlingTjeneste,
+                                  GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
+                                  BehandlingRevurderingTjeneste revurderingTjeneste,
+                                  BehandlendeEnhetTjeneste enhetTjeneste,
                                   BehandlingDtoTjeneste behandlingDtoTjeneste,
                                   ProsessTaskTjeneste taskTjeneste,
                                   VergeTjeneste vergeTjeneste,
@@ -145,18 +144,16 @@ public class BehandlingRestTjeneste {
                                   HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                   BehandlingsprosessApplikasjonTjeneste behandlingsprosessTjeneste,
                                   BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste,
-                                  BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer,
                                   HistorikkTjenesteAdapter historikkTjenesteAdapter) {
-        this.behandlingTjeneste = behandlingsTjenesteProvider.getBehandlingTjeneste();
-        this.gjenopptaBehandlingTjeneste = behandlingsTjenesteProvider.getGjenopptaBehandlingTjeneste();
+        this.behandlingTjeneste = behandlingTjeneste;
+        this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
         this.behandlingDtoTjeneste = behandlingDtoTjeneste;
         this.vergeTjeneste = vergeTjeneste;
         this.behandlingsprosessTjeneste = behandlingsprosessTjeneste;
         this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
-        this.revurderingTjeneste = behandlingsTjenesteProvider.getRevurderingTjeneste();
+        this.revurderingTjeneste = revurderingTjeneste;
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollAsynkTjeneste;
-        this.behandlendeEnhetTjeneste = behandlingsTjenesteProvider.getEnhetTjeneste();
-        this.fristenEndretEventPubliserer = fristenEndretEventPubliserer;
+        this.behandlendeEnhetTjeneste = enhetTjeneste;
         this.taskTjeneste = taskTjeneste;
         this.totrinnTjeneste = totrinnTjeneste;
         this.dokumentBehandlingTjeneste = dokumentBehandlingTjeneste;
@@ -338,7 +335,6 @@ public class BehandlingRestTjeneste {
                 : behandlingTjeneste.hentBehandling(dto.getBehandlingUuid());
         behandlingTjeneste.kanEndreBehandling(behandling.getId(), dto.getBehandlingVersjon());
         behandlingTjeneste.endreBehandlingPåVent(behandling, dto.getFrist(), dto.getVentearsak());
-        fristenEndretEventPubliserer.fireEvent(behandling, LocalDateTime.of(dto.getFrist(), LocalDateTime.now().toLocalTime()));
     }
 
     @GET

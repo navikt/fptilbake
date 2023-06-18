@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.batch;
+package no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatiskgjenoppta;
 
 import java.time.Clock;
 import java.time.LocalDate;
@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.felles.Helligdager;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;

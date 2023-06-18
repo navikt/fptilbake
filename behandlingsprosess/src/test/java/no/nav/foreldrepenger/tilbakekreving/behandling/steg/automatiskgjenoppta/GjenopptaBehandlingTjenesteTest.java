@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste;
+package no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatiskgjenoppta;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -174,36 +173,6 @@ class GjenopptaBehandlingTjenesteTest {
 
         gjenopptaBehandlingTjeneste.automatiskGjenopptaBehandlinger();
         assertThat(faktiskeProsessTaskDataListe).hasSize(0);
-    }
-
-    @Test
-    void skal_ikke_fortsette_behandling_med_grunnlag_for_behandling_i_varsel_steg_og_fristen_ikke_gått_ut() {
-        Behandling behandling = lagBehandling();
-        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
-        internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().plusDays(20));
-        when(mockTaskTjeneste.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
-        Optional<String> callId = gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling.getId());
-        assertThat(callId).isEmpty();
-    }
-
-    @Test
-    void skal_fortsette_behandling_med_grunnlag_for_behandling_i_tbk_steg() {
-        Behandling behandling = lagBehandling();
-        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
-        internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(20));
-        when(mockTaskTjeneste.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
-        Optional<String> callId = gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling.getId());
-        assertThat(callId).isNotEmpty();
-    }
-
-    @Test
-    void skal_fortsette_behandling_med_grunnlag_for_behandling_i_fakta_steg() {
-        Behandling behandling = lagBehandling();
-        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
-        internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(20));
-        when(mockTaskTjeneste.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
-        Optional<String> callId = gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling.getId());
-        assertThat(callId).isNotEmpty();
     }
 
     private Behandling lagBehandling() {

@@ -17,10 +17,6 @@ public class AksjonspunktKodeDefinisjon {
     public static final String VENT_PÅ_BRUKERTILBAKEMELDING = "7001";
     public static final String VENT_PÅ_TILBAKEKREVINGSGRUNNLAG = "7002";
 
-
-    // Fiktivt aksjonspunkt - brukes for å sende data til fplos når behandling venter på grunnlaget etter fristen
-    public static final String VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG = "8001";
-
     // Andre koder
     public static final boolean TOTRINN = true;
     public static final boolean ENTRINN = false;

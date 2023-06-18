@@ -13,7 +13,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingT
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -60,7 +59,7 @@ public class LosBehandlingDtoTjeneste {
             behandling.getBehandlendeEnhetId(),
             null,
             behandling.getAnsvarligSaksbehandler(),
-            mapAksjonspunkter(behandling, kravgrunnlag431, frist),
+            mapAksjonspunkter(behandling),
             List.of(),
             false,
             false,
@@ -96,16 +95,10 @@ public class LosBehandlingDtoTjeneste {
         };
     }
 
-    private static List<LosBehandlingDto.LosAksjonspunktDto> mapAksjonspunkter(Behandling behandling, Kravgrunnlag431 kravgrunnlag431, LocalDateTime kravgrunnlagManglerFrist) {
-        if (!behandling.erAvsluttet() && kravgrunnlag431 == null && kravgrunnlagManglerFrist != null) {
-            return List.of(new LosBehandlingDto.LosAksjonspunktDto(AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG,
-                Aksjonspunktstatus.OPPRETTET, kravgrunnlagManglerFrist));
-        } else {
-            return behandling.getAksjonspunkter().stream()
-                .map(LosBehandlingDtoTjeneste::mapTilLosAksjonspunkt)
-                .toList();
-        }
-
+    private static List<LosBehandlingDto.LosAksjonspunktDto> mapAksjonspunkter(Behandling behandling) {
+        return behandling.getAksjonspunkter().stream()
+            .map(LosBehandlingDtoTjeneste::mapTilLosAksjonspunkt)
+            .toList();
     }
 
     private static LosBehandlingDto.LosAksjonspunktDto mapTilLosAksjonspunkt(Aksjonspunkt aksjonspunkt) {
@@ -122,26 +115,26 @@ public class LosBehandlingDtoTjeneste {
         };
     }
 
-    private LosBehandlingDto.LosTilbakeDto mapTilbake(Behandling behandling, Kravgrunnlag431 kravgrunnlag431, LocalDateTime kravgrunnlagManglerFrist) {
+    private LosBehandlingDto.LosTilbakeDto mapTilbake(Behandling behandling, Kravgrunnlag431 kravgrunnlag431, LocalDate kravgrunnlagManglerFrist) {
         return new LosBehandlingDto.LosTilbakeDto(kravgrunnlag431 != null ? hentFeilutbetaltBeløp(behandling.getId()) : BigDecimal.ZERO,
             hentFørsteFeilutbetalingDato(kravgrunnlag431, kravgrunnlagManglerFrist));
     }
 
-    private static LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431, LocalDateTime kravgrunnlagManglerFrist) {
+    private static LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431, LocalDate kravgrunnlagManglerFrist) {
         if (kravgrunnlag431 == null) {
-            return kravgrunnlagManglerFrist != null ? kravgrunnlagManglerFrist.toLocalDate() : null;
+            return kravgrunnlagManglerFrist;
         }
         return kravgrunnlag431.getPerioder().stream()
             .map(KravgrunnlagPeriode432::getFom)
             .min(LocalDate::compareTo)
-            .orElse(null);
+            .orElseGet(() -> kravgrunnlagManglerFrist);
     }
 
     private BigDecimal hentFeilutbetaltBeløp(Long behandlingId) {
         return faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandlingId).getAktuellFeilUtbetaltBeløp();
     }
 
-    private static LocalDateTime hentFrist(Behandling behandling) {
+    private static LocalDate hentFrist(Behandling behandling) {
         var nå = LocalDateTime.now();
         var erPåVentAnnenÅrsak = behandling.getAksjonspunkter().stream()
             .filter(o -> !AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(o.getAksjonspunktDefinisjon()))
@@ -151,9 +144,10 @@ public class LosBehandlingDtoTjeneste {
         }
         return behandling.getAksjonspunkter().stream()
             .filter(o -> AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(o.getAksjonspunktDefinisjon()))
+            .filter(Aksjonspunkt::erOpprettet)
             .map(Aksjonspunkt::getFristTid)
             .filter(Objects::nonNull)
-            .filter(nå::isAfter)
+            .map(LocalDateTime::toLocalDate)
             .findFirst().orElse(null);
     }
 
