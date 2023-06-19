@@ -105,7 +105,7 @@ public class EksternDataForBrevTjeneste {
     }
 
     private Adresseinfo fra(Virksomhet virksomhet, String vergeNavn, Personinfo personinfo, BrevMottaker brevMottaker) {
-        String organisasjonNavn = virksomhet.getNavn();
+        String organisasjonNavn = virksomhet.navn();
         String vedVergeNavn = "v/ " + vergeNavn;
         String annenMottakerNavn = organisasjonNavn + " " + vedVergeNavn;
         Adresseinfo adresseinfo;
