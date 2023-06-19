@@ -395,28 +395,18 @@ public class Behandling extends BaseEntitet {
     }
 
     public LocalDate getFristDatoBehandlingPåVent() {
-        Optional<Aksjonspunkt> aksjonspunkt = getFørsteÅpneAutopunkt();
-        LocalDateTime fristTid = null;
-        if (aksjonspunkt.isPresent()) {
-            fristTid = aksjonspunkt.get().getFristTid();
-        }
-        return fristTid == null ? null : fristTid.toLocalDate();
+        return getFørsteÅpneAutopunkt()
+            .filter(ap -> ap.getFristTid() != null)
+            .map(Aksjonspunkt::getFristTid)
+            .map(LocalDateTime::toLocalDate).orElse(null);
     }
 
     public AksjonspunktDefinisjon getBehandlingPåVentAksjonspunktDefinisjon() {
-        Optional<Aksjonspunkt> aksjonspunkt = getFørsteÅpneAutopunkt();
-        if (aksjonspunkt.isPresent()) {
-            return aksjonspunkt.get().getAksjonspunktDefinisjon();
-        }
-        return null;
+        return getFørsteÅpneAutopunkt().map(Aksjonspunkt::getAksjonspunktDefinisjon).orElse(null);
     }
 
     public Venteårsak getVenteårsak() {
-        Optional<Aksjonspunkt> aksjonspunkt = getFørsteÅpneAutopunkt();
-        if (aksjonspunkt.isPresent()) {
-            return aksjonspunkt.get().getVenteårsak();
-        }
-        return null;
+        return getFørsteÅpneAutopunkt().map(Aksjonspunkt::getVenteårsak).orElse(null);
     }
 
     private Optional<Aksjonspunkt> getFørsteÅpneAutopunkt() {

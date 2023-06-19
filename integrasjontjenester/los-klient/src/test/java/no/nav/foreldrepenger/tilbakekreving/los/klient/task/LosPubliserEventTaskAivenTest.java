@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -21,8 +20,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.GjenopptaBehandlingMedGrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
@@ -32,7 +31,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
@@ -79,7 +77,7 @@ class LosPubliserEventTaskAivenTest {
     @BeforeEach
     void setup(EntityManager entityManager) throws IOException {
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
-        GjenopptaBehandlingTjeneste mockGjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingTjeneste.class);
+        GjenopptaBehandlingMedGrunnlagTjeneste mockGjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingMedGrunnlagTjeneste.class);
         BehandlingskontrollTjeneste mockBehandlingskontrollTjeneste = mock(BehandlingskontrollTjeneste.class);
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
         SlettGrunnlagEventPubliserer mockEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
@@ -161,68 +159,6 @@ class LosPubliserEventTaskAivenTest {
         assertThat(event.getYtelseTypeKode()).isEqualTo(FagsakYtelseType.FORELDREPENGER.getKode());
         assertThat(event.getBehandlingTypeKode()).isEqualTo(BehandlingType.TILBAKEKREVING.getKode());
         assertThat(event.getBehandlingSteg()).isEqualTo(BehandlingStegType.VARSEL.getKode());
-        assertThat(event.getHref()).isNotEmpty();
-    }
-
-    @Test
-    void skal_publisere_fplos_data_til_kafka_når_behandling_venter_på_kravgrunnlag_og_fristen_går_ut() throws IOException {
-        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
-        behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.TBKGSTEG, List.of(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG));
-        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
-        LocalDateTime fristTid = LocalDateTime.now();
-        ProsessTaskData prosessTaskData = lagProsessTaskData();
-        prosessTaskData.setProperty(LosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID, fristTid.toString());
-        prosessTaskData.setProperty(LosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE, AksjonspunktStatus.OPPRETTET.getKode());
-
-        losPubliserEventTask.doTask(prosessTaskData);
-        verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelse(any(), any());
-        TilbakebetalingBehandlingProsessEventDto event = losPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, EventHendelse.AKSJONSPUNKT_OPPRETTET.name(), null);
-
-        assertThat(event.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.ZERO);
-        assertThat(event.getFørsteFeilutbetaling()).isEqualTo(fristTid.toLocalDate());
-
-        Map<String, String> aksjonpunkterMap = event.getAksjonspunktKoderMedStatusListe();
-        assertThat(aksjonpunkterMap).isNotEmpty()
-                .containsEntry(AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG, AksjonspunktStatus.OPPRETTET.getKode());
-
-        assertThat(event.getEksternId()).isEqualByComparingTo(behandling.getUuid());
-        assertThat(event.getFagsystem()).isEqualTo(Fagsystem.K9TILBAKE.getKode());
-        assertThat(event.getEventHendelse()).isEqualByComparingTo(EventHendelse.AKSJONSPUNKT_OPPRETTET);
-        assertThat(event.getAktørId()).isEqualTo(behandling.getAktørId().getId());
-        assertThat(event.getYtelseTypeKode()).isEqualTo(FagsakYtelseType.FORELDREPENGER.getKode());
-        assertThat(event.getBehandlingTypeKode()).isEqualTo(BehandlingType.TILBAKEKREVING.getKode());
-        assertThat(event.getBehandlingSteg()).isEqualTo(BehandlingStegType.TBKGSTEG.getKode());
-        assertThat(event.getHref()).isNotEmpty();
-    }
-
-    @Test
-    void skal_publisere_fplos_data_til_kafka_når_behandling_venter_på_kravgrunnlag_og_fristen_er_endret() throws IOException {
-        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
-        behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.TBKGSTEG, List.of(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG));
-        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
-        LocalDateTime fristTid = LocalDateTime.now();
-        ProsessTaskData prosessTaskData = lagProsessTaskData();
-        prosessTaskData.setProperty(LosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID, fristTid.toString());
-        prosessTaskData.setProperty(LosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE, AksjonspunktStatus.AVBRUTT.getKode());
-
-        losPubliserEventTask.doTask(prosessTaskData);
-        verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelse(any(), any());
-        TilbakebetalingBehandlingProsessEventDto event = losPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, EventHendelse.AKSJONSPUNKT_AVBRUTT.name(), null);
-
-        assertThat(event.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.ZERO);
-        assertThat(event.getFørsteFeilutbetaling()).isEqualTo(fristTid.toLocalDate());
-
-        Map<String, String> aksjonpunkterMap = event.getAksjonspunktKoderMedStatusListe();
-        assertThat(aksjonpunkterMap).isNotEmpty()
-                .containsEntry(AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG, AksjonspunktStatus.AVBRUTT.getKode());
-
-        assertThat(event.getEksternId()).isEqualByComparingTo(behandling.getUuid());
-        assertThat(event.getFagsystem()).isEqualTo(Fagsystem.K9TILBAKE.getKode());
-        assertThat(event.getEventHendelse()).isEqualByComparingTo(EventHendelse.AKSJONSPUNKT_AVBRUTT);
-        assertThat(event.getAktørId()).isEqualTo(behandling.getAktørId().getId());
-        assertThat(event.getYtelseTypeKode()).isEqualTo(FagsakYtelseType.FORELDREPENGER.getKode());
-        assertThat(event.getBehandlingTypeKode()).isEqualTo(BehandlingType.TILBAKEKREVING.getKode());
-        assertThat(event.getBehandlingSteg()).isEqualTo(BehandlingStegType.TBKGSTEG.getKode());
         assertThat(event.getHref()).isNotEmpty();
     }
 

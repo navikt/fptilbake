@@ -7,7 +7,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -21,8 +20,6 @@ import org.mockito.Mockito;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingEnhetEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingManglerKravgrunnlagFristenEndretEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingManglerKravgrunnlagFristenUtløptEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
@@ -177,24 +174,6 @@ class LosEventObserverFptilbakeTest {
 
         losEventObserver.observerAksjonspunktHarEndretBehandlendeEnhetEvent(behandlingEnhetEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_HAR_ENDRET_BEHANDLENDE_ENHET);
-    }
-
-    @Test
-    void skal_ikke_publisere_data_når_behandling_sett_på_vent_og_fristen_er_utløpt() {
-        var fristTid = LocalDateTime.now();
-        var utløptEvent = new BehandlingManglerKravgrunnlagFristenUtløptEvent(behandling, fristTid);
-
-        losEventObserver.observerBehandlingFristenUtløptEvent(utløptEvent);
-        verifyNoInteractions(taskTjeneste);
-    }
-
-    @Test
-    void skal_ikke_publisere_data_når_behandling_sett_på_vent_og_fristen_er_endret() {
-        var fristTid = LocalDateTime.now();
-        var fristenEndretEvent = new BehandlingManglerKravgrunnlagFristenEndretEvent(behandling, fristTid);
-
-        losEventObserver.observerBehandlingFristenEndretEvent(fristenEndretEvent);
-        verifyNoInteractions(taskTjeneste);
     }
 
     private ProsessTaskData fellesAssertProsessTask(EventHendelse eventHendelse) {

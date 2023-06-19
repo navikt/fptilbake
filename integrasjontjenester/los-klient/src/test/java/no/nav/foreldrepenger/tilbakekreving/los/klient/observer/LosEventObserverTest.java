@@ -6,7 +6,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -20,8 +19,6 @@ import org.mockito.Mockito;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingEnhetEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingManglerKravgrunnlagFristenEndretEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingManglerKravgrunnlagFristenUtløptEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
@@ -32,7 +29,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
@@ -177,28 +173,6 @@ class LosEventObserverTest {
 
         losEventObserver.observerAksjonspunktHarEndretBehandlendeEnhetEvent(behandlingEnhetEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_HAR_ENDRET_BEHANDLENDE_ENHET);
-    }
-
-    @Test
-    void skal_publisere_data_når_behandling_sett_på_vent_og_fristen_er_utløpt() {
-        var fristTid = LocalDateTime.now();
-        var utløptEvent = new BehandlingManglerKravgrunnlagFristenUtløptEvent(behandling, fristTid);
-
-        losEventObserver.observerBehandlingFristenUtløptEvent(utløptEvent);
-        var publisherEventProsessTask = fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_OPPRETTET);
-        assertThat(publisherEventProsessTask.getPropertyValue(LosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID)).isEqualTo(fristTid.toString());
-        assertThat(publisherEventProsessTask.getPropertyValue(LosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE)).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());
-    }
-
-    @Test
-    void skal_publisere_data_når_behandling_sett_på_vent_og_fristen_er_endret() {
-        var fristTid = LocalDateTime.now();
-        var fristenEndretEvent = new BehandlingManglerKravgrunnlagFristenEndretEvent(behandling, fristTid);
-
-        losEventObserver.observerBehandlingFristenEndretEvent(fristenEndretEvent);
-        var publisherEventProsessTask = fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_AVBRUTT);
-        assertThat(publisherEventProsessTask.getPropertyValue(LosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID)).isEqualTo(fristTid.toString());
-        assertThat(publisherEventProsessTask.getPropertyValue(LosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE)).isEqualTo(AksjonspunktStatus.AVBRUTT.getKode());
     }
 
     private ProsessTaskData fellesAssertProsessTask(EventHendelse eventHendelse) {

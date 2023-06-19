@@ -1,28 +1,26 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatiskgjenoppta.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.observer.BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
+import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 
 class MottattGrunnlagStegTest extends FellesTestOppsett {
-
-    private BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer utløptEventPublisererMock =
-            Mockito.mock(BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer.class);
 
     @Test
     void skal_sette_behandling_på_vent() {
@@ -59,7 +57,9 @@ class MottattGrunnlagStegTest extends FellesTestOppsett {
     }
 
     private MottattGrunnlagSteg steg() {
-        return new MottattGrunnlagSteg(behandlingRepository, behandlingskontrollTjeneste, gjenopptaBehandlingTjeneste, utløptEventPublisererMock, Period.ofWeeks(4));
+        var gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskTjeneste, behandlingKandidaterRepository, behandlingVenterRepository,
+            repositoryProvider, mock(VarselresponsTjeneste.class));
+        return new MottattGrunnlagSteg(behandlingRepository, behandlingskontrollTjeneste, gjenopptaBehandlingTjeneste, Period.ofWeeks(4));
     }
 
 }

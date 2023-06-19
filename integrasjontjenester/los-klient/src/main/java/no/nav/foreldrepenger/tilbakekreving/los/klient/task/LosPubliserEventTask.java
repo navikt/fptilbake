@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
@@ -129,17 +130,14 @@ public class LosPubliserEventTask implements ProsessTaskHandler {
     public TilbakebetalingBehandlingProsessEventDto getTilbakebetalingBehandlingProsessEventDto(ProsessTaskData prosessTaskData, Behandling behandling, String eventName, Kravgrunnlag431 kravgrunnlag431) {
         Fagsak fagsak = behandling.getFagsak();
         String saksnummer = fagsak.getSaksnummer().getVerdi();
-        String fristTidVerdi = prosessTaskData.getPropertyValue(PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID);
-        LocalDateTime kravgrunnlagManglerFristTid = fristTidVerdi != null ? LocalDateTime.parse(fristTidVerdi) : null;
-        String kravgrunnlagManglerAksjonspunktStatusKode = prosessTaskData.getPropertyValue(PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE);
+        var kravgrunnlagManglerFristTid = behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+            .filter(Aksjonspunkt::erOpprettet)
+            .map(Aksjonspunkt::getFristTid).map(LocalDateTime::toLocalDate).orElse(null);
+
 
         Map<String, String> aksjonspunktKoderMedStatusListe = new HashMap<>();
-        if (kravgrunnlagManglerFristTid != null) {
-            aksjonspunktKoderMedStatusListe.put(AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG, kravgrunnlagManglerAksjonspunktStatusKode);
-        } else {
-            behandling.getAksjonspunkter().forEach(aksjonspunkt ->
-                aksjonspunktKoderMedStatusListe.put(aksjonspunkt.getAksjonspunktDefinisjon().getKode(), aksjonspunkt.getStatus().getKode()));
-        }
+        behandling.getAksjonspunkter().forEach(aksjonspunkt ->
+            aksjonspunktKoderMedStatusListe.put(aksjonspunkt.getAksjonspunktDefinisjon().getKode(), aksjonspunkt.getStatus().getKode()));
 
         return TilbakebetalingBehandlingProsessEventDto.builder()
             .medBehandlingStatus(behandling.getStatus().getKode())
@@ -163,17 +161,14 @@ public class LosPubliserEventTask implements ProsessTaskHandler {
             .build();
     }
 
-    private LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431, LocalDateTime kravgrunnlagManglerFristTid) {
-        if (kravgrunnlagManglerFristTid != null) {
-            return kravgrunnlagManglerFristTid.toLocalDate();
-        }
+    private LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431, LocalDate kravgrunnlagManglerFristTid) {
         if (kravgrunnlag431 == null) {
-            return null;
+            return kravgrunnlagManglerFristTid;
         }
         return kravgrunnlag431.getPerioder().stream()
             .map(KravgrunnlagPeriode432::getFom)
             .min(LocalDate::compareTo)
-            .orElse(null);
+            .orElseGet(() -> kravgrunnlagManglerFristTid);
     }
 
     private BigDecimal hentFeilutbetaltBeløp(Long behandlingId) {
