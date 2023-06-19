@@ -29,10 +29,7 @@ public class VirksomhetTjeneste {
     public Virksomhet hentOrganisasjon(String orgNummer) {
         Objects.requireNonNull(orgNummer, "orgNummer");
         var response = organisasjonConsumer.hentOrganisasjonNavn(orgNummer);
-        return new Virksomhet.Builder()
-                .medOrgnr(orgNummer)
-                .medNavn(response)
-                .build();
+        return new Virksomhet(orgNummer, response);
     }
 
     public boolean validerOrganisasjon(String orgNummer) {
