@@ -117,6 +117,7 @@ public class LosPubliserEventTask implements ProsessTaskHandler {
                     .medYtelse(mapYtelse(behandling))
                     .medBehandlingstype(mapBehandlingstype(behandling))
                     .medHendelse(utledHendelse(behandling))
+                    .medTidspunkt(LocalDateTime.now())
                     .build();
                 losKafkaProducerAiven.sendHendelseFplos(behandling.getFagsak().getSaksnummer(), losHendelseDto);
             } else {
