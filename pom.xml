@@ -426,5 +426,15 @@
         </repository>
     </distributionManagement>
 
+    <repositories>
+        <repository>
+            <id>OPF-Vera</id>
+            <url>https://artifactory.openpreservation.org/artifactory/vera-dev/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
 </project>
 

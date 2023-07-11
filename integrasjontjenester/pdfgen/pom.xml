@@ -21,8 +21,8 @@
         </dependency>
         <dependency>
             <groupId>org.verapdf</groupId>
-            <artifactId>validation-model</artifactId>
-            <version>1.24.1</version>
+            <artifactId>validation-model-jakarta</artifactId>
+            <version>1.23.17</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.xml.bind</groupId>
