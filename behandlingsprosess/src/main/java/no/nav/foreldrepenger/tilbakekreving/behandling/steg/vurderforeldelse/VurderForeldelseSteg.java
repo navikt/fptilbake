@@ -2,8 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.vurderforeldelse;
 
 import static java.util.Collections.singletonList;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

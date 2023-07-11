@@ -5,8 +5,8 @@ import static org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler.St
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;

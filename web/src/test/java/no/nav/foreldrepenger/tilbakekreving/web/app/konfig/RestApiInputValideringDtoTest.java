@@ -31,18 +31,20 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
-import javax.validation.Valid;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import jakarta.persistence.Entity;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+import jakarta.ws.rs.core.Context;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -169,7 +171,7 @@ class RestApiInputValideringDtoTest extends RestApiTester {
         }
         Set<Class<?>> filtreteParametre = new TreeSet<>(Comparator.comparing(Class::getName));
         for (Class<?> klasse : parametre) {
-            if (klasse.getName().startsWith("java")) {
+            if (klasse.getName().startsWith("java") || klasse.isInterface() ) {
                 // ikke sjekk nedover i innebygde klasser, det skal brukes annoteringer på tidligere tidspunkt
                 continue;
             }

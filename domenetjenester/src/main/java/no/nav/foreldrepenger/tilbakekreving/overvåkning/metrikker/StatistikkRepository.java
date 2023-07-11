@@ -23,12 +23,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Instance;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.Tuple;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Any;
+import jakarta.enterprise.inject.Instance;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Tuple;
 
 import org.hibernate.query.NativeQuery;
 import org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy;
@@ -442,7 +442,7 @@ public class StatistikkRepository {
             from (
               select opprettet_tid as tidspunkt,
               case
-                when melding like '<?xml version="1.0" encoding="utf-8"?><urn:detaljertKravgrunnlagMelding%' then 'KRAVGRUNNLAG' 
+                when melding like '<?xml version="1.0" encoding="utf-8"?><urn:detaljertKravgrunnlagMelding%' then 'KRAVGRUNNLAG'
                 when melding like '<?xml version="1.0" encoding="utf-8"?><urn:endringKravOgVedtakstatus%' then 'STATUSMELDING'
                 else 'UKJENT' end as meldingstype,
                 cast(regexp_substr(melding, 'kodeStatusKrav>([^<]*)<', 1, 1, null, 1) as varchar2(10 char)) as status,
@@ -555,7 +555,7 @@ public class StatistikkRepository {
             SELECT BS.OPPRETTET_TID, BS.BREV_TYPE, F.YTELSE_TYPE, COUNT(BS.ID) AS ANTALL
             FROM BREV_SPORING BS
             JOIN BEHANDLING B ON BS.BEHANDLING_ID = B.ID
-            JOIN FAGSAK F ON B.FAGSAK_ID = F.ID       
+            JOIN FAGSAK F ON B.FAGSAK_ID = F.ID
             GROUP BY BS.OPPRETTET_TID,
                      BS.BREV_TYPE,
                      F.YTELSE_TYPE

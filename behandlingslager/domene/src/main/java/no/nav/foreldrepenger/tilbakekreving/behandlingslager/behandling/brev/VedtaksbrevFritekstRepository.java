@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 
 import no.nav.vedtak.felles.jpa.HibernateVerktøy;
 
@@ -37,13 +37,13 @@ public class VedtaksbrevFritekstRepository {
     }
 
     public Optional<VedtaksbrevFritekstOppsummering> hentVedtaksbrevOppsummering(Long behandlingId) {
-        TypedQuery<VedtaksbrevFritekstOppsummering> query = entityManager.createQuery("from VedtaksbrevFritekstOppsummering where behandling_id = :behandlingId", VedtaksbrevFritekstOppsummering.class);
+        TypedQuery<VedtaksbrevFritekstOppsummering> query = entityManager.createQuery("from VedtaksbrevFritekstOppsummering where behandlingId = :behandlingId", VedtaksbrevFritekstOppsummering.class);
         query.setParameter("behandlingId", behandlingId);
         return HibernateVerktøy.hentUniktResultat(query);
     }
 
     public List<VedtaksbrevFritekstPeriode> hentVedtaksbrevPerioderMedTekst(Long behandlingId) {
-        TypedQuery<VedtaksbrevFritekstPeriode> query = entityManager.createQuery("from VedtaksbrevFritekstPeriode where behandling_id = :behandlingId", VedtaksbrevFritekstPeriode.class);
+        TypedQuery<VedtaksbrevFritekstPeriode> query = entityManager.createQuery("from VedtaksbrevFritekstPeriode where behandlingId = :behandlingId", VedtaksbrevFritekstPeriode.class);
         query.setParameter("behandlingId", behandlingId);
         return query.getResultList();
     }

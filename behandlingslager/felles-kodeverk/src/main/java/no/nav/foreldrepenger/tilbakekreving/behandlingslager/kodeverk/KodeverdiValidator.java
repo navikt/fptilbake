@@ -2,7 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk;
 
 import java.util.Objects;
 
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidatorContext;
 
 
 public class KodeverdiValidator extends KodeverkValidator<Kodeverdi> {

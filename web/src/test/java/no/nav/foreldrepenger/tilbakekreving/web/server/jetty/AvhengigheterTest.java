@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
-import javax.enterprise.inject.spi.CDI;
+import jakarta.enterprise.inject.spi.CDI;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

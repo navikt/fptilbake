@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceException;
-import javax.persistence.TypedQuery;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
 
 import no.nav.vedtak.exception.TekniskException;
 
@@ -45,7 +45,7 @@ public class VarselresponsRepository {
     }
 
     public Optional<Varselrespons> hentRespons(Long behandlingId) {
-        TypedQuery<Varselrespons> query = entityManager.createQuery("from Varselrespons where behandling_id = :behandlingId", Varselrespons.class);
+        TypedQuery<Varselrespons> query = entityManager.createQuery("from Varselrespons where behandlingId = :behandlingId", Varselrespons.class);
         query.setParameter("behandlingId", behandlingId);
         List<Varselrespons> resultat = query.getResultList();
 

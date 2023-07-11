@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.FlushModeType;
+import jakarta.persistence.FlushModeType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

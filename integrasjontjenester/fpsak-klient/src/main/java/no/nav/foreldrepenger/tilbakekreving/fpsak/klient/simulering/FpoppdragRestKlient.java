@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering;
 import java.net.URI;
 import java.util.Optional;
 
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriBuilder;
 
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.FeilutbetaltePerioderDto;
 import no.nav.vedtak.felles.integrasjon.rest.FpApplication;

@@ -3,9 +3,9 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.FlushModeType;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
 
 import org.junit.jupiter.api.BeforeEach;
 

@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import javax.inject.Inject;
-import javax.persistence.FlushModeType;
+import jakarta.inject.Inject;
+import jakarta.persistence.FlushModeType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
