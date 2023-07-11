@@ -55,6 +55,10 @@
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>sensu-klient</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se-core</artifactId>
+        </dependency>
 
         <!-- Test avhengigheter -->
         <dependency>
@@ -70,6 +74,11 @@
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>domene-testutilities</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-micrometer</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
