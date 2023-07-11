@@ -95,6 +95,10 @@
             <artifactId>hibernate-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-micrometer</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-oracle</artifactId>
         </dependency>
@@ -293,12 +297,6 @@
             <!-- redirect java.utils.logging til slf4j (og videre til logback) -->
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
-        </dependency>
-
-        <!-- Java10 -->
-        <dependency>
-            <groupId>com.sun.xml.messaging.saaj</groupId>
-            <artifactId>saaj-impl</artifactId>
         </dependency>
 
         <!-- bean validation -->
