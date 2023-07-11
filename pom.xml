@@ -7,7 +7,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>0.8.2-jakarta</version>
+        <version>0.8.2-ee9</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -31,6 +31,10 @@
     <properties>
         <revision>1.0-SNAPSHOT</revision>
 
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
+        <sonar.projectName>fp-tilbake</sonar.projectName>
+        <sonar.projectKey>navikt_fptilbake</sonar.projectKey>
+
         <felles.version>4.4.4-ee9</felles.version>
         <prosesstask.version>3.2.6-ee9</prosesstask.version>
         <fp-tidsserie.version>2.6.8</fp-tidsserie.version>
@@ -45,6 +49,8 @@
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.projectName>fptilbake</sonar.projectName>
         <sonar.projectKey>navikt_fptilbake</sonar.projectKey>
+
+        <verapdf-validation-model.version>1.23.17</verapdf-validation-model.version>
     </properties>
 
     <dependencies>
