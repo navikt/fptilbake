@@ -24,12 +24,6 @@
             <groupId>org.verapdf</groupId>
             <artifactId>validation-model-jakarta</artifactId>
             <version>${verapdf-validation-model.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.openhtmltopdf</groupId>
@@ -91,8 +85,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
     </dependencies>
-
 </project>
 
