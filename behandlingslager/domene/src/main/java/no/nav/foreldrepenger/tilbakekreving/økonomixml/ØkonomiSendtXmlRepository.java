@@ -2,12 +2,16 @@ package no.nav.foreldrepenger.tilbakekreving.økonomixml;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 
 
 @ApplicationScoped
@@ -44,6 +48,16 @@ public class ØkonomiSendtXmlRepository {
                 .stream()
                 .map(ØkonomiXmlSendt::getMelding)
                 .collect(Collectors.toList());
+    }
+
+    public Optional<String> finnSisteXml(Long behandlingId, MeldingType meldingType) {
+        TypedQuery<ØkonomiXmlSendt> query = entityManager.createQuery("from OkoXmlSendt where behandling_id = :behandlingId and melding_type =:meldingType", ØkonomiXmlSendt.class);
+        query.setParameter("behandlingId", behandlingId);
+        query.setParameter("meldingType", meldingType.getKode());
+        return query.getResultList()
+            .stream()
+            .max(Comparator.comparing(BaseEntitet::getOpprettetTidspunkt))
+            .map(ØkonomiXmlSendt::getMelding);
     }
 
     public void oppdatereKvittering(Long sendtXmlId, String kvitteringXml) {
