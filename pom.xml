@@ -31,7 +31,7 @@
     <properties>
         <revision>1.0-SNAPSHOT</revision>
 
-        <felles.version>4.4.2</felles.version>
+        <felles.version>4.4.4</felles.version>
         <prosesstask.version>3.2.5</prosesstask.version>
         <fp-tidsserie.version>2.6.8</fp-tidsserie.version>
 
