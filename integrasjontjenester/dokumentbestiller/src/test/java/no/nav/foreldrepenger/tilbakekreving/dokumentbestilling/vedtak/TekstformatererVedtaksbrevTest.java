@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -889,7 +888,7 @@ Skatten som er trukket fra beløpet du skal betale tilbake, er beregnet etter de
 
 NAV gir opplysninger til Skattetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trukket fra. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
 _Hvordan betaler du tilbake?
-Du vil få faktura fra NAV Innkreving på det beløpet du skal betale tilbake.
+Du vil få faktura fra Innkrevingssentralen for bidrag og tilbakebetalingskrav på det beløpet du skal betale tilbake.
 
 På fakturaen vil det stå informasjon om nøyaktig beløp, kontonummer og forfallsdato. Du trenger ikke å gjøre noe før du får fakturaen.
 
@@ -940,7 +939,7 @@ Skatten som er trukket fra beløpet du skal betale tilbake, er beregnet etter de
 
 NAV gir opplysninger til Skattetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trukket fra. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
 _Hvordan betaler du tilbake?
-Du vil få faktura fra NAV Innkreving på det beløpet du skal betale tilbake.
+Du vil få faktura fra Innkrevingssentralen for bidrag og tilbakebetalingskrav på det beløpet du skal betale tilbake.
 
 På fakturaen vil det stå informasjon om nøyaktig beløp, kontonummer og forfallsdato. Du trenger ikke å gjøre noe før du får fakturaen.
 
