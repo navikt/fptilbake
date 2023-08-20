@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.først
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -10,7 +9,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatiskgjenoppta.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
@@ -24,6 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 
 @BehandlingStegRef(BehandlingStegType.TBKGSTEG)
 @BehandlingTypeRef
@@ -35,7 +34,6 @@ public class MottattGrunnlagSteg implements BehandlingSteg {
     private BehandlingRepository behandlingRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
-    private Period ventefrist;
 
     public MottattGrunnlagSteg() {
         // CDI
@@ -44,12 +42,10 @@ public class MottattGrunnlagSteg implements BehandlingSteg {
     @Inject
     public MottattGrunnlagSteg(BehandlingRepository behandlingRepository,
                                BehandlingskontrollTjeneste behandlingskontrollTjeneste,
-                               GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
-                               @KonfigVerdi(value = "frist.grunnlag.tbkg") Period ventefrist) {
+                               GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste) {
         this.behandlingRepository = behandlingRepository;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
-        this.ventefrist = ventefrist;
     }
 
     @Override
@@ -59,7 +55,7 @@ public class MottattGrunnlagSteg implements BehandlingSteg {
         if (gjenopptaBehandlingTjeneste.kanGjenopptaSteg(kontekst.getBehandlingId())) {
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
-        LocalDateTime fristTid = LocalDateTime.now().plus(ventefrist);
+        LocalDateTime fristTid = LocalDateTime.now().plus(Frister.KRAVGRUNNLAG_FØRSTE);
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
                 BehandlingStegType.TBKGSTEG, fristTid, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
