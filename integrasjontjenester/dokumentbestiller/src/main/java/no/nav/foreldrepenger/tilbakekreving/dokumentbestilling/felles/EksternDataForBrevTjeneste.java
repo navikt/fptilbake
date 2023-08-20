@@ -41,7 +41,7 @@ public class EksternDataForBrevTjeneste {
         this.fagsystemKlient = fagsystemKlient;
     }
 
-    private EksternDataForBrevTjeneste() {
+    EksternDataForBrevTjeneste() {
         //NOSONAR
     }
 
