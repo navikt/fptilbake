@@ -131,7 +131,7 @@ public class BehandlingTjeneste {
                                             AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                             BehandlingType behandlingType) {
         Behandling behandling = opprettFørstegangsbehandling(saksnummer, eksternUuid, henvisning, aktørId, fagsakYtelseType, behandlingType);
-        var gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
+        behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
         return behandling.getId();
     }
 
@@ -201,7 +201,6 @@ public class BehandlingTjeneste {
 
 
     private Behandling opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, Henvisning henvisning, AktørId aktørId, FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
-        LOG.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternUuid);
         validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer, eksternUuid);
         boolean manueltOpprettet = false;
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto;
@@ -214,6 +213,8 @@ public class BehandlingTjeneste {
         } else {
             eksternBehandlingsinfoDto = fagsystemKlient.hentBehandling(eksternUuid);
         }
+        LOG.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternBehandlingsinfoDto.getUuid());
+
         henvisning = hentHenvisningHvisIkkeFinnes(henvisning, eksternBehandlingsinfoDto);
 
         Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, fagsakYtelseType, eksternBehandlingsinfoDto.getSpråkkodeEllerDefault());
