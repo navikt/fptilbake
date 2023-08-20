@@ -93,7 +93,6 @@ public class ForvaltningKravgrunnlagRestTjeneste {
             }
         }
 
-        LOG.info("Oppretter task for å hente korrigert kravgrunnlag {} for behandlingId={}", kravgrunnlagId, behandling.getId());
         forvaltningTjeneste.hentKorrigertKravgrunnlag(behandling, kravgrunnlagId);
         return Response.ok().build();
     }

@@ -112,7 +112,7 @@ public class ForvaltningBehandlingRestTjeneste {
         if (behandling.erAvsluttet()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        LOG.info("Tving henleggelse. Oppretter task for å henlegge behandlingId={}", behandlingReferanse.getBehandlingId());
+        LOG.info("Tving henleggelse. Oppretter task for å henlegge behandlingId={}", behandling.getUuid());
         opprettHenleggBehandlingTask(behandling);
         return Response.ok().build();
     }
@@ -135,7 +135,7 @@ public class ForvaltningBehandlingRestTjeneste {
         if (behandling.erAvsluttet() || !erPåVent(behandling)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        LOG.info("Tving gjenoppta. Oppretter task for å gjenoppta behandlingId={}", behandlingReferanse.getBehandlingId());
+        LOG.info("Tving gjenoppta. Oppretter task for å gjenoppta behandlingId={}", behandling.getUuid());
         opprettGjenopptaBehandlingTask(behandling);
 
         return Response.ok().build();
@@ -164,7 +164,7 @@ public class ForvaltningBehandlingRestTjeneste {
         if (behandling.erAvsluttet() || behandling.isBehandlingPåVent()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        LOG.info("Fortsett behandling. Oppretter task for å fortsettelse av behandlingId={}", behandlingReferanse.getBehandlingId());
+        LOG.info("Fortsett behandling. Oppretter task for å fortsettelse av behandlingId={}", behandling.getUuid());
         var prosessTaskData = opprettFortsettBehandlingTask(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         taskTjeneste.lagre(prosessTaskData);
         return Response.ok().build();
