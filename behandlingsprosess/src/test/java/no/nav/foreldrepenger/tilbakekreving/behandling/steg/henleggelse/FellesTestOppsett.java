@@ -5,7 +5,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -48,7 +47,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 public abstract class FellesTestOppsett {
 
     protected static final LocalDate FOM = LocalDate.of(2016, 3, 10);
-    protected static final Period defaultVentetid = Period.ofWeeks(4);
     protected static final String BEHANDLENDE_ENHET_ID = "4833";
     protected static final String BEHANDLENDE_ENHET_NAVN = "NAV Familie- og pensjonsytelser Oslo 1";
 
@@ -95,7 +93,7 @@ public abstract class FellesTestOppsett {
         revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider, behandlingskontrollTjeneste);
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollProvider,
-                fagsakTjeneste, mock(HistorikkinnslagTjeneste.class), mockFagsystemKlient, defaultVentetid);
+                fagsakTjeneste, mock(HistorikkinnslagTjeneste.class), mockFagsystemKlient);
         testUtility = new TestUtility(behandlingTjeneste);
         aktørId = testUtility.genererAktørId();
         when(mockTpsTjeneste.hentBrukerForAktør(aktørId)).thenReturn(testUtility.lagPersonInfo(aktørId));

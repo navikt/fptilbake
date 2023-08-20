@@ -20,7 +20,7 @@ public class HbKonfigurasjon {
     @JsonProperty("klagefrist-uker")
     private Integer klagefristUker;
 
-    public HbKonfigurasjon() {
+    private HbKonfigurasjon() {
     }
 
     public static Builder builder() {

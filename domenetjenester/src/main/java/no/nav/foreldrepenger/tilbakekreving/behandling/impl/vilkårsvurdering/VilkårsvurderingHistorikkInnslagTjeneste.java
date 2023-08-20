@@ -97,7 +97,7 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
                 finnEndring(gammel, ny, ANDEL_TILBAKEKREVES, VilkårVurderingPeriodeEntitet::finnAndelTilbakekreves),
                 finnEndring(gammel, ny, ILEGG_RENTER, r -> fraBoolean(r.manueltSattIleggRenter())),
                 finnEndring(gammel, ny, TILBAKEKREV_SMÅBELOEP, r -> fraBoolean(r.tilbakekrevesSmåbeløp())),
-                !(ny.getAktsomhet() != null && ny.getAktsomhet().getSærligGrunner().isEmpty()) ?
+                !(ny != null && ny.getAktsomhet() != null && ny.getAktsomhet().getSærligGrunner().isEmpty()) ?
                         finnEndring(gammel, ny, ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON, this::lagSærligeGrunnerTekst) : null
         );
         return endringer

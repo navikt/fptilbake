@@ -34,7 +34,7 @@ import no.nav.vedtak.felles.integrasjon.dokarkiv.dto.Sak;
 @ApplicationScoped
 public class JournalføringTjeneste {
 
-    private static final Logger logger = LoggerFactory.getLogger(JournalføringTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JournalføringTjeneste.class);
     private static final Fagsystem appName = ApplicationName.hvilkenTilbake();
 
     private BehandlingRepository behandlingRepository;
@@ -75,7 +75,7 @@ public class JournalføringTjeneste {
     }
 
     public JournalpostIdOgDokumentId journalførUtgåendeBrev(Long behandlingId, String dokumentkategori, BrevMetadata brevMetadata, BrevMottaker brevMottaker, byte[] vedleggPdf) {
-        logger.info("Starter journalføring av {} til {} for behandlingId={}", dokumentkategori, brevMottaker, behandlingId);
+        LOG.info("Starter journalføring av {} til {} for behandlingId={}", dokumentkategori, brevMottaker, behandlingId);
 
         boolean forsøkFerdigstill = true;
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
@@ -99,7 +99,7 @@ public class JournalføringTjeneste {
         if (response.dokumenter().size() != 1) {
             throw uforventetAntallDokumenterIRespons(response.dokumenter().size());
         }
-        logger.info("Journalførte utgående {} til {} for behandlingId={} med journalpostid={}", dokumentkategori, brevMottaker, behandlingId, journalpostId.getVerdi());
+        LOG.info("Journalførte utgående {} til {} for behandlingId={} med journalpostid={}", dokumentkategori, brevMottaker, behandlingId, journalpostId.getVerdi());
         return new JournalpostIdOgDokumentId(journalpostId, response.dokumenter().get(0).dokumentInfoId());
     }
 

@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch;
 
 import java.time.Clock;
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,7 +11,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.automatisksaksbehandling.AutomatiskSaksbehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.felles.Helligdager;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -29,7 +28,6 @@ public class HåndterGamleKravgrunnlagBatchTask implements ProsessTaskHandler {
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private ProsessTaskTjeneste taskTjeneste;
     private Clock clock;
-    private Period grunnlagAlder;
 
     HåndterGamleKravgrunnlagBatchTask() {
         // for CDI proxy
@@ -37,23 +35,19 @@ public class HåndterGamleKravgrunnlagBatchTask implements ProsessTaskHandler {
 
     @Inject
     public HåndterGamleKravgrunnlagBatchTask(ØkonomiMottattXmlRepository mottattXmlRepository,
-                                             ProsessTaskTjeneste taskTjeneste,
-                                             @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
+                                             ProsessTaskTjeneste taskTjeneste) {
         this.mottattXmlRepository = mottattXmlRepository;
         this.taskTjeneste = taskTjeneste;
         this.clock = Clock.systemDefaultZone();
-        this.grunnlagAlder = grunnlagAlder;
     }
 
     // kun for test forbruk
     public HåndterGamleKravgrunnlagBatchTask(ØkonomiMottattXmlRepository mottattXmlRepository,
                                              ProsessTaskTjeneste taskTjeneste,
-                                             Clock clock,
-                                             @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
+                                             Clock clock) {
         this.mottattXmlRepository = mottattXmlRepository;
         this.taskTjeneste = taskTjeneste;
         this.clock = clock;
-        this.grunnlagAlder = grunnlagAlder;
     }
 
     @Override
@@ -65,7 +59,7 @@ public class HåndterGamleKravgrunnlagBatchTask implements ProsessTaskHandler {
         if (Helligdager.erHelligdagEllerHelg(iDag)) {
             LOG.info("I dag er helg/helligdag, kan ikke kjøre batch {}", batchRun);
         } else {
-            var bestemtDato = iDag.minus(grunnlagAlder);
+            var bestemtDato = iDag.minus(AutomatiskSaksbehandlingRepository.getKravgrunnlagAlderNårGammel());
             LOG.info("Håndterer kravgrunnlag som er eldre enn {} i batch {}", bestemtDato, batchRun);
 
             var alleGamleKravgrunnlag = hentGamleKravgrunnlag(bestemtDato);

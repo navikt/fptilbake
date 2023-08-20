@@ -39,7 +39,7 @@ public class ØkonomiProxyKlient {
     private static final String PATH_TILBAKEKREVING_KONTROLLER = "/tilbakekreving";
     private static final String KODE_403_FRA_SERVER = "Mangler tilgang. Fikk http-kode 403 fra server";
 
-    private static final Logger logger = LoggerFactory.getLogger(ØkonomiProxyKlient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ØkonomiProxyKlient.class);
 
     private final RestClient restClient;
     private final RestConfig restConfig;
@@ -53,7 +53,7 @@ public class ØkonomiProxyKlient {
         this.endpointKravgrunnlag = UriBuilder.fromUri(restConfig.endpoint()).path(PATH_TILBAKEKREVING_KONTROLLER).path("/kravgrunnlag").build();
         this.endpointKravgrunnlagAnnuller = UriBuilder.fromUri(restConfig.endpoint()).path(PATH_TILBAKEKREVING_KONTROLLER).path("/kravgrunnlag/annuller").build();
         this.endpointIverksett = UriBuilder.fromUri(restConfig.endpoint()).path(PATH_TILBAKEKREVING_KONTROLLER).path("/tilbakekrevingsvedtak").build();
-        logger.info("proxy klient konfigurasjon: endepunkt {}, scopes {}, token config {}", restConfig.endpoint(), restConfig.scopes(), restConfig.tokenConfig());
+        LOG.info("proxy klient konfigurasjon: endepunkt {}, scopes {}, token config {}", restConfig.endpoint(), restConfig.scopes(), restConfig.tokenConfig());
     }
 
     public void iverksettTilbakekrevingsvedtak(TilbakekrevingVedtakDTO tilbakekrevingVedtakDTO) {

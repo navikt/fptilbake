@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
-import java.time.Period;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -51,7 +50,6 @@ class AksjonspunktRestTjenesteTest {
 
     private static final Saksnummer SAKSNUMMER = new Saksnummer("12345");
     private static final NavBruker NAV_BRUKER = NavBruker.opprettNy(new AktørId(12345L), Språkkode.nb);
-    private static final Period DEFAULT_PERIOD = Period.ofWeeks(4);
 
     private AksjonspunktApplikasjonTjeneste aksjonspunktTjenesteMock = mock(AksjonspunktApplikasjonTjeneste.class);
 
@@ -76,8 +74,7 @@ class AksjonspunktRestTjenesteTest {
                 behandlingskontrollProvider,
                 mock(FagsakTjeneste.class),
                 mock(HistorikkinnslagTjeneste.class),
-                mock(FagsystemKlient.class),
-                DEFAULT_PERIOD);
+                mock(FagsystemKlient.class));
 
         aksjonspunktRestTjeneste = new AksjonspunktRestTjeneste(behandlingRepositoryMock,
                 totrinnRepositoryMock,

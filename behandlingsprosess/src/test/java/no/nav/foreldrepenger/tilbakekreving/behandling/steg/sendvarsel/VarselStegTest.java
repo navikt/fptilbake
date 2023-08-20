@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,12 +34,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodev
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
+import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.sikkerhet.kontekst.BasisKontekst;
-import no.nav.vedtak.sikkerhet.kontekst.IdentType;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
-import no.nav.vedtak.sikkerhet.kontekst.SikkerhetContext;
 
 @CdiDbAwareTest
 class VarselStegTest {
@@ -88,7 +86,7 @@ class VarselStegTest {
         behandling = behandlingRepository.hentBehandling(behandling.getId());
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         Aksjonspunkt ap = behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING);
-        assertThat(ap.getFristTid().toLocalDate()).isEqualTo(LocalDate.now().plusWeeks(4).plusDays(1));
+        assertThat(ap.getFristTid().toLocalDate()).isEqualTo(LocalDate.now().plus(Frister.BEHANDLING_TILSVAR).plusDays(1));
 
         List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(behandling.getId());
         assertThat(historikkinnslager).isNotEmpty();
@@ -130,7 +128,7 @@ class VarselStegTest {
                 repositoryProvider,
                 behandlingskontrollTjeneste,
                 varselresponsTjeneste,
-                taskTjeneste,
-                Period.ofWeeks(4));
+                taskTjeneste
+        );
     }
 }

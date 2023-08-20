@@ -36,6 +36,12 @@ import no.nav.vedtak.exception.TekniskException;
 @Dependent
 public class VedtaksbrevFritekstValidator {
 
+    public static Set<HendelseUnderType> UNDERTYPER_MED_PÅKREVD_FRITEKST = Set.of(
+        HendelseUnderType.ANNET_FRITEKST,
+        HendelseUnderType.ENDRING_GRUNNLAG,
+        HendelseUnderType.SVP_ENDRING_GRUNNLAG
+    );
+
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private BehandlingRepository behandlingRepository;
@@ -146,7 +152,7 @@ public class VedtaksbrevFritekstValidator {
     private static void validerFritekstFaktaTimelineImpl(FaktaFeilutbetaling fakta, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
         LocalDateTimeline<HendelseUnderType> perioderSomSkalHaFritekst = new LocalDateTimeline<>(
                 fakta.getFeilutbetaltPerioder().stream()
-                        .filter(f -> VedtaksbrevFritekstKonfigurasjon.UNDERTYPER_MED_PÅKREVD_FRITEKST.contains(f.getHendelseUndertype()))
+                        .filter(f -> UNDERTYPER_MED_PÅKREVD_FRITEKST.contains(f.getHendelseUndertype()))
                         .map(f -> new LocalDateSegment<HendelseUnderType>(f.getPeriode().getFom(), f.getPeriode().getTom(), f.getHendelseUndertype()))
                         .toList()
         );

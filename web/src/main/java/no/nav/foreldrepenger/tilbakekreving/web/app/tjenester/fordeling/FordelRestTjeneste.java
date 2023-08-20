@@ -32,7 +32,7 @@ import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 @Transactional
 public class FordelRestTjeneste {
 
-    private static final Logger logger = LoggerFactory.getLogger(FordelRestTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FordelRestTjeneste.class);
 
     public static final String UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID = "I000114";
 
@@ -66,13 +66,13 @@ public class FordelRestTjeneste {
         if (behandlingForSaksnummer.isPresent()) {
             Behandling behandling = behandlingForSaksnummer.get();
             if (erTilbakemeldingFraBruker(dokumentTypeId)) {
-                logger.info("Mottok dokument og tok behandlingId={} av vent. Saksnummer={} dokumentTypeId={} forsendelseId={}", behandling.getId(), saksnummer, dokumentTypeId, forsendelseId);
+                LOG.info("Mottok dokument og tok behandlingId={} av vent. Saksnummer={} dokumentTypeId={} forsendelseId={}", behandling.getId(), saksnummer, dokumentTypeId, forsendelseId);
                 gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), HistorikkAktør.SØKER); //ta behandling av vent
             } else {
-                logger.info("Mottok og ignorerte dokument pga dokumentTypeId. Saksnummer={} dokumentTypeId={} forsendelseId={}", saksnummer, dokumentTypeId, forsendelseId);
+                LOG.info("Mottok og ignorerte dokument pga dokumentTypeId. Saksnummer={} dokumentTypeId={} forsendelseId={}", saksnummer, dokumentTypeId, forsendelseId);
             }
         } else {
-            logger.info("Mottok og ignorerte dokument siden ingen behandling er på vent for saken. Saksnummer={} dokumentTypeId={} forsendelseId={}", saksnummer, dokumentTypeId, forsendelseId);
+            LOG.info("Mottok og ignorerte dokument siden ingen behandling er på vent for saken. Saksnummer={} dokumentTypeId={} forsendelseId={}", saksnummer, dokumentTypeId, forsendelseId);
         }
     }
 

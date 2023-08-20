@@ -19,7 +19,7 @@ import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
     endpointDefault = "http://k9-oppdrag", endpointProperty = "k9oppdrag.url")
 public class K9oppdragRestKlient {
 
-    private static final Logger logger = LoggerFactory.getLogger(K9oppdragRestKlient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(K9oppdragRestKlient.class);
 
     private final RestClient restClient;
     private final RestConfig restConfig;
@@ -42,7 +42,7 @@ public class K9oppdragRestKlient {
     private URI getK9OoppdragBaseUri() {
         String overrideUrl = Environment.current().getProperty(K9_OPPDRAG_OVERRIDE_URL);
         if (overrideUrl != null && !overrideUrl.isEmpty()) {
-            logger.info("Overstyrte URL til k9-oppdrag til {}", overrideUrl);
+            LOG.info("Overstyrte URL til k9-oppdrag til {}", overrideUrl);
             return URI.create(overrideUrl);
         } else {
             return URI.create(K9_OPPDRAG_BASE_URL);

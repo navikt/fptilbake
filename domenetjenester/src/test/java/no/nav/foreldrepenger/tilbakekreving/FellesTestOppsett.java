@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -84,7 +83,6 @@ public abstract class FellesTestOppsett {
     protected static final HendelseType HENDELSE_TYPE = HendelseType.FP_UTTAK_UTSETTELSE_TYPE;
     protected static final HendelseUnderType HENDELSE_UNDERTYPE = HendelseUnderType.ARBEID_HELTID;
     protected static final String BEGRUNNELSE = "ABC";
-    protected static final Period defaultVentetid = Period.ofWeeks(4);
     protected static final String BEHANDLENDE_ENHET_ID = "4833";
     protected static final String BEHANDLENDE_ENHET_NAVN = "NAV Familie- og pensjonsytelser Oslo 1";
     protected static final BehandlingType REVURDERING_BEHANDLING_TYPE = BehandlingType.REVURDERING_TILBAKEKREVING;
@@ -170,7 +168,7 @@ public abstract class FellesTestOppsett {
         faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repoProvider, kravgrunnlagTjeneste, mockFagsystemKlient);
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollProvider,
-                fagsakTjeneste, mockHistorikkTjeneste, mockFagsystemKlient, defaultVentetid);
+                fagsakTjeneste, mockHistorikkTjeneste, mockFagsystemKlient);
         testUtility = new TestUtility(behandlingTjeneste);
         aktørId = testUtility.genererAktørId();
         when(mockTpsTjeneste.hentBrukerForAktør(aktørId)).thenReturn(testUtility.lagPersonInfo(aktørId));

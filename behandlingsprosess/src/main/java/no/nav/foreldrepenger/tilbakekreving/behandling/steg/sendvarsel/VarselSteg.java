@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.sendvarsel;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -11,7 +10,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRef;
@@ -28,6 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.SendVarselbrevTask;
+import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
@@ -46,7 +45,6 @@ public class VarselSteg implements BehandlingSteg {
     private VarselRepository varselRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private VarselresponsTjeneste varselresponsTjeneste;
-    private Period ventefrist;
 
     public VarselSteg() {
         //for cdi proxy
@@ -56,15 +54,13 @@ public class VarselSteg implements BehandlingSteg {
     public VarselSteg(BehandlingRepositoryProvider behandlingRepositoryProvider,
                       BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                       VarselresponsTjeneste varselresponsTjeneste,
-                      ProsessTaskTjeneste taskTjeneste,
-                      @KonfigVerdi(value = "behandling.venter.frist.lengde") Period ventefrist) {
+                      ProsessTaskTjeneste taskTjeneste) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.taskTjeneste = taskTjeneste;
         this.varselRepository = behandlingRepositoryProvider.getVarselRepository();
 
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.varselresponsTjeneste = varselresponsTjeneste;
-        this.ventefrist = ventefrist;
     }
 
     @Override
@@ -73,7 +69,7 @@ public class VarselSteg implements BehandlingSteg {
         if (sjekkTilbakekrevingOpprettetUtenVarsel(behandling.getId()) || behandling.isManueltOpprettet()) { //ikke sendt varsel når behandling er opprettet manuelt eller opprettet uten varsel
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
-        LocalDateTime fristTid = LocalDateTime.now().plus(ventefrist).plusDays(1);
+        LocalDateTime fristTid = LocalDateTime.now().plus(Frister.BEHANDLING_TILSVAR).plusDays(1);
         opprettSendVarselTask(behandling);
 
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,

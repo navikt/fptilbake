@@ -25,7 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.producer.Selvbe
 public class SelvbetjeningTjeneste {
 
     private static final Environment ENV = Environment.current();
-    private static final Logger logger = LoggerFactory.getLogger(SelvbetjeningTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SelvbetjeningTjeneste.class);
 
     private BrevSporingRepository brevSporingRepository;
     private BehandlingRepository behandlingRepository;
@@ -95,9 +95,9 @@ public class SelvbetjeningTjeneste {
 
     private void logMelding(String msg, Hendelse hendelse, String personIdent) {
         if (ENV.isProd()) {
-            logger.info("{} beskjed til selvbetjening om {}", msg, hendelse.getBeskrivelse());
+            LOG.info("{} beskjed til selvbetjening om {}", msg, hendelse.getBeskrivelse());
         } else {
-            logger.info("{} beskjed til selvbetjening om {} for fnr {}", msg, hendelse.getBeskrivelse(), personIdent);
+            LOG.info("{} beskjed til selvbetjening om {} for fnr {}", msg, hendelse.getBeskrivelse(), personIdent);
         }
     }
 }

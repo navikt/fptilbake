@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.time.Period;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +49,6 @@ class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestOppsett 
         when(mockEksternDataForBrevTjeneste.hentPerson(aktørId)).thenReturn(personinfo);
         when(mockEksternDataForBrevTjeneste.hentAdresse(any(Personinfo.class), any(BrevMottaker.class), any(Optional.class)))
                 .thenReturn(lagStandardNorskAdresse());
-        when(mockEksternDataForBrevTjeneste.getBrukersSvarfrist()).thenReturn(Period.ofWeeks(2));
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setSprakkode(Språkkode.nb);

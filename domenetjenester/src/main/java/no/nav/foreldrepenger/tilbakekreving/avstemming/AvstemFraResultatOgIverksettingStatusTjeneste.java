@@ -23,7 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 @ApplicationScoped
 public class AvstemFraResultatOgIverksettingStatusTjeneste {
 
-    private static final Logger logger = LoggerFactory.getLogger(AvstemFraResultatOgIverksettingStatusTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AvstemFraResultatOgIverksettingStatusTjeneste.class);
 
     private BehandlingRepository behandlingRepository;
     private BehandlingVedtakRepository behandlingVedtakRepository;
@@ -63,7 +63,7 @@ public class AvstemFraResultatOgIverksettingStatusTjeneste {
 
         leggTilOppsummering(dato, avstemmingCsvFormatter);
 
-        logger.info("Sender {} vedtak til avstemming for {}", avstemmingCsvFormatter.getAntallRader(), dato);
+        LOG.info("Sender {} vedtak til avstemming for {}", avstemmingCsvFormatter.getAntallRader(), dato);
 
         if (avstemmingCsvFormatter.getAntallRader() == 0) {
             return Optional.empty();
@@ -92,10 +92,10 @@ public class AvstemFraResultatOgIverksettingStatusTjeneste {
 
         }
         if (antallFeilet != 0) {
-            logger.warn("{} vedtak har feilet i overføring til OS for {}", antallFeilet, dato);
+            LOG.warn("{} vedtak har feilet i overføring til OS for {}", antallFeilet, dato);
         }
         if (antallFørstegangsvedtakUtenTilbakekreving != 0) {
-            logger.info("{} førstegangsvedtak uten tilbakekreving sendes ikke til avstemming for {}", antallFørstegangsvedtakUtenTilbakekreving, dato);
+            LOG.info("{} førstegangsvedtak uten tilbakekreving sendes ikke til avstemming for {}", antallFørstegangsvedtakUtenTilbakekreving, dato);
         }
     }
 

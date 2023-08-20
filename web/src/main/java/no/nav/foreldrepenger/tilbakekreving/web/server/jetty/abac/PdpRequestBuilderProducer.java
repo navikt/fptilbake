@@ -17,7 +17,7 @@ import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 @ApplicationScoped
 public class PdpRequestBuilderProducer {
 
-    private static final Logger logger = LoggerFactory.getLogger(PdpRequestBuilderProducer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PdpRequestBuilderProducer.class);
 
     private PdpRequestBuilder pdpRequestBuilder;
 
@@ -29,11 +29,11 @@ public class PdpRequestBuilderProducer {
         var applikasjon = ApplicationName.hvilkenTilbake();
         switch (applikasjon) {
             case FPTILBAKE -> {
-                logger.info("Bruker PdpRequestBuilder for fptilbake");
+                LOG.info("Bruker PdpRequestBuilder for fptilbake");
                 pdpRequestBuilder = pdpRequestBuilders.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
             }
             case K9TILBAKE -> {
-                logger.info("Bruker PdpRequestBuilder for k9");
+                LOG.info("Bruker PdpRequestBuilder for k9");
                 pdpRequestBuilder = pdpRequestBuilders.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
             }
             default -> throw new IllegalStateException("applikasjonsnavn er satt til " + applikasjon + " som ikke er en støttet verdi");

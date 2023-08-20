@@ -24,9 +24,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagXmlUnmarshaller;
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
@@ -61,7 +61,7 @@ import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 @Produces(MediaType.APPLICATION_JSON)
 public class ForvaltningBehandlingRestTjeneste {
 
-    private static final Logger logger = LoggerFactory.getLogger(ForvaltningBehandlingRestTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ForvaltningBehandlingRestTjeneste.class);
 
     private BehandlingRepository behandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
@@ -112,7 +112,7 @@ public class ForvaltningBehandlingRestTjeneste {
         if (behandling.erAvsluttet()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        logger.info("Tving henleggelse. Oppretter task for å henlegge behandlingId={}", behandlingReferanse.getBehandlingId());
+        LOG.info("Tving henleggelse. Oppretter task for å henlegge behandlingId={}", behandlingReferanse.getBehandlingId());
         opprettHenleggBehandlingTask(behandling);
         return Response.ok().build();
     }
@@ -135,7 +135,7 @@ public class ForvaltningBehandlingRestTjeneste {
         if (behandling.erAvsluttet() || !erPåVent(behandling)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        logger.info("Tving gjenoppta. Oppretter task for å gjenoppta behandlingId={}", behandlingReferanse.getBehandlingId());
+        LOG.info("Tving gjenoppta. Oppretter task for å gjenoppta behandlingId={}", behandlingReferanse.getBehandlingId());
         opprettGjenopptaBehandlingTask(behandling);
 
         return Response.ok().build();
@@ -164,7 +164,7 @@ public class ForvaltningBehandlingRestTjeneste {
         if (behandling.erAvsluttet() || behandling.isBehandlingPåVent()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        logger.info("Fortsett behandling. Oppretter task for å fortsettelse av behandlingId={}", behandlingReferanse.getBehandlingId());
+        LOG.info("Fortsett behandling. Oppretter task for å fortsettelse av behandlingId={}", behandlingReferanse.getBehandlingId());
         var prosessTaskData = opprettFortsettBehandlingTask(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         taskTjeneste.lagre(prosessTaskData);
         return Response.ok().build();
@@ -187,11 +187,11 @@ public class ForvaltningBehandlingRestTjeneste {
             return Response.ok().build();
         } catch (UgyldigTvingKoblingForespørselException e) {
             String message = LoggerUtils.removeLineBreaks(e.getMessage());
-            logger.info(message);
+            LOG.info(message);
             return Response.status(Response.Status.BAD_REQUEST).entity(message).build();
         } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
             String message = LoggerUtils.removeLineBreaks("Kunne ikke koble behandling med behandlingId=" + behandlingTilGrunnlagDto.getBehandlingId() + " til kravgrunnlag med mottattXmlId=" + behandlingTilGrunnlagDto.getMottattXmlId() + " siden kravgrunnlaget ikke er gyldig: ");
-            logger.info(message, e);
+            LOG.info(message, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(message + e.getMessage()).build();
         }
     }
@@ -210,7 +210,7 @@ public class ForvaltningBehandlingRestTjeneste {
     public Response korrigerHenvisning(@Valid @NotNull KorrigertHenvisningDto korrigertHenvisningDto) {
         Behandling behandling = behandlingRepository.hentBehandling(korrigertHenvisningDto.getBehandlingId());
         UUID eksternBehandlingUuid = korrigertHenvisningDto.getEksternBehandlingUuid();
-        logger.info("Korrigerer henvisning. Oppretter task for å korrigere henvisning={} behandlingId={}", eksternBehandlingUuid, behandling.getId());
+        LOG.info("Korrigerer henvisning. Oppretter task for å korrigere henvisning={} behandlingId={}", eksternBehandlingUuid, behandling.getId());
         opprettKorrigertHenvisningTask(behandling, eksternBehandlingUuid);
         return Response.ok().build();
     }
@@ -267,7 +267,7 @@ public class ForvaltningBehandlingRestTjeneste {
         if (mottattXml == null) {
             throw new UgyldigTvingKoblingForespørselException("MottattXmlId=" + mottattXmlId + " finnes ikke");
         }
-        if (mottattXml.getMottattXml().contains(TaskProperty.ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML)) {
+        if (mottattXml.getMottattXml().contains(TaskProperties.ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML)) {
             throw new UgyldigTvingKoblingForespørselException("MottattXmlId=" + mottattXmlId + " peker ikke på et kravgrunnlag, men på en status-melding");
         }
 
@@ -283,7 +283,7 @@ public class ForvaltningBehandlingRestTjeneste {
         KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
         grunnlagRepository.lagre(behandlingId, kravgrunnlag);
         mottattXmlRepository.opprettTilkobling(mottattXmlId);
-        logger.info("Behandling med behandlingId={} ble tvunget koblet til kravgrunnlag med mottattXmlId={}", behandlingId, mottattXmlId);
+        LOG.info("Behandling med behandlingId={} ble tvunget koblet til kravgrunnlag med mottattXmlId={}", behandlingId, mottattXmlId);
     }
 
     private void fjernKoblingTilHenlagteBehandlinger(ØkonomiXmlMottatt mottattXml, Long behandlingIdSomTilkobles) {
@@ -299,15 +299,15 @@ public class ForvaltningBehandlingRestTjeneste {
             }
             if (resultat.isPresent() && resultat.get().erBehandlingHenlagt()) {
                 eksternBehandlingRepository.deaktivateTilkobling(eksternBehandling.getInternId());
-                logger.info("Deaktiverer kobling mellom behandlingId {} og mottattXmlId {} for {}", eksternBehandling.getInternId(), mottattXml.getId(), mottattXml.getSaksnummer());
+                LOG.info("Deaktiverer kobling mellom behandlingId {} og mottattXmlId {} for {}", eksternBehandling.getInternId(), mottattXml.getId(), mottattXml.getSaksnummer());
             } else {
                 alleKoblingerFjernes = false;
-                logger.info("Kan ikke fjerne tilkobling til behandling {}, denne er ikke henlagt siden behandlingsresultat er {}", kobletBehandlingId, resultat);
+                LOG.info("Kan ikke fjerne tilkobling til behandling {}, denne er ikke henlagt siden behandlingsresultat er {}", kobletBehandlingId, resultat);
             }
         }
         if (alleKoblingerFjernes) {
             mottattXmlRepository.fjernTilkobling(mottattXml.getId());
-            logger.info("Fjener tilkobling ØkonomiMottattXml id {}", mottattXml.getId());
+            LOG.info("Fjener tilkobling ØkonomiMottattXml id {}", mottattXml.getId());
         }
     }
 

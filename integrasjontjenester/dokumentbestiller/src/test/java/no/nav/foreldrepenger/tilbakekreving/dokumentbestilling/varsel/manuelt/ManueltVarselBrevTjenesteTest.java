@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,7 +64,6 @@ class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett {
         String aktørId = behandling.getAktørId().getId();
         when(mockEksternDataForBrevTjeneste.hentPerson(aktørId)).thenReturn(personinfo);
         when(mockEksternDataForBrevTjeneste.hentAdresse(any(Personinfo.class), any(BrevMottaker.class), any(Optional.class))).thenReturn(lagStandardNorskAdresse());
-        when(mockEksternDataForBrevTjeneste.getBrukersSvarfrist()).thenReturn(Period.ofWeeks(3));
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setSprakkode(Språkkode.nb);

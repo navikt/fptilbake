@@ -26,7 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 @ApplicationScoped
 public class VurderForeldelseSteg implements BehandlingSteg {
 
-    private static final Logger logger = LoggerFactory.getLogger(VurderForeldelseSteg.class);
+    private static final Logger LOG = LoggerFactory.getLogger(VurderForeldelseSteg.class);
 
     private BehandlingRepository behandlingRepository;
     private VurderForeldelseAksjonspunktUtleder vurderForeldelseAksjonspunktUtleder;
@@ -60,7 +60,7 @@ public class VurderForeldelseSteg implements BehandlingSteg {
     }
 
     protected void utførStegAutomatisk(Behandling behandling) {
-        logger.info("utfører foreldelse steg automatisk for behandling={}", behandling.getId());
+        LOG.info("utfører foreldelse steg automatisk for behandling={}", behandling.getId());
         automatiskVurdertForeldelseTjeneste.automatiskVurdetForeldelse(behandling,
                 AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE);
     }

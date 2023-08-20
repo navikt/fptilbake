@@ -8,8 +8,6 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.time.Period;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,8 +33,8 @@ class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
 
         varselbrevTask = new SendManueltVarselbrevTask(repositoryProvider,
                 mockManueltVarselBrevTjeneste,
-                behandlingskontrollTjeneste,
-                Period.ofWeeks(3));
+                behandlingskontrollTjeneste
+        );
     }
 
     @Test
@@ -44,7 +42,7 @@ class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Sender manuelt varsel brev");
-        prosessTaskData.setProperty(TaskProperty.MAL_TYPE, DokumentMalType.VARSEL_DOK.getKode());
+        prosessTaskData.setProperty(SendManueltVarselbrevTask.MAL_TYPE, DokumentMalType.VARSEL_DOK.getKode());
 
         varselbrevTask.doTask(prosessTaskData);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
@@ -56,7 +54,7 @@ class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Sender korrigert varsel brev");
-        prosessTaskData.setProperty(TaskProperty.MAL_TYPE, DokumentMalType.KORRIGERT_VARSEL_DOK.getKode());
+        prosessTaskData.setProperty(SendManueltVarselbrevTask.MAL_TYPE, DokumentMalType.KORRIGERT_VARSEL_DOK.getKode());
 
         varselbrevTask.doTask(prosessTaskData);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
@@ -68,7 +66,7 @@ class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Sender manuelt varsel brev");
-        prosessTaskData.setProperty(TaskProperty.MAL_TYPE, DokumentMalType.VARSEL_DOK.getKode());
+        prosessTaskData.setProperty(SendManueltVarselbrevTask.MAL_TYPE, DokumentMalType.VARSEL_DOK.getKode());
         vergeRepository.lagreVergeInformasjon(behandling.getId(), lagVerge());
 
         varselbrevTask.doTask(prosessTaskData);

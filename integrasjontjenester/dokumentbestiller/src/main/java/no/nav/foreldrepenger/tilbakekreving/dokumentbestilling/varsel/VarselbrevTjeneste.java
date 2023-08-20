@@ -36,6 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.FeilutbetaltePerioderDto;
+import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 
 
 @ApplicationScoped
@@ -150,7 +151,7 @@ public class VarselbrevTjeneste {
                 adresseinfo,
                 personinfo,
                 feilutbetaltePerioderDto,
-                eksternDataForBrevTjeneste.getBrukersSvarfrist(),
+                Frister.BRUKER_TILSVAR,
                 fagsakYtelseType,
                 ytelseNavn,
                 varselTekst,
@@ -181,7 +182,7 @@ public class VarselbrevTjeneste {
                 eksternBehandlingsinfo,
                 personinfo,
                 feilutbetaltePerioderDto,
-                eksternDataForBrevTjeneste.getBrukersSvarfrist(),
+                Frister.BRUKER_TILSVAR,
                 fagsakYtleseType,
                 ytelseNavn,
                 finnesVerge,

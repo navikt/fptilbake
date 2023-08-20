@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.finn;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,7 +20,7 @@ import org.mockito.ArgumentCaptor;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.KravVedtakStatusMapper;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.KravVedtakStatusTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravVedtakStatusTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -53,11 +54,11 @@ class FinnGrunnlagTaskTest extends FellesTestOppsett {
         HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider,
                 taskTjeneste, behandlingskontrollTjeneste, historikkinnslagTjeneste);
         KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
-                taskTjeneste, repositoryProvider.getBehandlingRepository(), repositoryProvider.getGrunnlagRepository(), henleggBehandlingTjeneste,
-                behandlingskontrollTjeneste);
+                taskTjeneste, repositoryProvider.getBehandlingRepository(), repositoryProvider.getGrunnlagRepository(),
+            behandlingskontrollTjeneste);
         KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
-        finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository,
-                kravVedtakStatusTjeneste, behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper, fagsystemKlientMock);
+        finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kravVedtakStatusTjeneste,
+            behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper, fagsystemKlientMock, henleggBehandlingTjeneste);
 
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, HENVISNING, FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);

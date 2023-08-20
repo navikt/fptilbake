@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -112,7 +111,7 @@ class HåndterGamleKravgrunnlagTaskTest {
                 repositoryProvider.getHistorikkRepository());
         var fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repositoryProvider,
-                behandlingskontrollProvider, fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock, Period.ofWeeks(4));
+                behandlingskontrollProvider, fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock);
         var kravgrunnlagHenter = new KravgrunnlagHenter(økonomiProxyKlient, hentKravgrunnlagMapperProxy);
         var håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(
                 mottattXmlRepository, grunnlagRepository, lesKravgrunnlagMapper, behandlingTjeneste,

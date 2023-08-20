@@ -14,7 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 
 public class SamletEksternBehandlingInfo {
 
-    private static final Logger logger = LoggerFactory.getLogger(SamletEksternBehandlingInfo.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SamletEksternBehandlingInfo.class);
 
     private Collection<Tillegsinformasjon> tilleggsinformasjonHentet;
     private EksternBehandlingsinfoDto grunninformasjon;
@@ -149,7 +149,7 @@ public class SamletEksternBehandlingInfo {
         private void valider(Tillegsinformasjon tillegsinformasjon, Function<SamletEksternBehandlingInfo, Object> opplysningsSupplier) {
             if (kladd.tilleggsinformasjonHentet.contains(tillegsinformasjon) && opplysningsSupplier.apply(kladd) == null) {
                 //TODO når verifisert i prod, gjør om logging til å kaste exceptions
-                logger.info("Etterspurte {}, men fikk ikke dette fra fagsystemet", tillegsinformasjon);
+                LOG.info("Etterspurte {}, men fikk ikke dette fra fagsystemet", tillegsinformasjon);
             }
         }
     }

@@ -25,7 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste.Automa
 @ApplicationScoped
 public class FaktaFeilutbetalingSteg implements BehandlingSteg {
 
-    private static final Logger logger = LoggerFactory.getLogger(FaktaFeilutbetalingSteg.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FaktaFeilutbetalingSteg.class);
 
     private BehandlingRepository behandlingRepository;
     private AutomatiskFaktaFastsettelseTjeneste faktaFastsettelseTjeneste;
@@ -54,7 +54,7 @@ public class FaktaFeilutbetalingSteg implements BehandlingSteg {
     }
 
     protected void utførStegAutomatisk(Behandling behandling) {
-        logger.info("utfører fakta steg automatisk for behandling={}", behandling.getId());
+        LOG.info("utfører fakta steg automatisk for behandling={}", behandling.getId());
         faktaFastsettelseTjeneste.fastsettFaktaAutomatisk(behandling, AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE);
     }
 

@@ -30,7 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 @Disabled("Kjøres ved behov for å regenerere dokumentasjon")
 class DokumentasjonGeneratorVedtakOppsummeringTest {
 
-    private final static LocalDate JANUAR_15 = LocalDate.of(2020, 1, 15);
+    private static final LocalDate JANUAR_15 = LocalDate.of(2020, 1, 15);
 
     private static List<VedtakResultatType> tilbakekrevingsResultat = new ArrayList<>();
 

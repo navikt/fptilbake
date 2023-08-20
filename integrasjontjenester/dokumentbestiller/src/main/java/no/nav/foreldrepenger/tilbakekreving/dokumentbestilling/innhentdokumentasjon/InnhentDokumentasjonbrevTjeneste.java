@@ -28,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBre
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 
 @ApplicationScoped
 public class InnhentDokumentasjonbrevTjeneste {
@@ -110,7 +111,7 @@ public class InnhentDokumentasjonbrevTjeneste {
         Språkkode mottakersSpråkkode = hentSpråkkode(behandling.getId());
         FagsakYtelseType ytelseType = behandling.getFagsak().getFagsakYtelseType();
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(ytelseType, mottakersSpråkkode);
-        Period brukersSvarfrist = eksternDataForBrevTjeneste.getBrukersSvarfrist();
+        Period brukersSvarfrist = Frister.BRUKER_TILSVAR;
 
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())

@@ -1,12 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt;
 
 import java.time.LocalDateTime;
-import java.time.Period;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
@@ -17,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.D
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
+import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -26,29 +25,28 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendManueltVarselbrevTask implements ProsessTaskHandler {
 
+    public static final String MAL_TYPE = "malType";
+
     private final BehandlingRepository behandlingRepository;
     private final VergeRepository vergeRepository;
 
     private final ManueltVarselBrevTjeneste manueltVarselBrevTjeneste;
     private final BehandlingskontrollTjeneste behandlingskontrollTjeneste;
-    private final Period ventefrist;
 
     @Inject
     public SendManueltVarselbrevTask(BehandlingRepositoryProvider repositoryProvider,
                                      ManueltVarselBrevTjeneste manueltVarselBrevTjeneste,
-                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste,
-                                     @KonfigVerdi(value = "behandling.venter.frist.lengde", defaultVerdi = "P3W") Period ventefrist) {
+                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.vergeRepository = repositoryProvider.getVergeRepository();
         this.manueltVarselBrevTjeneste = manueltVarselBrevTjeneste;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
-        this.ventefrist = ventefrist;
     }
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         var behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
-        var malType = DokumentMalType.fraKode(prosessTaskData.getPropertyValue(TaskProperty.MAL_TYPE));
+        var malType = DokumentMalType.fraKode(prosessTaskData.getPropertyValue(MAL_TYPE));
         var friTekst = prosessTaskData.getPayloadAsString();
         // sjekk om behandlingen har verge
         var finnesVerge = vergeRepository.finnesVerge(behandlingId);
@@ -64,7 +62,7 @@ public class SendManueltVarselbrevTask implements ProsessTaskHandler {
             manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, friTekst, BrevMottaker.BRUKER);
         }
 
-        var fristTid = LocalDateTime.now().plus(ventefrist).plusDays(1);
+        var fristTid = LocalDateTime.now().plus(Frister.BEHANDLING_TILSVAR).plusDays(1);
         var behandling = behandlingRepository.hentBehandling(behandlingId);
         behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
                 fristTid, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);

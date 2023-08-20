@@ -24,7 +24,7 @@ import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
     scopesProperty = "dokdist.scopes", scopesDefault = "api://prod-fss.teamdokumenthandtering.saf/.default")
 public class DokdistKlient {
 
-    private static final Logger logger = LoggerFactory.getLogger(DokdistKlient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DokdistKlient.class);
 
     private final RestClient restClient;
     private final RestConfig restConfig;
@@ -53,7 +53,7 @@ public class DokdistKlient {
             distribusjonstype,
             Distribusjonstidspunkt.KJERNETID);
         DistribuerJournalpostResponse response = distribuerJournalpost(request);
-        logger.info("Bestilt distribusjon av journalpost til {}, bestillingId ble {}", mottaker, response.bestillingsId());
+        LOG.info("Bestilt distribusjon av journalpost til {}, bestillingId ble {}", mottaker, response.bestillingsId());
     }
 
     private String getBestillendeFagsystem() {

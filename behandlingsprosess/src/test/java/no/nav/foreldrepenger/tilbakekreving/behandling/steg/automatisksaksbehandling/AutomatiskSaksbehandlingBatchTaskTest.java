@@ -10,7 +10,6 @@ import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
@@ -72,7 +71,7 @@ class AutomatiskSaksbehandlingBatchTaskTest {
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         automatiskSaksbehandlingRepository = new AutomatiskSaksbehandlingRepository(entityManager);
-        automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, clock, Period.ofWeeks(-1));
+        automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, clock);
         behandling = scenarioSimple.medBehandlingType(BehandlingType.TILBAKEKREVING).lagre(repositoryProvider);
         lagKravgrunnlag(behandling.getId(), BigDecimal.valueOf(500L), behandling.getFagsak().getSaksnummer().getVerdi(),
                 123L);
@@ -96,7 +95,7 @@ class AutomatiskSaksbehandlingBatchTaskTest {
     @Test
     void skal_ikke_kjøre_batch_i_helgen() {
         var helgeClock = Clock.fixed(Instant.parse("2020-05-03T12:00:00.00Z"), ZoneId.systemDefault());
-        var automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, helgeClock, Period.ofWeeks(-1));
+        var automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, helgeClock);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
         verifyNoInteractions(taskTjeneste);
@@ -105,7 +104,7 @@ class AutomatiskSaksbehandlingBatchTaskTest {
     @Test
     void skal_ikke_kjøre_batch_hvis_hellidag() {
         var helgeClock = Clock.fixed(Instant.parse("2021-05-17T12:00:00.00Z"), ZoneId.systemDefault());
-        var automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, helgeClock, Period.ofWeeks(-1));
+        var automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, helgeClock);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
         verifyNoInteractions(taskTjeneste);

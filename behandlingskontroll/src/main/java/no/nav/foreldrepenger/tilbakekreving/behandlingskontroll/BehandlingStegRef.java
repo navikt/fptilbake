@@ -69,7 +69,7 @@ public @interface BehandlingStegRef {
     }
 
     @SuppressWarnings("unchecked")
-    public final static class Lookup {
+    public static final  class Lookup {
 
         private Lookup() {
         }

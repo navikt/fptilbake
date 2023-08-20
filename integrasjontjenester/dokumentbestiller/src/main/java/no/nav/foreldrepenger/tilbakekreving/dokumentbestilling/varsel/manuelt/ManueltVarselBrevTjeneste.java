@@ -34,6 +34,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.Tekstforma
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevSamletInfo;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevUtil;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 
 @ApplicationScoped
 public class ManueltVarselBrevTjeneste {
@@ -156,7 +157,7 @@ public class ManueltVarselBrevTjeneste {
         FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtelseType, mottakersSpråkkode);
 
-        Period ventetid = eksternDataForBrevTjeneste.getBrukersSvarfrist();
+        Period ventetid = Frister.BRUKER_TILSVAR;
 
         //Henter feilutbetaling fakta
         BehandlingFeilutbetalingFakta feilutbetalingFakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandling.getId());

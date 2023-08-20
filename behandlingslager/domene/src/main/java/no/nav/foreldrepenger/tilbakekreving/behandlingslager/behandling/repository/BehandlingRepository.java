@@ -29,6 +29,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 public class BehandlingRepository {
 
     public static final String KEY_FAGSAK_ID = "fagsakId";
+    public static final String KEY_SAKSNUMMER = "saksnummer";
     private static final String KEY_BEHANDLING_TYPE = "behandlingType";
 
     private EntityManager entityManager;
@@ -62,12 +63,12 @@ public class BehandlingRepository {
     }
 
     public List<Behandling> hentAlleBehandlingerForSaksnummer(Saksnummer saksnummer) {
-        Objects.requireNonNull(saksnummer, "saksnummer"); //$NON-NLS-1$
+        Objects.requireNonNull(saksnummer, KEY_SAKSNUMMER); //$NON-NLS-1$
 
         TypedQuery<Behandling> query = getEntityManager().createQuery(
                 "SELECT beh from Behandling beh, Fagsak fagsak WHERE beh.fagsak.id=fagsak.id AND fagsak.saksnummer=:saksnummer", //$NON-NLS-1$
                 Behandling.class);
-        query.setParameter("saksnummer", saksnummer); //$NON-NLS-1$
+        query.setParameter(KEY_SAKSNUMMER, saksnummer); //$NON-NLS-1$
         return query.getResultList();
     }
 
@@ -77,7 +78,7 @@ public class BehandlingRepository {
                 WHERE f.saksnummer = :saksnummer
                 AND beh.status <>'AVSLU'
                 AND beh.behandlingType='BT-007'""", Behandling.class);
-        query.setParameter("saksnummer", saksnummer);
+        query.setParameter(KEY_SAKSNUMMER, saksnummer);
         return hentUniktResultat(query);
     }
 
@@ -235,7 +236,7 @@ public class BehandlingRepository {
     }
 
     public void avbrytÅpentAksjonspunktForAvsluttetBehandling() {
-        var antall = entityManager.createNativeQuery("""
+        entityManager.createNativeQuery("""
                     update aksjonspunkt
                     set aksjonspunkt_status = :avbrutt
                     where aksjonspunkt_status = :opprettet and behandling_id in (select id from behandling where behandling_status = :avsluttet)
