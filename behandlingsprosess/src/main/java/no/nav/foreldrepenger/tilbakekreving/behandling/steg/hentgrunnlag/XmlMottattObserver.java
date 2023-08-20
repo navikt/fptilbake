@@ -1,8 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag;
 
-import static no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty.ROOT_ELEMENT_KRAVGRUNNLAG_XML;
-import static no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty.ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.control.ActivateRequestContext;
 import javax.enterprise.event.Observes;
@@ -14,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.LesKravgrunnlagTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.LesKravvedtakStatusTask;
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer.XmlMottattEvent;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -44,9 +42,9 @@ public class XmlMottattObserver {
         var innhold = event.mottattXml();
         var mottattXmlId = økonomiMottattXmlRepository.lagreMottattXml(innhold);
 
-        if (innhold.contains(ROOT_ELEMENT_KRAVGRUNNLAG_XML)) {
+        if (innhold.contains(TaskProperties.ROOT_ELEMENT_KRAVGRUNNLAG_XML)) {
             lagreProsesTask(mottattXmlId, TaskType.forProsessTask(LesKravgrunnlagTask.class));
-        } else if (innhold.contains(ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML)) {
+        } else if (innhold.contains(TaskProperties.ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML)) {
             lagreProsesTask(mottattXmlId, TaskType.forProsessTask(LesKravvedtakStatusTask.class));
         } else {
             log.error("Mottok XML som ikke ble forstått, mottattXmlId={}", mottattXmlId);
@@ -55,7 +53,7 @@ public class XmlMottattObserver {
 
     private void lagreProsesTask(Long mottattXmlId, TaskType taskType) {
         var lesXmlTask = ProsessTaskData.forTaskType(taskType);
-        lesXmlTask.setProperty(TaskProperty.PROPERTY_MOTTATT_XML_ID, Long.toString(mottattXmlId));
+        lesXmlTask.setProperty(TaskProperties.PROPERTY_MOTTATT_XML_ID, Long.toString(mottattXmlId));
         taskTjeneste.lagre(lesXmlTask);
     }
 }

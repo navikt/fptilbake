@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status;
+package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -11,14 +11,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import no.nav.vedtak.exception.TekniskException;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravVedtakStatusTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -36,6 +35,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
+import no.nav.vedtak.exception.TekniskException;
 
 @ExtendWith(MockitoExtension.class)
 class KravVedtakStatusTjenesteTest {
@@ -53,7 +53,8 @@ class KravVedtakStatusTjenesteTest {
 
     @BeforeEach
     void setUp() {
-        kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, null, behandlingRepository, grunnlagRepository, null, behandlingskontrollTjeneste);
+        kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, null, behandlingRepository, grunnlagRepository,
+            behandlingskontrollTjeneste);
     }
 
     @Test

@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
@@ -43,7 +43,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class HentKravgrunnlagTask implements ProsessTaskHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(HentKravgrunnlagTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HentKravgrunnlagTask.class);
 
     private BehandlingRepositoryProvider repositoryProvider;
     private KravgrunnlagRepository grunnlagRepository;
@@ -76,7 +76,7 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         Behandling behandling = repositoryProvider.getBehandlingRepository().hentBehandling(behandlingId);
-        Long origBehandlingId = Long.valueOf(prosessTaskData.getPropertyValue(TaskProperty.PROPERTY_ORIGINAL_BEHANDLING_ID));
+        Long origBehandlingId = Long.valueOf(prosessTaskData.getPropertyValue(TaskProperties.PROPERTY_ORIGINAL_BEHANDLING_ID));
 
         Kravgrunnlag431 kravgrunnlag431 = hentNyttKravgrunnlag(origBehandlingId);
 
@@ -121,7 +121,7 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
         Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDto = eksternBehandlinger.stream()
                 .filter(eksternBehandling -> grunnlagHenvisning.equals(eksternBehandling.getHenvisning())).findFirst();
         if (eksternBehandlingsinfoDto.isPresent()) {
-            logger.info("Oppdaterer EksternBehandling henvisning={} for behandlingId={}", grunnlagHenvisning, behandling.getId());
+            LOG.info("Oppdaterer EksternBehandling henvisning={} for behandlingId={}", grunnlagHenvisning, behandling.getId());
             EksternBehandlingsinfoDto eksternBehandlingDto = eksternBehandlingsinfoDto.get();
             EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingDto.getHenvisning(), eksternBehandlingDto.getUuid());
             eksternBehandlingRepository.lagre(eksternBehandling);

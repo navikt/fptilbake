@@ -16,9 +16,9 @@ import no.nav.vedtak.felles.jpa.HibernateVerktøy;
 @Dependent
 public class BeregningsresultatRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(BeregningsresultatRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BeregningsresultatRepository.class);
 
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     @Inject
     public BeregningsresultatRepository(EntityManager entityManager) {
@@ -41,9 +41,9 @@ public class BeregningsresultatRepository {
             }
             entityManager.persist(kobling);
             entityManager.flush();
-            logger.info("Lagret beregningsresultat for behandlingId={}", behandlingId);
+            LOG.info("Lagret beregningsresultat for behandlingId={}", behandlingId);
         } else {
-            logger.info("Lagret ikke beregningsresultat for behandlingId={}, det var ingen endring fra forrige", behandlingId);
+            LOG.info("Lagret ikke beregningsresultat for behandlingId={}, det var ingen endring fra forrige", behandlingId);
         }
     }
 

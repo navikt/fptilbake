@@ -383,10 +383,10 @@
                 <version>0.1.55</version>
             </dependency>
             <dependency>
-                <!-- denne tas inn av com.ibm.mq.jakarta.client, overstyrer med nyere versjon -->
+                <!-- denne tas inn av com.ibm.mq.jakarta.client, overstyrer med nyere versjon. Trengs denne? -->
                 <groupId>org.json</groupId>
                 <artifactId>json</artifactId>
-                <version>20230227</version>
+                <version>20230618</version>
             </dependency>
             <dependency>
                 <groupId>org.xerial.snappy</groupId>

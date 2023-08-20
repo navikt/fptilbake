@@ -1,12 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon;
 
 import java.time.LocalDateTime;
-import java.time.Period;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -17,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
+import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -31,18 +30,15 @@ public class InnhentDokumentasjonbrevTask implements ProsessTaskHandler {
 
     private InnhentDokumentasjonbrevTjeneste innhentDokumentasjonBrevTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
-    private Period ventefrist;
 
     @Inject
     public InnhentDokumentasjonbrevTask(BehandlingRepositoryProvider repositoryProvider,
                                         InnhentDokumentasjonbrevTjeneste innhentDokumentasjonBrevTjeneste,
-                                        BehandlingskontrollTjeneste behandlingskontrollTjeneste,
-                                        @KonfigVerdi(value = "behandling.venter.frist.lengde") Period ventefrist) {
+                                        BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.vergeRepository = repositoryProvider.getVergeRepository();
         this.innhentDokumentasjonBrevTjeneste = innhentDokumentasjonBrevTjeneste;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
-        this.ventefrist = ventefrist;
     }
 
     @Override
@@ -55,7 +51,7 @@ public class InnhentDokumentasjonbrevTask implements ProsessTaskHandler {
         }
         innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, friTekst, BrevMottaker.BRUKER);
 
-        LocalDateTime fristTid = LocalDateTime.now().plus(ventefrist).plusDays(1);
+        LocalDateTime fristTid = LocalDateTime.now().plus(Frister.BEHANDLING_TILSVAR).plusDays(1);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
                 fristTid, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);

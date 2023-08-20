@@ -6,12 +6,16 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravVedtakStatusTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.FagsystemId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -29,6 +33,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste;
     private KravVedtakStatusMapper statusMapper;
+    private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
 
 
     LesKravvedtakStatusTask() {
@@ -40,16 +45,18 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
                                    BehandlingRepository behandlingRepository,
                                    KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
                                    KravVedtakStatusMapper statusMapper,
-                                   FagsystemKlient fagsystemKlient) {
+                                   FagsystemKlient fagsystemKlient,
+                                   HenleggBehandlingTjeneste henleggBehandlingTjeneste) {
         super(behandlingRepository, fagsystemKlient);
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
         this.kravVedtakStatusTjeneste = kravVedtakStatusTjeneste;
         this.statusMapper = statusMapper;
+        this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
     }
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        var mottattXmlId = Long.valueOf(prosessTaskData.getPropertyValue(TaskProperty.PROPERTY_MOTTATT_XML_ID));
+        var mottattXmlId = Long.valueOf(prosessTaskData.getPropertyValue(TaskProperties.PROPERTY_MOTTATT_XML_ID));
         LOG_CONTEXT.add("mottattXmlId", mottattXmlId);
         var råXml = økonomiMottattXmlRepository.hentMottattXml(mottattXmlId);
 
@@ -69,6 +76,9 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
             var behandlingId = åpenTilbakekrevingBehandling.get().getId();
             LOG_CONTEXT.add("behandling", behandlingId);
             kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(behandlingId, kravVedtakStatus437);
+            if (KravStatusKode.AVSLUTTET.equals(kravVedtakStatus437.getKravStatusKode())) {
+                henleggBehandlingTjeneste.henleggBehandling(behandlingId, BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT);
+            }
             økonomiMottattXmlRepository.opprettTilkobling(mottattXmlId);
             LOG.info("Koblet statusmelding til behandling {}", behandlingId);
         } else {

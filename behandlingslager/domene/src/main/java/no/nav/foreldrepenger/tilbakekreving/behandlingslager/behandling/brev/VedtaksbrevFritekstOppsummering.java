@@ -33,6 +33,7 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
     private long versjon;
 
     public VedtaksbrevFritekstOppsummering() {
+        // Hibernate
     }
 
     public Long getId() {

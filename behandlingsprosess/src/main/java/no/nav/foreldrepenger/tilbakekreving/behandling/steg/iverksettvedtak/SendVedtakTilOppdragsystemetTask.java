@@ -29,7 +29,7 @@ import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(SendVedtakTilOppdragsystemetTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SendVedtakTilOppdragsystemetTask.class);
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private EntityManager entityManager;
@@ -77,7 +77,7 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
             //setter før kall til OS, slik at kvittering-status blir lagret selv om kallet feiler
             try {
                 økonomiProxyKlient.iverksettTilbakekrevingsvedtak(tilbakekrevingsvedtak);
-                logger.info("Tilbakekrevingsvedtak sendt OK til oppdragsystemet via fpwsproxy. BehandlingId={}", behandlingId);
+                LOG.info("Tilbakekrevingsvedtak sendt OK til oppdragsystemet via fpwsproxy. BehandlingId={}", behandlingId);
                 oppdragIverksettingStatusRepository.registrerKvittering(behandlingId, true);
             } catch (UkjentKvitteringFraOSException e) {
                 oppdragIverksettingStatusRepository.registrerKvittering(behandlingId, false);

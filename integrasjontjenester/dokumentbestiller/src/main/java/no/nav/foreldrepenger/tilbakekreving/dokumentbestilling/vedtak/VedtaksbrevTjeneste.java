@@ -104,7 +104,7 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 @Transactional
 public class VedtaksbrevTjeneste {
 
-    private static final Logger logger = LoggerFactory.getLogger(VedtaksbrevTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(VedtaksbrevTjeneste.class);
 
     private static final String TITTEL_VEDTAK_TILBAKEBETALING = "Vedtak tilbakebetaling ";
     private static final String TITTEL_VEDTAK_INGEN_TILBAKEBETALING = "Vedtak ingen tilbakebetaling ";
@@ -538,7 +538,7 @@ public class VedtaksbrevTjeneste {
         List<VilkårVurderingAktsomhetEntitet> aktsomhetVurderinger = vilkårvurdering.stream()
                 .map(VilkårVurderingPeriodeEntitet::getAktsomhet)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
 
         if (!aktsomhetVurderinger.isEmpty()) {
             boolean unntasInnkrevingPgaLavtBeløp = Boolean.FALSE.equals(hent(aktsomhetVurderinger, VilkårVurderingAktsomhetEntitet::getTilbakekrevSmåBeløp, periode, "småbeløp"));
@@ -556,7 +556,7 @@ public class VedtaksbrevTjeneste {
         List<VilkårVurderingGodTroEntitet> godTroVurderinger = vilkårvurdering.stream()
                 .map(VilkårVurderingPeriodeEntitet::getGodTro)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
 
         if (!godTroVurderinger.isEmpty()) {
             builder.medAktsomhetResultat(AnnenVurdering.GOD_TRO);
@@ -575,7 +575,7 @@ public class VedtaksbrevTjeneste {
             return null;
         }
         if (alternativer.size() != 1) {
-            logger.warn("Forventet eksakt 1 unik, men fikk {} for {} for periode {}", Environment.current().isProd() ? alternativer.size() : alternativer, hva, p);
+            LOG.warn("Forventet eksakt 1 unik, men fikk {} for {} for periode {}", Environment.current().isProd() ? alternativer.size() : alternativer, hva, p);
         }
         return alternativer.get(0);
     }
@@ -602,7 +602,7 @@ public class VedtaksbrevTjeneste {
                 .medRenterBeløp(summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getRenteBeløp));
 
         List<VurdertForeldelsePeriode> foreldelsePerioder = finnForeldelsePerioder(foreldelse, periode);
-        boolean foreldetPeriode = !foreldelsePerioder.isEmpty() && hent(foreldelsePerioder, VurdertForeldelsePeriode::erForeldet, periode, "foreldet");
+        boolean foreldetPeriode = !foreldelsePerioder.isEmpty() && hent(foreldelsePerioder, VurdertForeldelsePeriode::erForeldet, periode, "foreldet") != null;
         if (foreldetPeriode) {
             BigDecimal feilutbetaltForPeriode = summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getFeilutbetaltBeløp);
             BigDecimal tilbakekreves = summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp);

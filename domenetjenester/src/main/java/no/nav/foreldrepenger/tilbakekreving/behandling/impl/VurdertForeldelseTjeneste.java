@@ -201,13 +201,12 @@ public class VurdertForeldelseTjeneste {
         // samme perioder med endret foreldelse vurdering type
         if (forrigeForeldelsePeriode.isPresent()) {
             harEndret = lagEndretInnslag(behandlingId, foreldelsePeriode, tekstBuilder, forrigeForeldelsePeriode.get());
-        } else if (forrigeForeldelsePeriode.isEmpty()) { // nye perioder
+            harEndret = harEndret || !foreldelsePeriode.getBegrunnelse().equals(forrigeForeldelsePeriode.get().getBegrunnelse());
+        } else { // nye perioder
             harEndret = true;
             lagNyttInnslag(foreldelsePeriode, tekstBuilder);
             // hvis saksbehandler deler opp perioder, må vi starte vilkårs på nytt
             sletteVilkårData(behandlingId);
-        } else if (!forrigeForeldelsePeriode.isEmpty() && !foreldelsePeriode.getBegrunnelse().equals(forrigeForeldelsePeriode.get().getBegrunnelse())) {
-            harEndret = true;
         }
         return harEndret;
     }

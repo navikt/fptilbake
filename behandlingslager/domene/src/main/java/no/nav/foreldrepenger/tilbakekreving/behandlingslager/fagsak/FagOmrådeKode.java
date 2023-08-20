@@ -26,14 +26,14 @@ public enum FagOmrådeKode implements Kodeverdi {
     SYKEPENGER("SP", "Sykepenger"),
     SYKEPENGER_ARBEIDSGIVER("SPREF", "Sykepenger refusjon"),
     PLEIEPENGER_V1("OOP", "Pleiepenger sykt barn"),
-    PLEIEPENGER_V1_ARBEIDSGIVER("OOPREF", "Pleiepenger sykt barn"),
+    PLEIEPENGER_V1_ARBEIDSGIVER("OOPREF", PLEIEPENGER_V1.navn),
     ENGANGSSTØNAD("REFUTG", "Engangsstønad"),
     SVANGERSKAPSPENGER("SVP", "Svangerskapspenger"),
     SVANGERSKAPSPENGER_ARBEIDSGIVER("SVPREF", "Svangerskapspenger refusjon til arbeidsgiver"),
 
     //K9
-    PLEIEPENGER_SYKT_BARN("PB", "Pleiepenger sykt barn"),
-    PLEIEPENGER_SYKT_BARN_ARBEIDSGIVER("PBREF", "Pleiepenger sykt barn"),
+    PLEIEPENGER_SYKT_BARN("PB", PLEIEPENGER_V1.navn),
+    PLEIEPENGER_SYKT_BARN_ARBEIDSGIVER("PBREF", PLEIEPENGER_V1.navn),
     PLEIEPENGER_NÆRSTÅENDE("PN", "Pleiepenger nærstående"),
     PLEIEPENGER_NÆRSTÅENDE_ARBEIDSGIVER("PNREF", "Pleiepenger nærstående"),
     OMSORGSPENGER("OM", "Omsorgspenger"),

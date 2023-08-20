@@ -18,7 +18,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @ProsessTask(value = "batch.ta.behandling.av.vent", cronExpression = "0 0 7 ? * MON-FRI")
 public class AutomatiskGjenopptaBehandlingBatchTask implements ProsessTaskHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(AutomatiskGjenopptaBehandlingBatchTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AutomatiskGjenopptaBehandlingBatchTask.class);
 
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
     private Clock clock;
@@ -44,7 +44,7 @@ public class AutomatiskGjenopptaBehandlingBatchTask implements ProsessTaskHandle
     public void doTask(ProsessTaskData prosessTaskData) {
         LocalDate iDag = LocalDate.now(clock);
         if (Helligdager.erHelligdagEllerHelg(iDag)) {
-            logger.info("I dag er helg/helligdag, kan ikke kjøre batch-en {}", this.getClass().getSimpleName());
+            LOG.info("I dag er helg/helligdag, kan ikke kjøre batch-en {}", this.getClass().getSimpleName());
         } else {
             gjenopptaBehandlingTjeneste.automatiskGjenopptaBehandlinger();
         }

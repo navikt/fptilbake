@@ -36,7 +36,7 @@ import no.nav.vedtak.exception.TekniskException;
 public class TilbakekrevingVedtakPeriodeBeregner {
 
     private static final int GRENSE_AVRUNDINGSFEIL = 5;
-    private static final Logger logger = LoggerFactory.getLogger(TilbakekrevingVedtakPeriodeBeregner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TilbakekrevingVedtakPeriodeBeregner.class);
 
     private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private VurdertForeldelseRepository vurdertForeldelseRepository;
@@ -94,7 +94,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
             if (manglerFEIL(kgPeriode)) {
                 //TODO denne blokken skal fjernes etter at PFP-9287 er løst.
                 //midlertidig kode for å fikse iverksettelse for en behandling med feil i kravgrunnlaget
-                logger.warn("Ignorerte periode {} ved iverksetting, siden hadde ingen postering med klasseType=FEIL", kgPeriode.getPeriode());
+                LOG.warn("Ignorerte periode {} ved iverksetting, siden hadde ingen postering med klasseType=FEIL", kgPeriode.getPeriode());
                 continue;
             }
             if (virkedagerOverlapp(kgPeriode.getPeriode(), bgPeriode.getPeriode(), gjelderEngangsstønad) > 0) {
@@ -433,7 +433,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
     }
 
     private static void logInfo(TekniskException e) {
-        logger.info(String.format("%s: %s", e.getKode(), e.getMessage()));
+        LOG.info(String.format("%s: %s", e.getKode(), e.getMessage()));
     }
 
     static class TilbakekrevingVedtakPeriodeBeregnerFeil {

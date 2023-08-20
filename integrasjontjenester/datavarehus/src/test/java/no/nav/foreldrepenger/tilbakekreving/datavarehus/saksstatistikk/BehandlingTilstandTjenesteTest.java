@@ -110,7 +110,6 @@ class BehandlingTilstandTjenesteTest {
 
     @Test
     void skal_utlede_behandlingstilstand_for_behandling_på_vent() {
-        System.setProperty("frist.brukerrespons.varsel", "P3W");
         behandlingTjeneste.settBehandlingPaVent(behandling.getId(), LocalDate.now().plusDays(1), Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
         entityManager.flush();
         entityManager.clear();

@@ -44,7 +44,7 @@ import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 @Produces(MediaType.APPLICATION_JSON)
 public class ForvaltningKravgrunnlagRestTjeneste {
 
-    private static final Logger logger = LoggerFactory.getLogger(ForvaltningKravgrunnlagRestTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ForvaltningKravgrunnlagRestTjeneste.class);
 
     private BehandlingRepository behandlingRepository;
     private ForvaltningTjeneste forvaltningTjeneste;
@@ -93,7 +93,6 @@ public class ForvaltningKravgrunnlagRestTjeneste {
             }
         }
 
-        logger.info("Oppretter task for å hente korrigert kravgrunnlag {} for behandlingId={}", kravgrunnlagId, behandling.getId());
         forvaltningTjeneste.hentKorrigertKravgrunnlag(behandling, kravgrunnlagId);
         return Response.ok().build();
     }
@@ -113,9 +112,9 @@ public class ForvaltningKravgrunnlagRestTjeneste {
         Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
         try {
             var behandlingId = behandling.getId();
-            logger.info("Starter Anullerekravgrunnlag for behandlingId={}", behandlingId);
+            LOG.info("Starter Anullerekravgrunnlag for behandlingId={}", behandlingId);
             forvaltningTjeneste.annullerKravgrunnlag(behandlingId);
-            logger.info("AnnulereKravgrunnlag sendt til oppdragssystemet.");
+            LOG.info("AnnulereKravgrunnlag sendt til oppdragssystemet.");
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }

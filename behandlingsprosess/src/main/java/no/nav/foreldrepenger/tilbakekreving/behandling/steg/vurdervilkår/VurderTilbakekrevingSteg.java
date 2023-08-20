@@ -33,7 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 @ApplicationScoped
 public class VurderTilbakekrevingSteg implements BehandlingSteg {
 
-    private static final Logger logger = LoggerFactory.getLogger(VurderTilbakekrevingSteg.class);
+    private static final Logger LOG = LoggerFactory.getLogger(VurderTilbakekrevingSteg.class);
 
     private VurdertForeldelseRepository vurdertForeldelseRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
@@ -71,7 +71,7 @@ public class VurderTilbakekrevingSteg implements BehandlingSteg {
 
     protected void utførStegAutomatisk(Behandling behandling) {
         long behandlingId = behandling.getId();
-        logger.info("utfører vilkår steg automatisk for behandling={}", behandlingId);
+        LOG.info("utfører vilkår steg automatisk for behandling={}", behandlingId);
         automatiskVurdertVilkårTjeneste.automatiskVurdertVilkår(behandling, AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE);
     }
 

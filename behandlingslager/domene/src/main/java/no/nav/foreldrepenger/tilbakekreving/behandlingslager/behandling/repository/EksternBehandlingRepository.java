@@ -23,6 +23,7 @@ public class EksternBehandlingRepository {
     private static final String EKSTERN_UUID = "eksternUuid";
     private static final String INTERN_ID = "internId";
     private static final String HENVISNING = "henvisning";
+    private static final String QRY_INTERINID_AKTIV = "from EksternBehandling where intern_id=:internId and aktiv='J'";
     private EntityManager entityManager;
 
     EksternBehandlingRepository() {
@@ -59,7 +60,7 @@ public class EksternBehandlingRepository {
      * @param internBehandlingId
      */
     public EksternBehandling hentFraInternId(long internBehandlingId) {
-        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and aktiv='J'", EksternBehandling.class);
+        TypedQuery<EksternBehandling> query = entityManager.createQuery(QRY_INTERINID_AKTIV, EksternBehandling.class);
         query.setParameter(INTERN_ID, internBehandlingId);
         return hentEksaktResultat(query);
     }
@@ -118,7 +119,7 @@ public class EksternBehandlingRepository {
     }
 
     public boolean finnesAktivtEksternBehandling(long internId) {
-        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and aktiv='J'", EksternBehandling.class);
+        TypedQuery<EksternBehandling> query = entityManager.createQuery(QRY_INTERINID_AKTIV, EksternBehandling.class);
         query.setParameter(INTERN_ID, internId);
         return !query.getResultList().isEmpty();
     }
@@ -143,7 +144,7 @@ public class EksternBehandlingRepository {
     }
 
     public Optional<EksternBehandling> hentOptionalFraInternId(long internBehandlingId) {
-        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and aktiv='J'", EksternBehandling.class);
+        TypedQuery<EksternBehandling> query = entityManager.createQuery(QRY_INTERINID_AKTIV, EksternBehandling.class);
         query.setParameter(INTERN_ID, internBehandlingId);
         return hentUniktResultat(query);
     }
@@ -160,9 +161,9 @@ public class EksternBehandlingRepository {
      * For idempotens-sjekk
      */
     public boolean harEksternBehandlingForEksternUuid(UUID eksternUuid) {
-        return entityManager.createQuery("from EksternBehandling where eksternUuid=:eksternUuid", EksternBehandling.class)
+        return !entityManager.createQuery("from EksternBehandling where eksternUuid=:eksternUuid", EksternBehandling.class)
                 .setParameter(EKSTERN_UUID, eksternUuid)
                 .getResultList()
-                .size() > 0;
+                .isEmpty();
     }
 }

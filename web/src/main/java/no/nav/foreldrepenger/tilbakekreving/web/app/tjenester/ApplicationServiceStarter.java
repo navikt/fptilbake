@@ -20,7 +20,7 @@ import no.nav.vedtak.log.metrics.Controllable;
 
 @ApplicationScoped
 public class ApplicationServiceStarter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationServiceStarter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationServiceStarter.class);
 
     private Set<Controllable> services;
 
@@ -46,17 +46,17 @@ public class ApplicationServiceStarter {
         DefaultExports.initialize();
 
         // Services
-        LOGGER.info("Starter {} services", services.size());
+        LOG.info("Starter {} services", services.size());
         CompletableFuture.allOf(services.stream().map(service -> runAsync(service::start)).toArray(CompletableFuture[]::new)).join();
-        LOGGER.info("Startet {} services", services.size());
+        LOG.info("Startet {} services", services.size());
     }
 
     public void stopServices() {
-        LOGGER.info("Stopper {} services", services.size());
+        LOG.info("Stopper {} services", services.size());
         CompletableFuture.allOf(services.stream().map(service -> runAsync(service::stop)).toArray(CompletableFuture[]::new))
             .orTimeout(31, TimeUnit.SECONDS)
             .join();
-        LOGGER.info("Stoppet {} services", services.size());
+        LOG.info("Stoppet {} services", services.size());
     }
 
     @Override

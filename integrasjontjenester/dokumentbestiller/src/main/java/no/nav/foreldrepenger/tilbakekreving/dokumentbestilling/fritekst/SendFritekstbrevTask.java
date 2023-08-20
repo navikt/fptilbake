@@ -20,7 +20,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @ProsessTask("brev.fritekstbrev")
 public class SendFritekstbrevTask implements ProsessTaskHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(SendFritekstbrevTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SendFritekstbrevTask.class);
 
     private FritekstbrevTjeneste fritekstbrevTjeneste;
 
@@ -38,7 +38,7 @@ public class SendFritekstbrevTask implements ProsessTaskHandler {
         BrevMottaker brevMottaker = BrevMottaker.valueOf(prosessTaskData.getPropertyValue("mottaker"));
 
         fritekstbrevTjeneste.sendFritekstbrev(behandlingId, tittel, overskrift, fritekst, brevMottaker);
-        logger.info("Sendte fritekstbrev til {} for {}", brevMottaker, behandlingId);
+        LOG.info("Sendte fritekstbrev til {} for {}", brevMottaker, behandlingId);
     }
 
     private static String base64decode(String base64) {

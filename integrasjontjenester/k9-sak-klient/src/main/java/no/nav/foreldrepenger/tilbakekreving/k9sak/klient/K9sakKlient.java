@@ -44,7 +44,7 @@ import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
     endpointDefault = "http://k9-sak", endpointProperty = "k9sak.url")
 public class K9sakKlient implements FagsystemKlient {
 
-    private static final Logger logger = LoggerFactory.getLogger(K9sakKlient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(K9sakKlient.class);
 
     private static final String K9SAK_BASE_URL = "http://k9-sak";
     private static final String K9SAK_OVERRIDE_URL = "k9sak.override.url";
@@ -230,7 +230,7 @@ public class K9sakKlient implements FagsystemKlient {
     private URI baseUri() {
         String override = Environment.current().getProperty(K9SAK_OVERRIDE_URL);
         if (override != null && !override.isEmpty()) {
-            logger.info("Overstyrer k9sak base URL med {}", override);
+            LOG.info("Overstyrer k9sak base URL med {}", override);
             return URI.create(override);
         }
         return URI.create(K9SAK_BASE_URL);

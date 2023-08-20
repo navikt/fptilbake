@@ -39,7 +39,7 @@ public class BrevSporing extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    public BrevSporing() {
+    private BrevSporing() {
     }
 
     public String getDokumentId() {
@@ -80,7 +80,7 @@ public class BrevSporing extends BaseEntitet {
 
     public static class Builder {
 
-        private BrevSporing brevSporing = new BrevSporing();
+        private final BrevSporing brevSporing = new BrevSporing();
 
         public BrevSporing.Builder medBehandlingId(Long behandlingId) {
             brevSporing.behandlingId = behandlingId;

@@ -31,7 +31,7 @@ import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
 @K9tilbake
 public class K9PdpRequestBuilder implements PdpRequestBuilder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(K9PdpRequestBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(K9PdpRequestBuilder.class);
 
     public static final String ABAC_DOMAIN = "k9";
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
@@ -119,7 +119,7 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
             build.getFødselsnumre().size()
         );
 
-        LOGGER.info(melding);
+        LOG.info(melding);
     }
 
     private Optional<String> utledSaksnummer(AbacDataAttributter attributter, PipBehandlingInfo behandlingData) {

@@ -28,7 +28,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @ProsessTask(value = "batch.avstemming", cronExpression = "0 55 6 ? * * ")
 public class AvstemmingBatchTask implements ProsessTaskHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(AvstemmingBatchTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AvstemmingBatchTask.class);
 
     private static final String APPNAME = ApplicationName.hvilkenTilbakeAppName();
     private static final DateTimeFormatter DATO_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -58,7 +58,7 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         String batchRun = this.getClass().getSimpleName() + "-" + UUID.randomUUID();
         LocalDate dato = LocalDate.now().minusDays(1);
-        logger.info("Kjører avstemming for {} i batch {}", dato, batchRun);
+        LOG.info("Kjører avstemming for {} i batch {}", dato, batchRun);
 
         Optional<String> resultat = oppsummer(dato);
 
@@ -68,7 +68,7 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
             String filnavn = String.format(FILNAVN_MAL, APPNAME, miljø, forDato, kjøreTidspunkt);
             try {
                 sftpBatchTjeneste.put(resultat.get(), filnavn);
-                logger.info("Filen {} er overført til avstemming sftp", filnavn);
+                LOG.info("Filen {} er overført til avstemming sftp", filnavn);
             } catch (JSchException | SftpException e) {
                 throw new IntegrasjonException("FPT-614386", String.format("Overføring av fil [%s] til avstemming feilet.", filnavn), e);
             }
@@ -80,7 +80,7 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
 
         avstemFraResultatOgIverksettingStatusTjeneste.leggTilOppsummering(dato, avstemmingCsvFormatter);
 
-        logger.info("Sender {} vedtak til avstemming for {}", avstemmingCsvFormatter.getAntallRader(), dato);
+        LOG.info("Sender {} vedtak til avstemming for {}", avstemmingCsvFormatter.getAntallRader(), dato);
 
         if (avstemmingCsvFormatter.getAntallRader() == 0) {
             return Optional.empty();

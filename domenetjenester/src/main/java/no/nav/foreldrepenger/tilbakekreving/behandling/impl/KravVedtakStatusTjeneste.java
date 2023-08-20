@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status;
+package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import java.time.LocalDateTime;
 
@@ -8,10 +8,8 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
@@ -35,7 +33,6 @@ public class KravVedtakStatusTjeneste {
     private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private ProsessTaskTjeneste taskTjeneste;
-    private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
     KravVedtakStatusTjeneste() {
@@ -47,13 +44,11 @@ public class KravVedtakStatusTjeneste {
                                     ProsessTaskTjeneste taskTjeneste,
                                     BehandlingRepository behandlingRepository,
                                     KravgrunnlagRepository kravgrunnlagRepository,
-                                    HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.kravVedtakStatusRepository = kravVedtakStatusRepository;
         this.taskTjeneste = taskTjeneste;
         this.behandlingRepository = behandlingRepository;
         this.grunnlagRepository = kravgrunnlagRepository;
-        this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }
 
@@ -63,7 +58,7 @@ public class KravVedtakStatusTjeneste {
         switch (statusKode) {
             case MANUELL, SPERRET -> sperrGrunnlagOgSettPåVent(behandlingId, statusKode);
             case ENDRET -> håndteresEndretStatusMelding(behandlingId, statusKode.getKode());
-            case AVSLUTTET -> getHenleggBehandling(behandlingId);
+            case AVSLUTTET -> { } // NOSONAR intentional noop
             default -> throw new TekniskException("FPT-107928",
                 String.format("Har fått ugyldig status kode %s fra økonomisystem, kan ikke aksepteres for behandlingId '%s'",
                     statusKode.getKode(), behandlingId));
@@ -123,10 +118,6 @@ public class KravVedtakStatusTjeneste {
         taskData.setCallIdFraEksisterende();
         taskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
         taskTjeneste.lagre(taskData);
-    }
-
-    private void getHenleggBehandling(Long behandlingId) {
-        henleggBehandlingTjeneste.henleggBehandling(behandlingId, BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT);
     }
 
 }

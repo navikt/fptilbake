@@ -1,10 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
-import static no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingUtil.bestemFristForBehandlingVent;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,7 +13,6 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
@@ -51,6 +47,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VergeDto;
+import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
@@ -58,7 +55,7 @@ import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 @Transactional
 public class BehandlingTjeneste {
 
-    private static final Logger logger = LoggerFactory.getLogger(BehandlingTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BehandlingTjeneste.class);
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
@@ -71,7 +68,6 @@ public class BehandlingTjeneste {
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
     private FagsystemKlient fagsystemKlient;
 
-    private Period defaultVentefrist;
 
     BehandlingTjeneste() {
         // CDI
@@ -82,14 +78,12 @@ public class BehandlingTjeneste {
                               BehandlingskontrollProvider behandlingskontrollProvider,
                               FagsakTjeneste fagsakTjeneste,
                               HistorikkinnslagTjeneste historikkinnslagTjeneste,
-                              FagsystemKlient fagsystemKlient,
-                              @KonfigVerdi("frist.brukerrespons.varsel") Period defaultVentefrist) {
+                              FagsystemKlient fagsystemKlient) {
         this.behandlingskontrollTjeneste = behandlingskontrollProvider.getBehandlingskontrollTjeneste();
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollProvider.getBehandlingskontrollAsynkTjeneste();
         this.fagsakTjeneste = fagsakTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
         this.fagsystemKlient = fagsystemKlient;
-        this.defaultVentefrist = defaultVentefrist;
 
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
@@ -137,7 +131,7 @@ public class BehandlingTjeneste {
                                             AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                             BehandlingType behandlingType) {
         Behandling behandling = opprettFørstegangsbehandling(saksnummer, eksternUuid, henvisning, aktørId, fagsakYtelseType, behandlingType);
-        var gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
+        behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
         return behandling.getId();
     }
 
@@ -189,7 +183,8 @@ public class BehandlingTjeneste {
     }
 
     private void doSetBehandlingPåVent(Long behandlingId, AksjonspunktDefinisjon apDef, LocalDate frist, Venteårsak venteårsak) {
-        LocalDateTime fristTid = bestemFristForBehandlingVent(frist, defaultVentefrist);
+        LocalDateTime fristTid = frist != null ?
+            LocalDateTime.of(frist, LocalDateTime.now().toLocalTime()) : LocalDateTime.now().plus(Frister.BEHANDLING_DEFAULT);
 
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
 
@@ -206,7 +201,6 @@ public class BehandlingTjeneste {
 
 
     private Behandling opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, Henvisning henvisning, AktørId aktørId, FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
-        logger.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternUuid);
         validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer, eksternUuid);
         boolean manueltOpprettet = false;
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto;
@@ -219,6 +213,8 @@ public class BehandlingTjeneste {
         } else {
             eksternBehandlingsinfoDto = fagsystemKlient.hentBehandling(eksternUuid);
         }
+        LOG.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternBehandlingsinfoDto.getUuid());
+
         henvisning = hentHenvisningHvisIkkeFinnes(henvisning, eksternBehandlingsinfoDto);
 
         Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, fagsakYtelseType, eksternBehandlingsinfoDto.getSpråkkodeEllerDefault());
@@ -299,7 +295,7 @@ public class BehandlingTjeneste {
     //TODO verge bør flyttes til egen tjeneste, aller helst i eget 'hent fra saksbehandlingssystemet-steg'
     private void lagreVergeInformasjon(long behandlingId, VergeDto vergeDto) {
         if (vergeDto.getGyldigTom().isBefore(LocalDate.now())) {
-            logger.info("Verge informasjon er utløpt.Så kopierer ikke fra fpsak");
+            LOG.info("Verge informasjon er utløpt.Så kopierer ikke fra fpsak");
         } else {
             VergeEntitet.Builder builder = VergeEntitet.builder().medVergeType(vergeDto.getVergeType())
                     .medKilde(KildeType.FPSAK.name())

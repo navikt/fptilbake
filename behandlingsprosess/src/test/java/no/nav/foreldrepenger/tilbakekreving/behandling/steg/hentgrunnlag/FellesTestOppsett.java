@@ -24,6 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.GjenopptaBehandlingM
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.LesKravgrunnlagTask;
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
@@ -152,7 +153,7 @@ public abstract class FellesTestOppsett {
 
     public ProsessTaskData lagProsessTaskData(Long mottattXmlId, TaskType taskType) {
         ProsessTaskData prosessTaskData = ProsessTaskData.forTaskType(taskType);
-        prosessTaskData.setProperty(TaskProperty.PROPERTY_MOTTATT_XML_ID, String.valueOf(mottattXmlId));
+        prosessTaskData.setProperty(TaskProperties.PROPERTY_MOTTATT_XML_ID, String.valueOf(mottattXmlId));
         return prosessTaskData;
     }
 }

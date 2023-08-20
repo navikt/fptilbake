@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstKonfigurasjon;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstValidator;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbBehandling;
@@ -24,7 +24,7 @@ public class VedtaksbrevFritekst {
                 vurderinger.setFritekstForeldelse(markerValgfriFritekst(vurderinger.getFritekstForeldelse(), Underavsnitt.Underavsnittstype.FORELDELSE));
                 vurderinger.setFritekstVilkår(markerValgfriFritekst(vurderinger.getFritekstVilkår(), Underavsnitt.Underavsnittstype.VILKÅR));
             }
-            HbSærligeGrunner sg = vurderinger.getSærligeGrunner();
+            HbSærligeGrunner sg = vurderinger != null ? vurderinger.getSærligeGrunner() : null;
             if (sg != null) {
                 sg.setFritekstSærligeGrunner(markerValgfriFritekst(sg.getFritekstSærligeGrunner(), Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER));
                 sg.setFritekstSærligeGrunnerAnnet(markerPåkrevetFritekst(sg.getFritekstSærligeGrunnerAnnet(), Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET));
@@ -40,7 +40,7 @@ public class VedtaksbrevFritekst {
     }
 
     private static FritekstType utledFritekstTypeFakta(HendelseUnderType underType) {
-        return VedtaksbrevFritekstKonfigurasjon.UNDERTYPER_MED_PÅKREVD_FRITEKST.contains(underType) ? FritekstType.PÅKREVET : FritekstType.VALGFRI;
+        return VedtaksbrevFritekstValidator.UNDERTYPER_MED_PÅKREVD_FRITEKST.contains(underType) ? FritekstType.PÅKREVET : FritekstType.VALGFRI;
     }
 
     static String markerValgfriFritekst(String fritekst) {

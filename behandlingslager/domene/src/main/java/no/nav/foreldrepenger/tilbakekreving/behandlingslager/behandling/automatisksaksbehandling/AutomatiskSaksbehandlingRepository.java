@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.automatisksaksbehandling;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -13,6 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
+import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 import no.nav.foreldrepenger.tilbakekreving.felles.Satser;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 
@@ -28,6 +30,10 @@ public class AutomatiskSaksbehandlingRepository {
     @Inject
     public AutomatiskSaksbehandlingRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
+    }
+
+    public static Period getKravgrunnlagAlderNårGammel() {
+        return Frister.KRAVGRUNNLAG_ALDER_GAMMELT;
     }
 
     public List<Behandling> hentAlleBehandlingerSomErKlarForAutomatiskSaksbehandling(LocalDate bestemtDato) {
@@ -46,7 +52,8 @@ public class AutomatiskSaksbehandlingRepository {
                 and b.ansvarligSaksbehandler is null
                 and b.status=:behandlingStatus
                 and b.behandlingType in (:behandlingTyper)
-                and grunn.aktiv='J'
+                and grunn.sperret=:sperret
+                and grunn.aktiv=:aktiv
                 and NOT EXISTS (select id from BrevSporing brev where brev.behandlingId = b.id)
                 and to_timestamp(kravgrunnlag.kontrollFelt,'YYYY-MM-DD-HH24.mi.ss.ff') < to_timestamp(:bestemtDato)
                 and beløp.klasseType=:klasseType
@@ -69,10 +76,12 @@ public class AutomatiskSaksbehandlingRepository {
         query.setParameter("aksjonspunktStatus", AksjonspunktStatus.OPPRETTET);
         query.setParameter("behandlingStatus", BehandlingStatus.UTREDES);
         query.setParameter("behandlingTyper", List.of(BehandlingType.TILBAKEKREVING, BehandlingType.REVURDERING_TILBAKEKREVING));
-        query.setParameter("bestemtDato", bestemtDato.atStartOfDay());
+        query.setParameter("bestemtDato", bestemtDato.atStartOfDay().minus(getKravgrunnlagAlderNårGammel()));
         query.setParameter("klasseType", KlasseType.FEIL);
         query.setParameter("heltRettsgebyr", Satser.rettsgebyr());
         query.setParameter("halvtRettsgebyr", Satser.halvtRettsgebyr());
+        query.setParameter("aktiv", true);
+        query.setParameter("sperret", false);
         return query.getResultList();
     }
 }

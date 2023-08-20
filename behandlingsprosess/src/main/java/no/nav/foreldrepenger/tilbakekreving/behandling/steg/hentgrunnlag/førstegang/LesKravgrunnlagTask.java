@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
@@ -34,7 +34,7 @@ import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 @ProsessTask("kravgrunnlag.les")
 public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(LesKravgrunnlagTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LesKravgrunnlagTask.class);
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
@@ -62,7 +62,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        Long mottattXmlId = Long.valueOf(prosessTaskData.getPropertyValue(TaskProperty.PROPERTY_MOTTATT_XML_ID));
+        Long mottattXmlId = Long.valueOf(prosessTaskData.getPropertyValue(TaskProperties.PROPERTY_MOTTATT_XML_ID));
         LOG_CONTEXT.add("mottattXmlId", mottattXmlId);
 
         String råXml = økonomiMottattXmlRepository.hentMottattXml(mottattXmlId);
@@ -84,14 +84,14 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
             Behandling behandling = åpenTilbakekrevingBehandling.get();
             long behandlingId = behandling.getId();
             LOG_CONTEXT.add("behandling", behandlingId);
-            logger.info("Leste kravgrunnlag {}", kravgrunnlagId);
+            LOG.info("Leste kravgrunnlag {}", kravgrunnlagId);
             kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(behandlingId, kravgrunnlag, kravgrunnlagetErGyldig);
             økonomiMottattXmlRepository.opprettTilkobling(mottattXmlId);
-            logger.info("Behandling {} koblet med kravgrunnlag {}", behandlingId, kravgrunnlagId);
+            LOG.info("Behandling {} koblet med kravgrunnlag {}", behandlingId, kravgrunnlagId);
             oppdaterHenvisningFraGrunnlag(behandling, saksnummer, henvisning);
         } else {
             validerBehandlingsEksistens(henvisning, saksnummer);
-            logger.info("Ignorerte kravgrunnlag {} for sak {}. Fantes ikke en åpen tilbakekrevingsbehandling", kravgrunnlagId, saksnummer);
+            LOG.info("Ignorerte kravgrunnlag {} for sak {}. Fantes ikke en åpen tilbakekrevingsbehandling", kravgrunnlagId, saksnummer);
         }
     }
 
@@ -103,7 +103,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
             //logger feilen i kravgrunnlaget sammen med metainformasjon slik at feilen kan følges opp
             //prosessen får fortsette, slik at prosessen hopper tilbake hvis den er i fakta-steget eller senere
-            logger.warn(String.format("FPT-839288: Mottok et ugyldig kravgrunnlag for sak %s, kravgrunnlagId er %s", saksnummer, kravgrunnlag.getEksternKravgrunnlagId()), e);
+            LOG.warn(String.format("FPT-839288: Mottok et ugyldig kravgrunnlag for sak %s, kravgrunnlagId er %s", saksnummer, kravgrunnlag.getEksternKravgrunnlagId()), e);
             return false;
         }
     }
@@ -125,7 +125,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDto = eksternBehandlinger.stream()
                 .filter(eksternBehandling -> grunnlagHenvisning.equals(eksternBehandling.getHenvisning())).findFirst();
         if (eksternBehandlingsinfoDto.isPresent()) {
-            logger.info("Oppdaterer EksternBehandling henvisning={} for behandlingId={}", grunnlagHenvisning, behandling.getId());
+            LOG.info("Oppdaterer EksternBehandling henvisning={} for behandlingId={}", grunnlagHenvisning, behandling.getId());
             EksternBehandlingsinfoDto eksternBehandlingDto = eksternBehandlingsinfoDto.get();
             EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingDto.getHenvisning(), eksternBehandlingDto.getUuid());
             eksternBehandlingRepository.lagre(eksternBehandling);

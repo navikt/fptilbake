@@ -21,7 +21,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 @ApplicationScoped
 public class HendelseHåndtererTjeneste {
 
-    private static final Logger logger = LoggerFactory.getLogger(HendelseHåndtererTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HendelseHåndtererTjeneste.class);
 
     private ProsessTaskTjeneste taskTjeneste;
     private FagsystemKlient fagsystemKlient;
@@ -50,13 +50,13 @@ public class HendelseHåndtererTjeneste {
                 .ifPresent(tbkData -> {
                     if (erRelevantHendelseForOpprettTilbakekreving(tbkData)) {
                         if (eksternBehandlingRepository.harEksternBehandlingForEksternUuid(eksternBehandlingUuid)) {
-                            logger.info("Hendelse={} allerede opprettet tilbakekreving for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
+                            LOG.info("Hendelse={} allerede opprettet tilbakekreving for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
                         } else {
-                            logger.info("Hendelse={} er relevant for tilbakekreving opprett for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
+                            LOG.info("Hendelse={} er relevant for tilbakekreving opprett for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
                             lagOpprettBehandlingTask(hendelseTaskDataWrapper, henvisning);
                         }
                     } else if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {
-                        logger.info("Hendelse={} for henvisning={} var tidligere relevant for å oppdatere behandling. Nå ignoreres den",
+                        LOG.info("Hendelse={} for henvisning={} var tidligere relevant for å oppdatere behandling. Nå ignoreres den",
                                 tbkData.getVidereBehandling(), henvisning);
                     }
                 });

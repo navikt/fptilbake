@@ -4,22 +4,20 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.felles.jms.QueueConsumer;
-
-import no.nav.foreldrepenger.felles.jms.precond.PreconditionChecker;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.TextMessage;
+import no.nav.foreldrepenger.felles.jms.QueueConsumer;
+import no.nav.foreldrepenger.felles.jms.precond.PreconditionChecker;
 import no.nav.vedtak.log.metrics.Controllable;
 
 @ApplicationScoped
 public class KravgrunnlagAsyncJmsConsumer extends QueueConsumer implements Controllable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(KravgrunnlagAsyncJmsConsumer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KravgrunnlagAsyncJmsConsumer.class);
 
     private DatabasePreconditionChecker preconditionChecker;
     private BeanManager beanManager;
@@ -48,14 +46,14 @@ public class KravgrunnlagAsyncJmsConsumer extends QueueConsumer implements Contr
 
     @Override
     public void handle(Message message) throws JMSException {
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Mottok en melding over MQ av type {}", message.getClass().getName());
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Mottok en melding over MQ av type {}", message.getClass().getName());
         }
 
         if (message instanceof TextMessage tm) {
             håndterMelding(tm.getText());
-        } else if (LOGGER.isWarnEnabled()) {
-            LOGGER.warn("FPT-832935: Mottok en ikke støttet melding av klasse {}. Kø-elementet ble ignorert.", message.getClass().getName());
+        } else if (LOG.isWarnEnabled()) {
+            LOG.warn("FPT-832935: Mottok en ikke støttet melding av klasse {}. Kø-elementet ble ignorert.", message.getClass().getName());
         }
     }
 
@@ -70,18 +68,18 @@ public class KravgrunnlagAsyncJmsConsumer extends QueueConsumer implements Contr
     @Override
     public void start() {
         if (!isDisabled()) {
-            LOGGER.debug("Starter {}", KravgrunnlagAsyncJmsConsumer.class.getSimpleName());
+            LOG.debug("Starter {}", KravgrunnlagAsyncJmsConsumer.class.getSimpleName());
             super.start();
-            LOGGER.info("Startet: {}", KravgrunnlagAsyncJmsConsumer.class.getSimpleName());
+            LOG.info("Startet: {}", KravgrunnlagAsyncJmsConsumer.class.getSimpleName());
         }
     }
 
     @Override
     public void stop() {
         if (!isDisabled()) {
-            LOGGER.debug("Stoping {}", KravgrunnlagAsyncJmsConsumer.class.getSimpleName());
+            LOG.debug("Stoping {}", KravgrunnlagAsyncJmsConsumer.class.getSimpleName());
             super.stop();
-            LOGGER.info("Stoppet: {}", KravgrunnlagAsyncJmsConsumer.class.getSimpleName());
+            LOG.info("Stoppet: {}", KravgrunnlagAsyncJmsConsumer.class.getSimpleName());
         }
     }
 }

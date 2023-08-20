@@ -19,7 +19,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class HåndterGamleKravgrunnlagTask implements ProsessTaskHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(HåndterGamleKravgrunnlagTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HåndterGamleKravgrunnlagTask.class);
 
     private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste;
 
@@ -35,13 +35,13 @@ public class HåndterGamleKravgrunnlagTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long mottattXmlId = Long.valueOf(prosessTaskData.getPropertyValue("mottattXmlId"));
-        logger.info("Håndterer gammelt kravgrunnlag med id={}", mottattXmlId);
+        LOG.info("Håndterer gammelt kravgrunnlag med id={}", mottattXmlId);
         ØkonomiXmlMottatt økonomiXmlMottatt = håndterGamleKravgrunnlagTjeneste.hentGammeltKravgrunnlag(mottattXmlId);
         KravgrunnlagMedStatus respons = håndterGamleKravgrunnlagTjeneste.hentKravgrunnlagFraØkonomi(økonomiXmlMottatt);
         if (!respons.harKravgrunnlag()) {
             håndterGamleKravgrunnlagTjeneste.slettMottattUgyldigKravgrunnlag(mottattXmlId);
         } else {
-            logger.info("Referanse etter henting fra WS og mapping: {}", respons.getKravgrunnlag().getReferanse());
+            LOG.info("Referanse etter henting fra WS og mapping: {}", respons.getKravgrunnlag().getReferanse());
             Optional<Long> ugyldigkravgrunnlag = håndterGamleKravgrunnlagTjeneste.
                     håndterKravgrunnlagRespons(mottattXmlId, økonomiXmlMottatt.getMottattXml(), respons);
             ugyldigkravgrunnlag.ifPresent(håndterGamleKravgrunnlagTjeneste::slettMottattUgyldigKravgrunnlag);

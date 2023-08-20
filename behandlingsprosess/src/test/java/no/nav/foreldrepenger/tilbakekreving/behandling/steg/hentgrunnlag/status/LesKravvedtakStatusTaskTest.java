@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravVedtakStatusTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.LesKravgrunnlagTask;
@@ -67,11 +69,11 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         behandlingresultatRepository = new BehandlingresultatRepository(entityManager);
         henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, taskTjeneste, behandlingskontrollTjeneste, historikkinnslagTjeneste);
         var kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
-                taskTjeneste, repositoryProvider.getBehandlingRepository(), repositoryProvider.getGrunnlagRepository(), henleggBehandlingTjeneste,
-                behandlingskontrollTjeneste);
+                taskTjeneste, repositoryProvider.getBehandlingRepository(), repositoryProvider.getGrunnlagRepository(),
+            behandlingskontrollTjeneste);
         var kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
         lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider.getBehandlingRepository(),
-                kravVedtakStatusTjeneste, kravVedtakStatusMapper, fagsystemKlientMock);
+                kravVedtakStatusTjeneste, kravVedtakStatusMapper, fagsystemKlientMock, henleggBehandlingTjeneste);
 
         behandling = lagBehandling();
         lagEksternBehandling(behandling);

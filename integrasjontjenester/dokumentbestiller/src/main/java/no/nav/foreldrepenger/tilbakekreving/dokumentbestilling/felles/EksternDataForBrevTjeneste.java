@@ -50,11 +50,6 @@ public class EksternDataForBrevTjeneste {
         //NOSONAR
     }
 
-    //TODO dette er ikke ekstern data, flytt til annen tjeneste
-    public Period getBrukersSvarfrist() {
-        return brukersSvarfrist;
-    }
-
     public SamletEksternBehandlingInfo hentYtelsesbehandlingFraFagsystemet(UUID eksternUuid, Tillegsinformasjon... tillegsinformasjon) {
         return fagsystemKlient.hentBehandlingsinfo(eksternUuid, tillegsinformasjon);
     }

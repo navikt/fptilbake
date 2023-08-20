@@ -8,8 +8,6 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.time.Period;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,8 +33,8 @@ class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppsett {
 
         innhentDokumentasjonBrevTask = new InnhentDokumentasjonbrevTask(repositoryProvider,
                 mockInnhentDokumentasjonbrevTjeneste,
-                behandlingskontrollTjeneste,
-                Period.ofWeeks(3));
+                behandlingskontrollTjeneste
+        );
     }
 
     @Test

@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurd
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRef;
@@ -41,7 +41,7 @@ public class HentgrunnlagSteg implements BehandlingSteg {
 
         // opprett prosess task for å hente grunnlag
         ProsessTaskData hentxmlTask = ProsessTaskData.forProsessTask(HentKravgrunnlagTask.class);
-        hentxmlTask.setProperty(TaskProperty.PROPERTY_ORIGINAL_BEHANDLING_ID, String.valueOf(origBehandlingId));
+        hentxmlTask.setProperty(TaskProperties.PROPERTY_ORIGINAL_BEHANDLING_ID, String.valueOf(origBehandlingId));
         hentxmlTask.setBehandling(kontekst.getFagsakId(), kontekst.getBehandlingId(), kontekst.getAktørId().getId());
         taskTjeneste.lagre(hentxmlTask);
 

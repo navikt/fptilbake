@@ -17,7 +17,7 @@ import no.nav.vedtak.log.mdc.MDCOperations;
 @ApplicationScoped
 public class GjenopptaBehandlingMedGrunnlagTjeneste {
 
-    private static final Logger logger = LoggerFactory.getLogger(GjenopptaBehandlingMedGrunnlagTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GjenopptaBehandlingMedGrunnlagTjeneste.class);
 
     private ProsessTaskTjeneste taskTjeneste;
     private BehandlingVenterRepository behandlingVenterRepository;
@@ -58,7 +58,7 @@ public class GjenopptaBehandlingMedGrunnlagTjeneste {
         var callId = (cid == null ? MDCOperations.generateCallId() : cid) + "_" + behandling.getId();
         prosessTaskData.setCallId(callId);
 
-        logger.info("Gjenopptar behandling av behandlingId={}, oppretter {}-prosesstask med callId={}", behandling.getId(), prosessTaskData.getTaskType(), callId);
+        LOG.info("Gjenopptar behandling av behandlingId={}, oppretter {}-prosesstask med callId={}", behandling.getId(), prosessTaskData.getTaskType(), callId);
         return taskTjeneste.lagre(prosessTaskData);
     }
 

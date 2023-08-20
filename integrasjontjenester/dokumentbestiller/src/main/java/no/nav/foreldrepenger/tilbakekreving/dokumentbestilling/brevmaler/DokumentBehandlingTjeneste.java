@@ -19,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentas
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon.InnhentDokumentasjonbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.ManueltVarselBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.SendManueltVarselbrevTask;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.exception.TekniskException;
@@ -122,11 +121,11 @@ public class DokumentBehandlingTjeneste {
         }
 
         var sendVarselbrev = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
-        sendVarselbrev.setProperty(TaskProperty.MAL_TYPE, malType.getKode());
+        sendVarselbrev.setProperty(SendManueltVarselbrevTask.MAL_TYPE, malType.getKode());
         sendVarselbrev.setPayload(fritekst);
         sendVarselbrev.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
         sendVarselbrev.setCallIdFraEksisterende();
-        
+
         taskTjeneste.lagre(sendVarselbrev);
     }
 

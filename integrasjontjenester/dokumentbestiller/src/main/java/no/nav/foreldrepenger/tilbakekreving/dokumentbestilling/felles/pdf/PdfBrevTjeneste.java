@@ -30,7 +30,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 @ApplicationScoped
 public class PdfBrevTjeneste {
 
-    private Logger logger = LoggerFactory.getLogger(PdfBrevTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PdfBrevTjeneste.class);
 
     private JournalføringTjeneste journalføringTjeneste;
 
@@ -120,7 +120,7 @@ public class PdfBrevTjeneste {
             ProsessTaskBehandlingUtil.setBehandling(data, behandling);
             return Optional.of(data);
         } else {
-            logger.info("Sender ikke beskjed til selvbetjening for varsel for behandlingId={} i sak={}", behandling.getId(), behandling.getFagsak().getSaksnummer().getVerdi());
+            LOG.info("Sender ikke beskjed til selvbetjening for varsel for behandlingId={} i sak={}", behandling.getId(), behandling.getFagsak().getSaksnummer().getVerdi());
             return Optional.empty();
         }
     }
