@@ -37,7 +37,7 @@ public class HalvtRettsgebyrTjeneste {
             !harFeilutbetaltUnderHalvtRettsgebyrLiggetLengeNok(kravgrunnlag);
     }
 
-    private static boolean harFeilutbetaltUnderHalvtRettsgebyrLiggetLengeNok(Kravgrunnlag431 kravgrunnlag) {
+    private boolean harFeilutbetaltUnderHalvtRettsgebyrLiggetLengeNok(Kravgrunnlag431 kravgrunnlag) {
         return ventefristForTilfelleUnderHalvtRettsgebyr(kravgrunnlag).isBefore(LocalDateTime.now());
     }
 

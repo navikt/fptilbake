@@ -9,6 +9,7 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HalvtRettsgebyrTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatiskgjenoppta.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
@@ -34,6 +35,7 @@ public class MottattGrunnlagSteg implements BehandlingSteg {
     private BehandlingRepository behandlingRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
+    private HalvtRettsgebyrTjeneste halvtRettsgebyrTjeneste;
 
     public MottattGrunnlagSteg() {
         // CDI
@@ -42,20 +44,24 @@ public class MottattGrunnlagSteg implements BehandlingSteg {
     @Inject
     public MottattGrunnlagSteg(BehandlingRepository behandlingRepository,
                                BehandlingskontrollTjeneste behandlingskontrollTjeneste,
-                               GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste) {
+                               GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
+                               HalvtRettsgebyrTjeneste halvtRettsgebyrTjeneste) {
         this.behandlingRepository = behandlingRepository;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
+        this.halvtRettsgebyrTjeneste = halvtRettsgebyrTjeneste;
     }
 
     @Override
     public BehandleStegResultat utførSteg(BehandlingskontrollKontekst kontekst) {
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
 
-        if (gjenopptaBehandlingTjeneste.kanGjenopptaSteg(kontekst.getBehandlingId())) {
+        var fristTid = kanFortsetteEtter(kontekst.getBehandlingId(), LocalDateTime.now().plus(Frister.KRAVGRUNNLAG_FØRSTE));
+
+        if (fristTid.isBefore(LocalDateTime.now())) {
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
-        LocalDateTime fristTid = LocalDateTime.now().plus(Frister.KRAVGRUNNLAG_FØRSTE);
+
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
                 BehandlingStegType.TBKGSTEG, fristTid, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
@@ -66,11 +72,11 @@ public class MottattGrunnlagSteg implements BehandlingSteg {
     public BehandleStegResultat gjenopptaSteg(BehandlingskontrollKontekst kontekst) {
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
 
-        if (gjenopptaBehandlingTjeneste.kanGjenopptaSteg(behandling.getId())) {
+        var fristTid = kanFortsetteEtter(kontekst.getBehandlingId(), hentFrist(behandling));
+        if (fristTid.isBefore(LocalDateTime.now())) {
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
 
-        LocalDateTime fristTid = hentFrist(behandling);
         if (gåttOverFristen(fristTid)) {
             LOG.error("MottaGrunnlagSteg: Behandling {} gjenopptatt, over frist, uten kravgrunnlag. Skal ikke lenger forekomme", behandling.getId());
         }
@@ -81,11 +87,24 @@ public class MottattGrunnlagSteg implements BehandlingSteg {
 
     private LocalDateTime hentFrist(Behandling behandling) {
         return behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
-            .map(Aksjonspunkt::getFristTid).orElse(null);
+            .map(Aksjonspunkt::getFristTid).orElseGet(() -> LocalDateTime.now().plus(Frister.KRAVGRUNNLAG_FØRSTE));
     }
 
     private boolean gåttOverFristen(LocalDateTime fristTid) {
         return fristTid != null && LocalDate.now().isAfter(fristTid.toLocalDate());
+    }
+
+    private LocalDateTime kanFortsetteEtter(Long behandlingId, LocalDateTime gjeldendeFrist) {
+        if (gjenopptaBehandlingTjeneste.kanGjenopptaSteg(behandlingId)) {
+            // Sørg for at de under halvt rettegebyr blir liggende til de kan behandles automatisk uten å ha aktivt aksjonspunkt i fakta mer enn en halv time.
+            if (halvtRettsgebyrTjeneste.samletUnderHalvtRettsgebyrKanVentePåAutomatiskBehandling(behandlingId)) {
+                var fristFraGrunnlag = halvtRettsgebyrTjeneste.ventefristForTilfelleUnderHalvtRettsgebyr(behandlingId);
+                return gjeldendeFrist == null || fristFraGrunnlag.isAfter(gjeldendeFrist) ? fristFraGrunnlag : gjeldendeFrist;
+            } else {
+                return LocalDateTime.now().minusHours(1);
+            }
+        }
+        return gjeldendeFrist;
     }
 
 }

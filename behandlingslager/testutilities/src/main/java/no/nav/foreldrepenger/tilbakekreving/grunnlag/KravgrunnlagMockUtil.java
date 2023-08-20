@@ -1,6 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.grunnlag;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -16,6 +18,10 @@ public class KravgrunnlagMockUtil {
     }
 
     public static Kravgrunnlag431 lagMockObject(List<KravgrunnlagMock> kravgrunnlagMocker) {
+        return lagMockObject(kravgrunnlagMocker, LocalDateTime.now());
+    }
+
+    public static Kravgrunnlag431 lagMockObject(List<KravgrunnlagMock> kravgrunnlagMocker, LocalDateTime kontroll) {
         var kravgrunnlag431 = Kravgrunnlag431.builder()
                 .medVedtakId(100000l)
                 .medEksternKravgrunnlagId("12123")
@@ -29,21 +35,23 @@ public class KravgrunnlagMockUtil {
                 .medAnsvarligEnhet("8020")
                 .medBehandlendeEnhet("8020")
                 .medBostedEnhet("8020")
-                .medFeltKontroll("00")
+                .medFeltKontroll(kontroll.format(Kravgrunnlag431.KONTROLL_FELT_FORMAT))
                 .medSaksBehId("Z991035")
                 .medReferanse(Henvisning.fraEksternBehandlingId(100000000L))
                 .build();
-        for (var mock : kravgrunnlagMocker) {
+        var perioder = kravgrunnlagMocker.stream().collect(Collectors.groupingBy(m -> m.getPeriode().getFom()));
+        for (var mock : perioder.values()) {
             kravgrunnlag431.leggTilPeriode(lagMockPeriode(mock, kravgrunnlag431));
         }
         return kravgrunnlag431;
     }
 
-    public static KravgrunnlagPeriode432 lagMockPeriode(KravgrunnlagMock mock, Kravgrunnlag431 kravgrunnlag431) {
+    public static KravgrunnlagPeriode432 lagMockPeriode(List<KravgrunnlagMock> mock, Kravgrunnlag431 kravgrunnlag431) {
+        var periode = mock.stream().map(KravgrunnlagMock::getPeriode).findFirst().orElseThrow();
         var kravgrunnlagPeriode432 = KravgrunnlagPeriode432.builder()
-                .medPeriode(mock.getPeriode())
+                .medPeriode(periode)
                 .medKravgrunnlag431(kravgrunnlag431).build();
-        kravgrunnlagPeriode432.leggTilBeløp(lagBeløp(mock, kravgrunnlagPeriode432));
+        mock.forEach(m -> kravgrunnlagPeriode432.leggTilBeløp(lagBeløp(m, kravgrunnlagPeriode432)));
         return kravgrunnlagPeriode432;
     }
 
@@ -51,6 +59,7 @@ public class KravgrunnlagMockUtil {
         return KravgrunnlagBelop433.builder().medKravgrunnlagPeriode432(kravgrunnlagPeriode432)
                 .medKlasseKode(mock.getKlasseKode() != null ? mock.getKlasseKode() : KlasseKode.FPADATORD)
                 .medKlasseType(mock.getKlasseType())
+                .medOpprUtbetBelop(mock.getTilbakekrevesBelop())
                 .medNyBelop(mock.getNyBelop())
                 .medTilbakekrevesBelop(mock.getTilbakekrevesBelop()).build();
     }

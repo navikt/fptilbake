@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.GjenopptaBehandlingMedGrunnlagTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HalvtRettsgebyrTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.LesKravgrunnlagTask;
@@ -116,8 +117,9 @@ public abstract class FellesTestOppsett {
         );
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager,
                 new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
+        var haltGebyrTjeneste = new HalvtRettsgebyrTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository());
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste,
-                behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer, entityManager);
+                behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer, haltGebyrTjeneste, entityManager);
         kravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
         lesKravgrunnlagTask = new LesKravgrunnlagTask(mottattXmlRepository, kravgrunnlagTjeneste, kravgrunnlagMapper,
                 repositoryProvider, fagsystemKlientMock);

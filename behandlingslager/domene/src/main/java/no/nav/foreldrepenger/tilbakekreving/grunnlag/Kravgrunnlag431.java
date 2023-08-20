@@ -3,6 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.grunnlag;
 import static no.nav.vedtak.log.util.LoggerUtils.mask;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +33,8 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 @Entity(name = "Kravgrunnlag431")
 @Table(name = "KRAV_GRUNNLAG_431")
 public class Kravgrunnlag431 extends BaseEntitet {
+
+    public static final DateTimeFormatter KONTROLL_FELT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS");
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_KRAV_GRUNNLAG_431")
@@ -176,6 +180,14 @@ public class Kravgrunnlag431 extends BaseEntitet {
 
     public String getKontrollFelt() {
         return kontrollFelt;
+    }
+
+    public LocalDateTime getKontrollFeltAsLocalDateTime() {
+        return LocalDateTime.parse(kontrollFelt, KONTROLL_FELT_FORMAT);
+    }
+
+    public LocalDate getKontrollFeltAsLocalDate() {
+        return LocalDateTime.parse(kontrollFelt, KONTROLL_FELT_FORMAT).toLocalDate();
     }
 
     public String getSaksBehId() {

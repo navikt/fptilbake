@@ -30,6 +30,7 @@ public class KravVedtakStatusTjeneste {
     private static final Logger LOG = LoggerFactory.getLogger(KravVedtakStatusTjeneste.class);
 
     private KravVedtakStatusRepository kravVedtakStatusRepository;
+    private HalvtRettsgebyrTjeneste halvtRettsgebyrTjeneste;
     private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private ProsessTaskTjeneste taskTjeneste;
@@ -41,11 +42,13 @@ public class KravVedtakStatusTjeneste {
 
     @Inject
     public KravVedtakStatusTjeneste(KravVedtakStatusRepository kravVedtakStatusRepository,
+                                    HalvtRettsgebyrTjeneste halvtRettsgebyrTjeneste,
                                     ProsessTaskTjeneste taskTjeneste,
                                     BehandlingRepository behandlingRepository,
                                     KravgrunnlagRepository kravgrunnlagRepository,
                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.kravVedtakStatusRepository = kravVedtakStatusRepository;
+        this.halvtRettsgebyrTjeneste = halvtRettsgebyrTjeneste;
         this.taskTjeneste = taskTjeneste;
         this.behandlingRepository = behandlingRepository;
         this.grunnlagRepository = kravgrunnlagRepository;
@@ -99,7 +102,15 @@ public class KravVedtakStatusTjeneste {
             var kravgrunnlag431 = grunnlagRepository.finnKravgrunnlag(behandlingId);
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
 
-            taBehandlingAvventOgFortsettBehandling(behandlingId);
+            if (halvtRettsgebyrTjeneste.samletUnderHalvtRettsgebyrKanVentePåAutomatiskBehandling(behandlingId)) {
+                // Bli stående på vent til 8 uker.
+                var fristDato = HalvtRettsgebyrTjeneste.ventefristForTilfelleUnderHalvtRettsgebyr(kravgrunnlag431);
+                var behandling = behandlingRepository.hentBehandling(behandlingId);
+                behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
+                    BehandlingStegType.TBKGSTEG, fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+            } else {
+                taBehandlingAvventOgFortsettBehandling(behandlingId);
+            }
             grunnlagRepository.opphevGrunnlag(behandlingId);
         } else {
             throw kanIkkeHåndtereGrunnlagForBehandling(", men det finnes ikke noe grunnlag", statusKode, behandlingId, saksnummer);

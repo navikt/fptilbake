@@ -24,6 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderin
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.GjenopptaBehandlingMedGrunnlagTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HalvtRettsgebyrTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
@@ -157,7 +158,9 @@ public abstract class FellesTestOppsett {
         behandlingRepository = repoProvider.getBehandlingRepository();
         varselRepository = repoProvider.getVarselRepository();
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
-        kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer, entityManager);
+        var halvtGebyrTjeneste = new HalvtRettsgebyrTjeneste(grunnlagRepository, varselRepository);
+        kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste,
+            mockSlettGrunnlagEventPubliserer, halvtGebyrTjeneste, entityManager);
         kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(grunnlagRepository);
         historikkInnslagKonverter = new HistorikkInnslagKonverter(behandlingRepository);
         historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);

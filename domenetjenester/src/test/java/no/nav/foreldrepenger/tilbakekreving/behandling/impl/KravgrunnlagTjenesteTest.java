@@ -63,7 +63,8 @@ class KravgrunnlagTjenesteTest extends FellesTestOppsett {
         entityManager.setFlushMode(FlushModeType.AUTO);
         when(mockTpsTjeneste.hentAktørForFnr(new PersonIdent(SSN))).thenReturn(Optional.of(aktørId));
         when(behandlingskontrollTjeneste.erStegPassert(any(Behandling.class), any(BehandlingStegType.class))).thenReturn(true);
-        kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, mockGjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, eventPubliserer, entityManager);
+        kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, mockGjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, eventPubliserer,
+            new HalvtRettsgebyrTjeneste(grunnlagRepository, varselRepository), entityManager);
     }
 
     @Test

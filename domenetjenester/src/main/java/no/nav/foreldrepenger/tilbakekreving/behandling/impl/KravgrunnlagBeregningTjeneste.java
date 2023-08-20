@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.felles.Satser;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
@@ -47,6 +49,16 @@ public class KravgrunnlagBeregningTjeneste {
             map.put(periode, new FordeltKravgrunnlagBeløp(feilutbetaltBeløp, utbetaltYtelseBeløp, riktigYtelseBeløp));
         }
         return map;
+    }
+
+    public static boolean samletFeilutbetaltUnderHalvtRettsgebyr(Kravgrunnlag431 kravgrunnlag) {
+        var feilutbetalt = kravgrunnlag.getPerioder().stream()
+            .map(KravgrunnlagPeriode432::getKravgrunnlagBeloper433)
+            .flatMap(Collection::stream)
+            .filter(kgBeløp -> KlasseType.FEIL.equals(kgBeløp.getKlasseType()))
+            .map(KravgrunnlagBelop433::getNyBelop)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return feilutbetalt.compareTo(Satser.halvtRettsgebyr()) <= 0;
     }
 
     public Map<Periode, BigDecimal> beregnFeilutbetaltBeløp(Long behandlingId, List<Periode> perioder) {
