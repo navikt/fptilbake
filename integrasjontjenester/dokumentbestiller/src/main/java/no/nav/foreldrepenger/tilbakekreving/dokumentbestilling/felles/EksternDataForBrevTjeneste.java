@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles;
 
-import java.time.Period;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -8,7 +7,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
@@ -33,20 +31,17 @@ public class EksternDataForBrevTjeneste {
     private PersoninfoAdapter tpsTjeneste;
     private VirksomhetTjeneste virksomhetTjeneste;
     private FagsystemKlient fagsystemKlient;
-    private Period brukersSvarfrist;
 
     @Inject
     public EksternDataForBrevTjeneste(PersoninfoAdapter tpsTjeneste,
                                       VirksomhetTjeneste virksomhetTjeneste,
-                                      FagsystemKlient fagsystemKlient,
-                                      @KonfigVerdi(value = "brukertilbakemelding.venter.frist.lengde") Period brukersSvarfrist) {
+                                      FagsystemKlient fagsystemKlient) {
         this.tpsTjeneste = tpsTjeneste;
         this.virksomhetTjeneste = virksomhetTjeneste;
         this.fagsystemKlient = fagsystemKlient;
-        this.brukersSvarfrist = brukersSvarfrist;
     }
 
-    public EksternDataForBrevTjeneste() {
+    private EksternDataForBrevTjeneste() {
         //NOSONAR
     }
 
