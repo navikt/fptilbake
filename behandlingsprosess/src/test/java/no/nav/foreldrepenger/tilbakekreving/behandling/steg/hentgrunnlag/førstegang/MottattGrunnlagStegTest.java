@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
@@ -59,7 +58,7 @@ class MottattGrunnlagStegTest extends FellesTestOppsett {
     private MottattGrunnlagSteg steg() {
         var gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskTjeneste, behandlingKandidaterRepository, behandlingVenterRepository,
             repositoryProvider, mock(VarselresponsTjeneste.class));
-        return new MottattGrunnlagSteg(behandlingRepository, behandlingskontrollTjeneste, gjenopptaBehandlingTjeneste, Period.ofWeeks(4));
+        return new MottattGrunnlagSteg(behandlingRepository, behandlingskontrollTjeneste, gjenopptaBehandlingTjeneste);
     }
 
 }
