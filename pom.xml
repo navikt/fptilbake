@@ -83,7 +83,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>fp-bom</artifactId>
-                <version>0.7.2-jakarta</version>
+                <version>0.8.2-ee9</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
