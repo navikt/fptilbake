@@ -14,6 +14,7 @@ import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
@@ -50,14 +51,14 @@ class HåndterGamleKravgrunnlagBatchTaskTest {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML());
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
-                taskTjeneste, clock);
+                taskTjeneste, clock, Period.ofWeeks(-1));
     }
 
     @Test
     void skal_ikke_kjøre_batch_i_helgen() {
         Clock clock = Clock.fixed(Instant.parse("2020-05-03T12:00:00.00Z"), ZoneId.systemDefault());
         HåndterGamleKravgrunnlagBatchTask gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
-                taskTjeneste, clock);
+                taskTjeneste, clock, Period.ofWeeks(-1));
         gamleKravgrunnlagBatchTjeneste.doTask(lagProsessTaskData());
         verifyNoInteractions(taskTjeneste);
     }
@@ -66,7 +67,7 @@ class HåndterGamleKravgrunnlagBatchTaskTest {
     void skal_ikke_kjøre_batch_på_helligdager() {
         Clock clock = Clock.fixed(Instant.parse("2020-12-25T12:00:00.00Z"), ZoneId.systemDefault());
         HåndterGamleKravgrunnlagBatchTask gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
-                taskTjeneste, clock);
+                taskTjeneste, clock, Period.ofWeeks(-1));
         gamleKravgrunnlagBatchTjeneste.doTask(lagProsessTaskData());
         verifyNoInteractions(taskTjeneste);
     }
