@@ -2,8 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.avstemming.batch;
 
 import java.util.Base64;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;

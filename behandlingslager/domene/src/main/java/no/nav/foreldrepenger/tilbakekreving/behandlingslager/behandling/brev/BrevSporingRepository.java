@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 
 @ApplicationScoped
 public class BrevSporingRepository {
@@ -41,7 +41,7 @@ public class BrevSporingRepository {
     public List<BrevSporing> hentBrevData(Long behandlingId, BrevType brevType) {
         var query = entityManager.createQuery("""
         from BrevSporing
-        where behandling_id = :behandlingId
+        where behandlingId = :behandlingId
         and brevType = :brevType""", BrevSporing.class);
         query.setParameter("behandlingId", behandlingId);
         query.setParameter("brevType", brevType);

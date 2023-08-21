@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.overvåkning.metrikker;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;

@@ -8,6 +8,7 @@
         <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
         <version>${revision}</version>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>pdfgen</artifactId>
@@ -21,14 +22,8 @@
         </dependency>
         <dependency>
             <groupId>org.verapdf</groupId>
-            <artifactId>validation-model</artifactId>
-            <version>1.24.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>validation-model-jakarta</artifactId>
+            <version>${verapdf-validation-model.version}</version>
         </dependency>
         <dependency>
             <groupId>com.openhtmltopdf</groupId>
@@ -90,8 +85,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
     </dependencies>
-
 </project>
 

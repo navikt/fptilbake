@@ -1,12 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer;
 
+import jakarta.annotation.Resource;
 import no.nav.foreldrepenger.felles.jms.precond.PreconditionChecker;
 import no.nav.foreldrepenger.felles.jms.precond.PreconditionCheckerResult;
 
 import java.sql.SQLException;
 
-import javax.annotation.Resource;
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import javax.sql.DataSource;
 
 

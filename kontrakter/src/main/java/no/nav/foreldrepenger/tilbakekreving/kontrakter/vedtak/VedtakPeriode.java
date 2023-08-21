@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -5,9 +5,9 @@ import static org.mockito.Mockito.mock;
 
 import java.time.LocalDateTime;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.FlushModeType;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.SendVedtakTilOppdragsystemetTask;
 

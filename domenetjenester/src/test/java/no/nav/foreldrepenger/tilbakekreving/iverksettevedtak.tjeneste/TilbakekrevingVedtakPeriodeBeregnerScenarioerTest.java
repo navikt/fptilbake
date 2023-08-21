@@ -5,8 +5,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

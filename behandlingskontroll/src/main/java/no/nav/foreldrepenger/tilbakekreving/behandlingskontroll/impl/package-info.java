@@ -13,7 +13,7 @@
  * <p>
  * <h1>Events</h1>
  * Når Behandlingskontroll endrer steg eller stegstatus, eller aksjonspunkter oppdages eller utføres vil ulike typer
- * {@link javax.enterprise.event.Event} fyres.
+ * {@link jakarta.enterprise.event.Event} fyres.
  * Disse kan observeres synkront og implementere logikk for hva som skal skje når prosessen endrer tilstand.
  */
 package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl;

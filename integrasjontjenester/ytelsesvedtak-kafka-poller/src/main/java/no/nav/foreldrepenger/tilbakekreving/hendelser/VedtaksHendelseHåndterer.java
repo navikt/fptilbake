@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.control.ActivateRequestContext;
-import javax.inject.Inject;
-import javax.transaction.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.control.ActivateRequestContext;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class VedtaksHendelseHåndterer {
         Ytelser.PLEIEPENGER_NÆRSTÅENDE, FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE,
         Ytelser.PLEIEPENGER_SYKT_BARN, FagsakYtelseType.PLEIEPENGER_SYKT_BARN
     );
-    
+
     private ProsessTaskTjeneste taskTjeneste;
     private Set<Ytelser> abonnerteYtelser;
     private Set<Ytelser> resterendeYtelser;

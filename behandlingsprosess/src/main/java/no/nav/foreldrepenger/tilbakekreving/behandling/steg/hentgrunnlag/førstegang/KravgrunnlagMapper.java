@@ -2,8 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.først
 
 import java.time.LocalDate;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;

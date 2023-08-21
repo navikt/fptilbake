@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.persistence.FlushModeType;
+import jakarta.persistence.FlushModeType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

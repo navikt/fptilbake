@@ -2,9 +2,9 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak;
 
 import java.util.Objects;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

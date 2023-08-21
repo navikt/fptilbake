@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dokdist;
 
 import java.util.UUID;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

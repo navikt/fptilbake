@@ -2,11 +2,11 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår;
 
 import java.math.BigDecimal;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 

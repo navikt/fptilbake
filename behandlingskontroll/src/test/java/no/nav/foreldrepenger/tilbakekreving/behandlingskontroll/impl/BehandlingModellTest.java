@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

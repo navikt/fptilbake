@@ -3,6 +3,19 @@ Applikasjonene fptilbake og k9-tilbake
 ===============
 [![Bygg og deploy](https://github.com/navikt/fptilbake/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/navikt/fptilbake/actions/workflows/build.yml)
 
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=navikt_fptilbake&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=navikt_fptilbake)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=navikt_fptilbake&metric=coverage)](https://sonarcloud.io/summary/new_code?id=navikt_fptilbake)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=navikt_fptilbake&metric=alert_status)](https://sonarcloud.io/dashboard?id=navikt_fptilbake)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=navikt_fptilbake&metric=bugs)](https://sonarcloud.io/dashboard?id=navikt_fptilbake)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=navikt_fptilbake&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=navikt_fptilbake)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=navikt_fptilbake&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=navikt_fptilbake)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=navikt_fptilbake&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=navikt_fptilbake)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=navikt_fptilbake&metric=sqale_index)](https://sonarcloud.io/dashboard?id=navikt_fptilbake)
+
+![GitHub](https://img.shields.io/github/license/navikt/fptilbake)
+
+
 Dette er repository for applikasjonene:  
  * fptilbake, en tilbakekrevingsapplikasjon for foreldrepenger, svangerskapspenger og engangsstønad.
  * k9-tilbake, en tilbakekrevingsapplikasjon for frisinn og kapittel 9-ytelser: pleiepenger for sykt barn, pleiepenger for syk nærstående, omsorgspenger, opplæringspenger

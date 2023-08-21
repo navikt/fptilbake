@@ -7,8 +7,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
-import javax.persistence.FlushModeType;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

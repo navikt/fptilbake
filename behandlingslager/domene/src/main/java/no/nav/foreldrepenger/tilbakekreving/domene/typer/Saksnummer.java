@@ -3,8 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.domene.typer;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;

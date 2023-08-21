@@ -3,8 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker.BRUKER;
 import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker.VERGE;
 
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;

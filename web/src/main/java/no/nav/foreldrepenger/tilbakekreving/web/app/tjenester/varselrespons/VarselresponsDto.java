@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import javax.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidator;
 
 import no.nav.vedtak.util.InputValideringRegex;
 

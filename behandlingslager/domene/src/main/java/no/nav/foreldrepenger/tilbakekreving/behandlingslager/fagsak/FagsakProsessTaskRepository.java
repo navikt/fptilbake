@@ -11,21 +11,19 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-
-import org.hibernate.jpa.QueryHints;
+import org.hibernate.jpa.HibernateHints;
 import org.hibernate.query.NativeQuery;
-import org.hibernate.type.LongType;
-import org.hibernate.type.StringType;
+import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskStatusUtil;
 import no.nav.vedtak.felles.jpa.HibernateVerktøy;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -106,12 +104,12 @@ public class FagsakProsessTaskRepository {
                         ProsessTaskEntitet.class);
 
         query.setParameter("statuses", statusNames)
-                .setParameter("gruppe", gruppeId, StringType.INSTANCE)
+                .setParameter("gruppe", gruppeId, StandardBasicTypes.STRING)
                 .setParameter("nesteKjoeringFraOgMed", nesteKjoeringFraOgMed) // max oppløsning på neste_kjoering_etter er sekunder
                 .setParameter("nesteKjoeringTilOgMed", nesteKjoeringTilOgMed)
                 .setParameter("fagsakId", fagsakId) // NOSONAR
-                .setParameter("behandlingId", behandlingId, LongType.INSTANCE) // NOSONAR
-                .setHint(QueryHints.HINT_READONLY, "true");
+                .setParameter("behandlingId", behandlingId, StandardBasicTypes.LONG) // NOSONAR
+                .setHint(HibernateHints.HINT_READ_ONLY, "true");
 
         List<ProsessTaskEntitet> resultList = query.getResultList();
         return tilProsessTask(resultList);

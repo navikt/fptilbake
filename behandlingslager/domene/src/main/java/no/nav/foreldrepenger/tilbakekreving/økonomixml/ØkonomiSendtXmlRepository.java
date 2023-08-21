@@ -4,10 +4,10 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 
 
 @ApplicationScoped
@@ -37,9 +37,9 @@ public class ØkonomiSendtXmlRepository {
     }
 
     public Collection<String> finnXml(Long behandlingId, MeldingType meldingType) {
-        TypedQuery<ØkonomiXmlSendt> query = entityManager.createQuery("from OkoXmlSendt where behandling_id = :behandlingId and melding_type =:meldingType", ØkonomiXmlSendt.class);
+        TypedQuery<ØkonomiXmlSendt> query = entityManager.createQuery("from OkoXmlSendt where behandlingId = :behandlingId and meldingType =:meldingType", ØkonomiXmlSendt.class);
         query.setParameter("behandlingId", behandlingId);
-        query.setParameter("meldingType", meldingType.getKode());
+        query.setParameter("meldingType", meldingType);
         return query.getResultList()
                 .stream()
                 .map(ØkonomiXmlSendt::getMelding)

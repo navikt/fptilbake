@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.persistence.FlushModeType;
+import jakarta.persistence.FlushModeType;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

@@ -2,8 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
 import java.util.UUID;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;

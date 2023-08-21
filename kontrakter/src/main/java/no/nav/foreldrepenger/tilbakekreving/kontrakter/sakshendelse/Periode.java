@@ -2,7 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse;
 
 import java.time.LocalDate;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;

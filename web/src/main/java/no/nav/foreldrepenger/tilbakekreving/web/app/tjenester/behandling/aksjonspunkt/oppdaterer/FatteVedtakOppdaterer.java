@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.VedtakAksjonspunktData;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.FatteVedtakTjeneste;

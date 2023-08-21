@@ -2,7 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.dto;
 
 import java.time.LocalDate;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;

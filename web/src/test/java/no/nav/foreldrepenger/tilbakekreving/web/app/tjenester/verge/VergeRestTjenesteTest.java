@@ -14,9 +14,9 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
+import jakarta.persistence.EntityManager;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

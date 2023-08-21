@@ -5,13 +5,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import org.hibernate.jpa.HibernateHints;
 
-import org.hibernate.jpa.QueryHints;
-
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
@@ -38,7 +37,7 @@ public class FellesQueriesForBehandlingRepositories {
                         select distinct b
                           from Aksjonspunkt ap
                           inner join ap.behandling b on ap.behandling.id = b.id
-                          where ap.status = :åpneAksjonspunktKoder
+                          where ap.status in (:åpneAksjonspunktKoder)
                           and ap.aksjonspunktDefinisjon in (:aksjonspunkt)
                         """,
                 Behandling.class);
@@ -57,13 +56,13 @@ public class FellesQueriesForBehandlingRepositories {
                           where b.id = :behandlingId
                           and exists (select 1 from Aksjonspunkt ap
                                       where ap.behandling = b
-                                      and ap.status = :åpneAksjonspunktKoder
+                                      and ap.status in (:åpneAksjonspunktKoder)
                                       and ap.aksjonspunktDefinisjon in (:aksjonspunkt) )
                         """,
                 Behandling.class);
 
         setParametre(query, aksjonspunktDefinisjoner);
-        query.setHint(QueryHints.HINT_READONLY, "true");
+        query.setHint(HibernateHints.HINT_READ_ONLY, "true");
         query.setParameter("behandlingId", behandingId);
 
         List<Behandling> resultat = query.getResultList();
@@ -74,7 +73,7 @@ public class FellesQueriesForBehandlingRepositories {
     }
 
     private void setParametre(TypedQuery<Behandling> query, AksjonspunktDefinisjon[] aksjonspunktDefinisjoner) {
-        query.setHint(QueryHints.HINT_READONLY, "true");
+        query.setHint(HibernateHints.HINT_READ_ONLY, "true");
         query.setParameter("åpneAksjonspunktKoder", AksjonspunktStatus.getÅpneAksjonspunktStatuser());
         query.setParameter("aksjonspunkt", Arrays.asList(aksjonspunktDefinisjoner));
     }

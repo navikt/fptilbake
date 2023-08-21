@@ -6,8 +6,8 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class Periode {

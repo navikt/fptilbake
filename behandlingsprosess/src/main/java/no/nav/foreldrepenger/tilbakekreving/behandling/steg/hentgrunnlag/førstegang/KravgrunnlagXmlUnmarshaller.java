@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 
 import org.xml.sax.SAXException;

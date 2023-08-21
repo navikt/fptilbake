@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør;
 
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.MappedSuperclass;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 

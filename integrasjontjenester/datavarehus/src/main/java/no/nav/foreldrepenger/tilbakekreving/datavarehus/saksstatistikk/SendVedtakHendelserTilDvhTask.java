@@ -1,9 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.validation.Validation;
-import javax.validation.Validator;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
