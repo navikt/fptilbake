@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +28,7 @@ public class HåndterGamleKravgrunnlagBatchTask implements ProsessTaskHandler {
 
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private ProsessTaskTjeneste taskTjeneste;
+    private Period alderForGammeltGrunnlag;
     private Clock clock;
 
     HåndterGamleKravgrunnlagBatchTask() {
@@ -39,15 +41,18 @@ public class HåndterGamleKravgrunnlagBatchTask implements ProsessTaskHandler {
         this.mottattXmlRepository = mottattXmlRepository;
         this.taskTjeneste = taskTjeneste;
         this.clock = Clock.systemDefaultZone();
+        this.alderForGammeltGrunnlag = AutomatiskSaksbehandlingRepository.getKravgrunnlagAlderNårGammel();
     }
 
     // kun for test forbruk
     public HåndterGamleKravgrunnlagBatchTask(ØkonomiMottattXmlRepository mottattXmlRepository,
                                              ProsessTaskTjeneste taskTjeneste,
-                                             Clock clock) {
+                                             Clock clock,
+                                             Period alderForGammeltGrunnlag) {
         this.mottattXmlRepository = mottattXmlRepository;
         this.taskTjeneste = taskTjeneste;
         this.clock = clock;
+        this.alderForGammeltGrunnlag = alderForGammeltGrunnlag;
     }
 
     @Override
@@ -59,7 +64,7 @@ public class HåndterGamleKravgrunnlagBatchTask implements ProsessTaskHandler {
         if (Helligdager.erHelligdagEllerHelg(iDag)) {
             LOG.info("I dag er helg/helligdag, kan ikke kjøre batch {}", batchRun);
         } else {
-            var bestemtDato = iDag.minus(AutomatiskSaksbehandlingRepository.getKravgrunnlagAlderNårGammel());
+            var bestemtDato = iDag.minus(alderForGammeltGrunnlag);
             LOG.info("Håndterer kravgrunnlag som er eldre enn {} i batch {}", bestemtDato, batchRun);
 
             var alleGamleKravgrunnlag = hentGamleKravgrunnlag(bestemtDato);
