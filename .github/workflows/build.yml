@@ -24,7 +24,6 @@ jobs:
       packages: write
     uses: navikt/fp-gha-workflows/.github/workflows/build-app.yml@main
     with:
-      sonar-scan: false
       build-image: ${{ github.ref_name == 'master' }} # default: true
       push-image: ${{ github.ref_name == 'master' }} # default: false
     secrets: inherit
