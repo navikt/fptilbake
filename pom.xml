@@ -47,7 +47,7 @@
 
         <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
         <handlebars.version>4.3.1</handlebars.version>
-        <open.batik.version>1.16</open.batik.version>
+        <open.batik.version>1.17</open.batik.version>
 
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.projectName>fptilbake</sonar.projectName>
