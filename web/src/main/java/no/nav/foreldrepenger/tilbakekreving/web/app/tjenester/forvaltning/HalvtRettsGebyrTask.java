@@ -1,9 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HalvtRettsgebyrTjeneste;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.AutomatiskSaksbehandlingVurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -24,7 +23,7 @@ public class HalvtRettsGebyrTask implements ProsessTaskHandler {
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private BehandlingRepository behandlingRepository;
 
-    private HalvtRettsgebyrTjeneste halvtRettsgebyrTjeneste;
+    private AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste;
 
     HalvtRettsGebyrTask() {
         // for CDI
@@ -33,7 +32,7 @@ public class HalvtRettsGebyrTask implements ProsessTaskHandler {
     @Inject
     public HalvtRettsGebyrTask(BehandlingRepositoryProvider repositoryProvider,
                                BehandlingskontrollTjeneste behandlingskontrollTjeneste,
-                               HalvtRettsgebyrTjeneste halvtRettsgebyrTjeneste) {
+                               AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.halvtRettsgebyrTjeneste = halvtRettsgebyrTjeneste;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
@@ -43,8 +42,8 @@ public class HalvtRettsGebyrTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         var behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         var behandling = behandlingRepository.hentBehandling(behandlingId);
-        if (halvtRettsgebyrTjeneste.samletUnderHalvtRettsgebyrKanVentePåAutomatiskBehandling(behandlingId)) {
-            var fristDato = halvtRettsgebyrTjeneste.ventefristForTilfelleUnderHalvtRettsgebyr(behandlingId);
+        if (halvtRettsgebyrTjeneste.lavFeilutbetalingKanVentePåAutomatiskBehandling(behandlingId)) {
+            var fristDato = halvtRettsgebyrTjeneste.ventefristForTilfelleSomKanAutomatiskSaksbehandles(behandlingId);
             behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
                 BehandlingStegType.TBKGSTEG, fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 

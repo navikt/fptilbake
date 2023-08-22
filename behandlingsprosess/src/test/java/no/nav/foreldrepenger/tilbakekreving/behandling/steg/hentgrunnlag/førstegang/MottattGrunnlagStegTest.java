@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HalvtRettsgebyrTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.AutomatiskSaksbehandlingVurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatiskgjenoppta.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
@@ -94,7 +94,7 @@ class MottattGrunnlagStegTest extends FellesTestOppsett {
         var gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskTjeneste, behandlingKandidaterRepository, behandlingVenterRepository,
             repositoryProvider, mock(VarselresponsTjeneste.class));
         return new MottattGrunnlagSteg(behandlingRepository, behandlingskontrollTjeneste, gjenopptaBehandlingTjeneste,
-            new HalvtRettsgebyrTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository()));
+            new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository()));
     }
 
     private void lagKravgrunnlagMedFeilPostering(long behandlingId, int beløp, LocalDateTime kontroll) {

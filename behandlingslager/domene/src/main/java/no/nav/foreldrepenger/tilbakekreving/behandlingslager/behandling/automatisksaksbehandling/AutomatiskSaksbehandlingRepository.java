@@ -8,7 +8,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -76,7 +75,7 @@ public class AutomatiskSaksbehandlingRepository {
         query.setParameter("aksjonspunktStatus", AksjonspunktStatus.OPPRETTET);
         query.setParameter("behandlingStatus", BehandlingStatus.UTREDES);
         query.setParameter("behandlingTyper", List.of(BehandlingType.TILBAKEKREVING, BehandlingType.REVURDERING_TILBAKEKREVING));
-        query.setParameter("bestemtDato", bestemtDato.atStartOfDay().minus(getKravgrunnlagAlderNårGammel()));
+        query.setParameter("bestemtDato", bestemtDato.minus(getKravgrunnlagAlderNårGammel()).atStartOfDay());
         query.setParameter("klasseType", KlasseType.FEIL);
         query.setParameter("heltRettsgebyr", Satser.rettsgebyr());
         query.setParameter("halvtRettsgebyr", Satser.halvtRettsgebyr());

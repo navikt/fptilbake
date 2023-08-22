@@ -2,12 +2,11 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import java.time.LocalDateTime;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -30,7 +29,7 @@ public class KravVedtakStatusTjeneste {
     private static final Logger LOG = LoggerFactory.getLogger(KravVedtakStatusTjeneste.class);
 
     private KravVedtakStatusRepository kravVedtakStatusRepository;
-    private HalvtRettsgebyrTjeneste halvtRettsgebyrTjeneste;
+    private AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste;
     private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private ProsessTaskTjeneste taskTjeneste;
@@ -42,7 +41,7 @@ public class KravVedtakStatusTjeneste {
 
     @Inject
     public KravVedtakStatusTjeneste(KravVedtakStatusRepository kravVedtakStatusRepository,
-                                    HalvtRettsgebyrTjeneste halvtRettsgebyrTjeneste,
+                                    AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste,
                                     ProsessTaskTjeneste taskTjeneste,
                                     BehandlingRepository behandlingRepository,
                                     KravgrunnlagRepository kravgrunnlagRepository,
@@ -102,9 +101,9 @@ public class KravVedtakStatusTjeneste {
             var kravgrunnlag431 = grunnlagRepository.finnKravgrunnlag(behandlingId);
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
 
-            if (halvtRettsgebyrTjeneste.samletUnderHalvtRettsgebyrKanVentePåAutomatiskBehandling(behandlingId)) {
+            if (halvtRettsgebyrTjeneste.lavFeilutbetalingKanVentePåAutomatiskBehandling(behandlingId)) {
                 // Bli stående på vent til 8 uker.
-                var fristDato = HalvtRettsgebyrTjeneste.ventefristForTilfelleUnderHalvtRettsgebyr(kravgrunnlag431);
+                var fristDato = AutomatiskSaksbehandlingVurderingTjeneste.ventefristForTilfelleSomKanAutomatiskSaksbehandles(kravgrunnlag431);
                 var behandling = behandlingRepository.hentBehandling(behandlingId);
                 behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
                     BehandlingStegType.TBKGSTEG, fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);

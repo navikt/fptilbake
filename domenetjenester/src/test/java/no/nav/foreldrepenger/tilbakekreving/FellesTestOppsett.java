@@ -11,20 +11,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import jakarta.persistence.EntityManager;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
+import jakarta.persistence.EntityManager;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatAktsomhetDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatAnnetDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatGodTroDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårsvurderingPerioderDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.AutomatiskSaksbehandlingVurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.GjenopptaBehandlingMedGrunnlagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HalvtRettsgebyrTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
@@ -158,7 +157,7 @@ public abstract class FellesTestOppsett {
         behandlingRepository = repoProvider.getBehandlingRepository();
         varselRepository = repoProvider.getVarselRepository();
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
-        var halvtGebyrTjeneste = new HalvtRettsgebyrTjeneste(grunnlagRepository, varselRepository);
+        var halvtGebyrTjeneste = new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, varselRepository);
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste,
             mockSlettGrunnlagEventPubliserer, halvtGebyrTjeneste, entityManager);
         kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(grunnlagRepository);

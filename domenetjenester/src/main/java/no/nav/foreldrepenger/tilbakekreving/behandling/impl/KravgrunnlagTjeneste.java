@@ -10,14 +10,13 @@ import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -50,7 +49,7 @@ public class KravgrunnlagTjeneste {
     private HistorikkRepository historikkRepository;
     private GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
-    private HalvtRettsgebyrTjeneste halvtRettsgebyrTjeneste;
+    private AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste;
     private SlettGrunnlagEventPubliserer kravgrunnlagEventPubliserer;
     private EntityManager entityManager;
 
@@ -64,7 +63,7 @@ public class KravgrunnlagTjeneste {
                                 GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste,
                                 BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                 SlettGrunnlagEventPubliserer slettGrunnlagEventPubliserer,
-                                HalvtRettsgebyrTjeneste halvtRettsgebyrTjeneste,
+                                AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste,
                                 EntityManager entityManager) {
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
@@ -135,8 +134,8 @@ public class KravgrunnlagTjeneste {
             LOG.info("Setter behandling på vent pga kravgrunnlag endret til et ugyldig kravgrunnlag for behandlingId={}", behandlingId);
             behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, LocalDateTime.now().plusDays(7), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         } else {
-            var skalVenteTil = halvtRettsgebyrTjeneste.samletUnderHalvtRettsgebyrKanVentePåAutomatiskBehandling(behandlingId, kravgrunnlag431) ?
-                HalvtRettsgebyrTjeneste.ventefristForTilfelleUnderHalvtRettsgebyr(kravgrunnlag431) : null;
+            var skalVenteTil = halvtRettsgebyrTjeneste.lavFeilutbetalingKanVentePåAutomatiskBehandling(behandlingId, kravgrunnlag431) ?
+                AutomatiskSaksbehandlingVurderingTjeneste.ventefristForTilfelleSomKanAutomatiskSaksbehandles(kravgrunnlag431) : null;
             tilbakeførBehandlingTilFaktaSteg(behandling, skalVenteTil);
         }
     }

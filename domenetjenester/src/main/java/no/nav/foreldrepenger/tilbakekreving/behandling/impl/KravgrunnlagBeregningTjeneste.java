@@ -12,7 +12,6 @@ import java.util.function.Function;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Satser;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -51,7 +50,7 @@ public class KravgrunnlagBeregningTjeneste {
         return map;
     }
 
-    public static boolean samletFeilutbetaltUnderHalvtRettsgebyr(Kravgrunnlag431 kravgrunnlag) {
+    public static boolean samletFeilutbetaltKanAutomatiskBehandles(Kravgrunnlag431 kravgrunnlag) {
         var feilutbetalt = kravgrunnlag.getPerioder().stream()
             .map(KravgrunnlagPeriode432::getKravgrunnlagBeloper433)
             .flatMap(Collection::stream)

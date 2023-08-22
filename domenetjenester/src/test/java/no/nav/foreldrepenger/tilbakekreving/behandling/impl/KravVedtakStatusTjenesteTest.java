@@ -55,7 +55,7 @@ class KravVedtakStatusTjenesteTest {
     @BeforeEach
     void setUp() {
         kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
-            new HalvtRettsgebyrTjeneste(grunnlagRepository, mock(VarselRepository.class)),
+            new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, mock(VarselRepository.class)),
             null, behandlingRepository, grunnlagRepository, behandlingskontrollTjeneste);
     }
 

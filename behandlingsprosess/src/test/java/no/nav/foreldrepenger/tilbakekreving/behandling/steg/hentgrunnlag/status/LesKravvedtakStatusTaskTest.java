@@ -16,7 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HalvtRettsgebyrTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.AutomatiskSaksbehandlingVurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravVedtakStatusTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
@@ -69,7 +69,7 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         behandlingresultatRepository = new BehandlingresultatRepository(entityManager);
         henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, taskTjeneste, behandlingskontrollTjeneste, historikkinnslagTjeneste);
         var kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
-            new HalvtRettsgebyrTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository()), taskTjeneste,
+            new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository()), taskTjeneste,
             repositoryProvider.getBehandlingRepository(), repositoryProvider.getGrunnlagRepository(), behandlingskontrollTjeneste);
         var kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
         lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider.getBehandlingRepository(),
