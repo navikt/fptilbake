@@ -3,6 +3,11 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -17,12 +22,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -33,7 +32,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.He
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
-import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
@@ -108,7 +106,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
             @ApiResponse(responseCode = "500", description = "Ukjent feil!")
         })
     @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
-    public Response annullerKravgrunnlag(@Valid @NotNull @TilpassetAbacAttributt(supplierClass = AbacBehandlingId.class) HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
+    public Response annullerKravgrunnlag(@Valid @NotNull @TilpassetAbacAttributt(supplierClass = AbacIngen.class) HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
         Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
         try {
             var behandlingId = behandling.getId();
@@ -153,15 +151,4 @@ public class ForvaltningKravgrunnlagRestTjeneste {
         }
     }
 
-    public class AbacBehandlingId implements Function<Object, AbacDataAttributter> {
-
-        @Override
-        public AbacDataAttributter apply(Object obj) {
-            if (obj instanceof HentKorrigertKravgrunnlagDto kravgrunnlagDto) {
-                return AbacDataAttributter.opprett()
-                    .leggTil(StandardAbacAttributtType.BEHANDLING_ID, kravgrunnlagDto.getBehandlingId());
-            }
-            throw new IllegalArgumentException("Ikke-støttet type: " + (obj != null ? obj.getClass() : null));
-        }
-    }
 }
