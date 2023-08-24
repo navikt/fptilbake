@@ -4,6 +4,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -16,12 +21,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
@@ -250,26 +249,6 @@ public class ForvaltningBehandlingRestTjeneste {
     @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
     public Response avbrytÅpentAksjonspunktForAvsluttetBehandling() {
         behandlingRepository.avbrytÅpentAksjonspunktForAvsluttetBehandling();
-        return Response.ok().build();
-    }
-
-    @POST
-    @Path("/sjekk-halvt-rettsgebyr")
-    @Operation(
-        tags = "FORVALTNING-behandling",
-        description = "Tjeneste for å hoppe tilbake dersom kan behandles automatisk!",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Aksjonspunkt avbrut"),
-            @ApiResponse(responseCode = "500", description = "ukjent feil.")
-        })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
-    public Response sjekkMuligAutomatiskBehandling() {
-        behandlingRepository.finnBehandlingerFaktaFeilutbetaling().forEach(b -> {
-            var behandling = behandlingRepository.hentBehandling(b);
-            ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(HalvtRettsGebyrTask.class);
-            prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-            taskTjeneste.lagre(prosessTaskData);
-        });
         return Response.ok().build();
     }
 

@@ -248,18 +248,4 @@ public class BehandlingRepository {
 
     }
 
-    public List<Long> finnBehandlingerFaktaFeilutbetaling() {
-        var query =  entityManager.createNativeQuery("""
-           select distinct ap.behandling_id
-           from aksjonspunkt ap
-           where ap.aksjonspunkt_status = 'OPPR'
-           and ap.aksjonspunkt_def = '7003'
-           and ap.behandling_id not in (select distinct api.behandling_id from aksjonspunkt api where api.aksjonspunkt_status = 'OPPR' and api.aksjonspunkt_def in ('7001', '7002'))
-        """);
-        @SuppressWarnings("unchecked")
-        List<Number> resultatList = query.getResultList();
-        return resultatList.stream().map(Number::longValue).toList();
-    }
-
-
 }
