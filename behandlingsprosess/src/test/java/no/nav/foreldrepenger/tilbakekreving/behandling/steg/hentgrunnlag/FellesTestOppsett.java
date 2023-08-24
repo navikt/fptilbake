@@ -13,13 +13,13 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.FlushModeType;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.AutomatiskSaksbehandlingVurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.GjenopptaBehandlingMedGrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
@@ -116,8 +116,9 @@ public abstract class FellesTestOppsett {
         );
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager,
                 new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
+        var haltGebyrTjeneste = new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository());
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste,
-                behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer, entityManager);
+                behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer, haltGebyrTjeneste, entityManager);
         kravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
         lesKravgrunnlagTask = new LesKravgrunnlagTask(mottattXmlRepository, kravgrunnlagTjeneste, kravgrunnlagMapper,
                 repositoryProvider, fagsystemKlientMock);

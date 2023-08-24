@@ -10,14 +10,13 @@ import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -50,7 +49,7 @@ public class KravgrunnlagTjeneste {
     private HistorikkRepository historikkRepository;
     private GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
-
+    private AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste;
     private SlettGrunnlagEventPubliserer kravgrunnlagEventPubliserer;
     private EntityManager entityManager;
 
@@ -64,13 +63,14 @@ public class KravgrunnlagTjeneste {
                                 GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste,
                                 BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                 SlettGrunnlagEventPubliserer slettGrunnlagEventPubliserer,
+                                AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste,
                                 EntityManager entityManager) {
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.historikkRepository = repositoryProvider.getHistorikkRepository();
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
-
+        this.halvtRettsgebyrTjeneste = halvtRettsgebyrTjeneste;
         this.kravgrunnlagEventPubliserer = slettGrunnlagEventPubliserer;
         this.entityManager = entityManager;
     }
@@ -134,11 +134,13 @@ public class KravgrunnlagTjeneste {
             LOG.info("Setter behandling på vent pga kravgrunnlag endret til et ugyldig kravgrunnlag for behandlingId={}", behandlingId);
             behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, LocalDateTime.now().plusDays(7), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         } else {
-            tilbakeførBehandlingTilFaktaSteg(behandling);
+            var skalVenteTil = halvtRettsgebyrTjeneste.lavFeilutbetalingKanVentePåAutomatiskBehandling(behandlingId, kravgrunnlag431) ?
+                AutomatiskSaksbehandlingVurderingTjeneste.ventefristForTilfelleSomKanAutomatiskSaksbehandles(kravgrunnlag431) : null;
+            tilbakeførBehandlingTilFaktaSteg(behandling, skalVenteTil);
         }
     }
 
-    public void tilbakeførBehandlingTilFaktaSteg(Behandling behandling) {
+    public void tilbakeførBehandlingTilFaktaSteg(Behandling behandling, LocalDateTime skalVenteTil) {
         var behandlingId = behandling.getId();
         var erForbiFaktaSteg = behandlingskontrollTjeneste.erStegPassert(behandling, FAKTA_FEILUTBETALING);
         // forutsatt at FPTILBAKE allerede har fått SPER melding for den behandlingen og sett behandling på vent med VenteÅrsak VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
@@ -156,7 +158,12 @@ public class KravgrunnlagTjeneste {
         }
         slettVLAnsvarlingSaksbehandler(behandling); // Hvis AS er ikke null vil den aldri bli plukket opp av automatisk saksbehandling igjen.
         fyrKravgrunnlagEndretEvent(behandlingId);
-        gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
+        if (skalVenteTil == null || skalVenteTil.isBefore(LocalDateTime.now())) {
+            gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
+        } else {
+            behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
+                BehandlingStegType.TBKGSTEG, skalVenteTil, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        }
     }
 
     private void avbrytPlanlagteTasker(Long behandlingId) {

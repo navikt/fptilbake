@@ -108,8 +108,8 @@ class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
                 .medSaksBehId("Z991035")
                 .medReferanse(henvisning)
                 .build();
-        KravgrunnlagPeriode432 feilPeriode = KravgrunnlagMockUtil.lagMockPeriode(mockMedFeilPostering, kravgrunnlag431);
-        KravgrunnlagPeriode432 ytelPeriode = KravgrunnlagMockUtil.lagMockPeriode(mockMedYtelPostering, kravgrunnlag431);
+        KravgrunnlagPeriode432 feilPeriode = KravgrunnlagMockUtil.lagMockPeriode(List.of(mockMedFeilPostering), kravgrunnlag431);
+        KravgrunnlagPeriode432 ytelPeriode = KravgrunnlagMockUtil.lagMockPeriode(List.of(mockMedYtelPostering), kravgrunnlag431);
         kravgrunnlag431.leggTilPeriode(feilPeriode);
         kravgrunnlag431.leggTilPeriode(ytelPeriode);
 

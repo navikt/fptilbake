@@ -234,7 +234,7 @@ public class ForvaltningBehandlingRestTjeneste {
         } else if (behandling.isBehandlingPåVent()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Kan ikke flyttes, behandlingen er på vent!").build();
         }
-        kravgrunnlagTjeneste.tilbakeførBehandlingTilFaktaSteg(behandling);
+        kravgrunnlagTjeneste.tilbakeførBehandlingTilFaktaSteg(behandling, null);
         return Response.ok().build();
     }
 
@@ -250,6 +250,26 @@ public class ForvaltningBehandlingRestTjeneste {
     @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
     public Response avbrytÅpentAksjonspunktForAvsluttetBehandling() {
         behandlingRepository.avbrytÅpentAksjonspunktForAvsluttetBehandling();
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/sjekk-halvt-rettsgebyr")
+    @Operation(
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å hoppe tilbake dersom kan behandles automatisk!",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Aksjonspunkt avbrut"),
+            @ApiResponse(responseCode = "500", description = "ukjent feil.")
+        })
+    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
+    public Response sjekkMuligAutomatiskBehandling() {
+        behandlingRepository.finnBehandlingerFaktaFeilutbetaling().forEach(b -> {
+            var behandling = behandlingRepository.hentBehandling(b);
+            ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(HalvtRettsGebyrTask.class);
+            prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+            taskTjeneste.lagre(prosessTaskData);
+        });
         return Response.ok().build();
     }
 

@@ -15,12 +15,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import jakarta.inject.Inject;
-import jakarta.persistence.FlushModeType;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import jakarta.inject.Inject;
+import jakarta.persistence.FlushModeType;
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -63,7 +62,8 @@ class KravgrunnlagTjenesteTest extends FellesTestOppsett {
         entityManager.setFlushMode(FlushModeType.AUTO);
         when(mockTpsTjeneste.hentAktørForFnr(new PersonIdent(SSN))).thenReturn(Optional.of(aktørId));
         when(behandlingskontrollTjeneste.erStegPassert(any(Behandling.class), any(BehandlingStegType.class))).thenReturn(true);
-        kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, mockGjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, eventPubliserer, entityManager);
+        kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, mockGjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, eventPubliserer,
+            new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, varselRepository), entityManager);
     }
 
     @Test
