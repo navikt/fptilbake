@@ -2,13 +2,12 @@ package no.nav.foreldrepenger.tilbakekreving.los.klient.observer;
 
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType.FAKTA_FEILUTBETALING;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Observes;
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingEnhetEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
@@ -17,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.Behandlings
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
@@ -65,9 +63,9 @@ public class LosEventObserver {
 
     public void observerAksjonpunktStatusEvent(@Observes AksjonspunktStatusEvent event) {
         if (Fagsystem.FPTILBAKE.equals(fagsystem)) {
-            var manueltPåVent = event.getAksjonspunkter().stream()
-                .anyMatch(e -> e.erOpprettet() && AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING.equals(e.getAksjonspunktDefinisjon()));
-            if (manueltPåVent) {
+            var sattPåVent = event.getAksjonspunkter().stream()
+                .anyMatch(e -> e.erOpprettet() && e.erAutopunkt());
+            if (sattPåVent) {
                 opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.AKSJONSPUNKT_OPPRETTET);
             }
         } else {
