@@ -9,14 +9,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.hibernate.jpa.QueryHints;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
-
-import org.hibernate.jpa.QueryHints;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -258,8 +257,8 @@ public class BehandlingRepository {
            and ap.behandling_id not in (select distinct api.behandling_id from aksjonspunkt api where api.aksjonspunkt_status = 'OPPR' and api.aksjonspunkt_def in ('7001', '7002'))
         """);
         @SuppressWarnings("unchecked")
-        List<BigDecimal> resultatList = query.getResultList();
-        return resultatList.stream().map(BigDecimal::longValue).toList();
+        List<Number> resultatList = query.getResultList();
+        return resultatList.stream().map(Number::longValue).toList();
     }
 
 
