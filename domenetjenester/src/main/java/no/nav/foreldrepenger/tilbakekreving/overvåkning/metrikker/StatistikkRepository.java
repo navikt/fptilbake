@@ -23,13 +23,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jakarta.enterprise.context.Dependent;
-import jakarta.enterprise.inject.Any;
-import jakarta.enterprise.inject.Instance;
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Tuple;
-
 import org.hibernate.query.NativeQuery;
 import org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy;
 import org.slf4j.Logger;
@@ -38,6 +31,12 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Any;
+import jakarta.enterprise.inject.Instance;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Tuple;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
@@ -285,7 +284,7 @@ public class StatistikkRepository {
         var values = stream.map(t -> {
                 String ytelseType = t.get(0, String.class);
                 String saksnummer = t.get(1, String.class);
-                String behandlingId = t.get(2, BigDecimal.class).toString();
+                String behandlingId = t.get(2, Long.class).toString();
                 String aksjonspunktKode = t.get(3, String.class);
                 String aksjonspunktNavn = coalesce(AksjonspunktDefinisjon.kodeMap().getOrDefault(aksjonspunktKode, AksjonspunktDefinisjon.UNDEFINED).getNavn(), UDEFINERT);
                 String aksjonspunktStatus = t.get(4, String.class);
@@ -379,7 +378,7 @@ public class StatistikkRepository {
         Collection<SensuEvent> values = stream.map(t -> {
                 String ytelseType = t.get(0, String.class);
                 String saksnummer = t.get(1, String.class);
-                String taskId = t.get(2, BigDecimal.class).toString();
+                String taskId = t.get(2, Long.class).toString();
                 String taskType = t.get(3, String.class);
                 String status = t.get(4, String.class);
                 Timestamp sistKjørt = t.get(5, Timestamp.class);
@@ -399,12 +398,12 @@ public class StatistikkRepository {
 
                 String taskParams = t.get(7, String.class);
 
-                BigDecimal blokkertAvId = t.get(8, BigDecimal.class);
+                Long blokkertAvId = t.get(8, Long.class);
                 String blokkertAv = blokkertAvId == null ? null : blokkertAvId.toString();
 
                 String opprettetTid = t.get(9, Timestamp.class).toInstant().toString();
 
-                var gruppeSekvensnr = t.get(10, BigDecimal.class);
+                var gruppeSekvensnr = t.get(10, Long.class);
 
                 return SensuEvent.createSensuEvent(metricName,
                     toMap(
