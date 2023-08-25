@@ -52,7 +52,6 @@
     "FORELDELSE_ANTALLMAANEDER" : "P1M",
     "VEDTAKSBREV_JOIN_PERIODER" : "true",
     "AKTIVER_ABAC_LOGGING" : "false",
-    "TOKEN_SYSTEM_USE_AZURE" : "false",
     "TOGGLE_AIVEN_LOS" : "true",
     "TOGGLE_ENABLE_SENSU" : "true"
   },
