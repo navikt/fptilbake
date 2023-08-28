@@ -25,14 +25,12 @@ updates:
       prod-deps:
         dependency-type: "production"
         exclude-patterns:
-          - "no.nav.foreldrepenger.*"
-          - "no.nav.vedtak.*"
+          - "no.nav.*"
       dev-deps:
         dependency-type: "development"
         exclude-patterns:
-          - "no.nav.foreldrepenger.*"
-          - "no.nav.vedtak.*"
+          - "no.nav.*"
       interne-deps:
         patterns:
-          - "no.nav.foreldrepenger.*"
-          - "no.nav.vedtak.*"
+          - "no.nav.*"
+
