@@ -12,6 +12,7 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 @ApplicationScoped
 public class ØkonomiMottattXmlRepository {
@@ -58,7 +59,7 @@ public class ØkonomiMottattXmlRepository {
         return query.getResultList();
     }
 
-    public List<ØkonomiXmlMottatt> finnAlleForSaksnummer(String saksnummer) {
+    public List<ØkonomiXmlMottatt> finnAlleForSaksnummer(Saksnummer saksnummer) {
         var query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer=:saksnummer", ØkonomiXmlMottatt.class);
         query.setParameter("saksnummer", saksnummer);
         return query.getResultList();

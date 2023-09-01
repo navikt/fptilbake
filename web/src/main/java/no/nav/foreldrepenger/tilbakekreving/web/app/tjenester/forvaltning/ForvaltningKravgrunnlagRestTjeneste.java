@@ -24,6 +24,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
@@ -132,7 +133,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
     public Response hentForvaltninginfo(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataSaksnummerReferanse.class)
                                         @NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummer) {
         try {
-            return Response.ok(forvaltningTjeneste.hentForvaltningsinfo(saksnummer.getVerdi())).build();
+            return Response.ok(forvaltningTjeneste.hentForvaltningsinfo(new Saksnummer(saksnummer.getVerdi()))).build();
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }

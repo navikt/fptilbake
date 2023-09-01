@@ -11,6 +11,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.første
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.exception.TekniskException;
@@ -53,7 +54,7 @@ class ForvaltningTjeneste {
         økonomiProxyKlient.anullerKravgrunnlag(annullerKravgrunnlagDto);
     }
 
-    Forvaltningsinfo hentForvaltningsinfo(String saksnummer) {
+    Forvaltningsinfo hentForvaltningsinfo(Saksnummer saksnummer) {
         var behandling = behandlingRepository.finnÅpenTilbakekrevingsbehandling(saksnummer);
         if (behandling.isPresent()) {
             var behandlingId = behandling.get().getId();

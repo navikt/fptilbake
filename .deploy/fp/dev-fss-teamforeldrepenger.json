@@ -46,6 +46,11 @@
       "app": "fpfordel",
       "namespace": "teamforeldrepenger",
       "cluster": "dev-fss"
+    },
+    {
+      "app": "fpoversikt",
+      "namespace": "teamforeldrepenger",
+      "cluster": "dev-gcp"
     }
   ]
 }
