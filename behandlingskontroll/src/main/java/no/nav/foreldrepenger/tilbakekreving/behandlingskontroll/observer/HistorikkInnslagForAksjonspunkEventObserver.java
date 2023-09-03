@@ -6,12 +6,13 @@ import java.util.Optional;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
@@ -28,14 +29,16 @@ import no.nav.vedtak.sikkerhet.kontekst.SikkerhetContext;
 public class HistorikkInnslagForAksjonspunkEventObserver {
 
     private HistorikkRepository historikkRepository;
+    private BehandlingRepository behandlingRepository;
 
     private HistorikkInnslagForAksjonspunkEventObserver() {
         // CDI
     }
 
     @Inject
-    public HistorikkInnslagForAksjonspunkEventObserver(HistorikkRepository historikkRepository) {
+    public HistorikkInnslagForAksjonspunkEventObserver(HistorikkRepository historikkRepository, BehandlingRepository behandlingRepository) {
         this.historikkRepository = historikkRepository;
+        this.behandlingRepository = behandlingRepository;
     }
 
     public void oppretteHistorikkForBehandlingPåVent(@Observes AksjonspunktStatusEvent aksjonspunkterFunnetEvent) {
@@ -54,7 +57,14 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
         for (Aksjonspunkt aksjonspunkt : aksjonspunkterFunnetEvent.getAksjonspunkter()) {
             BehandlingskontrollKontekst ktx = aksjonspunkterFunnetEvent.getKontekst();
 
-            if (!AksjonspunktStatus.OPPRETTET.equals(aksjonspunkt.getStatus()) && aksjonspunkt.getFristTid() != null) {
+            if (aksjonspunkt.erUtført() && aksjonspunkt.getFristTid() != null) {
+                // Unngå dobbelinnslag (innslag ved manuellTaAvVent) + konvensjon med påVent->SBH=null og manuellGjenoppta->SBH=ident
+                var manueltTattAvVent = Optional.ofNullable(behandlingRepository.hentBehandling(ktx.getBehandlingId()))
+                    .map(Behandling::getAnsvarligSaksbehandler).isPresent();
+                if (!manueltTattAvVent) {
+                    opprettHistorikkinnslagForVenteFristRelaterteInnslag(ktx.getBehandlingId(), ktx.getFagsakId(), HistorikkinnslagType.BEH_GJEN,
+                        null, null);
+                }
                 opprettHistorikkinnslagForVenteFristRelaterteInnslag(ktx.getBehandlingId(), ktx.getFagsakId(),
                         HistorikkinnslagType.BEH_GJEN, null, null);
             }
