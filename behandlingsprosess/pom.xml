@@ -34,10 +34,6 @@
         <!-- interne -->
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>kontrakter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>behandlingslager-domene</artifactId>
         </dependency>
         <dependency>
