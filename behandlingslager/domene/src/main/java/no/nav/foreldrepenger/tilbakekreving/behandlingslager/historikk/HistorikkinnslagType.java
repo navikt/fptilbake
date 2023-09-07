@@ -15,15 +15,14 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Converter;
-import jakarta.persistence.Transient;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+import jakarta.persistence.Transient;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
@@ -47,6 +46,7 @@ public enum HistorikkinnslagType implements Kodeverdi {
     NYE_REGOPPLYSNINGER("NYE_REGOPPLYSNINGER", "Nye registeropplysninger", MAL_TYPE_1),
     KLAGEBEH_STARTET("KLAGEBEH_STARTET", "Klage mottatt", MAL_TYPE_1),
     TBK_OPPR("TILBAKEKREVING_OPPR", "Tilbakekreving opprettet", MAL_TYPE_1),
+    OPPGAVE_VEDTAK("OPPGAVE_VEDTAK", "Oppgave før vedtak", MAL_TYPE_1),
 
     // type 2
     FORSLAG_VEDTAK("FORSLAG_VEDTAK", "Vedtak foreslått og sendt til beslutter", MAL_TYPE_2),
