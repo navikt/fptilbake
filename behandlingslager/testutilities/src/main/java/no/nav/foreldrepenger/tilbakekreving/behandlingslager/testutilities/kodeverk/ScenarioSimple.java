@@ -6,7 +6,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kode
  */
 public class ScenarioSimple extends AbstractTestScenario<ScenarioSimple> {
 
-    private ScenarioSimple() {
+    public ScenarioSimple() {
         super();
     }
 
