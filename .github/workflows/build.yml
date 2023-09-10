@@ -66,7 +66,6 @@ jobs:
     needs: [build-app, fptilbake-tester, verdikjede-tester]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
     with:
-      gar: true
       image: ${{ needs.build-app.outputs.build-version }}
       cluster: dev-fss
       namespace: teamforeldrepenger
@@ -80,7 +79,6 @@ jobs:
     needs: [build-app, fptilbake-tester, verdikjede-tester, deploy-dev-teamforeldrepenger]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
     with:
-      gar: true
       image: ${{ needs.build-app.outputs.build-version }}
       cluster: prod-fss
       namespace: teamforeldrepenger
