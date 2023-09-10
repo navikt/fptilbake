@@ -22,6 +22,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
     uses: navikt/fp-gha-workflows/.github/workflows/build-app.yml@main
     with:
       build-image: ${{ github.ref_name == 'master' }} # default: true
@@ -59,22 +60,28 @@ jobs:
 
   deploy-dev-teamforeldrepenger:
     name: Deploy dev fp
+    permissions:
+      id-token: write
     if: github.ref_name == 'master'
     needs: [build-app, fptilbake-tester, verdikjede-tester]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
     with:
-      image: ghcr.io/${{ github.repository }}:${{ needs.build-app.outputs.build-version }}
+      gar: true
+      image: ${{ needs.build-app.outputs.build-version }}
       cluster: dev-fss
       namespace: teamforeldrepenger
     secrets: inherit
 
   deploy-prod-teamforeldrepenger:
     name: Deploy prod fp
+    permissions:
+      id-token: write
     if: github.ref_name == 'master'
     needs: [build-app, fptilbake-tester, verdikjede-tester, deploy-dev-teamforeldrepenger]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
     with:
-      image: ghcr.io/${{ github.repository }}:${{ needs.build-app.outputs.build-version }}
+      gar: true
+      image: ${{ needs.build-app.outputs.build-version }}
       cluster: prod-fss
       namespace: teamforeldrepenger
     secrets: inherit

@@ -24,9 +24,11 @@ on:
 jobs:
   deploy:
     name: Deploy dev
+    permissions:
+      id-token: write
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
     with:
-      image: ghcr.io/${{ github.repository }}:${{ inputs.image }}
+      image: ${{ inputs.image }}
       cluster: ${{ inputs.environment }}-fss
       namespace: ${{ inputs.namespace }}
     secrets: inherit

@@ -28,13 +28,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy ${{ inputs.cluster }}
+      - name: Login GAR
+        uses: nais/login@v0
+        if: inputs.namespace == 'teamforeldrepenger'
+        id: login
+        with:
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          team: teamforeldrepenger
+
+      - name: Deploy ${{ inputs.cluster }} fra GAR
         if: inputs.namespace == 'teamforeldrepenger'
         uses: nais/deploy/actions/deploy@v1
         env:
           PRINT_PAYLOAD: true
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_FP }}
           CLUSTER: ${{ inputs.cluster }}
+          IMAGE: ${{ steps.login.outputs.registry }}/${{ github.repository }}:${{ inputs.image }}
           RESOURCE: .deploy/fp/naiserator.yaml
           VARS: .deploy/fp/${{ inputs.cluster }}-${{ inputs.namespace }}.json
 
