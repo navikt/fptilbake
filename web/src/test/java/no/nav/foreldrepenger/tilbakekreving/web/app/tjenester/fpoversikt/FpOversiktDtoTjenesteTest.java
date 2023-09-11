@@ -56,8 +56,7 @@ class FpOversiktDtoTjenesteTest {
         assertThat(sak).isPresent();
         assertThat(sak.get().saksnummer()).isEqualTo(behandling.getFagsak().getSaksnummer().getVerdi());
         assertThat(sak.get().harVerge()).isTrue();
-        assertThat(sak.get().varsel().sendt()).isFalse();
-        assertThat(sak.get().varsel().besvart()).isFalse();
+        assertThat(sak.get().varsel()).isNull();
     }
 
     @Test
@@ -72,7 +71,8 @@ class FpOversiktDtoTjenesteTest {
 
         assertThat(sak).isPresent();
         assertThat(sak.get().harVerge()).isFalse();
-        assertThat(sak.get().varsel().sendt()).isTrue();
+        var brevSporing = repositoryProvider.getBrevSporingRepository().hentSistSendtVarselbrev(behandling.getId()).orElseThrow();
+        assertThat(sak.get().varsel().utsendtTidspunkt()).isEqualTo(brevSporing.getOpprettetTidspunkt());
         assertThat(sak.get().varsel().besvart()).isTrue();
     }
 

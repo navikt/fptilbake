@@ -41,10 +41,16 @@ public class FpOversiktDtoTjeneste {
         }
         var behandlingId = behandling.get().getId();
         var harVerge = vergeRepository.finnesVerge(behandlingId);
-        var erVarselSendt = brevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId);
-        var respons = varselresponsTjeneste.hentRespons(behandlingId);
         var fagsak = behandling.get().getFagsak();
 
-        return Optional.of(new Sak(fagsak.getSaksnummer().getVerdi(), new Sak.Varsel(erVarselSendt, respons.isPresent()), harVerge));
+        var varsel = finnBrukerVarsel(behandlingId);
+        return Optional.of(new Sak(fagsak.getSaksnummer().getVerdi(), varsel.orElse(null), harVerge));
+    }
+
+    private Optional<Sak.Varsel> finnBrukerVarsel(Long behandlingId) {
+        return brevSporingRepository.hentSistSendtVarselbrev(behandlingId).map(v -> {
+            var respons = varselresponsTjeneste.hentRespons(behandlingId);
+            return new Sak.Varsel(v.getOpprettetTidspunkt(), respons.isPresent());
+        });
     }
 }
