@@ -6,12 +6,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import no.nav.foreldrepenger.kontrakter.simulering.resultat.v1.FeilutbetaltePerioderDto;
+import no.nav.foreldrepenger.kontrakter.simulering.resultat.v1.PeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriodeMedFaktaDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
@@ -31,8 +31,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.FeilutbetaltePerioderDto;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.PeriodeDto;
 
 class VarselbrevUtilTest {
 
@@ -85,15 +83,15 @@ class VarselbrevUtilTest {
         assertThat(varselbrev.getFritekstFraSaksbehandler()).isEqualTo(VARSEL_TEKST);
         assertThat(varselbrev.getBrevMetadata().getSaksnummer()).isEqualTo(saksnummer.getVerdi());
         assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(eksternBehandlingsinfoDto.getSpråkkodeEllerDefault());
-        assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetaltePerioderDto.getSumFeilutbetaling());
+        assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetaltePerioderDto.sumFeilutbetaling());
         assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("eingongsstønad");
         assertThat(varselbrev.getBrevMetadata().getTittel()).isEqualTo("Varsel tilbakebetaling engangsstønad");
 
         assertThat(varselbrev.getBrevMetadata().getSakspartNavn()).isEqualTo(personinfo.getNavn());
         assertThat(varselbrev.getBrevMetadata().getSakspartId()).isEqualTo(personinfo.getPersonIdent().getIdent());
 
-        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getFom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getFom());
-        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getTom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getTom());
+        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getFom()).isEqualTo(feilutbetaltePerioderDto.perioder().get(0).fom());
+        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getTom()).isEqualTo(feilutbetaltePerioderDto.perioder().get(0).tom());
         assertThat(varselbrev.getBrevMetadata().getMottakerAdresse()).isEqualTo(adresseinfo);
     }
 
@@ -136,15 +134,15 @@ class VarselbrevUtilTest {
         assertThat(varselbrev.getBrevMetadata().getSaksnummer()).isEqualTo("11111111");
         assertThat(varselbrev.getBrevMetadata().getAnsvarligSaksbehandler()).isEqualTo("VL");
         assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(Språkkode.nn);
-        assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetaltePerioderDto.getSumFeilutbetaling());
+        assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetaltePerioderDto.sumFeilutbetaling());
         assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("svangerskapspengar");
         assertThat(varselbrev.getBrevMetadata().getTittel()).isEqualTo("Varsel tilbakebetaling svangerskapspenger");
 
         assertThat(varselbrev.getBrevMetadata().getSakspartNavn()).isEqualTo("Fiona");
         assertThat(varselbrev.getBrevMetadata().getSakspartId()).isEqualTo(PERSONNUMMER);
 
-        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getFom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getFom());
-        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getTom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getTom());
+        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getFom()).isEqualTo(feilutbetaltePerioderDto.perioder().get(0).fom());
+        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getTom()).isEqualTo(feilutbetaltePerioderDto.perioder().get(0).tom());
         assertThat(varselbrev.getBrevMetadata().getMottakerAdresse()).isEqualTo(adresseinfo);
     }
 
@@ -207,10 +205,7 @@ class VarselbrevUtilTest {
     }
 
     private FeilutbetaltePerioderDto lagFeilutbetaltePerioderMock(Long sumFeilutbetalinger) {
-        FeilutbetaltePerioderDto feilutbetaltePerioderDto = new FeilutbetaltePerioderDto();
-        feilutbetaltePerioderDto.setSumFeilutbetaling(sumFeilutbetalinger);
-        feilutbetaltePerioderDto.setPerioder(lagPerioderDtoMock());
-        return feilutbetaltePerioderDto;
+        return new FeilutbetaltePerioderDto(sumFeilutbetalinger, lagPerioderDtoMock());
     }
 
     private Personinfo byggStandardPerson(String navn, String personnummer) {
@@ -228,9 +223,7 @@ class VarselbrevUtilTest {
     }
 
     private List<PeriodeDto> lagPerioderDtoMock() {
-        PeriodeDto periode = new PeriodeDto();
-        periode.setFom(LocalDate.of(2019, 1, 1));
-        periode.setTom(LocalDate.of(2020, 2, 1));
+        PeriodeDto periode = new PeriodeDto(LocalDate.of(2019, 1, 1), LocalDate.of(2020, 2, 1));
         return List.of(periode);
     }
 
