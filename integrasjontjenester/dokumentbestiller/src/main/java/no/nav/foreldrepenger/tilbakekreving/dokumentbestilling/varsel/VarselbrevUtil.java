@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import no.nav.foreldrepenger.kontrakter.simulering.resultat.v1.FeilutbetaltePerioderDto;
+import no.nav.foreldrepenger.kontrakter.simulering.resultat.v1.PeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
@@ -19,8 +21,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.pe
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.FeilutbetaltePerioderDto;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.PeriodeDto;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 public class VarselbrevUtil {
@@ -65,7 +65,7 @@ public class VarselbrevUtil {
         return new VarselbrevSamletInfo.Builder()
                 .medMetadata(metadata)
                 .medFritekstFraSaksbehandler(varselTekst)
-                .medSumFeilutbetaling(feilutbetaltePerioderDto.getSumFeilutbetaling())
+                .medSumFeilutbetaling(feilutbetaltePerioderDto.sumFeilutbetaling())
                 .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
                 .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
                 .medRevurderingVedtakDato(grunninformasjon.getVedtakDato())
@@ -105,7 +105,7 @@ public class VarselbrevUtil {
         return new VarselbrevSamletInfo.Builder()
                 .medMetadata(brevMetadata)
                 .medFritekstFraSaksbehandler(varseltekst)
-                .medSumFeilutbetaling(feilutbetaltePerioderDto.getSumFeilutbetaling())
+                .medSumFeilutbetaling(feilutbetaltePerioderDto.sumFeilutbetaling())
                 .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
                 .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
                 .medRevurderingVedtakDato(grunninformasjon.getVedtakDato())
@@ -160,8 +160,8 @@ public class VarselbrevUtil {
 
     private static List<HbPeriode> mapFeilutbetaltePerioder(FeilutbetaltePerioderDto feilutbetaltePerioderDto) {
         ArrayList<HbPeriode> feilutbetaltPerioder = new ArrayList<>();
-        for (PeriodeDto periodeDto : feilutbetaltePerioderDto.getPerioder()) {
-            feilutbetaltPerioder.add(HbPeriode.of(periodeDto.getFom(), periodeDto.getTom()));
+        for (PeriodeDto periodeDto : feilutbetaltePerioderDto.perioder()) {
+            feilutbetaltPerioder.add(HbPeriode.of(periodeDto.fom(), periodeDto.tom()));
         }
         return feilutbetaltPerioder;
     }
