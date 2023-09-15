@@ -4,12 +4,11 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -107,15 +106,16 @@ public class GjenopptaBehandlingTjeneste {
      * Fortsetter behandling manuelt, registrerer brukerrespons hvis i varsel-steg
      * og venter på brukerrespons.
      *
+     * @param responsKanal
      * @param behandlingId
      * @return
      */
-    public Optional<String> fortsettBehandlingManuelt(long behandlingId, HistorikkAktør historikkAktør) {
+    public Optional<String> fortsettBehandlingManuelt(long behandlingId, HistorikkAktør historikkAktør, ResponsKanal responsKanal) {
         Optional<Behandling> behandlingOpt = behandlingVenterRepository.hentBehandlingPåVent(behandlingId);
         if (behandlingOpt.isPresent()) {
             Behandling behandling = behandlingOpt.get();
             if (BehandlingStegType.VARSEL.equals(behandling.getAktivtBehandlingSteg()) && Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING.equals(behandling.getVenteårsak())) {
-                varselresponsTjeneste.lagreRespons(behandlingId, ResponsKanal.MANUELL);
+                varselresponsTjeneste.lagreRespons(behandlingId, responsKanal);
             } else if (!kanGjenopptaSteg(behandlingId) && Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(behandling.getVenteårsak())) {
                 return Optional.empty();
             }
