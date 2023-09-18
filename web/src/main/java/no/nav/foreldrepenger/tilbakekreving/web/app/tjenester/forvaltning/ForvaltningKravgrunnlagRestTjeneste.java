@@ -130,8 +130,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
             @ApiResponse(responseCode = "500", description = "Ukjent feil!")
         })
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.DRIFT)
-    public Response hentForvaltninginfo(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataSaksnummerReferanse.class)
-                                        @NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummer) {
+    public Response hentForvaltninginfo(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummer) {
         try {
             return Response.ok(forvaltningTjeneste.hentForvaltningsinfo(new Saksnummer(saksnummer.getVerdi()))).build();
         } catch (Exception e) {
