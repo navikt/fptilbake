@@ -25,13 +25,4 @@ public class BehandlingReferanseAbacAttributter {
             return fraBehandlingReferanse(req);
         }
     }
-
-    public static class AbacDataSaksnummerReferanse implements Function<Object, AbacDataAttributter> {
-
-        @Override
-        public AbacDataAttributter apply(Object obj) {
-            var req = (Saksnummer) obj;
-            return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.SAKSNUMMER, req.getVerdi());
-        }
-    }
 }
