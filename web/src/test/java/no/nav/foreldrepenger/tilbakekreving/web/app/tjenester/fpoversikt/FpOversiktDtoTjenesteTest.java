@@ -60,12 +60,12 @@ class FpOversiktDtoTjenesteTest {
     }
 
     @Test
-    void returnerer_med_varsel() {
+    void returnerer_med_varsel_respons_fra_selvbetjening() {
         var tjeneste = tjeneste();
         var behandling = åpenTilbakekreving();
 
         lagVarsel(behandling);
-        lagVarselRespons(behandling);
+        lagVarselRespons(behandling, ResponsKanal.SELVBETJENING);
 
         var sak = tjeneste.hentSak(behandling.getFagsak().getSaksnummer());
 
@@ -76,8 +76,23 @@ class FpOversiktDtoTjenesteTest {
         assertThat(sak.get().varsel().besvart()).isTrue();
     }
 
-    private void lagVarselRespons(Behandling behandling) {
-        varselresponsTjeneste.lagreRespons(behandling.getId(), ResponsKanal.MANUELL, null);
+    @Test
+    void returnerer_ikke_varsel_respons_hvis_manuell_kanal() {
+        var tjeneste = tjeneste();
+        var behandling = åpenTilbakekreving();
+
+        lagVarsel(behandling);
+        lagVarselRespons(behandling, ResponsKanal.MANUELL);
+
+        var sak = tjeneste.hentSak(behandling.getFagsak().getSaksnummer());
+
+        assertThat(sak).isPresent();
+        var brevSporing = repositoryProvider.getBrevSporingRepository().hentSistSendtVarselbrev(behandling.getId()).orElseThrow();
+        assertThat(sak.get().varsel().besvart()).isFalse();
+    }
+
+    private void lagVarselRespons(Behandling behandling, ResponsKanal responsKanal) {
+        varselresponsTjeneste.lagreRespons(behandling.getId(), responsKanal, null);
     }
 
     private void lagVarsel(Behandling behandling) {

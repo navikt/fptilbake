@@ -8,6 +8,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 
 @ApplicationScoped
@@ -49,7 +50,8 @@ public class FpOversiktDtoTjeneste {
 
     private Optional<Sak.Varsel> finnBrukerVarsel(Long behandlingId) {
         return brevSporingRepository.hentSistSendtVarselbrev(behandlingId).map(v -> {
-            var respons = varselresponsTjeneste.hentRespons(behandlingId);
+            var respons = varselresponsTjeneste.hentRespons(behandlingId)
+                .filter(r -> ResponsKanal.getResponsKanal(r.getKilde()) == ResponsKanal.SELVBETJENING);
             return new Sak.Varsel(v.getOpprettetTidspunkt(), respons.isPresent());
         });
     }
