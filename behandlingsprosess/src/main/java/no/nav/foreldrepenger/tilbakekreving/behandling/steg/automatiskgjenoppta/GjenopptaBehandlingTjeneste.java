@@ -111,21 +111,19 @@ public class GjenopptaBehandlingTjeneste {
      * @return
      */
     public Optional<String> fortsettBehandlingManuelt(long behandlingId, HistorikkAktør historikkAktør, ResponsKanal responsKanal) {
-        Optional<Behandling> behandlingOpt = behandlingVenterRepository.hentBehandlingPåVent(behandlingId);
-        if (behandlingOpt.isPresent()) {
-            Behandling behandling = behandlingOpt.get();
+        var behandling = behandlingVenterRepository.hentBehandlingPåVent(behandlingId).orElse(null);
+        if (behandling != null) {
             if (BehandlingStegType.VARSEL.equals(behandling.getAktivtBehandlingSteg()) && Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING.equals(behandling.getVenteårsak())) {
                 varselresponsTjeneste.lagreRespons(behandlingId, responsKanal);
             } else if (!kanGjenopptaSteg(behandlingId) && Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(behandling.getVenteårsak())) {
                 return Optional.empty();
             }
-        }
-        var callId = behandlingOpt.map(behandling -> hentCallId() + behandling.getId()).orElse(null);
-        behandlingOpt.ifPresent(behandling -> {
-            opprettFortsettBehandlingTask(behandling, callId);
+            var callId = hentCallId() + behandling.getId();
+            var gruppe = opprettFortsettBehandlingTask(behandling, callId);
             opprettHistorikkInnslagForManueltGjenopptaBehandling(behandlingId, historikkAktør);
-        });
-        return Optional.ofNullable(callId);
+            return Optional.ofNullable(gruppe);
+        }
+        return Optional.empty();
     }
 
     /**
