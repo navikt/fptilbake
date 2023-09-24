@@ -432,6 +432,22 @@ public class BehandlingRestTjeneste {
 
     //kun brukes av fpsak(backend)
     @GET
+    @Path("/tilbakekreving/aapen-behandling")
+    @Operation(
+        tags = "behandlinger",
+        description = "Sjekk om det finnes åpne behandlinger - tilbakekreving eller revurdering",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Returnerer true hvis det finnes en åpen behandling ellers false", content = @Content(schema = @Schema(implementation = Boolean.class)))
+        })
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
+    public Response harÅpenBehandling(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto) {
+        List<Behandling> behandlinger = behandlingTjeneste.hentBehandlinger(new Saksnummer(saksnummerDto.getVerdi()));
+        var result = behandlinger.stream().anyMatch(behandling -> !behandling.erAvsluttet());
+        return Response.ok().entity(result).build();
+    }
+
+    //kun brukes av fpsak(backend)
+    @GET
     @Path("/tilbakekreving/vedtak-info")
     @Operation(
             tags = "behandlinger",
