@@ -4,16 +4,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingEvent;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 
-public class BehandlingEnhetEvent implements BehandlingEvent {
-    private Long fagsakId;
-    private Long behandlingId;
-    private AktørId aktørId;
-
+public record BehandlingEnhetEvent(Long fagsakId, Long behandlingId, AktørId aktørId) implements BehandlingEvent {
 
     public BehandlingEnhetEvent(Behandling behandling) {
-        this.fagsakId = behandling.getFagsakId();
-        this.behandlingId = behandling.getId();
-        this.aktørId = behandling.getAktørId();
+        this(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId());
     }
 
     @Override
