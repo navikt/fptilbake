@@ -330,7 +330,7 @@
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>swagger-ui</artifactId>
-                <version>4.19.0</version>
+                <version>5.7.2</version>
             </dependency>
 
             <!-- 3dje parts biblioteker -->
@@ -386,7 +386,7 @@
             <dependency>
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>pdfbox</artifactId>
-                <version>2.0.24</version>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>xml-apis</groupId>
@@ -408,7 +408,7 @@
                 <groupId>org.xerial.snappy</groupId>
                 <artifactId>snappy-java</artifactId>
                 <!-- oppdaterer versjon for å bli kvitt CVE-2023-34455 CVE-2023-34454 CVE-2023-34453 -->
-                <version>1.1.10.3</version>
+                <version>1.1.10.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
