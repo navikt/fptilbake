@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordeling;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -64,11 +63,11 @@ public class FordelRestTjeneste {
 
         String dokumentTypeId = mottattJournalpost.getDokumentTypeIdOffisiellKode().orElse(null);
         String saksnummer = mottattJournalpost.getSaksnummer();
-        Optional<Behandling> behandlingForSaksnummer = harBehandlingPåVent(new Saksnummer(saksnummer));
         UUID forsendelseId = mottattJournalpost.getForsendelseId().orElse(null);
 
-        if (behandlingForSaksnummer.isPresent()) {
-            Behandling behandling = behandlingForSaksnummer.get();
+        var åpenBehandling = hentÅpenBehandling(saksnummer);
+        if (åpenBehandling.isPresent()) {
+            var behandling = åpenBehandling.get();
             if (erTilbakemeldingFraBruker(dokumentTypeId)) {
                 LOG.info("Mottok dokument og tok behandlingId={} av vent. Saksnummer={} dokumentTypeId={} forsendelseId={}", behandling.getId(), saksnummer, dokumentTypeId, forsendelseId);
                 varselresponsTjeneste.lagreRespons(behandling.getId(), ResponsKanal.SELVBETJENING);
@@ -81,17 +80,14 @@ public class FordelRestTjeneste {
         }
     }
 
-    private boolean erTilbakemeldingFraBruker(String dokumentTypeId) {
-        return UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID.equals(dokumentTypeId);
+    private Optional<Behandling> hentÅpenBehandling(String saksnummer) {
+        return behandlingRepository.hentAlleBehandlingerForSaksnummer(new Saksnummer(saksnummer))
+            .stream()
+            .filter(b -> !b.erAvsluttet())
+            .findAny();
     }
 
-    private Optional<Behandling> harBehandlingPåVent(Saksnummer saksnummer) {
-        List<Behandling> behandlinger = behandlingRepository.hentAlleBehandlingerForSaksnummer(saksnummer);
-        if (!behandlinger.isEmpty()) {
-            return behandlinger.stream()
-                    .filter(beh -> !beh.erAvsluttet())
-                    .filter(Behandling::isBehandlingPåVent).findAny();
-        }
-        return Optional.empty();
+    private boolean erTilbakemeldingFraBruker(String dokumentTypeId) {
+        return UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID.equals(dokumentTypeId);
     }
 }
