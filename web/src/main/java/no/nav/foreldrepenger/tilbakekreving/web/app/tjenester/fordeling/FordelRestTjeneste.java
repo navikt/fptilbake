@@ -23,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
+import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
@@ -38,6 +39,7 @@ public class FordelRestTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
+    private VarselresponsTjeneste varselresponsTjeneste;
 
     public FordelRestTjeneste() {
         // for CDI
@@ -45,9 +47,11 @@ public class FordelRestTjeneste {
 
     @Inject
     public FordelRestTjeneste(BehandlingRepository behandlingRepository,
-                              GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste) {
+                              GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
+                              VarselresponsTjeneste varselresponsTjeneste) {
         this.behandlingRepository = behandlingRepository;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
+        this.varselresponsTjeneste = varselresponsTjeneste;
     }
 
 
@@ -67,7 +71,8 @@ public class FordelRestTjeneste {
             Behandling behandling = behandlingForSaksnummer.get();
             if (erTilbakemeldingFraBruker(dokumentTypeId)) {
                 LOG.info("Mottok dokument og tok behandlingId={} av vent. Saksnummer={} dokumentTypeId={} forsendelseId={}", behandling.getId(), saksnummer, dokumentTypeId, forsendelseId);
-                gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), HistorikkAktør.SØKER, ResponsKanal.SELVBETJENING); //ta behandling av vent
+                varselresponsTjeneste.lagreRespons(behandling.getId(), ResponsKanal.SELVBETJENING);
+                gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), HistorikkAktør.SØKER);
             } else {
                 LOG.info("Mottok og ignorerte dokument pga dokumentTypeId. Saksnummer={} dokumentTypeId={} forsendelseId={}", saksnummer, dokumentTypeId, forsendelseId);
             }
