@@ -56,7 +56,7 @@ import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEv
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 @ExtendWith(JpaExtension.class)
-class LosPubliserEventTaskAivenTest {
+class K9LosPubliserEventTaskAivenTest {
 
     private static final LocalDate FOM_1 = LocalDate.of(2019, 12, 1);
     private static final LocalDate TOM_1 = LocalDate.of(2019, 12, 31);
@@ -68,7 +68,7 @@ class LosPubliserEventTaskAivenTest {
 
     private LosKafkaProducerAiven mockKafkaProducerAiven = mock(LosKafkaProducerAiven.class);
 
-    private LosPubliserEventTask losPubliserEventTask;
+    private K9LosPubliserEventTask losPubliserEventTask;
 
     private Behandling behandling;
     private ProsessTaskData prosessTaskData;
@@ -86,7 +86,7 @@ class LosPubliserEventTaskAivenTest {
                 mockGjenopptaBehandlingTjeneste, mockBehandlingskontrollTjeneste, mockEventPubliserer, mock(AutomatiskSaksbehandlingVurderingTjeneste.class), entityManager);
         FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repositoryProvider,
                 kravgrunnlagTjeneste, mockFagsystemKlient);
-        losPubliserEventTask = new LosPubliserEventTask(repositoryProvider, faktaFeilutbetalingTjeneste, mockKafkaProducerAiven, Fagsystem.K9TILBAKE);
+        losPubliserEventTask = new K9LosPubliserEventTask(repositoryProvider, faktaFeilutbetalingTjeneste, mockKafkaProducerAiven, Fagsystem.K9TILBAKE);
 
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
         behandling.setAnsvarligSaksbehandler("1234");
@@ -176,9 +176,9 @@ class LosPubliserEventTaskAivenTest {
     }
 
     private ProsessTaskData lagProsessTaskData() {
-        prosessTaskData = ProsessTaskData.forProsessTask(LosPubliserEventTask.class);
+        prosessTaskData = ProsessTaskData.forProsessTask(K9LosPubliserEventTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        prosessTaskData.setProperty(LosPubliserEventTask.PROPERTY_EVENT_NAME, EventHendelse.AKSJONSPUNKT_OPPRETTET.name());
+        prosessTaskData.setProperty(K9LosPubliserEventTask.PROPERTY_EVENT_NAME, EventHendelse.AKSJONSPUNKT_OPPRETTET.name());
         return prosessTaskData;
     }
 

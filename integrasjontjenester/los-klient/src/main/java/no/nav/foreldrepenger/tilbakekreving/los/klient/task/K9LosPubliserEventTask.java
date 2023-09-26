@@ -7,12 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
@@ -44,18 +43,16 @@ import no.nav.vedtak.hendelser.behandling.v1.BehandlingHendelseV1;
 @ApplicationScoped
 @ProsessTask("fplos.oppgavebehandling.PubliserEvent")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
-public class LosPubliserEventTask implements ProsessTaskHandler {
+public class K9LosPubliserEventTask implements ProsessTaskHandler {
 
     public static final String PROPERTY_EVENT_NAME = "eventName";
-    public static final String PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID = "kravgrunnlagManglerFristTid";
-    public static final String PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE = "kravgrunnlagManglerAksjonspunktStatusKode";
     public static final String FP_DEFAULT_HREF = "/fpsak/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
     public static final String K9_DEFAULT_HREF = "/k9/web/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
 
     private Fagsystem fagsystem;
     private String defaultHRef;
 
-    private static final Logger LOG = LoggerFactory.getLogger(LosPubliserEventTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(K9LosPubliserEventTask.class);
 
     private KravgrunnlagRepository grunnlagRepository;
     private BehandlingRepository behandlingRepository;
@@ -64,21 +61,21 @@ public class LosPubliserEventTask implements ProsessTaskHandler {
 
     boolean brukAiven;
 
-    LosPubliserEventTask() {
+    K9LosPubliserEventTask() {
         // for CDI proxy
     }
 
     @Inject
-    public LosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
-                                FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
-                                LosKafkaProducerAiven losKafkaProducerAiven) {
+    public K9LosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
+                                  FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
+                                  LosKafkaProducerAiven losKafkaProducerAiven) {
         this(repositoryProvider, faktaFeilutbetalingTjeneste, losKafkaProducerAiven, ApplicationName.hvilkenTilbake());
     }
 
-    public LosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
-                                FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
-                                LosKafkaProducerAiven losKafkaProducerAiven,
-                                Fagsystem applikasjonNavn) {
+    public K9LosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
+                                  FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
+                                  LosKafkaProducerAiven losKafkaProducerAiven,
+                                  Fagsystem applikasjonNavn) {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
