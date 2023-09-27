@@ -32,8 +32,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
-import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
-import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
@@ -56,15 +54,13 @@ class GjenopptaBehandlingTjenesteTest {
 
     private InternalAksjonspunktManipulator internalAksjonspunktManipulator = new InternalAksjonspunktManipulator();
     private ProsessTaskTjeneste mockTaskTjeneste = mock(ProsessTaskTjeneste.class);
-    private VarselresponsTjeneste mockVarselResponsTjeneste = mock(VarselresponsTjeneste.class);
 
     @BeforeEach
     void setup() {
         gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(mockTaskTjeneste,
                 behandlingKandidaterRepository,
                 behandlingVenterRepository,
-                repositoryProvider,
-                mockVarselResponsTjeneste);
+                repositoryProvider);
     }
 
     @Test
@@ -100,10 +96,10 @@ class GjenopptaBehandlingTjenesteTest {
 
         when(mockTaskTjeneste.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
 
-        gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SAKSBEHANDLER, ResponsKanal.MANUELL);
+        gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SAKSBEHANDLER);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         List<Historikkinnslag> historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
-        assertThat(historikkinnslager.size()).isEqualTo(1);
+        assertThat(historikkinnslager).hasSize(1);
         Historikkinnslag historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BEH_MAN_GJEN);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);

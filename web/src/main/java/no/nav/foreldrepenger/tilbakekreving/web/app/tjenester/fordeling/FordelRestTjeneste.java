@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordeling;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,6 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
+import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
@@ -38,6 +38,7 @@ public class FordelRestTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
+    private VarselresponsTjeneste varselresponsTjeneste;
 
     public FordelRestTjeneste() {
         // for CDI
@@ -45,9 +46,11 @@ public class FordelRestTjeneste {
 
     @Inject
     public FordelRestTjeneste(BehandlingRepository behandlingRepository,
-                              GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste) {
+                              GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
+                              VarselresponsTjeneste varselresponsTjeneste) {
         this.behandlingRepository = behandlingRepository;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
+        this.varselresponsTjeneste = varselresponsTjeneste;
     }
 
 
@@ -60,14 +63,15 @@ public class FordelRestTjeneste {
 
         String dokumentTypeId = mottattJournalpost.getDokumentTypeIdOffisiellKode().orElse(null);
         String saksnummer = mottattJournalpost.getSaksnummer();
-        Optional<Behandling> behandlingForSaksnummer = harBehandlingPåVent(new Saksnummer(saksnummer));
         UUID forsendelseId = mottattJournalpost.getForsendelseId().orElse(null);
 
-        if (behandlingForSaksnummer.isPresent()) {
-            Behandling behandling = behandlingForSaksnummer.get();
+        var åpenBehandling = hentÅpenBehandling(saksnummer);
+        if (åpenBehandling.isPresent()) {
+            var behandling = åpenBehandling.get();
             if (erTilbakemeldingFraBruker(dokumentTypeId)) {
                 LOG.info("Mottok dokument og tok behandlingId={} av vent. Saksnummer={} dokumentTypeId={} forsendelseId={}", behandling.getId(), saksnummer, dokumentTypeId, forsendelseId);
-                gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), HistorikkAktør.SØKER, ResponsKanal.SELVBETJENING); //ta behandling av vent
+                varselresponsTjeneste.lagreRespons(behandling.getId(), ResponsKanal.SELVBETJENING);
+                gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), HistorikkAktør.SØKER);
             } else {
                 LOG.info("Mottok og ignorerte dokument pga dokumentTypeId. Saksnummer={} dokumentTypeId={} forsendelseId={}", saksnummer, dokumentTypeId, forsendelseId);
             }
@@ -76,17 +80,14 @@ public class FordelRestTjeneste {
         }
     }
 
-    private boolean erTilbakemeldingFraBruker(String dokumentTypeId) {
-        return UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID.equals(dokumentTypeId);
+    private Optional<Behandling> hentÅpenBehandling(String saksnummer) {
+        return behandlingRepository.hentAlleBehandlingerForSaksnummer(new Saksnummer(saksnummer))
+            .stream()
+            .filter(b -> !b.erAvsluttet())
+            .findAny();
     }
 
-    private Optional<Behandling> harBehandlingPåVent(Saksnummer saksnummer) {
-        List<Behandling> behandlinger = behandlingRepository.hentAlleBehandlingerForSaksnummer(saksnummer);
-        if (!behandlinger.isEmpty()) {
-            return behandlinger.stream()
-                    .filter(beh -> !beh.erAvsluttet())
-                    .filter(Behandling::isBehandlingPåVent).findAny();
-        }
-        return Optional.empty();
+    private boolean erTilbakemeldingFraBruker(String dokumentTypeId) {
+        return UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID.equals(dokumentTypeId);
     }
 }

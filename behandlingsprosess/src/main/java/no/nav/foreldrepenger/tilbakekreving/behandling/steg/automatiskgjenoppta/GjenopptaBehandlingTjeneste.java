@@ -17,6 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingKandidaterRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
@@ -25,8 +26,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
-import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.log.mdc.MDCOperations;
@@ -43,7 +42,7 @@ public class GjenopptaBehandlingTjeneste {
     private BehandlingVenterRepository behandlingVenterRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private HistorikkRepository historikkRepository;
-    private VarselresponsTjeneste varselresponsTjeneste;
+    private BehandlingRepository behandlingRepository;
 
     public GjenopptaBehandlingTjeneste() {
         // CDI
@@ -53,14 +52,13 @@ public class GjenopptaBehandlingTjeneste {
     public GjenopptaBehandlingTjeneste(ProsessTaskTjeneste taskTjeneste,
                                        BehandlingKandidaterRepository behandlingKandidaterRepository,
                                        BehandlingVenterRepository behandlingVenterRepository,
-                                       BehandlingRepositoryProvider repositoryProvider,
-                                       VarselresponsTjeneste varselresponsTjeneste) {
+                                       BehandlingRepositoryProvider repositoryProvider) {
         this.taskTjeneste = taskTjeneste;
         this.behandlingKandidaterRepository = behandlingKandidaterRepository;
         this.behandlingVenterRepository = behandlingVenterRepository;
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.historikkRepository = repositoryProvider.getHistorikkRepository();
-        this.varselresponsTjeneste = varselresponsTjeneste;
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
     }
 
     /**
@@ -103,21 +101,17 @@ public class GjenopptaBehandlingTjeneste {
     }
 
     /**
-     * Fortsetter behandling manuelt, registrerer brukerrespons hvis i varsel-steg
-     * og venter på brukerrespons.
-     *
-     * @param responsKanal
-     * @param behandlingId
-     * @return
+     * Fortsetter behandling manuelt
      */
-    public Optional<String> fortsettBehandlingManuelt(long behandlingId, HistorikkAktør historikkAktør, ResponsKanal responsKanal) {
-        var behandling = behandlingVenterRepository.hentBehandlingPåVent(behandlingId).orElse(null);
-        if (behandling != null) {
-            if (BehandlingStegType.VARSEL.equals(behandling.getAktivtBehandlingSteg()) && Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING.equals(behandling.getVenteårsak())) {
-                varselresponsTjeneste.lagreRespons(behandlingId, responsKanal);
-            } else if (!kanGjenopptaSteg(behandlingId) && Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(behandling.getVenteårsak())) {
-                return Optional.empty();
-            }
+    public Optional<String> fortsettBehandlingManuelt(long behandlingId, HistorikkAktør historikkAktør) {
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
+        if (behandling.erAvsluttet()) {
+            throw new IllegalArgumentException("Kan ikke fortsette avsluttet behandling");
+        }
+
+        var kanGjenopptaBehandling = behandling.isBehandlingPåVent() && BehandlingStegType.VARSEL.equals(behandling.getAktivtBehandlingSteg())
+            || (!Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(behandling.getVenteårsak()) && kanGjenopptaSteg(behandlingId));
+        if (kanGjenopptaBehandling) {
             var callId = hentCallId() + behandling.getId();
             var gruppe = opprettFortsettBehandlingTask(behandling, callId);
             opprettHistorikkInnslagForManueltGjenopptaBehandling(behandlingId, historikkAktør);
