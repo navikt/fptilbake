@@ -34,13 +34,6 @@ public class Fagsak extends BaseEntitet {
     @JoinColumn(name = "bruker_id", nullable = false)
     private NavBruker navBruker;
 
-    /*
-     * Kan avmappes men OBS på bruk i bl.a StatistikkRepository. Søk på fagsak_status overalt og fagsakStatus i *R*.java
-     */
-    @Convert(converter = FagsakStatus.KodeverdiConverter.class)
-    @Column(name = "fagsak_status", nullable = false)
-    private FagsakStatus fagsakStatus = FagsakStatus.DEFAULT;
-
     /**
      * Offisielt tildelt saksnummer fra GSAK.
      */
@@ -88,18 +81,6 @@ public class Fagsak extends BaseEntitet {
 
     public AktørId getAktørId() {
         return getNavBruker().getAktørId();
-    }
-
-    /*
-     * Er ikke i aktiv bruk
-     * OBS - sjekk bruk i bl.a StatistikkRepository. Søk på fagsak_status overalt og fagsakStatus i *R*.java
-     * PDP bruker konstant verdi under behandling pga manglende update.
-     */
-    private FagsakStatus getFagsakStatus() {
-        return fagsakStatus;
-    }
-    private void setFagsakStatus(FagsakStatus fagsakStatus) {
-        this.fagsakStatus = fagsakStatus;
     }
 
     public FagsakYtelseType getFagsakYtelseType() {

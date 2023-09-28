@@ -1,15 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.overvåkning.metrikker;
 
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepository;
 
 @CdiDbAwareTest
 class StatistikkRepositoryTest {
@@ -23,12 +20,6 @@ class StatistikkRepositoryTest {
     static void afterAll() {
         System.clearProperty("app.name");
     }
-
-    @Inject
-    private EntityManager entityManager;
-
-    @Inject
-    private ProsessTaskRepository prosessTaskRepository;
 
     @Inject
     private StatistikkRepository statistikkRepository;
