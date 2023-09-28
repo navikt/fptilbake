@@ -54,10 +54,6 @@
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>domenetjenester</artifactId>
         </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>selvbetjening-klient</artifactId>
-        </dependency>
 
         <!-- for datavarehus -->
         <dependency>

@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
@@ -20,8 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.SendHenleggelsesbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.selvbetjening.SelvbetjeningTilbakekrevingStøtte;
-import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendTilbakekrevingHenlagtTilSelvbetjeningTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
@@ -39,7 +36,6 @@ public class HenleggBehandlingTjeneste {
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
     static final TaskType HENLEGGELSESBREV_TASK_TYPE = TaskType.forProsessTask(SendHenleggelsesbrevTask.class);
-    static final TaskType SELVBETJENING_HENLAGT_TASKTYPE = TaskType.forProsessTask(SendTilbakekrevingHenlagtTilSelvbetjeningTask.class);
     private static final long OPPRETTELSE_DAGER_BEGRENSNING = 6L;
 
     HenleggBehandlingTjeneste() {
@@ -104,9 +100,7 @@ public class HenleggBehandlingTjeneste {
         if (kanSendeHenleggeslsesBrev(behandling, årsakKode)) {
             sendHenleggelsesbrev(behandling, fritekst);
         }
-        if (SelvbetjeningTilbakekrevingStøtte.harStøtteFor(behandling) && varselSendt(behandlingId)) {
-            informerSelvbetjening(behandling);
-        }
+
         opprettHistorikkinnslag(behandling, årsakKode, begrunnelse);
         eksternBehandlingRepository.deaktivateTilkobling(behandlingId);
     }
@@ -117,13 +111,6 @@ public class HenleggBehandlingTjeneste {
         henleggelseBrevTask.setPayload(fritekst);
         henleggelseBrevTask.setCallIdFraEksisterende();
         taskTjeneste.lagre(henleggelseBrevTask);
-    }
-
-    private void informerSelvbetjening(Behandling behandling) {
-        var selvbetjeningTask = ProsessTaskData.forTaskType(SELVBETJENING_HENLAGT_TASKTYPE);
-        selvbetjeningTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        selvbetjeningTask.setCallIdFraEksisterende();
-        taskTjeneste.lagre(selvbetjeningTask);
     }
 
     private boolean kanSendeHenleggeslsesBrev(Behandling behandling, BehandlingResultatType behandlingResultatType) {

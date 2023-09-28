@@ -35,10 +35,6 @@
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>pdfgen</artifactId>
         </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>selvbetjening-klient</artifactId>
-        </dependency>
 
         <!-- eksterne avhengigheter -->
         <dependency>

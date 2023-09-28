@@ -2,13 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
-import no.nav.foreldrepenger.tilbakekreving.selvbetjening.SelvbetjeningTilbakekrevingStøtte;
-import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtakFattetTilSelvbetjeningTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
@@ -17,16 +12,14 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 public class ProsessTaskIverksett {
 
     private ProsessTaskTjeneste taskTjeneste;
-    private BrevSporingRepository brevSporingRepository;
 
     ProsessTaskIverksett() {
         // for CDI
     }
 
     @Inject
-    public ProsessTaskIverksett(ProsessTaskTjeneste taskTjeneste, BrevSporingRepository brevSporingRepository) {
+    public ProsessTaskIverksett(ProsessTaskTjeneste taskTjeneste) {
         this.taskTjeneste = taskTjeneste;
-        this.brevSporingRepository = brevSporingRepository;
     }
 
     public void opprettIverksettingstasker(Behandling behandling, boolean sendVedtaksbrev) {
@@ -39,11 +32,6 @@ public class ProsessTaskIverksett {
         taskGruppe.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         taskGruppe.setCallIdFraEksisterende();
 
-        if (SelvbetjeningTilbakekrevingStøtte.harStøtteFor(behandling) && brevSporingRepository.harVarselBrevSendtForBehandlingId(behandling.getId())) {
-            var selvbetjeningTask = ProsessTaskData.forProsessTask(SendVedtakFattetTilSelvbetjeningTask.class);
-            selvbetjeningTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-            taskGruppe.addNesteSekvensiell(selvbetjeningTask);
-        }
         opprettDvhProsessTask(behandling, taskGruppe);
         taskTjeneste.lagre(taskGruppe);
     }

@@ -23,7 +23,6 @@
         <module>pdfgen</module>
         <module>los-klient</module>
         <module>datavarehus</module>
-        <module>selvbetjening-klient</module>
         <module>organisasjon</module>
         <module>kafka-producer</module>
         <module>ytelsesvedtak-kafka-poller</module>

@@ -185,7 +185,7 @@ class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    void kan_sende_henleggelsesbrev_hvis_varselbrev_er_sendt() {
+    void kan_sende_henleggelsesbrev() {
         JournalpostId journalpostId = new JournalpostId("123");
         BrevSporing henleggelsesBrevsporing = new BrevSporing.Builder().medBehandlingId(internBehandlingId)
                 .medJournalpostId(journalpostId)
@@ -196,11 +196,10 @@ class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        verify(taskTjeneste, times(2)).lagre(captor.capture());
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
         var prosessTaskData = captor.getAllValues();
         assertThat(prosessTaskData).isNotEmpty();
         assertThat(prosessTaskData.get(0).taskType()).isEqualTo(HenleggBehandlingTjeneste.HENLEGGELSESBREV_TASK_TYPE);
-        assertThat(prosessTaskData.get(1).taskType()).isEqualTo(HenleggBehandlingTjeneste.SELVBETJENING_HENLAGT_TASKTYPE);
         assertHenleggelse(internBehandlingId);
     }
 
@@ -215,28 +214,6 @@ class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         var prosessTaskData = captor.getAllValues();
         assertThat(prosessTaskData).isNotEmpty();
         assertThat(prosessTaskData.get(0).taskType()).isEqualTo(HenleggBehandlingTjeneste.HENLEGGELSESBREV_TASK_TYPE);
-        assertHenleggelse(revuderingBehandlingId);
-    }
-
-    @Test
-    void kan_sende_henleggelsesbrev_for_tilbakekreving_revurdering_med_henlagt_feilopprettet_med_brev_når_varsel_er_sendt() {
-        Long revuderingBehandlingId = opprettTilbakekrevingRevurdering();
-        JournalpostId journalpostId = new JournalpostId("123");
-        BrevSporing henleggelsesBrevsporing = new BrevSporing.Builder().medBehandlingId(revuderingBehandlingId)
-                .medJournalpostId(journalpostId)
-                .medDokumentId("123")
-                .medBrevType(BrevType.VARSEL_BREV)
-                .build();
-        brevSporingRepository.lagre(henleggelsesBrevsporing);
-
-        henleggBehandlingTjeneste.henleggBehandling(revuderingBehandlingId,
-                BehandlingResultatType.HENLAGT_FEILOPPRETTET_MED_BREV);
-        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        verify(taskTjeneste, times(2)).lagre(captor.capture());
-        var prosessTaskData = captor.getAllValues();
-        assertThat(prosessTaskData).isNotEmpty();
-        assertThat(prosessTaskData.get(0).taskType()).isEqualTo(HenleggBehandlingTjeneste.HENLEGGELSESBREV_TASK_TYPE);
-        assertThat(prosessTaskData.get(1).taskType()).isEqualTo(HenleggBehandlingTjeneste.SELVBETJENING_HENLAGT_TASKTYPE);
         assertHenleggelse(revuderingBehandlingId);
     }
 
