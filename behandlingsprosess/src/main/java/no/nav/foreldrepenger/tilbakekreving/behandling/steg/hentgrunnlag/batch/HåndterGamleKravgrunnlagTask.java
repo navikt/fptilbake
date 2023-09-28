@@ -39,7 +39,7 @@ public class HåndterGamleKravgrunnlagTask implements ProsessTaskHandler {
         LOG_CONTEXT.add("mottattXmlId", mottattXmlId);
         LOG.info("Håndterer gammelt kravgrunnlag med mottattXmlId={}", mottattXmlId);
         ØkonomiXmlMottatt økonomiXmlMottatt = håndterGamleKravgrunnlagTjeneste.hentGammeltKravgrunnlag(mottattXmlId);
-        LOG_CONTEXT.add("henvisning", økonomiXmlMottatt.getHenvisning().getVerdi());
+        LOG_CONTEXT.add("henvisning", økonomiXmlMottatt.getHenvisning());
         LOG_CONTEXT.add("saksnummer", økonomiXmlMottatt.getSaksnummer());
 
         KravgrunnlagMedStatus respons = håndterGamleKravgrunnlagTjeneste.hentKravgrunnlagFraØkonomi(økonomiXmlMottatt);

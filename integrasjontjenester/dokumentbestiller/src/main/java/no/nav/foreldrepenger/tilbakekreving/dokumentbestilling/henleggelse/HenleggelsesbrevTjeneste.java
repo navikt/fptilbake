@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -29,7 +28,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBre
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.exception.FunksjonellException;
 
 @ApplicationScoped
@@ -43,7 +41,6 @@ public class HenleggelsesbrevTjeneste {
     private VergeRepository vergeRepository;
 
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
-    private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
     private PdfBrevTjeneste pdfBrevTjeneste;
 
@@ -55,14 +52,13 @@ public class HenleggelsesbrevTjeneste {
     @Inject
     public HenleggelsesbrevTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                     EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
-                                    HistorikkinnslagTjeneste historikkinnslagTjeneste, PdfBrevTjeneste pdfBrevTjeneste) {
+                                    PdfBrevTjeneste pdfBrevTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.vergeRepository = repositoryProvider.getVergeRepository();
 
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
-        this.historikkinnslagTjeneste = historikkinnslagTjeneste;
         this.pdfBrevTjeneste = pdfBrevTjeneste;
     }
 

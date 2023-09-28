@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.økonomixml;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,6 +34,7 @@ public class ØkonomiXmlMottatt extends BaseEntitet {
     @Column(name = "melding", nullable = false)
     private String mottattXml;
 
+    @Embedded
     private Henvisning henvisning;
 
     @Column(name = "saksnummer")

@@ -55,7 +55,7 @@ class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     void setup() {
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository);
 
-        henleggelsesbrevTjeneste = new HenleggelsesbrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste, historikkinnslagTjeneste, mockPdfBrevTjeneste);
+        henleggelsesbrevTjeneste = new HenleggelsesbrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste, mockPdfBrevTjeneste);
         var kontroll = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
         behandlingRevurderingTjeneste = new BehandlingRevurderingTjeneste(repositoryProvider, kontroll);
 
