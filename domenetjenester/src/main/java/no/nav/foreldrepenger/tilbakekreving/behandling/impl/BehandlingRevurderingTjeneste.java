@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -17,14 +16,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
@@ -69,7 +66,6 @@ public class BehandlingRevurderingTjeneste {
 
         validerHarIkkeÅpenBehandling(saksnummer, eksternUuid);
 
-        repositoryProvider.getFagsakRepository().oppdaterFagsakStatus(fagsak.getId(), FagsakStatus.UNDER_BEHANDLING);
         return opprettManuellRevurdering(fagsak, behandlingÅrsakType, eksternUuid, enhet, opprettetAv);
     }
 
@@ -105,13 +101,12 @@ public class BehandlingRevurderingTjeneste {
         if (opprettetAv != null && Fagsystem.FPTILBAKE.equals(ApplicationName.hvilkenTilbake())) {
             revurdering.setAnsvarligSaksbehandler(opprettetAv);
         }
-        BehandlingLås lås = behandlingRepository.taSkriveLås(revurdering);
-        behandlingRepository.lagre(revurdering, lås);
+        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(revurdering);
+        behandlingskontrollTjeneste.opprettBehandling(kontekst, revurdering);
 
         opprettRelasjonMedEksternBehandling(henvisning, revurdering, eksternUuid);
 
         // revurdering skal starte med Fakta om feilutbetaling
-        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(revurdering);
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.FAKTA_FEILUTBETALING, List.of(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
 
         kopierVergeInformasjon(origBehandling.getId(), revurdering.getId());

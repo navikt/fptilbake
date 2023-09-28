@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.los.klient.observer;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +13,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.Behandlin
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingskontrollEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.los.klient.task.FpLosPubliserEventTask;
@@ -42,47 +45,32 @@ public class FpLosEventObserver {
     }
 
     public void observerStoppetEvent(@Observes BehandlingskontrollEvent.StoppetEvent event) {
-        try {
-            opprettProsessTask(event, Hendelse.AKSJONSPUNKT);
-        } catch (Exception ex) {
-            LOG.warn("Publisering av StoppetEvent feilet", ex);
-        }
+        opprettProsessTask(event, Hendelse.AKSJONSPUNKT);
     }
 
     // Lytter på AksjonspunkterFunnetEvent, filtrer ut når behandling er satt manuelt på vent og legger melding på kafka
     public void observerAksjonpunktStatusEvent(@Observes AksjonspunktStatusEvent event) {
-        var sattPåVent = event.getAksjonspunkter().stream().anyMatch(e -> e.erOpprettet() && e.erAutopunkt());
-        if (sattPåVent) {
-            try {
-                opprettProsessTask(event, Hendelse.VENTETILSTAND);
-            } catch (Exception ex) {
-                LOG.warn("Publisering av AksjonspunkterFunnetEvent feilet", ex);
-            }
+        var sattPåVentAvSaksbehandler = event.getAksjonspunkter().stream().anyMatch(FpLosEventObserver::manueltPåVent);
+        if (sattPåVentAvSaksbehandler) {
+            opprettProsessTask(event, Hendelse.VENTETILSTAND);
         }
+    }
+
+    private static boolean manueltPåVent(Aksjonspunkt aksjonspunkt) {
+        var endretOpprettetAv = Optional.ofNullable(aksjonspunkt.getEndretAv()).orElseGet(aksjonspunkt::getOpprettetAv);
+        return aksjonspunkt.erOpprettet() && aksjonspunkt.erAutopunkt() && !endretOpprettetAv.startsWith("srv");
     }
 
     public void observerBehandlingAvsluttetEvent(@Observes BehandlingStatusEvent.BehandlingOpprettetEvent event) {
-        try {
-            opprettProsessTask(event, Hendelse.OPPRETTET);
-        } catch (Exception ex) {
-            LOG.warn("Publisering av BehandlingAvsluttetEvent feilet", ex);
-        }
+        opprettProsessTask(event, Hendelse.OPPRETTET);
     }
 
     public void observerBehandlingAvsluttetEvent(@Observes BehandlingStatusEvent.BehandlingAvsluttetEvent event) {
-        try {
-            opprettProsessTask(event, Hendelse.AVSLUTTET);
-        } catch (Exception ex) {
-            LOG.warn("Publisering av BehandlingAvsluttetEvent feilet", ex);
-        }
+        opprettProsessTask(event, Hendelse.AVSLUTTET);
     }
 
     public void observerAksjonspunktHarEndretBehandlendeEnhetEvent(@Observes BehandlingEnhetEvent event) {
-        try {
-            opprettProsessTask(event, Hendelse.ENHET);
-        } catch (Exception ex) {
-            LOG.warn("Publisering av AksjonspunktHarEndretBehandlendeEnhetEvent feilet", ex);
-        }
+        opprettProsessTask(event, Hendelse.ENHET);
     }
 
     private void opprettProsessTask(BehandlingEvent behandlingEvent, Hendelse hendelse) {

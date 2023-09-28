@@ -8,8 +8,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.BehandlingInfo;
 
 @ApplicationScoped
@@ -46,9 +44,6 @@ public class PipRepository {
             behandlingData.setStatusForBehandling(internData.getBehandlingStatus());
             behandlingData.setSaksnummer(internData.getSaksnummer());
             behandlingData.leggTilAktørId(internData.getAktørId());
-            // FIXME: hardkoder her fagsakstatus for å kunne ha tilbakekreving på fagsak som er avsluttet
-            // .....  bør ideelt ha tilpassede regler for fptilbake
-            behandlingData.setFagsakstatus(FagsakStatus.UNDER_BEHANDLING.getKode());
             return Optional.of(behandlingData);
         }
         return Optional.empty();

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -32,7 +31,6 @@ class FagsakTjenesteTest extends FellesTestOppsett {
     }
 
     private void fellesAssert(Fagsak fagsak, Saksnummer saksnummer) {
-        assertThat(fagsak.getStatus()).isEqualByComparingTo(FagsakStatus.OPPRETTET);
         assertThat(fagsak.getFagsakYtelseType()).isEqualByComparingTo(FagsakYtelseType.FORELDREPENGER);
         assertThat(fagsak.getSaksnummer()).isEqualTo(saksnummer);
         assertThat(fagsak.getAktørId()).isEqualTo(aktørId);

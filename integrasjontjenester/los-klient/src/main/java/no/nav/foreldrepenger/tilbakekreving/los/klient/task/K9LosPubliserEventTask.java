@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -34,11 +32,6 @@ import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEv
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.hendelser.behandling.Behandlingstype;
-import no.nav.vedtak.hendelser.behandling.Hendelse;
-import no.nav.vedtak.hendelser.behandling.Kildesystem;
-import no.nav.vedtak.hendelser.behandling.Ytelse;
-import no.nav.vedtak.hendelser.behandling.v1.BehandlingHendelseV1;
 
 @ApplicationScoped
 @ProsessTask("fplos.oppgavebehandling.PubliserEvent")
@@ -103,20 +96,10 @@ public class K9LosPubliserEventTask implements ProsessTaskHandler {
         Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) ? grunnlagRepository.finnKravgrunnlag(behandlingId) : null;
         try {
             if (Fagsystem.K9TILBAKE.equals(fagsystem)) {
-                TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto = getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, eventName, kravgrunnlag431);
+                TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto = getTilbakebetalingBehandlingProsessEventDto(behandling, eventName, kravgrunnlag431);
                 losKafkaProducerAiven.sendHendelse(behandling.getUuid(), behandlingProsessEventDto);
             } else if (Fagsystem.FPTILBAKE.equals(fagsystem)) {
-                var losHendelseDto = new BehandlingHendelseV1.Builder().medKildesystem(Kildesystem.FPTILBAKE)
-                    .medHendelseUuid(UUID.randomUUID())
-                    .medBehandlingUuid(behandling.getUuid())
-                    .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
-                    .medAktørId(behandling.getAktørId().getId())
-                    .medYtelse(mapYtelse(behandling))
-                    .medBehandlingstype(mapBehandlingstype(behandling))
-                    .medHendelse(utledHendelse(behandling))
-                    .medTidspunkt(LocalDateTime.now())
-                    .build();
-                losKafkaProducerAiven.sendHendelseFplos(behandling.getFagsak().getSaksnummer(), losHendelseDto);
+                LOG.info("Publiser ikke behandlingshendelse for behandling {}", behandling.getId());
             } else {
                 throw new IllegalStateException("Mangler fagsystem");
             }
@@ -125,7 +108,7 @@ public class K9LosPubliserEventTask implements ProsessTaskHandler {
         }
     }
 
-    public TilbakebetalingBehandlingProsessEventDto getTilbakebetalingBehandlingProsessEventDto(ProsessTaskData prosessTaskData, Behandling behandling, String eventName, Kravgrunnlag431 kravgrunnlag431) {
+    public TilbakebetalingBehandlingProsessEventDto getTilbakebetalingBehandlingProsessEventDto(Behandling behandling, String eventName, Kravgrunnlag431 kravgrunnlag431) {
         Fagsak fagsak = behandling.getFagsak();
         String saksnummer = fagsak.getSaksnummer().getVerdi();
         var kravgrunnlagManglerFristTid = behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
@@ -171,35 +154,6 @@ public class K9LosPubliserEventTask implements ProsessTaskHandler {
 
     private BigDecimal hentFeilutbetaltBeløp(Long behandlingId) {
         return faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandlingId).getAktuellFeilUtbetaltBeløp();
-    }
-
-    private static Ytelse mapYtelse(Behandling behandling) {
-        return switch (behandling.getFagsak().getFagsakYtelseType()) {
-            case ENGANGSTØNAD -> Ytelse.ENGANGSTØNAD;
-            case FORELDREPENGER -> Ytelse.FORELDREPENGER;
-            case SVANGERSKAPSPENGER -> Ytelse.SVANGERSKAPSPENGER;
-            default -> null;
-        };
-    }
-
-    private static Behandlingstype mapBehandlingstype(Behandling behandling) {
-        return switch (behandling.getType()) {
-            case TILBAKEKREVING -> Behandlingstype.TILBAKEBETALING;
-            case REVURDERING_TILBAKEKREVING -> Behandlingstype.TILBAKEBETALING_REVURDERING;
-            default -> null;
-        };
-    }
-
-    private static Hendelse utledHendelse(Behandling behandling) {
-        if (behandling.isBehandlingPåVent()) {
-            return Hendelse.VENTETILSTAND;
-        } else if (BehandlingStatus.OPPRETTET.equals(behandling.getStatus()) && behandling.getAksjonspunkter().isEmpty()) {
-            return Hendelse.OPPRETTET;
-        } else if (BehandlingStatus.AVSLUTTET.equals(behandling.getStatus())) {
-            return Hendelse.AVSLUTTET;
-        } else {
-            return Hendelse.AKSJONSPUNKT;
-        }
     }
 
 }

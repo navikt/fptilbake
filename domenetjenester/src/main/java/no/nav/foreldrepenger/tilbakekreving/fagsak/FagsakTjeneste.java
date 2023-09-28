@@ -2,19 +2,17 @@ package no.nav.foreldrepenger.tilbakekreving.fagsak;
 
 import java.util.Optional;
 
+import org.hibernate.exception.ConstraintViolationException;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
-
-import org.hibernate.exception.ConstraintViolationException;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
@@ -50,7 +48,6 @@ public class FagsakTjeneste {
         Optional<Fagsak> forrigeFagsak = finnFagsak(saksnummer);
         if (forrigeFagsak.isPresent()) {
             fagsak = forrigeFagsak.get();
-            fagsakRepository.oppdaterFagsakStatus(fagsak.getId(), FagsakStatus.OPPRETTET);
         }
         lagreFagsak(fagsak, saksnummer);
         return fagsak;

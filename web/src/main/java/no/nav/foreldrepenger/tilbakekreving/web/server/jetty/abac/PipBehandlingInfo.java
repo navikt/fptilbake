@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
 import no.nav.vedtak.sikkerhet.abac.pipdata.AbacPipDto;
@@ -18,7 +17,7 @@ public record PipBehandlingInfo(Set<PipAktørId> aktørId, String saksnummer, Pi
 
     public PipBehandlingInfo(PipBehandlingData data) {
         this(Optional.ofNullable(data.getAktørId()).orElse(Set.of()).stream().map(AktørId::getId).map(PipAktørId::new).collect(Collectors.toSet()),
-            data.getSaksnummer(), oversettAbacFagstatus(data.getFagsakstatus()),
+            data.getSaksnummer(), oversettAbacFagstatus(),
             oversettAbacBehandlingStatus(data.getStatusForBehandling()), data.getAnsvarligSaksbehandler().orElse(null));
     }
 
@@ -30,13 +29,9 @@ public record PipBehandlingInfo(Set<PipAktørId> aktørId, String saksnummer, Pi
         return aktørId() != null ? aktørId() : Set.of();
     }
 
-    private static PipFagsakStatus oversettAbacFagstatus(String kode) {
-        if (FagsakStatus.OPPRETTET.getKode().equals(kode)) {
-            return PipFagsakStatus.OPPRETTET;
-        } else {
-            // For å tillate å opprette TBK
-            return PipFagsakStatus.UNDER_BEHANDLING;
-        }
+    private static PipFagsakStatus oversettAbacFagstatus() {
+        // Hardkodet for å tillate å opprette TBK
+        return PipFagsakStatus.UNDER_BEHANDLING;
     }
 
     private static PipFagsakStatus oversettPipFagstatus(PipFagsakStatus status) {

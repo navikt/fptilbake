@@ -38,13 +38,11 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
@@ -68,9 +66,7 @@ public class StatistikkRepository {
         .filter(p -> !AksjonspunktStatus.AVBRUTT.equals(p)).map(AksjonspunktStatus::getKode)
         .toList();
 
-    static final List<String> BEHANDLING_RESULTAT_TYPER = List.copyOf(BehandlingResultatType.kodeMap().keySet());
     static final List<String> BEHANDLING_STATUS = List.copyOf(BehandlingStatus.kodeMap().keySet());
-    static final List<String> FAGSAK_STATUS = List.copyOf(FagsakStatus.kodeMap().keySet());
     static final List<String> BEHANDLING_TYPER = BehandlingType.kodeMap().values().stream().filter(p -> !BehandlingType.UDEFINERT.equals(p)).map(BehandlingType::getKode).toList();
 
     private static final ObjectMapper OM = new ObjectMapper();
@@ -124,7 +120,6 @@ public class StatistikkRepository {
         List<SensuEvent> metrikker = new ArrayList<>();
 
         //følgende er kopiert fra k9-sak
-        metrikker.addAll(timeCall(this::fagsakStatusStatistikk, "fagsakStatusStatistikk"));
         metrikker.addAll(timeCall(this::behandlingStatusStatistikk, "behandlingStatusStatistikk"));
         metrikker.addAll(timeCall(this::prosessTaskStatistikk, "prosessTaskStatistikk"));
         metrikker.addAll(timeCall(this::aksjonspunktStatistikk, "aksjonspunktStatistikk"));
@@ -149,38 +144,6 @@ public class StatistikkRepository {
         log.info("{} benyttet {} ms. Har {} eventer", function, (slutt - start), sensuEvents.size());
 
         return sensuEvents;
-    }
-
-    @SuppressWarnings("unchecked")
-    Collection<SensuEvent> fagsakStatusStatistikk() {
-        String sql = "select f.ytelse_type, f.fagsak_status, count(*) as antall" +
-            "         from fagsak f" +
-            "         group by f.ytelse_type, f.fagsak_status" +
-            "         order by 1, 2";
-
-        String metricField = "totalt_antall";
-        String metricName = "fagsak_status_v1";
-
-        NativeQuery<Tuple> query = (NativeQuery<Tuple>) entityManager.createNativeQuery(sql, Tuple.class);
-        Stream<Tuple> stream = query.getResultStream();
-        var values = stream.map(t -> SensuEvent.createSensuEvent(metricName,
-            toMap(
-                "ytelse_type", t.get(0, String.class),
-                "fagsak_status", t.get(1, String.class)),
-            Map.of("totalt_antall", t.get(2, BigDecimal.class)))).collect(Collectors.toCollection(LinkedHashSet::new));
-
-        /* siden fagsak endrer status må vi ta hensyn til at noen verdier vil gå til 0, ellers vises siste verdi i stedet. */
-        var zeroValues = emptyEvents(metricName,
-            Map.of(
-                "ytelse_type", ytelseTypeKoder,
-                "fagsak_status", FAGSAK_STATUS),
-            Map.of(
-                metricField, BigDecimal.ZERO));
-
-        values.addAll(zeroValues); // NB: utnytter at Set#addAll ikke legger til verdier som ikke finnes fra før
-
-        return values;
-
     }
 
     @SuppressWarnings("unchecked")

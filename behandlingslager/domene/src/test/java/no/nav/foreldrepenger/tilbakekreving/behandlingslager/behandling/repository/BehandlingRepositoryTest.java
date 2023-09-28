@@ -7,12 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import jakarta.persistence.EntityManager;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import jakarta.persistence.EntityManager;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -126,21 +125,6 @@ class BehandlingRepositoryTest {
         List<Behandling> resultat = behandlingRepository.hentBehandlingerSomIkkeErAvsluttetForFagsakId(fagsakId);
 
         assertThat(resultat).isEmpty();
-    }
-
-    @Test
-    void skal_opprette_ny_behandling_basert_på_tidligere() {
-        Behandling.Builder builder = opprettBuilderForBehandling();
-        Behandling behandling = builder.build();
-        behandling.avsluttBehandling();
-
-        lagreBehandling(behandling);
-
-        Behandling nyBehandling = behandlingRepository.opprettNyBehandlingBasertPåTidligere(behandling,
-                BehandlingType.REVURDERING_TILBAKEKREVING);
-
-        assertThat(nyBehandling).isNotNull();
-        assertThat(nyBehandling.getType()).isEqualByComparingTo(BehandlingType.REVURDERING_TILBAKEKREVING);
     }
 
     private Map<String, Object> opprettBuilderForBehandlingMedFagsakId() {

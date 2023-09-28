@@ -30,8 +30,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTje
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingHistorikkInnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -88,7 +90,7 @@ public abstract class FellesTestOppsett {
     protected static final BehandlingType REVURDERING_BEHANDLING_TYPE = BehandlingType.REVURDERING_TILBAKEKREVING;
     protected static final String SÆRLIG_GRUNNER_BEGRUNNELSE = "særlig grunner begrunnelse";
 
-    protected BehandlingskontrollTjeneste behandlingskontrollTjeneste = mock(BehandlingskontrollTjeneste.class);
+    protected BehandlingskontrollTjeneste behandlingskontrollTjeneste;;
     protected GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingMedGrunnlagTjeneste.class);
     protected BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste = mock(BehandlingskontrollAsynkTjeneste.class);
     protected PersoninfoAdapter mockTpsTjeneste = mock(PersoninfoAdapter.class);
@@ -96,7 +98,7 @@ public abstract class FellesTestOppsett {
     protected FagsystemKlient mockFagsystemKlient = mock(FagsystemKlient.class);
     protected SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
 
-    protected BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(behandlingskontrollTjeneste, behandlingskontrollAsynkTjeneste);
+    protected BehandlingskontrollProvider behandlingskontrollProvider;
 
     protected BehandlingRepositoryProvider repoProvider;
     protected NavBrukerRepository brukerRepository;
@@ -146,6 +148,9 @@ public abstract class FellesTestOppsett {
     @BeforeEach
     public final void init(EntityManager entityManager) {
         this.entityManager = entityManager;
+        var behandlinskontrollServiceProvider = new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null);
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(behandlinskontrollServiceProvider);
+        behandlingskontrollProvider =  new BehandlingskontrollProvider(behandlingskontrollTjeneste, behandlingskontrollAsynkTjeneste);
         repoProvider = new BehandlingRepositoryProvider(entityManager);
         brukerRepository = new NavBrukerRepository(entityManager);
         grunnlagRepository = repoProvider.getGrunnlagRepository();
