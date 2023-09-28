@@ -7,7 +7,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -36,9 +36,9 @@
         <sonar.projectKey>navikt_fptilbake</sonar.projectKey>
 
         <!-- Jakarta deps -->
-        <felles.version>5.1.0</felles.version>
+        <felles.version>5.1.1</felles.version>
         <prosesstask.version>4.0.0</prosesstask.version>
-        <fpkontrakter.version>7.0.1</fpkontrakter.version>
+        <fpkontrakter.version>7.1.1</fpkontrakter.version>
         <abakus-kontrakt.version>2.0.0</abakus-kontrakt.version>
         <verapdf-validation-model.version>1.24.1</verapdf-validation-model.version>
         <!-- Jakarta deps end -->
@@ -83,7 +83,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>fp-bom</artifactId>
-                <version>1.0.1</version>
+                <version>1.0.2</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
