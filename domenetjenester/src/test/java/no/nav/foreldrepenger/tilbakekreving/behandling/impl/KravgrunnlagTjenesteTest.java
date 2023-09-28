@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -21,8 +20,6 @@ import org.junit.jupiter.api.Test;
 import jakarta.inject.Inject;
 import jakarta.persistence.FlushModeType;
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -61,7 +58,6 @@ class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     void setup() {
         entityManager.setFlushMode(FlushModeType.AUTO);
         when(mockTpsTjeneste.hentAktørForFnr(new PersonIdent(SSN))).thenReturn(Optional.of(aktørId));
-        when(behandlingskontrollTjeneste.erStegPassert(any(Behandling.class), any(BehandlingStegType.class))).thenReturn(true);
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, mockGjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, eventPubliserer,
             new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, varselRepository), entityManager);
     }

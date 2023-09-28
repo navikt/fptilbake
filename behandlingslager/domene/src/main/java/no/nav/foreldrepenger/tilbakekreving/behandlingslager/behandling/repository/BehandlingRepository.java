@@ -166,15 +166,6 @@ public class BehandlingRepository {
     /**
      * Lager en ny Behandling basert på en gammel, med samme grunnlag strukturer.
      */
-    public Behandling opprettNyBehandlingBasertPåTidligere(Behandling gammelBehandling, BehandlingType behandlingType) {
-        var nyBuilder = Behandling.nyBehandlingFor(gammelBehandling.getFagsak(), behandlingType);
-
-        var nyBehandling = nyBuilder.build();
-        var lås = taSkriveLås(nyBehandling);
-        lagre(nyBehandling, lås);
-        return nyBehandling;
-    }
-
     private Optional<Behandling> finnSisteBehandling(Long fagsakId, BehandlingType behandlingType, boolean readOnly) {
         Objects.requireNonNull(fagsakId, KEY_FAGSAK_ID); // NOSONAR //$NON-NLS-1$
         Objects.requireNonNull(behandlingType, KEY_BEHANDLING_TYPE); // NOSONAR //$NON-NLS-1$

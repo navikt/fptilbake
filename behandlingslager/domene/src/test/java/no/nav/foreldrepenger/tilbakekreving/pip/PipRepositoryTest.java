@@ -4,12 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
-import jakarta.persistence.EntityManager;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import jakarta.persistence.EntityManager;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -17,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 
@@ -50,7 +48,6 @@ class PipRepositoryTest {
         PipBehandlingData behandlingData = pipBehandlingData.get();
         assertThat(behandlingData.getBehandlingId()).isEqualTo(behandling.getId());
         assertThat(behandlingData.getStatusForBehandling()).isEqualTo(BehandlingStatus.OPPRETTET.getKode());
-        assertThat(behandlingData.getFagsakstatus()).isEqualTo(FagsakStatus.UNDER_BEHANDLING.getKode());
     }
 
     @Test
@@ -60,7 +57,6 @@ class PipRepositoryTest {
         PipBehandlingData behandlingData = pipBehandlingData.get();
         assertThat(behandlingData.getBehandlingId()).isEqualTo(behandling.getId());
         assertThat(behandlingData.getStatusForBehandling()).isEqualTo(BehandlingStatus.OPPRETTET.getKode());
-        assertThat(behandlingData.getFagsakstatus()).isEqualTo(FagsakStatus.UNDER_BEHANDLING.getKode());
     }
 
 

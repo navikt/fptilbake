@@ -8,16 +8,17 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
-import jakarta.persistence.EntityManager;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
+import jakarta.persistence.EntityManager;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -50,11 +51,11 @@ public abstract class FellesTestOppsett {
     protected static final String BEHANDLENDE_ENHET_ID = "4833";
     protected static final String BEHANDLENDE_ENHET_NAVN = "NAV Familie- og pensjonsytelser Oslo 1";
 
-    protected BehandlingskontrollTjeneste behandlingskontrollTjeneste = mock(BehandlingskontrollTjeneste.class);
+    protected BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     protected PersoninfoAdapter mockTpsTjeneste = mock(PersoninfoAdapter.class);
     protected FagsystemKlient mockFagsystemKlient = mock(FagsystemKlient.class);
 
-    protected BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
+    protected BehandlingskontrollProvider behandlingskontrollProvider;
 
     protected BehandlingRepositoryProvider repoProvider;
     protected NavBrukerRepository brukerRepository;
@@ -84,6 +85,8 @@ public abstract class FellesTestOppsett {
     @BeforeEach
     public final void init(EntityManager entityManager) {
         this.entityManager = entityManager;
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
+        behandlingskontrollProvider = new BehandlingskontrollProvider(behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
         repoProvider = new BehandlingRepositoryProvider(entityManager);
         brukerRepository = new NavBrukerRepository(entityManager);
         grunnlagRepository = repoProvider.getGrunnlagRepository();

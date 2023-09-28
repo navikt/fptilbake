@@ -16,7 +16,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -35,6 +34,9 @@ public class Fagsak extends BaseEntitet {
     @JoinColumn(name = "bruker_id", nullable = false)
     private NavBruker navBruker;
 
+    /*
+     * Kan avmappes men OBS på bruk i bl.a StatistikkRepository. Søk på fagsak_status overalt og fagsakStatus i *R*.java
+     */
     @Convert(converter = FagsakStatus.KodeverdiConverter.class)
     @Column(name = "fagsak_status", nullable = false)
     private FagsakStatus fagsakStatus = FagsakStatus.DEFAULT;
@@ -80,22 +82,6 @@ public class Fagsak extends BaseEntitet {
         this.saksnummer = saksnummer;
     }
 
-    public boolean erÅpen() {
-        return !getFagsakStatus().equals(FagsakStatus.AVSLUTTET);
-    }
-
-    public FagsakStatus getStatus() {
-        return getFagsakStatus();
-    }
-
-    public void setAvsluttet() {
-        oppdaterStatus(FagsakStatus.AVSLUTTET);
-    }
-
-    void oppdaterStatus(FagsakStatus status) {
-        this.setFagsakStatus(status);
-    }
-
     public NavBruker getNavBruker() {
         return navBruker;
     }
@@ -104,11 +90,15 @@ public class Fagsak extends BaseEntitet {
         return getNavBruker().getAktørId();
     }
 
+    /*
+     * Er ikke i aktiv bruk
+     * OBS - sjekk bruk i bl.a StatistikkRepository. Søk på fagsak_status overalt og fagsakStatus i *R*.java
+     * PDP bruker konstant verdi under behandling pga manglende update.
+     */
     private FagsakStatus getFagsakStatus() {
         return fagsakStatus;
     }
-
-    public void setFagsakStatus(FagsakStatus fagsakStatus) {
+    private void setFagsakStatus(FagsakStatus fagsakStatus) {
         this.fagsakStatus = fagsakStatus;
     }
 

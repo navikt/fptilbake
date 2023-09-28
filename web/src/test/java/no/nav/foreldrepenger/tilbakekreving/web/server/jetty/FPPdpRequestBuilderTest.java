@@ -55,7 +55,7 @@ class FPPdpRequestBuilderTest {
         var request = requestBuilder.lagAppRessursData(attributter);
         assertThat(request.getAktørIdSet()).containsOnly(PERSON1, PERSON2);
         assertThat(request.getResource(ForeldrepengerDataKeys.SAKSBEHANDLER).verdi()).isEqualTo(SAKSBEHANDLER);
-        assertThat(request.getResource(ForeldrepengerDataKeys.FAGSAK_STATUS).verdi()).isEqualTo(PipFagsakStatus.OPPRETTET.getVerdi());
+        assertThat(request.getResource(ForeldrepengerDataKeys.FAGSAK_STATUS).verdi()).isEqualTo(PipFagsakStatus.UNDER_BEHANDLING.getVerdi());
         assertThat(request.getResource(ForeldrepengerDataKeys.BEHANDLING_STATUS).verdi()).isEqualTo(PipBehandlingStatus.UTREDES.getVerdi());
     }
 
@@ -69,7 +69,7 @@ class FPPdpRequestBuilderTest {
         var request = requestBuilder.lagAppRessursData(attributter);
         assertThat(request.getAktørIdSet()).containsOnly(PERSON1, PERSON2);
         assertThat(request.getResource(ForeldrepengerDataKeys.SAKSBEHANDLER).verdi()).isEqualTo(SAKSBEHANDLER);
-        assertThat(request.getResource(ForeldrepengerDataKeys.FAGSAK_STATUS).verdi()).isEqualTo(PipFagsakStatus.OPPRETTET.getVerdi());
+        assertThat(request.getResource(ForeldrepengerDataKeys.FAGSAK_STATUS).verdi()).isEqualTo(PipFagsakStatus.UNDER_BEHANDLING.getVerdi());
         assertThat(request.getResource(ForeldrepengerDataKeys.BEHANDLING_STATUS).verdi()).isEqualTo(PipBehandlingStatus.UTREDES.getVerdi());
     }
 
@@ -123,7 +123,7 @@ class FPPdpRequestBuilderTest {
         var request = requestBuilder.lagAppRessursData(attributter);
         assertThat(request.getAktørIdSet()).containsOnly(PERSON1, PERSON2);
         assertThat(request.getResource(ForeldrepengerDataKeys.SAKSBEHANDLER)).isNull();
-        assertThat(request.getResource(ForeldrepengerDataKeys.FAGSAK_STATUS).verdi()).isEqualTo(PipFagsakStatus.OPPRETTET.getVerdi());
+        assertThat(request.getResource(ForeldrepengerDataKeys.FAGSAK_STATUS).verdi()).isEqualTo(PipFagsakStatus.UNDER_BEHANDLING.getVerdi());
         assertThat(request.getResource(ForeldrepengerDataKeys.BEHANDLING_STATUS).verdi()).isEqualTo(PipBehandlingStatus.UTREDES.getVerdi());
     }
 
@@ -177,7 +177,6 @@ class FPPdpRequestBuilderTest {
             PipBehandlingData data = new PipBehandlingData();
             data.setSaksnummer(SAKSNUMMER);
             data.setBehandlingId(BEHANDLING_ID);
-            data.setFagsakstatus(SAK_STATUS);
             data.leggTilAktørId(new AktørId(PERSON1));
             data.leggTilAktørId(new AktørId(PERSON2));
             data.setStatusForBehandling(BEHANDLING_STATUS);

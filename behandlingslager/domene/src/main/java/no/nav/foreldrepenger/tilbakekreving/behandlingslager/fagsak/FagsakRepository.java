@@ -11,7 +11,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.exception.TekniskException;
@@ -85,23 +84,4 @@ public class FagsakRepository {
         return fagsak.getId();
     }
 
-
-    /**
-     * Oppderer status på fagsak.
-     *
-     * @param fagsakId - id på fagsak
-     * @param status   - ny status
-     */
-    public void oppdaterFagsakStatus(Long fagsakId, FagsakStatus status) {
-        Fagsak fagsak = finnEksaktFagsak(fagsakId);
-        fagsak.oppdaterStatus(status);
-        entityManager.persist(fagsak);
-    }
-
-    public List<Fagsak> hentForStatus(FagsakStatus fagsakStatus) {
-        TypedQuery<Fagsak> query = entityManager.createQuery("select fagsak from Fagsak fagsak where fagsak.fagsakStatus=:fagsakStatus", Fagsak.class);
-        query.setParameter("fagsakStatus", fagsakStatus);
-
-        return query.getResultList();
-    }
 }

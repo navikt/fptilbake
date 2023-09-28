@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModellVisitor;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKonfigurasjon;
@@ -46,7 +45,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.vedtak.exception.TekniskException;
 
 /**
@@ -388,26 +386,6 @@ public class BehandlingskontrollTjeneste {
         behandlingRepository.lagre(behandling, kontekst.getSkriveLås());
         serviceProvider.oppdaterLåsVersjon(fagsakLås);
         eventPubliserer.fireEvent(kontekst, null, behandling.getStatus());
-    }
-
-    /**
-     * Opprett ny behandling for gitt fagsak og BehandlingType.
-     * <p>
-     * Vil alltid opprette ny behandling, selv om det finnes eksisterende åpen behandling på fagsaken.
-     *
-     * @param fagsak               - fagsak med eller uten eksisterende behandling
-     * @param behandlingType       - type behandling
-     * @param behandlingOppdaterer - funksjon for oppdatering av grunnlag
-     * @return Behandling - nylig opprettet og lagret.
-     */
-    public Behandling opprettNyBehandling(Fagsak fagsak, BehandlingType behandlingType, Consumer<Behandling> behandlingOppdaterer) {
-        Behandling.Builder behandlingBuilder = Behandling.nyBehandlingFor(fagsak, behandlingType);
-        Behandling nyBehandling = behandlingBuilder.build();
-        behandlingOppdaterer.accept(nyBehandling);
-
-        BehandlingskontrollKontekst kontekst = this.initBehandlingskontroll(nyBehandling);
-        this.opprettBehandling(kontekst, nyBehandling);
-        return nyBehandling;
     }
 
     public void avsluttBehandling(BehandlingskontrollKontekst kontekst) {

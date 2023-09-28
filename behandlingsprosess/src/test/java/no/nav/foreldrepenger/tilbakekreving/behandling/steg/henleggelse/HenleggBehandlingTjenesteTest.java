@@ -14,17 +14,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import jakarta.persistence.FlushModeType;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
+import jakarta.persistence.FlushModeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
@@ -65,7 +61,6 @@ class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
         brevSporingRepository = repoProvider.getBrevSporingRepository();
 
-        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository);
         henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, taskTjeneste,
                 behandlingskontrollTjeneste, historikkinnslagTjeneste);

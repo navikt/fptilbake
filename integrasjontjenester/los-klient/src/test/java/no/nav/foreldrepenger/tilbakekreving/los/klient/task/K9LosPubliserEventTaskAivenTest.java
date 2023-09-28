@@ -112,7 +112,7 @@ class K9LosPubliserEventTaskAivenTest {
         losPubliserEventTask.doTask(prosessTaskData);
 
         verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelse(any(), any());
-        TilbakebetalingBehandlingProsessEventDto event = losPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, EventHendelse.AKSJONSPUNKT_OPPRETTET.name(),
+        TilbakebetalingBehandlingProsessEventDto event = losPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(behandling, EventHendelse.AKSJONSPUNKT_OPPRETTET.name(),
                 kravgrunnlag431);
 
         assertThat(event.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(22000));
@@ -143,7 +143,7 @@ class K9LosPubliserEventTaskAivenTest {
         losPubliserEventTask.doTask(prosessTaskData);
         verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelse(any(), any());
 
-        TilbakebetalingBehandlingProsessEventDto event = losPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, EventHendelse.AKSJONSPUNKT_AVBRUTT.name(), null);
+        TilbakebetalingBehandlingProsessEventDto event = losPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(behandling, EventHendelse.AKSJONSPUNKT_AVBRUTT.name(), null);
 
         assertThat(event.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(event.getFørsteFeilutbetaling()).isNull();
