@@ -10,15 +10,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.FlushModeType;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
@@ -44,7 +43,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.Iverksetting
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
-import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtakFattetTilSelvbetjeningTask;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
@@ -72,7 +70,7 @@ class IverksetteVedtakStegTest {
         repoProvider = new BehandlingRepositoryProvider(entityManager);
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         brevSporingRepository = new BrevSporingRepository(entityManager);
-        var prosessTaskIverksett = new ProsessTaskIverksett(taskTjeneste, brevSporingRepository);
+        var prosessTaskIverksett = new ProsessTaskIverksett(taskTjeneste);
         iverksetteVedtakSteg = new IverksetteVedtakSteg(repoProvider, prosessTaskIverksett);
         behandlingVedtakRepository = repoProvider.getBehandlingVedtakRepository();
         behandlingRepository = repoProvider.getBehandlingRepository();
@@ -112,8 +110,7 @@ class IverksetteVedtakStegTest {
         assertThat(tasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtakTilOppdragsystemetTask.class));
         assertThat(tasker.get(1).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtaksbrevTask.class));
         assertThat(tasker.get(2).taskType()).isEqualTo(TaskType.forProsessTask(AvsluttBehandlingTask.class));
-        assertThat(tasker.get(3).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtakFattetTilSelvbetjeningTask.class));
-        assertThat(tasker.get(4).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtakHendelserTilDvhTask.class));
+        assertThat(tasker.get(3).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtakHendelserTilDvhTask.class));
     }
 
     @Test

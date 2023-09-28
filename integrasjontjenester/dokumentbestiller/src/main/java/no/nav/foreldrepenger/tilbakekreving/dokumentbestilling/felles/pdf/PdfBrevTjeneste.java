@@ -2,14 +2,12 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Optional;
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
@@ -20,8 +18,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.header.Tek
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.pdfgen.DokumentVariant;
 import no.nav.foreldrepenger.tilbakekreving.pdfgen.PdfGenerator;
-import no.nav.foreldrepenger.tilbakekreving.selvbetjening.SelvbetjeningTilbakekrevingStøtte;
-import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendBeskjedUtsendtVarselTilSelvbetjeningTask;
 import no.nav.journalpostapi.DokArkivKlient;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
@@ -73,7 +69,6 @@ public class PdfBrevTjeneste {
         taskGruppe.addNesteSekvensiell(lagSporingBrevTask(behandling, detaljertBrevType, data, dokumentreferanse));
         if (detaljertBrevType.gjelderVarsel() && data.getMottaker() == BrevMottaker.BRUKER) {
             taskGruppe.addNesteSekvensiell(lagSporingVarselBrevTask(behandling, varsletBeløp, fritekst));
-            lagSendBeskjedTilSelvbetjeningTask(behandling).ifPresent(taskGruppe::addNesteSekvensiell);
         }
         taskTjeneste.lagre(taskGruppe);
     }
@@ -112,17 +107,6 @@ public class PdfBrevTjeneste {
         data.setProperty(LagreVarselBrevSporingTask.VARSLET_BELOEP, Long.toString(varsletBeløp));
         data.setPayload(fritekst);
         return data;
-    }
-
-    private Optional<ProsessTaskData> lagSendBeskjedTilSelvbetjeningTask(Behandling behandling) {
-        if (SelvbetjeningTilbakekrevingStøtte.harStøtteFor(behandling)) {
-            var data = ProsessTaskData.forProsessTask(SendBeskjedUtsendtVarselTilSelvbetjeningTask.class);
-            ProsessTaskBehandlingUtil.setBehandling(data, behandling);
-            return Optional.of(data);
-        } else {
-            LOG.info("Sender ikke beskjed til selvbetjening for varsel for behandlingId={} i sak={}", behandling.getId(), behandling.getFagsak().getSaksnummer().getVerdi());
-            return Optional.empty();
-        }
     }
 
     private static void valider(DetaljertBrevType brevType, Long varsletBeløp) {
