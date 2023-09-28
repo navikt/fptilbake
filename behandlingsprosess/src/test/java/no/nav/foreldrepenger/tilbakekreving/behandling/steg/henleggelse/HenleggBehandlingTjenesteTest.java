@@ -196,7 +196,7 @@ class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        verify(taskTjeneste, times(2)).lagre(captor.capture());
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
         var prosessTaskData = captor.getAllValues();
         assertThat(prosessTaskData).isNotEmpty();
         assertThat(prosessTaskData.get(0).taskType()).isEqualTo(HenleggBehandlingTjeneste.HENLEGGELSESBREV_TASK_TYPE);
