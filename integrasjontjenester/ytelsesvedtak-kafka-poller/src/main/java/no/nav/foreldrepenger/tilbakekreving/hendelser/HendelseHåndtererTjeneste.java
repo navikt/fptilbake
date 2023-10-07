@@ -1,34 +1,31 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser;
 
+import static java.time.temporal.TemporalAdjusters.next;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-
-import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.HendelseTaskDataWrapper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
-
-import static java.time.temporal.TemporalAdjusters.next;
 
 @ApplicationScoped
 public class HendelseHåndtererTjeneste {
@@ -37,8 +34,9 @@ public class HendelseHåndtererTjeneste {
 
     private ProsessTaskTjeneste taskTjeneste;
     private FagsystemKlient fagsystemKlient;
-    private EksternBehandlingRepository eksternBehandlingRepository;
     private BehandlingRepository behandlingRepository;
+    private EksternBehandlingRepository eksternBehandlingRepository;
+    private BrevSporingRepository brevSporingRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
     HendelseHåndtererTjeneste() {
@@ -49,16 +47,23 @@ public class HendelseHåndtererTjeneste {
     public HendelseHåndtererTjeneste(ProsessTaskTjeneste taskTjeneste,
                                      FagsystemKlient fagsystemKlient,
                                      EksternBehandlingRepository eksternBehandlingRepository,
-                                     BehandlingRepository behandlingRepository, BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
+                                     BehandlingRepository behandlingRepository,
+                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste,
+                                     BrevSporingRepository brevSporingRepository) {
+
         this.taskTjeneste = taskTjeneste;
         this.fagsystemKlient = fagsystemKlient;
-        this.eksternBehandlingRepository = eksternBehandlingRepository;
         this.behandlingRepository = behandlingRepository;
+        this.eksternBehandlingRepository = eksternBehandlingRepository;
+        this.brevSporingRepository = brevSporingRepository;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }
 
+
     public void håndterHendelse(HendelseTaskDataWrapper hendelseTaskDataWrapper, Henvisning henvisning, String kaller) {
         var eksternBehandlingUuid = hendelseTaskDataWrapper.getBehandlingUuid();
+        var samletBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG, Tillegsinformasjon.VARSELTEKST);
+        var tbkData = samletBehandlingInfo.getTilbakekrevingsvalg();
         var åpenTilbakekreving = behandlingRepository.finnÅpenTilbakekrevingsbehandling(hendelseTaskDataWrapper.getSaksnummer())
             .orElse(null);
         if (åpenTilbakekreving != null && !åpenTilbakekreving.isBehandlingPåVent()) {
@@ -70,20 +75,30 @@ public class HendelseHåndtererTjeneste {
             behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(åpenTilbakekreving, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
                 venteTid.atStartOfDay(), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         }
-        fagsystemKlient.hentTilbakekrevingValg(eksternBehandlingUuid)
-                .ifPresent(tbkData -> {
-                    if (erRelevantHendelseForOpprettTilbakekreving(tbkData)) {
-                        if (eksternBehandlingRepository.harEksternBehandlingForEksternUuid(eksternBehandlingUuid)) {
-                            LOG.info("Hendelse={} allerede opprettet tilbakekreving for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
-                        } else {
-                            LOG.info("Hendelse={} er relevant for tilbakekreving opprett for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
-                            lagOpprettBehandlingTask(hendelseTaskDataWrapper, henvisning);
-                        }
-                    } else if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {
-                        LOG.info("Hendelse={} for henvisning={} var tidligere relevant for å oppdatere behandling. Nå ignoreres den",
-                                tbkData.getVidereBehandling(), henvisning);
-                    }
-                });
+        if (erRelevantHendelseForOpprettTilbakekreving(tbkData)) {
+            if (åpenTilbakekreving != null) {
+                // TODO TFP-5599 - burde vi satt evt åpen TBK på vent? Eller er det så kort tid før det kommer noe fra OS at det ikke er et problem?
+                if  (samletBehandlingInfo.getVarseltekst() == null || samletBehandlingInfo.getVarseltekst().isBlank()) {
+                    // Do nothing. Det skal ikke sendes varsel å spiller liten rolle om det er sendt tidligere varsel eller ikke
+                    return;
+                } else {
+                    var harSendtVarselTidligere = brevSporingRepository.harVarselBrevSendtForBehandlingId(åpenTilbakekreving.getId()) ?
+                        "er varslet tidligere" : "ikke er varslet";
+                    LOG.info("Mottatt VedtakHendelse {} har bedt om varsel og det finnes åpen tilbakekreving som {}", tbkData.getVidereBehandling(), harSendtVarselTidligere);
+                }
+            }
+            // TODO TFP-5599 vurdere else-logikk her
+            if (eksternBehandlingRepository.harEksternBehandlingForEksternUuid(eksternBehandlingUuid)) {
+                LOG.info("Mottatt VedtakHendelse {} allerede opprettet tilbakekreving for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
+            } else {
+                LOG.info("Mottatt VedtakHendelse {} er relevant for tilbakekreving opprett for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
+                lagOpprettBehandlingTask(hendelseTaskDataWrapper, henvisning);
+            }
+        } else if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {
+            // TODO TFP-5599 - burde denne satt evt åpen TBK på vent? Eller er det så kort tid før det kommer noe fra OS at det ikke er et problem?
+            LOG.info("Mottatt VedtakHendelse {} for henvisning={} var tidligere relevant for å oppdatere behandling. Nå ignoreres den",
+                tbkData.getVidereBehandling(), henvisning);
+        }
     }
 
     public Henvisning hentHenvisning(UUID behandling) {
