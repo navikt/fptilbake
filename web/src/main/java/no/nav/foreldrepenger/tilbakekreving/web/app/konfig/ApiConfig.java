@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningUttrekkRestTjeneste;
+
 import org.glassfish.jersey.server.ServerProperties;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -102,6 +104,7 @@ public class ApiConfig extends Application {
             FordelRestTjeneste.class,
             ForvaltningBehandlingRestTjeneste.class,
             ForvaltningKravgrunnlagRestTjeneste.class,
+            ForvaltningUttrekkRestTjeneste.class,
             VergeRestTjeneste.class,
             LosRestTjeneste.class,
             FpOversiktRestTjeneste.class,
