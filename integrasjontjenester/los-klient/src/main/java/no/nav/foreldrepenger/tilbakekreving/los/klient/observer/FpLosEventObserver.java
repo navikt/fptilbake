@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.los.klient.observer;
 
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +11,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.Behandlin
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingskontrollEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.los.klient.task.FpLosPubliserEventTask;
@@ -48,17 +45,12 @@ public class FpLosEventObserver {
         opprettProsessTask(event, Hendelse.AKSJONSPUNKT);
     }
 
-    // Lytter på AksjonspunkterFunnetEvent, filtrer ut når behandling er satt manuelt på vent og legger melding på kafka
+    // Lytter på AksjonspunkterFunnetEvent, filtrer ut når behandling er satt på vent - skjer manuelt men også maskinelt
     public void observerAksjonpunktStatusEvent(@Observes AksjonspunktStatusEvent event) {
-        var sattPåVentAvSaksbehandler = event.getAksjonspunkter().stream().anyMatch(FpLosEventObserver::manueltPåVent);
-        if (sattPåVentAvSaksbehandler) {
+        var sattPåVent = event.getAksjonspunkter().stream().anyMatch(ap -> ap.erAutopunkt() && ap.erOpprettet());
+        if (sattPåVent) {
             opprettProsessTask(event, Hendelse.VENTETILSTAND);
         }
-    }
-
-    private static boolean manueltPåVent(Aksjonspunkt aksjonspunkt) {
-        var endretOpprettetAv = Optional.ofNullable(aksjonspunkt.getEndretAv()).orElseGet(aksjonspunkt::getOpprettetAv);
-        return aksjonspunkt.erOpprettet() && aksjonspunkt.erAutopunkt() && !endretOpprettetAv.startsWith("srv");
     }
 
     public void observerBehandlingAvsluttetEvent(@Observes BehandlingStatusEvent.BehandlingOpprettetEvent event) {
