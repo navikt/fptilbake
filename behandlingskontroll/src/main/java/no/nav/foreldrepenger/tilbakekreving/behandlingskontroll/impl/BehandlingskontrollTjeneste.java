@@ -669,12 +669,6 @@ public class BehandlingskontrollTjeneste {
         getEventPubliserer().fireEvent(event);
     }
 
-    private void fireEventBehandlingStegTilstandEndring(BehandlingskontrollKontekst kontekst,
-                                                        BehandlingStegTilstandSnapshot fraTilstand, BehandlingStegTilstandSnapshot tilTilstand) {
-        var event = BehandlingModellImpl.nyBehandlingStegTilstandEndring(kontekst, fraTilstand, tilTilstand);
-        getEventPubliserer().fireEvent(event);
-    }
-
     protected void oppdaterEksisterendeBehandlingStegStatusVedFramføringEllerTilbakeføring(Behandling behandling, BehandlingStegType revidertStegType,
                                                                                            BehandlingStegStatus behandlingStegStatus,
                                                                                            BehandlingStegStatus sluttStatusForAndreÅpneSteg) {
@@ -741,7 +735,6 @@ public class BehandlingskontrollTjeneste {
         var statusEtter = behandling.getStatus();
         var tilTilstand = BehandlingModellImpl.tilBehandlingsStegSnapshot(behandling.getBehandlingStegTilstand());
         fireEventBehandlingStegOvergang(kontekst, behandling, fraTilstand, tilTilstand);
-        fireEventBehandlingStegTilstandEndring(kontekst, fraTilstand, tilTilstand);
         eventPubliserer.fireEvent(kontekst, statusFør, statusEtter);
     }
 

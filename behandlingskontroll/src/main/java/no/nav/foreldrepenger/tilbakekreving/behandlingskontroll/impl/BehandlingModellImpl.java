@@ -12,11 +12,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jakarta.enterprise.inject.spi.CDI;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.inject.spi.CDI;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModellVisitor;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
@@ -27,7 +26,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegUt
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.StegProsesseringResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStegOvergangEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStegTilstandEndringEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.transisjoner.Transisjoner;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.StegTransisjon;
@@ -72,12 +70,6 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
         Objects.requireNonNull(behandlingType, "behandlingType"); //$NON-NLS-1$ // NOSONAR
         this.behandlingType = behandlingType;
         this.lookup = (stegType, behType) -> new BehandlingStegModellImpl(this, lookup.apply(stegType, behType), stegType);
-    }
-
-    static BehandlingStegTilstandEndringEvent nyBehandlingStegTilstandEndring(BehandlingskontrollKontekst kontekst,
-                                                                              BehandlingStegTilstandSnapshot fraTilstand,
-                                                                              BehandlingStegTilstandSnapshot tilTilstand) {
-        return new BehandlingStegTilstandEndringEvent(kontekst, fraTilstand, tilTilstand);
     }
 
     static BehandlingStegTilstandSnapshot tilBehandlingsStegSnapshot(Optional<BehandlingStegTilstand> tilstand) {
