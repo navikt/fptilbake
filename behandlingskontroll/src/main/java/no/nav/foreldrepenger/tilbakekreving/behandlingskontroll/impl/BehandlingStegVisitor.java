@@ -153,13 +153,6 @@ class BehandlingStegVisitor {
         BehandlingStegType tilSteg = finnFremoverhoppSteg(stegType, transisjon);
         eventPubliserer.fireEvent(opprettEvent(stegResultat, transisjon, stegTilstandFør.orElse(null), tilSteg));
 
-        // Publiser event om endring i stegets tilstand
-        var fraTilstand = BehandlingModellImpl.tilBehandlingsStegSnapshot(stegTilstandFør);
-        var tilTilstand = BehandlingModellImpl.tilBehandlingsStegSnapshot(behandling.getBehandlingStegTilstand());
-        var behandlingStegTilstandEndringEvent = BehandlingModellImpl.nyBehandlingStegTilstandEndring(kontekst,
-                fraTilstand, tilTilstand);
-        eventPubliserer.fireEvent(behandlingStegTilstandEndringEvent);
-
         // Publiser de funnede aksjonspunktene
         if (!funnetAksjonspunkter.isEmpty()) {
             eventPubliserer.fireEvent(new AksjonspunktStatusEvent(kontekst, funnetAksjonspunkter, stegType));
