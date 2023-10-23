@@ -62,8 +62,9 @@ public class FagsakTjeneste {
         return aktørId.get();
     }
 
-    public String hentNavnForAktør(AktørId aktørId) {
-        return tpsTjeneste.hentBrukerForAktør(aktørId).map(Personinfo::getNavn).orElseThrow(() -> new TekniskException("FPT-7428492", "Fant ikke person med aktørId"));
+    public String hentNavnForAktør(FagsakYtelseType ytelseType, AktørId aktørId) {
+        return tpsTjeneste.hentBrukerForAktør(ytelseType, aktørId).map(Personinfo::getNavn)
+            .orElseThrow(() -> new TekniskException("FPT-7428492", "Fant ikke person med aktørId"));
     }
 
     private NavBruker hentNavBruker(AktørId aktørId, Språkkode språkkode) {

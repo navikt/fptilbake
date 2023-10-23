@@ -43,6 +43,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.FagsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VergeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
@@ -282,15 +283,16 @@ public class BehandlingTjeneste {
 
     //TODO verge bør flyttes til egen tjeneste, aller helst i eget 'hent fra saksbehandlingssystemet-steg'
     private void hentVergeInformasjonFraFpsak(long behandlingId) {
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
-        SamletEksternBehandlingInfo eksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VERGE);
+        var eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+        var eksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VERGE, Tillegsinformasjon.FAGSAK);
+        var ytelseType = Optional.ofNullable(eksternBehandlingInfo.getFagsak()).map(FagsakDto::getFagsakYtelseType).orElse(FagsakYtelseType.UDEFINERT);
         if (eksternBehandlingInfo.getVerge() != null) {
-            lagreVergeInformasjon(behandlingId, eksternBehandlingInfo.getVerge());
+            lagreVergeInformasjon(ytelseType, behandlingId, eksternBehandlingInfo.getVerge());
         }
     }
 
     //TODO verge bør flyttes til egen tjeneste, aller helst i eget 'hent fra saksbehandlingssystemet-steg'
-    private void lagreVergeInformasjon(long behandlingId, VergeDto vergeDto) {
+    private void lagreVergeInformasjon(FagsakYtelseType ytelseType, long behandlingId, VergeDto vergeDto) {
         if (vergeDto.getGyldigTom().isBefore(LocalDate.now())) {
             LOG.info("Verge informasjon er utløpt.Så kopierer ikke fra fpsak");
         } else {
@@ -306,7 +308,7 @@ public class BehandlingTjeneste {
             } else if (vergeDto.getAktoerId() != null && !vergeDto.getAktoerId().isEmpty()) {
                 var aktørId = new AktørId(vergeDto.getAktoerId());
                 builder.medVergeAktørId(aktørId);
-                builder.medNavn(fagsakTjeneste.hentNavnForAktør(aktørId));
+                builder.medNavn(fagsakTjeneste.hentNavnForAktør(ytelseType, aktørId));
             }
             vergeRepository.lagreVergeInformasjon(behandlingId, builder.build());
         }

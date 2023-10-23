@@ -119,7 +119,7 @@ class HåndterGamleKravgrunnlagTaskTest {
         håndterGamleKravgrunnlagTask = new HåndterGamleKravgrunnlagTask(håndterGamleKravgrunnlagTjeneste);
 
         behandling = ScenarioSimple.simple().lagMocked();
-        when(tpsTjenesteMock.hentBrukerForAktør(any(AktørId.class))).thenReturn(lagPersonInfo(behandling.getFagsak().getAktørId()));
+        when(tpsTjenesteMock.hentBrukerForAktør(any(), any(AktørId.class))).thenReturn(lagPersonInfo(behandling.getFagsak().getAktørId()));
         when(tpsTjenesteMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));
         when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(true, ENHET, true));
         var eksternBehandlingsinfoDto = lagEksternBehandlingData();
