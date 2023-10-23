@@ -285,7 +285,9 @@ public class BehandlingTjeneste {
     private void hentVergeInformasjonFraFpsak(long behandlingId) {
         var eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
         var eksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VERGE, Tillegsinformasjon.FAGSAK);
-        var ytelseType = Optional.ofNullable(eksternBehandlingInfo.getFagsak()).map(FagsakDto::getFagsakYtelseType).orElse(FagsakYtelseType.UDEFINERT);
+        var ytelseType = Optional.ofNullable(eksternBehandlingInfo)
+            .map(SamletEksternBehandlingInfo::getFagsak)
+            .map(FagsakDto::getFagsakYtelseType).orElse(FagsakYtelseType.UDEFINERT);
         if (eksternBehandlingInfo.getVerge() != null) {
             lagreVergeInformasjon(ytelseType, behandlingId, eksternBehandlingInfo.getVerge());
         }
