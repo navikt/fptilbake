@@ -43,7 +43,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.FagsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VergeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
@@ -230,7 +229,7 @@ public class BehandlingTjeneste {
 
         historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling); // FIXME: sjekk om journalpostId skal hentes ///
 
-        hentVergeInformasjonFraFpsak(behandling.getId());
+        hentVergeInformasjonFraFpsak(fagsakYtelseType, behandling.getId());
 
         return behandling;
     }
@@ -282,12 +281,9 @@ public class BehandlingTjeneste {
     }
 
     //TODO verge bør flyttes til egen tjeneste, aller helst i eget 'hent fra saksbehandlingssystemet-steg'
-    private void hentVergeInformasjonFraFpsak(long behandlingId) {
+    private void hentVergeInformasjonFraFpsak(FagsakYtelseType ytelseType, long behandlingId) {
         var eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
-        var eksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VERGE, Tillegsinformasjon.FAGSAK);
-        var ytelseType = Optional.ofNullable(eksternBehandlingInfo)
-            .map(SamletEksternBehandlingInfo::getFagsak)
-            .map(FagsakDto::getFagsakYtelseType).orElse(FagsakYtelseType.UDEFINERT);
+        var eksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VERGE);
         if (eksternBehandlingInfo.getVerge() != null) {
             lagreVergeInformasjon(ytelseType, behandlingId, eksternBehandlingInfo.getVerge());
         }
