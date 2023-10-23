@@ -229,7 +229,7 @@ public class BehandlingTjeneste {
 
         historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling); // FIXME: sjekk om journalpostId skal hentes ///
 
-        hentVergeInformasjonFraFpsak(behandling.getId());
+        hentVergeInformasjonFraFpsak(fagsakYtelseType, behandling.getId());
 
         return behandling;
     }
@@ -281,16 +281,16 @@ public class BehandlingTjeneste {
     }
 
     //TODO verge bør flyttes til egen tjeneste, aller helst i eget 'hent fra saksbehandlingssystemet-steg'
-    private void hentVergeInformasjonFraFpsak(long behandlingId) {
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
-        SamletEksternBehandlingInfo eksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VERGE);
+    private void hentVergeInformasjonFraFpsak(FagsakYtelseType ytelseType, long behandlingId) {
+        var eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+        var eksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VERGE);
         if (eksternBehandlingInfo.getVerge() != null) {
-            lagreVergeInformasjon(behandlingId, eksternBehandlingInfo.getVerge());
+            lagreVergeInformasjon(ytelseType, behandlingId, eksternBehandlingInfo.getVerge());
         }
     }
 
     //TODO verge bør flyttes til egen tjeneste, aller helst i eget 'hent fra saksbehandlingssystemet-steg'
-    private void lagreVergeInformasjon(long behandlingId, VergeDto vergeDto) {
+    private void lagreVergeInformasjon(FagsakYtelseType ytelseType, long behandlingId, VergeDto vergeDto) {
         if (vergeDto.getGyldigTom().isBefore(LocalDate.now())) {
             LOG.info("Verge informasjon er utløpt.Så kopierer ikke fra fpsak");
         } else {
@@ -306,7 +306,7 @@ public class BehandlingTjeneste {
             } else if (vergeDto.getAktoerId() != null && !vergeDto.getAktoerId().isEmpty()) {
                 var aktørId = new AktørId(vergeDto.getAktoerId());
                 builder.medVergeAktørId(aktørId);
-                builder.medNavn(fagsakTjeneste.hentNavnForAktør(aktørId));
+                builder.medNavn(fagsakTjeneste.hentNavnForAktør(ytelseType, aktørId));
             }
             vergeRepository.lagreVergeInformasjon(behandlingId, builder.build());
         }

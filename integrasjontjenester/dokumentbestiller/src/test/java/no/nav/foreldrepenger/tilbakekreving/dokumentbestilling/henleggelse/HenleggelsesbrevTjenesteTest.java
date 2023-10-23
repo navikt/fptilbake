@@ -71,8 +71,8 @@ class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
                 .thenReturn(lagYtelseNavn("foreldrepenger", "foreldrepenger"));
         Personinfo personinfo = byggStandardPerson("Fiona", DUMMY_FØDSELSNUMMER, Språkkode.nn);
         String aktørId = behandling.getAktørId().getId();
-        when(mockEksternDataForBrevTjeneste.hentPerson(aktørId)).thenReturn(personinfo);
-        when(mockEksternDataForBrevTjeneste.hentAdresse(any(Personinfo.class), any(BrevMottaker.class), any(Optional.class))).thenReturn(lagStandardNorskAdresse());
+        when(mockEksternDataForBrevTjeneste.hentPerson(any(), eq(aktørId))).thenReturn(personinfo);
+        when(mockEksternDataForBrevTjeneste.hentAdresse(any(), any(Personinfo.class), any(BrevMottaker.class), any(Optional.class))).thenReturn(lagStandardNorskAdresse());
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setSprakkode(Språkkode.nb);

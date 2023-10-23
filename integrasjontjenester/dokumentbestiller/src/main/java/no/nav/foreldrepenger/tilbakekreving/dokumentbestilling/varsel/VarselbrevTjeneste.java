@@ -33,7 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Frit
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.FagsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 
@@ -125,8 +125,8 @@ public class VarselbrevTjeneste {
         Saksnummer saksnummer = behandling.getFagsak().getSaksnummer();
         SamletEksternBehandlingInfo eksternBehandlingsinfoDto = eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(eksternBehandling.getEksternUuid(), Tillegsinformasjon.PERSONOPPLYSNINGER);
         //Henter data fra tps
-        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());
-        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, brevMottaker, vergeEntitet);
+        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getFagsak().getFagsakYtelseType(), behandling.getAktørId().getId());
+        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(behandling.getFagsak().getFagsakYtelseType(), personinfo, brevMottaker, vergeEntitet);
         String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet, adresseinfo);
 
         //Henter fagsaktypenavn på riktig språk
@@ -159,16 +159,17 @@ public class VarselbrevTjeneste {
     }
 
     public VarselbrevSamletInfo lagVarselbrevForForhåndsvisning(UUID behandlingUuId, String varseltekst, FagsakYtelseType fagsakYtleseType) {
-        SamletEksternBehandlingInfo eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(behandlingUuId, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.FAGSAK);
-        EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfo.getGrunninformasjon();
-        Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentFraHenvisning(grunninformasjon.getHenvisning());
-        Behandling behandling = eksternBehandling.isPresent() ? behandlingRepository.hentBehandling(eksternBehandling.get().getInternId()) : null;
+        var eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(behandlingUuId, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.FAGSAK);
+        var grunninformasjon = eksternBehandlingsinfo.getGrunninformasjon();
+        var eksternBehandling = eksternBehandlingRepository.hentFraHenvisning(grunninformasjon.getHenvisning());
+        var behandling = eksternBehandling.map(value -> behandlingRepository.hentBehandling(value.getInternId())).orElse(null);
         Optional<VergeEntitet> vergeEntitet = behandling != null ? vergeRepository.finnVergeInformasjon(behandling.getId()) : Optional.empty();
         boolean finnesVerge = vergeEntitet.isPresent();
-        BrevMottaker brevMottaker = finnesVerge ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
+        var brevMottaker = finnesVerge ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
+        var fagsakYtelse = Optional.ofNullable(eksternBehandlingsinfo.getFagsak()).map(FagsakDto::getFagsakYtelseType).orElse(FagsakYtelseType.UDEFINERT);
 
-        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(eksternBehandlingsinfo.getAktørId().getId());
-        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, brevMottaker, vergeEntitet);
+        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(fagsakYtelse, eksternBehandlingsinfo.getAktørId().getId());
+        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(fagsakYtelse, personinfo, brevMottaker, vergeEntitet);
         String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet, adresseinfo);
 
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(grunninformasjon.getHenvisning());

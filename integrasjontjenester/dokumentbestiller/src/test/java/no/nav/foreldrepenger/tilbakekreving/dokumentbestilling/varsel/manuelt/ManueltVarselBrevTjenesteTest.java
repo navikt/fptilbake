@@ -12,12 +12,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.inject.Inject;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriodeMedFaktaDto;
@@ -62,8 +61,8 @@ class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett {
                 .thenReturn(lagYtelseNavn("foreldrepenger", "foreldrepenger"));
         Personinfo personinfo = byggStandardPerson("Fiona", DUMMY_FØDSELSNUMMER, Språkkode.nn);
         String aktørId = behandling.getAktørId().getId();
-        when(mockEksternDataForBrevTjeneste.hentPerson(aktørId)).thenReturn(personinfo);
-        when(mockEksternDataForBrevTjeneste.hentAdresse(any(Personinfo.class), any(BrevMottaker.class), any(Optional.class))).thenReturn(lagStandardNorskAdresse());
+        when(mockEksternDataForBrevTjeneste.hentPerson(any(), eq(aktørId))).thenReturn(personinfo);
+        when(mockEksternDataForBrevTjeneste.hentAdresse(any(), any(Personinfo.class), any(BrevMottaker.class), any(Optional.class))).thenReturn(lagStandardNorskAdresse());
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setSprakkode(Språkkode.nb);

@@ -9,9 +9,9 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import jakarta.enterprise.context.ApplicationScoped;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
@@ -60,9 +60,10 @@ public class AktørTjeneste {
     private final LRUCache<PersonIdent, AktørId> cacheIdentTilAktørId;
 
     private final Persondata pdlKlient;
+    private final Tema tema;
 
     public AktørTjeneste() {
-        var tema = switch (ApplicationName.hvilkenTilbake()) {
+        this.tema = switch (ApplicationName.hvilkenTilbake()) {
             case FPTILBAKE -> Tema.FOR;
             case K9TILBAKE -> Tema.OMS;
             default -> throw new IllegalStateException("applikasjonsnavn er satt til " + ApplicationName.hvilkenTilbake() + " som ikke er en støttet verdi");
@@ -140,7 +141,7 @@ public class AktørTjeneste {
         return ident;
     }
 
-    public Personinfo hentPersoninfo(AktørId aktørId, PersonIdent personIdent) {
+    public Personinfo hentPersoninfo(FagsakYtelseType ytelseType, AktørId aktørId, PersonIdent personIdent) {
         var query = new HentPersonQueryRequest();
         query.setIdent(aktørId.getId());
         var projection = new PersonResponseProjection()
@@ -149,7 +150,8 @@ public class AktørTjeneste {
                 .doedsfall(new DoedsfallResponseProjection().doedsdato())
                 .sivilstand(new SivilstandResponseProjection().type());
 
-        var person = pdlKlient.hentPerson(query, projection);
+        var ytelse = utledYtelse(ytelseType);
+        var person = pdlKlient.hentPerson(ytelse, query, projection);
 
         var fødselsdato = person.getFoedsel().stream()
                 .map(Foedsel::getFoedselsdato)
@@ -178,6 +180,20 @@ public class AktørTjeneste {
         if (navn.getForkortetNavn() != null)
             return navn.getForkortetNavn();
         return navn.getEtternavn() + " " + navn.getFornavn() + (navn.getMellomnavn() == null ? "" : " " + navn.getMellomnavn());
+    }
+
+    private Persondata.Ytelse utledYtelse(FagsakYtelseType ytelseType) {
+        if (Tema.FOR.equals(this.tema)) {
+            if (FagsakYtelseType.ENGANGSTØNAD.equals(ytelseType)) {
+                return Persondata.Ytelse.ENGANGSSTØNAD;
+            } else if (FagsakYtelseType.SVANGERSKAPSPENGER.equals(ytelseType)) {
+                return Persondata.Ytelse.SVANGERSKAPSPENGER;
+            } else {
+                return Persondata.Ytelse.FORELDREPENGER;
+            }
+        } else {
+            return Persondata.Ytelse.PLEIEPENGER;
+        }
     }
 
 }

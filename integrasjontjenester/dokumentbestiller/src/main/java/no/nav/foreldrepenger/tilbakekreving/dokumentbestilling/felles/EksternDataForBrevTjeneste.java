@@ -48,8 +48,8 @@ public class EksternDataForBrevTjeneste {
         return fagsystemKlient.hentBehandlingsinfo(eksternUuid, tillegsinformasjon);
     }
 
-    public Personinfo hentPerson(String aktørId) {
-        return tpsTjeneste.hentBrukerForAktør(new AktørId(aktørId))
+    public Personinfo hentPerson(FagsakYtelseType ytelseType, String aktørId) {
+        return tpsTjeneste.hentBrukerForAktør(ytelseType, new AktørId(aktørId))
                 .orElseThrow(() -> new TekniskException("FPT-089912", String.format("Fant ikke person med aktørId %s i tps", aktørId)));
     }
 
@@ -57,14 +57,14 @@ public class EksternDataForBrevTjeneste {
         return new Adresseinfo.Builder(personinfo.getPersonIdent(), personinfo.getNavn()).build();
     }
 
-    public Adresseinfo hentAdresse(Personinfo personinfo, BrevMottaker brevMottaker, Optional<VergeEntitet> vergeEntitet) {
+    public Adresseinfo hentAdresse(FagsakYtelseType ytelseType, Personinfo personinfo, BrevMottaker brevMottaker, Optional<VergeEntitet> vergeEntitet) {
         if (vergeEntitet.isPresent()) {
             VergeEntitet verge = vergeEntitet.get();
             if (VergeType.ADVOKAT.equals(verge.getVergeType())) {
                 return hentOrganisasjonAdresse(verge.getOrganisasjonsnummer(), verge.getNavn(), personinfo, brevMottaker);
             } else if (BrevMottaker.VERGE.equals(brevMottaker)) {
                 String aktørId = verge.getVergeAktørId().getId();
-                personinfo = hentPerson(aktørId);
+                personinfo = hentPerson(ytelseType, aktørId);
             }
         }
         return hentAdresse(personinfo);

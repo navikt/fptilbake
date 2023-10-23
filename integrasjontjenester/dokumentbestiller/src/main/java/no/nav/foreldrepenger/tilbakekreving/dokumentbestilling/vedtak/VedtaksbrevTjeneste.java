@@ -13,15 +13,14 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.jknack.handlebars.internal.text.WordUtils;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
@@ -239,7 +238,7 @@ public class VedtaksbrevTjeneste {
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
         //TODO hent data fra fpsak i tidligere steg, og hent fra repository her
         SamletEksternBehandlingInfo fagsystemBehandling = hentDataFraFagsystem(behandling);
-        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());
+        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getFagsak().getFagsakYtelseType(), behandling.getAktørId().getId());
         BeregningResultat beregnetResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
 
         BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, fagsystemBehandling, personinfo, beregnetResultat.getVedtakResultatType(), brevMottaker);
@@ -443,7 +442,7 @@ public class VedtaksbrevTjeneste {
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandling.getId());
         boolean finnesVerge = vergeEntitet.isPresent();
 
-        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, brevMottaker, vergeEntitet);
+        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(behandling.getFagsak().getFagsakYtelseType(), personinfo, brevMottaker, vergeEntitet);
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakType, språkkode);
         String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet, adresseinfo);
 

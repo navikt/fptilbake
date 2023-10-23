@@ -1,11 +1,15 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,21 +26,14 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.headers.Header;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
@@ -138,9 +135,8 @@ public class VergeRestTjeneste {
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public VergeDto getVerge(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                              @QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse dto) {
-        Long behandlingId = hentBehandlingId(dto);
-        Optional<VergeEntitet> vergeEntitet = vergeTjeneste.hentVergeInformasjon(behandlingId);
-        return vergeEntitet.isPresent() ? map(vergeEntitet.get()) : null;
+        var behandling = hentBehandling(dto);
+        return vergeTjeneste.hentVergeInformasjon(behandling.getId()).map(v -> map(behandling.getFagsak().getFagsakYtelseType(), v)).orElse(null);
     }
 
     @GET
@@ -172,15 +168,13 @@ public class VergeRestTjeneste {
         return Response.ok(dto).build();
     }
 
-    private VergeDto map(VergeEntitet vergeEntitet) {
+    private VergeDto map(FagsakYtelseType ytelseType, VergeEntitet vergeEntitet) {
         VergeDto vergeDto = new VergeDto();
         if (vergeEntitet.getVergeType().equals(VergeType.ADVOKAT)) {
             vergeDto.setOrganisasjonsnummer(vergeEntitet.getOrganisasjonsnummer());
         } else {
-            Optional<Personinfo> personinfo = tpsTjeneste.hentBrukerForAktør(vergeEntitet.getVergeAktørId());
-            if (personinfo.isPresent()) {
-                vergeDto.setFnr(personinfo.get().getPersonIdent().getIdent());
-            }
+            tpsTjeneste.hentBrukerForAktør(ytelseType, vergeEntitet.getVergeAktørId())
+                .ifPresent(value -> vergeDto.setFnr(value.getPersonIdent().getIdent()));
         }
         vergeDto.setGyldigFom(vergeEntitet.getGyldigFom());
         vergeDto.setGyldigTom(vergeEntitet.getGyldigTom());

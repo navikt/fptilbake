@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.pdl.AktørTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -24,8 +24,8 @@ public class PersoninfoAdapter {
         this.aktørTjeneste = aktørTjeneste;
     }
 
-    public Optional<Personinfo> hentBrukerForAktør(AktørId aktørId) {
-        return aktørTjeneste.hentPersonIdentForAktørId(aktørId).map(pi -> aktørTjeneste.hentPersoninfo(aktørId, pi));
+    public Optional<Personinfo> hentBrukerForAktør(FagsakYtelseType ytelseType, AktørId aktørId) {
+        return aktørTjeneste.hentPersonIdentForAktørId(aktørId).map(pi -> aktørTjeneste.hentPersoninfo(ytelseType, aktørId, pi));
     }
 
     public Optional<PersonIdent> hentFnrForAktør(AktørId aktørId) {
