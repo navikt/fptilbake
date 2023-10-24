@@ -19,7 +19,7 @@ public class SaksnummerDto implements AbacDto {
     @JsonProperty("saksnummer")
     @NotNull
     @Size(min = 1, max = 20)
-    @Pattern(regexp = "^[\\p{L}\\p{N}\\p{P}]+$", message = "Saksnummer ${validatedValue} matcher ikke tillatt pattern '{regexp}'")
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Saksnummer ${validatedValue} matcher ikke tillatt pattern '{regexp}'")
     private final String saksnummer;
 
     public SaksnummerDto(String saksnummer) {
