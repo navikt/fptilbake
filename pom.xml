@@ -397,13 +397,13 @@
                 <!-- denne tas inn av com.ibm.mq.jakarta.client, overstyrer med nyere versjon. Trengs denne? -->
                 <groupId>org.json</groupId>
                 <artifactId>json</artifactId>
-                <version>20230618</version>
+                <version>20231013</version>
             </dependency>
             <dependency>
                 <groupId>org.xerial.snappy</groupId>
                 <artifactId>snappy-java</artifactId>
                 <!-- oppdaterer versjon for å bli kvitt CVE-2023-34455 CVE-2023-34454 CVE-2023-34453 -->
-                <version>1.1.10.3</version>
+                <version>1.1.10.5</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
