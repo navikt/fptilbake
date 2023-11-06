@@ -7,11 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.naming.NamingException;
-import jakarta.security.auth.message.config.AuthConfigFactory;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.eclipse.jetty.jaas.JAASLoginService;
@@ -41,6 +39,9 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import jakarta.security.auth.message.config.AuthConfigFactory;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
@@ -55,6 +56,8 @@ public class JettyServer {
     private static final String JETTY_SCAN_LOCATIONS = "^.*jersey-.*\\.jar$|^.*felles-.*\\.jar$|^.*/app\\.jar$";
     private static final String JETTY_LOCAL_CLASSES = "^.*/target/classes/|";
 
+    public static final AtomicBoolean KILL_APPLICATION = new AtomicBoolean(false);
+    private static byte[] EMERGENCY_HEAP_SPACE;
 
     /**
      * Legges først slik at alltid resetter context før prosesserer nye requests.
@@ -70,7 +73,27 @@ public class JettyServer {
     private final Integer serverPort;
 
     public static void main(String[] args) throws Exception {
-        jettyServer(args).bootStrap();
+        JettyServer jettyServer = jettyServer(args);
+        taNedApplikasjonVedError();
+        jettyServer.bootStrap();
+    }
+
+
+    private static void taNedApplikasjonVedError() {
+        String restartAppOnError = System.getenv("RESTART_APP_ON_ERROR");
+        if (Boolean.parseBoolean(restartAppOnError)) {
+            EMERGENCY_HEAP_SPACE = new byte[8192000];
+            Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+                // Frigir minne for å sikre at vi kan logge exception
+                EMERGENCY_HEAP_SPACE = null;
+                LOG.error("Uncaught exception for thread " + t.getId(), e);
+
+                if (e instanceof Error) {
+                    KILL_APPLICATION.set(true);
+                }
+
+            });
+        }
     }
 
     private static JettyServer jettyServer(String[] args) {

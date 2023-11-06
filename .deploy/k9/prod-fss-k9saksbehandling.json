@@ -15,6 +15,7 @@
   "env": {
     "APPDYNAMICS_AGENT_ACCOUNT_NAME": "PROD",
     "APPD_ENABLED": "true",
+    "RESTART_APP_ON_ERROR" : "true",
     "MQGATEWAY02_NAME": "MPLS02",
     "MQGATEWAY02_HOSTNAME": "mpls02.adeo.no",
     "MQGATEWAY02_PORT": "1414",
