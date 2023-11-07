@@ -7,7 +7,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.5</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -38,7 +38,7 @@
         <!-- Jakarta deps -->
         <felles.version>5.1.3</felles.version>
         <prosesstask.version>4.0.0</prosesstask.version>
-        <fpkontrakter.version>8.0.7</fpkontrakter.version>
+        <fpkontrakter.version>8.0.8</fpkontrakter.version>
         <abakus-kontrakt.version>2.0.0</abakus-kontrakt.version>
         <verapdf-validation-model.version>1.24.1</verapdf-validation-model.version>
         <!-- Jakarta deps end -->
@@ -83,7 +83,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>fp-bom</artifactId>
-                <version>1.0.3</version>
+                <version>1.0.5</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
