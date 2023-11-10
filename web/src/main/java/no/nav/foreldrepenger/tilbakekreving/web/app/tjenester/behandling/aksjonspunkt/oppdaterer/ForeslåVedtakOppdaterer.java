@@ -5,15 +5,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ForeslåVedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
@@ -28,6 +32,8 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 @ApplicationScoped
 @DtoTilServiceAdapter(dto = ForeslåVedtakDto.class, adapter = AksjonspunktOppdaterer.class)
 public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<ForeslåVedtakDto> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ForeslåVedtakOppdaterer.class);
 
     private ForeslåVedtakTjeneste foreslåVedtakTjeneste;
     private TotrinnTjeneste totrinnTjeneste;
@@ -46,7 +52,12 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
     public void oppdater(ForeslåVedtakDto dto, Behandling behandling) {
         Long behandlingId = behandling.getId();
         VedtaksbrevType brevType = behandling.utledVedtaksbrevType();
-        vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto), lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()), brevType);
+        boolean vedtakSendesFraKlagebehandling = erRevurderingOpprettetForKlage(behandling);
+        if (vedtakSendesFraKlagebehandling){
+            logger.info("Lagrer ikke fritekster for vedtaksbrev, siden vedtaksbrev skal sendes fra klagebehandlingen");
+        } else {
+            vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto), lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()), brevType);
+        }
         foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(behandlingId);
 
         opprettEllerReåpne(behandling, AksjonspunktDefinisjon.FATTE_VEDTAK);
@@ -100,5 +111,11 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
         } else {
             behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.FORESLÅ_VEDTAK, List.of(aksjonspunktDefinisjon));
         }
+    }
+
+    private boolean erRevurderingOpprettetForKlage(Behandling behandling) {
+        return BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) &&
+            behandling.getBehandlingÅrsaker().stream()
+                .anyMatch(årsak -> BehandlingÅrsakType.KLAGE_ÅRSAKER.contains(årsak.getBehandlingÅrsakType()));
     }
 }
