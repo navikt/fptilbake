@@ -122,13 +122,13 @@ public class BehandlingTjeneste {
     public Behandling opprettKunBehandlingManuell(Saksnummer saksnummer, UUID eksternUuid,
                                                   FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
 
-        return opprettFørstegangsbehandling(saksnummer, eksternUuid, null, null, fagsakYtelseType, behandlingType);
+        return opprettFørstegangsbehandling(saksnummer, eksternUuid, null, null, fagsakYtelseType, behandlingType, true);
     }
 
     public Long opprettBehandlingAutomatisk(Saksnummer saksnummer, UUID eksternUuid, Henvisning henvisning,
                                             AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                             BehandlingType behandlingType) {
-        Behandling behandling = opprettFørstegangsbehandling(saksnummer, eksternUuid, henvisning, aktørId, fagsakYtelseType, behandlingType);
+        Behandling behandling = opprettFørstegangsbehandling(saksnummer, eksternUuid, henvisning, aktørId, fagsakYtelseType, behandlingType, false);
         behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
         return behandling.getId();
     }
@@ -198,16 +198,14 @@ public class BehandlingTjeneste {
     }
 
 
-    private Behandling opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, Henvisning henvisning, AktørId aktørId, FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
+    private Behandling opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, Henvisning henvisning, AktørId aktørId,
+                                                    FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType, boolean erManueltOpprettet) {
         validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer, eksternUuid);
-        boolean manueltOpprettet = false;
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto;
         if (aktørId == null) {
-            //FIXME trenger en mer intuitiv måte å skille manuell/automatisk opprettelse enn ved at aktørid er satt eller ikke.
             SamletEksternBehandlingInfo samletEksternBehandlingInfo = hentEksternBehandlingMedAktørId(eksternUuid);
             aktørId = samletEksternBehandlingInfo.getAktørId();
             eksternBehandlingsinfoDto = samletEksternBehandlingInfo.getGrunninformasjon();
-            manueltOpprettet = true;
         } else {
             eksternBehandlingsinfoDto = fagsystemKlient.hentBehandling(eksternUuid);
         }
@@ -218,7 +216,7 @@ public class BehandlingTjeneste {
         Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, fagsakYtelseType, eksternBehandlingsinfoDto.getSpråkkodeEllerDefault());
 
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, behandlingType)
-                .medManueltOpprettet(manueltOpprettet).build();
+                .medManueltOpprettet(erManueltOpprettet).build();
         OrganisasjonsEnhet organisasjonsEnhet = hentEnhetFraEksternBehandling(eksternBehandlingsinfoDto);
         behandling.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);

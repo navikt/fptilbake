@@ -7,21 +7,23 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.FlushModeType;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKontrollRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
@@ -59,6 +61,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingMetode;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.YtelseType;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.UtvidetVilkårResultat;
@@ -101,10 +104,14 @@ class VedtakOppsummeringTjenesteTest {
         vedtakOppsummeringTjeneste = new VedtakOppsummeringTjeneste(repositoryProvider, beregningsresultatTjeneste);
 
         entityManager.setFlushMode(FlushModeType.AUTO);
-        behandling = ScenarioSimple.simple().lagre(repositoryProvider);
+        var scenario = ScenarioSimple.simple();
+        scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.FATTE_VEDTAK, BehandlingStegType.FATTE_VEDTAK);
+        behandling = scenario.lagre(repositoryProvider);
+        behandling.getÅpneAksjonspunkter().forEach(ap -> new AksjonspunktKontrollRepository().setTilUtført(ap));
         behandling.setAnsvarligSaksbehandler(ANSVARLIG_SAKSBEHANDLER);
         behandling.setAnsvarligBeslutter(ANSVARLIG_BESLUTTER);
         behandling.setBehandlendeEnhetId("8020");
+        behandling.avsluttBehandling();
         entityManager.persist(behandling);
 
         behandlingId = behandling.getId();
@@ -181,11 +188,15 @@ class VedtakOppsummeringTjenesteTest {
         assertThat(vedtakOppsummering.getVedtakFattetTid()).isNotNull();
         assertThat(vedtakOppsummering.getYtelseType()).isEqualByComparingTo(YtelseType.FP);
         assertThat(vedtakOppsummering.getForrigeBehandling()).isNull();
+        assertThat(vedtakOppsummering.getBehandlingMetode()).isEqualTo(BehandlingMetode.TOTRINN);
+        assertThat(vedtakOppsummering.getTekniskTid()).isNotNull();
+        assertThat(vedtakOppsummering.getFerdigBehandletTid()).isNotNull();
+        assertThat(vedtakOppsummering.getOpprettetAv()).isEqualTo("VL");
     }
 
     private VedtakPeriode fellesAssertVedtakPeriode(List<VedtakPeriode> vedtakPerioder) {
         assertThat(vedtakPerioder).isNotEmpty();
-        assertThat(vedtakPerioder.size()).isEqualTo(1);
+        assertThat(vedtakPerioder).hasSize(1);
         VedtakPeriode vedtakPeriode = vedtakPerioder.get(0);
         assertThat(vedtakPeriode.getFom()).isEqualTo(periode.getFom());
         assertThat(vedtakPeriode.getTom()).isEqualTo(periode.getTom());

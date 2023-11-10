@@ -7,7 +7,6 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingMetode;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingResultat;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingType;
@@ -25,7 +24,6 @@ public class BehandlingTilstand {
     private BehandlingType behandlingType;
     private BehandlingStatus behandlingStatus;
     private BehandlingResultat behandlingResultat;
-    private BehandlingMetode behandlingMetode;
     private boolean erBehandlingManueltOpprettet;
     @JsonProperty(value = "venterPaaBruker")
     private boolean venterPåBruker;
@@ -115,14 +113,6 @@ public class BehandlingTilstand {
 
     public void setBehandlingResultat(BehandlingResultat behandlingResultat) {
         this.behandlingResultat = behandlingResultat;
-    }
-
-    public BehandlingMetode getBehandlingMetode() {
-        return behandlingMetode;
-    }
-
-    public void setBehandlingMetode(BehandlingMetode behandlingMetode) {
-        this.behandlingMetode = behandlingMetode;
     }
 
     public boolean erBehandlingManueltOpprettet() {

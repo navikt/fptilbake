@@ -6,11 +6,12 @@ import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingMetode;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.YtelseType;
 
 public class VedtakOppsummering {
+    private OffsetDateTime tekniskTid;
     @NotNull
     @Size(min = 1, max = 20)
     private String saksnummer;
@@ -23,7 +24,9 @@ public class VedtakOppsummering {
     private UUID referertFagsakBehandlingUuid;
     @NotNull
     private BehandlingType behandlingType;
+    private BehandlingMetode behandlingMetode;
     private boolean erBehandlingManueltOpprettet;
+    private String opprettetAv;
     @NotNull
     private String behandlendeEnhetKode;
     @NotNull
@@ -34,9 +37,18 @@ public class VedtakOppsummering {
     private OffsetDateTime behandlingOpprettetTid;
     @NotNull
     private OffsetDateTime vedtakFattetTid;
+    private OffsetDateTime ferdigBehandletTid;
     @NotNull
     @Size(min = 1, max = 100)
     private List<VedtakPeriode> perioder;
+
+    public OffsetDateTime getTekniskTid() {
+        return tekniskTid;
+    }
+
+    public void setTekniskTid(OffsetDateTime tekniskTid) {
+        this.tekniskTid = tekniskTid;
+    }
 
     public String getSaksnummer() {
         return saksnummer;
@@ -86,12 +98,28 @@ public class VedtakOppsummering {
         this.behandlingType = behandlingType;
     }
 
+    public BehandlingMetode getBehandlingMetode() {
+        return behandlingMetode;
+    }
+
+    public void setBehandlingMetode(BehandlingMetode behandlingMetode) {
+        this.behandlingMetode = behandlingMetode;
+    }
+
     public boolean isErBehandlingManueltOpprettet() {
         return erBehandlingManueltOpprettet;
     }
 
     public void setErBehandlingManueltOpprettet(boolean erBehandlingManueltOpprettet) {
         this.erBehandlingManueltOpprettet = erBehandlingManueltOpprettet;
+    }
+
+    public String getOpprettetAv() {
+        return opprettetAv;
+    }
+
+    public void setOpprettetAv(String opprettetAv) {
+        this.opprettetAv = opprettetAv;
     }
 
     public String getBehandlendeEnhetKode() {
@@ -132,6 +160,14 @@ public class VedtakOppsummering {
 
     public void setVedtakFattetTid(OffsetDateTime vedtakFattetTid) {
         this.vedtakFattetTid = vedtakFattetTid;
+    }
+
+    public OffsetDateTime getFerdigBehandletTid() {
+        return ferdigBehandletTid;
+    }
+
+    public void setFerdigBehandletTid(OffsetDateTime ferdigBehandletTid) {
+        this.ferdigBehandletTid = ferdigBehandletTid;
     }
 
     public List<VedtakPeriode> getPerioder() {
