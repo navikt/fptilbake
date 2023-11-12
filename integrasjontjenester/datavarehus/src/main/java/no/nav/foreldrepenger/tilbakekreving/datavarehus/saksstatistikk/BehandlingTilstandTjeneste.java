@@ -126,6 +126,9 @@ public class BehandlingTilstandTjeneste {
         if (behandling.getAksjonspunkter().stream().filter(ap -> !ap.erAutopunkt()).anyMatch(BehandlingTilstandTjeneste::harSaksbehandlerVurdertAksjonspunkt)) {
             return BehandlingMetode.MANUELL;
         }
+        if (erSaksbehandler(behandling.getOpprettetAv())) {
+            return BehandlingMetode.MANUELL;
+        }
         if (behandling.getAksjonspunkter().stream().filter(Aksjonspunkt::erAutopunkt).anyMatch(BehandlingTilstandTjeneste::harSaksbehandlerVurdertAksjonspunkt)) {
             return BehandlingMetode.INNHENTING;
         }
@@ -133,7 +136,7 @@ public class BehandlingTilstandTjeneste {
     }
 
     private static boolean harSaksbehandlerVurdertAksjonspunkt(Aksjonspunkt aksjonspunkt) {
-        return aksjonspunkt.erUtført() || erSaksbehandler(aksjonspunkt.getEndretAv()) || erSaksbehandler(aksjonspunkt.getOpprettetAv());
+        return erSaksbehandler(aksjonspunkt.getEndretAv()) || erSaksbehandler(aksjonspunkt.getOpprettetAv());
     }
 
     private static boolean erSaksbehandler(String s) {
