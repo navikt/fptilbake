@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +15,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResult
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
@@ -36,7 +35,6 @@ import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.B
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.YtelseTypeMapper;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingMetode;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.SærligeGrunner;
@@ -94,17 +92,13 @@ public class VedtakOppsummeringTjeneste {
         vedtakOppsummering.setAnsvarligSaksbehandler(behandling.getAnsvarligSaksbehandler());
         vedtakOppsummering.setAnsvarligBeslutter(behandling.getAnsvarligBeslutter());
         vedtakOppsummering.setBehandlingType(BehandlingTypeMapper.getBehandlingType(behandling.getType()));
-        vedtakOppsummering.setBehandlingMetode(utledBehandlingMetode(behandling));
         vedtakOppsummering.setBehandlingOpprettetTid(tilOffsetDateTime(behandling.getOpprettetTidspunkt()));
         vedtakOppsummering.setVedtakFattetTid(tilOffsetDateTime(behandlingVedtak.get().getOpprettetTidspunkt()));
-        vedtakOppsummering.setFerdigBehandletTid(tilOffsetDateTime(behandling.getEndretTidspunkt()));
         vedtakOppsummering.setReferertFagsakBehandlingUuid(eksternBehandling.getEksternUuid());
         vedtakOppsummering.setBehandlendeEnhetKode(behandling.getBehandlendeEnhetId());
         vedtakOppsummering.setErBehandlingManueltOpprettet(erSaksbehandler(behandling.getOpprettetAv()));
-        vedtakOppsummering.setOpprettetAv(behandling.getOpprettetAv());
         forrigeBehandling.ifPresent(forrige -> vedtakOppsummering.setForrigeBehandling(forrige.getUuid()));
         vedtakOppsummering.setPerioder(hentVedtakPerioder(behandlingId));
-        vedtakOppsummering.setTekniskTid(tilOffsetDateTime(LocalDateTime.now()));
         return vedtakOppsummering;
     }
 
@@ -196,27 +190,7 @@ public class VedtakOppsummeringTjeneste {
     }
 
     private OffsetDateTime tilOffsetDateTime(LocalDateTime tidspunkt) {
-        return tidspunkt.atZone(ZoneId.of("UTC")).toOffsetDateTime();
-    }
-
-    private static BehandlingMetode utledBehandlingMetode(Behandling behandling) {
-        if (!behandling.erSaksbehandlingAvsluttet()) {
-            return null;
-        }
-        if (behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.FATTE_VEDTAK).filter(Aksjonspunkt::erUtført).isPresent()) {
-            return BehandlingMetode.TOTRINN;
-        }
-        if (behandling.getAksjonspunkter().stream().filter(ap -> !ap.erAutopunkt()).anyMatch(VedtakOppsummeringTjeneste::harSaksbehandlerVurdertAksjonspunkt)) {
-            return BehandlingMetode.MANUELL;
-        }
-        if (behandling.getAksjonspunkter().stream().filter(Aksjonspunkt::erAutopunkt).anyMatch(VedtakOppsummeringTjeneste::harSaksbehandlerVurdertAksjonspunkt)) {
-            return BehandlingMetode.INNHENTING;
-        }
-        return BehandlingMetode.AUTOMATISK;
-    }
-
-    private static boolean harSaksbehandlerVurdertAksjonspunkt(Aksjonspunkt aksjonspunkt) {
-        return aksjonspunkt.erUtført() || erSaksbehandler(aksjonspunkt.getEndretAv()) || erSaksbehandler(aksjonspunkt.getOpprettetAv());
+        return OffsetDateTime.ofInstant(tidspunkt.atZone(ZoneId.systemDefault()).toInstant(), ZoneOffset.UTC);
     }
 
     private static boolean erSaksbehandler(String s) {
