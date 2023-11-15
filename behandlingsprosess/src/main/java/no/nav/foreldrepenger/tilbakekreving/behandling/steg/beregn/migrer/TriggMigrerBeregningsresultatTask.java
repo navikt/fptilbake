@@ -39,7 +39,9 @@ public class TriggMigrerBeregningsresultatTask implements ProsessTaskHandler {
                 insert into prosess_task (id, task_type, task_parametere)
                  select seq_prosess_task.nextval, 'migrer.beregningsresultat', 'behandlingId=' || b.id
                  from behandling b
-                 where b.behandling_status = 'AVSLU' and not exists (select 1 from gr_beregningsresultat gr where gr.behandling_id = b.id and gr.aktiv = 'J')
+                 where b.behandling_status = 'AVSLU'
+                 and not exists (select 1 from gr_beregningsresultat gr where gr.behandling_id = b.id and gr.aktiv = 'J')
+                 and exists (select 1 from OKO_XML_SENDT oko where oko.behandling_id = b.id)
                 """
         );
         int rader = query.executeUpdate();
