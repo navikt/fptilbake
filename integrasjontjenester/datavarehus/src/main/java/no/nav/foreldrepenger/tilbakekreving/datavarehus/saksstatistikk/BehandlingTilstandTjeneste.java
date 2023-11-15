@@ -54,8 +54,12 @@ public class BehandlingTilstandTjeneste {
     }
 
     public BehandlingTilstand hentBehandlingensTilstand(long behandlingId) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        EksternBehandling eksternBehandling = getEksternBehandling(behandlingId);
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
+        return hentBehandlingensTilstand(behandling);
+    }
+
+    public BehandlingTilstand hentBehandlingensTilstand(Behandling behandling) {
+        EksternBehandling eksternBehandling = getEksternBehandling(behandling.getId());
         BehandlingResultatType behandlingResultatType = behandlingresultatRepository.hent(behandling)
             .map(Behandlingsresultat::getBehandlingResultatType)
             .orElse(BehandlingResultatType.IKKE_FASTSATT);
@@ -91,7 +95,7 @@ public class BehandlingTilstandTjeneste {
         forrigeBehandling.ifPresent(forrige -> tilstand.setForrigeBehandling(forrige.getUuid()));
         behandlingsårsak.ifPresent(årsak -> tilstand.setRevurderingOpprettetÅrsak(BehandlingÅrsakMapper.getRevurderingÅrsak(årsak)));
 
-        Optional<PeriodeMedBeløp> totaltFraKravgrunnlag = kravgrunnlagTjeneste.finnTotaltForKravgrunnlag(behandlingId);
+        Optional<PeriodeMedBeløp> totaltFraKravgrunnlag = kravgrunnlagTjeneste.finnTotaltForKravgrunnlag(behandling.getId());
         totaltFraKravgrunnlag.ifPresent(totalt -> {
             var periode = totalt.getPeriode();
             tilstand.setTotalFeilutbetaltPeriode(periode != null ? new Periode(periode.getFom(), periode.getTom()) : null);
@@ -123,14 +127,11 @@ public class BehandlingTilstandTjeneste {
         if (behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.FATTE_VEDTAK).filter(Aksjonspunkt::erUtført).isPresent()) {
             return BehandlingMetode.TOTRINN;
         }
-        if (behandling.getAksjonspunkter().stream().filter(ap -> !ap.erAutopunkt()).anyMatch(BehandlingTilstandTjeneste::harSaksbehandlerVurdertAksjonspunkt)) {
+        if (behandling.getAksjonspunkter().stream().anyMatch(BehandlingTilstandTjeneste::harSaksbehandlerVurdertAksjonspunkt)) {
             return BehandlingMetode.MANUELL;
         }
         if (erSaksbehandler(behandling.getOpprettetAv())) {
             return BehandlingMetode.MANUELL;
-        }
-        if (behandling.getAksjonspunkter().stream().filter(Aksjonspunkt::erAutopunkt).anyMatch(BehandlingTilstandTjeneste::harSaksbehandlerVurdertAksjonspunkt)) {
-            return BehandlingMetode.INNHENTING;
         }
         return BehandlingMetode.AUTOMATISK;
     }

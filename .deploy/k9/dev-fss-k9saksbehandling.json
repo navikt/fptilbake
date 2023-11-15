@@ -38,6 +38,7 @@
     "KAFKA_DVH_SAKSSTATISTIKK_TOPIC": "privat-k9-tilbakekreving-dvh-saksstatistikk-v1",
     "KAFKA_DVH_VEDTAK_AIVEN_TOPIC" : "k9saksbehandling.tilbakekreving-dvh-vedtak",
     "KAFKA_DVH_SAKSHENDELSE_AIVEN_TOPIC": "k9saksbehandling.tilbakekreving-dvh-saksstatistikk",
+    "KAFKA_DVH_ETTERSENDELSE_AIVEN_TOPIC": "k9saksbehandling.tilbakekreving-dvh-etterpopulering",
     "ORGANISASJON_RS_URL": "https://ereg-services-q1.dev.intern.nav.no/api/v2/organisasjon",
     "DOKARKIV_BASE_URL": "http://dokarkiv-q1.teamdokumenthandtering/rest/journalpostapi/v1/journalpost",
     "DOKARKIV_SCOPES": "api://dev-fss.teamdokumenthandtering.dokarkiv-q1/.default",
