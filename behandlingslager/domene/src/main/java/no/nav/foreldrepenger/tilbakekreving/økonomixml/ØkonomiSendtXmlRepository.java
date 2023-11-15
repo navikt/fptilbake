@@ -51,9 +51,9 @@ public class ØkonomiSendtXmlRepository {
     }
 
     public Optional<String> finnSisteXml(Long behandlingId, MeldingType meldingType) {
-        TypedQuery<ØkonomiXmlSendt> query = entityManager.createQuery("from OkoXmlSendt where behandling_id = :behandlingId and melding_type =:meldingType", ØkonomiXmlSendt.class);
+        TypedQuery<ØkonomiXmlSendt> query = entityManager.createQuery("from OkoXmlSendt where behandlingId = :behandlingId and meldingType =:meldingType", ØkonomiXmlSendt.class);
         query.setParameter("behandlingId", behandlingId);
-        query.setParameter("meldingType", meldingType.getKode());
+        query.setParameter("meldingType", meldingType);
         return query.getResultList()
             .stream()
             .max(Comparator.comparing(BaseEntitet::getOpprettetTidspunkt))
