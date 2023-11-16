@@ -32,7 +32,6 @@ jobs:
   fptilbake-tester:
     name: Fptilbake tester
     permissions:
-      contents: read
       id-token: write
     if: github.ref_name == 'master'
     needs: build-app
@@ -44,7 +43,6 @@ jobs:
   verdikjede-tester:
     name: Verdikjedetester
     permissions:
-      contents: read
       id-token: write
     if: github.ref_name == 'master'
     needs: build-app
