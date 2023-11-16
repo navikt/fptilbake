@@ -31,7 +31,6 @@ import no.nav.fpsak.tidsserie.LocalDateTimeline;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.Tilbakekrevingsbelop;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.Tilbakekrevingsperiode;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.Tilbakekrevingsvedtak;
-import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakRequest;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -84,8 +83,7 @@ private static final Logger logger = LoggerFactory.getLogger(MigrerBeregningsres
         if (sistSendteVedtak.isEmpty()) {
             throw new IllegalStateException("Kan ikke migrere beregningsresultat. Fantes ikke noe lagret vedtaksXML.");
         }
-        TilbakekrevingsvedtakRequest sisteVedtakRequest = TilbakekrevingsvedtakMarshaller.unmarshall(sistSendteVedtak.get(), null, behandlingId);
-        Tilbakekrevingsvedtak gjeldendeVedtak = sisteVedtakRequest.getTilbakekrevingsvedtak();
+        var gjeldendeVedtak = TilbakekrevingsvedtakMarshaller.unmarshall(sistSendteVedtak.get(), behandlingId);
 
         beregningsresultatTjeneste.beregnOgLagre(behandlingId);
         //hvis verifisering under feiler vil ingenting lagres, siden transaksjonen avbrytes ved exeption
