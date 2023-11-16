@@ -32,6 +32,7 @@ jobs:
   fptilbake-tester:
     name: Fptilbake tester
     permissions:
+      contents: read
       id-token: write
     if: github.ref_name == 'master'
     needs: build-app
@@ -39,10 +40,12 @@ jobs:
     with:
       build-version: ${{ needs.build-app.outputs.build-version }}
       test-suite: fptilbake
+    secrets: inherit
 
   verdikjede-tester:
     name: Verdikjedetester
     permissions:
+      contents: read
       id-token: write
     if: github.ref_name == 'master'
     needs: build-app
@@ -50,6 +53,7 @@ jobs:
     with:
       build-version: ${{ needs.build-app.outputs.build-version }}
       test-suite: verdikjede
+    secrets: inherit
 
   notify:
     name: Notify
