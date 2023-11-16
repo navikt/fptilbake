@@ -41,7 +41,7 @@ import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
 
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
-private static final Logger logger = LoggerFactory.getLogger(MigrerBeregningsresultatTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MigrerBeregningsresultatTask.class);
 
     private BeregningsresultatRepository beregningsresultatRepository;
     private BeregningsresultatTjeneste beregningsresultatTjeneste;
@@ -72,11 +72,11 @@ private static final Logger logger = LoggerFactory.getLogger(MigrerBeregningsres
         LOG_CONTEXT.add("behandling", Long.toString(behandlingId));
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         if (behandling.getStatus() != BehandlingStatus.AVSLUTTET) {
-            logger.info("Ingenting å gjøre, behandlingen er ikke avsluttet. Avslutter task.");
+            LOG.info("Ingenting å gjøre, behandlingen er ikke avsluttet. Avslutter task.");
             return;
         }
         if (beregningsresultatRepository.hentHvisEksisterer(behandlingId).isPresent()) {
-            logger.info("Ingenting å gjøre, beregningsresultat finnes allerede. Avslutter task");
+            LOG.info("Ingenting å gjøre, beregningsresultat finnes allerede. Avslutter task");
             return;
         }
         Optional<String> sistSendteVedtak = økonomiSendtXmlRepository.finnSisteXml(behandlingId, MeldingType.VEDTAK);
@@ -96,22 +96,26 @@ private static final Logger logger = LoggerFactory.getLogger(MigrerBeregningsres
     }
 
     private void verifiserLikeVedtak(Tilbakekrevingsvedtak gjeldendeVedtak, TilbakekrevingVedtakDTO reprodusertVedtak) {
-        verifiserLikeVedtakX(gjeldendeVedtak, reprodusertVedtak, "opprinnelig beløp",
+        var avvik = "";
+        avvik = avvik + verifiserLikeVedtakX(gjeldendeVedtak, reprodusertVedtak, "opprinnelig beløp",
             Tilbakekrevingsbelop::getBelopOpprUtbet, TilbakekrevingsbelopDTO::belopOpprUtbet);
-        verifiserLikeVedtakX(gjeldendeVedtak, reprodusertVedtak, "nytt beløp",
+        avvik = avvik + verifiserLikeVedtakX(gjeldendeVedtak, reprodusertVedtak, "nytt beløp",
             Tilbakekrevingsbelop::getBelopNy, TilbakekrevingsbelopDTO::belopNy);
-        verifiserLikeVedtakX(gjeldendeVedtak, reprodusertVedtak, "tilbakekreves",
+        avvik = avvik + verifiserLikeVedtakX(gjeldendeVedtak, reprodusertVedtak, "tilbakekreves",
             Tilbakekrevingsbelop::getBelopTilbakekreves,
             TilbakekrevingsbelopDTO::belopTilbakekreves);
-        verifiserLikeVedtakX(gjeldendeVedtak, reprodusertVedtak, "uinnkrevd",
+        avvik = avvik + verifiserLikeVedtakX(gjeldendeVedtak, reprodusertVedtak, "uinnkrevd",
             Tilbakekrevingsbelop::getBelopUinnkrevd, TilbakekrevingsbelopDTO::belopUinnkrevd);
-        verifiserLikeVedtakX(gjeldendeVedtak, reprodusertVedtak, "skatt",
+        avvik = avvik + verifiserLikeVedtakX(gjeldendeVedtak, reprodusertVedtak, "skatt",
             Tilbakekrevingsbelop::getBelopSkatt, TilbakekrevingsbelopDTO::belopSkatt);
-        verifiserLikeVedtak(gjeldendeVedtak, reprodusertVedtak, "renter",
+        avvik = avvik + verifiserLikeVedtak(gjeldendeVedtak, reprodusertVedtak, "renter",
             Tilbakekrevingsperiode::getBelopRenter, TilbakekrevingsperiodeDTO::belopRenter);
+        if (!avvik.trim().isEmpty()) {
+            throw new IllegalStateException("Differanse i gjeldende vedtak og reprodusert vedtak for " + avvik);
+        }
     }
 
-    private void verifiserLikeVedtakX(Tilbakekrevingsvedtak gjeldendeVedtak,
+    private String verifiserLikeVedtakX(Tilbakekrevingsvedtak gjeldendeVedtak,
                                       TilbakekrevingVedtakDTO reprodusertVedtak,
                                       String beskrivelse,
                                       Function<Tilbakekrevingsbelop, BigDecimal> gjeldendVerdier,
@@ -124,10 +128,10 @@ private static final Logger logger = LoggerFactory.getLogger(MigrerBeregningsres
             .stream()
             .map(reproduserteVerdier)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
-        verifiserLikeVedtak(gjeldendeVedtak, reprodusertVedtak, beskrivelse, gjeldendeVerdierFraBeløp, reproduserteVerdierFraBeløp);
+        return verifiserLikeVedtak(gjeldendeVedtak, reprodusertVedtak, beskrivelse, gjeldendeVerdierFraBeløp, reproduserteVerdierFraBeløp);
     }
 
-    private void verifiserLikeVedtak(Tilbakekrevingsvedtak gjeldendeVedtak,
+    private String verifiserLikeVedtak(Tilbakekrevingsvedtak gjeldendeVedtak,
                                      TilbakekrevingVedtakDTO reprodusertVedtak,
                                      String beskrivelse,
                                      Function<Tilbakekrevingsperiode, BigDecimal> gjeldendeVerdierUthenter,
@@ -143,9 +147,11 @@ private static final Logger logger = LoggerFactory.getLogger(MigrerBeregningsres
         LocalDateTimeline<BigDecimal> differanse = gjeldendeVerdier.crossJoin(reproduserteVerdier, subtract)
             .filterValue(b -> b.signum() != 0);
         if (!differanse.isEmpty()) {
-            throw new IllegalStateException(
-                "Differanse i gjeldende vedtak og reprodusert vedtak for " + beskrivelse + ": " + prettyPrint(differanse));
+            var diffPretty = prettyPrint(differanse);
+            LOG.error("Differanse i gjeldende vedtak og reprodusert vedtak for {}: {}", beskrivelse, diffPretty);
+            return ":" + beskrivelse + ":";
         }
+        return "";
 
     }
 
