@@ -135,6 +135,13 @@ public class BeregningResultatPeriode {
         return riktigYtelseBeløp;
     }
 
+    public void setTilbakekrevingBeløpEtterSkatt(BigDecimal tilbakekrevingBeløpEtterSkatt) {
+        this.tilbakekrevingBeløpEtterSkatt = tilbakekrevingBeløpEtterSkatt;
+    }
+
+    public void setSkattBeløp(BigDecimal skattBeløp) {
+        this.skattBeløp = skattBeløp;
+    }
 
     @Override
     public boolean equals(Object o) {
