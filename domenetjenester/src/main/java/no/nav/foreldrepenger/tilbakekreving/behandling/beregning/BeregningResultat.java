@@ -20,4 +20,11 @@ public class BeregningResultat {
         return vedtakResultatType;
     }
 
+    @Override
+    public String toString() {
+        return "BeregningResultat{" +
+            "vedtakResultatType=" + vedtakResultatType +
+            ", beregningResultatPerioder=" + beregningResultatPerioder +
+            '}';
+    }
 }

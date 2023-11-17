@@ -102,6 +102,9 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
                     return;
                 }
             }
+            var beregning = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
+            var repro = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId, beregning);
+            LOG.info("Migrering differanse i {} for behandling {} beregning {} reprovedtak {}", avvik, behandlingId, beregning, repro);
             throw new IllegalStateException("Differanse i gjeldende vedtak og reprodusert vedtak for " + avvik);
         }
     }
