@@ -15,6 +15,7 @@ import jakarta.inject.Inject;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingsbelopDTO;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingsperiodeDTO;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -100,10 +101,8 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
                 var avvik1 = verifiserLikeVedtak(gjeldendeVedtak, reprodusertVedtak1);
                 if (avvik1.trim().isEmpty()) {
                     return;
-                } else if (":skatt:".equals(avvik)) {
-                    oppdaterSkattFase2(behandlingId, gjeldendeVedtak);
-                    TilbakekrevingVedtakDTO reprodusertVedtak2 = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
-                    var avvik2 = verifiserLikeVedtak(gjeldendeVedtak, reprodusertVedtak2);
+                } else if (":skatt:".equals(avvik1)) {
+                    var avvik2 = oppdaterSkattFase2(behandlingId, gjeldendeVedtak);
                     if (avvik2.trim().isEmpty()) {
                         return;
                     }
@@ -190,7 +189,7 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
         }
     }
 
-    private void oppdaterSkattFase2(Long behandlingId, Tilbakekrevingsvedtak gjeldendeVedtak) {
+    private String oppdaterSkattFase2(Long behandlingId, Tilbakekrevingsvedtak gjeldendeVedtak) {
         Function<Tilbakekrevingsperiode, BigDecimal> gjeldendeVerdierFraBeløp = p -> p.getTilbakekrevingsbelop()
             .stream()
             .map(Tilbakekrevingsbelop::getBelopSkatt)
@@ -212,6 +211,9 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
         if (endret) {
             beregningsresultatRepository.lagre(behandlingId, BeregningsresultatMapper.map(beregning));
         }
+        var sumSkattGjeldendeVedtak = gjeldendeVerdier.stream().map(LocalDateSegment::getValue).reduce(BigDecimal.ZERO, BigDecimal::add);
+        var sumSkattBeregning = beregning.getBeregningResultatPerioder().stream().map(BeregningResultatPeriode::getSkattBeløp).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return sumSkattGjeldendeVedtak.compareTo(sumSkattBeregning) == 0 ? "" : ":skatt:";
     }
 
     private String verifiserLikeVedtak(Tilbakekrevingsvedtak gjeldendeVedtak,
