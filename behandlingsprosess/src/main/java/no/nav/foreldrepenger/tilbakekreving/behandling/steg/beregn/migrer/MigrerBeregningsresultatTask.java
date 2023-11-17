@@ -100,6 +100,13 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
                 var avvik1 = verifiserLikeVedtak(gjeldendeVedtak, reprodusertVedtak1);
                 if (avvik1.trim().isEmpty()) {
                     return;
+                } else if (":skatt:".equals(avvik)) {
+                    oppdaterSkattFase2(behandlingId, gjeldendeVedtak);
+                    TilbakekrevingVedtakDTO reprodusertVedtak2 = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
+                    var avvik2 = verifiserLikeVedtak(gjeldendeVedtak, reprodusertVedtak2);
+                    if (avvik2.trim().isEmpty()) {
+                        return;
+                    }
                 }
             }
             var beregning = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
@@ -176,6 +183,30 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
                 LocalDateTimeline<BigDecimal> nyeReproduserteVerdier = hentVerdierFraReprodusertVedtak(nyttReprodusert, reproduserteVerdierFraBeløp);
                 differanse = gjeldendeVerdier.crossJoin(nyeReproduserteVerdier, subtract)
                     .filterValue(b -> b.signum() != 0);
+            }
+        }
+        if (endret) {
+            beregningsresultatRepository.lagre(behandlingId, BeregningsresultatMapper.map(beregning));
+        }
+    }
+
+    private void oppdaterSkattFase2(Long behandlingId, Tilbakekrevingsvedtak gjeldendeVedtak) {
+        Function<Tilbakekrevingsperiode, BigDecimal> gjeldendeVerdierFraBeløp = p -> p.getTilbakekrevingsbelop()
+            .stream()
+            .map(Tilbakekrevingsbelop::getBelopSkatt)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        LocalDateTimeline<BigDecimal> gjeldendeVerdier = hentVerdierFraGjeldendeVedtak(gjeldendeVedtak, gjeldendeVerdierFraBeløp);
+
+        var beregning = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
+        var endret = false;
+        for (var p : beregning.getBeregningResultatPerioder()) {
+            var aktuellDiff = gjeldendeVerdier.intersection(new LocalDateInterval(p.getPeriode().getFom(), p.getPeriode().getTom()));
+            var sumSkatt = aktuellDiff.stream().map(LocalDateSegment::getValue).reduce(BigDecimal.ZERO, BigDecimal::add);
+            if (sumSkatt.compareTo(p.getSkattBeløp()) != 0) {
+                var sDiff = sumSkatt.subtract(p.getSkattBeløp());
+                p.setSkattBeløp(p.getSkattBeløp().add(sDiff));
+                p.setTilbakekrevingBeløpEtterSkatt(p.getSkattBeløp().subtract(sDiff));
+                endret = true;
             }
         }
         if (endret) {
