@@ -169,6 +169,10 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
                 p.setSkattBeløp(p.getSkattBeløp().add(sumSkatt));
                 p.setTilbakekrevingBeløpEtterSkatt(p.getSkattBeløp().subtract(sumSkatt));
                 endret = true;
+                var nyttReprodusert = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId, beregning);
+                LocalDateTimeline<BigDecimal> nyeReproduserteVerdier = hentVerdierFraReprodusertVedtak(nyttReprodusert, reproduserteVerdierFraBeløp);
+                differanse = gjeldendeVerdier.crossJoin(nyeReproduserteVerdier, subtract)
+                    .filterValue(b -> b.signum() != 0);
             }
         }
         if (endret) {
