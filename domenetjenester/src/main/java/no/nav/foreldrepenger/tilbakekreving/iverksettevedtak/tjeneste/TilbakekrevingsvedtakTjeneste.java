@@ -8,6 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -39,6 +40,15 @@ public class TilbakekrevingsvedtakTjeneste {
         var kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
         var vurdertForeldelse = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
         var beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
+        var tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, vurdertForeldelse,
+            beregningResultat);
+        validerSkattBeløp(tilbakekrevingPerioder);
+        return TilbakekrevingsvedtakMapper.tilDto(kravgrunnlag, tilbakekrevingPerioder);
+    }
+
+    public TilbakekrevingVedtakDTO lagTilbakekrevingsvedtak(Long behandlingId, BeregningResultat beregningResultat) {
+        var kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
+        var vurdertForeldelse = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
         var tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, vurdertForeldelse,
             beregningResultat);
         validerSkattBeløp(tilbakekrevingPerioder);
