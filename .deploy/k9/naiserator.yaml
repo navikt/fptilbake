@@ -33,7 +33,9 @@ spec:
   replicas:
     min: {{minReplicas}}
     max: {{maxReplicas}}
-    cpuThresholdPercentage: 80
+    scalingStrategy:
+      cpu:
+        thresholdPercentage: 80
   leaderElection: false
   istio: # Optional.
     enabled: false
@@ -58,8 +60,6 @@ spec:
         kvPath: {{k9tilbakeserviceuser}}
       - mountPath: /var/run/secrets/nais.io/vault
         kvPath: /kv/{{cluster}}/fss/k9-tilbake/{{namespace}}
-      - mountPath: /var/run/secrets/nais.io/appdynamics
-        kvPath: /apikey/appdynamics/{{environment}}
   secureLogs:
     enabled: true
   sidecar: true # refresh token
