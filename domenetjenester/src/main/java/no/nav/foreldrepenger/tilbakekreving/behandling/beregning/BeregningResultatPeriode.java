@@ -155,4 +155,20 @@ public class BeregningResultatPeriode {
     public int hashCode() {
         return Objects.hash(periode);
     }
+
+    @Override
+    public String toString() {
+        return "BeregningResultatPeriode{" +
+            "periode=" + periode +
+            ", tilbakekrevingBeløp=" + tilbakekrevingBeløp +
+            ", tilbakekrevingBeløpEtterSkatt=" + tilbakekrevingBeløpEtterSkatt +
+            ", tilbakekrevingBeløpUtenRenter=" + tilbakekrevingBeløpUtenRenter +
+            ", renterProsent=" + renterProsent +
+            ", renteBeløp=" + renteBeløp +
+            ", skattBeløp=" + skattBeløp +
+            ", feilutbetaltBeløp=" + feilutbetaltBeløp +
+            ", utbetaltYtelseBeløp=" + utbetaltYtelseBeløp +
+            ", riktigYtelseBeløp=" + riktigYtelseBeløp +
+            '}';
+    }
 }
