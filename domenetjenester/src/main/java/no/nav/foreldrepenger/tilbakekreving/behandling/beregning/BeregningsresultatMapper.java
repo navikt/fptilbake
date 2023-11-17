@@ -4,7 +4,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatPeriodeEntitet;
 
-class BeregningsresultatMapper {
+public class BeregningsresultatMapper {
     private BeregningsresultatMapper() {
     }
 

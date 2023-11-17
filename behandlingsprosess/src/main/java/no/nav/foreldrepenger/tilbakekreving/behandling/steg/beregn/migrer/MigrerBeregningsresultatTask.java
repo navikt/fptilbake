@@ -7,15 +7,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingsbelopDTO;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingsperiodeDTO;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
@@ -92,10 +92,21 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
         //av tidligere endringer på avrundingsregler. Da trenger vi å reprodusere beregnigsresultatet slik det ville vært
         //med regler som eksisterte da behandlingen ble iverksatt. (har ikke laget støtte for det p.t.)
         TilbakekrevingVedtakDTO reprodusertVedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
-        verifiserLikeVedtak(gjeldendeVedtak, reprodusertVedtak);
+        var avvik = verifiserLikeVedtak(gjeldendeVedtak, reprodusertVedtak);
+        if (!avvik.trim().isEmpty()) {
+            if (":skatt:".equals(avvik)) {
+                oppdaterSkatt(behandlingId, gjeldendeVedtak, reprodusertVedtak);
+                TilbakekrevingVedtakDTO reprodusertVedtak1 = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
+                var avvik1 = verifiserLikeVedtak(gjeldendeVedtak, reprodusertVedtak1);
+                if (avvik1.trim().isEmpty()) {
+                    return;
+                }
+            }
+            throw new IllegalStateException("Differanse i gjeldende vedtak og reprodusert vedtak for " + avvik);
+        }
     }
 
-    private void verifiserLikeVedtak(Tilbakekrevingsvedtak gjeldendeVedtak, TilbakekrevingVedtakDTO reprodusertVedtak) {
+    private String verifiserLikeVedtak(Tilbakekrevingsvedtak gjeldendeVedtak, TilbakekrevingVedtakDTO reprodusertVedtak) {
         var avvik = "";
         avvik = avvik + verifiserLikeVedtakX(gjeldendeVedtak, reprodusertVedtak, "opprinnelig beløp",
             Tilbakekrevingsbelop::getBelopOpprUtbet, TilbakekrevingsbelopDTO::belopOpprUtbet);
@@ -110,9 +121,7 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
             Tilbakekrevingsbelop::getBelopSkatt, TilbakekrevingsbelopDTO::belopSkatt);
         avvik = avvik + verifiserLikeVedtak(gjeldendeVedtak, reprodusertVedtak, "renter",
             Tilbakekrevingsperiode::getBelopRenter, TilbakekrevingsperiodeDTO::belopRenter);
-        if (!avvik.trim().isEmpty()) {
-            throw new IllegalStateException("Differanse i gjeldende vedtak og reprodusert vedtak for " + avvik);
-        }
+        return avvik;
     }
 
     private String verifiserLikeVedtakX(Tilbakekrevingsvedtak gjeldendeVedtak,
@@ -129,6 +138,42 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
             .map(reproduserteVerdier)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
         return verifiserLikeVedtak(gjeldendeVedtak, reprodusertVedtak, beskrivelse, gjeldendeVerdierFraBeløp, reproduserteVerdierFraBeløp);
+    }
+
+    private void oppdaterSkatt(Long behandlingId, Tilbakekrevingsvedtak gjeldendeVedtak, TilbakekrevingVedtakDTO reprodusertVedtak) {
+        Function<Tilbakekrevingsperiode, BigDecimal> gjeldendeVerdierFraBeløp = p -> p.getTilbakekrevingsbelop()
+            .stream()
+            .map(Tilbakekrevingsbelop::getBelopSkatt)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        Function<TilbakekrevingsperiodeDTO, BigDecimal> reproduserteVerdierFraBeløp = p -> p.tilbakekrevingsbelop()
+            .stream()
+            .map(TilbakekrevingsbelopDTO::belopSkatt)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        LocalDateTimeline<BigDecimal> gjeldendeVerdier = hentVerdierFraGjeldendeVedtak(gjeldendeVedtak, gjeldendeVerdierFraBeløp);
+        LocalDateTimeline<BigDecimal> reproduserteVerdier = hentVerdierFraReprodusertVedtak(reprodusertVedtak, reproduserteVerdierFraBeløp);
+
+        LocalDateSegmentCombinator<BigDecimal, BigDecimal, BigDecimal> subtract = (intervall, lhs, rhs) -> {
+            BigDecimal lhsValue = lhs != null ? lhs.getValue() : BigDecimal.ZERO;
+            BigDecimal rhsValue = rhs != null ? rhs.getValue() : BigDecimal.ZERO;
+            return new LocalDateSegment<>(intervall, lhsValue.subtract(rhsValue));
+        };
+        LocalDateTimeline<BigDecimal> differanse = gjeldendeVerdier.crossJoin(reproduserteVerdier, subtract)
+            .filterValue(b -> b.signum() != 0);
+
+        var beregning = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
+        var endret = false;
+        for (var p : beregning.getBeregningResultatPerioder()) {
+            var aktuellDiff = differanse.intersection(new LocalDateInterval(p.getPeriode().getFom(), p.getPeriode().getTom()));
+            var sumSkatt = aktuellDiff.stream().map(LocalDateSegment::getValue).reduce(BigDecimal.ZERO, BigDecimal::add);
+            if (sumSkatt.compareTo(BigDecimal.ZERO) != 0) {
+                p.setSkattBeløp(p.getSkattBeløp().add(sumSkatt));
+                p.setTilbakekrevingBeløpEtterSkatt(p.getSkattBeløp().subtract(sumSkatt));
+                endret = true;
+            }
+        }
+        if (endret) {
+            beregningsresultatRepository.lagre(behandlingId, BeregningsresultatMapper.map(beregning));
+        }
     }
 
     private String verifiserLikeVedtak(Tilbakekrevingsvedtak gjeldendeVedtak,
