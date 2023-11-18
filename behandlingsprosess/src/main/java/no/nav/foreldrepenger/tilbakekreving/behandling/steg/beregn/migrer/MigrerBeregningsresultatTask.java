@@ -43,6 +43,8 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
 
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
     private static final Logger LOG = LoggerFactory.getLogger(MigrerBeregningsresultatTask.class);
+    private static final String LAGRE_MED_AVVIK_KEY = "lagreUansett";
+    private static final String LAGRE_MED_AVVIK_VALUE = "true";
 
     private BeregningsresultatRepository beregningsresultatRepository;
     private BeregningsresultatTjeneste beregningsresultatTjeneste;
@@ -70,6 +72,7 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         long behandlingId = Long.parseLong(prosessTaskData.getBehandlingId());
+        var skalLagreUansett = LAGRE_MED_AVVIK_VALUE.equals(prosessTaskData.getPropertyValue(LAGRE_MED_AVVIK_KEY));
         LOG_CONTEXT.add("behandling", Long.toString(behandlingId));
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         if (behandling.getStatus() != BehandlingStatus.AVSLUTTET) {
@@ -87,6 +90,12 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
         var gjeldendeVedtak = TilbakekrevingsvedtakMarshaller.unmarshall(sistSendteVedtak.get(), behandlingId);
 
         beregningsresultatTjeneste.beregnOgLagre(behandlingId);
+
+        // Manuell håndtering av enkelttilfelle
+        if (skalLagreUansett) {
+            return;
+        }
+
         //hvis verifisering under feiler vil ingenting lagres, siden transaksjonen avbrytes ved exeption
 
         //hvis gamle vedtak sendt til innkrevingskomponenten ikke reproduseres eksakt, er behandlingen antagelig påvirket
