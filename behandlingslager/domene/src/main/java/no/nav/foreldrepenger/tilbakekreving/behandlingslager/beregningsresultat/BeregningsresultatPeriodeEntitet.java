@@ -61,10 +61,6 @@ public class BeregningsresultatPeriodeEntitet  extends BaseCreateableEntitet {
         return tilbakekrevingBeløpEtterSkatt;
     }
 
-    public void setTilbakekrevingBeløpEtterSkatt(BigDecimal tilbakekrevingBeløpEtterSkatt) {
-        this.tilbakekrevingBeløpEtterSkatt = tilbakekrevingBeløpEtterSkatt;
-    }
-
     public BigDecimal getTilbakekrevingBeløpUtenRenter() {
         return tilbakekrevingBeløpUtenRenter;
     }

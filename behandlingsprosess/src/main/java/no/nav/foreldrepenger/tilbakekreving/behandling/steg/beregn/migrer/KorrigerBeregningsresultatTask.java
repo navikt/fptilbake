@@ -9,13 +9,12 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.beregningsresultat.BeregningsresultatRepository;
-import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -33,8 +32,6 @@ public class KorrigerBeregningsresultatTask implements ProsessTaskHandler {
     private BeregningsresultatRepository beregningsresultatRepository;
     private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private BehandlingRepository behandlingRepository;
-    private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
-    private ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
 
     public KorrigerBeregningsresultatTask() {
         //for CDI proxy
@@ -43,14 +40,10 @@ public class KorrigerBeregningsresultatTask implements ProsessTaskHandler {
     @Inject
     public KorrigerBeregningsresultatTask(BeregningsresultatRepository beregningsresultatRepository,
                                           BeregningsresultatTjeneste beregningsresultatTjeneste,
-                                          BehandlingRepository behandlingRepository,
-                                          TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste,
-                                          ØkonomiSendtXmlRepository økonomiSendtXmlRepository) {
+                                          BehandlingRepository behandlingRepository) {
         this.beregningsresultatRepository = beregningsresultatRepository;
         this.beregningsresultatTjeneste = beregningsresultatTjeneste;
         this.behandlingRepository = behandlingRepository;
-        this.tilbakekrevingsvedtakTjeneste = tilbakekrevingsvedtakTjeneste;
-        this.økonomiSendtXmlRepository = økonomiSendtXmlRepository;
     }
 
     @Override
@@ -62,13 +55,14 @@ public class KorrigerBeregningsresultatTask implements ProsessTaskHandler {
             LOG.info("Ingenting å gjøre, behandlingen er ikke avsluttet. Avslutter task.");
             return;
         }
-        var beregning = beregningsresultatRepository.hentHvisEksisterer(behandlingId).orElse(null);
-        if (beregning == null || beregning.getOpprettetTidspunkt().isBefore(CUTOFF)) {
+        var beregningEntitet = beregningsresultatRepository.hentHvisEksisterer(behandlingId).orElse(null);
+        if (beregningEntitet == null || beregningEntitet.getOpprettetTidspunkt().isBefore(CUTOFF)) {
             LOG.info("Ingenting å gjøre, mangler beregningsresultat . Avslutter task");
             return;
         }
+        var beregning = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
         var endret = false;
-        for (var p : beregning.getPerioder()) {
+        for (var p : beregning.getBeregningResultatPerioder()) {
             var netto = p.getTilbakekrevingBeløp().subtract(p.getSkattBeløp());
             if (netto.compareTo(p.getTilbakekrevingBeløpEtterSkatt()) != 0) {
                 p.setTilbakekrevingBeløpEtterSkatt(netto);
@@ -77,7 +71,7 @@ public class KorrigerBeregningsresultatTask implements ProsessTaskHandler {
         }
         if (endret) {
             LOG.info("Korrigert beregning for behandling {}.", behandlingId);
-            beregningsresultatRepository.lagre(behandlingId, beregning);
+            beregningsresultatRepository.lagre(behandlingId, BeregningsresultatMapper.map(beregning));
         }
     }
 
