@@ -176,7 +176,7 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
             var sumSkatt = aktuellDiff.stream().map(LocalDateSegment::getValue).reduce(BigDecimal.ZERO, BigDecimal::add);
             if (sumSkatt.compareTo(BigDecimal.ZERO) != 0) {
                 p.setSkattBeløp(p.getSkattBeløp().add(sumSkatt));
-                p.setTilbakekrevingBeløpEtterSkatt(p.getSkattBeløp().subtract(sumSkatt));
+                p.setTilbakekrevingBeløpEtterSkatt(p.getTilbakekrevingBeløpEtterSkatt().subtract(sumSkatt));
                 endret = true;
                 var nyttReprodusert = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId, beregning);
                 LocalDateTimeline<BigDecimal> nyeReproduserteVerdier = hentVerdierFraReprodusertVedtak(nyttReprodusert, reproduserteVerdierFraBeløp);
@@ -204,7 +204,7 @@ public class MigrerBeregningsresultatTask implements ProsessTaskHandler {
             if (sumSkatt.compareTo(p.getSkattBeløp()) != 0) {
                 var sDiff = sumSkatt.subtract(p.getSkattBeløp());
                 p.setSkattBeløp(p.getSkattBeløp().add(sDiff));
-                p.setTilbakekrevingBeløpEtterSkatt(p.getSkattBeløp().subtract(sDiff));
+                p.setTilbakekrevingBeløpEtterSkatt(p.getTilbakekrevingBeløpEtterSkatt().subtract(sDiff));
                 endret = true;
             }
         }

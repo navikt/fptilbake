@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseCreateableEntitet;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
@@ -60,6 +59,10 @@ public class BeregningsresultatPeriodeEntitet  extends BaseCreateableEntitet {
 
     public BigDecimal getTilbakekrevingBeløpEtterSkatt() {
         return tilbakekrevingBeløpEtterSkatt;
+    }
+
+    public void setTilbakekrevingBeløpEtterSkatt(BigDecimal tilbakekrevingBeløpEtterSkatt) {
+        this.tilbakekrevingBeløpEtterSkatt = tilbakekrevingBeløpEtterSkatt;
     }
 
     public BigDecimal getTilbakekrevingBeløpUtenRenter() {
