@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingMetode;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingResultat;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingType;
@@ -23,12 +24,16 @@ public class BehandlingTilstand {
     private UUID referertFagsakBehandlingUuid;
     private BehandlingType behandlingType;
     private BehandlingStatus behandlingStatus;
-    private BehandlingResultat behandlingResultat;
-    private boolean erBehandlingManueltOpprettet;
     @JsonProperty(value = "venterPaaBruker")
     private boolean venterPåBruker;
     @JsonProperty(value = "venterPaaOekonomi")
     private boolean venterPåØkonomi;
+    private BehandlingResultat behandlingResultat;
+    private BehandlingMetode behandlingMetode;
+    private OffsetDateTime registrertTid;
+    private OffsetDateTime ferdigBehandletTid;
+    private boolean erBehandlingManueltOpprettet;
+    private String opprettetAv;
     private String behandlendeEnhetKode;
     private String ansvarligSaksbehandler;
     private String ansvarligBeslutter;
@@ -113,6 +118,38 @@ public class BehandlingTilstand {
 
     public void setBehandlingResultat(BehandlingResultat behandlingResultat) {
         this.behandlingResultat = behandlingResultat;
+    }
+
+    public BehandlingMetode getBehandlingMetode() {
+        return behandlingMetode;
+    }
+
+    public void setBehandlingMetode(BehandlingMetode behandlingMetode) {
+        this.behandlingMetode = behandlingMetode;
+    }
+
+    public OffsetDateTime getRegistrertTid() {
+        return registrertTid;
+    }
+
+    public void setRegistrertTid(OffsetDateTime registrertTid) {
+        this.registrertTid = registrertTid;
+    }
+
+    public OffsetDateTime getFerdigBehandletTid() {
+        return ferdigBehandletTid;
+    }
+
+    public void setFerdigBehandletTid(OffsetDateTime ferdigBehandletTid) {
+        this.ferdigBehandletTid = ferdigBehandletTid;
+    }
+
+    public String getOpprettetAv() {
+        return opprettetAv;
+    }
+
+    public void setOpprettetAv(String opprettetAv) {
+        this.opprettetAv = opprettetAv;
     }
 
     public boolean erBehandlingManueltOpprettet() {

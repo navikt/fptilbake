@@ -7,13 +7,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.FlushModeType;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
@@ -185,7 +184,7 @@ class VedtakOppsummeringTjenesteTest {
 
     private VedtakPeriode fellesAssertVedtakPeriode(List<VedtakPeriode> vedtakPerioder) {
         assertThat(vedtakPerioder).isNotEmpty();
-        assertThat(vedtakPerioder.size()).isEqualTo(1);
+        assertThat(vedtakPerioder).hasSize(1);
         VedtakPeriode vedtakPeriode = vedtakPerioder.get(0);
         assertThat(vedtakPeriode.getFom()).isEqualTo(periode.getFom());
         assertThat(vedtakPeriode.getTom()).isEqualTo(periode.getTom());

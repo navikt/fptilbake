@@ -6,11 +6,11 @@ import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.YtelseType;
 
 public class VedtakOppsummering {
+    private OffsetDateTime tekniskTid;
     @NotNull
     @Size(min = 1, max = 20)
     private String saksnummer;
@@ -37,6 +37,14 @@ public class VedtakOppsummering {
     @NotNull
     @Size(min = 1, max = 100)
     private List<VedtakPeriode> perioder;
+
+    public OffsetDateTime getTekniskTid() {
+        return tekniskTid;
+    }
+
+    public void setTekniskTid(OffsetDateTime tekniskTid) {
+        this.tekniskTid = tekniskTid;
+    }
 
     public String getSaksnummer() {
         return saksnummer;

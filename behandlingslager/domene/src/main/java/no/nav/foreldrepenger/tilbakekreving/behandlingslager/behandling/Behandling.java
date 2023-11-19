@@ -16,6 +16,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hibernate.annotations.NaturalId;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ColumnResult;
@@ -33,9 +35,6 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
-
-import org.hibernate.annotations.NaturalId;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.SaksbehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
@@ -122,6 +121,10 @@ public class Behandling extends BaseEntitet {
     @Version
     @Column(name = "versjon", nullable = false)
     private long versjon;
+
+    // Har sysdate som default value
+    @Column(name = "opprettet_dato")
+    private LocalDateTime opprettetDato;
 
     @Column(name = "avsluttet_dato")
     private LocalDateTime avsluttetDato;
@@ -459,6 +462,10 @@ public class Behandling extends BaseEntitet {
         return versjon;
     }
 
+    public LocalDateTime getOpprettetDato() {
+        return opprettetDato;
+    }
+
     public LocalDateTime getAvsluttetDato() {
         return avsluttetDato;
     }
@@ -628,6 +635,7 @@ public class Behandling extends BaseEntitet {
                 behandling = new Behandling(fagsak, behandlingType);
             }
 
+            behandling.opprettetDato = opprettetDato != null ? opprettetDato : LocalDateTime.now();
             if (avsluttetDato != null) {
                 behandling.avsluttetDato = avsluttetDato;
             }

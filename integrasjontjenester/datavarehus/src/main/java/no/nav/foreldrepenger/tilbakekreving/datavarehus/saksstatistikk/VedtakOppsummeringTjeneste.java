@@ -3,13 +3,13 @@ package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
@@ -96,7 +96,7 @@ public class VedtakOppsummeringTjeneste {
         vedtakOppsummering.setVedtakFattetTid(tilOffsetDateTime(behandlingVedtak.get().getOpprettetTidspunkt()));
         vedtakOppsummering.setReferertFagsakBehandlingUuid(eksternBehandling.getEksternUuid());
         vedtakOppsummering.setBehandlendeEnhetKode(behandling.getBehandlendeEnhetId());
-        vedtakOppsummering.setErBehandlingManueltOpprettet(behandling.isManueltOpprettet());
+        vedtakOppsummering.setErBehandlingManueltOpprettet(erSaksbehandler(behandling.getOpprettetAv()));
         forrigeBehandling.ifPresent(forrige -> vedtakOppsummering.setForrigeBehandling(forrige.getUuid()));
         vedtakOppsummering.setPerioder(hentVedtakPerioder(behandlingId));
         return vedtakOppsummering;
@@ -190,7 +190,11 @@ public class VedtakOppsummeringTjeneste {
     }
 
     private OffsetDateTime tilOffsetDateTime(LocalDateTime tidspunkt) {
-        return tidspunkt.atZone(ZoneId.of("UTC")).toOffsetDateTime();
+        return OffsetDateTime.ofInstant(tidspunkt.atZone(ZoneId.systemDefault()).toInstant(), ZoneOffset.UTC);
+    }
+
+    private static boolean erSaksbehandler(String s) {
+        return s != null && !s.startsWith("srv") && !s.startsWith("SRV") && !"VL".equals(s);
     }
 
 }

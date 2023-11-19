@@ -1,18 +1,21 @@
 package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.PeriodeMedBeløp;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -24,6 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.B
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTypeMapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingÅrsakMapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.YtelseTypeMapper;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingMetode;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.Periode;
 
@@ -50,8 +54,12 @@ public class BehandlingTilstandTjeneste {
     }
 
     public BehandlingTilstand hentBehandlingensTilstand(long behandlingId) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        EksternBehandling eksternBehandling = getEksternBehandling(behandlingId);
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
+        return hentBehandlingensTilstand(behandling);
+    }
+
+    public BehandlingTilstand hentBehandlingensTilstand(Behandling behandling) {
+        EksternBehandling eksternBehandling = getEksternBehandling(behandling.getId());
         BehandlingResultatType behandlingResultatType = behandlingresultatRepository.hent(behandling)
             .map(Behandlingsresultat::getBehandlingResultatType)
             .orElse(BehandlingResultatType.IKKE_FASTSATT);
@@ -73,17 +81,21 @@ public class BehandlingTilstandTjeneste {
         tilstand.setBehandlingType(BehandlingTypeMapper.getBehandlingType(behandling.getType()));
         tilstand.setBehandlingStatus(BehandlingStatusMapper.getBehandlingStatus(behandling.getStatus()));
         tilstand.setBehandlingResultat(BehandlingResultatTypeMapper.getBehandlingResultatType(behandlingResultatType));
+        tilstand.setBehandlingMetode(utledBehandlingMetode(behandling));
         tilstand.setBehandlendeEnhetKode(behandling.getBehandlendeEnhetId());
         tilstand.setAnsvarligBeslutter(behandling.getAnsvarligBeslutter());
         tilstand.setAnsvarligSaksbehandler(behandling.getAnsvarligSaksbehandler());
-        tilstand.setErBehandlingManueltOpprettet(behandling.isManueltOpprettet());
-        tilstand.setFunksjonellTid(OffsetDateTime.now(ZoneOffset.UTC));
+        tilstand.setErBehandlingManueltOpprettet(erSaksbehandler(behandling.getOpprettetAv()));
+        tilstand.setOpprettetAv(behandling.getOpprettetAv());
+        tilstand.setFunksjonellTid(behandling.erAvsluttet() ? tilOffsetDateTime(behandling.getEndretTidspunkt()) : OffsetDateTime.now(ZoneOffset.UTC));
+        tilstand.setRegistrertTid(tilOffsetDateTime(behandling.getOpprettetTidspunkt()));
+        tilstand.setFerdigBehandletTid(behandling.erAvsluttet() ? tilOffsetDateTime(behandling.getEndretTidspunkt()) : null);
         tilstand.setVenterPåBruker(venterPåBruker);
         tilstand.setVenterPåØkonomi(venterPåØkonomi);
         forrigeBehandling.ifPresent(forrige -> tilstand.setForrigeBehandling(forrige.getUuid()));
         behandlingsårsak.ifPresent(årsak -> tilstand.setRevurderingOpprettetÅrsak(BehandlingÅrsakMapper.getRevurderingÅrsak(årsak)));
 
-        Optional<PeriodeMedBeløp> totaltFraKravgrunnlag = kravgrunnlagTjeneste.finnTotaltForKravgrunnlag(behandlingId);
+        Optional<PeriodeMedBeløp> totaltFraKravgrunnlag = kravgrunnlagTjeneste.finnTotaltForKravgrunnlag(behandling.getId());
         totaltFraKravgrunnlag.ifPresent(totalt -> {
             var periode = totalt.getPeriode();
             tilstand.setTotalFeilutbetaltPeriode(periode != null ? new Periode(periode.getFom(), periode.getTom()) : null);
@@ -102,5 +114,33 @@ public class BehandlingTilstandTjeneste {
             eksternBehandling = eksternBehandlingRepository.hentForSisteAktivertInternId(behandlingId);
         }
         return eksternBehandling;
+    }
+
+    private static OffsetDateTime tilOffsetDateTime(LocalDateTime tidspunkt) {
+        return OffsetDateTime.ofInstant(tidspunkt.atZone(ZoneId.systemDefault()).toInstant(), ZoneOffset.UTC);
+    }
+
+    private static BehandlingMetode utledBehandlingMetode(Behandling behandling) {
+        if (!behandling.erSaksbehandlingAvsluttet()) {
+            return null;
+        }
+        if (behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.FATTE_VEDTAK).filter(Aksjonspunkt::erUtført).isPresent()) {
+            return BehandlingMetode.TOTRINN;
+        }
+        if (behandling.getAksjonspunkter().stream().anyMatch(BehandlingTilstandTjeneste::harSaksbehandlerVurdertAksjonspunkt)) {
+            return BehandlingMetode.MANUELL;
+        }
+        if (erSaksbehandler(behandling.getOpprettetAv())) {
+            return BehandlingMetode.MANUELL;
+        }
+        return BehandlingMetode.AUTOMATISK;
+    }
+
+    private static boolean harSaksbehandlerVurdertAksjonspunkt(Aksjonspunkt aksjonspunkt) {
+        return erSaksbehandler(aksjonspunkt.getEndretAv()) || erSaksbehandler(aksjonspunkt.getOpprettetAv());
+    }
+
+    private static boolean erSaksbehandler(String s) {
+        return s != null && !s.startsWith("srv") && !s.startsWith("SRV") && !"VL".equals(s);
     }
 }
