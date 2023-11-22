@@ -37,6 +37,7 @@ jobs:
           team: teamforeldrepenger
 
       - name: Deploy ${{ inputs.cluster }} fra GAR
+        if: inputs.namespace == 'teamforeldrepenger'
         uses: nais/deploy/actions/deploy@v1
         env:
           PRINT_PAYLOAD: true
@@ -45,3 +46,13 @@ jobs:
           IMAGE: ${{ steps.login.outputs.registry }}/${{ github.repository }}:${{ inputs.image }}
           RESOURCE: .deploy/fp/naiserator.yaml
           VARS: .deploy/fp/${{ inputs.cluster }}-${{ inputs.namespace }}.json
+
+      - name: Deploy ${{ inputs.cluster }}
+        if: inputs.namespace == 'k9saksbehandling'
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          PRINT_PAYLOAD: true
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_K9 }}
+          CLUSTER: ${{ inputs.cluster }}
+          RESOURCE: .deploy/k9/naiserator.yaml
+          VARS: .deploy/k9/${{ inputs.cluster }}-${{ inputs.namespace }}.json
