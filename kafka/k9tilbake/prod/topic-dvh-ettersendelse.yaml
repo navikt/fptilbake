@@ -1,0 +1,23 @@
+apiVersion: kafka.nais.io/v1
+kind: Topic
+metadata:
+  name: tilbakekreving-dvh-etterpopulering
+  namespace: k9saksbehandling
+  labels:
+    team: k9saksbehandling
+spec:
+  pool: nav-prod
+  config:
+    cleanupPolicy: delete # delete or compact
+    minimumInSyncReplicas: 2
+    partitions: 2
+    replication: 3
+    retentionBytes: -1
+    retentionHours: 504 # 3 uker
+  acl:
+    - team: k9saksbehandling
+      application: k9-tilbake
+      access: write
+    - team: ptsak
+      application: pt-sak-k9tilbake
+      access: read
