@@ -54,5 +54,6 @@ jobs:
           PRINT_PAYLOAD: true
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_K9 }}
           CLUSTER: ${{ inputs.cluster }}
+          IMAGE: ${{ steps.login.outputs.registry }}/${{ github.repository }}:${{ inputs.image }}
           RESOURCE: .deploy/k9/naiserator.yaml
           VARS: .deploy/k9/${{ inputs.cluster }}-${{ inputs.namespace }}.json
