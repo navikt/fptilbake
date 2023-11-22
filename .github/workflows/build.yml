@@ -94,6 +94,8 @@ jobs:
 
   deploy-dev-k9saksbehandling:
     name: Deploy dev k9
+    permissions:
+      id-token: write
     if: github.ref_name == 'master'
     needs: [build-app, fptilbake-tester, verdikjede-tester]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
@@ -105,6 +107,8 @@ jobs:
 
   deploy-prod-k9saksbehandling:
     name: Deploy prod k9
+    permissions:
+      id-token: write
     if: github.ref_name == 'master'
     needs: [build-app, fptilbake-tester, verdikjede-tester, deploy-dev-k9saksbehandling]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
