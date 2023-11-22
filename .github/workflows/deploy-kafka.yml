@@ -12,7 +12,7 @@ jobs:
   deploy-topics:
     strategy:
       matrix:
-        topic: [dvh-vedtak, dvh-sakshendelse, k9los-hendelse]
+        topic: [dvh-vedtak, dvh-sakshendelse, k9los-hendelse, dvh-ettersendelse]
 
     runs-on: ubuntu-latest
     steps:
