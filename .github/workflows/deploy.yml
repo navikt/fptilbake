@@ -17,9 +17,6 @@ on:
         description: 'The namespace to deploy to'
         default: 'teamforeldrepenger'
 
-env:
-  IMAGE: ${{ inputs.image }} # Brukes i naiserator.yaml
-
 jobs:
   deploy:
     name: deploy
@@ -34,7 +31,7 @@ jobs:
         with:
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          team: ${{ inputs.namespace }}
+          team: teamforeldrepenger
 
       - name: Deploy ${{ inputs.cluster }} fra GAR
         if: inputs.namespace == 'teamforeldrepenger'
