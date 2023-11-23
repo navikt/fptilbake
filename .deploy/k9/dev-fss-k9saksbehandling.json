@@ -27,7 +27,7 @@
     "K9SAK_URL": "http://k9-sak.k9saksbehandling",
     "K9OPPDRAG_SCOPES": "api://dev-fss.k9saksbehandling.k9-oppdrag/.default",
     "K9OPPDRAG_URL": "http://k9-oppdrag.k9saksbehandling",
-    "FPWSPROXY_OVERRIDE_URL": "http://k9-ws-proxy.k9saksbehandling/k9/wsproxy",
+    "FPWSPROXY_OVERRIDE_URL": "http://fpwsproxy.teamforeldrepenger/fpwsproxy",
     "TILBAKEKREVING_V1_URL": "https://cics-q1.adeo.no/oppdrag/K231CW80",
     "DOKUMENTPRODUKSJON_V2_URL": "https://dokprod-q1.nais.preprod.local/dokprod/ws/dokumentproduksjon/v2",
     "KAFKA_BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
