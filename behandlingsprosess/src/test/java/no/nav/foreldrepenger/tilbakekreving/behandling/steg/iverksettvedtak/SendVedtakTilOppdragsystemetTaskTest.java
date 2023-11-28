@@ -7,13 +7,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.UkjentKvitteringFraOSException;
@@ -25,8 +24,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.Oppdra
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
-import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 
@@ -41,8 +38,6 @@ class SendVedtakTilOppdragsystemetTaskTest {
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
     @Inject
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
-    @Inject
-    private ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
     @Inject
     private OppdragIverksettingStatusRepository oppdragIverksettingStatusRepository;
     @Inject
@@ -76,9 +71,6 @@ class SendVedtakTilOppdragsystemetTaskTest {
         var status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
         assertThat(status).isPresent();
         assertThat(status.get().getKvitteringOk()).isTrue();
-
-        //skal ikke lenger lagre noe XML
-        assertThat(økonomiSendtXmlRepository.finnXml(behandling.getId(), MeldingType.VEDTAK)).isEmpty();
     }
 
     @Test
@@ -98,9 +90,6 @@ class SendVedtakTilOppdragsystemetTaskTest {
         var status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
         assertThat(status).isPresent();
         assertThat(status.get().getKvitteringOk()).isFalse();
-
-        //skal ikke lenger lagre noe XML
-        assertThat(økonomiSendtXmlRepository.finnXml(behandling.getId(), MeldingType.VEDTAK)).isEmpty();
     }
 
     private ProsessTaskData lagProsessTaskKonfigurasjon(Behandling behandling) {
