@@ -1,11 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -30,6 +29,7 @@ import no.nav.vedtak.felles.integrasjon.dokarkiv.dto.DokumentInfoOpprett;
 import no.nav.vedtak.felles.integrasjon.dokarkiv.dto.Dokumentvariant;
 import no.nav.vedtak.felles.integrasjon.dokarkiv.dto.OpprettJournalpostRequest;
 import no.nav.vedtak.felles.integrasjon.dokarkiv.dto.Sak;
+import no.nav.vedtak.log.mdc.MDCOperations;
 
 @ApplicationScoped
 public class JournalføringTjeneste {
@@ -77,7 +77,14 @@ public class JournalføringTjeneste {
     public JournalpostIdOgDokumentId journalførUtgåendeBrev(Long behandlingId, String dokumentkategori, BrevMetadata brevMetadata, BrevMottaker brevMottaker, byte[] vedleggPdf) {
         LOG.info("Starter journalføring av {} til {} for behandlingId={}", dokumentkategori, brevMottaker, behandlingId);
 
-        boolean forsøkFerdigstill = true;
+        var callId = MDCOperations.getCallId();
+        LOG.info("Tilbake journalføring callId fra task: {}", callId);
+        if (callId == null || callId.isBlank()) {
+            LOG.info("Setter manglende callId.");
+            MDCOperations.putCallId();
+            callId = MDCOperations.getCallId();
+        }
+
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         var request = OpprettJournalpostRequest.nyUtgående()
                 .medTema(utledTema(behandling.getFagsak().getFagsakYtelseType()))
@@ -92,9 +99,10 @@ public class JournalføringTjeneste {
                         .medTittel(brevMetadata.getTittel())
                         .medBrevkode(brevMetadata.getFagsaktype().getKode() + "-TILB")
                         .leggTilDokumentvariant(new Dokumentvariant(Dokumentvariant.Variantformat.ARKIV, Dokumentvariant.Filtype.PDFA, vedleggPdf)))
+                .medEksternReferanseId(callId)
                 .build();
 
-        var response = dokArkivKlient.opprettJournalpost(request, forsøkFerdigstill);
+        var response = dokArkivKlient.opprettJournalpost(request, true);
         JournalpostId journalpostId = new JournalpostId(response.journalpostId());
         if (response.dokumenter().size() != 1) {
             throw uforventetAntallDokumenterIRespons(response.dokumenter().size());

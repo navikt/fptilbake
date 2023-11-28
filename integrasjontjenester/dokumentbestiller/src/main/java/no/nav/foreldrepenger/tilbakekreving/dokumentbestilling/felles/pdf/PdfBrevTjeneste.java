@@ -3,9 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -25,8 +22,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
 public class PdfBrevTjeneste {
-
-    private static final Logger LOG = LoggerFactory.getLogger(PdfBrevTjeneste.class);
 
     private JournalføringTjeneste journalføringTjeneste;
 
