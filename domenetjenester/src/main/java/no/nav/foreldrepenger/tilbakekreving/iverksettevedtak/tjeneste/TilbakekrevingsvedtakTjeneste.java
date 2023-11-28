@@ -46,15 +46,6 @@ public class TilbakekrevingsvedtakTjeneste {
         return TilbakekrevingsvedtakMapper.tilDto(kravgrunnlag, tilbakekrevingPerioder);
     }
 
-    public TilbakekrevingVedtakDTO lagTilbakekrevingsvedtak(Long behandlingId, BeregningResultat beregningResultat) {
-        var kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
-        var vurdertForeldelse = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
-        var tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, vurdertForeldelse,
-            beregningResultat);
-        validerSkattBeløp(tilbakekrevingPerioder);
-        return TilbakekrevingsvedtakMapper.tilDto(kravgrunnlag, tilbakekrevingPerioder);
-    }
-
     private void validerSkattBeløp(final List<TilbakekrevingPeriode> tilbakekrevingPerioder) {
         var klassekoderSomFeilaktigHarSkattebeløp = tilbakekrevingPerioder.stream()
             .flatMap(periode -> periode.getBeløp().stream())
