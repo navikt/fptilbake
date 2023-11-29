@@ -5,10 +5,8 @@
                  https://jakarta.ee/xml/ns/persistence/orm/orm_3_0.xsd"
                  version="3.0">
 
-    <sequence-generator name="SEQ_OKO_XML_SENDT" allocation-size="50" sequence-name="SEQ_OKO_XML_SENDT"/>
     <sequence-generator name="SEQ_OKO_XML_MOTTATT" allocation-size="50" sequence-name="SEQ_OKO_XML_MOTTATT"/>
 
-    <entity class="no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlSendt"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottattArkiv"/>
 
