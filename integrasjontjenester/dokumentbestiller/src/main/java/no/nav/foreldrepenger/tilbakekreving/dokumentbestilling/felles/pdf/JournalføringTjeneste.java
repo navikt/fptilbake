@@ -1,5 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 
+import java.util.Objects;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +32,6 @@ import no.nav.vedtak.felles.integrasjon.dokarkiv.dto.DokumentInfoOpprett;
 import no.nav.vedtak.felles.integrasjon.dokarkiv.dto.Dokumentvariant;
 import no.nav.vedtak.felles.integrasjon.dokarkiv.dto.OpprettJournalpostRequest;
 import no.nav.vedtak.felles.integrasjon.dokarkiv.dto.Sak;
-import no.nav.vedtak.log.mdc.MDCOperations;
-
-import java.util.Objects;
-import java.util.UUID;
 
 @ApplicationScoped
 public class JournalføringTjeneste {

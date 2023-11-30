@@ -1,15 +1,14 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
+import java.util.UUID;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.SendManueltVarselbrevTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
-
-import java.util.UUID;
 
 @ApplicationScoped
 public class ProsessTaskIverksett {
@@ -29,7 +28,7 @@ public class ProsessTaskIverksett {
         var taskGruppe = new ProsessTaskGruppe();
         taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(SendVedtakTilOppdragsystemetTask.class));
         if (sendVedtaksbrev) {
-            opprettVerdatksbrevProsessTask(taskGruppe);
+            opprettVedtaksbrevProsessTask(taskGruppe);
         }
         taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(AvsluttBehandlingTask.class));
         taskGruppe.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
@@ -39,9 +38,10 @@ public class ProsessTaskIverksett {
         taskTjeneste.lagre(taskGruppe);
     }
 
-    private static void opprettVerdatksbrevProsessTask(ProsessTaskGruppe taskGruppe) {
+    private static void opprettVedtaksbrevProsessTask(ProsessTaskGruppe taskGruppe) {
         var taskData = ProsessTaskData.forProsessTask(SendVedtaksbrevTask.class);
-        taskData.setProperty(SendVedtaksbrevTask.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
+        taskData.setProperty(SendVedtaksbrevTask.BESTILLING_UUID,
+            UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
         taskGruppe.addNesteSekvensiell(taskData);
     }
 
