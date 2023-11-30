@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,7 @@ import no.nav.vedtak.exception.FunksjonellException;
 class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     private static final String REVURDERING_HENLEGGELSESBREV_FRITEKST = "Revurderingen ble henlagt";
+    private static final UUID BESTILLING_UUID = UUID.randomUUID();
 
     private EksternDataForBrevTjeneste mockEksternDataForBrevTjeneste = mock(EksternDataForBrevTjeneste.class);
     private PdfBrevTjeneste mockPdfBrevTjeneste = mock(PdfBrevTjeneste.class);
@@ -88,9 +90,9 @@ class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     @Test
     void skal_sende_henleggelsesbrev() {
         lagreVarselBrevSporing();
-        henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, null, BrevMottaker.BRUKER);
+        henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, null, BrevMottaker.BRUKER, BESTILLING_UUID);
 
-        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.HENLEGGELSE), any(BrevData.class));
+        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.HENLEGGELSE), any(BrevData.class), eq(BESTILLING_UUID));
     }
 
     @Test
@@ -108,7 +110,7 @@ class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     @Test
     void skal_ikke_sende_henleggelsesbrev_hvis_varselbrev_ikke_sendt() {
         var e = assertThrows(FunksjonellException.class, () ->
-                henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, null, BrevMottaker.BRUKER));
+                henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, null, BrevMottaker.BRUKER, BESTILLING_UUID));
         assertThat(e.getMessage()).contains("FPT-110801");
     }
 
@@ -116,7 +118,7 @@ class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     void skal_ikke_sende_henleggelsesbrev_for_tilbakekreving_revurdering_uten_fritekst() {
         Long revurderingBehandlingId = opprettOgForberedTilbakekrevingRevurdering();
         var e = assertThrows(FunksjonellException.class, () ->
-                henleggelsesbrevTjeneste.sendHenleggelsebrev(revurderingBehandlingId, null, BrevMottaker.BRUKER));
+                henleggelsesbrevTjeneste.sendHenleggelsebrev(revurderingBehandlingId, null, BrevMottaker.BRUKER, BESTILLING_UUID));
         assertThat(e.getMessage()).contains("FPT-110802");
     }
 

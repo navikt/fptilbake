@@ -31,6 +31,9 @@ import no.nav.vedtak.felles.integrasjon.dokarkiv.dto.OpprettJournalpostRequest;
 import no.nav.vedtak.felles.integrasjon.dokarkiv.dto.Sak;
 import no.nav.vedtak.log.mdc.MDCOperations;
 
+import java.util.Objects;
+import java.util.UUID;
+
 @ApplicationScoped
 public class JournalføringTjeneste {
 
@@ -74,16 +77,11 @@ public class JournalføringTjeneste {
         }
     }
 
-    public JournalpostIdOgDokumentId journalførUtgåendeBrev(Long behandlingId, String dokumentkategori, BrevMetadata brevMetadata, BrevMottaker brevMottaker, byte[] vedleggPdf) {
+    public JournalpostIdOgDokumentId journalførUtgåendeBrev(Long behandlingId, String dokumentkategori, BrevMetadata brevMetadata, BrevMottaker brevMottaker, byte[] vedleggPdf,
+                                                            UUID unikBestillingUuid) {
         LOG.info("Starter journalføring av {} til {} for behandlingId={}", dokumentkategori, brevMottaker, behandlingId);
 
-        var callId = MDCOperations.getCallId();
-        LOG.info("Tilbake journalføring callId fra task: {}", callId);
-        if (callId == null || callId.isBlank()) {
-            LOG.info("Setter manglende callId.");
-            MDCOperations.putCallId();
-            callId = MDCOperations.getCallId();
-        }
+        Objects.requireNonNull(unikBestillingUuid, "Bestilling UUID kan ikke være null");
 
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         var request = OpprettJournalpostRequest.nyUtgående()
@@ -99,7 +97,7 @@ public class JournalføringTjeneste {
                         .medTittel(brevMetadata.getTittel())
                         .medBrevkode(brevMetadata.getFagsaktype().getKode() + "-TILB")
                         .leggTilDokumentvariant(new Dokumentvariant(Dokumentvariant.Variantformat.ARKIV, Dokumentvariant.Filtype.PDFA, vedleggPdf)))
-                .medEksternReferanseId(callId)
+                .medEksternReferanseId(unikBestillingUuid + "-" + brevMottaker.name()) //Brev til bruker og ev. verge produseres med lik bestillingUuid fra samme task.
                 .build();
 
         var response = dokArkivKlient.opprettJournalpost(request, true);

@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,8 @@ class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     private static final String VARSEL_TEKST = "Sender manuelt varselbrev";
     private final String KORRIGERT_VARSEL_TEKST = "Sender korrigert varselbrev";
+
+    private final UUID BESTILLING_UUID = UUID.randomUUID();
 
     @Inject
     private VarselRepository varselRepository;
@@ -74,38 +77,38 @@ class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     @Test
     void skal_sende_manuelt_varselbrev() {
-        manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.BRUKER);
+        manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.BRUKER, BESTILLING_UUID);
 
-        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.VARSEL), eq(Long.valueOf(9000L)), anyString(), any(BrevData.class));
+        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.VARSEL), eq(Long.valueOf(9000L)), anyString(), any(BrevData.class), eq(BESTILLING_UUID));
     }
 
     @Test
     void skal_sende_korrigert_varselbrev() {
         //arrange
-        manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.BRUKER);
+        manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.BRUKER, BESTILLING_UUID);
         varselRepository.lagre(behandlingId, VARSEL_TEKST, 100L);
         Mockito.clearInvocations(mockPdfBrevTjeneste);
 
         //act
-        manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, KORRIGERT_VARSEL_TEKST, BrevMottaker.BRUKER);
+        manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, KORRIGERT_VARSEL_TEKST, BrevMottaker.BRUKER, BESTILLING_UUID);
 
         //assert
-        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.KORRIGERT_VARSEL), eq(Long.valueOf(9000L)), anyString(), any(BrevData.class));
+        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.KORRIGERT_VARSEL), eq(Long.valueOf(9000L)), anyString(), any(BrevData.class), eq(BESTILLING_UUID));
     }
 
     @Test
     void skal_sende_korrigert_varselbrev_med_verge() {
         //arrange
-        manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.BRUKER);
+        manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.BRUKER, BESTILLING_UUID);
         varselRepository.lagre(behandlingId, VARSEL_TEKST, 100L);
         Mockito.clearInvocations(mockPdfBrevTjeneste);
         vergeRepository.lagreVergeInformasjon(behandlingId, lagVerge());
 
         //act
-        manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.VERGE);
+        manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.VERGE, BESTILLING_UUID);
 
         //assert
-        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.KORRIGERT_VARSEL), eq(Long.valueOf(9000L)), anyString(), any(BrevData.class));
+        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.KORRIGERT_VARSEL), eq(Long.valueOf(9000L)), anyString(), any(BrevData.class), eq(BESTILLING_UUID));
     }
 
     @Test

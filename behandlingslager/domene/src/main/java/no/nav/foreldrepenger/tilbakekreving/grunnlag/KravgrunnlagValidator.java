@@ -184,51 +184,51 @@ public class KravgrunnlagValidator {
 
     public static class KravgrunnlagFeil {
 
-        static RuntimeException manglerFelt(String felt, Periode periode) {
+        static UgyldigKravgrunnlagException manglerFelt(String felt, Periode periode) {
             return new UgyldigKravgrunnlagException("FPT-879715", String.format("Ugyldig kravgrunnlag. Mangler forventet felt %s for periode %s.", felt, periode));
         }
 
-        static RuntimeException manglerReferanse(String kravgrunnlagId) {
+        static UgyldigKravgrunnlagException manglerReferanse(String kravgrunnlagId) {
             return new UgyldigKravgrunnlagException("FPT-879716", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. Mangler referanse.", kravgrunnlagId));
         }
 
-        static RuntimeException overlappendePerioder(String kravgrunnlagId, Periode a, Periode b) {
+        static UgyldigKravgrunnlagException overlappendePerioder(String kravgrunnlagId, Periode a, Periode b) {
             return new UgyldigKravgrunnlagException("FPT-936521", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. Overlappende perioder %s og %s.", kravgrunnlagId, a, b));
         }
 
-        static RuntimeException manglerKlasseTypeFeil(String kravgrunnlagId, Periode periode) {
+        static UgyldigKravgrunnlagException manglerKlasseTypeFeil(String kravgrunnlagId, Periode periode) {
             return new UgyldigKravgrunnlagException("FPT-727260", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. Perioden %s mangler postering med klasseType=FEIL.", kravgrunnlagId, periode));
         }
 
-        static RuntimeException manglerKlasseTypeYtel(String kravgrunnlagId, Periode periode) {
+        static UgyldigKravgrunnlagException manglerKlasseTypeYtel(String kravgrunnlagId, Periode periode) {
             return new UgyldigKravgrunnlagException("FPT-727261", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. Perioden %s mangler postering med klasseType=YTEL.", kravgrunnlagId, periode));
         }
 
-        static RuntimeException periodeIkkInnenforMåned(String kravgrunnlagId, Periode periode) {
+        static UgyldigKravgrunnlagException periodeIkkInnenforMåned(String kravgrunnlagId, Periode periode) {
             return new UgyldigKravgrunnlagException("FPT-438893", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. Perioden %s er ikke innenfor en kalendermåned.", kravgrunnlagId, periode));
         }
 
-        static RuntimeException manglerMaksSkatt(YearMonth måned) {
+        static UgyldigKravgrunnlagException manglerMaksSkatt(YearMonth måned) {
             return new UgyldigKravgrunnlagException("FPT-734548", String.format("Ugyldig kravgrunnlag. Mangler max skatt for måned %s", måned));
         }
 
-        static RuntimeException feilSkatt(YearMonth måned) {
+        static UgyldigKravgrunnlagException feilSkatt(YearMonth måned) {
             return new UgyldigKravgrunnlagException("FPT-560295", String.format("Ugyldig kravgrunnlag. For måned %s er opplyses ulike verdier maks skatt i ulike perioder", måned));
         }
 
-        static RuntimeException feilSkatt(YearMonth måned, BigDecimal maxSkatt, BigDecimal maxUtregnbarSkatt) {
+        static UgyldigKravgrunnlagException feilSkatt(YearMonth måned, BigDecimal maxSkatt, BigDecimal maxUtregnbarSkatt) {
             return new UgyldigKravgrunnlagException("FPT-930235", String.format("Ugyldig kravgrunnlag. For måned %s er maks skatt %s, men maks tilbakekreving ganget med skattesats blir %s", måned, maxSkatt, maxUtregnbarSkatt));
         }
 
-        static RuntimeException feilYtelseEllerFeilutbetaling(String kravgrunnlagId, Periode periode, BigDecimal sumTilbakekrevingYtel, BigDecimal belopNyttFraFeilpostering) {
+        static UgyldigKravgrunnlagException feilYtelseEllerFeilutbetaling(String kravgrunnlagId, Periode periode, BigDecimal sumTilbakekrevingYtel, BigDecimal belopNyttFraFeilpostering) {
             return new UgyldigKravgrunnlagException("FPT-361605", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. For periode %s er sum tilkakekreving fra YTEL %s, mens belopNytt i FEIL er %s. Det er forventet at disse er like.", kravgrunnlagId, periode, sumTilbakekrevingYtel, belopNyttFraFeilpostering));
         }
 
-        static RuntimeException ytelPosteringHvorTilbakekrevesIkkeStemmerMedNyttOgOpprinneligBeløp(String kravgrunnlagId, Periode periode, BigDecimal tilbakekrevesBeløp, BigDecimal nyttBeløp, BigDecimal opprinneligBeløp) {
+        static UgyldigKravgrunnlagException ytelPosteringHvorTilbakekrevesIkkeStemmerMedNyttOgOpprinneligBeløp(String kravgrunnlagId, Periode periode, BigDecimal tilbakekrevesBeløp, BigDecimal nyttBeløp, BigDecimal opprinneligBeløp) {
             return new UgyldigKravgrunnlagException("FPT-615761", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. For perioden %s finnes YTEL-postering med tilbakekrevesBeløp %s som er større enn differanse mellom nyttBeløp %s og opprinneligBeløp %s", kravgrunnlagId, periode, tilbakekrevesBeløp, nyttBeløp, opprinneligBeløp));
         }
 
-        static RuntimeException feilBeløp(String kravgrunnlagId, Periode periode) {
+        static UgyldigKravgrunnlagException feilBeløp(String kravgrunnlagId, Periode periode) {
             return new UgyldigKravgrunnlagException("FPT-930247", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. Perioden %s har FEIL postering med negativ beløp", kravgrunnlagId, periode));
         }
     }

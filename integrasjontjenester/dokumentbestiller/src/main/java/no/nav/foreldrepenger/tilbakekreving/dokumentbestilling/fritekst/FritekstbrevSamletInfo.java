@@ -2,7 +2,11 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekst;
 
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 
-public class FritekstbrevSamletInfo {
+/**
+ * @deprecated antageligvis ikke i bruk og kan fjernes
+ */
+@Deprecated(forRemoval = true)
+class FritekstbrevSamletInfo {
 
     private BrevMetadata brevMetadata;
     private String overskrift;

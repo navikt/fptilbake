@@ -27,8 +27,12 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Brev
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 
+/**
+ * @deprecated antageligvis ikke i bruk og kan fjernes
+ */
+@Deprecated(forRemoval = true)
 @ApplicationScoped
-public class FritekstbrevTjeneste {
+class FritekstbrevTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
@@ -53,12 +57,13 @@ public class FritekstbrevTjeneste {
         this.pdfBrevTjeneste = pdfBrevTjeneste;
     }
 
-    public void sendFritekstbrev(Long behandlingId, String tittel, String overskrift, String fritekst, BrevMottaker brevMottaker) {
+    void sendFritekstbrev(Long behandlingId, String tittel, String overskrift, String fritekst, BrevMottaker brevMottaker, UUID unikBestillingUuid) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        sendFritekstbrev(behandling, tittel, overskrift, fritekst, brevMottaker);
+        sendFritekstbrev(behandling, tittel, overskrift, fritekst, brevMottaker, unikBestillingUuid);
     }
 
-    public void sendFritekstbrev(Behandling behandling, String tittel, String overskrift, String fritekst, BrevMottaker brevMottaker) {
+    private void sendFritekstbrev(Behandling behandling, String tittel, String overskrift, String fritekst, BrevMottaker brevMottaker,
+                                  UUID unikBestillingUuid) {
         FritekstbrevSamletInfo fritekstbrevSamletInfo = lagFritekstbrevForSending(behandling, tittel, overskrift, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = lagFritekstbrev(fritekstbrevSamletInfo);
         pdfBrevTjeneste.sendBrev(behandling.getId(), DetaljertBrevType.FRITEKST, BrevData.builder()
@@ -67,21 +72,8 @@ public class FritekstbrevTjeneste {
                 .setTittel(fritekstbrevData.getTittel())
                 .setOverskrift(fritekstbrevData.getOverskrift())
                 .setBrevtekst(fritekstbrevData.getBrevtekst())
-                .build());
-    }
-
-    public byte[] hentForhåndsvisningFritekstbrev(Behandling behandling, String tittel, String overskrift, String fritekst) {
-        boolean finnesVerge = vergeRepository.finnesVerge(behandling.getId());
-        BrevMottaker brevMottaker = finnesVerge ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
-        FritekstbrevSamletInfo fritekstbrevSamletInfo = lagFritekstbrevForSending(behandling, tittel, overskrift, fritekst, brevMottaker);
-        FritekstbrevData fritekstbrevData = lagFritekstbrev(fritekstbrevSamletInfo);
-
-        return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
-                .setMottaker(brevMottaker)
-                .setMetadata(fritekstbrevData.getBrevMetadata())
-                .setOverskrift(fritekstbrevData.getOverskrift())
-                .setBrevtekst(fritekstbrevData.getBrevtekst())
-                .build());
+                .build(),
+            unikBestillingUuid);
     }
 
     private FritekstbrevSamletInfo lagFritekstbrevForSending(Behandling behandling, String tittel, String overskrift, String fritekst, BrevMottaker brevMottaker) {

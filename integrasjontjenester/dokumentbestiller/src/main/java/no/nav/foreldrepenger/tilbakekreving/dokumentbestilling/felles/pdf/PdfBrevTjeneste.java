@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.UUID;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -45,15 +46,16 @@ public class PdfBrevTjeneste {
         return pdfGenerator.genererPDFMedLogo(html, DokumentVariant.UTKAST);
     }
 
-    public void sendBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, BrevData data) {
-        sendBrev(behandlingId, detaljertBrevType, null, null, data);
+    public void sendBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, BrevData data, UUID unikBestillingUuid) {
+        sendBrev(behandlingId, detaljertBrevType, null, null, data, unikBestillingUuid);
     }
 
-    public void sendBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, Long varsletBeløp, String fritekst, BrevData data) {
+    public void sendBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, Long varsletBeløp, String fritekst, BrevData data,
+                         UUID unikBestillingUuid) {
         valider(detaljertBrevType, varsletBeløp);
         valider(detaljertBrevType, data);
 
-        var dokumentreferanse = lagOgJournalførBrev(behandlingId, detaljertBrevType, data);
+        var dokumentreferanse = lagOgJournalførBrev(behandlingId, detaljertBrevType, data, unikBestillingUuid);
         lagTaskerForUtsendingOgSporing(behandlingId, detaljertBrevType, varsletBeløp, fritekst, data, dokumentreferanse);
     }
 
@@ -68,10 +70,10 @@ public class PdfBrevTjeneste {
         taskTjeneste.lagre(taskGruppe);
     }
 
-    private JournalpostIdOgDokumentId lagOgJournalførBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, BrevData data) {
+    private JournalpostIdOgDokumentId lagOgJournalførBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, BrevData data, UUID unikBestillingUuid) {
         var html = lagHtml(data);
         var pdf = pdfGenerator.genererPDFMedLogo(html, DokumentVariant.ENDELIG);
-        return journalføringTjeneste.journalførUtgåendeBrev(behandlingId, mapBrevTypeTilDokumentKategori(detaljertBrevType), data.getMetadata(), data.getMottaker(), pdf);
+        return journalføringTjeneste.journalførUtgåendeBrev(behandlingId, mapBrevTypeTilDokumentKategori(detaljertBrevType), data.getMetadata(), data.getMottaker(), pdf, unikBestillingUuid);
     }
 
     private ProsessTaskData lagPubliserJournalpostTask(Behandling behandling, BrevData brevdata, JournalpostIdOgDokumentId dokumentreferanse, BrevType brevType) {

@@ -1,6 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
@@ -25,6 +27,8 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class InnhentDokumentasjonbrevTask implements ProsessTaskHandler {
 
+    public static final String BESTILLING_UUID = "bestillingUuid";
+
     private BehandlingRepository behandlingRepository;
     private VergeRepository vergeRepository;
 
@@ -45,11 +49,12 @@ public class InnhentDokumentasjonbrevTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         String friTekst = prosessTaskData.getPayloadAsString();
+        var unikBestillingUuid = UUID.fromString(Optional.ofNullable(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElse(UUID.randomUUID().toString()));
 
         if (vergeRepository.finnesVerge(behandlingId)) {
-            innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, friTekst, BrevMottaker.VERGE);
+            innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, friTekst, BrevMottaker.VERGE, unikBestillingUuid);
         }
-        innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, friTekst, BrevMottaker.BRUKER);
+        innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, friTekst, BrevMottaker.BRUKER, unikBestillingUuid);
 
         LocalDateTime fristTid = LocalDateTime.now().plus(Frister.BEHANDLING_TILSVAR).plusDays(1);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
