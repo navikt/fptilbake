@@ -16,10 +16,15 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @ApplicationScoped
 @ProsessTask("iverksetteVedtak.sendVedtaksbrev")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class SendVedtaksbrevTask implements ProsessTaskHandler {
+
+    public static final String BESTILLING_UUID = "bestillingUuid";
 
     private static final Logger log = LoggerFactory.getLogger(SendVedtaksbrevTask.class);
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
@@ -41,11 +46,12 @@ public class SendVedtaksbrevTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
+        var unikBestillingUuid = UUID.fromString(Optional.ofNullable(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElse(UUID.randomUUID().toString()));
         LOG_CONTEXT.add("behandling", behandlingId);
         if (vergeRepository.finnesVerge(behandlingId)) {
-            vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId, BrevMottaker.VERGE);
+            vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId, BrevMottaker.VERGE, unikBestillingUuid);
         }
-        vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId, BrevMottaker.BRUKER);
+        vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId, BrevMottaker.BRUKER, unikBestillingUuid);
         log.info("Utført for behandling: {}", behandlingId);
     }
 }

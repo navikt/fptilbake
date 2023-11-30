@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
+import java.util.UUID;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -26,7 +28,7 @@ public class ProsessTaskIverksett {
         var taskGruppe = new ProsessTaskGruppe();
         taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(SendVedtakTilOppdragsystemetTask.class));
         if (sendVedtaksbrev) {
-            taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(SendVedtaksbrevTask.class));
+            opprettVedtaksbrevProsessTask(taskGruppe);
         }
         taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(AvsluttBehandlingTask.class));
         taskGruppe.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
@@ -36,10 +38,17 @@ public class ProsessTaskIverksett {
         taskTjeneste.lagre(taskGruppe);
     }
 
+    private static void opprettVedtaksbrevProsessTask(ProsessTaskGruppe taskGruppe) {
+        var taskData = ProsessTaskData.forProsessTask(SendVedtaksbrevTask.class);
+        taskData.setProperty(SendVedtaksbrevTask.BESTILLING_UUID,
+            UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
+        taskGruppe.addNesteSekvensiell(taskData);
+    }
+
     private void opprettDvhProsessTask(Behandling behandling, ProsessTaskGruppe taskGruppe) {
-        ProsessTaskData dvhProsessTaskData = ProsessTaskData.forProsessTask(SendVedtakHendelserTilDvhTask.class);
-        dvhProsessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        taskGruppe.addNesteSekvensiell(dvhProsessTaskData);
+        var taskData = ProsessTaskData.forProsessTask(SendVedtakHendelserTilDvhTask.class);
+        taskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        taskGruppe.addNesteSekvensiell(taskData);
     }
 
 }

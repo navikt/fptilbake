@@ -67,7 +67,7 @@ public class ManueltVarselBrevTjeneste {
         this.pdfBrevTjeneste = pdfBrevTjeneste;
     }
 
-    public void sendManueltVarselBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
+    public void sendManueltVarselBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker, UUID unikBestillingUuid) {
         var behandling = behandlingRepository.hentBehandling(behandlingId);
         var varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, false);
 
@@ -79,7 +79,8 @@ public class ManueltVarselBrevTjeneste {
                 .setMetadata(data.getBrevMetadata())
                 .setOverskrift(data.getOverskrift())
                 .setBrevtekst(data.getBrevtekst())
-                .build());
+                .build(),
+            unikBestillingUuid);
     }
 
     public byte[] hentForhåndsvisningManueltVarselbrev(Long behandlingId, DokumentMalType malType, String fritekst) {
@@ -105,7 +106,7 @@ public class ManueltVarselBrevTjeneste {
                 .build());
     }
 
-    public void sendKorrigertVarselBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
+    public void sendKorrigertVarselBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker, UUID unikBestillingUuid) {
         var behandling = behandlingRepository.hentBehandling(behandlingId);
         var varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, true);
         var varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
@@ -118,7 +119,8 @@ public class ManueltVarselBrevTjeneste {
                 .setOverskrift(data.getOverskrift())
                 .setBrevtekst(data.getBrevtekst())
                 .setMetadata(data.getBrevMetadata())
-                .build());
+                .build(),
+            unikBestillingUuid);
     }
 
     private FritekstbrevData lagManueltVarselBrev(VarselbrevSamletInfo varselbrevSamletInfo) {

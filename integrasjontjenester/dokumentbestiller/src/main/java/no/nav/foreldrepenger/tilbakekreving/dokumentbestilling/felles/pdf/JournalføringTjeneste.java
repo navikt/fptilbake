@@ -1,11 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
+import java.util.Objects;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -74,10 +76,12 @@ public class JournalføringTjeneste {
         }
     }
 
-    public JournalpostIdOgDokumentId journalførUtgåendeBrev(Long behandlingId, String dokumentkategori, BrevMetadata brevMetadata, BrevMottaker brevMottaker, byte[] vedleggPdf) {
+    public JournalpostIdOgDokumentId journalførUtgåendeBrev(Long behandlingId, String dokumentkategori, BrevMetadata brevMetadata, BrevMottaker brevMottaker, byte[] vedleggPdf,
+                                                            UUID unikBestillingUuid) {
         LOG.info("Starter journalføring av {} til {} for behandlingId={}", dokumentkategori, brevMottaker, behandlingId);
 
-        boolean forsøkFerdigstill = true;
+        Objects.requireNonNull(unikBestillingUuid, "Bestilling UUID kan ikke være null");
+
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         var request = OpprettJournalpostRequest.nyUtgående()
                 .medTema(utledTema(behandling.getFagsak().getFagsakYtelseType()))
@@ -92,9 +96,10 @@ public class JournalføringTjeneste {
                         .medTittel(brevMetadata.getTittel())
                         .medBrevkode(brevMetadata.getFagsaktype().getKode() + "-TILB")
                         .leggTilDokumentvariant(new Dokumentvariant(Dokumentvariant.Variantformat.ARKIV, Dokumentvariant.Filtype.PDFA, vedleggPdf)))
+                .medEksternReferanseId(unikBestillingUuid + "-" + brevMottaker.name()) //Brev til bruker og ev. verge produseres med lik bestillingUuid fra samme task.
                 .build();
 
-        var response = dokArkivKlient.opprettJournalpost(request, forsøkFerdigstill);
+        var response = dokArkivKlient.opprettJournalpost(request, true);
         JournalpostId journalpostId = new JournalpostId(response.journalpostId());
         if (response.dokumenter().size() != 1) {
             throw uforventetAntallDokumenterIRespons(response.dokumenter().size());

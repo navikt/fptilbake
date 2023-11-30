@@ -1,6 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
@@ -26,6 +28,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 public class SendManueltVarselbrevTask implements ProsessTaskHandler {
 
     public static final String MAL_TYPE = "malType";
+    public static final String BESTILLING_UUID = "bestillingUuid";
 
     private final BehandlingRepository behandlingRepository;
     private final VergeRepository vergeRepository;
@@ -48,18 +51,20 @@ public class SendManueltVarselbrevTask implements ProsessTaskHandler {
         var behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         var malType = DokumentMalType.fraKode(prosessTaskData.getPropertyValue(MAL_TYPE));
         var friTekst = prosessTaskData.getPayloadAsString();
+        var unikBestillingUuid = UUID.fromString(Optional.ofNullable(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElse(UUID.randomUUID().toString()));
+
         // sjekk om behandlingen har verge
         var finnesVerge = vergeRepository.finnesVerge(behandlingId);
         if (DokumentMalType.VARSEL_DOK.equals(malType)) {
             if (finnesVerge) {
-                manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, friTekst, BrevMottaker.VERGE);
+                manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, friTekst, BrevMottaker.VERGE, unikBestillingUuid);
             }
-            manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, friTekst, BrevMottaker.BRUKER);
+            manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, friTekst, BrevMottaker.BRUKER, unikBestillingUuid);
         } else if (DokumentMalType.KORRIGERT_VARSEL_DOK.equals(malType)) {
             if (finnesVerge) {
-                manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, friTekst, BrevMottaker.VERGE);
+                manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, friTekst, BrevMottaker.VERGE, unikBestillingUuid);
             }
-            manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, friTekst, BrevMottaker.BRUKER);
+            manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, friTekst, BrevMottaker.BRUKER, unikBestillingUuid);
         }
 
         var fristTid = LocalDateTime.now().plus(Frister.BEHANDLING_TILSVAR).plusDays(1);

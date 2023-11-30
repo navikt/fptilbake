@@ -58,7 +58,7 @@ public class InnhentDokumentasjonbrevTjeneste {
         this.pdfBrevTjeneste = pdfBrevTjeneste;
     }
 
-    public void sendInnhentDokumentasjonBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
+    public void sendInnhentDokumentasjonBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker, UUID unikBestillingUuid) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
 
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = settOppInnhentDokumentasjonBrevSamletInfo(behandling, fritekst, brevMottaker);
@@ -69,7 +69,8 @@ public class InnhentDokumentasjonbrevTjeneste {
                 .setMetadata(fritekstbrevData.getBrevMetadata())
                 .setOverskrift(fritekstbrevData.getOverskrift())
                 .setBrevtekst(fritekstbrevData.getBrevtekst())
-                .build());
+                .build(),
+            unikBestillingUuid);
 
     }
 

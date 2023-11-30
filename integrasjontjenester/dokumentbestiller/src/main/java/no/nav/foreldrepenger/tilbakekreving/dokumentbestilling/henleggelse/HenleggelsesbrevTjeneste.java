@@ -62,7 +62,7 @@ public class HenleggelsesbrevTjeneste {
         this.pdfBrevTjeneste = pdfBrevTjeneste;
     }
 
-    public void sendHenleggelsebrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
+    public void sendHenleggelsebrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker, UUID unikBestillingUuid) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = BehandlingType.TILBAKEKREVING.equals(behandling.getType()) ?
@@ -72,7 +72,8 @@ public class HenleggelsesbrevTjeneste {
                 .setMetadata(fritekstbrevData.getBrevMetadata())
                 .setOverskrift(fritekstbrevData.getOverskrift())
                 .setBrevtekst(fritekstbrevData.getBrevtekst())
-                .build());
+                .build(),
+            unikBestillingUuid);
     }
 
     public byte[] hentForhåndsvisningHenleggelsebrev(UUID behandlingUuid, String fritekst) {

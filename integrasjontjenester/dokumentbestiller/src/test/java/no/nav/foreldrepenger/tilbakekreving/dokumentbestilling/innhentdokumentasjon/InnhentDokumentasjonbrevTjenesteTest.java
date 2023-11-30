@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     private static final String FLERE_OPPLYSNINGER = "Vi trenger flere opplysninger";
+    private final UUID BESTILLING_UUID = UUID.randomUUID();
 
     private EksternDataForBrevTjeneste mockEksternDataForBrevTjeneste = mock(EksternDataForBrevTjeneste.class);
     private PdfBrevTjeneste mockPdfBrevTjeneste = mock(PdfBrevTjeneste.class);
@@ -60,9 +62,9 @@ class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestOppsett 
 
     @Test
     void skal_sende_innhent_dokumentasjonbrev() {
-        innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, FLERE_OPPLYSNINGER, BrevMottaker.BRUKER);
+        innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, FLERE_OPPLYSNINGER, BrevMottaker.BRUKER, BESTILLING_UUID);
 
-        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.INNHENT_DOKUMETASJON), any(BrevData.class));
+        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.INNHENT_DOKUMETASJON), any(BrevData.class), eq(BESTILLING_UUID));
     }
 
     @Test

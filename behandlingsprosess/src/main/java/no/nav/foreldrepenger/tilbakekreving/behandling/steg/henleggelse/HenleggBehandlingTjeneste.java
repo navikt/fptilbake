@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -35,7 +36,6 @@ public class HenleggBehandlingTjeneste {
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
-    static final TaskType HENLEGGELSESBREV_TASK_TYPE = TaskType.forProsessTask(SendHenleggelsesbrevTask.class);
     private static final long OPPRETTELSE_DAGER_BEGRENSNING = 6L;
 
     HenleggBehandlingTjeneste() {
@@ -106,9 +106,10 @@ public class HenleggBehandlingTjeneste {
     }
 
     private void sendHenleggelsesbrev(Behandling behandling, String fritekst) {
-        var henleggelseBrevTask = ProsessTaskData.forTaskType(HENLEGGELSESBREV_TASK_TYPE);
+        var henleggelseBrevTask = ProsessTaskData.forTaskType(TaskType.forProsessTask(SendHenleggelsesbrevTask.class));
         henleggelseBrevTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         henleggelseBrevTask.setPayload(fritekst);
+        henleggelseBrevTask.setProperty(SendHenleggelsesbrevTask.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
         henleggelseBrevTask.setCallIdFraEksisterende();
         taskTjeneste.lagre(henleggelseBrevTask);
     }

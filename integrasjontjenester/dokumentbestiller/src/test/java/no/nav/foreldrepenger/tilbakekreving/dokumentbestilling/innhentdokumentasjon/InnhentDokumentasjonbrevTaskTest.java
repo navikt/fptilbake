@@ -8,6 +8,8 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -59,6 +61,7 @@ class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppsett {
         innhentDokumentasjonBrevTask.doTask(prosessTaskData);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
-        verify(mockInnhentDokumentasjonbrevTjeneste, atLeast(2)).sendInnhentDokumentasjonBrev(anyLong(), anyString(), any(BrevMottaker.class));
+        verify(mockInnhentDokumentasjonbrevTjeneste, atLeast(2)).sendInnhentDokumentasjonBrev(anyLong(), anyString(),
+            any(BrevMottaker.class), any(UUID.class));
     }
 }

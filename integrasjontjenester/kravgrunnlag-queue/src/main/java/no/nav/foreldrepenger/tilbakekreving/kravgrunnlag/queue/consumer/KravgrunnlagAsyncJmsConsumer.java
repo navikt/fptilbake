@@ -1,12 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.spi.BeanManager;
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.inject.Inject;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.TextMessage;
@@ -19,7 +18,7 @@ public class KravgrunnlagAsyncJmsConsumer extends QueueConsumer implements Contr
 
     private static final Logger LOG = LoggerFactory.getLogger(KravgrunnlagAsyncJmsConsumer.class);
 
-    private DatabasePreconditionChecker preconditionChecker;
+    private PreconditionChecker preconditionChecker;
     private BeanManager beanManager;
 
     KravgrunnlagAsyncJmsConsumer() {
@@ -27,7 +26,7 @@ public class KravgrunnlagAsyncJmsConsumer extends QueueConsumer implements Contr
     }
 
     @Inject
-    public KravgrunnlagAsyncJmsConsumer(DatabasePreconditionChecker preconditionChecker,
+    public KravgrunnlagAsyncJmsConsumer(PreconditionChecker preconditionChecker,
                                         KravgrunnlagJmsConsumerKonfig konfig,
                                         BeanManager beanManager) {
         super(konfig.getJmsKonfig());

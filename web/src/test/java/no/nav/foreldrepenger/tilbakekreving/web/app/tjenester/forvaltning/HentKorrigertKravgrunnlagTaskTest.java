@@ -13,18 +13,16 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.FlushModeType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.FagOmrådeKode;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.GjelderType;
@@ -51,7 +49,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.vedtak.exception.IntegrasjonException;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
@@ -105,7 +103,7 @@ class HentKorrigertKravgrunnlagTaskTest {
     void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_hentet_grunnlaget_er_ugyldig() {
         when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlagNY(false));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
-        var e = assertThrows(IntegrasjonException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
+        var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
         assertThat(e.getMessage()).contains("FPT-930235");
     }
 

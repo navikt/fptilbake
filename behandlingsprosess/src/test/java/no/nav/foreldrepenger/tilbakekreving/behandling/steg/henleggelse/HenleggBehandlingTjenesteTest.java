@@ -14,6 +14,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.SendHenleggelsesbrevTask;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -194,7 +196,7 @@ class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         verify(taskTjeneste, times(1)).lagre(captor.capture());
         var prosessTaskData = captor.getAllValues();
         assertThat(prosessTaskData).isNotEmpty();
-        assertThat(prosessTaskData.get(0).taskType()).isEqualTo(HenleggBehandlingTjeneste.HENLEGGELSESBREV_TASK_TYPE);
+        assertThat(prosessTaskData.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendHenleggelsesbrevTask.class));
         assertHenleggelse(internBehandlingId);
     }
 
@@ -208,7 +210,7 @@ class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         verify(taskTjeneste, times(1)).lagre(captor.capture());
         var prosessTaskData = captor.getAllValues();
         assertThat(prosessTaskData).isNotEmpty();
-        assertThat(prosessTaskData.get(0).taskType()).isEqualTo(HenleggBehandlingTjeneste.HENLEGGELSESBREV_TASK_TYPE);
+        assertThat(prosessTaskData.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendHenleggelsesbrevTask.class));
         assertHenleggelse(revuderingBehandlingId);
     }
 

@@ -20,6 +20,8 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestiller
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
+import java.util.UUID;
+
 class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
 
     private ManueltVarselBrevTjeneste mockManueltVarselBrevTjeneste = mock(ManueltVarselBrevTjeneste.class);
@@ -72,6 +74,6 @@ class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
         varselbrevTask.doTask(prosessTaskData);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
-        verify(mockManueltVarselBrevTjeneste, atLeast(2)).sendManueltVarselBrev(anyLong(), anyString(), any(BrevMottaker.class));
+        verify(mockManueltVarselBrevTjeneste, atLeast(2)).sendManueltVarselBrev(anyLong(), anyString(), any(BrevMottaker.class), any(UUID.class));
     }
 }

@@ -13,10 +13,15 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Dependent
 @ProsessTask(value = "brev.sendVarsel", maxFailedRuns = 5, firstDelay = 60)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendVarselbrevTask implements ProsessTaskHandler {
+
+    public static final String BESTILLING_UUID = "bestillingUuid";
 
     private VarselbrevTjeneste varselbrevTjeneste;
     private VergeRepository vergeRepository;
@@ -31,9 +36,11 @@ public class SendVarselbrevTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
+        var unikBestillingUuid = UUID.fromString(Optional.ofNullable(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElse(UUID.randomUUID().toString()));
+
         if (vergeRepository.finnesVerge(behandlingId)) {
-            varselbrevTjeneste.sendVarselbrev(behandlingId, VERGE);
+            varselbrevTjeneste.sendVarselbrev(behandlingId, VERGE, unikBestillingUuid);
         }
-        varselbrevTjeneste.sendVarselbrev(behandlingId, BRUKER);
+        varselbrevTjeneste.sendVarselbrev(behandlingId, BRUKER, unikBestillingUuid);
     }
 }

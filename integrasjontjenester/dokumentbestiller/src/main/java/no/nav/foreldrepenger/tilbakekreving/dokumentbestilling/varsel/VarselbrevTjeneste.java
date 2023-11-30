@@ -71,7 +71,7 @@ public class VarselbrevTjeneste {
     public VarselbrevTjeneste() {
     }
 
-    public void sendVarselbrev(Long behandlingId, BrevMottaker brevMottaker) {
+    public void sendVarselbrev(Long behandlingId, BrevMottaker brevMottaker, UUID unikBestillingUuid) {
         VarselbrevSamletInfo varselbrevSamletInfo = lagVarselbrevForSending(behandlingId, brevMottaker);
         String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(varselbrevSamletInfo.getBrevMetadata());
         String brevtekst = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
@@ -87,7 +87,8 @@ public class VarselbrevTjeneste {
                 .setMetadata(data.getBrevMetadata())
                 .setOverskrift(data.getOverskrift())
                 .setBrevtekst(data.getBrevtekst())
-                .build());
+                .build(),
+            unikBestillingUuid);
     }
 
     public byte[] hentForhåndsvisningVarselbrev(HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) {

@@ -11,10 +11,15 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Dependent
 @ProsessTask("brev.sendhenleggelse")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class SendHenleggelsesbrevTask implements ProsessTaskHandler {
+
+    public static final String BESTILLING_UUID = "bestillingUuid";
 
     private HenleggelsesbrevTjeneste henleggelsesbrevTjeneste;
     private VergeRepository vergeRepository;
@@ -30,9 +35,11 @@ public class SendHenleggelsesbrevTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         String fritekst = prosessTaskData.getPayloadAsString();
+        var unikBestillingUuid = UUID.fromString(Optional.ofNullable(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElse(UUID.randomUUID().toString()));
+
         if (vergeRepository.finnesVerge(behandlingId)) {
-            henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, fritekst, BrevMottaker.VERGE);
+            henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, fritekst, BrevMottaker.VERGE, unikBestillingUuid);
         }
-        henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, fritekst, BrevMottaker.BRUKER);
+        henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, fritekst, BrevMottaker.BRUKER, unikBestillingUuid);
     }
 }

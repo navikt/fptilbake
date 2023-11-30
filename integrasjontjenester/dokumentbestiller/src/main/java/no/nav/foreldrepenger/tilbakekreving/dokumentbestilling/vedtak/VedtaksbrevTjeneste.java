@@ -153,7 +153,7 @@ public class VedtaksbrevTjeneste {
         // for CDI
     }
 
-    public void sendVedtaksbrev(Long behandlingId, BrevMottaker brevMottaker) {
+    public void sendVedtaksbrev(Long behandlingId, BrevMottaker brevMottaker, UUID unikBestillingUuid) {
         VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId, brevMottaker);
         HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
         FritekstbrevData data = new FritekstbrevData.Builder()
@@ -170,7 +170,7 @@ public class VedtaksbrevTjeneste {
         if (vedtaksbrevData.getVedtaksbrevData().getFelles().isMedVedlegg()) {
             brevData.setVedleggHtml(TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData()));
         }
-        pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VEDTAK, brevData.build());
+        pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VEDTAK, brevData.build(), unikBestillingUuid);
     }
 
     public byte[] hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
