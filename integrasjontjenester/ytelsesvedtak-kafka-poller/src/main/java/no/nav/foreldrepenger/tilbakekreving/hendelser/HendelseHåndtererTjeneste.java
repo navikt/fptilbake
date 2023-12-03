@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser;
 
-import java.time.LocalDateTime;
 import static java.time.temporal.TemporalAdjusters.next;
 
 import java.time.DayOfWeek;
@@ -17,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.Behandlings
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
@@ -31,7 +29,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
-import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
@@ -71,17 +68,7 @@ public class HendelseHåndtererTjeneste {
         var samletBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG, Tillegsinformasjon.VARSELTEKST);
         var tbkData = samletBehandlingInfo.getTilbakekrevingsvalg();
         var åpenTilbakekreving = behandlingRepository.finnÅpenTilbakekrevingsbehandling(hendelseTaskDataWrapper.getSaksnummer())
-            .orElse(null);
-        if (åpenTilbakekreving != null && !åpenTilbakekreving.isBehandlingPåVent()) {
-            // For å redusere risiko for at det fattes vedtak basert på gammelt kravgrunnlag
-            // Nytt ytelsesvedtak når det finnes åpen tilbakekreving vil ofte føre til at kravgrunnlag sperres samme kveld
-            // Gjenoppta-batch kjører hverdager kl 07:00. Hvis helg, vent til tirsdag morgen, ellers 24 timer.
-            var venteTid = DayOfWeek.FRIDAY.getValue() < DayOfWeek.from(LocalDate.now()).getValue() ?
-                LocalDate.now().with(next(DayOfWeek.TUESDAY)) : LocalDate.now().plusDays(1);
-            behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(åpenTilbakekreving, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
-                venteTid.atStartOfDay(), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
-        }
-        var harSendtVarselTidligere = åpenTilbakekreving != null && brevSporingRepository.harVarselBrevSendtForBehandlingId(åpenTilbakekreving.getId());
+            .orElse(null);var harSendtVarselTidligere = åpenTilbakekreving != null && brevSporingRepository.harVarselBrevSendtForBehandlingId(åpenTilbakekreving.getId());
         if (erRelevantHendelseForOpprettTilbakekreving(tbkData)) {
             if (eksternBehandlingRepository.harEksternBehandlingForEksternUuid(eksternBehandlingUuid)) {
                 LOG.info("Mottatt VedtakHendelse {} allerede opprettet tilbakekreving for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
@@ -90,13 +77,11 @@ public class HendelseHåndtererTjeneste {
             if (åpenTilbakekreving != null) {
                 // Enten vent på nytt grunnlag / ny status - eller start på nytt med nytt varselbrev
                 if  (samletBehandlingInfo.getVarseltekst() == null || samletBehandlingInfo.getVarseltekst().isBlank()) {
-                    // Det skal ikke sendes varsel og spiller liten rolle om det er sendt tidligere varsel eller ikke.
-                    // TODO TFP-5599 riktig å sette på vent?
-                    behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(åpenTilbakekreving, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
-                        LocalDateTime.now().plus(Frister.KRAVGRUNNLAG_FØRSTE), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+                    settÅpenTilbakekrevingPåVent(åpenTilbakekreving);
                 } else {
                     var loggVarsel = harSendtVarselTidligere ? "er varslet tidligere" : "ikke er varslet";
-                    LOG.info("Mottatt VedtakHendelse {} har bedt om varsel og det finnes åpen tilbakekreving som {}", tbkData.getVidereBehandling(), loggVarsel);
+                    LOG.info("Mottatt VedtakHendelse {} for behandling {} har bedt om varsel og det finnes åpen tilbakekreving {} som {}",
+                        tbkData.getVidereBehandling(), eksternBehandlingUuid.toString(), åpenTilbakekreving.getId(), loggVarsel);
                     // Brute-force rewind slik at det sendes nytt varsel (og man venter på grunnlag)
                     rewindTilbakekrevingTilStart(åpenTilbakekreving, henvisning, eksternBehandlingUuid);
                 }
@@ -105,14 +90,25 @@ public class HendelseHåndtererTjeneste {
                     henvisning, kaller);
                 lagOpprettBehandlingTask(hendelseTaskDataWrapper, henvisning);
             }
-        } else if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {
-            LOG.info("Mottatt VedtakHendelse {} for henvisning {} var tidligere relevant for å oppdatere behandling. Nå ignoreres den",
-                tbkData.getVidereBehandling(), henvisning);
-            // TODO TFP-5599 riktig å sette på vent?
-            if (åpenTilbakekreving != null) {
-                behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(åpenTilbakekreving, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
-                    LocalDateTime.now().plus(Frister.KRAVGRUNNLAG_FØRSTE), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        } else {
+            if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {
+                LOG.info("Mottatt VedtakHendelse {} for henvisning {} var tidligere relevant for å oppdatere behandling. Nå ignoreres den",
+                    tbkData.getVidereBehandling(), henvisning);
             }
+            settÅpenTilbakekrevingPåVent(åpenTilbakekreving);
+        }
+    }
+
+    private void settÅpenTilbakekrevingPåVent(Behandling åpenTilbakekreving) {
+        if (åpenTilbakekreving != null) {
+            // For å redusere risiko for at det fattes vedtak basert på gammelt kravgrunnlag
+            // Nytt ytelsesvedtak når det finnes åpen tilbakekreving vil ofte føre til at kravgrunnlag sperres samme kveld
+            // Gjenoppta-batch kjører hverdager kl 07:00. Hvis helg, vent til tirsdag morgen, ellers 24 timer.
+            var idag = LocalDate.now();
+            var venteTid = idag.getDayOfWeek().getValue() > DayOfWeek.FRIDAY.getValue() ?
+                idag.with(next(DayOfWeek.TUESDAY)) : idag.plusDays(1);
+            behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(åpenTilbakekreving, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
+                venteTid.atStartOfDay(), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         }
     }
 
@@ -144,6 +140,12 @@ public class HendelseHåndtererTjeneste {
     }
 
     private void rewindTilbakekrevingTilStart(Behandling åpenTilbakekreving, Henvisning henvisning, UUID eksternBehandlingUuid) {
+        // Kan ikke håndtere når står under iverksettelse
+        if (behandlingskontrollTjeneste.erIStegEllerSenereSteg(åpenTilbakekreving.getId(), BehandlingStegType.IVERKSETT_VEDTAK)) {
+            var melding = String.format("Åpen tilbakekreving %s er under iverksetting. Kan ikke håndtere hendsels for behandling %s",
+                åpenTilbakekreving.getId().toString(), eksternBehandlingUuid.toString());
+            throw new IllegalStateException(melding);
+        }
         EksternBehandling eksternBehandling = new EksternBehandling(åpenTilbakekreving, henvisning, eksternBehandlingUuid);
         eksternBehandlingRepository.lagre(eksternBehandling);
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(åpenTilbakekreving);
