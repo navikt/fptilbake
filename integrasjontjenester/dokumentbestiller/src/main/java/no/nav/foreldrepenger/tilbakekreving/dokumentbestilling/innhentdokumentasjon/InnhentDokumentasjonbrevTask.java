@@ -49,7 +49,7 @@ public class InnhentDokumentasjonbrevTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         String friTekst = prosessTaskData.getPayloadAsString();
-        var unikBestillingUuid = UUID.fromString(Optional.ofNullable(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElse(UUID.randomUUID().toString()));
+        var unikBestillingUuid = UUID.fromString(Optional.of(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElseThrow());
 
         if (vergeRepository.finnesVerge(behandlingId)) {
             innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, friTekst, BrevMottaker.VERGE, unikBestillingUuid);
