@@ -35,7 +35,7 @@ public class SendHenleggelsesbrevTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         String fritekst = prosessTaskData.getPayloadAsString();
-        var unikBestillingUuid = UUID.fromString(Optional.ofNullable(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElse(UUID.randomUUID().toString()));
+        var unikBestillingUuid = UUID.fromString(Optional.of(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElseThrow());
 
         if (vergeRepository.finnesVerge(behandlingId)) {
             henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, fritekst, BrevMottaker.VERGE, unikBestillingUuid);

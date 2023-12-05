@@ -100,7 +100,7 @@ public class HendelseHåndtererTjeneste {
     }
 
     private void settÅpenTilbakekrevingPåVent(Behandling åpenTilbakekreving) {
-        if (åpenTilbakekreving != null) {
+        if (åpenTilbakekreving != null && !åpenTilbakekreving.isBehandlingPåVent()) {
             // For å redusere risiko for at det fattes vedtak basert på gammelt kravgrunnlag
             // Nytt ytelsesvedtak når det finnes åpen tilbakekreving vil ofte føre til at kravgrunnlag sperres samme kveld
             // Gjenoppta-batch kjører hverdager kl 07:00. Hvis helg, vent til tirsdag morgen, ellers 24 timer.

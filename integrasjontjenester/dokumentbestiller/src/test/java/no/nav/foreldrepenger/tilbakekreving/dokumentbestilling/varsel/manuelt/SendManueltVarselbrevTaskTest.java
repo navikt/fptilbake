@@ -41,10 +41,11 @@ class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
 
     @Test
     void skal_sende_manuelt_varselbrev_og_sett_behandling_på_vent() {
-        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
+        var prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Sender manuelt varsel brev");
         prosessTaskData.setProperty(SendManueltVarselbrevTask.MAL_TYPE, DokumentMalType.VARSEL_DOK.getKode());
+        prosessTaskData.setProperty(SendManueltVarselbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());
 
         varselbrevTask.doTask(prosessTaskData);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
@@ -53,10 +54,11 @@ class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
 
     @Test
     void skal_sende_korrigert_varselbrev_og_sett_behandling_på_vent() {
-        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
+        var prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Sender korrigert varsel brev");
         prosessTaskData.setProperty(SendManueltVarselbrevTask.MAL_TYPE, DokumentMalType.KORRIGERT_VARSEL_DOK.getKode());
+        prosessTaskData.setProperty(SendManueltVarselbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());
 
         varselbrevTask.doTask(prosessTaskData);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
@@ -65,10 +67,12 @@ class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
 
     @Test
     void skal_sende_manuelt_varselbrev_med_verge() {
-        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
+        var prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Sender manuelt varsel brev");
         prosessTaskData.setProperty(SendManueltVarselbrevTask.MAL_TYPE, DokumentMalType.VARSEL_DOK.getKode());
+        prosessTaskData.setProperty(SendManueltVarselbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());
+
         vergeRepository.lagreVergeInformasjon(behandling.getId(), lagVerge());
 
         varselbrevTask.doTask(prosessTaskData);

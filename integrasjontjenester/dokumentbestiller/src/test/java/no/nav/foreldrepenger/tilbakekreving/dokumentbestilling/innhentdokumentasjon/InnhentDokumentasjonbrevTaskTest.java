@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -41,9 +42,10 @@ class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppsett {
 
     @Test
     void skal_sende_innhent_dokumentasjonbrev_og_sett_behandling_på_vent() {
-        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
+        var prosessTaskData = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Ber om flere opplysninger");
+        prosessTaskData.setProperty(InnhentDokumentasjonbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());
 
         innhentDokumentasjonBrevTask.doTask(prosessTaskData);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
@@ -52,8 +54,9 @@ class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppsett {
 
     @Test
     void skal_sende_innhent_dokumentasjonbrev_og_sett_behandling_på_vent_når_verge_finnes() {
-        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
+        var prosessTaskData = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setProperty(InnhentDokumentasjonbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());
         prosessTaskData.setPayload("Ber om flere opplysninger");
 
         vergeRepository.lagreVergeInformasjon(behandling.getId(), lagVerge());
@@ -63,5 +66,14 @@ class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppsett {
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
         verify(mockInnhentDokumentasjonbrevTjeneste, atLeast(2)).sendInnhentDokumentasjonBrev(anyLong(), anyString(),
             any(BrevMottaker.class), any(UUID.class));
+    }
+
+    @Test
+    void skal_feile_om_bestilling_uuid_mangler() {
+        var prosessTaskData = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
+        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setPayload("Ber om flere opplysninger");
+
+        assertThrows(NullPointerException.class, () -> innhentDokumentasjonBrevTask.doTask(prosessTaskData));
     }
 }

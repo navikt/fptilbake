@@ -51,7 +51,7 @@ public class SendManueltVarselbrevTask implements ProsessTaskHandler {
         var behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         var malType = DokumentMalType.fraKode(prosessTaskData.getPropertyValue(MAL_TYPE));
         var friTekst = prosessTaskData.getPayloadAsString();
-        var unikBestillingUuid = UUID.fromString(Optional.ofNullable(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElse(UUID.randomUUID().toString()));
+        var unikBestillingUuid = UUID.fromString(Optional.of(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElseThrow());
 
         // sjekk om behandlingen har verge
         var finnesVerge = vergeRepository.finnesVerge(behandlingId);

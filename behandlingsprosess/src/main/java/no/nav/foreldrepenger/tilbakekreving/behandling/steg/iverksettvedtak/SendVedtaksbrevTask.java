@@ -46,7 +46,7 @@ public class SendVedtaksbrevTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
-        var unikBestillingUuid = UUID.fromString(Optional.ofNullable(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElse(UUID.randomUUID().toString()));
+        var unikBestillingUuid = UUID.fromString(Optional.of(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElseThrow());
         LOG_CONTEXT.add("behandling", behandlingId);
         if (vergeRepository.finnesVerge(behandlingId)) {
             vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId, BrevMottaker.VERGE, unikBestillingUuid);
