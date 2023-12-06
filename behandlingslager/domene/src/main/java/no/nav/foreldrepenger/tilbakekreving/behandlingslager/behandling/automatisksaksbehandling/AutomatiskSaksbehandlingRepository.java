@@ -54,7 +54,7 @@ public class AutomatiskSaksbehandlingRepository {
                 and grunn.sperret=:sperret
                 and grunn.aktiv=:aktiv
                 and NOT EXISTS (select id from BrevSporing brev where brev.behandlingId = b.id)
-                and to_timestamp(kravgrunnlag.kontrollFelt,'YYYY-MM-DD-HH24.mi.ss.ff') < to_timestamp(:bestemtDato)
+                and to_timestamp(kravgrunnlag.kontrollFelt,'YYYY-MM-DD-HH24.mi.ss.ff') < :bestemtDato
                 and beløp.klasseType=:klasseType
                 group by b.id,f.fagsakYtelseType
                 having

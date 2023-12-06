@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
@@ -13,13 +13,14 @@ import no.nav.foreldrepenger.felles.jms.QueueConsumer;
 import no.nav.foreldrepenger.felles.jms.precond.PreconditionChecker;
 import no.nav.vedtak.log.metrics.Controllable;
 
+
 @ApplicationScoped
 public class KravgrunnlagAsyncJmsConsumer extends QueueConsumer implements Controllable {
 
     private static final Logger LOG = LoggerFactory.getLogger(KravgrunnlagAsyncJmsConsumer.class);
 
     private PreconditionChecker preconditionChecker;
-    private BeanManager beanManager;
+    private Event<XmlMottattEvent> eventHandler;
 
     KravgrunnlagAsyncJmsConsumer() {
         // CDI
@@ -28,14 +29,14 @@ public class KravgrunnlagAsyncJmsConsumer extends QueueConsumer implements Contr
     @Inject
     public KravgrunnlagAsyncJmsConsumer(PreconditionChecker preconditionChecker,
                                         KravgrunnlagJmsConsumerKonfig konfig,
-                                        BeanManager beanManager) {
+                                        Event<XmlMottattEvent> beanManager) {
         super(konfig.getJmsKonfig());
         super.setConnectionFactory(konfig.getMqConnectionFactory());
         super.setQueue(konfig.getMqQueue());
         super.setToggleJms(new FellesJmsToggle());
         super.setMdcHandler(new QueueMdcLogHandler());
         this.preconditionChecker = preconditionChecker;
-        this.beanManager = beanManager;
+        this.eventHandler = beanManager;
     }
 
     @Override
@@ -61,7 +62,7 @@ public class KravgrunnlagAsyncJmsConsumer extends QueueConsumer implements Contr
      */
     private void håndterMelding(String message) {
         XmlMottattEvent event = new XmlMottattEvent(message);
-        beanManager.fireEvent(event);
+        eventHandler.fire(event);
     }
 
     @Override

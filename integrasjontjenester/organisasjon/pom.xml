@@ -15,12 +15,6 @@
         <dependency>
             <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
             <artifactId>ereg-klient</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.reactivestreams</groupId>
-                    <artifactId>reactive-streams</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!-- Prosjektinterne avhengigheter -->
         <dependency>
