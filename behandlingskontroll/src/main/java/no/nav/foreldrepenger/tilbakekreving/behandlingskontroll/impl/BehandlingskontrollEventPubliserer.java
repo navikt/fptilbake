@@ -1,10 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl;
 
-import java.lang.annotation.Annotation;
 import java.util.Objects;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
@@ -27,15 +26,15 @@ public class BehandlingskontrollEventPubliserer {
 
     public static final BehandlingskontrollEventPubliserer NULL_EVENT_PUB = new BehandlingskontrollEventPubliserer();
 
-    private BeanManager beanManager;
+    private Event<BehandlingEvent> eventHandler;
 
     BehandlingskontrollEventPubliserer() {
         // null ctor, publiserer ingen events
     }
 
     @Inject
-    public BehandlingskontrollEventPubliserer(BeanManager beanManager) {
-        this.beanManager = beanManager;
+    public BehandlingskontrollEventPubliserer(Event<BehandlingEvent> eventHandler) {
+        this.eventHandler = eventHandler;
     }
 
     public void fireEvent(BehandlingStegOvergangEvent event) {
@@ -83,9 +82,9 @@ public class BehandlingskontrollEventPubliserer {
      * Fyrer event via BeanManager slik at håndtering av events som subklasser andre events blir korrekt.
      */
     protected void doFireEvent(BehandlingEvent event) {
-        if (beanManager == null) {
+        if (eventHandler == null || event == null) {
             return;
         }
-        beanManager.fireEvent(event, new Annotation[]{});
+        eventHandler.fire(event);
     }
 }

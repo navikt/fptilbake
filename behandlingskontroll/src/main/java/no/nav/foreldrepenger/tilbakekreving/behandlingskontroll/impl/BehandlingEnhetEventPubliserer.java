@@ -1,11 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl;
 
-import java.lang.annotation.Annotation;
-
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingEnhetEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 
@@ -13,19 +10,19 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 @ApplicationScoped
 public class BehandlingEnhetEventPubliserer {
 
-    private BeanManager beanManager;
+    private Event<BehandlingEnhetEvent> eventHandler;
 
     BehandlingEnhetEventPubliserer() {
         //for CDI proxy
     }
 
     @Inject
-    public BehandlingEnhetEventPubliserer(BeanManager beanManager) {
-        this.beanManager = beanManager;
+    public BehandlingEnhetEventPubliserer(Event<BehandlingEnhetEvent> eventHandler) {
+        this.eventHandler = eventHandler;
     }
 
     public void fireEvent(Behandling behandling) {
         BehandlingEnhetEvent event = new BehandlingEnhetEvent(behandling);
-        beanManager.fireEvent(event, new Annotation[]{});
+        eventHandler.fire(event);
     }
 }

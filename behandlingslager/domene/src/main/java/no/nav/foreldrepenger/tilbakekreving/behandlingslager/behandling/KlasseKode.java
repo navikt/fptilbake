@@ -21,6 +21,8 @@ public enum KlasseKode implements Kodeverdi {
 
     FPATAL("FPATAL"),
     FPATFER("FPATFER"),
+    FPADATFER("FPADATFER"),
+    FPSVATFER("FPSVATFER"),
     FPATFRI("FPATFRI"),
     FPATORD("FPATORD"),
     FPREFAGFER_IOP("FPREFAGFER-IOP"),
