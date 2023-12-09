@@ -182,9 +182,11 @@ public class JettyServer {
         ctx.setParentLoaderPriority(true);
         // må hoppe litt bukk for å hente web.xml fra classpath i stedet for fra filsystem.
         String descriptor;
+        String baseResource;
         try (var factory = ResourceFactory.closeable()) {
             var resource = factory.newClassLoaderResource("/WEB-INF/web.xml", false);
             descriptor = resource.getURI().toURL().toExternalForm();
+            baseResource = factory.newResource(".").getRealURI().toURL().toExternalForm();
         }
         ctx.setDescriptor(descriptor);
 
@@ -194,7 +196,7 @@ public class JettyServer {
         if (Fagsystem.K9TILBAKE.equals(appname)) {
             ctx.setBaseResource(createResourceCollection(ctx));
         } else {
-            ctx.setBaseResourceAsString(".");
+            ctx.setBaseResourceAsString(baseResource);
         }
 
         ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
