@@ -34,11 +34,6 @@
             <artifactId>openhtmltopdf-pdfbox</artifactId>
             <exclusions>
                 <exclusion>
-                    <!-- openhtmltopdf-pdfbox er ikke enig med seg selv hvilken versjon av pdfbox som skal brukes, se under -->
-                    <groupId>org.apache.pdfbox</groupId>
-                    <artifactId>pdfbox</artifactId>
-                </exclusion>
-                <exclusion>
                     <!-- unngår commons-logging siden den forkludrer logging -->
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
@@ -49,17 +44,6 @@
             <!-- Optional, leave out if you do not need logging via slf4j. -->
             <groupId>com.openhtmltopdf</groupId>
             <artifactId>openhtmltopdf-slf4j</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
