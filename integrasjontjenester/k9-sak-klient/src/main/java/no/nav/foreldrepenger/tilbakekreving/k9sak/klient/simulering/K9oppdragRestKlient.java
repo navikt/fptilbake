@@ -15,7 +15,7 @@ import no.nav.vedtak.felles.integrasjon.rest.RestConfig;
 import no.nav.vedtak.felles.integrasjon.rest.RestRequest;
 import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 
-@RestClientConfig(tokenConfig = TokenFlow.STS_CC, scopesProperty = "k9oppdrag.scopes", scopesDefault = "api://prod-fss.k9saksbehandling.k9-oppdrag/.default",
+@RestClientConfig(tokenConfig = TokenFlow.AZUREAD_CC, scopesProperty = "k9oppdrag.scopes", scopesDefault = "api://prod-fss.k9saksbehandling.k9-oppdrag/.default",
     endpointDefault = "http://k9-oppdrag", endpointProperty = "k9oppdrag.url")
 public class K9oppdragRestKlient {
 

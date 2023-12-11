@@ -39,7 +39,7 @@ import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 
 @ApplicationScoped
 @K9tilbake
-@RestClientConfig(tokenConfig = TokenFlow.STS_CC, scopesProperty = "k9sak.scopes", scopesDefault = "api://prod-fss.k9saksbehandling.k9-sak/.default",
+@RestClientConfig(tokenConfig = TokenFlow.ADAPTIVE, scopesProperty = "k9sak.scopes", scopesDefault = "api://prod-fss.k9saksbehandling.k9-sak/.default",
     endpointDefault = "http://k9-sak", endpointProperty = "k9sak.url")
 public class K9sakKlient implements FagsystemKlient {
 
