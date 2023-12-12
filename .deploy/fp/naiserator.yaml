@@ -41,8 +41,8 @@ spec:
       cpu: "2000m"
       memory: "2048Mi"
     requests:
-      cpu: "1200m"
-      memory: "1400Mi"
+      cpu: "200m"
+      memory: "1024Mi"
   vault:
     enabled: true
     paths:
