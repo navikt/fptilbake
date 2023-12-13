@@ -35,7 +35,7 @@
         <sonar.projectKey>navikt_fptilbake</sonar.projectKey>
 
         <!-- Jakarta deps -->
-        <felles.version>7.0.2</felles.version>
+        <felles.version>7.0.3</felles.version>
         <prosesstask.version>5.0.2</prosesstask.version>
         <fpkontrakter.version>9.0.2</fpkontrakter.version>
         <abakus-kontrakt.version>2.0.1</abakus-kontrakt.version>
