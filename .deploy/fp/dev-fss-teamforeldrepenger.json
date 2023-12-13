@@ -5,14 +5,18 @@
   "fptilbakeserviceuser": "serviceuser/data/dev/srvfptilbake",
   "minReplicas": "1",
   "maxReplicas": "2",
+  "limits": {
+    "cpu": "1",
+    "mem": "1024Mi"
+  },
+  "requests": {
+    "cpu": "200m",
+    "mem": "512Mi"
+  },
   "ingresses": [
-    "https://fptilbake.dev.intern.nav.no",
     "https://fptilbake.dev-fss-pub.nais.io"
   ],
   "kafkaPool" : "nav-dev",
-  "env": {
-    "APPD_ENABLED": "false"
-  },
   "groups": [
     "27e77109-fef2-48ce-a174-269074490353",
     "8cddda87-0a22-4d35-9186-a2c32a6ab450",
