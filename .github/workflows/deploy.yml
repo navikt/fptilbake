@@ -20,6 +20,8 @@ on:
 jobs:
   deploy:
     name: deploy
+    permissions:
+      id-token: write
     environment: ${{ inputs.cluster }}:${{ inputs.namespace }}
     runs-on: 'ubuntu-latest'
     steps:
@@ -35,10 +37,9 @@ jobs:
 
       - name: Deploy ${{ inputs.cluster }} fra GAR
         if: inputs.namespace == 'teamforeldrepenger'
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v2
         env:
           PRINT_PAYLOAD: true
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_FP }}
           CLUSTER: ${{ inputs.cluster }}
           IMAGE: ${{ steps.login.outputs.registry }}/${{ github.repository }}:${{ inputs.image }}
           RESOURCE: .deploy/fp/naiserator.yaml
