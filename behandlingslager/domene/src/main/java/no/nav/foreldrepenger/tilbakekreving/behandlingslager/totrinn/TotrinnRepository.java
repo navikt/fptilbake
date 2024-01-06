@@ -96,7 +96,7 @@ public class TotrinnRepository {
 
     protected Optional<Totrinnresultatgrunnlag> getAktivtTotrinnresultatgrunnlag(Long behandlingId) {
         TypedQuery<Totrinnresultatgrunnlag> query = entityManager.createQuery(
-                "SELECT trg FROM Totrinnresultatgrunnlag trg WHERE trg.behandling.id = :behandling_id AND trg.aktiv = 'J'", //$NON-NLS-1$
+                "SELECT trg FROM Totrinnresultatgrunnlag trg WHERE trg.behandling.id = :behandling_id AND trg.aktiv = true", //$NON-NLS-1$
                 Totrinnresultatgrunnlag.class);
 
         query.setParameter("behandling_id", behandlingId); //$NON-NLS-1$
@@ -105,7 +105,7 @@ public class TotrinnRepository {
 
     protected Collection<Totrinnsvurdering> getAktiveTotrinnaksjonspunktvurderinger(Long behandlingId) {
         TypedQuery<Totrinnsvurdering> query = entityManager.createQuery(
-                "SELECT tav FROM Totrinnsvurdering tav WHERE tav.behandling.id = :behandling_id AND tav.aktiv = 'J'", //$NON-NLS-1$
+                "FROM Totrinnsvurdering tav WHERE tav.behandling.id = :behandling_id AND tav.aktiv = true", //$NON-NLS-1$
                 Totrinnsvurdering.class);
 
         query.setParameter("behandling_id", behandlingId); //$NON-NLS-1$

@@ -58,7 +58,7 @@ public class VergeRepository {
     }
 
     private Optional<VergeAggregateEntitet> hentVergeForBehandling(long behandlingId) {
-        TypedQuery<VergeAggregateEntitet> query = entityManager.createQuery("from VergeAggregateEntitet where behandlingId=:behandlingId and aktiv='J'", VergeAggregateEntitet.class);
+        TypedQuery<VergeAggregateEntitet> query = entityManager.createQuery("from VergeAggregateEntitet where behandlingId=:behandlingId and aktiv=true", VergeAggregateEntitet.class);
         query.setParameter("behandlingId", behandlingId);
         return hentUniktResultat(query);
     }

@@ -23,7 +23,7 @@ public class EksternBehandlingRepository {
     private static final String EKSTERN_UUID = "eksternUuid";
     private static final String INTERN_ID = "internId";
     private static final String HENVISNING = "henvisning";
-    private static final String QRY_INTERINID_AKTIV = "from EksternBehandling where internId=:internId and aktiv='J'";
+    private static final String QRY_INTERINID_AKTIV = "from EksternBehandling where internId=:internId and aktiv=true";
     private EntityManager entityManager;
 
     EksternBehandlingRepository() {
@@ -66,7 +66,7 @@ public class EksternBehandlingRepository {
     }
 
     public Optional<EksternBehandling> hentFraHenvisning(Henvisning henvisning) {
-        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where henvisning=:henvisning and aktiv='J'", EksternBehandling.class);
+        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where henvisning=:henvisning and aktiv=true", EksternBehandling.class);
         query.setParameter(HENVISNING, henvisning);
         return hentUniktResultat(query);
     }
@@ -75,7 +75,7 @@ public class EksternBehandlingRepository {
      * Ikke bruk denne - unntatt i spesialtilfeller for å rydde opp
      */
     public List<EksternBehandling> hentFlereFraHenvisning(Henvisning henvisning) {
-        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where henvisning=:henvisning and aktiv='J'", EksternBehandling.class);
+        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where henvisning=:henvisning and aktiv=true", EksternBehandling.class);
         query.setParameter(HENVISNING, henvisning);
         return query.getResultList();
     }
@@ -86,7 +86,7 @@ public class EksternBehandlingRepository {
      * @param eksternUuid
      */
     public List<EksternBehandling> hentAlleBehandlingerMedEksternUuid(UUID eksternUuid) {
-        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where eksternUuid=:eksternUuid and aktiv='J'", EksternBehandling.class);
+        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where eksternUuid=:eksternUuid and aktiv=true", EksternBehandling.class);
         query.setParameter(EKSTERN_UUID, eksternUuid);
         return query.getResultList();
     }
@@ -100,7 +100,7 @@ public class EksternBehandlingRepository {
     public Optional<EksternBehandling> finnForSisteAvsluttetTbkBehandling(UUID eksternUuid) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("select eks from EksternBehandling eks , Behandling beh where eks.internId=beh.id " +
                 "and eks.eksternUuid=:eksternUuid and beh.behandlingType=:behandlingType " +
-                "and beh.status = :behandlingStatus and eks.aktiv = 'J' " +
+                "and beh.status = :behandlingStatus and eks.aktiv = true " +
                 "ORDER BY beh.opprettetTidspunkt DESC", EksternBehandling.class);
 
         query.setParameter(EKSTERN_UUID, eksternUuid);
@@ -112,7 +112,7 @@ public class EksternBehandlingRepository {
     }
 
     public boolean finnesEksternBehandling(long internId, Henvisning henvisning) {
-        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where henvisning=:henvisning and internId=:internId and aktiv='J'", EksternBehandling.class);
+        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where henvisning=:henvisning and internId=:internId and aktiv=true", EksternBehandling.class);
         query.setParameter(HENVISNING, henvisning);
         query.setParameter(INTERN_ID, internId);
         return !query.getResultList().isEmpty();
