@@ -54,7 +54,7 @@ public class ØkonomiMottattXmlRepository {
     }
 
     public List<ØkonomiXmlMottatt> finnAlleForSaksnummerSomIkkeErKoblet(String saksnummer) {
-        var query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer=:saksnummer and tilkoblet='N'", ØkonomiXmlMottatt.class);
+        var query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer=:saksnummer and tilkoblet=false", ØkonomiXmlMottatt.class);
         query.setParameter("saksnummer", saksnummer);
         return query.getResultList();
     }
