@@ -13,11 +13,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.DetaljertFeilutbetalingPeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeMedBeløpDto;
@@ -50,6 +52,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 @ApplicationScoped
 @Transactional
 public class VilkårsvurderingTjeneste {
+    private static final Logger LOG = LoggerFactory.getLogger(VilkårsvurderingTjeneste.class);
 
     private KravgrunnlagRepository grunnlagRepository;
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
@@ -97,9 +100,10 @@ public class VilkårsvurderingTjeneste {
         for (VilkårsvurderingPerioderDto periode : vilkarsVurdertPerioder) {
             if (erPeriodeForeldet(behandlingId, periode.getFom(), periode.getTom())) {
                 //TODO kaste exception istedet, det skal ikke skje at saksbehandler vurderer en foreldet periode
+                LOG.warn("Bør ikke kunne skje at en saksbehandler vurderer en foreldet periode");
                 continue;
             }
-            VilkårVurderingPeriodeEntitet periodeEntitet = VilkårVurderingPeriodeEntitet.builder()
+            var periodeEntitet = VilkårVurderingPeriodeEntitet.builder()
                     .medPeriode(periode.getFom(), periode.getTom())
                     .medBegrunnelse(periode.getBegrunnelse())
                     .medVilkårResultat(periode.getVilkårResultat())
@@ -113,8 +117,8 @@ public class VilkårsvurderingTjeneste {
             vilkårVurderingEntitet.leggTilPeriode(periodeEntitet);
         }
 
-        Optional<VilkårVurderingEntitet> forrigeEntitet = vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId);
-        VilkårVurderingEntitet forrigeVurdering = forrigeEntitet.orElse(null);
+        var forrigeEntitet = vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId);
+        var forrigeVurdering = forrigeEntitet.orElse(null);
 
         vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandlingId, forrigeVurdering, vilkårVurderingEntitet);
 

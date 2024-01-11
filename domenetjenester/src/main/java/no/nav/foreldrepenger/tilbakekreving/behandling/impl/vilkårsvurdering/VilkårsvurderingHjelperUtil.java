@@ -34,11 +34,11 @@ public class VilkårsvurderingHjelperUtil {
     }
 
     static void formAktsomhetEntitet(VilkårsvurderingPerioderDto periode, VilkårVurderingPeriodeEntitet periodeEntitet) {
-        VilkårResultatAnnetDto annetDto = (VilkårResultatAnnetDto) periode.getVilkarResultatInfo();
-        Aktsomhet aktsomhet = annetDto.getAktsomhet();
-        VilkårVurderingAktsomhetEntitet aktsomhetEntitet = null;
+        var annetDto = (VilkårResultatAnnetDto) periode.getVilkarResultatInfo();
+        var aktsomhet = annetDto.getAktsomhet();
+        VilkårVurderingAktsomhetEntitet aktsomhetEntitet;
         if (Aktsomhet.FORSETT.equals(annetDto.getAktsomhet())) {
-            VilkårVurderingAktsomhetEntitet.Builder builder = VilkårVurderingAktsomhetEntitet.builder();
+            var builder = VilkårVurderingAktsomhetEntitet.builder();
             builder.medPeriode(periodeEntitet)
                     .medAktsomhet(aktsomhet)
                     .medBegrunnelse(annetDto.getBegrunnelse());
@@ -47,23 +47,36 @@ public class VilkårsvurderingHjelperUtil {
             }
             aktsomhetEntitet = builder.build();
         } else {
-            VilkårResultatAktsomhetDto aktsomhetInfo = annetDto.getAktsomhetInfo();
-            aktsomhetEntitet = VilkårVurderingAktsomhetEntitet.builder().medPeriode(periodeEntitet)
-                    .medAktsomhet(aktsomhet)
-                    .medBegrunnelse(annetDto.getBegrunnelse())
-                    .medSærligGrunnerTilReduksjon(aktsomhetInfo.isHarGrunnerTilReduksjon())
-                    .medProsenterSomTilbakekreves(aktsomhetInfo.isHarGrunnerTilReduksjon() ? aktsomhetInfo.getAndelTilbakekreves() : null)
+            var aktsomhetInfo = annetDto.getAktsomhetInfo();
+            var tilbakekrevSelvOmBeloepErUnder4Rettsgebyr = aktsomhetInfo.isTilbakekrevSelvOmBeloepErUnder4Rettsgebyr();
+
+            var builder = VilkårVurderingAktsomhetEntitet.builder()
+                .medPeriode(periodeEntitet)
+                .medAktsomhet(aktsomhet)
+                .medBegrunnelse(annetDto.getBegrunnelse())
+                .medTilbakekrevSmåBeløp(tilbakekrevSelvOmBeloepErUnder4Rettsgebyr);
+
+            aktsomhetEntitet = builder.build();
+
+            if (tilbakekrevSelvOmBeloepErUnder4Rettsgebyr == null || tilbakekrevSelvOmBeloepErUnder4Rettsgebyr) { // null or true
+                var harGrunnerTilReduksjon = aktsomhetInfo.isHarGrunnerTilReduksjon();
+
+                builder.medProsenterSomTilbakekreves(harGrunnerTilReduksjon ? aktsomhetInfo.getAndelTilbakekreves() : null)
+                    .medSærligGrunnerTilReduksjon(harGrunnerTilReduksjon)
                     .medIleggRenter(aktsomhetInfo.isIleggRenter())
                     .medBeløpTilbakekreves(aktsomhetInfo.getTilbakekrevesBelop())
-                    .medTilbakekrevSmåBeløp(aktsomhetInfo.isTilbakekrevSelvOmBeloepErUnder4Rettsgebyr())
-                    .medSærligGrunnerBegrunnelse(aktsomhetInfo.getSærligGrunnerBegrunnelse()).build();
+                    .medSærligGrunnerBegrunnelse(aktsomhetInfo.getSærligGrunnerBegrunnelse());
 
-            for (SærligGrunn grunn : aktsomhetInfo.getSærligeGrunner()) {
-                VilkårVurderingSærligGrunnEntitet særligGrunnEntitet = VilkårVurderingSærligGrunnEntitet.builder()
+                aktsomhetEntitet = builder.build();
+
+                for (var grunn : aktsomhetInfo.getSærligeGrunner()) {
+                    var særligGrunnEntitet = VilkårVurderingSærligGrunnEntitet.builder()
                         .medGrunn(grunn)
-                        .medVurdertAktsomhet(aktsomhetEntitet)
-                        .medBegrunnelse(SærligGrunn.ANNET.equals(grunn) ? aktsomhetInfo.getAnnetBegrunnelse() : null).build();
-                aktsomhetEntitet.leggTilSærligGrunn(særligGrunnEntitet);
+                        .medVurdertAktsomhet(builder.build())
+                        .medBegrunnelse(SærligGrunn.ANNET.equals(grunn) ? aktsomhetInfo.getAnnetBegrunnelse() : null)
+                        .build();
+                    aktsomhetEntitet.leggTilSærligGrunn(særligGrunnEntitet);
+                }
             }
         }
         periodeEntitet.setAktsomhet(aktsomhetEntitet);
