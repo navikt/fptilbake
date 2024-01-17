@@ -10,8 +10,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Ved
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @ApplicationScoped
 public class VedtaksbrevFritekstTjeneste {
+
+    private static final Logger LOG = LoggerFactory.getLogger(VedtaksbrevFritekstTjeneste.class);
 
     private VedtaksbrevFritekstValidator validator;
     private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository;
@@ -30,6 +35,10 @@ public class VedtaksbrevFritekstTjeneste {
                                                 VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering,
                                                 List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder,
                                                 VedtaksbrevType brevType) {
+        LOG.info("Behandling: {}, lagrer fritekster for {}, med oppsummering {} lang og {} perioder.", behandlingId, brevType,
+            (vedtaksbrevFritekstOppsummering != null ? vedtaksbrevFritekstOppsummering.getOppsummeringFritekst().length() : "null"),
+            vedtaksbrevFritekstPerioder.size());
+
         validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, vedtaksbrevFritekstPerioder, vedtaksbrevFritekstOppsummering, brevType);
 
         vedtaksbrevFritekstRepository.slettOppsummering(behandlingId);

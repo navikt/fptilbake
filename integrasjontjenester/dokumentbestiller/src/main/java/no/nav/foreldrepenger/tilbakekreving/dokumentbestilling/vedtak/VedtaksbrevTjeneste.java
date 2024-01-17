@@ -193,8 +193,7 @@ public class VedtaksbrevTjeneste {
         if (hbVedtaksbrevData.getFelles().isMedVedlegg()) {
             brevData.setVedleggHtml(TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData()));
         }
-        return pdfBrevTjeneste.genererForhåndsvisning(brevData
-                .build());
+        return pdfBrevTjeneste.genererForhåndsvisning(brevData.build());
     }
 
     private void validerFritekstOppsummering(VedtaksbrevType vedtaksbrevType, String oppsummeringFritekst) {
