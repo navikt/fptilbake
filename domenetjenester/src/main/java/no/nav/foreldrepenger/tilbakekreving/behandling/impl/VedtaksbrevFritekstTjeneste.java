@@ -2,9 +2,11 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
@@ -12,6 +14,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Ved
 
 @ApplicationScoped
 public class VedtaksbrevFritekstTjeneste {
+
+    private static final Logger LOG = LoggerFactory.getLogger(VedtaksbrevFritekstTjeneste.class);
 
     private VedtaksbrevFritekstValidator validator;
     private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository;
@@ -30,6 +34,10 @@ public class VedtaksbrevFritekstTjeneste {
                                                 VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering,
                                                 List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder,
                                                 VedtaksbrevType brevType) {
+        LOG.info("Behandling: {}, lagrer fritekster for {}, med oppsummering {} og {} perioder.", behandlingId, brevType,
+            (vedtaksbrevFritekstOppsummering != null && vedtaksbrevFritekstOppsummering.getOppsummeringFritekst() != null),
+            vedtaksbrevFritekstPerioder.size());
+
         validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, vedtaksbrevFritekstPerioder, vedtaksbrevFritekstOppsummering, brevType);
 
         vedtaksbrevFritekstRepository.slettOppsummering(behandlingId);

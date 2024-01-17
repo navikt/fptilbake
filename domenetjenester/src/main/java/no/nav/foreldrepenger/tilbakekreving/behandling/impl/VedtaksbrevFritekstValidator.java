@@ -5,6 +5,8 @@ import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.b
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -59,11 +61,12 @@ public class VedtaksbrevFritekstValidator {
                                                   List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder,
                                                   VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering,
                                                   VedtaksbrevType brevType) {
-        vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId)
-                .ifPresent(vilkårVurderingEntitet -> validerSærligeGrunnerAnnet(vilkårVurderingEntitet, vedtaksbrevFritekstPerioder));
 
-        FaktaFeilutbetaling faktaFeilutbetaling = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
         if (brevType == VedtaksbrevType.ORDINÆR) {
+            var vurderingEntitet = vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId);
+            vurderingEntitet.ifPresent(vurdering -> validerSærligeGrunnerAnnet(vurdering, vedtaksbrevFritekstPerioder));
+
+            var faktaFeilutbetaling = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
             validerFritekstFakta(faktaFeilutbetaling, vedtaksbrevFritekstPerioder);
         }
 
@@ -95,49 +98,6 @@ public class VedtaksbrevFritekstValidator {
 
     private void validerFritekstFakta(FaktaFeilutbetaling fakta, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
         validerFritekstFaktaTimelineImpl(fakta, vedtaksbrevFritekstPerioder);
-    }
-
-    private static void validerFritekstFakta(FaktaFeilutbetaling fakta, HendelseUnderType hendelseUnderType, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
-        fakta.getFeilutbetaltPerioder().stream()
-                .filter(p -> hendelseUnderType.equals(p.getHendelseUndertype()))
-                .forEach(p -> validerFritekstSatt(vedtaksbrevFritekstPerioder, p.getPeriode(), hendelseUnderType.getKode(), VedtaksbrevFritekstType.FAKTA_AVSNITT));
-    }
-
-    private static void validerFritekstSatt(List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder, Periode periodeSomMåHaFritekst, String hva, VedtaksbrevFritekstType fritekstType) {
-        List<Periode> perioder = finnFritekstPerioder(vedtaksbrevFritekstPerioder, periodeSomMåHaFritekst, fritekstType);
-        if (perioder.isEmpty()) {
-            throw manglerFritekst(hva, periodeSomMåHaFritekst, fritekstType.getKode());
-        }
-        Periode førstePeriode = perioder.get(0);
-        if (!periodeSomMåHaFritekst.getFom().equals(førstePeriode.getFom())) {
-            throw manglerFritekst(hva, Periode.of(periodeSomMåHaFritekst.getFom(), førstePeriode.getFom().minusDays(1)), fritekstType.getKode());
-        }
-        for (int i = 1; i < perioder.size(); i++) {
-            LocalDate forrigeSlutt = perioder.get(i - 1).getTom();
-            LocalDate start = perioder.get(i).getFom();
-            if (!forrigeSlutt.plusDays(1).equals(start)) {
-                throw manglerFritekst(hva, Periode.of(forrigeSlutt.plusDays(1), start.minusDays(1)), fritekstType.getKode());
-            }
-        }
-        Periode sistePeriode = perioder.get(perioder.size() - 1);
-        if (!periodeSomMåHaFritekst.getTom().equals(sistePeriode.getTom())) {
-            throw manglerFritekst(hva, Periode.of(sistePeriode.getTom().plusDays(1), periodeSomMåHaFritekst.getTom()), fritekstType.getKode());
-        }
-    }
-
-    private static List<Periode> finnFritekstPerioder(List<VedtaksbrevFritekstPeriode> perioder, Periode periodeSomMåHaFritekst, VedtaksbrevFritekstType fritekstType) {
-        return perioder.stream()
-                .filter(p -> fritekstType.equals(p.getFritekstType()))
-                .filter(p -> !p.getFritekst().isBlank())
-                .map(VedtaksbrevFritekstPeriode::getPeriode)
-                .filter(periodeSomMåHaFritekst::omslutter)
-                .sorted(Comparator.comparing(Periode::getFom))
-                .collect(Collectors.toList());
-    }
-
-
-    static TekniskException manglerFritekst(String hendelseUnderType, Periode periode, String fritekstType) {
-        return new TekniskException("FPT-022180", String.format("Ugyldig input: Når '%s' er valgt er fritekst påkrevet. Mangler for periode %s og avsnitt %s", hendelseUnderType, periode, fritekstType));
     }
 
     static TekniskException manglerPåkrevetOppsumering() {

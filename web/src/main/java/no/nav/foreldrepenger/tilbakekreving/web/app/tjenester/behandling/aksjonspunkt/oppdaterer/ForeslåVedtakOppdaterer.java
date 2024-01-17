@@ -55,8 +55,11 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
         if (vedtakSendesFraKlagebehandling){
             logger.info("Lagrer ikke fritekster for vedtaksbrev, siden vedtaksbrev skal sendes fra klagebehandlingen");
         } else {
-            VedtaksbrevType brevType = behandling.utledVedtaksbrevType();
-            vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto), lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()), brevType);
+            vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(
+                behandlingId,
+                lagOppsummeringstekst(behandlingId, dto),
+                lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()),
+                behandling.utledVedtaksbrevType());
         }
         foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(behandlingId);
 
