@@ -35,8 +35,8 @@ public class VedtaksbrevFritekstTjeneste {
                                                 VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering,
                                                 List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder,
                                                 VedtaksbrevType brevType) {
-        LOG.info("Behandling: {}, lagrer fritekster for {}, med oppsummering {} lang og {} perioder.", behandlingId, brevType,
-            (vedtaksbrevFritekstOppsummering != null ? vedtaksbrevFritekstOppsummering.getOppsummeringFritekst().length() : "null"),
+        LOG.info("Behandling: {}, lagrer fritekster for {}, med oppsummering {} og {} perioder.", behandlingId, brevType,
+            (vedtaksbrevFritekstOppsummering != null && vedtaksbrevFritekstOppsummering.getOppsummeringFritekst() != null),
             vedtaksbrevFritekstPerioder.size());
 
         validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, vedtaksbrevFritekstPerioder, vedtaksbrevFritekstOppsummering, brevType);
