@@ -26,7 +26,7 @@ public class VilkårResultatAktsomhetDto {
     @Valid
     private List<@ValidKodeverk SærligGrunn> særligeGrunner = new ArrayList<>();
 
-    private boolean harGrunnerTilReduksjon;
+    private Boolean harGrunnerTilReduksjon;
 
     @DecimalMin("0.00")
     @DecimalMax("99.99")
@@ -61,11 +61,11 @@ public class VilkårResultatAktsomhetDto {
         this.særligeGrunner = særligeGrunner;
     }
 
-    public boolean isHarGrunnerTilReduksjon() {
+    public Boolean isHarGrunnerTilReduksjon() {
         return harGrunnerTilReduksjon;
     }
 
-    public void setHarGrunnerTilReduksjon(boolean harGrunnerTilReduksjon) {
+    public void setHarGrunnerTilReduksjon(Boolean harGrunnerTilReduksjon) {
         this.harGrunnerTilReduksjon = harGrunnerTilReduksjon;
     }
 
