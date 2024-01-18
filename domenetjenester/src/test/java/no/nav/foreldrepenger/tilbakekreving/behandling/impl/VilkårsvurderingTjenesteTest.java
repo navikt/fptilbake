@@ -356,7 +356,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         VilkårResultatAnnetDto annetDto = (VilkårResultatAnnetDto) andrePeriode.getVilkarResultatInfo();
         assertThat(annetDto.getAktsomhet()).isEqualByComparingTo(Aktsomhet.FORSETT);
         assertThat(annetDto.getAktsomhetInfo()).isNotNull();
-        assertThat(annetDto.getAktsomhetInfo().isHarGrunnerTilReduksjon()).isFalse();
+        assertThat(annetDto.getAktsomhetInfo().isHarGrunnerTilReduksjon()).isNull();
         assertThat(annetDto.getAktsomhetInfo().getAndelTilbakekreves()).isNull();
         assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isNull();
         assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner().size()).isEqualTo(0);
