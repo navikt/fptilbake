@@ -36,8 +36,6 @@ spec:
       cpu:
         thresholdPercentage: 80
   leaderElection: false
-  istio: # Optional.
-    enabled: false
   resources: # Optional. See: http://kubernetes.io/docs/user-guide/compute-resources/
     limits:
       cpu: "2000m"
