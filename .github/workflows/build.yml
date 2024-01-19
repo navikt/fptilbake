@@ -34,6 +34,7 @@ jobs:
     # enkleste vei ser ut til å bygge på nytt og puhse til k9sakbehandling i GAR
     name: Build på nytt for publisering til k9saksbehandling i GAR
     if: github.ref_name == 'master'
+    needs: build-app
     permissions:
       contents: read
       packages: write
@@ -115,7 +116,7 @@ jobs:
     permissions:
       id-token: write
     if: github.ref_name == 'master'
-    needs: [build-app, fptilbake-tester, verdikjede-tester]
+    needs: [publish-image-k9, fptilbake-tester, verdikjede-tester]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
     with:
       image: ${{ needs.build-app.outputs.build-version }}
@@ -128,7 +129,7 @@ jobs:
     permissions:
       id-token: write
     if: github.ref_name == 'master'
-    needs: [build-app, fptilbake-tester, verdikjede-tester, deploy-dev-k9saksbehandling]
+    needs: [publish-image-k9, fptilbake-tester, verdikjede-tester, deploy-dev-k9saksbehandling]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
     with:
       image: ${{ needs.build-app.outputs.build-version }}
