@@ -26,8 +26,8 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - uses: actions/checkout@v4
-
       - name: Login GAR
+        if: inputs.namespace == 'teamforeldrepenger'
         uses: nais/login@v0
         id: login
         with:
@@ -44,6 +44,15 @@ jobs:
           IMAGE: ${{ steps.login.outputs.registry }}/${{ github.repository }}:${{ inputs.image }}
           RESOURCE: .deploy/fp/naiserator.yaml
           VARS: .deploy/fp/${{ inputs.cluster }}-${{ inputs.namespace }}.json
+
+      - name: Login GAR
+        if: inputs.namespace == 'k9saksbehandling'
+        uses: nais/login@v0
+        id: login
+        with:
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          team: teamforeldrepenger
 
       - name: Deploy ${{ inputs.cluster }}
         if: inputs.namespace == 'k9saksbehandling'
