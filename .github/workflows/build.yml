@@ -33,6 +33,7 @@ jobs:
     # målet her er at k9-verdikjede skal kunne hente imaget for k9-tilbake
     # enkleste vei ser ut til å bygge på nytt og puhse til k9sakbehandling i GAR
     name: Build på nytt for publisering til k9saksbehandling i GAR
+    if: github.ref_name == 'master'
     permissions:
       contents: read
       packages: write
