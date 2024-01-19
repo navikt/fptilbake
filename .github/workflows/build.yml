@@ -119,7 +119,7 @@ jobs:
     needs: [publish-image-k9, fptilbake-tester, verdikjede-tester]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
     with:
-      image: ${{ needs.build-app.outputs.build-version }}
+      image: ${{ needs.publish-image-k9.outputs.build-version }}
       cluster: dev-fss
       namespace: k9saksbehandling
     secrets: inherit
@@ -132,7 +132,7 @@ jobs:
     needs: [publish-image-k9, fptilbake-tester, verdikjede-tester, deploy-dev-k9saksbehandling]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
     with:
-      image: ${{ needs.build-app.outputs.build-version }}
+      image: ${{ needs.publish-image-k9.outputs.build-version }}
       cluster: prod-fss
       namespace: k9saksbehandling
     secrets: inherit
