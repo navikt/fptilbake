@@ -29,6 +29,22 @@ jobs:
       push-image: ${{ github.ref_name == 'master' }} # default: false
     secrets: inherit
 
+  publish-image-k9:
+    # målet her er at k9-verdikjede skal kunne hente imaget for k9-tilbake
+    # enkleste vei ser ut til å bygge på nytt og puhse til k9sakbehandling i GAR
+    name: Build på nytt for publisering til k9saksbehandling i GAR
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    uses: navikt/fp-gha-workflows/.github/workflows/build-app.yml@main
+    with:
+      build-image: ${{ github.ref_name == 'master' }} # default: true
+      push-image: ${{ github.ref_name == 'master' }} # default: false
+      namespace: k9saksbehandling
+      skip-tests: true
+    secrets: inherit
+    
   fptilbake-tester:
     name: Fptilbake tester
     permissions:
