@@ -32,6 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -44,7 +45,7 @@ import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 public class FeilutbetalingSisteBehandlingRestTjeneste {
 
     private BehandlingRepository behandlingRepository;
-
+    private KravgrunnlagRepository kravgrunnlagRepository;
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
 
     public FeilutbetalingSisteBehandlingRestTjeneste() {
@@ -52,8 +53,9 @@ public class FeilutbetalingSisteBehandlingRestTjeneste {
     }
 
     @Inject
-    public FeilutbetalingSisteBehandlingRestTjeneste(BehandlingRepository behandlingRepository, KravgrunnlagTjeneste kravgrunnlagTjeneste) {
+    public FeilutbetalingSisteBehandlingRestTjeneste(BehandlingRepository behandlingRepository, KravgrunnlagRepository kravgrunnlagRepository, KravgrunnlagTjeneste kravgrunnlagTjeneste) {
         this.behandlingRepository = behandlingRepository;
+        this.kravgrunnlagRepository = kravgrunnlagRepository;
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
     }
 
@@ -81,6 +83,13 @@ public class FeilutbetalingSisteBehandlingRestTjeneste {
 
         Behandling behandlingen = sisteBehandling.get();
         LocalDate avsluttetDato = behandlingen.getAvsluttetDato() != null ? behandlingen.getAvsluttetDato().toLocalDate() : null;
+
+        boolean harKravgrunnlag = kravgrunnlagRepository.finnesIsAktivFor(behandlingen.getId());
+        if (!harKravgrunnlag){
+            //utledLogisk periode kaster exception ved manglende kravgrunnlag, så må håndtere manglende kravgrunnlag her
+            List<Periode> perioder = List.of();
+            return Response.ok(new BehandlingStatusOgFeilutbetalinger(avsluttetDato, perioder)).build();
+        }
         List<LogiskPeriode> logiskePerioder = kravgrunnlagTjeneste.utledLogiskPeriode(behandlingen.getId());
         List<Periode> perioder = logiskePerioder.stream().map(LogiskPeriode::getPeriode).toList();
         return Response.ok(new BehandlingStatusOgFeilutbetalinger(avsluttetDato, perioder)).build();
