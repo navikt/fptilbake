@@ -7,16 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Response;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -24,6 +14,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Response;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
@@ -57,7 +57,7 @@ public class FeilutbetalingSisteBehandlingRestTjeneste {
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
     }
 
-    @POST
+    @GET
     @Path("/siste-behandling")
     @Operation(
         tags = "feilutbetaling",
@@ -67,7 +67,7 @@ public class FeilutbetalingSisteBehandlingRestTjeneste {
             @ApiResponse(responseCode = "204", description = "Det finnes ingen tilbakekrevigsbehandlnig for saken")
         })
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
-    public Response hentInfoForSisteFørstegangsBehandling(@NotNull @Valid SaksnummerDto saksnummer) {
+    public Response hentInfoForSisteFørstegangsBehandling(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummer) {
         Saksnummer saksnummeret = new Saksnummer(saksnummer.getVerdi());
 
         List<Behandling> behandlinger = behandlingRepository.hentAlleBehandlingerForSaksnummer(saksnummeret);
