@@ -53,7 +53,9 @@ public class FeilutbetalingSisteBehandlingRestTjeneste {
     }
 
     @Inject
-    public FeilutbetalingSisteBehandlingRestTjeneste(BehandlingRepository behandlingRepository, KravgrunnlagRepository kravgrunnlagRepository, KravgrunnlagTjeneste kravgrunnlagTjeneste) {
+    public FeilutbetalingSisteBehandlingRestTjeneste(BehandlingRepository behandlingRepository,
+                                                     KravgrunnlagRepository kravgrunnlagRepository,
+                                                     KravgrunnlagTjeneste kravgrunnlagTjeneste) {
         this.behandlingRepository = behandlingRepository;
         this.kravgrunnlagRepository = kravgrunnlagRepository;
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
@@ -84,8 +86,7 @@ public class FeilutbetalingSisteBehandlingRestTjeneste {
         Behandling behandlingen = sisteBehandling.get();
         LocalDate avsluttetDato = behandlingen.getAvsluttetDato() != null ? behandlingen.getAvsluttetDato().toLocalDate() : null;
 
-        boolean harKravgrunnlag = kravgrunnlagRepository.finnesIsAktivFor(behandlingen.getId());
-        if (!harKravgrunnlag){
+        if (!kravgrunnlagRepository.harGrunnlagForBehandlingId(behandlingen.getId())) {
             //utledLogisk periode kaster exception ved manglende kravgrunnlag, så må håndtere manglende kravgrunnlag her
             List<Periode> perioder = List.of();
             return Response.ok(new BehandlingStatusOgFeilutbetalinger(avsluttetDato, perioder)).build();
@@ -102,7 +103,8 @@ public class FeilutbetalingSisteBehandlingRestTjeneste {
         private List<Periode> feilutbetaltePerioder;
 
         @JsonCreator
-        public BehandlingStatusOgFeilutbetalinger(@JsonProperty("avsluttetDato") LocalDate avsluttetDato, @JsonProperty("feilutbetaltePerioder") List<Periode> feilutbetaltePerioder) {
+        public BehandlingStatusOgFeilutbetalinger(@JsonProperty("avsluttetDato") LocalDate avsluttetDato,
+                                                  @JsonProperty("feilutbetaltePerioder") List<Periode> feilutbetaltePerioder) {
             this.avsluttetDato = avsluttetDato;
             this.feilutbetaltePerioder = feilutbetaltePerioder;
         }
