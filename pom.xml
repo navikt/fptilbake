@@ -7,7 +7,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-bom</artifactId>
-        <version>3.1.0</version>
+        <version>3.1.2</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -35,10 +35,10 @@
         <sonar.projectKey>navikt_fptilbake</sonar.projectKey>
 
         <!-- Jakarta deps -->
-        <felles.version>7.0.4</felles.version>
-        <prosesstask.version>5.0.4</prosesstask.version>
-        <fpkontrakter.version>9.0.3</fpkontrakter.version>
-        <abakus-kontrakt.version>2.0.4</abakus-kontrakt.version>
+        <felles.version>7.0.5</felles.version>
+        <prosesstask.version>5.0.5</prosesstask.version>
+        <fpkontrakter.version>9.1.4</fpkontrakter.version>
+        <abakus-kontrakt.version>2.0.5</abakus-kontrakt.version>
         <verapdf-validation-model.version>1.24.1</verapdf-validation-model.version>
         <!-- Jakarta deps end -->
 
@@ -82,7 +82,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>fp-bom</artifactId>
-                <version>3.1.0</version>
+                <version>3.1.2</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -391,7 +391,7 @@
                 <!-- denne tas inn av com.ibm.mq.jakarta.client, overstyrer med nyere versjon. Trengs denne? -->
                 <groupId>org.json</groupId>
                 <artifactId>json</artifactId>
-                <version>20231013</version>
+                <version>20240205</version>
             </dependency>
             <dependency>
                 <groupId>org.xerial.snappy</groupId>

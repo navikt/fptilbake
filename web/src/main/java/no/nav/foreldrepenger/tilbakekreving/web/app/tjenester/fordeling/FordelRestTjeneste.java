@@ -34,7 +34,8 @@ public class FordelRestTjeneste {
 
     private static final Logger LOG = LoggerFactory.getLogger(FordelRestTjeneste.class);
 
-    public static final String UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID = "I000114";
+    public static final String UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID = "I000114";
+    public static final String UTTALELSE_TILBAKEBETALING_DOKUMENT_TYPE_ID = "I000119";
 
     private BehandlingRepository behandlingRepository;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
@@ -88,6 +89,6 @@ public class FordelRestTjeneste {
     }
 
     private boolean erTilbakemeldingFraBruker(String dokumentTypeId) {
-        return UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID.equals(dokumentTypeId);
+        return UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID.equals(dokumentTypeId) || UTTALELSE_TILBAKEBETALING_DOKUMENT_TYPE_ID.equals(dokumentTypeId);
     }
 }
