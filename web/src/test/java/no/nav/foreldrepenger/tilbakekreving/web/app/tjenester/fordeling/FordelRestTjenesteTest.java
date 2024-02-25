@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordeling;
 
-import static no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordeling.FordelRestTjeneste.UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID;
+import static no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordeling.FordelRestTjeneste.UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -62,7 +62,7 @@ class FordelRestTjenesteTest {
     void mottaJournalpost_når_saksnummer_ikke_finnes() {
         Long behandlingId = lagBehandling();
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto("10000", JOURNAL_POST_ID, FORSENDELSE_ID,
-                UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
+                UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
         verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SØKER);
     }
@@ -83,7 +83,7 @@ class FordelRestTjenesteTest {
         behandling.avsluttBehandling();
 
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
-                UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
+                UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
         verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SØKER);
     }
@@ -95,7 +95,7 @@ class FordelRestTjenesteTest {
         AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.FAKTA_FEILUTBETALING);
 
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
-                UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
+                UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
         verify(mockGjenopptaBehandlingTjeneste, atLeastOnce()).fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SØKER);
         assertThat(varselresponsTjeneste.hentRespons(behandlingId)).isPresent();
