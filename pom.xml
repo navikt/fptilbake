@@ -35,9 +35,9 @@
         <sonar.projectKey>navikt_fptilbake</sonar.projectKey>
 
         <!-- Jakarta deps -->
-        <felles.version>7.0.5</felles.version>
+        <felles.version>7.0.6</felles.version>
         <prosesstask.version>5.0.5</prosesstask.version>
-        <fpkontrakter.version>9.1.4</fpkontrakter.version>
+        <fpkontrakter.version>9.1.5</fpkontrakter.version>
         <abakus-kontrakt.version>2.0.5</abakus-kontrakt.version>
         <verapdf-validation-model.version>1.24.1</verapdf-validation-model.version>
         <!-- Jakarta deps end -->
@@ -240,7 +240,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>jms-integrasjon</artifactId>
-                <version>3.2.2</version>
+                <version>3.2.3</version>
             </dependency>
 
             <dependency>
