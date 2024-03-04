@@ -324,7 +324,7 @@
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>swagger-ui</artifactId>
-                <version>5.10.3</version>
+                <version>5.11.8</version>
             </dependency>
 
             <!-- 3dje parts biblioteker -->
@@ -391,7 +391,7 @@
                 <!-- denne tas inn av com.ibm.mq.jakarta.client, overstyrer med nyere versjon. Trengs denne? -->
                 <groupId>org.json</groupId>
                 <artifactId>json</artifactId>
-                <version>20240205</version>
+                <version>20240303</version>
             </dependency>
             <dependency>
                 <groupId>org.xerial.snappy</groupId>
