@@ -28,6 +28,7 @@ public class BehandlingRepository {
     public static final String KEY_FAGSAK_ID = "fagsakId";
     public static final String KEY_SAKSNUMMER = "saksnummer";
     private static final String KEY_BEHANDLING_TYPE = "behandlingType";
+    private static final String KEY_BEHANDLING_STATUS = "behandlingStatus";
 
     private EntityManager entityManager;
 
@@ -73,9 +74,12 @@ public class BehandlingRepository {
         Objects.requireNonNull(saksnummer, KEY_SAKSNUMMER);
         var query = getEntityManager().createQuery("""
             SELECT beh FROM Behandling beh, Fagsak fagsak WHERE beh.fagsak.id=fagsak.id AND fagsak.saksnummer = :saksnummer
-                AND beh.status <>'AVSLU'
-                AND beh.behandlingType='BT-007'""", Behandling.class);
-        query.setParameter(KEY_SAKSNUMMER, saksnummer);
+                AND beh.status <> :behandlingStatus
+                AND beh.behandlingType = :behandlingType
+                """, Behandling.class)
+            .setParameter(KEY_SAKSNUMMER, saksnummer)
+            .setParameter(KEY_BEHANDLING_STATUS, BehandlingStatus.AVSLUTTET)
+            .setParameter(KEY_BEHANDLING_TYPE, BehandlingType.TILBAKEKREVING);
         return hentUniktResultat(query);
     }
 
@@ -86,10 +90,10 @@ public class BehandlingRepository {
         Objects.requireNonNull(fagsakId, KEY_FAGSAK_ID); //$NON-NLS-1$
 
         var query = getEntityManager().createQuery(
-            "SELECT beh from Behandling beh WHERE beh.fagsak.id = :fagsakId AND beh.status <> :status", //$NON-NLS-1$
+            "SELECT beh from Behandling beh WHERE beh.fagsak.id = :fagsakId AND beh.status <> :behandlingStatus", //$NON-NLS-1$
             Behandling.class);
         query.setParameter(KEY_FAGSAK_ID, fagsakId); //$NON-NLS-1$
-        query.setParameter("status", BehandlingStatus.AVSLUTTET); //$NON-NLS-1$
+        query.setParameter(KEY_BEHANDLING_STATUS, BehandlingStatus.AVSLUTTET); //$NON-NLS-1$
         query.setHint(QueryHints.HINT_READONLY, "true"); //$NON-NLS-1$
         return query.getResultList();
     }
@@ -213,12 +217,12 @@ public class BehandlingRepository {
 
         var query = entityManager.createQuery(
             "FROM Behandling behandling " +
-                "WHERE behandling.status <> :status " +
+                "WHERE behandling.status <> :behandlingStatus " +
                 "  AND behandling.behandlendeEnhetId = :enhet ",
             Behandling.class);
 
         query.setParameter("enhet", enhetId);
-        query.setParameter("status", BehandlingStatus.AVSLUTTET);
+        query.setParameter(KEY_BEHANDLING_STATUS, BehandlingStatus.AVSLUTTET);
         query.setHint(QueryHints.HINT_READONLY, "true");
         return query.getResultList();
     }
