@@ -93,8 +93,7 @@ public class HendelseHåndtererTjeneste {
     }
 
     private boolean erRelevantHendelseForOpprettTilbakekreving(TilbakekrevingValgDto tbkData) {
-        return VidereBehandling.TILBAKEKREV_I_INFOTRYGD.equals(tbkData.getVidereBehandling())
-                || VidereBehandling.TILBAKEKR_OPPRETT.equals(tbkData.getVidereBehandling());
+        return VidereBehandling.TILBAKEKR_OPPRETT.equals(tbkData.getVidereBehandling());
     }
 
     private boolean erRelevantHendelseForOppdatereTilbakekreving(TilbakekrevingValgDto tbkData) {

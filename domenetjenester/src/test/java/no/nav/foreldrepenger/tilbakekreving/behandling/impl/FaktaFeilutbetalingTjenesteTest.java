@@ -48,7 +48,7 @@ class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         EksternBehandlingsinfoDto behandlingsinfoDto = lagEksternBehandlingsInfo();
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = new SamletEksternBehandlingInfo.Builder(Set.of(Tillegsinformasjon.TILBAKEKREVINGSVALG))
                 .setGrunninformasjon(behandlingsinfoDto)
-                .setTilbakekrevingvalg(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD))
+                .setTilbakekrevingvalg(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKR_OPPRETT))
                 .build();
         when(mockFagsystemKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG)).thenReturn(samletEksternBehandlingInfo);
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
@@ -208,7 +208,7 @@ class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         assertThat(fakta.getTotalPeriodeTom()).isEqualTo(TOM);
         assertThat(fakta.getPerioder()).isNotEmpty();
         assertThat(fakta.getDatoForRevurderingsvedtak()).isEqualTo(NOW);
-        assertThat(fakta.getTilbakekrevingValg().getVidereBehandling()).isEqualToComparingFieldByField(VidereBehandling.TILBAKEKREV_I_INFOTRYGD);
+        assertThat(fakta.getTilbakekrevingValg().getVidereBehandling()).isEqualToComparingFieldByField(VidereBehandling.TILBAKEKR_OPPRETT);
     }
 
     private EksternBehandlingsinfoDto lagEksternBehandlingsInfo() {
