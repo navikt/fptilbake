@@ -18,7 +18,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum VidereBehandling implements Kodeverdi {
 
-    TILBAKEKREV_I_INFOTRYGD("TILBAKEKR_INFOTRYGD", "Feilutbetaling med tilbakekreving"),
     TILBAKEKR_OPPRETT("TILBAKEKR_OPPRETT", "Feilutbetaling med tilbakekreving"),
     IGNORER_TILBAKEKREVING("TILBAKEKR_IGNORER", "Feilutbetaling, avvent samordning"),
     INNTREKK("TILBAKEKR_INNTREKK", "Feilutbetaling hvor inntrekk dekker hele beløpet"),

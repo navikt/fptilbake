@@ -52,7 +52,7 @@ class BehandlingTjenesteTest extends FellesTestOppsett {
     @BeforeEach
     void setup() {
         entityManager.setFlushMode(FlushModeType.AUTO);
-        when(mockFagsystemKlient.hentTilbakekrevingValg(eksternBehandlingUuid)).thenReturn(Optional.of(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD)));
+        when(mockFagsystemKlient.hentTilbakekrevingValg(eksternBehandlingUuid)).thenReturn(Optional.of(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKR_OPPRETT)));
         when(mockFagsystemKlient.hentBehandlingOptional(eksternBehandlingUuid)).thenReturn(Optional.of(lagEksternBehandlingsInfo()));
         vergeRepository = repoProvider.getVergeRepository();
     }

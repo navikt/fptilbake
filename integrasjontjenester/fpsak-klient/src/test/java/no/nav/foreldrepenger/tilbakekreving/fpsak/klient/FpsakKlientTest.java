@@ -81,13 +81,13 @@ class FpsakKlientTest {
 
     @Test
     void skal_returnere_tilbakekreving_valg() {
-        TilbakekrevingValgDto tilbakekrevingValgDto = new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD);
+        TilbakekrevingValgDto tilbakekrevingValgDto = new TilbakekrevingValgDto(VidereBehandling.TILBAKEKR_OPPRETT);
         when(restClientMock.sendReturnOptional(any(), eq(FpsakBehandlingInfoDto.class))).thenReturn(Optional.of(dokumentinfoDto()));
         when(restClientMock.sendReturnOptional(any(), eq(TilbakekrevingValgDto.class))).thenReturn(Optional.of(tilbakekrevingValgDto));
 
         Optional<TilbakekrevingValgDto> valgDto = klient.hentTilbakekrevingValg(BEHANDLING_UUID);
         assertThat(valgDto).isPresent();
-        assertThat(valgDto.get().getVidereBehandling()).isEqualByComparingTo(VidereBehandling.TILBAKEKREV_I_INFOTRYGD);
+        assertThat(valgDto.get().getVidereBehandling()).isEqualByComparingTo(VidereBehandling.TILBAKEKR_OPPRETT);
     }
 
     @Test
