@@ -42,7 +42,6 @@
     "DOKDIST_REST_DISTRIBUER_JOURNALPOST" : "https://dokdistfordeling.nais.adeo.no/rest/v1/distribuerjournalpost",
     "DOKDIST_SCOPES" : "api://prod-fss.teamdokumenthandtering.saf/.default",
     "ABAC_ATTRIBUTT_DRIFT" : "no.nav.abac.attributter.k9.oppdrag.drift",
-    "KODEVERK_V2_URL": "https://kodeverk.nais.adeo.no/ws/kodeverk/v2",
     "SENSU_HOST": "sensu.nais",
     "SENSU_PORT": "3030",
     "METRIKKER_KRAVGRUNNLAG_OPPDATERINGSPERIODE" : "P2W",
