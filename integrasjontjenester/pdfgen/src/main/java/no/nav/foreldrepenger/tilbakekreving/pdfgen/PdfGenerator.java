@@ -7,11 +7,14 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import com.openhtmltopdf.extend.FSSupplier;
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+
 import com.openhtmltopdf.slf4j.Slf4jLogger;
 import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
+
 import com.openhtmltopdf.util.XRLog;
 
 import no.nav.foreldrepenger.tilbakekreving.pdfgen.validering.PdfaValidator;
