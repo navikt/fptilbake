@@ -275,7 +275,7 @@ public class BehandlingskontrollTjeneste {
         var lås = serviceProvider.taLås(behandlingId);
         // så les
         var behandling = serviceProvider.hentBehandling(behandlingId);
-        return new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), lås);
+        return new BehandlingskontrollKontekst(behandling.getFagsak().getSaksnummer(), behandling.getFagsakId(), behandling.getAktørId(), lås);
     }
 
     /**
@@ -290,7 +290,7 @@ public class BehandlingskontrollTjeneste {
         var lås = serviceProvider.taLås(behandling.getId());
 
         // så les
-        return new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), lås);
+        return new BehandlingskontrollKontekst(behandling.getFagsak().getSaksnummer(), behandling.getFagsakId(), behandling.getAktørId(), lås);
     }
 
     public void aksjonspunkterEndretStatus(BehandlingskontrollKontekst kontekst, BehandlingStegType behandlingStegType,
@@ -728,7 +728,7 @@ public class BehandlingskontrollTjeneste {
         // Oppdater behandling og lagre
         behandlingOppdaterer.accept(behandling);
         var skriveLås = behandlingRepository.taSkriveLås(behandling);
-        var kontekst = new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), skriveLås);
+        var kontekst = new BehandlingskontrollKontekst(behandling.getFagsak().getSaksnummer(), behandling.getFagsakId(), behandling.getAktørId(), skriveLås);
         behandlingRepository.lagre(behandling, skriveLås);
 
         // Publiser oppdatering

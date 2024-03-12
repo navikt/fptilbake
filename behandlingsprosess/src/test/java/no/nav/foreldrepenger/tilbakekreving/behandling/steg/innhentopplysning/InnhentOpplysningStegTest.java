@@ -41,7 +41,7 @@ class InnhentOpplysningStegTest extends FellesTestOppsett {
         when(fagsystemKlientMock.hentBehandlingsinfo(FPSAK_BEHANDLING_UUID, Tillegsinformasjon.VARSELTEKST)).thenReturn(samletEksternBehandlingInfo);
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
 
-        innhentOpplysningSteg.utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
+        innhentOpplysningSteg.utførSteg(new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), fagsak.getAktørId(), lås));
 
         Optional<VarselInfo> entitet = varselRepository.finnVarsel(behandling.getId());
         assertThat(entitet).isPresent();
@@ -57,7 +57,7 @@ class InnhentOpplysningStegTest extends FellesTestOppsett {
         when(fagsystemKlientMock.hentBehandlingsinfo(FPSAK_BEHANDLING_UUID, Tillegsinformasjon.VARSELTEKST)).thenReturn(samletEksternBehandlingInfo);
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
 
-        innhentOpplysningSteg.utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
+        innhentOpplysningSteg.utførSteg(new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), fagsak.getAktørId(), lås));
 
         Optional<VarselInfo> entitet = varselRepository.finnVarsel(behandling.getId());
         assertThat(entitet).isEmpty();

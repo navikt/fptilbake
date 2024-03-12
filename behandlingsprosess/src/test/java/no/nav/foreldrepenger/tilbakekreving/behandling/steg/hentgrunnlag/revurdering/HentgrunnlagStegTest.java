@@ -21,7 +21,7 @@ class HentgrunnlagStegTest extends FellesTestOppsett {
         Behandling revurdering = lagBehandling(behandlingÅrsakBuilder);
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(revurdering);
 
-        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), behandlingLås));
+        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), fagsak.getAktørId(), behandlingLås));
         assertThat(stegResultat).isNotNull();
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.UTFØRT);
         assertThat(stegResultat.getAksjonspunktListe()).isEmpty();

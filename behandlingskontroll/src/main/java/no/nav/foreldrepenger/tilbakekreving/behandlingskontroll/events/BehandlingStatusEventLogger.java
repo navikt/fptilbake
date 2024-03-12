@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 
 @ApplicationScoped
@@ -20,9 +21,10 @@ public class BehandlingStatusEventLogger {
     public void loggBehandlingStatusEndring(@Observes BehandlingStatusEvent event) {
         Long behandlingId = event.getBehandlingId();
         Long fagsakId = event.getKontekst().getFagsakId();
+        Saksnummer saksnummer = event.getKontekst().getSaksnummer();
 
         BehandlingStatus nyStatus = event.getNyStatus();
         String kode = nyStatus == null ? null : nyStatus.getKode();
-        log.info("Behandling status oppdatert; behandlingId [{}]; fagsakId [{}]; status [{}]]", behandlingId, fagsakId, kode);
+        log.info("Behandling status oppdatert; behandlingId [{}]; fagsakId [{}]; saksnummer [{}]; status [{}]]", behandlingId, fagsakId, saksnummer.getVerdi(), kode);
     }
 }

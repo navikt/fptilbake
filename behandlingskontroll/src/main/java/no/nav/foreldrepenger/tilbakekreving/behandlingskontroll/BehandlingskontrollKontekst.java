@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 
 /**
@@ -14,12 +15,16 @@ public class BehandlingskontrollKontekst {
     private BehandlingLås behandlingLås;
     private AktørId aktørId;
     private Long fagsakId;
+    private Saksnummer saksnummer;
 
     /**
      * NB: Foretrekk {@link BehandlingskontrollTjeneste#initBehandlingskontroll} i stedet for å opprette her direkte.
      */
-    public BehandlingskontrollKontekst(Long fagsakId, AktørId aktørId, BehandlingLås behandlingLås) {
+    public BehandlingskontrollKontekst(Saksnummer saksnummer, Long fagsakId, AktørId aktørId, BehandlingLås behandlingLås) {
         Objects.requireNonNull(behandlingLås, "behandlingLås"); //$NON-NLS-1$
+        Objects.requireNonNull(saksnummer, "saksnummer");
+        Objects.requireNonNull(fagsakId, "fagsakId");
+        this.saksnummer = saksnummer;
         this.fagsakId = fagsakId;
         this.aktørId = aktørId;
         this.behandlingLås = behandlingLås;
@@ -31,6 +36,10 @@ public class BehandlingskontrollKontekst {
 
     public Long getBehandlingId() {
         return behandlingLås.getBehandlingId();
+    }
+
+    public Saksnummer getSaksnummer() {
+        return saksnummer;
     }
 
     public Long getFagsakId() {
@@ -62,6 +71,6 @@ public class BehandlingskontrollKontekst {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<fagsakId=" + fagsakId + ", aktørId=" + aktørId + ", behandlingId=" + getBehandlingId() + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        return getClass().getSimpleName() + "<saksnummer=" + saksnummer.getVerdi() + " fagsakId=" + fagsakId + ", aktørId=" + aktørId + ", behandlingId=" + getBehandlingId() + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 }

@@ -79,7 +79,7 @@ class VarselStegTest {
 
         //act
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
-        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
+        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), fagsak.getAktørId(), lås));
 
 
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
@@ -99,7 +99,7 @@ class VarselStegTest {
     @Test
     void skal_ikke_sette_behandling_på_vent_når_varseltekst_ikke_finnes() {
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
-        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
+        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), fagsak.getAktørId(), lås));
         assertThat(stegResultat.getAksjonspunktListe()).isEmpty();
         assertThat(behandling.isBehandlingPåVent()).isFalse();
     }
@@ -110,7 +110,7 @@ class VarselStegTest {
         varselRepository.lagre(behandling.getId(), "hello", 23000l);
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
-        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
+        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), fagsak.getAktørId(), lås));
 
         assertThat(stegResultat.getAksjonspunktListe()).isEmpty();
         assertThat(behandling.isBehandlingPåVent()).isFalse();
