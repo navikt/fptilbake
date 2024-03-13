@@ -41,7 +41,7 @@ public class PdfaValidator {
     }
 
     private static void validatePdf(InputStream inputStream) throws ModelParsingException, EncryptedPdfException, IOException, ValidationException {
-        PDFAFlavour flavour = PDFAFlavour.fromString("2u");
+        PDFAFlavour flavour = PDFAFlavour.fromString("2b");
         try (PDFAValidator validator = Foundries.defaultInstance().createValidator(flavour, false)) {
             try (PDFAParser parser = Foundries.defaultInstance().createParser(inputStream, flavour)) {
                 ValidationResult result = validator.validate(parser);
