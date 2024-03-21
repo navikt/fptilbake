@@ -22,7 +22,7 @@ import no.nav.vedtak.log.metrics.Controllable;
 import no.nav.vedtak.log.metrics.LiveAndReadinessAware;
 
 @ApplicationScoped
-public class VedtakConsumer implements LiveAndReadinessAware, Controllable {
+public class VedtakConsumer  {
 
     private static final Logger LOG = LoggerFactory.getLogger(VedtakConsumer.class);
     private KafkaStreams stream;
@@ -63,12 +63,10 @@ public class VedtakConsumer implements LiveAndReadinessAware, Controllable {
     }
 
 
-    @Override
     public boolean isAlive() {
         return stream != null && stream.state().isRunningOrRebalancing();
     }
 
-    @Override
     public boolean isReady() {
         return isAlive();
     }
@@ -77,14 +75,12 @@ public class VedtakConsumer implements LiveAndReadinessAware, Controllable {
         return topic;
     }
 
-    @Override
     public void start() {
         addShutdownHooks();
         stream.start();
         LOG.info("Starter konsumering av topic={}, tilstand={}", topic, stream.state());
     }
 
-    @Override
     public void stop() {
         var timeoutSekunder = 30;
         LOG.info("Starter shutdown av topic={}, tilstand={} med {} sekunder timeout", topic, stream.state(), timeoutSekunder);
