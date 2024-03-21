@@ -12,6 +12,9 @@ import jakarta.enterprise.context.control.ActivateRequestContext;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.vedtak.felles.integrasjon.kafka.KafkaMessageHandler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +33,7 @@ import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 @ApplicationScoped
 @ActivateRequestContext
 @Transactional
-public class VedtaksHendelseHåndterer {
+public class VedtaksHendelseHåndterer implements KafkaMessageHandler.KafkaStringMessageHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(VedtaksHendelseHåndterer.class);
 
@@ -55,6 +58,7 @@ public class VedtaksHendelseHåndterer {
         Ytelser.PLEIEPENGER_SYKT_BARN, FagsakYtelseType.PLEIEPENGER_SYKT_BARN
     );
 
+    private String topicName;
     private ProsessTaskTjeneste taskTjeneste;
     private Set<Ytelser> abonnerteYtelser;
     private Set<Ytelser> resterendeYtelser;
@@ -63,24 +67,27 @@ public class VedtaksHendelseHåndterer {
     }
 
     @Inject
-    public VedtaksHendelseHåndterer(ProsessTaskTjeneste taskTjeneste) {
+    public VedtaksHendelseHåndterer(@KonfigVerdi(value = "kafka.fattevedtak.topic", defaultVerdi = "teamforeldrepenger.familie-vedtakfattet-v1") String topicName,
+                                    ProsessTaskTjeneste taskTjeneste) {
+        this.topicName = topicName;
         this.taskTjeneste = taskTjeneste;
         this.abonnerteYtelser = STØTTET_YTELSE_TYPER.getOrDefault(ApplicationName.hvilkenTilbake(), Set.of());
         this.resterendeYtelser = REST_YTELSE_TYPER.getOrDefault(ApplicationName.hvilkenTilbake(), Set.of());
     }
 
-    void handleMessage(String key, String payload) {
+    @Override
+    public void handleRecord(String key, String value) {
         // enhver exception ut fra denne metoden medfører at tråden som leser fra kafka gir opp og dør på seg.
         try {
             LOG.info("TILBAKE VEDTAKFATTET: mottok nøkkel {}", key);
-            var mottattVedtak = DefaultJsonMapper.fromJson(payload, Ytelse.class);
+            var mottattVedtak = DefaultJsonMapper.fromJson(value, Ytelse.class);
             if (mottattVedtak instanceof YtelseV1 ytelse) {
                 lagHåndterHendelseProsessTask(ytelse);
             }
         } catch (VLException e) {
-            LOG.warn("FP-328773 Vedtatt-Ytelse Feil under parsing av vedtak. key={} payload={}", key, payload, e);
+            LOG.warn("FP-328773 Vedtatt-Ytelse Feil under parsing av vedtak. key={} payload={}", key, value, e);
         } catch (Exception e) {
-            LOG.warn("Vedtatt-Ytelse exception ved håndtering av vedtaksmelding, ignorerer key={}", LoggerUtils.removeLineBreaks(payload), e);
+            LOG.warn("Vedtatt-Ytelse exception ved håndtering av vedtaksmelding, ignorerer key={}", LoggerUtils.removeLineBreaks(value), e);
         }
     }
 
@@ -111,5 +118,15 @@ public class VedtaksHendelseHåndterer {
         td.setSaksnummer(melding.getSaksnummer());
         td.setProperty(FAGSAK_YTELSE_TYPE, YTELSE_TYPE_MAP.get(melding.getYtelse()).getKode());
         return td;
+    }
+
+    @Override
+    public String topic() {
+        return topicName;
+    }
+
+    @Override
+    public String groupId() {
+        return ApplicationName.hvilkenTilbakeAppName() + "-vedtak"; // Hold denne konstant pga offset-commit;
     }
 }
