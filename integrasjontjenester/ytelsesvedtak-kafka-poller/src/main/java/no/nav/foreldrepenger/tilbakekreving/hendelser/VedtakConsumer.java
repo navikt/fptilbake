@@ -22,7 +22,7 @@ public class VedtakConsumer implements LiveAndReadinessAware, Controllable {
 
     @Inject
     public VedtakConsumer(VedtaksHendelseHåndterer vedtaksHendelseHåndterer) {
-        this.kcm = new KafkaConsumerManager<>(List.of(vedtaksHendelseHåndterer));
+        this.kcm = new KafkaConsumerManager<>(vedtaksHendelseHåndterer);
     }
 
     @Override
