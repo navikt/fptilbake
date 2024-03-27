@@ -105,6 +105,8 @@ public class ApiConfig extends Application {
             VergeRestTjeneste.class,
             LosRestTjeneste.class,
             FpOversiktRestTjeneste.class,
+            // autentisering
+            AuthenticationFilter.class,
             // swagger
             OpenApiResource.class,
             // Applikasjonsoppsett
