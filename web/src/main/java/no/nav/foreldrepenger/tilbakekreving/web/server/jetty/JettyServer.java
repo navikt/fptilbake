@@ -194,6 +194,7 @@ public class JettyServer {
         // K9-tilbake bruker deprekert swagger-oppsett
         if (Fagsystem.K9TILBAKE.equals(ApplicationName.hvilkenTilbake())) {
             handler.addConstraintMapping(pathConstraint(Constraint.ALLOWED, "/swagger-ui/*"));
+            handler.addConstraintMapping(pathConstraint(Constraint.ALLOWED, "/swagger/*"));
         }
         // Alt annet av paths og metoder forbudt - 403
         handler.addConstraintMapping(pathConstraint(Constraint.FORBIDDEN, "/*"));
