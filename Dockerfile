@@ -6,7 +6,8 @@ ENV TZ=Europe/Oslo
 RUN mkdir lib
 RUN mkdir conf
 
-ENV JAVA_OPTS="-Djava.security.egd=file:/dev/urandom \
+ENV JAVA_OPTS="-XX:-OmitStackTraceInFastThrow \
+    -Djava.security.egd=file:/dev/urandom \
     -Dlogback.configurationFile=conf/logback.xml"
 
 # Config
