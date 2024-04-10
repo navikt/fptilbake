@@ -65,6 +65,8 @@ public class LosBehandlingDtoTjeneste {
             false,
             null,
             null,
+            null,
+            List.of(),
             mapTilbake(behandling, kravgrunnlag431, frist));
     }
 
