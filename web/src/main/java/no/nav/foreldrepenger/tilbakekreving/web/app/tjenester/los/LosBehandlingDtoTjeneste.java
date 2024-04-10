@@ -63,7 +63,7 @@ public class LosBehandlingDtoTjeneste {
             List.of(),
             false,
             false,
-            null,
+            List.of(),
             null,
             null,
             List.of(),
