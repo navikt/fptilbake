@@ -9,7 +9,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.loginmodu
 public class OIDCLoginConfiguration implements LoginConfiguration {
 
     private static final AppConfigurationEntry[] OIDC_CONFIGURATION = new AppConfigurationEntry[]{new AppConfigurationEntry(
-        "no.nav.vedtak.sikkerhet.loginmodule.DummyLoginModule", AppConfigurationEntry.LoginModuleControlFlag.REQUISITE, Map.of())};
+        "no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.loginmodule.DummyLoginModule", AppConfigurationEntry.LoginModuleControlFlag.REQUISITE, Map.of())};
 
     @Override
     public String getName() {
