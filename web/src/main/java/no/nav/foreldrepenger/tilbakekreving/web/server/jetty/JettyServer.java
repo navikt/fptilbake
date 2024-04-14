@@ -11,8 +11,17 @@ import java.util.Optional;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import jakarta.security.auth.message.config.AuthConfigFactory;
+
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.ContextPathHolder;
+
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.jaspic.OidcAuthModule;
+
 import org.eclipse.jetty.ee10.cdi.CdiDecoratingListener;
 import org.eclipse.jetty.ee10.cdi.CdiServletContainerInitializer;
+import org.eclipse.jetty.ee10.security.jaspi.DefaultAuthConfigFactory;
+import org.eclipse.jetty.ee10.security.jaspi.JaspiAuthenticatorFactory;
+import org.eclipse.jetty.ee10.security.jaspi.provider.JaspiAuthConfigProvider;
 import org.eclipse.jetty.ee10.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.security.ConstraintMapping;
@@ -20,18 +29,26 @@ import org.eclipse.jetty.ee10.servlet.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.plus.jndi.EnvEntry;
 import org.eclipse.jetty.security.Constraint;
+import org.eclipse.jetty.security.DefaultIdentityService;
+import org.eclipse.jetty.security.SecurityHandler;
+import org.eclipse.jetty.security.jaas.JAASLoginService;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import no.nav.foreldrepenger.konfig.Environment;
@@ -65,6 +82,9 @@ public class JettyServer {
     protected JettyServer(int serverPort) {
         this.serverPort = serverPort;
         ApplicationName.hvilkenTilbake(); // Sørger for at den initialiseres fra environment
+        if (Fagsystem.K9TILBAKE.equals(ApplicationName.hvilkenTilbake())) {
+            setContextAndCookiePath();
+        }
     }
 
     protected void bootStrap() throws Exception {
@@ -86,6 +106,15 @@ public class JettyServer {
     private void konfigurerSikkerhet() {
         if (ENV.isLocal()) {
             initTrustStore();
+        }
+        if (Fagsystem.K9TILBAKE.equals(ApplicationName.hvilkenTilbake())) {
+            var factory = new DefaultAuthConfigFactory();
+            factory.registerConfigProvider(new JaspiAuthConfigProvider(new OidcAuthModule()),
+                "HttpServlet",
+                "server " + CONTEXT_PATH,
+                "OIDC Authentication");
+
+            AuthConfigFactory.setFactory(factory);
         }
     }
 
@@ -128,7 +157,12 @@ public class JettyServer {
     private void start() throws Exception {
         var server = new Server(getServerPort());
         server.setConnectors(createConnectors(server).toArray(new Connector[]{}));
-        server.setHandler(createContext());
+        if (Fagsystem.K9TILBAKE.equals(ApplicationName.hvilkenTilbake())) {
+            var handlers = new Handler.Sequence(new ResetLogContextHandler(), createContext());
+            server.setHandler(handlers);
+        } else {
+            server.setHandler(createContext());
+        }
         server.start();
         server.join();
     }
@@ -149,6 +183,39 @@ public class JettyServer {
     }
 
     private static ContextHandler createContext() throws IOException {
+        if (Fagsystem.K9TILBAKE.equals(ApplicationName.hvilkenTilbake())) {
+            var ctx = new WebAppContext();
+            ctx.setParentLoaderPriority(true);
+            // må hoppe litt bukk for å hente web.xml fra classpath i stedet for fra filsystem.
+            String descriptor;
+            String baseResource;
+            try (var factory = ResourceFactory.closeable()) {
+                var resource = factory.newClassLoaderResource("/WEB-INF/web.xml", false);
+                descriptor = resource.getURI().toURL().toExternalForm();
+                baseResource = factory.newResource(".").getRealURI().toURL().toExternalForm();
+            }
+            ctx.setDescriptor(descriptor);
+
+            ctx.setContextPath(CONTEXT_PATH);
+
+            var appname = ApplicationName.hvilkenTilbake();
+            if (Fagsystem.K9TILBAKE.equals(appname)) {
+                ctx.setBaseResource(createResourceCollection(ctx));
+            } else {
+                ctx.setBaseResourceAsString(baseResource);
+            }
+            ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
+            ctx.setAttribute(CONTAINER_JAR_PATTERN, String.format("%s%s", ENV.isLocal() ? JETTY_LOCAL_CLASSES : "", JETTY_SCAN_LOCATIONS));
+            // Enable Weld + CDI
+            ctx.setInitParameter(CdiServletContainerInitializer.CDI_INTEGRATION_ATTRIBUTE, CdiDecoratingListener.MODE);
+            ctx.addServletContainerInitializer(new CdiServletContainerInitializer());
+            ctx.addServletContainerInitializer(new org.jboss.weld.environment.servlet.EnhancedListener());
+
+            ctx.setSecurityHandler(createSecurityHandler());
+            ctx.setThrowUnavailableOnStartupException(true);
+
+            return ctx;
+        }
         var ctx = new WebAppContext(CONTEXT_PATH, null, simpleConstraints(), null,
             new ErrorPageErrorHandler(), ServletContextHandler.NO_SESSIONS);
         ctx.setParentLoaderPriority(true);
@@ -234,4 +301,35 @@ public class JettyServer {
             default -> throw new IllegalArgumentException("Ikke-støttet applikasjonsnavn: " + appname);
         };
     }
+
+    /*
+     * K9-spesifikke ting som brukes ifm JASPI
+     */
+    /**
+     * Legges først slik at alltid resetter context før prosesserer nye requests.
+     * Kjøres først så ikke risikerer andre har satt Request#setHandled(true).
+     */
+    static final class ResetLogContextHandler extends Handler.Abstract {
+        @Override
+        public boolean handle(Request request, Response response, Callback callback) {
+            MDC.clear();
+            return false;
+        }
+    }
+
+    private static SecurityHandler createSecurityHandler() {
+        var securityHandler = new ConstraintSecurityHandler();
+        securityHandler.setAuthenticatorFactory(new JaspiAuthenticatorFactory());
+        var loginService = new JAASLoginService();
+        loginService.setName("jetty-login");
+        loginService.setLoginModuleName("jetty-login");
+        loginService.setIdentityService(new DefaultIdentityService());
+        securityHandler.setLoginService(loginService);
+        return securityHandler;
+    }
+
+    private void setContextAndCookiePath() {
+        ContextPathHolder.instance(CONTEXT_PATH, "/k9");
+    }
+
 }
