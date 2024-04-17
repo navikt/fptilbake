@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
+
 import org.glassfish.jersey.server.ServerProperties;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -105,8 +108,6 @@ public class ApiConfig extends Application {
             VergeRestTjeneste.class,
             LosRestTjeneste.class,
             FpOversiktRestTjeneste.class,
-            // autentisering
-            AuthenticationFilter.class,
             // swagger
             OpenApiResource.class,
             // Applikasjonsoppsett
@@ -121,6 +122,11 @@ public class ApiConfig extends Application {
         if (ENV.isLocal()) {
             classes.add(GrunnlagRestTestTjenesteLocalDev.class);
         }
+        // Standard etter fork av fp-tilbake
+        if (Fagsystem.FPTILBAKE.equals(ApplicationName.hvilkenTilbake())) {
+            classes.add(AuthenticationFilter.class); // autentisering etter ny standard
+        }
+
 
         return Collections.unmodifiableSet(classes);
     }

@@ -16,7 +16,7 @@
 
     <properties>
         <!-- versjon brukes fra webapp-modulen under resources/web.swagger/index.html og må være samme som faktisk avhengighet som brukes -->
-        <swagger-ui.version>5.15.0</swagger-ui.version>
+        <swagger-ui.version>5.15.1</swagger-ui.version>
     </properties>
 
     <build>
@@ -239,6 +239,15 @@
         <dependency>
             <groupId>org.eclipse.jetty.ee10</groupId>
             <artifactId>jetty-ee10-cdi</artifactId>
+        </dependency>
+        <!-- k9tilbake -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-jaspi</artifactId>
         </dependency>
 
         <dependency>
