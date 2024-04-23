@@ -55,13 +55,8 @@ spec:
   secureLogs:
     enabled: true
   env:
-  # miljø-spesifikke variable
-  {{#each env}}
-   - name: {{@key}}
-     value: "{{this}}"
-  {{/each}}
-   - name: APP_NAME
-     value: "fptilbake"
+    - name: APP_NAME
+      value: "fptilbake"
   kafka:
     pool: {{kafkaPool}}
   azure:
