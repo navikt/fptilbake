@@ -22,8 +22,8 @@ public class BeregnBeløpUtil {
         this(fagOmrådeKode == FagOmrådeKode.ENGANGSSTØNAD || fagOmrådeKode == FagOmrådeKode.OMSORGSPENGER);
     }
 
-    private BeregnBeløpUtil(boolean brukAlleDager) {
-        periodeTilDager = brukAlleDager
+    private BeregnBeløpUtil(boolean utbetalingMuligAlleDager) {
+        periodeTilDager = utbetalingMuligAlleDager
             ? (Periode p) -> (int) ChronoUnit.DAYS.between(p.getFom(), p.getTom()) + 1
             : Ukedager::beregnAntallVirkedager;
     }

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
@@ -17,9 +16,6 @@ public class LogiskPeriodeTjeneste {
 
     private final boolean utbetalingMuligAlleDager;
 
-    public LogiskPeriodeTjeneste(FagOmrådeKode fagOmrådeKode){
-        this(fagOmrådeKode == FagOmrådeKode.ENGANGSSTØNAD || fagOmrådeKode == FagOmrådeKode.OMSORGSPENGER);
-    }
     LogiskPeriodeTjeneste(boolean utbetalingMuligAlleDager){
         this.utbetalingMuligAlleDager = utbetalingMuligAlleDager;
     }
