@@ -12,6 +12,7 @@ import java.util.function.Function;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Satser;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -32,11 +33,6 @@ public class KravgrunnlagBeregningTjeneste {
     @Inject
     public KravgrunnlagBeregningTjeneste(KravgrunnlagRepository grunnlagRepository) {
         this.grunnlagRepository = grunnlagRepository;
-    }
-
-    public Map<Periode, FordeltKravgrunnlagBeløp> fordelKravgrunnlagBeløpPåPerioder(Long behandlingId, List<Periode> perioder) {
-        Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(behandlingId);
-        return fordelKravgrunnlagBeløpPåPerioder(kravgrunnlag, perioder);
     }
 
     public Map<Periode, FordeltKravgrunnlagBeløp> fordelKravgrunnlagBeløpPåPerioder(Kravgrunnlag431 kravgrunnlag, List<Periode> perioder) {
