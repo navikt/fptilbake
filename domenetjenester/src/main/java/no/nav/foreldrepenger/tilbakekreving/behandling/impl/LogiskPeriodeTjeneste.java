@@ -9,11 +9,26 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class LogiskPeriodeTjeneste {
 
-    public static List<LogiskPeriode> utledLogiskPeriode(SortedMap<Periode, BigDecimal> feilutbetalingPrPeriode) {
+    private final boolean utbetalingMuligAlleDager;
+
+    public LogiskPeriodeTjeneste(FagOmrådeKode fagOmrådeKode){
+        this(fagOmrådeKode == FagOmrådeKode.ENGANGSSTØNAD || fagOmrådeKode == FagOmrådeKode.OMSORGSPENGER);
+    }
+    LogiskPeriodeTjeneste(boolean utbetalingMuligAlleDager){
+        this.utbetalingMuligAlleDager = utbetalingMuligAlleDager;
+    }
+
+    public LogiskPeriodeTjeneste(FagsakYtelseType fagsakYtelseType) {
+        this(fagsakYtelseType == FagsakYtelseType.ENGANGSTØNAD || fagsakYtelseType == FagsakYtelseType.OMSORGSPENGER);
+    }
+
+    public List<LogiskPeriode> utledLogiskPeriode(SortedMap<Periode, BigDecimal> feilutbetalingPrPeriode) {
         LocalDate førsteDag = null;
         LocalDate sisteDag = null;
         BigDecimal logiskPeriodeBeløp = BigDecimal.ZERO;
@@ -25,7 +40,7 @@ public class LogiskPeriodeTjeneste {
                 førsteDag = periode.getFom();
                 sisteDag = periode.getTom();
             } else {
-                if (harUkedagerMellom(sisteDag, periode.getFom())) {
+                if (harUtbetalingsdagerMellom(sisteDag, periode.getFom())) {
                     resultat.add(LogiskPeriode.lagPeriode(førsteDag, sisteDag, logiskPeriodeBeløp));
                     førsteDag = periode.getFom();
                     logiskPeriodeBeløp = BigDecimal.ZERO;
@@ -40,13 +55,17 @@ public class LogiskPeriodeTjeneste {
         return resultat;
     }
 
-    private static boolean harUkedagerMellom(LocalDate dag1, LocalDate dag2) {
+    private boolean harUtbetalingsdagerMellom(LocalDate dag1, LocalDate dag2) {
         if (!dag2.isAfter(dag1)) {
             throw new IllegalArgumentException("dag2 må være etter dag1");
         }
         if (dag1.plusDays(1).equals(dag2)) {
             return false;
         }
+        if (utbetalingMuligAlleDager){
+            return true;
+        }
+
         if (dag1.plusDays(2).equals(dag2) && (dag1.getDayOfWeek() == DayOfWeek.FRIDAY || dag1.getDayOfWeek() == DayOfWeek.SATURDAY)) {
             return false;
         }

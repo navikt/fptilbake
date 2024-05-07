@@ -108,8 +108,8 @@ public class KravgrunnlagBeregningTjeneste {
         for (KravgrunnlagPeriode432 kgPeriode : kgPerioder) {
             BigDecimal beløp = beløpUtleder.apply(kgPeriode);
             if (isNotZero(beløp)) {
-                BigDecimal feilutbetaltBeløpPrVirkedag = beregnBeløpUtil.beregnBeløpPrVirkedag(beløp, kgPeriode.getPeriode());
-                sum = sum.add(beregnBeløpUtil.beregnBeløp(periode, kgPeriode.getPeriode(), feilutbetaltBeløpPrVirkedag));
+                BigDecimal feilutbetaltBeløpPrDag = beregnBeløpUtil.beregnBeløpPrDag(beløp, kgPeriode.getPeriode());
+                sum = sum.add(beregnBeløpUtil.beregnBeløp(periode, kgPeriode.getPeriode(), feilutbetaltBeløpPrDag));
             }
         }
 
