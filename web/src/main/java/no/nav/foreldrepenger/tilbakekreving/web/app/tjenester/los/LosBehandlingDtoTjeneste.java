@@ -118,8 +118,16 @@ public class LosBehandlingDtoTjeneste {
     }
 
     private LosBehandlingDto.LosTilbakeDto mapTilbake(Behandling behandling, Kravgrunnlag431 kravgrunnlag431, LocalDate kravgrunnlagManglerFrist) {
-        return new LosBehandlingDto.LosTilbakeDto(kravgrunnlag431 != null ? hentFeilutbetaltBeløp(behandling.getId()) : BigDecimal.ZERO,
-            hentFørsteFeilutbetalingDato(kravgrunnlag431, kravgrunnlagManglerFrist));
+        try {
+            return new LosBehandlingDto.LosTilbakeDto(kravgrunnlag431 != null ? hentFeilutbetaltBeløp(behandling.getId()) : BigDecimal.ZERO,
+                hentFørsteFeilutbetalingDato(kravgrunnlag431, kravgrunnlagManglerFrist));
+        } catch (Exception e) {
+            if (behandling.erAvsluttet()) {
+                return new LosBehandlingDto.LosTilbakeDto(BigDecimal.ZERO, kravgrunnlagManglerFrist);
+            } else {
+                throw e;
+            }
+        }
     }
 
     private static LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431, LocalDate kravgrunnlagManglerFrist) {
