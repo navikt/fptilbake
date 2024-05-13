@@ -13,7 +13,14 @@ public class BehandlingStatusMapper {
             no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus.IVERKSETTER_VEDTAK, BehandlingStatus.IVERKSETTER_VEDTAK,
             no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus.AVSLUTTET, BehandlingStatus.AVSLUTTET);
 
-    public static BehandlingStatus getBehandlingStatus(no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus behandlingStatus) {
+    public static BehandlingStatus getBehandlingStatus(no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus behandlingStatus,
+                                                       boolean venterPåBruker, boolean venterPåØkonomi) {
+        if (venterPåBruker) {
+            return BehandlingStatus.VENT_BRUKER;
+        }
+        if (venterPåØkonomi) {
+            return BehandlingStatus.VENT_SAKSBEHANDLING;
+        }
         var verdi = MAPPING.get(behandlingStatus);
         if (verdi == null) {
             throw new IllegalArgumentException("Mangler mapping fra " + no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus.class + " til " + BehandlingStatus.class + " for " + behandlingStatus);

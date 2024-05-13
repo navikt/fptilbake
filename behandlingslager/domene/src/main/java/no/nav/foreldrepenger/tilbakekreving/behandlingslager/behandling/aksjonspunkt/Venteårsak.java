@@ -73,7 +73,7 @@ public enum Venteårsak implements Kodeverdi {
     }
 
     public static boolean venterPåØkonomi(Venteårsak venteårsak) {
-        return VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(venteårsak) || VENT_PÅ_MULIG_MOTREGNING.equals(venteårsak);
+        return VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(venteårsak) || VENT_PÅ_MULIG_MOTREGNING.equals(venteårsak) || ENDRE_TILKJENT_YTELSE.equals(venteårsak);
     }
 
     @JsonProperty
