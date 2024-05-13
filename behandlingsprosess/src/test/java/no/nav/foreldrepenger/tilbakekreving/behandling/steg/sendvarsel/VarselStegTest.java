@@ -9,6 +9,8 @@ import java.util.UUID;
 
 import jakarta.inject.Inject;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -61,6 +63,16 @@ class VarselStegTest {
     private final VarselresponsTjeneste varselresponsTjeneste = mock(VarselresponsTjeneste.class);
     private Fagsak fagsak;
     private Behandling behandling;
+
+    @BeforeAll
+    static void setupAlle() {
+        System.setProperty("app.name", "fptilbake");
+    }
+
+    @AfterAll
+    static void teardown() {
+        System.clearProperty("app.name");
+    }
 
     @BeforeEach
     void setup() {

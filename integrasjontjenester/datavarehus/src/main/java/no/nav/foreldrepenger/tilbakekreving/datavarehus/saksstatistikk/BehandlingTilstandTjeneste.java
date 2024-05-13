@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.PeriodeMedBeløp;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -22,11 +23,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingResultatTypeMapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingStatusMapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTypeMapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingÅrsakMapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.YtelseTypeMapper;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingMetode;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.Periode;
@@ -34,6 +37,7 @@ import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.Periode;
 @ApplicationScoped
 public class BehandlingTilstandTjeneste {
 
+    private static final Fagsystem FAGSYSTEM = ApplicationName.hvilkenTilbake();
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
@@ -59,6 +63,10 @@ public class BehandlingTilstandTjeneste {
     }
 
     public BehandlingTilstand hentBehandlingensTilstand(Behandling behandling) {
+        return hentBehandlingensTilstand(behandling, FAGSYSTEM);
+    }
+
+    public BehandlingTilstand hentBehandlingensTilstand(Behandling behandling, Fagsystem fagsystem) {
         EksternBehandling eksternBehandling = getEksternBehandling(behandling.getId());
         BehandlingResultatType behandlingResultatType = behandlingresultatRepository.hent(behandling)
             .map(Behandlingsresultat::getBehandlingResultatType)
@@ -79,7 +87,8 @@ public class BehandlingTilstandTjeneste {
         tilstand.setBehandlingUuid(behandling.getUuid());
         tilstand.setReferertFagsakBehandlingUuid(eksternBehandling.getEksternUuid());
         tilstand.setBehandlingType(BehandlingTypeMapper.getBehandlingType(behandling.getType()));
-        tilstand.setBehandlingStatus(BehandlingStatusMapper.getBehandlingStatus(behandling.getStatus()));
+        tilstand.setBehandlingStatus(BehandlingStatusMapper.getBehandlingStatus(behandling.getStatus(),
+                Fagsystem.FPTILBAKE.equals(fagsystem) && venterPåBruker, Fagsystem.FPTILBAKE.equals(fagsystem) && venterPåØkonomi));
         tilstand.setBehandlingResultat(BehandlingResultatTypeMapper.getBehandlingResultatType(behandlingResultatType));
         tilstand.setBehandlingMetode(utledBehandlingMetode(behandling));
         tilstand.setBehandlendeEnhetKode(behandling.getBehandlendeEnhetId());

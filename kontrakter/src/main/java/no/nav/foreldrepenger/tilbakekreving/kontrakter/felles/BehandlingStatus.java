@@ -5,5 +5,7 @@ public enum BehandlingStatus {
     FATTER_VEDTAK,
     IVERKSETTER_VEDTAK,
     OPPRETTET,
-    UTREDES;
+    UTREDES,
+    VENT_BRUKER,
+    VENT_SAKSBEHANDLING;
 }

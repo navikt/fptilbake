@@ -5,14 +5,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.UUID;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -25,6 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -51,6 +54,16 @@ class BehandlingTilstandTjenesteTest {
     private Behandling behandling;
     private static final UUID EKSTERN_UUID = UUID.randomUUID();
 
+    @BeforeAll
+    static void setupAlle() {
+        System.setProperty("app.name", "fptilbake");
+    }
+
+    @AfterAll
+    static void teardown() {
+        System.clearProperty("app.name");
+    }
+
     @BeforeEach
     void setup() {
         behandling = ScenarioSimple.simple().lagre(behandlingRepositoryProvider);
@@ -60,7 +73,7 @@ class BehandlingTilstandTjenesteTest {
 
     @Test
     void skal_utlede_behandlingtilstand_for_nyopprettet_behandling() {
-        var tilstand = tjeneste.hentBehandlingensTilstand(behandling.getId());
+        var tilstand = tjeneste.hentBehandlingensTilstand(behandling, Fagsystem.FPTILBAKE);
 
         assertThat(tilstand.getYtelseType()).isEqualTo(YtelseType.FP);
         assertThat(tilstand.getSaksnummer()).isEqualTo(behandling.getFagsak().getSaksnummer().getVerdi());
@@ -103,7 +116,7 @@ class BehandlingTilstandTjenesteTest {
         entityManager.flush();
         entityManager.clear();
 
-        var tilstand = tjeneste.hentBehandlingensTilstand(behandling.getId());
+        var tilstand = tjeneste.hentBehandlingensTilstand(behandling, Fagsystem.FPTILBAKE);
 
         assertThat(tilstand.getYtelseType()).isEqualTo(YtelseType.FP);
         assertThat(tilstand.getSaksnummer()).isEqualTo(behandling.getFagsak().getSaksnummer().getVerdi());
@@ -132,7 +145,7 @@ class BehandlingTilstandTjenesteTest {
         entityManager.flush();
         entityManager.clear();
 
-        var tilstand = tjeneste.hentBehandlingensTilstand(behandling.getId());
+        var tilstand = tjeneste.hentBehandlingensTilstand(behandling, Fagsystem.K9TILBAKE);
 
         assertThat(tilstand.getYtelseType()).isEqualTo(YtelseType.FP);
         assertThat(tilstand.getSaksnummer()).isEqualTo(behandling.getFagsak().getSaksnummer().getVerdi());

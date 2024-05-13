@@ -4,11 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -21,6 +16,12 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
@@ -36,6 +37,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.BehandlingTilstandTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendSakshendelserTilDvhTask;
+import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
@@ -70,6 +74,7 @@ public class ForvaltningBehandlingRestTjeneste {
     private KravgrunnlagMapper kravgrunnlagMapper;
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
     private EksternBehandlingRepository eksternBehandlingRepository;
+    private BehandlingTilstandTjeneste behandlingTilstandTjeneste;
 
     public ForvaltningBehandlingRestTjeneste() {
         // for CDI
@@ -82,7 +87,8 @@ public class ForvaltningBehandlingRestTjeneste {
                                              ØkonomiMottattXmlRepository mottattXmlRepository,
                                              KravgrunnlagMapper kravgrunnlagMapper,
                                              KravgrunnlagTjeneste kravgrunnlagTjeneste,
-                                             EksternBehandlingRepository eksternBehandlingRepository) {
+                                             EksternBehandlingRepository eksternBehandlingRepository,
+                                             BehandlingTilstandTjeneste behandlingTilstandTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.behandlingresultatRepository = behandlingresultatRepository;
         this.taskTjeneste = taskTjeneste;
@@ -91,6 +97,7 @@ public class ForvaltningBehandlingRestTjeneste {
         this.kravgrunnlagMapper = kravgrunnlagMapper;
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
         this.eksternBehandlingRepository = eksternBehandlingRepository;
+        this.behandlingTilstandTjeneste = behandlingTilstandTjeneste;
     }
 
     @POST
@@ -249,6 +256,28 @@ public class ForvaltningBehandlingRestTjeneste {
     @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
     public Response avbrytÅpentAksjonspunktForAvsluttetBehandling() {
         behandlingRepository.avbrytÅpentAksjonspunktForAvsluttetBehandling();
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/resend-saksstatistikk-aapen-vent")
+    @Operation(
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å avbryte åpne aksjonspunkt når behandling er avsluttet!",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Aksjonspunkt avbrut"),
+            @ApiResponse(responseCode = "500", description = "ukjent feil.")
+        })
+    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
+    public Response publiserSaksstatistikkForBehandlingPåVent() {
+        behandlingRepository.finnBehandlingerPåVent().forEach(b -> {
+            var tilstand = behandlingTilstandTjeneste.hentBehandlingensTilstand(b);
+            var taskData = ProsessTaskData.forProsessTask(SendSakshendelserTilDvhTask.class);
+            taskData.setPayload(BehandlingTilstandMapper.tilJsonString(tilstand));
+            taskData.setProperty("behandlingId", Long.toString(b.getId()));
+            taskTjeneste.lagre(taskData);
+
+        });
         return Response.ok().build();
     }
 
