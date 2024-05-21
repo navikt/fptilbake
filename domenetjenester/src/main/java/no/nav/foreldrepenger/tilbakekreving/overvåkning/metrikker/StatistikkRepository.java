@@ -472,6 +472,7 @@ public class StatistikkRepository {
               INNER JOIN FAGSAK F ON B.FAGSAK_ID = F.ID
               LEFT OUTER JOIN EKSTERN_BEHANDLING eb on eb.intern_id = b.id
               LEFT OUTER JOIN OKO_XML_MOTTATT oxm on oxm.henvisning = eb.henvisning and oxm.melding like '<?xml version="1.0" encoding="utf-8"?><urn:detaljertKravgrunnlagMelding%'
+              where b.opprettet_tid > systimestamp - 365
             ) where rnk = 1
             group by time, behandling_type, behandling_status, ytelse_type, opprettelsegrunn
             order by 1, 2, 3, 4, 5
