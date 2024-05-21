@@ -55,6 +55,14 @@
       "app": "k9-sak",
       "namespace": "k9saksbehandling",
       "cluster": "prod-fss"
+    },
+    {
+      "app": "k9-swagger",
+      "namespace": "k9saksbehandling",
+      "cluster": "prod-gcp",
+      "scopes": [
+        "swagger"
+      ]
     }
   ]
 }
