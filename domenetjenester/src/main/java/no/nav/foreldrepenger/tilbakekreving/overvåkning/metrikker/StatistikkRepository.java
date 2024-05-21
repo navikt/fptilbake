@@ -491,13 +491,13 @@ public class StatistikkRepository {
             return new BehandlignOpprettetHendelse(gruppering, behandlingStatus, antall);
         }).collect(Collectors.groupingBy(e -> e.gruppering));
 
-        //registere antall=0 for behandlingStatuser som ikke finnes for å nulle ut forrige innslag når behandling har byttet status
         List<BehandlignOpprettetHendelse> inklNulling = new ArrayList<>();
         for (var entry : gruppertHendelse.entrySet()) {
             BehandlignOpprettetGruppering gruppering = entry.getKey();
             for (BehandlingStatus behandlingStatus : BehandlingStatus.values()) {
                 boolean finnes = entry.getValue().stream().anyMatch(it -> it.behandlingStatus.equals(behandlingStatus.getKode()));
                 if (!finnes) {
+                    //registere antall=0 for behandlingStatuser som ikke finnes for å nulle ut forrige innslag når behandling har byttet status
                     inklNulling.add(new BehandlignOpprettetHendelse(gruppering, behandlingStatus.getKode(), BigDecimal.ZERO));
                 }
             }
