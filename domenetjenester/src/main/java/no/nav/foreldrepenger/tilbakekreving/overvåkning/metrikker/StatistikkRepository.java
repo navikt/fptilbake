@@ -475,7 +475,6 @@ public class StatistikkRepository {
               where b.opprettet_tid > systimestamp - 365
             ) where rnk = 1
             group by time, behandling_type, behandling_status, ytelse_type, opprettelsegrunn
-            order by 1, 2, 3, 4, 5
             """;
 
         String metricName = "behandlinger_opprettet_v1";
