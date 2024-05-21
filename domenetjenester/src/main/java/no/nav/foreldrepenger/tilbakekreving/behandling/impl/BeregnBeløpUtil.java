@@ -2,9 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-import java.util.function.Function;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -12,39 +10,39 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Ukedager;
 
 public class BeregnBeløpUtil {
 
-    private Function<Periode, Integer> periodeTilDager;
+    private boolean forEngangsstønad;
 
     public static BeregnBeløpUtil forFagområde(FagOmrådeKode fagOmrådeKode) {
-        return new BeregnBeløpUtil(fagOmrådeKode);
+        return new BeregnBeløpUtil(fagOmrådeKode == FagOmrådeKode.ENGANGSSTØNAD);
     }
 
-    private BeregnBeløpUtil(FagOmrådeKode fagOmrådeKode) {
-        this(fagOmrådeKode == FagOmrådeKode.ENGANGSSTØNAD || fagOmrådeKode == FagOmrådeKode.OMSORGSPENGER);
+    public BeregnBeløpUtil(boolean forEngangsstønad) {
+        this.forEngangsstønad = forEngangsstønad;
     }
 
-    private BeregnBeløpUtil(boolean utbetalingMuligAlleDager) {
-        periodeTilDager = utbetalingMuligAlleDager
-            ? (Periode p) -> (int) ChronoUnit.DAYS.between(p.getFom(), p.getTom()) + 1
-            : Ukedager::beregnAntallVirkedager;
-    }
-
-    public BigDecimal beregnBeløpPrDag(BigDecimal beløp, Periode periode) {
-        int antallDager = periodeTilDager.apply(periode);
-        return beløp.divide(BigDecimal.valueOf(antallDager), 2, RoundingMode.HALF_UP);
+    public BigDecimal beregnBeløpPrVirkedag(BigDecimal beløp, Periode periode) {
+        int antallVirkedager = Ukedager.beregnAntallVirkedager(periode);
+        if (forEngangsstønad && antallVirkedager == 0) { //Gjelder kun ved Engangsstønad (REFUTG) som treffer en ikke vanlig virkedag.
+            return beløp;
+        }
+        return beløp.divide(BigDecimal.valueOf(antallVirkedager), 2, RoundingMode.HALF_UP);
     }
 
     public BigDecimal beregnBeløp(Periode foreldetPeriode, Periode grunnlagPeriode, BigDecimal beløpPrVirkedag) {
         Optional<Periode> overlap = grunnlagPeriode.overlap(foreldetPeriode);
         if (overlap.isPresent()) {
             Periode overlapInterval = overlap.get();
-            int antallDager = periodeTilDager.apply(overlapInterval);
-            return beløpPrVirkedag.multiply(BigDecimal.valueOf(antallDager));
+            int antallVirkedager = Ukedager.beregnAntallVirkedager(overlapInterval);
+            if (forEngangsstønad && antallVirkedager == 0) { //Gjelder kun ved Engangsstønad (REFUTG) som treffer en ikke vanlig virkedag.
+                return beløpPrVirkedag;
+            }
+            return beløpPrVirkedag.multiply(BigDecimal.valueOf(antallVirkedager));
         }
         return BigDecimal.ZERO;
     }
 
     public BigDecimal beregnBeløpForPeriode(BigDecimal tilbakekrevesBeløp, Periode feilutbetalingPeriode, Periode periode) {
-        BigDecimal grunnlagBelopPerUkeDager = beregnBeløpPrDag(tilbakekrevesBeløp, periode);
+        BigDecimal grunnlagBelopPerUkeDager = beregnBeløpPrVirkedag(tilbakekrevesBeløp, periode);
         BigDecimal ytelseBeløp = beregnBeløp(feilutbetalingPeriode, periode, grunnlagBelopPerUkeDager);
         return ytelseBeløp.setScale(0, RoundingMode.HALF_UP);
     }
