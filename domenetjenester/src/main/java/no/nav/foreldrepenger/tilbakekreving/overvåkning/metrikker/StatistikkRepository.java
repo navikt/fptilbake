@@ -23,6 +23,13 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Any;
+import jakarta.enterprise.inject.Instance;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Tuple;
+
 import org.hibernate.query.NativeQuery;
 import org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy;
 import org.slf4j.Logger;
@@ -31,12 +38,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.enterprise.context.Dependent;
-import jakarta.enterprise.inject.Any;
-import jakarta.enterprise.inject.Instance;
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Tuple;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -59,7 +60,8 @@ public class StatistikkRepository {
 
     private static final String UDEFINERT = "-";
 
-    static final List<String> PROSESS_TASK_STATUSER = Stream.of(ProsessTaskStatus.KLAR, ProsessTaskStatus.FEILET, ProsessTaskStatus.VENTER_SVAR, ProsessTaskStatus.SUSPENDERT).map(ProsessTaskStatus::getDbKode).toList();
+    static final List<String> PROSESS_TASK_STATUSER = Stream.of(ProsessTaskStatus.KLAR, ProsessTaskStatus.FEILET, ProsessTaskStatus.VENTER_SVAR,
+        ProsessTaskStatus.SUSPENDERT).map(ProsessTaskStatus::getDbKode).toList();
     static final List<String> AKSJONSPUNKTER = AksjonspunktDefinisjon.kodeMap().values().stream()
         .filter(p -> !AksjonspunktDefinisjon.UNDEFINED.equals(p)).map(AksjonspunktDefinisjon::getKode).toList();
     static final List<String> AKSJONSPUNKT_STATUSER = AksjonspunktStatus.kodeMap().values().stream()
@@ -67,7 +69,12 @@ public class StatistikkRepository {
         .toList();
 
     static final List<String> BEHANDLING_STATUS = List.copyOf(BehandlingStatus.kodeMap().keySet());
-    static final List<String> BEHANDLING_TYPER = BehandlingType.kodeMap().values().stream().filter(p -> !BehandlingType.UDEFINERT.equals(p)).map(BehandlingType::getKode).toList();
+    static final List<String> BEHANDLING_TYPER = BehandlingType.kodeMap()
+        .values()
+        .stream()
+        .filter(p -> !BehandlingType.UDEFINERT.equals(p))
+        .map(BehandlingType::getKode)
+        .toList();
 
     private static final ObjectMapper OM = new ObjectMapper();
 
@@ -249,7 +256,8 @@ public class StatistikkRepository {
                 String saksnummer = t.get(1, String.class);
                 String behandlingId = t.get(2, Long.class).toString();
                 String aksjonspunktKode = t.get(3, String.class);
-                String aksjonspunktNavn = coalesce(AksjonspunktDefinisjon.kodeMap().getOrDefault(aksjonspunktKode, AksjonspunktDefinisjon.UNDEFINED).getNavn(), UDEFINERT);
+                String aksjonspunktNavn = coalesce(
+                    AksjonspunktDefinisjon.kodeMap().getOrDefault(aksjonspunktKode, AksjonspunktDefinisjon.UNDEFINED).getNavn(), UDEFINERT);
                 String aksjonspunktStatus = t.get(4, String.class);
                 String venteÅrsak = coalesce(t.get(5, String.class), UDEFINERT);
                 long tidsstempel = t.get(6, Timestamp.class).getTime();
@@ -315,16 +323,18 @@ public class StatistikkRepository {
     }
 
     Collection<SensuEvent> prosessTaskFeilStatistikk() {
-        String sql = "select coalesce(f.ytelse_type, 'NONE'), f.saksnummer, p.id, p.task_type, p.status, p.siste_kjoering_slutt_ts, p.siste_kjoering_feil_tekst, p.task_parametere"
-            + " , p.blokkert_av, p.opprettet_tid, fpt.gruppe_sekvensnr"
-            + " from prosess_task p " +
-            " left outer join fagsak_prosess_task fpt ON fpt.prosess_task_id = p.id" +
-            " left outer join fagsak f on f.id=fpt.fagsak_id" +
-            " where ("
-            + "       (p.status IN ('FEILET') AND p.siste_kjoering_feil_tekst IS NOT NULL)" // har feilet
-            + "    OR (p.status IN ('KLAR', 'VETO') AND p.opprettet_tid < :ts AND (p.neste_kjoering_etter IS NULL OR p.neste_kjoering_etter < :ts2))" // har ligget med veto, klar lenge
-            + "    OR (p.status IN ('VENTER_SVAR', 'SUSPENDERT') AND p.opprettet_tid < :ts )" // har ligget og ventet svar lenge
-            + " )";
+        String sql =
+            "select coalesce(f.ytelse_type, 'NONE'), f.saksnummer, p.id, p.task_type, p.status, p.siste_kjoering_slutt_ts, p.siste_kjoering_feil_tekst, p.task_parametere"
+                + " , p.blokkert_av, p.opprettet_tid, fpt.gruppe_sekvensnr"
+                + " from prosess_task p " +
+                " left outer join fagsak_prosess_task fpt ON fpt.prosess_task_id = p.id" +
+                " left outer join fagsak f on f.id=fpt.fagsak_id" +
+                " where ("
+                + "       (p.status IN ('FEILET') AND p.siste_kjoering_feil_tekst IS NOT NULL)" // har feilet
+                + "    OR (p.status IN ('KLAR', 'VETO') AND p.opprettet_tid < :ts AND (p.neste_kjoering_etter IS NULL OR p.neste_kjoering_etter < :ts2))"
+                // har ligget med veto, klar lenge
+                + "    OR (p.status IN ('VENTER_SVAR', 'SUSPENDERT') AND p.opprettet_tid < :ts )" // har ligget og ventet svar lenge
+                + " )";
 
         String metricName = "prosess_task_feil_log_" + PROSESS_TASK_VER;
         LocalDateTime nå = LocalDateTime.now();
@@ -470,16 +480,48 @@ public class StatistikkRepository {
         String metricName = "behandlinger_opprettet_v1";
 
         NativeQuery<Tuple> query = (NativeQuery<Tuple>) entityManager.createNativeQuery(sql, Tuple.class);
-        Stream<Tuple> stream = query.getResultStream();
-        var values = stream.map(t -> SensuEvent.createSensuEvent(metricName,
-                Map.of("behandling_type", t.get(1, String.class),
-                    "behandling_status", t.get(2, String.class),
-                    "ytelse_type", t.get(3, String.class),
-                    "opprettelsesgrunn", t.get(4, String.class)),
-                Map.of("totalt_antall", t.get(5, BigDecimal.class)),
-                t.get(0, Timestamp.class).getTime()))
+        Map<BehandlignOpprettetGruppering, List<BehandlignOpprettetHendelse>> gruppertHendelse = query.getResultStream().map(row -> {
+                long tidspunkt = row.get(0, Timestamp.class).getTime();
+                String behandlinType = row.get(1, String.class);
+                String ytelseType = row.get(3, String.class);
+                String opprettelsesgrunn = row.get(4, String.class);
+                String behandlingStatus = row.get(2, String.class);
+                BigDecimal antall = row.get(5, BigDecimal.class);
+                BehandlignOpprettetGruppering gruppering = new BehandlignOpprettetGruppering(tidspunkt, behandlinType, ytelseType, opprettelsesgrunn);
+                return new BehandlignOpprettetHendelse(gruppering, behandlingStatus, antall);
+            }).collect(Collectors.groupingBy(e->e.gruppering));
+
+        //registere antall=0 for behandlingStatuser som ikke finnes for å nulle ut forrige innslag når behandling har byttet status
+        List<BehandlignOpprettetHendelse> inklNulling = new ArrayList<>();
+        for (var entry : gruppertHendelse.entrySet()) {
+            BehandlignOpprettetGruppering gruppering = entry.getKey();
+            for (BehandlignOpprettetHendelse hendelse : entry.getValue()) {
+                inklNulling.add(hendelse);
+                for (BehandlingStatus behandlingStatus : BehandlingStatus.values()) {
+                    boolean finnes = entry.getValue().stream().anyMatch( it-> it.behandlingStatus.equals(behandlingStatus.getKode()));
+                    if (!finnes){
+                        inklNulling.add(new BehandlignOpprettetHendelse(gruppering, behandlingStatus.getKode(), BigDecimal.ZERO));
+                    }
+                }
+            }
+            inklNulling.addAll(entry.getValue());
+        }
+
+        return inklNulling.stream()
+            .map(t -> SensuEvent.createSensuEvent(metricName,
+                Map.of("behandling_type", t.gruppering.behandlingType,
+                    "behandling_status", t.behandlingStatus,
+                    "ytelse_type", t.gruppering.ytelseType,
+                    "opprettelsesgrunn", t.gruppering.opprettelsesgrunn),
+                Map.of("totalt_antall", t.antall),
+                t.gruppering.tidpunkt))
             .toList();
-        return values;
+    }
+
+    record BehandlignOpprettetHendelse(BehandlignOpprettetGruppering gruppering, String behandlingStatus, BigDecimal antall) {
+    }
+
+    record BehandlignOpprettetGruppering(long tidpunkt, String behandlingType, String ytelseType, String opprettelsesgrunn) {
     }
 
     Collection<SensuEvent> behandlingVedtak() {
