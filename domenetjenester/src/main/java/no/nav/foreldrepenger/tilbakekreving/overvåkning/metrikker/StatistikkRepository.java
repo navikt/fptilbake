@@ -481,27 +481,24 @@ public class StatistikkRepository {
 
         NativeQuery<Tuple> query = (NativeQuery<Tuple>) entityManager.createNativeQuery(sql, Tuple.class);
         Map<BehandlignOpprettetGruppering, List<BehandlignOpprettetHendelse>> gruppertHendelse = query.getResultStream().map(row -> {
-                long tidspunkt = row.get(0, Timestamp.class).getTime();
-                String behandlinType = row.get(1, String.class);
-                String ytelseType = row.get(3, String.class);
-                String opprettelsesgrunn = row.get(4, String.class);
-                String behandlingStatus = row.get(2, String.class);
-                BigDecimal antall = row.get(5, BigDecimal.class);
-                BehandlignOpprettetGruppering gruppering = new BehandlignOpprettetGruppering(tidspunkt, behandlinType, ytelseType, opprettelsesgrunn);
-                return new BehandlignOpprettetHendelse(gruppering, behandlingStatus, antall);
-            }).collect(Collectors.groupingBy(e->e.gruppering));
+            long tidspunkt = row.get(0, Timestamp.class).getTime();
+            String behandlinType = row.get(1, String.class);
+            String ytelseType = row.get(3, String.class);
+            String opprettelsesgrunn = row.get(4, String.class);
+            String behandlingStatus = row.get(2, String.class);
+            BigDecimal antall = row.get(5, BigDecimal.class);
+            BehandlignOpprettetGruppering gruppering = new BehandlignOpprettetGruppering(tidspunkt, behandlinType, ytelseType, opprettelsesgrunn);
+            return new BehandlignOpprettetHendelse(gruppering, behandlingStatus, antall);
+        }).collect(Collectors.groupingBy(e -> e.gruppering));
 
         //registere antall=0 for behandlingStatuser som ikke finnes for å nulle ut forrige innslag når behandling har byttet status
         List<BehandlignOpprettetHendelse> inklNulling = new ArrayList<>();
         for (var entry : gruppertHendelse.entrySet()) {
             BehandlignOpprettetGruppering gruppering = entry.getKey();
-            for (BehandlignOpprettetHendelse hendelse : entry.getValue()) {
-                inklNulling.add(hendelse);
-                for (BehandlingStatus behandlingStatus : BehandlingStatus.values()) {
-                    boolean finnes = entry.getValue().stream().anyMatch( it-> it.behandlingStatus.equals(behandlingStatus.getKode()));
-                    if (!finnes){
-                        inklNulling.add(new BehandlignOpprettetHendelse(gruppering, behandlingStatus.getKode(), BigDecimal.ZERO));
-                    }
+            for (BehandlingStatus behandlingStatus : BehandlingStatus.values()) {
+                boolean finnes = entry.getValue().stream().anyMatch(it -> it.behandlingStatus.equals(behandlingStatus.getKode()));
+                if (!finnes) {
+                    inklNulling.add(new BehandlignOpprettetHendelse(gruppering, behandlingStatus.getKode(), BigDecimal.ZERO));
                 }
             }
             inklNulling.addAll(entry.getValue());
