@@ -10,7 +10,7 @@ public class Satser {
     private static final BigDecimal HALVT_RETTSGEBYR = BigDecimal.valueOf(638);
 
     //se https://www.skatteetaten.no/satser/grunnbelopet-i-folketrygden/
-    private static final BigDecimal GRUNNBELØP = BigDecimal.valueOf(118620);
+    private static final BigDecimal GRUNNBELØP = BigDecimal.valueOf(124028);
     private static final BigDecimal HALVT_GRUNNBELØP = GRUNNBELØP.divide(BigDecimal.valueOf(2), 0, RoundingMode.UP);
 
     private Satser() {
