@@ -165,11 +165,11 @@ public class InntektskategoriKlassekodeMapper {
         for (int i = 0; i < resten.length/2; i++) {
             var nøkkel = resten[2 * i];
             var verdi = resten[2 * i + 1];
-            if (!nøkkel1.getClass().isAssignableFrom(nøkkel.getClass())){
-                throw new IllegalArgumentException("Alle nøkler må være av klasse " + nøkkel.getClass());
+            if (!nøkkel1.getClass().equals(nøkkel.getClass())){
+                throw new IllegalArgumentException("Alle nøkler må være av klasse " + nøkkel1.getClass());
             }
-            if (!verdi1.getClass().isAssignableFrom(verdi.getClass())){
-                throw new IllegalArgumentException("Alle verdier må være av klasse " + verdi.getClass());
+            if (!verdi1.getClass().equals(verdi.getClass())){
+                throw new IllegalArgumentException("Alle verdier må være av klasse " + verdi1.getClass());
             }
             map.put((K) nøkkel, (V) verdi);
         }
