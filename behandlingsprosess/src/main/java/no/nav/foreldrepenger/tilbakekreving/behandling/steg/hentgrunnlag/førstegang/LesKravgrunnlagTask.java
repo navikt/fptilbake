@@ -31,7 +31,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 @ApplicationScoped
-@ProsessTask("kravgrunnlag.les")
+@ProsessTask(value = "kravgrunnlag.les", prioritet = 2)
 public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(LesKravgrunnlagTask.class);

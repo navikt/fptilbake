@@ -34,7 +34,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask("fplos.oppgavebehandling.PubliserEvent")
+@ProsessTask(value = "fplos.oppgavebehandling.PubliserEvent", prioritet = 2)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class K9LosPubliserEventTask implements ProsessTaskHandler {
 

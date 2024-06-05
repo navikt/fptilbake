@@ -16,7 +16,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
-@ProsessTask("dvh.send.vedtak")
+@ProsessTask(value = "dvh.send.vedtak", prioritet = 2)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
 

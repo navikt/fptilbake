@@ -51,7 +51,7 @@ public class GjenopptaBehandlingMedGrunnlagTjeneste {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setSekvens("1");
-        prosessTaskData.setPrioritet(100);
+        prosessTaskData.setPrioritet(3);
         prosessTaskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
 
         var cid = MDCOperations.getCallId();

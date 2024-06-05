@@ -17,7 +17,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 @Dependent
-@ProsessTask("dvh.ettersend.sakshendelser")
+@ProsessTask(value = "dvh.ettersend.sakshendelser", prioritet = 4)
 public class EttersendSakshendelserTilDvhTask implements ProsessTaskHandler {
 
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");

@@ -20,7 +20,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(value = SensuMetrikkTask.TASKTYPE, cronExpression = "0 */15 * * * *", maxFailedRuns = 20, firstDelay = 60)
+@ProsessTask(value = SensuMetrikkTask.TASKTYPE, prioritet = 2, cronExpression = "0 */15 * * * *", maxFailedRuns = 20, firstDelay = 60)
 public class SensuMetrikkTask implements ProsessTaskHandler {
 
     private static final int CHUNK_EVENT_SIZE = 1000;

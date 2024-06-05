@@ -11,7 +11,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask("dvh.send.sakshendelser")
+@ProsessTask(value = "dvh.send.sakshendelser", prioritet = 2)
 public class SendSakshendelserTilDvhTask implements ProsessTaskHandler {
 
     private AivenSakshendelserKafkaProducer aivenSakshendelserKafkaProducer;

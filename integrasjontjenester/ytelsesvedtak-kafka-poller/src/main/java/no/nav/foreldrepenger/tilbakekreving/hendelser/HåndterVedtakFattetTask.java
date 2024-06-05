@@ -10,7 +10,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(value = "hendelser.håndterVedtakFattet", maxFailedRuns = 5)
+@ProsessTask(value = "hendelser.håndterVedtakFattet", prioritet = 2, maxFailedRuns = 5)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class HåndterVedtakFattetTask implements ProsessTaskHandler {
 

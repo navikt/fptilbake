@@ -176,7 +176,7 @@ public class GjenopptaBehandlingTjeneste {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setSekvens("1");
-        prosessTaskData.setPrioritet(100);
+        prosessTaskData.setPrioritet(3);
         prosessTaskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
 
         // unik per task da det gjelder ulike behandlinger, gjenbruker derfor ikke
@@ -190,7 +190,6 @@ public class GjenopptaBehandlingTjeneste {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(HenleggBehandlingTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setSekvens("1");
-        prosessTaskData.setPrioritet(100);
 
         // unik per task da det gjelder ulike behandlinger, gjenbruker derfor ikke
         prosessTaskData.setCallId(callId);

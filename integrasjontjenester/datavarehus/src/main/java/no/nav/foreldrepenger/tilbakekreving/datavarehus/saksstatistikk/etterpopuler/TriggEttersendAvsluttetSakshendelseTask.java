@@ -12,7 +12,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask("start.ettersend.sakshendelser")
+@ProsessTask(value = "start.ettersend.sakshendelser", prioritet = 4)
 public class TriggEttersendAvsluttetSakshendelseTask implements ProsessTaskHandler {
     private static final Logger logger = LoggerFactory.getLogger(TriggEttersendAvsluttetSakshendelseTask.class);
 

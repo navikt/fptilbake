@@ -17,7 +17,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
-@ProsessTask("oppgavebehandling.nasjonalenhet")
+@ProsessTask(value = "oppgavebehandling.nasjonalenhet", prioritet = 4)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class OppdaterBehandlendeEnhetAlleTask implements ProsessTaskHandler {
 

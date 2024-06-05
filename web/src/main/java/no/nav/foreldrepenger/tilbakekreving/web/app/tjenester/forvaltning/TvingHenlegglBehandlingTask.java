@@ -20,7 +20,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask("behandlingskontroll.tvingHenleggBehandling")
+@ProsessTask(value = "behandlingskontroll.tvingHenleggBehandling", prioritet = 2)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class TvingHenlegglBehandlingTask implements ProsessTaskHandler {
 

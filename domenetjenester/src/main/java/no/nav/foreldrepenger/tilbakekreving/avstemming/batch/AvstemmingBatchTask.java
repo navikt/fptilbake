@@ -25,7 +25,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(value = "batch.avstemming", cronExpression = "0 55 6 ? * * ")
+@ProsessTask(value = "batch.avstemming", prioritet = 3, cronExpression = "0 55 6 ? * * ")
 public class AvstemmingBatchTask implements ProsessTaskHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(AvstemmingBatchTask.class);
