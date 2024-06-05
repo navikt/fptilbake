@@ -37,7 +37,7 @@
         <!-- Jakarta deps -->
         <felles.version>7.2.0</felles.version>
         <prosesstask.version>5.0.9</prosesstask.version>
-        <fpkontrakter.version>9.1.12</fpkontrakter.version>
+        <fpkontrakter.version>9.1.15</fpkontrakter.version>
         <abakus-kontrakt.version>2.1.2</abakus-kontrakt.version>
         <verapdf-validation-model.version>1.26.1</verapdf-validation-model.version>
         <!-- Jakarta deps end -->
