@@ -80,47 +80,44 @@ public class InntektskategoriKlassekodeMapper {
         KlasseKode.OMATFER, FERIEPENGER_ARBEIDSTAKER
     );
 
-    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_PLEIEPENGER_SYKT_BARN = new LinkedHashMap<>() {{
-        put(KlasseKode.PNBSATORD, ARBEIDSTAKER);
-        put(KlasseKode.PNBSATFRI, FRILANSER);
-        put(KlasseKode.PNBSSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE);
-        put(KlasseKode.PNBSATAL, ARBEIDSLEDIG);
-        put(KlasseKode.PNBSATSJO, SJØMANN);
-        put(KlasseKode.PNBSSNDDM_OP, DAGMAMMA);
-        put(KlasseKode.PNBSSNDJB_OP, JORDBRUKER);
-        put(KlasseKode.PNBSSNDFI, FISKER);
-        put(KlasseKode.SPATFER, FERIEPENGER_ARBEIDSTAKER);
-        put(KlasseKode.PPATFER, FERIEPENGER_ARBEIDSTAKER);
-        put(KlasseKode.PPALFERTILL, FERIETILLEGG);
-    }};
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_PLEIEPENGER_SYKT_BARN = tilMap(
+        KlasseKode.PNBSATORD, ARBEIDSTAKER,
+        KlasseKode.PNBSATFRI, FRILANSER,
+        KlasseKode.PNBSSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
+        KlasseKode.PNBSATAL, ARBEIDSLEDIG,
+        KlasseKode.PNBSATSJO, SJØMANN,
+        KlasseKode.PNBSSNDDM_OP, DAGMAMMA,
+        KlasseKode.PNBSSNDJB_OP, JORDBRUKER,
+        KlasseKode.PNBSSNDFI, FISKER,
+        KlasseKode.SPATFER, FERIEPENGER_ARBEIDSTAKER,
+        KlasseKode.PPATFER, FERIEPENGER_ARBEIDSTAKER,
+        KlasseKode.PPALFERTILL, FERIETILLEGG);
 
-    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_PLEIEPENGER_I_LIVETS_SLUTTFASE = new LinkedHashMap<>() {{
-        put(KlasseKode.PPNPATORD, ARBEIDSTAKER);
-        put(KlasseKode.PPNPATFRI, FRILANSER);
-        put(KlasseKode.PPNPSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE);
-        put(KlasseKode.PPNPATAL, ARBEIDSLEDIG);
-        put(KlasseKode.PPNPATSJO, SJØMANN);
-        put(KlasseKode.PPNPSNDDM_OP, DAGMAMMA);
-        put(KlasseKode.PPNPSNDJB_OP, JORDBRUKER);
-        put(KlasseKode.PPNPSNDFI, FISKER);
-        put(KlasseKode.SPATFER, FERIEPENGER_ARBEIDSTAKER);
-        put(KlasseKode.PPATFER, FERIEPENGER_ARBEIDSTAKER);
-        put(KlasseKode.PPALFERTILL, FERIETILLEGG);
-    }};
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_PLEIEPENGER_I_LIVETS_SLUTTFASE = tilMap(
+        KlasseKode.PPNPATORD, ARBEIDSTAKER,
+        KlasseKode.PPNPATFRI, FRILANSER,
+        KlasseKode.PPNPSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
+        KlasseKode.PPNPATAL, ARBEIDSLEDIG,
+        KlasseKode.PPNPATSJO, SJØMANN,
+        KlasseKode.PPNPSNDDM_OP, DAGMAMMA,
+        KlasseKode.PPNPSNDJB_OP, JORDBRUKER,
+        KlasseKode.PPNPSNDFI, FISKER,
+        KlasseKode.SPATFER, FERIEPENGER_ARBEIDSTAKER,
+        KlasseKode.PPATFER, FERIEPENGER_ARBEIDSTAKER,
+        KlasseKode.PPALFERTILL, FERIETILLEGG);
 
-    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_OPPLÆRINGSPENGER = new LinkedHashMap<>() {{
-        put(KlasseKode.OPPATORD, ARBEIDSTAKER);
-        put(KlasseKode.OPPATFRI, FRILANSER);
-        put(KlasseKode.OPPSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE);
-        put(KlasseKode.OPPATAL, ARBEIDSLEDIG);
-        put(KlasseKode.OPPATSJO, SJØMANN);
-        put(KlasseKode.OPPSNDDM_OP, DAGMAMMA);
-        put(KlasseKode.OPPSNDJB_OP, JORDBRUKER);
-        put(KlasseKode.OPPSNDFI, FISKER);
-        put(KlasseKode.SPATFER, FERIEPENGER_ARBEIDSTAKER);
-        put(KlasseKode.OPPATFER, FERIEPENGER_ARBEIDSTAKER);
-        put(KlasseKode.OPALFERTILL, FERIETILLEGG);
-    }};
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_OPPLÆRINGSPENGER = tilMap(
+        KlasseKode.OPPATORD, ARBEIDSTAKER,
+        KlasseKode.OPPATFRI, FRILANSER,
+        KlasseKode.OPPSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
+        KlasseKode.OPPATAL, ARBEIDSLEDIG,
+        KlasseKode.OPPATSJO, SJØMANN,
+        KlasseKode.OPPSNDDM_OP, DAGMAMMA,
+        KlasseKode.OPPSNDJB_OP, JORDBRUKER,
+        KlasseKode.OPPSNDFI, FISKER,
+        KlasseKode.SPATFER, FERIEPENGER_ARBEIDSTAKER,
+        KlasseKode.OPPATFER, FERIEPENGER_ARBEIDSTAKER,
+        KlasseKode.OPALFERTILL, FERIETILLEGG);
 
     private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_FRISINN = Map.of(
         KlasseKode.FRISINN_FRILANS, FRILANSER,
@@ -155,5 +152,27 @@ public class InntektskategoriKlassekodeMapper {
         } else {
             throw new IllegalStateException("Utvikler feil: Mangler mapping for klasseKode=" + klasseKode);
         }
+    }
+
+    static <K, V> Map<K, V> tilMap(K nøkkel1, V verdi1, Object... resten) {
+        Map<K, V> map = new LinkedHashMap<>();
+        map.put(nøkkel1, verdi1);
+
+        if (resten.length % 2 == 1){
+            throw new IllegalArgumentException("Må ha partall antall elementer, siden alt er nøkkel-verdi-par");
+        }
+
+        for (int i = 0; i < resten.length/2; i++) {
+            var nøkkel = resten[2 * i];
+            var verdi = resten[2 * i + 1];
+            if (!nøkkel1.getClass().isAssignableFrom(nøkkel.getClass())){
+                throw new IllegalArgumentException("Alle nøkler må være av klasse " + nøkkel.getClass());
+            }
+            if (!verdi1.getClass().isAssignableFrom(verdi.getClass())){
+                throw new IllegalArgumentException("Alle verdier må være av klasse " + verdi.getClass());
+            }
+            map.put((K) nøkkel, (V) verdi);
+        }
+        return map;
     }
 }
