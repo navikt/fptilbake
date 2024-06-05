@@ -22,6 +22,7 @@ public enum Inntektskategori implements Kodeverdi {
     JORDBRUKER("JORDBRUKER", "Jordbruker"),
     FISKER("FISKER", "Fisker"),
     FERIEPENGER_ARBEIDSTAKER("FERIEPENGER_ARBEIDSTAKER", "Feriepenger arbeidstaker"),
+    FERIETILLEGG("FERIETILLEGG", "Ferietillegg dagpenger"),
 
     UDEFINERT("-", "Ikke Definert");
 
