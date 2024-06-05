@@ -25,7 +25,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 @ApplicationScoped
-@ProsessTask("iverksetteVedtak.sendVedtakTilOppdragsystemet")
+@ProsessTask(value = "iverksetteVedtak.sendVedtakTilOppdragsystemet", prioritet = 2)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
 

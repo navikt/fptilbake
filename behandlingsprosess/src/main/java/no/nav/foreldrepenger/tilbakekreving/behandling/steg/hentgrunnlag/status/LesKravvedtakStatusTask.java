@@ -24,7 +24,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 @ApplicationScoped
-@ProsessTask("kravvedtakstatus.les")
+@ProsessTask(value = "kravvedtakstatus.les", prioritet = 2)
 public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(LesKravvedtakStatusTask.class);

@@ -11,7 +11,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask("saksbehandling.henleggbehandling")
+@ProsessTask(value = "saksbehandling.henleggbehandling", prioritet = 3)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class HenleggBehandlingTask implements ProsessTaskHandler {
 

@@ -15,7 +15,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 @ApplicationScoped
-@ProsessTask("kravgrunnlag.gammelt.håndter")
+@ProsessTask(value = "kravgrunnlag.gammelt.håndter", prioritet = 2)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class HåndterGamleKravgrunnlagTask implements ProsessTaskHandler {
 

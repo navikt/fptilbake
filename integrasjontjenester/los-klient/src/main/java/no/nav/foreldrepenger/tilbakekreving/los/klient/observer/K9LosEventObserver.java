@@ -98,7 +98,6 @@ public class K9LosEventObserver {
         if (!Fagsystem.FPTILBAKE.equals(fagsystem)) {
             ProsessTaskData taskData = ProsessTaskData.forProsessTask(K9LosPubliserEventTask.class);
             taskData.setCallIdFraEksisterende();
-            taskData.setPrioritet(50);
             taskData.setProperty(K9LosPubliserEventTask.PROPERTY_EVENT_NAME, eventHendelse.name());
             taskData.setBehandling(fagsakId, behandlingId, aktørId.getId());
             taskTjeneste.lagre(taskData);

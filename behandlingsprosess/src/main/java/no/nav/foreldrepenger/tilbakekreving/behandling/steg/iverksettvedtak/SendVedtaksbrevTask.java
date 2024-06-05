@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
-@ProsessTask("iverksetteVedtak.sendVedtaksbrev")
+@ProsessTask(va"iverksetteVedtak.sendVedtaksbrev", prioritet = 2)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class SendVedtaksbrevTask implements ProsessTaskHandler {
 

@@ -14,7 +14,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask("iverksetteVedtak.avsluttBehandling")
+@ProsessTask(value = "iverksetteVedtak.avsluttBehandling", prioritet = 2)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class AvsluttBehandlingTask implements ProsessTaskHandler {
 

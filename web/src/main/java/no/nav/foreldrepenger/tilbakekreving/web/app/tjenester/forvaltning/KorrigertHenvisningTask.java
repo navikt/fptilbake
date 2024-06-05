@@ -23,7 +23,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask("henvisning.korrigert")
+@ProsessTask(value = "henvisning.korrigert", prioritet = 2)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class KorrigertHenvisningTask implements ProsessTaskHandler {
 

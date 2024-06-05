@@ -19,7 +19,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask("saksbehandling.automatisk")
+@ProsessTask(value = "saksbehandling.automatisk", prioritet = 2)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class AutomatiskSaksbehandlingProsessTask implements ProsessTaskHandler {
 

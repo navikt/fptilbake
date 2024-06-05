@@ -21,7 +21,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
-@ProsessTask(value = "batch.automatisk.saksbehandling", cronExpression = "0 30 7 ? * MON-FRI")
+@ProsessTask(value = "batch.automatisk.saksbehandling", prioritet = 2, cronExpression = "0 30 7 ? * MON-FRI")
 public class AutomatiskSaksbehandlingBatchTask implements ProsessTaskHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(AutomatiskSaksbehandlingBatchTask.class);

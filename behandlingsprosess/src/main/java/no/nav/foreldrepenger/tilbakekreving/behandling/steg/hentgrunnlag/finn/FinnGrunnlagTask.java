@@ -43,7 +43,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask("kravgrunnlag.finn")
+@ProsessTask(value = "kravgrunnlag.finn", prioritet = 2)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class FinnGrunnlagTask implements ProsessTaskHandler {
 

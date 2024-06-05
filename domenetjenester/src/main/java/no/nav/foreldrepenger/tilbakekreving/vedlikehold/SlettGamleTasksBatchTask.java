@@ -12,7 +12,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @Dependent
-@ProsessTask(value = "vedlikehold.tasks.slettgamle", cronExpression = "0 45 1 * * *", maxFailedRuns = 1)
+@ProsessTask(value = "vedlikehold.tasks.slettgamle", prioritet = 3, cronExpression = "0 45 1 * * *", maxFailedRuns = 1)
 public class SlettGamleTasksBatchTask implements ProsessTaskHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(SlettGamleTasksBatchTask.class);

@@ -27,7 +27,7 @@ import no.nav.vedtak.hendelser.behandling.Ytelse;
 import no.nav.vedtak.hendelser.behandling.v1.BehandlingHendelseV1;
 
 @ApplicationScoped
-@ProsessTask("fplos.oppgavebehandling.behandlingshendelse")
+@ProsessTask(value = "fplos.oppgavebehandling.behandlingshendelse", prioritet = 2)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class FpLosPubliserEventTask implements ProsessTaskHandler {
 
