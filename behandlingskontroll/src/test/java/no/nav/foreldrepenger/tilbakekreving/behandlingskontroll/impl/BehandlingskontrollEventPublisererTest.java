@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegTilstandSnapshot;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStegOvergangEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStegStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingskontrollEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -98,35 +97,6 @@ class BehandlingskontrollEventPublisererTest {
         BehandlingskontrollEvent stoppEvent = new BehandlingskontrollEvent.StoppetEvent(null, null, STEG_4, BehandlingStegStatus.UTGANG);
         TestEventObserver.containsExactly(startEvent, stoppEvent);
 
-    }
-
-    @Test
-    void skal_fyre_event_for_behandlingskontroll_behandlingsteg_status_endring_ved_prosessering() {
-        // Arrange
-        ScenarioSimple scenario = nyttScenario(STEG_1);
-
-        Behandling behandling = scenario.lagre(repositoryProvider);
-
-        BehandlingskontrollKontekst kontekst = kontrollTjeneste.initBehandlingskontroll(behandling.getId());
-
-        // Act
-        kontrollTjeneste.prosesserBehandling(kontekst);
-
-        // Assert
-
-        BehandlingStegStatusEvent steg1StatusEvent0 = new BehandlingStegStatusEvent(kontekst, STEG_1, null, BehandlingStegStatus.STARTET);
-        BehandlingStegStatusEvent steg1StatusEvent1 = new BehandlingStegStatusEvent(kontekst, STEG_1, BehandlingStegStatus.STARTET, BehandlingStegStatus.UTFØRT);
-        BehandlingStegStatusEvent steg2StatusEvent0 = new BehandlingStegStatusEvent(kontekst, STEG_2, null, BehandlingStegStatus.STARTET);
-        BehandlingStegStatusEvent steg2StatusEvent = new BehandlingStegStatusEvent(kontekst, STEG_2, BehandlingStegStatus.STARTET, BehandlingStegStatus.UTFØRT);
-        BehandlingStegStatusEvent steg3StatusEvent0 = new BehandlingStegStatusEvent(kontekst, STEG_2, null, BehandlingStegStatus.STARTET);
-        BehandlingStegStatusEvent steg3StatusEvent = new BehandlingStegStatusEvent(kontekst, STEG_3, BehandlingStegStatus.STARTET, BehandlingStegStatus.UTFØRT);
-        BehandlingStegStatusEvent steg4StatusEvent0 = new BehandlingStegStatusEvent(kontekst, STEG_4, null, BehandlingStegStatus.STARTET);
-        BehandlingStegStatusEvent steg4StatusEvent = new BehandlingStegStatusEvent(kontekst, STEG_3, BehandlingStegStatus.STARTET, BehandlingStegStatus.UTGANG);
-        TestEventObserver.containsExactly(steg1StatusEvent0, steg1StatusEvent1 //
-                , steg2StatusEvent0, steg2StatusEvent//
-                , steg3StatusEvent0, steg3StatusEvent//
-                , steg4StatusEvent0, steg4StatusEvent//
-        );
     }
 
     @Test

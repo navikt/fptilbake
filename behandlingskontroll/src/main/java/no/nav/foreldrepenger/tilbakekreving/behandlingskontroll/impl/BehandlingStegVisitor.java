@@ -214,7 +214,6 @@ class BehandlingStegVisitor {
             if (erForskjellig(førsteStegStatus, nyStegStatus)) {
                 InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, stegType, nyStegStatus, BehandlingStegStatus.UTFØRT);
                 behandlingRepository.lagre(behandling, kontekst.getSkriveLås());
-                eventPubliserer.fireEvent(kontekst, stegType, førsteStegStatus, nyStegStatus);
             }
         }
     }
