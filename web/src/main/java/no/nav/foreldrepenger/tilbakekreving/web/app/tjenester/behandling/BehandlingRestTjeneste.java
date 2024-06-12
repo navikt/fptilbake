@@ -47,6 +47,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -569,7 +570,9 @@ public class BehandlingRestTjeneste {
             return BehandlingOperasjonerDto.builder(b.getUuid()).build(); // Skal ikke foreta menyvalg lenger
         } else if (BehandlingStatus.FATTER_VEDTAK.equals(b.getStatus())) {
             var sisteSaksbehandler = Optional.ofNullable(b.getAnsvarligSaksbehandler())
-                .or(() -> b.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.FORESLÅ_VEDTAK).map(BaseEntitet::getEndretAv));
+                .or(() -> b.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.FORESLÅ_VEDTAK)
+                    .filter(Aksjonspunkt::erUtført)
+                    .map(BaseEntitet::getEndretAv));
             boolean tilgokjenning = sisteSaksbehandler.isPresent() &&
                 !sisteSaksbehandler.get().equalsIgnoreCase(KontekstHolder.getKontekst().getUid());
             return BehandlingOperasjonerDto.builder(b.getUuid()).medTilGodkjenning(tilgokjenning).build();

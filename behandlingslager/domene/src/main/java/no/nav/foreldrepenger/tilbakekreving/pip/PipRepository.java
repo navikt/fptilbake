@@ -8,6 +8,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.BehandlingInfo;
 
 @ApplicationScoped
@@ -55,16 +58,19 @@ public class PipRepository {
                 , f.saksnummer as saksnummer
                 , u.aktoer_id as aktørId
                 , b.behandling_status as behandlingstatus
-                , b.ansvarlig_saksbehandler as ansvarligSaksbehandler
+                , coalesce(b.ansvarlig_saksbehandler, ap.endret_av) as ansvarligSaksbehandler
                  from behandling b
                  left join fagsak f on f.id = b.fagsak_id
                  left join bruker u on u.id = f.bruker_id
+                 left join aksjonspunkt ap on (ap.behandling_id = b.id and aksjonspunkt_def = :foreslå and aksjonspunkt_status = :utført)
                  where b.id = :behandlingId
                  """;
 
         // PipBehandlingInfo-mappingen er definert i Behandling entiteten
-        Query query = entityManager.createNativeQuery(sql, "PipBehandlingInfo");
-        query.setParameter("behandlingId", behandlingId);
+        Query query = entityManager.createNativeQuery(sql, "PipBehandlingInfo")
+            .setParameter("behandlingId", behandlingId)
+            .setParameter("foreslå", AksjonspunktKodeDefinisjon.FORESLÅ_VEDTAK)
+            .setParameter("utført", AksjonspunktStatus.UTFØRT.getKode());
 
         List resultater = query.getResultList();
         if (resultater.isEmpty()) {
@@ -83,16 +89,19 @@ public class PipRepository {
                 , f.saksnummer as saksnummer
                 , u.aktoer_id as aktørId
                 , b.behandling_status as behandlingstatus
-                , b.ansvarlig_saksbehandler as ansvarligSaksbehandler
+                , coalesce(b.ansvarlig_saksbehandler, ap.endret_av) as ansvarligSaksbehandler
                  from behandling b
                  left join fagsak f on f.id = b.fagsak_id
                  left join bruker u on u.id = f.bruker_id
+                 left join aksjonspunkt ap on (ap.behandling_id = b.id and aksjonspunkt_def = :foreslå and aksjonspunkt_status = :utført)
                  where b.uuid = :behandlingUuid
                  """;
 
         // PipBehandlingInfo-mappingen er definert i Behandling entiteten
-        Query query = entityManager.createNativeQuery(sql, "PipBehandlingInfo");
-        query.setParameter("behandlingUuid", behandlingUuid);
+        Query query = entityManager.createNativeQuery(sql, "PipBehandlingInfo")
+            .setParameter("behandlingUuid", behandlingUuid)
+            .setParameter("foreslå", AksjonspunktKodeDefinisjon.FORESLÅ_VEDTAK)
+            .setParameter("utført", AksjonspunktStatus.UTFØRT.getKode());
 
         List resultater = query.getResultList();
         if (resultater.isEmpty()) {
