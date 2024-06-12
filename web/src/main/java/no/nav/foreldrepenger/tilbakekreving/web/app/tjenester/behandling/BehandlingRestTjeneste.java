@@ -285,7 +285,7 @@ public class BehandlingRestTjeneste {
 
         // gjenoppta behandling
         Optional<String> gruppeOpt = gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), HistorikkAktør.SAKSBEHANDLER);
-        if (gruppeOpt.isPresent() && behandling.getÅpneAksjonspunkter(List.of(AksjonspunktDefinisjon.FATTE_VEDTAK)).isEmpty()) {
+        if (gruppeOpt.isPresent() && !behandling.erOrdinærSaksbehandlingAvsluttet()) {
             behandlingTjeneste.setAnsvarligSaksbehandlerFraKontekst(behandling);
         }
 

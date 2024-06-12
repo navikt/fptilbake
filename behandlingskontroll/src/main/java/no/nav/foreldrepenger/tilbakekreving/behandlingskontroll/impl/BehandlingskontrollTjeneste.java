@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModellVisitor;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKonfigurasjon;
@@ -46,9 +50,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.vedtak.exception.TekniskException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * ALLE ENDRINGER I DENNE KLASSEN SKAL KLARERES OG KODE-REVIEWES MED ANSVARLIG APPLIKASJONSARKITEKT (SE
@@ -427,15 +428,15 @@ public class BehandlingskontrollTjeneste {
     public Aksjonspunkt settBehandlingPåVent(Behandling behandling, AksjonspunktDefinisjon aksjonspunktDefinisjonIn,
                                              BehandlingStegType stegType, LocalDateTime fristTid, Venteårsak venteårsak) {
         var kontekst = initBehandlingskontroll(behandling);
-        // Nullstill ansvarlig saksbehandler dersom settes på vent utenom totrinn/beslutter
-        if (behandling.getÅpneAksjonspunkter(List.of(AksjonspunktDefinisjon.FATTE_VEDTAK)).isEmpty()) {
+        // Nullstill ansvarlig saksbehandler dersom settes på vent utenom i sluttfasen
+        if (!behandling.erOrdinærSaksbehandlingAvsluttet()) {
             behandling.setAnsvarligSaksbehandler(null);
         } else {
             // Finn ut hvor dette oppstår
             try {
                 throw new IllegalStateException("Satt på vent mens ligger hos beslutter");
             } catch (Exception e) {
-                LOG.info("FPTILBAKE: Satt på vent mens ligger hos beslutter", e);
+                LOG.info("FPTILBAKE: Satt på vent mens status {}", behandling.getStatus(), e);
             }
         }
         var aksjonspunkt = aksjonspunktKontrollRepository.settBehandlingPåVent(behandling, aksjonspunktDefinisjonIn, stegType, fristTid,
