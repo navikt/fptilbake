@@ -34,6 +34,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBeh
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
@@ -312,6 +313,8 @@ public class ForvaltningBehandlingRestTjeneste {
         Set<String> saksbehandlerePåBehandlingen = behandling.getAksjonspunkter()
             .stream()
             .filter(a -> !a.erAutopunkt())
+            .filter(a->a.erUtført())
+            .filter(a->a.getAksjonspunktDefinisjon() != AksjonspunktDefinisjon.FATTE_VEDTAK)
             .map(a -> a.getEndretAv())
             .collect(Collectors.toSet());
 
