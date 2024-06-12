@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -316,10 +317,11 @@ public class ForvaltningBehandlingRestTjeneste {
             .filter(a->a.erUtført())
             .filter(a->a.getAksjonspunktDefinisjon() != AksjonspunktDefinisjon.FATTE_VEDTAK)
             .map(a -> a.getEndretAv())
+            .filter(Objects::nonNull)
             .collect(Collectors.toSet());
 
         if (saksbehandlerePåBehandlingen.contains(saksbehandlerIdent)){
-            throw new IllegalArgumentException("Saksbehandler er ikke på behandlingen fra før, avbryter");
+            throw new IllegalArgumentException("Saksbehandler er ikke på behandlingen fra før, avbryter. Aktuelle er: " + saksbehandlerePåBehandlingen);
         }
         if (behandling.getAnsvarligSaksbehandler() != null) {
             throw new IllegalArgumentException("Behandligen har allerede en ansvarlg saksbehandler");
