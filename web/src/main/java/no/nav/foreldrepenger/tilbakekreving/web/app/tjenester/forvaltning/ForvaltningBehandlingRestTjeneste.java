@@ -11,6 +11,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.ws.rs.Consumes;
@@ -59,7 +61,10 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.log.util.LoggerUtils;
+import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
+import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
@@ -299,13 +304,8 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "500", description = "ukjent feil.")
         })
     @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
-    public Response settAnsvarligSaksbehandler(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                               @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse,
-                                               @NotNull @QueryParam("ansvarligSaksbehandler") @Valid @Pattern(regexp = "^[A-Z]\\d+$") String saksbehandlerIdent) {
-
-        var behandling = behandlingReferanse.erInternBehandlingId()
-            ? behandlingRepository.hentBehandling(behandlingReferanse.getBehandlingId())
-            : behandlingRepository.hentBehandling(behandlingReferanse.getBehandlingUuid());
+    public Response settAnsvarligSaksbehandler(@Valid @NotNull ForvaltningBehandlingRestTjeneste.SettAnsvarligSaksbehandlerDto input) {
+        var behandling = behandlingRepository.hentBehandling(input.getBehandlingId());
 
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         if (behandling.erAvsluttet() || behandling.erUnderIverksettelse()) {
@@ -320,17 +320,59 @@ public class ForvaltningBehandlingRestTjeneste {
             .filter(Objects::nonNull)
             .collect(Collectors.toSet());
 
-        if (saksbehandlerePåBehandlingen.contains(saksbehandlerIdent)){
+        if (saksbehandlerePåBehandlingen.contains(input.getSaksbehandlerIdent())){
             throw new IllegalArgumentException("Saksbehandler er ikke på behandlingen fra før, avbryter. Aktuelle er: " + saksbehandlerePåBehandlingen);
         }
         if (behandling.getAnsvarligSaksbehandler() != null) {
             throw new IllegalArgumentException("Behandligen har allerede en ansvarlg saksbehandler");
         }
-        behandling.setAnsvarligSaksbehandler(saksbehandlerIdent);
+        behandling.setAnsvarligSaksbehandler(input.getSaksbehandlerIdent());
 
         behandlingRepository.lagre(behandling, behandlingLås);
 
         return Response.ok().build();
+    }
+
+    public static class SettAnsvarligSaksbehandlerDto implements AbacDto {
+
+        @NotNull
+        @Min(0)
+        @Max(Long.MAX_VALUE)
+        private Long behandlingId;
+
+        @NotNull
+        @Pattern(regexp = "^[A-Z]\\d+$")
+        private String saksbehandlerIdent;
+
+        public SettAnsvarligSaksbehandlerDto() {
+            // for CDI
+        }
+
+        public SettAnsvarligSaksbehandlerDto(Long behandlingId, String saksbehandlerIdent) {
+            this.behandlingId = behandlingId;
+            this.saksbehandlerIdent = saksbehandlerIdent;
+        }
+
+        public Long getBehandlingId() {
+            return behandlingId;
+        }
+
+        public void setBehandlingId(Long behandlingId) {
+            this.behandlingId = behandlingId;
+        }
+
+        public String getSaksbehandlerIdent() {
+            return saksbehandlerIdent;
+        }
+
+        public void setSaksbehandlerIdent(String saksbehandlerIdent) {
+            this.saksbehandlerIdent = saksbehandlerIdent;
+        }
+
+        @Override
+        public AbacDataAttributter abacAttributter() {
+            return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, getBehandlingId());
+        }
     }
 
     private void kobleBehandling(KobleBehandlingTilGrunnlagDto dto) {
