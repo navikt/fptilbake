@@ -47,12 +47,17 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.vedtak.exception.TekniskException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * ALLE ENDRINGER I DENNE KLASSEN SKAL KLARERES OG KODE-REVIEWES MED ANSVARLIG APPLIKASJONSARKITEKT (SE
  * UTVIKLERHÅNDBOK).
  */
 @RequestScoped // må være RequestScoped sålenge ikke nøstet prosessering støttes.
 public class BehandlingskontrollTjeneste {
+
+    private static final Logger LOG = LoggerFactory.getLogger(BehandlingskontrollTjeneste.class);
 
     private AksjonspunktKontrollRepository aksjonspunktKontrollRepository;
     private BehandlingRepository behandlingRepository;
@@ -422,7 +427,17 @@ public class BehandlingskontrollTjeneste {
     public Aksjonspunkt settBehandlingPåVent(Behandling behandling, AksjonspunktDefinisjon aksjonspunktDefinisjonIn,
                                              BehandlingStegType stegType, LocalDateTime fristTid, Venteårsak venteårsak) {
         var kontekst = initBehandlingskontroll(behandling);
-        behandling.setAnsvarligSaksbehandler(null);
+        // Nullstill ansvarlig saksbehandler dersom settes på vent utenom totrinn/beslutter
+        if (behandling.getÅpneAksjonspunkter(List.of(AksjonspunktDefinisjon.FATTE_VEDTAK)).isEmpty()) {
+            behandling.setAnsvarligSaksbehandler(null);
+        } else {
+            // Finn ut hvor dette oppstår
+            try {
+                throw new IllegalStateException("Satt på vent mens ligger hos beslutter");
+            } catch (Exception e) {
+                LOG.info("FPTILBAKE: Satt på vent mens ligger hos beslutter", e);
+            }
+        }
         var aksjonspunkt = aksjonspunktKontrollRepository.settBehandlingPåVent(behandling, aksjonspunktDefinisjonIn, stegType, fristTid,
                 venteårsak);
         behandlingRepository.lagre(behandling, kontekst.getSkriveLås());
