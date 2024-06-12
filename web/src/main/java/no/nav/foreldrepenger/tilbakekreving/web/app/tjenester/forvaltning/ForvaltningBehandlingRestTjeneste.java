@@ -2,7 +2,9 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -39,7 +41,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.BehandlingTilstandTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendSakshendelserTilDvhTask;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
@@ -78,7 +79,6 @@ public class ForvaltningBehandlingRestTjeneste {
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private BehandlingTilstandTjeneste behandlingTilstandTjeneste;
-    private HistorikkRepository historikkRepository;
 
     public ForvaltningBehandlingRestTjeneste() {
         // for CDI
@@ -309,11 +309,13 @@ public class ForvaltningBehandlingRestTjeneste {
         if (behandling.erAvsluttet() || behandling.erUnderIverksettelse()) {
             throw new IllegalArgumentException("Kan ikke endre på behandling som er ferdig/under iverksettelse");
         }
-        boolean saksbehandlerHarGjortNoeIBehandlingen = historikkRepository.hentHistorikkForSaksnummer(behandling.getFagsak().getSaksnummer())
+        Set<String> saksbehandlerePåBehandlingen = behandling.getAksjonspunkter()
             .stream()
-            .filter(h -> h.getBehandlingId().equals(behandling.getId()))
-            .anyMatch(h -> h.getOpprettetAv().equals(saksbehandlerIdent));
-        if (!saksbehandlerHarGjortNoeIBehandlingen){
+            .filter(a -> !a.erAutopunkt())
+            .map(a -> a.getEndretAv())
+            .collect(Collectors.toSet());
+
+        if (saksbehandlerePåBehandlingen.contains(saksbehandlerIdent)){
             throw new IllegalArgumentException("Saksbehandler er ikke på behandlingen fra før, avbryter");
         }
         if (behandling.getAnsvarligSaksbehandler() != null) {
