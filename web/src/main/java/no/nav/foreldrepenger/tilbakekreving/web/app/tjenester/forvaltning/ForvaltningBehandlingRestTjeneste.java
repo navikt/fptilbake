@@ -320,7 +320,7 @@ public class ForvaltningBehandlingRestTjeneste {
             .filter(Objects::nonNull)
             .collect(Collectors.toSet());
 
-        if (saksbehandlerePåBehandlingen.contains(input.getSaksbehandlerIdent())){
+        if (!saksbehandlerePåBehandlingen.contains(input.getSaksbehandlerIdent())){
             throw new IllegalArgumentException("Saksbehandler er ikke på behandlingen fra før, avbryter. Aktuelle er: " + saksbehandlerePåBehandlingen);
         }
         if (behandling.getAnsvarligSaksbehandler() != null) {
