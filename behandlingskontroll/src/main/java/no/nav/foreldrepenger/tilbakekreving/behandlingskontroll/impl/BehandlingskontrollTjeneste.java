@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModellVisitor;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKonfigurasjon;
@@ -53,6 +57,8 @@ import no.nav.vedtak.exception.TekniskException;
  */
 @RequestScoped // må være RequestScoped sålenge ikke nøstet prosessering støttes.
 public class BehandlingskontrollTjeneste {
+
+    private static final Logger LOG = LoggerFactory.getLogger(BehandlingskontrollTjeneste.class);
 
     private AksjonspunktKontrollRepository aksjonspunktKontrollRepository;
     private BehandlingRepository behandlingRepository;
@@ -422,7 +428,17 @@ public class BehandlingskontrollTjeneste {
     public Aksjonspunkt settBehandlingPåVent(Behandling behandling, AksjonspunktDefinisjon aksjonspunktDefinisjonIn,
                                              BehandlingStegType stegType, LocalDateTime fristTid, Venteårsak venteårsak) {
         var kontekst = initBehandlingskontroll(behandling);
-        behandling.setAnsvarligSaksbehandler(null);
+        // Nullstill ansvarlig saksbehandler dersom settes på vent utenom i sluttfasen
+        if (!behandling.erOrdinærSaksbehandlingAvsluttet()) {
+            behandling.setAnsvarligSaksbehandler(null);
+        } else {
+            // Finn ut hvor dette oppstår
+            try {
+                throw new IllegalStateException("Satt på vent mens ligger hos beslutter");
+            } catch (Exception e) {
+                LOG.info("FPTILBAKE: Satt på vent mens status {}", behandling.getStatus(), e);
+            }
+        }
         var aksjonspunkt = aksjonspunktKontrollRepository.settBehandlingPåVent(behandling, aksjonspunktDefinisjonIn, stegType, fristTid,
                 venteårsak);
         behandlingRepository.lagre(behandling, kontekst.getSkriveLås());

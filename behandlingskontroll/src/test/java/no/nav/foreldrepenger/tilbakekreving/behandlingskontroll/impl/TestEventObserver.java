@@ -17,7 +17,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegTi
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStegOvergangEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStegStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingskontrollEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
@@ -63,10 +62,6 @@ public class TestEventObserver {
         addEvent(event);
     }
 
-    public void observer(@Observes BehandlingStegStatusEvent event) {
-        addEvent(event);
-    }
-
     public static void containsExactly(AksjonspunktDefinisjon[]... ads) {
         List<AksjonspunktStatusEvent> aksjonspunkterEvents = getEvents(AksjonspunktStatusEvent.class);
         Assertions.assertThat(aksjonspunkterEvents).hasSize(ads.length);
@@ -107,16 +102,6 @@ public class TestEventObserver {
             assertThat(overgangEvents.get(i).getTilStegType()).as("%s", i).isEqualTo(minEvent.getTilStegType());
             Assertions.assertThat(hentKode(overgangEvents.get(i).getTilTilstand())).as("%s", i)
                     .isEqualTo(hentKode(minEvent.getTilTilstand()));
-        }
-    }
-
-    public static void containsExactly(BehandlingStegStatusEvent... bsoe) {
-        List<BehandlingStegStatusEvent> behandlingStegStatusEvents = getEvents(BehandlingStegStatusEvent.class);
-        Assertions.assertThat(behandlingStegStatusEvents).hasSize(bsoe.length);
-        for (int i = 0; i < bsoe.length; i++) {
-            BehandlingStegStatusEvent minEvent = bsoe[i];
-            assertThat(behandlingStegStatusEvents.get(i).getForrigeStatus()).as("%s:%s", i, minEvent.getStegType()).isEqualTo(minEvent.getForrigeStatus());
-            assertThat(behandlingStegStatusEvents.get(i).getNyStatus()).as("%s:%s", i, minEvent.getStegType()).isEqualTo(minEvent.getNyStatus());
         }
     }
 

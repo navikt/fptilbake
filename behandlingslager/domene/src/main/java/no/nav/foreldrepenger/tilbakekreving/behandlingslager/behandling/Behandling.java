@@ -16,8 +16,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hibernate.annotations.NaturalId;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ColumnResult;
@@ -35,6 +33,9 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+
+import org.hibernate.annotations.NaturalId;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.SaksbehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
@@ -440,6 +441,14 @@ public class Behandling extends BaseEntitet {
 
     public boolean erSaksbehandlingAvsluttet() {
         return erAvsluttet() || erUnderIverksettelse();
+    }
+
+    public boolean erOrdinærSaksbehandlingAvsluttet() {
+        return erAvsluttet() || erUnderIverksettelse() || erTilBeslutter();
+    }
+
+    public boolean erTilBeslutter() {
+        return Objects.equals(BehandlingStatus.FATTER_VEDTAK, getStatus());
     }
 
     public boolean erUnderIverksettelse() {
