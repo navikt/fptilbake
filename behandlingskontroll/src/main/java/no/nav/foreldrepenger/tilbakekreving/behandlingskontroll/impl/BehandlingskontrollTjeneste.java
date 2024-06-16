@@ -2,12 +2,10 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl;
 
 import static java.util.Collections.singletonList;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner.FREMHOPP_TIL_IVERKSETT_VEDTAK;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling.forceOppdaterBehandlingSteg;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,6 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKontrollRepository;
@@ -65,7 +64,6 @@ public class BehandlingskontrollTjeneste {
     private BehandlingresultatRepository behandlingresultatRepository;
     private BehandlingModellRepository behandlingModellRepository;
     private BehandlingskontrollEventPubliserer eventPubliserer;
-    private BehandlingStegKonfigurasjon behandlingStegKonfigurasjon;
 
     /**
      * Sjekker om vi allerede kjører Behandlingskontroll, og aborter forsøk på nøsting av kall (støttes ikke p.t.).
@@ -88,7 +86,6 @@ public class BehandlingskontrollTjeneste {
         this.behandlingRepository = serviceProvider.getBehandlingRepository();
         this.behandlingresultatRepository = serviceProvider.getBehandlingresultatRepository();
         this.behandlingModellRepository = serviceProvider.getBehandlingModellRepository();
-        this.behandlingStegKonfigurasjon = new BehandlingStegKonfigurasjon(EnumSet.allOf(BehandlingStegStatus.class));
         this.aksjonspunktKontrollRepository = serviceProvider.getAksjonspunktKontrollRepository();
         this.eventPubliserer = serviceProvider.getEventPubliserer();
     }
@@ -200,7 +197,7 @@ public class BehandlingskontrollTjeneste {
     public void behandlingTilbakeføringTilTidligereBehandlingSteg(BehandlingskontrollKontekst kontekst,
                                                                   BehandlingStegType tidligereStegType) {
 
-        final var startStatusForNyttSteg = getStatusKonfigurasjon().getInngang();
+        final var startStatusForNyttSteg = BehandlingStegKonfigurasjon.getInngang();
         var behandlingId = kontekst.getBehandlingId();
         var behandling = serviceProvider.hentBehandling(behandlingId);
 
@@ -252,7 +249,7 @@ public class BehandlingskontrollTjeneste {
      */
     public void behandlingFramføringTilSenereBehandlingSteg(BehandlingskontrollKontekst kontekst,
                                                             BehandlingStegType senereSteg) {
-        final var statusInngang = getStatusKonfigurasjon().getInngang();
+        final var statusInngang = BehandlingStegKonfigurasjon.getInngang();
         var behandlingId = kontekst.getBehandlingId();
         var behandling = serviceProvider.hentBehandling(behandlingId);
 
@@ -378,10 +375,6 @@ public class BehandlingskontrollTjeneste {
         });
         behandlingRepository.lagre(behandling, kontekst.getSkriveLås());
         aksjonspunkterEndretStatus(kontekst, null, reåpnet);
-    }
-
-    public BehandlingStegKonfigurasjon getBehandlingStegKonfigurasjon() {
-        return behandlingStegKonfigurasjon;
     }
 
     /**
@@ -688,9 +681,21 @@ public class BehandlingskontrollTjeneste {
     protected void oppdaterEksisterendeBehandlingStegStatusVedFramføringEllerTilbakeføring(Behandling behandling, BehandlingStegType revidertStegType,
                                                                                            BehandlingStegStatus behandlingStegStatus,
                                                                                            BehandlingStegStatus sluttStatusForAndreÅpneSteg) {
-        oppdaterEksisterendeBehandling(behandling,
-                (beh) -> forceOppdaterBehandlingSteg(behandling, revidertStegType, behandlingStegStatus,
-                        sluttStatusForAndreÅpneSteg));
+        // Eksisterende tilstand og status
+        var statusFør = behandling.getStatus();
+        var fraTilstand = BehandlingModellImpl.tilBehandlingsStegSnapshot(behandling.getBehandlingStegTilstand());
+
+        // Oppdater behandling og lagre
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, revidertStegType, behandlingStegStatus, sluttStatusForAndreÅpneSteg);
+        var skriveLås = behandlingRepository.taSkriveLås(behandling);
+        var kontekst = new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), skriveLås);
+        behandlingRepository.lagre(behandling, skriveLås);
+
+        // Publiser oppdatering
+        var statusEtter = behandling.getStatus();
+        var tilTilstand = BehandlingModellImpl.tilBehandlingsStegSnapshot(behandling.getBehandlingStegTilstand());
+        fireEventBehandlingStegOvergang(kontekst, behandling, fraTilstand, tilTilstand);
+        eventPubliserer.fireEvent(kontekst, statusFør, statusEtter);
     }
 
     protected Behandling hentBehandling(BehandlingskontrollKontekst kontekst) {
@@ -735,25 +740,6 @@ public class BehandlingskontrollTjeneste {
         eventPubliserer.fireEvent(startetEvent);
     }
 
-    private void oppdaterEksisterendeBehandling(Behandling behandling,
-                                                Consumer<Behandling> behandlingOppdaterer) {
-
-        var statusFør = behandling.getStatus();
-        var fraTilstand = BehandlingModellImpl.tilBehandlingsStegSnapshot(behandling.getBehandlingStegTilstand());
-
-        // Oppdater behandling og lagre
-        behandlingOppdaterer.accept(behandling);
-        var skriveLås = behandlingRepository.taSkriveLås(behandling);
-        var kontekst = new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), skriveLås);
-        behandlingRepository.lagre(behandling, skriveLås);
-
-        // Publiser oppdatering
-        var statusEtter = behandling.getStatus();
-        var tilTilstand = BehandlingModellImpl.tilBehandlingsStegSnapshot(behandling.getBehandlingStegTilstand());
-        fireEventBehandlingStegOvergang(kontekst, behandling, fraTilstand, tilTilstand);
-        eventPubliserer.fireEvent(kontekst, statusFør, statusEtter);
-    }
-
     public void fremoverTransisjon(TransisjonIdentifikator transisjonId, BehandlingskontrollKontekst kontekst) {
         var behandling = serviceProvider.hentBehandling(kontekst.getBehandlingId());
         var stegTilstandFør = behandling.getBehandlingStegTilstand();
@@ -779,13 +765,6 @@ public class BehandlingskontrollTjeneste {
         var modell = getModell(behandling.getType());
         return modell.hvertSteg()
                 .anyMatch(steg -> steg.getBehandlingStegType().equals(behandlingStegType));
-    }
-
-    private BehandlingStegKonfigurasjon getStatusKonfigurasjon() {
-        if (behandlingStegKonfigurasjon == null) {
-            behandlingStegKonfigurasjon = new BehandlingStegKonfigurasjon(EnumSet.allOf(BehandlingStegStatus.class));
-        }
-        return behandlingStegKonfigurasjon;
     }
 
     private boolean erSenereSteg(BehandlingModell modell, BehandlingStegType inneværendeSteg,

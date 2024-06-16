@@ -14,10 +14,12 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegTilstandSnapshot;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStegOvergangEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingskontrollEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -137,6 +139,24 @@ class BehandlingskontrollEventPublisererTest {
         BehandlingStegOvergangEvent overgang2_3 = nyOvergangEvent(kontekst, STEG_2, BehandlingStegStatus.UTFØRT, STEG_3, null);
         BehandlingStegOvergangEvent overgang3_4 = nyOvergangEvent(kontekst, STEG_3, BehandlingStegStatus.UTFØRT, STEG_4, null);
         TestEventObserver.containsExactly(overgang1_2, overgang2_3, overgang3_4);
+    }
+
+    @Test
+    void skal_fyre_event_behandling_status_endring_ved_prosessering() {
+        // Arrange
+        var scenario = ScenarioSimple.simple();
+
+        var behandling = scenario.lagre(repositoryProvider);
+
+        var kontekst = kontrollTjeneste.initBehandlingskontroll(behandling.getId());
+
+        // Act
+        kontrollTjeneste.prosesserBehandling(kontekst);
+
+        // Assert
+
+        var statusEvent = BehandlingStatusEvent.nyEvent(kontekst, BehandlingStatus.UTREDES);
+        TestEventObserver.containsExactly(statusEvent);
     }
 
     protected ScenarioSimple nyttScenario(BehandlingStegType startSteg) {

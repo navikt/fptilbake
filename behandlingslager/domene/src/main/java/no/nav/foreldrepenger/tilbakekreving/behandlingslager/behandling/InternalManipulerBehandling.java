@@ -15,7 +15,7 @@ public final class InternalManipulerBehandling {
 
         // finn riktig mapping av kodeverk slik at vi får med dette når Behandling brukes videre.
         var eksisterendeTilstand = behandling.getSisteBehandlingStegTilstand();
-        if (eksisterendeTilstand.isEmpty() || erUlikeSteg(stegType, eksisterendeTilstand.orElseThrow())) {
+        if (eksisterendeTilstand.filter(e -> e.getBehandlingSteg().equals(stegType)).isEmpty()) {
             if (eksisterendeTilstand.isPresent() && !BehandlingStegStatus.erSluttStatus(eksisterendeTilstand.get().getBehandlingStegStatus())) {
                 eksisterendeTilstand.ifPresent(it -> it.setBehandlingStegStatus(ikkeFerdigStegStatus));
             }
@@ -25,9 +25,5 @@ public final class InternalManipulerBehandling {
         } else {
             eksisterendeTilstand.ifPresent(it -> it.setBehandlingStegStatus(nesteStegStatus));
         }
-    }
-
-    private static boolean erUlikeSteg(BehandlingStegType stegType, BehandlingStegTilstand eksisterendeTilstand) {
-        return !eksisterendeTilstand.getBehandlingSteg().equals(stegType);
     }
 }

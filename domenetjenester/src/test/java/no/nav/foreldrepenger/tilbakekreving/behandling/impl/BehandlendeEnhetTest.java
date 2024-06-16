@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingEnhetEventPubliserer;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
@@ -20,12 +20,12 @@ class BehandlendeEnhetTest extends FellesTestOppsett {
 
     private static final String NY_ENHET_ID = "4849";
     private static final String NY_ENHET_NAVN = "NAV Familie- og pensjonsytelser Tromsø";
-    private BehandlingEnhetEventPubliserer mockEventPubliserer;
+    private BehandlingEventPubliserer mockEventPubliserer;
     private BehandlendeEnhetTjeneste behandlendeEnhetTjeneste;
 
     @BeforeEach
     void setUp() {
-        mockEventPubliserer = mock(BehandlingEnhetEventPubliserer.class);
+        mockEventPubliserer = mock(BehandlingEventPubliserer.class);
         behandlendeEnhetTjeneste = new BehandlendeEnhetTjeneste(repoProvider, mockEventPubliserer);
     }
 
