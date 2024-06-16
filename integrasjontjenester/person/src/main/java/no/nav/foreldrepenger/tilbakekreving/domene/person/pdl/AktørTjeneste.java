@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import jakarta.enterprise.context.ApplicationScoped;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -17,8 +18,8 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.pdl.Doedsfall;
 import no.nav.pdl.DoedsfallResponseProjection;
-import no.nav.pdl.Foedsel;
-import no.nav.pdl.FoedselResponseProjection;
+import no.nav.pdl.Foedselsdato;
+import no.nav.pdl.FoedselsdatoResponseProjection;
 import no.nav.pdl.HentIdenterQueryRequest;
 import no.nav.pdl.HentPersonQueryRequest;
 import no.nav.pdl.IdentGruppe;
@@ -146,15 +147,15 @@ public class AktørTjeneste {
         query.setIdent(aktørId.getId());
         var projection = new PersonResponseProjection()
                 .navn(new NavnResponseProjection().fornavn().mellomnavn().etternavn())
-                .foedsel(new FoedselResponseProjection().foedselsdato())
+                .foedselsdato(new FoedselsdatoResponseProjection().foedselsdato())
                 .doedsfall(new DoedsfallResponseProjection().doedsdato())
                 .sivilstand(new SivilstandResponseProjection().type());
 
         var ytelse = utledYtelse(ytelseType);
         var person = pdlKlient.hentPerson(ytelse, query, projection);
 
-        var fødselsdato = person.getFoedsel().stream()
-                .map(Foedsel::getFoedselsdato)
+        var fødselsdato = person.getFoedselsdato().stream()
+                .map(Foedselsdato::getFoedselsdato)
                 .filter(Objects::nonNull)
                 .findFirst().map(d -> LocalDate.parse(d, DateTimeFormatter.ISO_LOCAL_DATE)).orElse(null);
         var dødsdato = person.getDoedsfall().stream()
