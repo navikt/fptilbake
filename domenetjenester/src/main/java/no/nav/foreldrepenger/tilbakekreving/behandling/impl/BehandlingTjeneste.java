@@ -212,7 +212,7 @@ public class BehandlingTjeneste {
         }
         LOG.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternBehandlingsinfoDto.getUuid());
 
-        henvisning = hentHenvisningHvisIkkeFinnes(henvisning, eksternBehandlingsinfoDto);
+        var brukHenvisning = hentHenvisningHvisIkkeFinnes(henvisning, eksternBehandlingsinfoDto);
 
         Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, fagsakYtelseType, eksternBehandlingsinfoDto.getSpråkkodeEllerDefault());
 
@@ -221,12 +221,8 @@ public class BehandlingTjeneste {
         OrganisasjonsEnhet organisasjonsEnhet = hentEnhetFraEksternBehandling(eksternBehandlingsinfoDto);
         behandling.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
-        behandlingskontrollTjeneste.opprettBehandling(kontekst, behandling);
-
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, henvisning, eksternUuid);
-        eksternBehandlingRepository.lagre(eksternBehandling);
-
-        behandlingskontrollTjeneste.publiserBehandlingStatusEtterOpprettet(kontekst, behandling);
+        behandlingskontrollTjeneste.opprettBehandling(kontekst, behandling,
+            beh -> eksternBehandlingRepository.lagre(new EksternBehandling(beh, brukHenvisning, eksternUuid)));
 
         historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling); // FIXME: sjekk om journalpostId skal hentes ///
 
