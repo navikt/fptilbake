@@ -67,7 +67,10 @@ public class BehandlingTilstandTjeneste {
     }
 
     public BehandlingTilstand hentBehandlingensTilstand(Behandling behandling, Fagsystem fagsystem) {
-        EksternBehandling eksternBehandling = getEksternBehandling(behandling.getId());
+        var eksternBehandling = getEksternBehandling(behandling.getId());
+        if (eksternBehandling == null) {
+            return null;
+        }
         BehandlingResultatType behandlingResultatType = behandlingresultatRepository.hent(behandling)
             .map(Behandlingsresultat::getBehandlingResultatType)
             .orElse(BehandlingResultatType.IKKE_FASTSATT);
@@ -116,13 +119,11 @@ public class BehandlingTilstandTjeneste {
     }
 
     private EksternBehandling getEksternBehandling(long behandlingId) {
-        EksternBehandling eksternBehandling;
         if (eksternBehandlingRepository.finnesAktivtEksternBehandling(behandlingId)) {
-            eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+            return eksternBehandlingRepository.hentFraInternId(behandlingId);
         } else {
-            eksternBehandling = eksternBehandlingRepository.hentForSisteAktivertInternId(behandlingId);
+            return eksternBehandlingRepository.hentForSisteAktivertInternId(behandlingId);
         }
-        return eksternBehandling;
     }
 
     private static OffsetDateTime tilOffsetDateTime(LocalDateTime tidspunkt) {

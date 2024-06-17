@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -105,6 +106,8 @@ public class BehandlingRevurderingTjeneste {
         behandlingskontrollTjeneste.opprettBehandling(kontekst, revurdering);
 
         opprettRelasjonMedEksternBehandling(henvisning, revurdering, eksternUuid);
+
+        behandlingskontrollTjeneste.publiserBehandlingStatusEtterOpprettet(kontekst, revurdering);
 
         // revurdering skal starte med Fakta om feilutbetaling
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.FAKTA_FEILUTBETALING, List.of(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
