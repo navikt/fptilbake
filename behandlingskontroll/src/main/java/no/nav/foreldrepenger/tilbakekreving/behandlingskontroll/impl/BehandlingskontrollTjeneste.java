@@ -380,10 +380,11 @@ public class BehandlingskontrollTjeneste {
     /**
      * Lagrer en ny behandling i behandlingRepository og fyrer av event om at en Behandling er opprettet
      */
-    public void opprettBehandling(BehandlingskontrollKontekst kontekst, Behandling behandling) {
+    public void opprettBehandling(BehandlingskontrollKontekst kontekst, Behandling behandling, Consumer<Behandling> etterLagring) {
         final var fagsakLås = serviceProvider.taFagsakLås(behandling.getFagsakId());
         behandlingRepository.lagre(behandling, kontekst.getSkriveLås());
         serviceProvider.oppdaterLåsVersjon(fagsakLås);
+        etterLagring.accept(behandling);
         eventPubliserer.fireEvent(kontekst, null, behandling.getStatus());
     }
 
@@ -394,10 +395,6 @@ public class BehandlingskontrollTjeneste {
         behandlingRepository.lagre(behandling, kontekst.getSkriveLås());
         eventPubliserer.fireEvent(kontekst, gammelStatus, behandling.getStatus());
 
-    }
-
-    public void publiserBehandlingStatusEtterOpprettet(BehandlingskontrollKontekst kontekst, Behandling behandling) {
-        eventPubliserer.fireEvent(kontekst, null, behandling.getStatus());
     }
 
     /**

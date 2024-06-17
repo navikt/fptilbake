@@ -103,11 +103,8 @@ public class BehandlingRevurderingTjeneste {
             revurdering.setAnsvarligSaksbehandler(opprettetAv);
         }
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(revurdering);
-        behandlingskontrollTjeneste.opprettBehandling(kontekst, revurdering);
-
-        opprettRelasjonMedEksternBehandling(henvisning, revurdering, eksternUuid);
-
-        behandlingskontrollTjeneste.publiserBehandlingStatusEtterOpprettet(kontekst, revurdering);
+        behandlingskontrollTjeneste.opprettBehandling(kontekst, revurdering,
+            beh -> eksternBehandlingRepository.lagre(new EksternBehandling(beh, henvisning, eksternUuid)));
 
         // revurdering skal starte med Fakta om feilutbetaling
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.FAKTA_FEILUTBETALING, List.of(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
@@ -140,11 +137,6 @@ public class BehandlingRevurderingTjeneste {
     private boolean harÅpenBehandling(long origBehandlingId) {
         Behandling behandling = behandlingRepository.hentBehandling(origBehandlingId);
         return !behandling.erAvsluttet();
-    }
-
-    private void opprettRelasjonMedEksternBehandling(Henvisning henvisning, Behandling revurdering, UUID eksternUuid) {
-        EksternBehandling eksternBehandling = new EksternBehandling(revurdering, henvisning, eksternUuid);
-        eksternBehandlingRepository.lagre(eksternBehandling);
     }
 
     private void kopierVergeInformasjon(long origBehandlingId, long behandlingId) {
