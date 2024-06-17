@@ -140,7 +140,7 @@ public class EksternBehandlingRepository {
     public EksternBehandling hentForSisteAktivertInternId(long internBehandlingId) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where internId=:internId order by opprettetTidspunkt desc", EksternBehandling.class);
         query.setParameter(INTERN_ID, internBehandlingId);
-        return query.getResultList().get(0);
+        return query.getResultList().stream().findFirst().orElse(null);
     }
 
     public Optional<EksternBehandling> hentOptionalFraInternId(long internBehandlingId) {

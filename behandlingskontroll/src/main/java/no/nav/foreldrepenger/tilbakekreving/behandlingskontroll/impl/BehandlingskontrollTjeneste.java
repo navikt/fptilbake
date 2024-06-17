@@ -396,6 +396,10 @@ public class BehandlingskontrollTjeneste {
 
     }
 
+    public void publiserBehandlingStatusEtterOpprettet(BehandlingskontrollKontekst kontekst, Behandling behandling) {
+        eventPubliserer.fireEvent(kontekst, null, behandling.getStatus());
+    }
+
     /**
      * Setter behandlingen på vent.
      *

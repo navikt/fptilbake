@@ -53,8 +53,10 @@ public class SakshendelserEventObserver {
     }
 
     private void klargjørSendingAvBehandlingensTilstand(long behandlingId) {
-        BehandlingTilstand tilstand = behandlingTilstandTjeneste.hentBehandlingensTilstand(behandlingId);
-        opprettProsessTask(behandlingId, tilstand);
+        var tilstand = behandlingTilstandTjeneste.hentBehandlingensTilstand(behandlingId);
+        if (tilstand != null) {
+            opprettProsessTask(behandlingId, tilstand);
+        }
     }
 
     private void opprettProsessTask(long behandlingId, BehandlingTilstand behandlingTilstand) {
