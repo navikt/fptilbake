@@ -3,7 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingEnhetEventPubliserer;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingEnhetEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
@@ -22,7 +23,7 @@ public class BehandlendeEnhetTjeneste {
     private HistorikkRepository historikkRepository;
     private BehandlingRepository behandlingRepository;
 
-    private BehandlingEnhetEventPubliserer eventPubliserer;
+    private BehandlingEventPubliserer eventPubliserer;
 
     BehandlendeEnhetTjeneste() {
         // for CDI proxy
@@ -30,7 +31,7 @@ public class BehandlendeEnhetTjeneste {
 
     @Inject
     public BehandlendeEnhetTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                    BehandlingEnhetEventPubliserer eventPubliserer) {
+                                    BehandlingEventPubliserer eventPubliserer) {
         this.historikkRepository = repositoryProvider.getHistorikkRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eventPubliserer = eventPubliserer;
@@ -43,7 +44,7 @@ public class BehandlendeEnhetTjeneste {
 
         behandling.setBehandlendeOrganisasjonsEnhet(nyEnhet);
         behandlingRepository.lagre(behandling, lås);
-        eventPubliserer.fireEvent(behandling);
+        eventPubliserer.fireEvent(new BehandlingEnhetEvent(behandling));
     }
 
     private void lagHistorikkInnslagForByttBehandlendeEnhet(Behandling behandling, OrganisasjonsEnhet nyEnhet, HistorikkAktør aktør) {

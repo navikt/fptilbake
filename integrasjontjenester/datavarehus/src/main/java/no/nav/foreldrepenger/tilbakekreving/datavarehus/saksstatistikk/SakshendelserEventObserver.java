@@ -3,10 +3,12 @@ package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingEnhetEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingSaksbehandlerEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingskontrollEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -31,18 +33,22 @@ public class SakshendelserEventObserver {
     }
 
     public void observerAksjonpunktStatusEvent(@Observes AksjonspunktStatusEvent event) {
+        var aksjonspunkter = event.getAksjonspunkter();
+        // Utvider behandlingStatus i DVH med VenteKategori
+        if (aksjonspunkter.stream().anyMatch(Aksjonspunkt::erAutopunkt)) {
+            klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
+        }
+    }
+
+    public void observerBehandlingStatusEvent(@Observes BehandlingStatusEvent event) {
         klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
     }
 
-    public void observerBehandlingAvsluttetEvent(@Observes BehandlingStatusEvent.BehandlingAvsluttetEvent event) {
+    public void observerEndretBehandlendeEnhetEvent(@Observes BehandlingEnhetEvent event) {
         klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
     }
 
-    public void observerAksjonspunktHarEndretBehandlendeEnhetEvent(@Observes BehandlingEnhetEvent event) {
-        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
-    }
-
-    public void observerStoppetEvent(@Observes BehandlingskontrollEvent.StoppetEvent event) {
+    public void observerEndretAnsvarligSaksbehandlerEvent(@Observes BehandlingSaksbehandlerEvent event) {
         klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
     }
 

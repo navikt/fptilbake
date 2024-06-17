@@ -13,6 +13,8 @@ import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingSaksbehandlerEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -32,6 +34,7 @@ public class AksjonspunktApplikasjonTjeneste {
     private BehandlingRepository behandlingRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
+    private BehandlingEventPubliserer behandlingEventPubliserer;
 
     AksjonspunktApplikasjonTjeneste() {
         // For CDI
@@ -39,10 +42,12 @@ public class AksjonspunktApplikasjonTjeneste {
 
     @Inject
     public AksjonspunktApplikasjonTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                           BehandlingskontrollProvider behandlingskontrollProvider) {
+                                           BehandlingskontrollProvider behandlingskontrollProvider,
+                                           BehandlingEventPubliserer behandlingEventPubliserer) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.behandlingskontrollTjeneste = behandlingskontrollProvider.getBehandlingskontrollTjeneste();
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollProvider.getBehandlingskontrollAsynkTjeneste();
+        this.behandlingEventPubliserer = behandlingEventPubliserer;
     }
 
     public void bekreftAksjonspunkter(Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer, Long behandlingId) {
@@ -132,7 +137,12 @@ public class AksjonspunktApplikasjonTjeneste {
         if (bekreftedeAksjonspunktDtoer.stream().anyMatch(FatteVedtakDto.class::isInstance)) {
             return;
         }
-        behandling.setAnsvarligSaksbehandler(getCurrentUserId());
+        var aktivBruker = getCurrentUserId();
+        if (!Objects.equals(behandling.getAnsvarligSaksbehandler(), aktivBruker)) {
+            behandling.setAnsvarligSaksbehandler(aktivBruker);
+            // Datavarehus
+            behandlingEventPubliserer.fireEvent(new BehandlingSaksbehandlerEvent(behandling));
+        }
     }
 
     private String getCurrentUserId() {
