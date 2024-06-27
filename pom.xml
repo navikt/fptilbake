@@ -37,7 +37,7 @@
         <!-- Jakarta deps -->
         <felles.version>7.2.1</felles.version>
         <prosesstask.version>5.0.11</prosesstask.version>
-        <fpkontrakter.version>9.1.15</fpkontrakter.version>
+        <fpkontrakter.version>9.1.19</fpkontrakter.version>
         <abakus-kontrakt.version>2.1.2</abakus-kontrakt.version>
         <verapdf-validation-model.version>1.26.1</verapdf-validation-model.version>
         <!-- Jakarta deps end -->
@@ -240,7 +240,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>jms-integrasjon</artifactId>
-                <version>3.2.6</version>
+                <version>3.2.7</version>
             </dependency>
 
             <dependency>
