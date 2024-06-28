@@ -4,6 +4,7 @@ public enum Tillegsinformasjon {
     PERSONOPPLYSNINGER("personopplysninger-tilbake", "soeker-personopplysninger"),
     VARSELTEKST("tilbakekrevingsvarsel-fritekst"),
     SØKNAD("soknad-backend"),
+    SENDTOPPDRAG("oppdrag-info"),
     TILBAKEKREVINGSVALG("tilbakekreving-valg", "tilbakekrevingvalg"),
     FAGSAK("fagsak", "fagsak"),
     VERGE("verge-backend", "verge");

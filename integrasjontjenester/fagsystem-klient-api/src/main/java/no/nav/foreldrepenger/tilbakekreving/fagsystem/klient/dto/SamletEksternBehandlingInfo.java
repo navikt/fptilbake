@@ -24,6 +24,7 @@ public class SamletEksternBehandlingInfo {
     private SoknadDto søknad;
     private FagsakDto fagsak;
     private VergeDto verge;
+    private SendtoppdragDto sendtoppdrag;
 
     public EksternBehandlingsinfoDto getGrunninformasjon() {
         return grunninformasjon;
@@ -37,6 +38,11 @@ public class SamletEksternBehandlingInfo {
     public String getVarseltekst() {
         check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.VARSELTEKST), "Utvikler-feil: har ikke hentet varseltekst");
         return varseltekst;
+    }
+
+    public SendtoppdragDto getSendtoppdrag() {
+        check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.SENDTOPPDRAG), "Utvikler-feil: har ikke hentet sendt oppdrag");
+        return sendtoppdrag;
     }
 
     public TilbakekrevingValgDto getTilbakekrevingsvalg() {
@@ -111,6 +117,11 @@ public class SamletEksternBehandlingInfo {
             return this;
         }
 
+        public Builder setSendtoppdrag(SendtoppdragDto sendtoppdrag) {
+            kladd.sendtoppdrag = sendtoppdrag;
+            return this;
+        }
+
         public Builder setVarseltekst(VarseltekstDto varseltekst) {
             kladd.varseltekst = varseltekst.getVarseltekst();
             return this;
@@ -143,6 +154,7 @@ public class SamletEksternBehandlingInfo {
             valider(Tillegsinformasjon.SØKNAD, SamletEksternBehandlingInfo::getSøknad);
             valider(Tillegsinformasjon.VERGE, SamletEksternBehandlingInfo::getVerge);
             valider(Tillegsinformasjon.VARSELTEKST, SamletEksternBehandlingInfo::getVarseltekst);
+            valider(Tillegsinformasjon.SENDTOPPDRAG, SamletEksternBehandlingInfo::getSendtoppdrag);
             return kladd;
         }
 
