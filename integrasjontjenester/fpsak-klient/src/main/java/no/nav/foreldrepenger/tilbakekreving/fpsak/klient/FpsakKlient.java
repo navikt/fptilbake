@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.UriBuilder;
+
 import no.nav.foreldrepenger.kontrakter.simulering.resultat.v1.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
@@ -20,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandli
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.FagsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SendtoppdragDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SoknadDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VarseltekstDto;
@@ -88,6 +90,9 @@ public class FpsakKlient implements FagsystemKlient {
                 }
                 if (tilleggsinformasjon.contains(Tillegsinformasjon.VARSELTEKST) && lenke.getRel().equals(Tillegsinformasjon.VARSELTEKST.getFpsakRelasjonNavn())) {
                     hentVarseltekst(lenke).ifPresent(builder::setVarseltekst);
+                }
+                if (tilleggsinformasjon.contains(Tillegsinformasjon.SENDTOPPDRAG) && lenke.getRel().equals(Tillegsinformasjon.SENDTOPPDRAG.getFpsakRelasjonNavn())) {
+                    hentSendtoppdrag(lenke).ifPresent(builder::setSendtoppdrag);
                 }
                 if (tilleggsinformasjon.contains(Tillegsinformasjon.SØKNAD) && lenke.getRel().equals(Tillegsinformasjon.SØKNAD.getFpsakRelasjonNavn())) {
                     builder.setFamiliehendelse(hentSøknad(lenke));
@@ -182,6 +187,11 @@ public class FpsakKlient implements FagsystemKlient {
         URI endpoint = endpointFraLink(resourceLink);
         return get(endpoint, VarseltekstDto.class);
 
+    }
+
+    private Optional<SendtoppdragDto> hentSendtoppdrag(BehandlingResourceLinkDto resourceLink) {
+        URI endpoint = endpointFraLink(resourceLink);
+        return get(endpoint, SendtoppdragDto.class);
     }
 
     private SoknadDto hentSøknad(BehandlingResourceLinkDto resourceLink) {
