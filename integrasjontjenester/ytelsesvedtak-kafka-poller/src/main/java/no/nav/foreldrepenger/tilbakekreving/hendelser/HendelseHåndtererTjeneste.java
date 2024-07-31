@@ -4,6 +4,7 @@ import static java.time.temporal.TemporalAdjusters.next;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -68,20 +69,20 @@ public class HendelseHåndtererTjeneste {
     public void håndterHendelse(HendelseTaskDataWrapper hendelseTaskDataWrapper, Henvisning henvisning, String kaller) {
         var eksternBehandlingUuid = hendelseTaskDataWrapper.getBehandlingUuid();
         var samletBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG, Tillegsinformasjon.VARSELTEKST, Tillegsinformasjon.SENDTOPPDRAG);
-        var tbkData = samletBehandlingInfo.getTilbakekrevingsvalg();
-        var åpenTilbakekreving = behandlingRepository.finnÅpenTilbakekrevingsbehandling(hendelseTaskDataWrapper.getSaksnummer())
-            .orElse(null);var harSendtVarselTidligere = åpenTilbakekreving != null && brevSporingRepository.harVarselBrevSendtForBehandlingId(åpenTilbakekreving.getId());
+        var tbkVidereBehandling = Optional.ofNullable(samletBehandlingInfo.getTilbakekrevingsvalg())
+            .map(TilbakekrevingValgDto::getVidereBehandling).orElse(null);
+        var åpenTilbakekreving = behandlingRepository.finnÅpenTilbakekrevingsbehandling(hendelseTaskDataWrapper.getSaksnummer()).orElse(null);
 
-        if (skalOppretteTilbakekrevingEllerSendeNyttVarsel(tbkData, åpenTilbakekreving, samletBehandlingInfo.getVarseltekst())) {
+        if (skalOppretteTilbakekrevingEllerSendeNyttVarsel(tbkVidereBehandling, åpenTilbakekreving, samletBehandlingInfo.getVarseltekst())) {
             if (åpenTilbakekreving == null) { // Skal opprette tilbakekreving
                 LOG.info("Mottatt VedtakHendelse {} er relevant for tilbakekreving opprett for henvisning={} fra {}",
-                    tbkData.getVidereBehandling(), henvisning, kaller);
+                    tbkVidereBehandling, henvisning, kaller);
                 lagOpprettBehandlingTask(hendelseTaskDataWrapper, henvisning);
             } else { // Håndtere at det finnes tilbakekreving der man skal sende nytt varsel
-                // Start på nytt med nytt varselbrev
+                var harSendtVarselTidligere = brevSporingRepository.harVarselBrevSendtForBehandlingId(åpenTilbakekreving.getId());
                 var loggVarsel = harSendtVarselTidligere ? "er varslet tidligere" : "ikke er varslet";
                 LOG.info("Mottatt VedtakHendelse {} for behandling {} har bedt om varsel og det finnes åpen tilbakekreving {} som {}",
-                    tbkData.getVidereBehandling(), eksternBehandlingUuid.toString(), åpenTilbakekreving.getId(), loggVarsel);
+                    tbkVidereBehandling, eksternBehandlingUuid.toString(), åpenTilbakekreving.getId(), loggVarsel);
                 // Brute-force rewind slik at det sendes nytt varsel (og man venter på grunnlag)
                 rewindTilbakekrevingTilStart(åpenTilbakekreving, henvisning, eksternBehandlingUuid);
             }
@@ -109,9 +110,8 @@ public class HendelseHåndtererTjeneste {
                 .orElseThrow(() -> new NullPointerException("Henvisning fra saksbehandlingsklienten var null for behandling " + behandling.toString()));
     }
 
-    private boolean skalOppretteTilbakekrevingEllerSendeNyttVarsel(TilbakekrevingValgDto tbkData, Behandling åpenTilbakekreving, String varseltekst) {
-        return VidereBehandling.TILBAKEKR_OPPRETT.equals(tbkData.getVidereBehandling()) &&
-            (åpenTilbakekreving == null || (varseltekst != null && !varseltekst.isBlank()));
+    private boolean skalOppretteTilbakekrevingEllerSendeNyttVarsel(VidereBehandling tbkValg, Behandling åpenTilbakekreving, String varseltekst) {
+        return VidereBehandling.TILBAKEKR_OPPRETT.equals(tbkValg) && (åpenTilbakekreving == null || (varseltekst != null && !varseltekst.isBlank()));
     }
 
     private void lagOpprettBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper, Henvisning henvisning) {
