@@ -75,7 +75,7 @@ public class FaktaFeilutbetalingTjeneste {
 
     public BehandlingFeilutbetalingFakta hentBehandlingFeilutbetalingFakta(Long behandlingId) {
         var resultat = varselRepository.finnVarsel(behandlingId);
-        var eksternUuid = hentEksternUuid(behandlingId);
+        UUID eksternUuid = hentEksternUuid(behandlingId);
         SamletEksternBehandlingInfo samletBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG);
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = samletBehandlingInfo.getGrunninformasjon();
         TilbakekrevingValgDto tilbakekrevingValg = samletBehandlingInfo.getTilbakekrevingsvalg();

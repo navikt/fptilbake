@@ -1,8 +1,17 @@
 version: '3.7'
 services:
   oracle:
-    image: ghcr.io/navikt/oracle-foreldrepenger:18-migrert
+    image: gvenzl/oracle-xe:21.3.0-slim-faststart
+    environment:
+      - ORACLE_RANDOM_PASSWORD=true
     shm_size: 2gb
     ports:
       - "1521:1521"
+    volumes:
+      - ./oracle-init/:/docker-entrypoint-initdb.d/
+    healthcheck:
+      test: [ "CMD-SHELL", "healthcheck.sh" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     container_name: oraclefptilbake
