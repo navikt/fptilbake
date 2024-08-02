@@ -13,6 +13,7 @@ import no.nav.openapi.spec.utils.http.DynamicObjectMapperResolverVaryFilter;
 
 import org.glassfish.jersey.server.ServerProperties;
 
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -82,7 +83,7 @@ public class ApiConfig extends Application {
         try {
             return openapiSetupHelper.resolveOpenAPI();
         } catch (OpenApiConfigurationException e) {
-            throw  new TekniskException("OPEN-API", e.getMessage(), e);
+            throw new TekniskException("OPEN-API", e.getMessage(), e);
         }
     }
 
