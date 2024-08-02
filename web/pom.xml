@@ -71,6 +71,30 @@
                     </rules>
                 </configuration>
             </plugin>
+            <!--
+               This plugin lets us generate the json formatted openapi specification for the project at build time
+               without starting a server instance and calling the swagger server.
+
+               The compile phase must have run before this so that the classes that defines the api has been built.
+
+               By default the plugin writes the result to the file target/k9-sak.openapi.json. One can override this
+               with an argument override from the command line.
+
+               Example of invocation from root project dir:
+
+               mvn -&dash;projects web compile exec:java -Dexec.args="/tmp/openapi.json"
+           -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>no.nav.foreldrepenger.tilbakekreving.web.app.util.OpenapiGenerate</mainClass>
+                    <classpathScope>compile</classpathScope>
+                    <arguments>
+                        <argument>${project.build.sourceDirectory}/../resources/openapi-ts-client/XXk9-tilbake.openapi.json</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

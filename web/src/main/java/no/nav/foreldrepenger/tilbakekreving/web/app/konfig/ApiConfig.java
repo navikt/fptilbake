@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 
@@ -15,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.Historik
 import org.glassfish.jersey.server.ServerProperties;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
-import io.swagger.v3.oas.integration.GenericOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -63,6 +63,8 @@ public class ApiConfig extends Application {
 
     public static final String API_URI = "/api";
 
+    private final OpenAPI openAPI;
+
     public ApiConfig() {
         var oas = new OpenAPI();
         var info = new Info()
@@ -75,12 +77,17 @@ public class ApiConfig extends Application {
         var oasConfig = new SwaggerConfiguration()
             .openAPI(oas)
             .prettyPrint(true)
+            .scannerClass("io.swagger.v3.jaxrs2.integration.JaxrsAnnotationScanner")
             .resourceClasses(getClasses().stream().map(Class::getName).collect(Collectors.toSet()));
         try {
-            new GenericOpenApiContextBuilder<>().openApiConfiguration(oasConfig).buildContext(true).read();
+            this.openAPI = new JaxrsOpenApiContextBuilder<>().openApiConfiguration(oasConfig).buildContext(true).read();
         } catch (OpenApiConfigurationException e) {
             throw new TekniskException("OPEN-API", e.getMessage(), e);
         }
+    }
+
+    public OpenAPI getOpenAPI() {
+        return openAPI;
     }
 
     @Override
