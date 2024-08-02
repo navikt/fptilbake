@@ -78,7 +78,7 @@ public final class Databaseskjemainitialisering {
     private static DataSource createDs(String user) {
         Objects.requireNonNull(user, "user");
         var cfg = new HikariConfig();
-        cfg.setJdbcUrl("jdbc:oracle:thin:@localhost:1521:XE");
+        cfg.setJdbcUrl(buildJdbcUrl());
         cfg.setUsername(user);
         cfg.setPassword(user);
         cfg.setConnectionTimeout(1500);
@@ -88,5 +88,12 @@ public final class Databaseskjemainitialisering {
         var ds = new HikariDataSource(cfg);
         getRuntime().addShutdownHook(new Thread(ds::close));
         return ds;
+    }
+
+    private static String buildJdbcUrl() {
+        return String.format("jdbc:oracle:thin:@//%s:%s/%s",
+            ENV.getProperty("database.host", "localhost"),
+            ENV.getProperty("database.post", "1521"),
+            ENV.getProperty("database.service", "XE"));
     }
 }
