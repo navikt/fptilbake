@@ -39,6 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.dokument.DokumentR
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.FeilutbetalingSisteBehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.FeilutbetalingÅrsakRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordeling.FordelRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningAktørRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningBehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningKravgrunnlagRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fpoversikt.FpOversiktRestTjeneste;
@@ -102,6 +103,7 @@ public class ApiConfig extends Application {
             TilbakekrevingResultatRestTjeneste.class,
             TotrinnskontrollRestTjeneste.class,
             BrevRestTjeneste.class,
+            ForvaltningAktørRestTjeneste.class,
             FordelRestTjeneste.class,
             ForvaltningBehandlingRestTjeneste.class,
             ForvaltningKravgrunnlagRestTjeneste.class,
