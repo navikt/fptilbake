@@ -80,9 +80,8 @@ public class HendelseHåndtererTjeneste {
             .map(TilbakekrevingValgDto::videreBehandling).orElse(null);
         var åpenTilbakekreving = behandlingRepository.finnÅpenTilbakekrevingsbehandling(hendelseTaskDataWrapper.getSaksnummer()).orElse(null);
 
+        LOG.info("Behandle VedtakHendelse {} for henvisning={} fra {}", tbkVidereBehandling, henvisning, kaller);
         if (åpenTilbakekreving == null && oppretteTilbakekreving(tbkVidereBehandling)) {
-            LOG.info("Mottatt VedtakHendelse {} er relevant for tilbakekreving opprett for henvisning={} fra {}", tbkVidereBehandling, henvisning,
-                kaller);
             lagOpprettBehandlingTask(hendelseTaskDataWrapper, henvisning);
         } else if (åpenTilbakekreving != null && oppretteTilbakekreving(tbkVidereBehandling) && nyttVarsel(samletBehandlingInfo.getVarseltekst())) {
             // Brute-force rewind slik at det sendes nytt varsel (og man venter på grunnlag)
@@ -141,8 +140,8 @@ public class HendelseHåndtererTjeneste {
 
         var harSendtVarselTidligere = brevSporingRepository.harVarselBrevSendtForBehandlingId(åpenTilbakekreving.getId());
         var loggVarsel = harSendtVarselTidligere ? "er varslet tidligere" : "ikke er varslet";
-        LOG.info("Mottatt VedtakHendelse Opprett Tilbakekreving for behandling {} har bedt om varsel og det finnes åpen tilbakekreving {} som {}",
-            eksternBehandlingUuid.toString(), åpenTilbakekreving.getId(), loggVarsel);
+        LOG.info("Behandle VedtakHendelse Opprett Tilbakekreving m/varsel i henvisning={} åpen tilbakekreving {} som {}",
+            henvisning, åpenTilbakekreving.getId(), loggVarsel);
 
         EksternBehandling eksternBehandling = new EksternBehandling(åpenTilbakekreving, henvisning, eksternBehandlingUuid);
         eksternBehandlingRepository.lagre(eksternBehandling);
