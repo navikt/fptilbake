@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="web/generate typescript client" type="docker-deploy" factoryName="docker-image" server-name="Docker">
+  <configuration default="false" name="web/generate k9-tillbake typescript client" type="docker-deploy" factoryName="docker-image" server-name="Docker">
     <deployment type="docker-image">
       <settings>
         <option name="imageTag" value="europe-north1-docker.pkg.dev/nais-management-233d/k9saksbehandling/navikt/openapi-ts-clientmaker-cli:v1" />
@@ -9,12 +9,12 @@
           <list>
             <DockerVolumeBindingImpl>
               <option name="containerPath" value="/in" />
-              <option name="hostPath" value="$PROJECT_DIR$/web/src/main/resources/openapi-ts-client" />
+              <option name="hostPath" value="$PROJECT_DIR$/web/src/main/resources/openapi-ts-client/k9" />
               <option name="readOnly" value="true" />
             </DockerVolumeBindingImpl>
             <DockerVolumeBindingImpl>
               <option name="containerPath" value="/out" />
-              <option name="hostPath" value="$PROJECT_DIR$/web/target/ts-client" />
+              <option name="hostPath" value="$PROJECT_DIR$/web/target/ts-client/k9" />
             </DockerVolumeBindingImpl>
           </list>
         </option>

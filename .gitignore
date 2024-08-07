@@ -17,4 +17,4 @@ truststore.jts
 conf
 .mvn/maven.config
 .flattened*
-web/src/main/resources/openapi-ts-client/k9-tilbake.openapi.json
+web/src/main/resources/openapi-ts-client/k9/k9-tilbake.openapi.json

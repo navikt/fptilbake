@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="web/generate-openapi-json" type="MavenRunConfiguration" factoryName="Maven">
+  <configuration default="false" name="web/generate k9-tilbake.openapi.json" type="MavenRunConfiguration" factoryName="Maven">
     <MavenSettings>
       <option name="myGeneralSettings">
         <MavenGeneralSettings>
@@ -64,5 +64,26 @@
       </option>
     </MavenSettings>
     <method v="2" />
+  </configuration>
+  <configuration default="false" name="web/generate k9-tilbake.openapi.json" type="Application" factoryName="Application">
+    <envs>
+      <env name="app.name" value="k9-tilbake" />
+      <env name="AZURE_APP_CLIENT_ID" value="vtp" />
+      <env name="AZURE_APP_CLIENT_SECRET" value="vtp" />
+      <env name="AZURE_APP_WELL_KNOWN_URL" value="http://vtp:8060/rest/azuread/.well-known/openid-configuration" />
+      <env name="defaultDS.password" value="fptilbake" />
+      <env name="defaultDS.url" value="jdbc:oracle:thin:@localhost:1521:XE" />
+      <env name="defaultDS.username" value="fptilbake" />
+      <env name="KAFKA_BROKERS" value="localhost:9092" />
+      <env name="server.port" value="8030" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="no.nav.foreldrepenger.tilbakekreving.web.app.util.OpenapiGenerate" />
+    <module name="webapp" />
+    <option name="PROGRAM_PARAMETERS" value="src/main/resources/openapi-ts-client/k9/k9-tilbake.openapi.json" />
+    <option name="VM_PARAMETERS" value="-Dapp.name=k9-tilbake" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/web" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
   </configuration>
 </component>
