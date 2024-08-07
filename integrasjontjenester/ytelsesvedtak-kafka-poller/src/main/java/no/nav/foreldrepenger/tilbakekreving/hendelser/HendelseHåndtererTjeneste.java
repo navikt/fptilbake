@@ -4,6 +4,7 @@ import static java.time.temporal.TemporalAdjusters.next;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,7 +31,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SendtoppdragDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
@@ -91,11 +91,12 @@ public class HendelseHåndtererTjeneste {
         }
     }
 
-    private void settÅpenTilbakekrevingPåVent(Behandling åpenTilbakekreving, SendtoppdragDto oppdrag) {
-        if (åpenTilbakekreving != null && oppdrag != null) {
+    private void settÅpenTilbakekrevingPåVent(Behandling åpenTilbakekreving, Boolean sendtOppdrag) {
+        if (åpenTilbakekreving != null && !Objects.equals(sendtOppdrag, Boolean.FALSE)) {
             // For å redusere risiko for at det fattes vedtak basert på gammelt kravgrunnlag
             // Nytt ytelsesvedtak når det finnes åpen tilbakekreving vil ofte føre til at kravgrunnlag sperres samme kveld
             // Gjenoppta-batch kjører hverdager kl 07:00. Hvis helg, vent til tirsdag morgen, ellers 24 timer.
+            // Statusendringer for vedtak gjort en fredag kommer gjerne fredag kveld rundt kl 23.
             var idag = LocalDate.now();
             var venteTid = idag.getDayOfWeek().getValue() > DayOfWeek.FRIDAY.getValue() ?
                 idag.with(next(DayOfWeek.TUESDAY)) : idag.plusDays(1);

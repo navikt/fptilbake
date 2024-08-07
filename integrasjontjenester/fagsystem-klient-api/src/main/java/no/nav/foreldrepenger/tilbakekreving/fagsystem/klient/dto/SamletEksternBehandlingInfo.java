@@ -24,7 +24,7 @@ public class SamletEksternBehandlingInfo {
     private SoknadDto søknad;
     private FagsakDto fagsak;
     private VergeDto verge;
-    private SendtoppdragDto sendtoppdrag;
+    private Boolean sendtoppdrag;
 
     public EksternBehandlingsinfoDto getGrunninformasjon() {
         return grunninformasjon;
@@ -40,7 +40,7 @@ public class SamletEksternBehandlingInfo {
         return varseltekst;
     }
 
-    public SendtoppdragDto getSendtoppdrag() {
+    public Boolean getSendtoppdrag() {
         check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.SENDTOPPDRAG), "Utvikler-feil: har ikke hentet sendt oppdrag");
         return sendtoppdrag;
     }
@@ -117,7 +117,7 @@ public class SamletEksternBehandlingInfo {
             return this;
         }
 
-        public Builder setSendtoppdrag(SendtoppdragDto sendtoppdrag) {
+        public Builder setSendtoppdrag(Boolean sendtoppdrag) {
             kladd.sendtoppdrag = sendtoppdrag;
             return this;
         }

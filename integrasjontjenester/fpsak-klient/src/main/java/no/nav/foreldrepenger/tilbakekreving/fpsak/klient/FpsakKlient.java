@@ -92,7 +92,7 @@ public class FpsakKlient implements FagsystemKlient {
                     hentVarseltekst(lenke).ifPresent(builder::setVarseltekst);
                 }
                 if (tilleggsinformasjon.contains(Tillegsinformasjon.SENDTOPPDRAG) && lenke.getRel().equals(Tillegsinformasjon.SENDTOPPDRAG.getFpsakRelasjonNavn())) {
-                    hentSendtoppdrag(lenke).ifPresent(builder::setSendtoppdrag);
+                    builder.setSendtoppdrag(hentSendtoppdrag(lenke).isPresent());
                 }
                 if (tilleggsinformasjon.contains(Tillegsinformasjon.SØKNAD) && lenke.getRel().equals(Tillegsinformasjon.SØKNAD.getFpsakRelasjonNavn())) {
                     builder.setFamiliehendelse(hentSøknad(lenke));
