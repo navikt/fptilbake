@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="web/generate k9-tillbake typescript client" type="docker-deploy" factoryName="docker-image" server-name="Docker">
+  <configuration default="false" name="web/generate k9-tilbake typescript client" type="docker-deploy" factoryName="docker-image" server-name="Docker">
     <deployment type="docker-image">
       <settings>
         <option name="imageTag" value="europe-north1-docker.pkg.dev/nais-management-233d/k9saksbehandling/navikt/openapi-ts-clientmaker-cli:v1" />
@@ -21,8 +21,8 @@
       </settings>
     </deployment>
     <method v="2">
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="OpenapiGenerator" run_configuration_type="Application" />
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="web/pull openapi-ts-clientmaker-cli" run_configuration_type="ShConfigurationType" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="web/generate k9-tilbake.openapi.json" run_configuration_type="Application" />
     </method>
   </configuration>
 </component>
