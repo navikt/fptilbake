@@ -20,7 +20,7 @@ import jakarta.ws.rs.core.Response;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.ByttAktørRequest;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.aktørbytte.ByttAktørRequest;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -56,7 +56,7 @@ public class ForvaltningAktørRestTjeneste {
     @Operation(description = "MERGE: Oppdaterer aktørid for bruker i nødvendige tabeller", tags = "FORVALTNING", responses = {@ApiResponse(responseCode = "200", description = "Forekomster av utgått aktørid erstattet.")})
     @BeskyttetRessurs(actionType = ActionType.CREATE, property = DRIFT)
     public Response oppdaterAktoerId(@TilpassetAbacAttributt(supplierClass = AktørRequestAbacDataSupplier.class) @NotNull @Valid ByttAktørRequest request) {
-        int antall = oppdaterAktørIdFor(request.getUtgåttAktør().getId(), request.getGyldigAktør().getId());
+        int antall = oppdaterAktørIdFor(request.getUtgåttAktør(), request.getGyldigAktør());
         return Response.ok(antall).build();
     }
 
@@ -85,7 +85,7 @@ public class ForvaltningAktørRestTjeneste {
         public AbacDataAttributter apply(Object obj) {
             var req = (ByttAktørRequest) obj;
             return AbacDataAttributter.opprett()
-                .leggTil(StandardAbacAttributtType.AKTØR_ID, req.getGyldigAktør().getId());
+                .leggTil(StandardAbacAttributtType.AKTØR_ID, req.getGyldigAktør());
         }
     }
 

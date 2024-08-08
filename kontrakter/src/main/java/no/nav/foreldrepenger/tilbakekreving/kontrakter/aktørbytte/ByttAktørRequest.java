@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto;
+package no.nav.foreldrepenger.tilbakekreving.kontrakter.aktørbytte;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -8,9 +8,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-
-import no.nav.abakus.vedtak.ytelse.Aktør;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 
 /**
@@ -23,23 +22,30 @@ public class ByttAktørRequest {
 
     @JsonProperty(value = "utgatt", required = true)
     @NotNull
-    @Valid
-    private AktørId utgåttAktør;
+    @Size(max = 20)
+    @Pattern(regexp = "^\\d+$", message = "AktørId [${validatedValue}] matcher ikke tillatt pattern [{regexp}]")
+    private String utgåttAktør;
 
     @JsonProperty(value = "gyldig", required = true)
     @NotNull
-    @Valid
-    private AktørId gyldigAktør;
+    @Size(max = 20)
+    @Pattern(regexp = "^\\d+$", message = "AktørId [${validatedValue}] matcher ikke tillatt pattern [{regexp}]")
+    private String gyldigAktør;
 
     public ByttAktørRequest() {
         // Jackson
     }
 
-    public AktørId getUtgåttAktør() {
+    public ByttAktørRequest(String utgåttAktør, String gyldigAktør) {
+        this.utgåttAktør = utgåttAktør;
+        this.gyldigAktør = gyldigAktør;
+    }
+
+    public String getUtgåttAktør() {
         return utgåttAktør;
     }
 
-    public AktørId getGyldigAktør() {
+    public String getGyldigAktør() {
         return gyldigAktør;
     }
 }
