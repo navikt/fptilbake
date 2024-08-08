@@ -208,7 +208,7 @@ class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         assertThat(fakta.getTotalPeriodeTom()).isEqualTo(TOM);
         assertThat(fakta.getPerioder()).isNotEmpty();
         assertThat(fakta.getDatoForRevurderingsvedtak()).isEqualTo(NOW);
-        assertThat(fakta.getTilbakekrevingValg().getVidereBehandling()).isEqualToComparingFieldByField(VidereBehandling.TILBAKEKR_OPPRETT);
+        assertThat(fakta.getTilbakekrevingValg().videreBehandling()).isEqualToComparingFieldByField(VidereBehandling.TILBAKEKR_OPPRETT);
     }
 
     private EksternBehandlingsinfoDto lagEksternBehandlingsInfo() {

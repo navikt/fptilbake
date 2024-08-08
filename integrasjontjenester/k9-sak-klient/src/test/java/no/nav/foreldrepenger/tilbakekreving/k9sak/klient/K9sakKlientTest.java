@@ -85,7 +85,7 @@ class K9sakKlientTest {
 
         Optional<TilbakekrevingValgDto> valgDto = klient.hentTilbakekrevingValg(BEHANDLING_UUID);
         assertThat(valgDto).isPresent();
-        assertThat(valgDto.get().getVidereBehandling()).isEqualByComparingTo(VidereBehandling.TILBAKEKR_OPPRETT);
+        assertThat(valgDto.get().videreBehandling()).isEqualByComparingTo(VidereBehandling.TILBAKEKR_OPPRETT);
     }
 
     @Test
