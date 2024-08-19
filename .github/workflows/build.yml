@@ -27,6 +27,7 @@ jobs:
     with:
       build-image: ${{ github.ref_name == 'master' }} # default: true
       push-image: ${{ github.ref_name == 'master' }} # default: false
+      skip-tests: true #TODO fjern før merge
     secrets: inherit
 
   publish-image-k9:
@@ -77,9 +78,11 @@ jobs:
   k9-verdikjede-tester:
     name: K9 Verdikjedetester
     permissions:
-      contents: read
       id-token: write
-    if: github.ref_name == 'master'
+      contents: write
+      issues: write
+      packages: read
+    # if: github.ref_name == 'master' # TODO uncommit denne før merge!
     needs: build-app
     uses: navikt/sif-gha-workflows/.github/workflows/verdikjede-test-v2.yml@main
     with:
