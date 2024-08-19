@@ -27,7 +27,6 @@ jobs:
     with:
       build-image: ${{ github.ref_name == 'master' }} # default: true
       push-image: ${{ github.ref_name == 'master' }} # default: false
-      skip-tests: true #TODO fjern før merge
     secrets: inherit
 
   publish-image-k9:
@@ -82,13 +81,12 @@ jobs:
       contents: write
       issues: write
       packages: read
-    # if: github.ref_name == 'master' # TODO uncommit denne før merge!
+    if: github.ref_name == 'master'
     needs: build-app
     uses: navikt/sif-gha-workflows/.github/workflows/verdikjede-test-v2.yml@main
     with:
       tag: ${{ needs.build-app.outputs.build-version }}
-      image_version: 'latest' #TODO fjern før merge
-#      image_version: ${{ needs.build-app.outputs.build-version }}
+      image_version: ${{ needs.build-app.outputs.build-version }}
       suites: "tilbake"
     secrets: inherit
 
