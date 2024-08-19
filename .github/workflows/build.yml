@@ -47,7 +47,7 @@ jobs:
       skip-tests: true
       sonar-scan: false
     secrets: inherit
-    
+
   fptilbake-tester:
     name: Fptilbake tester
     permissions:
@@ -73,6 +73,21 @@ jobs:
       build-version: ${{ needs.build-app.outputs.build-version }}
       test-suite: verdikjede
     secrets: inherit
+
+  k9-verdikjede-tester:
+    name: K9 Verdikjedetester
+    permissions:
+      contents: read
+      id-token: write
+    if: github.ref_name == 'master'
+    needs: build-app
+    uses: navikt/sif-gha-workflows/.github/workflows/verdikjede-test-v2.yml@main
+    with:
+      tag: ${{ needs.build-app.outputs.build-version }}
+      image_version: ${{ needs.build-app.outputs.build-version }}
+      suites: "tilbake"
+    secrets: inherit
+
 
   notify:
     name: Notify
@@ -116,7 +131,7 @@ jobs:
     permissions:
       id-token: write
     if: github.ref_name == 'master'
-    needs: [publish-image-k9, fptilbake-tester, verdikjede-tester]
+    needs: [publish-image-k9, fptilbake-tester, verdikjede-tester, k9-verdikjede-tester]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
     with:
       image: ${{ needs.publish-image-k9.outputs.build-version }}
@@ -129,7 +144,7 @@ jobs:
     permissions:
       id-token: write
     if: github.ref_name == 'master'
-    needs: [publish-image-k9, fptilbake-tester, verdikjede-tester, deploy-dev-k9saksbehandling]
+    needs: [publish-image-k9, fptilbake-tester, verdikjede-tester, k9-verdikjede-tester, deploy-dev-k9saksbehandling, ]
     uses: navikt/fptilbake/.github/workflows/deploy.yml@master
     with:
       image: ${{ needs.publish-image-k9.outputs.build-version }}
