@@ -87,7 +87,8 @@ jobs:
     uses: navikt/sif-gha-workflows/.github/workflows/verdikjede-test-v2.yml@main
     with:
       tag: ${{ needs.build-app.outputs.build-version }}
-      image_version: ${{ needs.build-app.outputs.build-version }}
+      image_version: 'latest' #TODO fjern før merge
+#      image_version: ${{ needs.build-app.outputs.build-version }}
       suites: "tilbake"
     secrets: inherit
 
