@@ -32,6 +32,9 @@ public class VarselInfo extends BaseEntitet {
     @Column(name = "varsel_fritekst", nullable = false, updatable = false)
     private String varselTekst;
 
+    @Column(name = "varsel_fritekst_utvidet")
+    private String varselTekstUtvidet;
+
     @Column(name = "varsel_beloep")
     private Long varselBeløp;
 
@@ -48,7 +51,11 @@ public class VarselInfo extends BaseEntitet {
     }
 
     public String getVarselTekst() {
-        return varselTekst;
+        if (varselTekstUtvidet != null) {
+            return varselTekstUtvidet;
+        } else {
+            return varselTekst;
+        }
     }
 
     public Long getVarselBeløp() {
@@ -76,6 +83,7 @@ public class VarselInfo extends BaseEntitet {
         }
 
         public Builder medVarselTekst(String varselTekst) {
+            kladd.varselTekstUtvidet = varselTekst;
             kladd.varselTekst = varselTekst;
             return this;
         }
