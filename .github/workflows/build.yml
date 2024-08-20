@@ -77,8 +77,9 @@ jobs:
   k9-verdikjede-tester:
     name: K9 Verdikjedetester
     permissions:
-      contents: read
       id-token: write
+      contents: read
+      packages: read
     if: github.ref_name == 'master'
     needs: build-app
     uses: navikt/sif-gha-workflows/.github/workflows/verdikjede-test-v2.yml@main
