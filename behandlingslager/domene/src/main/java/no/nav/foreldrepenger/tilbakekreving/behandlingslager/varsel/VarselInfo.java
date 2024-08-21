@@ -32,7 +32,7 @@ public class VarselInfo extends BaseEntitet {
     @Column(name = "varsel_fritekst", nullable = false, updatable = false)
     private String varselTekst;
 
-    @Column(name = "varsel_fritekst_utvidet")
+    @Column(name = "varsel_fritekst_utvidet", nullable = false, updatable = false)
     private String varselTekstUtvidet;
 
     @Column(name = "varsel_beloep")
