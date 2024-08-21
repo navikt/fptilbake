@@ -77,14 +77,15 @@ jobs:
   k9-verdikjede-tester:
     name: K9 Verdikjedetester
     permissions:
-      contents: read
       id-token: write
+      contents: read
+      packages: read
     if: github.ref_name == 'master'
-    needs: build-app
+    needs: publish-image-k9
     uses: navikt/sif-gha-workflows/.github/workflows/verdikjede-test-v2.yml@main
     with:
-      tag: ${{ needs.build-app.outputs.build-version }}
-      image_version: ${{ needs.build-app.outputs.build-version }}
+      tag: ${{ needs.publish-image-k9.outputs.build-version }}
+      image_version: ${{ needs.publish-image-k9.outputs.build-version }}
       suites: "tilbake"
     secrets: inherit
 
