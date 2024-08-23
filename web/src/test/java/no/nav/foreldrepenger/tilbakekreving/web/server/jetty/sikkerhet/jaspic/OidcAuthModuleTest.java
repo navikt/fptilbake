@@ -13,6 +13,11 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.Configuration;
 
+import jakarta.security.auth.message.AuthStatus;
+import jakarta.security.auth.message.MessageInfo;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.eclipse.jetty.ee10.security.jaspi.JaspiMessageInfo;
 import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.http.HttpVersion;
@@ -20,18 +25,14 @@ import org.eclipse.jetty.server.ConnectionMetaData;
 import org.eclipse.jetty.server.Context;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
-import org.jose4j.json.JsonUtil;
 import org.jose4j.jwt.NumericDate;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import jakarta.security.auth.message.AuthStatus;
-import jakarta.security.auth.message.MessageInfo;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import no.nav.vedtak.sikkerhet.kontekst.IdentType;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.loginmodule.LoginContextConfiguration;
+import no.nav.vedtak.sikkerhet.kontekst.IdentType;
 import no.nav.vedtak.sikkerhet.oidc.config.AzureProperty;
 import no.nav.vedtak.sikkerhet.oidc.config.OpenIDProvider;
 import no.nav.vedtak.sikkerhet.oidc.config.impl.WellKnownConfigurationHelper;
@@ -43,14 +44,14 @@ import no.nav.vedtak.sikkerhet.oidc.validator.OidcTokenValidatorResult;
 
 class OidcAuthModuleTest {
 
-    private final OidcTokenValidator tokenValidator = Mockito.mock(OidcTokenValidator.class);
-    private final TokenLocator tokenLocator = Mockito.mock(TokenLocator.class);
-    private final CallbackHandler callbackHandler = Mockito.mock(CallbackHandler.class);
-    private final Configuration configuration = new LoginContextConfiguration();
+    private static final OidcTokenValidator tokenValidator = Mockito.mock(OidcTokenValidator.class);
+    private static final TokenLocator tokenLocator = Mockito.mock(TokenLocator.class);
+    private static final CallbackHandler callbackHandler = Mockito.mock(CallbackHandler.class);
+    private static final Configuration configuration = new LoginContextConfiguration();
 
-    private final OidcAuthModule authModule = new OidcAuthModule(tokenLocator, configuration);
-    private final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    private final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    private static final OidcAuthModule authModule = new OidcAuthModule(tokenLocator, configuration);
+    private static final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    private static final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
     private final Request requestBase = Mockito.mock(Request.class);
     private final Response responseBase = Mockito.mock(Response.class);
@@ -60,9 +61,15 @@ class OidcAuthModuleTest {
     private Subject subject = new Subject();
     private Subject serviceSubject = new Subject();
 
-    @BeforeEach
-    public void setUp() {
-        WellKnownConfigurationHelper.unsetWellKnownConfig();
+    private static final String WELL_KNOWN = System.getProperty(AzureProperty.AZURE_APP_WELL_KNOWN_URL.name());;
+    private static String CLIENT_ID = System.getProperty(AzureProperty.AZURE_APP_CLIENT_ID.name());;
+    private static String ISSUER = System.getProperty(AzureProperty.AZURE_OPENID_CONFIG_ISSUER.name());
+    private static String JWKS_URI = System.getProperty(AzureProperty.AZURE_OPENID_CONFIG_JWKS_URI.name());
+    private static String SYSTEMBRUKER = System.getProperty("systembruker.username");
+
+
+    @BeforeAll
+    public static void setUp() {
         authModule.initialize(null, null, callbackHandler, null);
 
         System.setProperty(AzureProperty.AZURE_APP_WELL_KNOWN_URL.name(),
@@ -74,11 +81,18 @@ class OidcAuthModuleTest {
 
         Map<String, String> testData = Map.of("issuer", OidcTokenGenerator.ISSUER, AzureProperty.AZURE_OPENID_CONFIG_JWKS_URI.name(),
             OidcTokenGenerator.ISSUER + "/jwks_uri");
-        WellKnownConfigurationHelper.setWellKnownConfig(OidcTokenGenerator.ISSUER + "/" + WellKnownConfigurationHelper.STANDARD_WELL_KNOWN_PATH,
-            JsonUtil.toJson(testData));
+
         OidcTokenValidatorConfig.addValidator(OpenIDProvider.AZUREAD, tokenValidator);
     }
-
+    
+    @AfterAll
+    public static void teardown() {
+        if (WELL_KNOWN != null) System.setProperty(AzureProperty.AZURE_APP_WELL_KNOWN_URL.name(), WELL_KNOWN);
+        if (CLIENT_ID != null) System.setProperty(AzureProperty.AZURE_APP_CLIENT_ID.name(), "OIDC");
+        if (ISSUER != null) System.setProperty(AzureProperty.AZURE_OPENID_CONFIG_ISSUER.name(), OidcTokenGenerator.ISSUER);
+        if (JWKS_URI != null) System.setProperty(AzureProperty.AZURE_OPENID_CONFIG_JWKS_URI.name(), OidcTokenGenerator.ISSUER + "/jwks_uri");
+        if (SYSTEMBRUKER != null) System.setProperty("systembruker.username", "JUnit Test");
+    }
     @Test
     void skal_ikke_slippe_gjennom_forespørsel_men_svare_med_401_etter_beskyttet_ressurs_når_forespørselen_ikke_har_med_id_token() throws Exception {
         when(request.getHeader("Accept")).thenReturn("application/json");
