@@ -84,7 +84,7 @@ public class VarselInfo extends BaseEntitet {
 
         public Builder medVarselTekst(String varselTekst) {
             kladd.varselTekstUtvidet = varselTekst;
-            kladd.varselTekst = varselTekst;
+            kladd.varselTekst = varselTekst.length() < 3000 ? varselTekst : varselTekst.substring(0, 3000);
             return this;
         }
 

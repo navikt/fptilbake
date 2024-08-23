@@ -27,7 +27,7 @@ public class BestillBrevDto implements AbacDto {
     private String brevmalkode;
 
     @NotNull
-    @Size(min = 1, max = 3000)
+    @Size(min = 1, max = 12000)
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String fritekst;
 
