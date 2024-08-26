@@ -24,7 +24,7 @@ class KravgrunnlagMapperTest extends FellesTestOppsett {
     @Test
     void skal_mappe_om_til_egen_domenemodell_og_konvertere_fnr_til_aktørId() {
         String xml = getInputXML("xml/kravgrunnlag_periode_FEIL.xml");
-        DetaljertKravgrunnlag input = KravgrunnlagXmlUnmarshaller.unmarshall(0L, xml);
+        DetaljertKravgrunnlag input = KravgrunnlagXmlUnmarshaller.unmarshall(0L, xml, true);
 
         Mockito.when(personinfoAdapterMock.hentAktørForFnr(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
 
@@ -49,7 +49,7 @@ class KravgrunnlagMapperTest extends FellesTestOppsett {
     @Test
     void skal_ha_med_klassekode_når_det_mappes_for_ytelsePeriode() {
         String xml = getInputXML("xml/kravgrunnlag_periode_YTEL.xml");
-        DetaljertKravgrunnlag input = KravgrunnlagXmlUnmarshaller.unmarshall(0L, xml);
+        DetaljertKravgrunnlag input = KravgrunnlagXmlUnmarshaller.unmarshall(0L, xml, true);
 
         Mockito.when(personinfoAdapterMock.hentAktørForFnr(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
 
@@ -75,7 +75,7 @@ class KravgrunnlagMapperTest extends FellesTestOppsett {
     @Test
     void skal_ignorere_belop_postering_med_positiv_ytel() {
         String xml = getInputXML("xml/kravgrunnlag_periode_POSITIV_YTEL.xml");
-        DetaljertKravgrunnlag input = KravgrunnlagXmlUnmarshaller.unmarshall(0L, xml);
+        DetaljertKravgrunnlag input = KravgrunnlagXmlUnmarshaller.unmarshall(0L, xml, true);
 
         Mockito.when(personinfoAdapterMock.hentAktørForFnr(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
 

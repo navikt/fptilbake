@@ -66,7 +66,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         LOG_CONTEXT.add("mottattXmlId", mottattXmlId);
 
         String råXml = økonomiMottattXmlRepository.hentMottattXml(mottattXmlId);
-        DetaljertKravgrunnlag kravgrunnlagDto = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, råXml);
+        DetaljertKravgrunnlag kravgrunnlagDto = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, råXml, true);
         Henvisning henvisning = kravgrunnlagMapper.finnHenvisning(kravgrunnlagDto);
         String saksnummer = FagsystemId.parse(kravgrunnlagDto.getFagsystemId()).getSaksnummer().getVerdi();
         LOG_CONTEXT.add("henvisning", henvisning.getVerdi());
