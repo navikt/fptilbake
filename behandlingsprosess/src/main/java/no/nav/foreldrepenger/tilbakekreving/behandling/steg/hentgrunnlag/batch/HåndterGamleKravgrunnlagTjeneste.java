@@ -72,7 +72,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
     protected KravgrunnlagMedStatus hentKravgrunnlagFraØkonomi(ØkonomiXmlMottatt økonomiXmlMottatt) {
         var melding = økonomiXmlMottatt.getMottattXml();
         var mottattXmlId = økonomiXmlMottatt.getId();
-        var detaljertKravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, melding, true);
+        var detaljertKravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, melding, false);
         var hentKravgrunnlagDetalj = forberedHentKravgrunnlagRequest(detaljertKravgrunnlag);
         try {
             var kravgrunnlag = kravgrunnlagHenter.hentKravgrunnlagFraOS(null, hentKravgrunnlagDetalj);
