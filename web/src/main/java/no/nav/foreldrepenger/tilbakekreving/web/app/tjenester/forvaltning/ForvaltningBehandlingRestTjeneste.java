@@ -405,7 +405,7 @@ public class ForvaltningBehandlingRestTjeneste {
                 "Kan ikke koble behandling med behandlingId=" + behandlingId + " til kravgrunnlag med mottattXmlId=" + mottattXml
                     + ". Kravgrunnlaget tilhører annen fagsak");
         }
-        DetaljertKravgrunnlag kravgrunnlagDto = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, mottattXml.getMottattXml());
+        DetaljertKravgrunnlag kravgrunnlagDto = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, mottattXml.getMottattXml(), true);
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagMapper.mapTilDomene(kravgrunnlagDto);
         KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
         grunnlagRepository.lagre(behandlingId, kravgrunnlag);

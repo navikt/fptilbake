@@ -1,7 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang;
 
-import jakarta.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
+
+import jakarta.xml.bind.JAXBException;
 
 import org.xml.sax.SAXException;
 
@@ -14,10 +15,15 @@ public class KravgrunnlagXmlUnmarshaller {
 
     private static final String XSD_PLASSERING = "xsd/kravgrunnlag_detalj.xsd";
 
-    public static DetaljertKravgrunnlag unmarshall(Long mottattXmlId, String xml) {
+    public static DetaljertKravgrunnlag unmarshall(Long mottattXmlId, String xml, boolean validate) {
 
         try {
-            DetaljertKravgrunnlagMelding melding = JaxbHelper.unmarshalAndValidateXMLWithStAX(DetaljertKravgrunnlagMelding.class, xml, XSD_PLASSERING);
+            DetaljertKravgrunnlagMelding melding;
+            if (validate) {
+                melding = JaxbHelper.unmarshalAndValidateXMLWithStAX(DetaljertKravgrunnlagMelding.class, xml, XSD_PLASSERING);
+            } else {
+                melding = JaxbHelper.unmarshalXMLWithStAX(DetaljertKravgrunnlagMelding.class, xml);
+            }
             DetaljertKravgrunnlag kravgrunnlag = melding.getDetaljertKravgrunnlag();
             if (kravgrunnlag != null) {
                 return kravgrunnlag;

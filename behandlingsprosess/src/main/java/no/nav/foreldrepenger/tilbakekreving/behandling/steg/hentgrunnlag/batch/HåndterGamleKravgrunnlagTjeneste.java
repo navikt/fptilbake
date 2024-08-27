@@ -72,7 +72,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
     protected KravgrunnlagMedStatus hentKravgrunnlagFraØkonomi(ØkonomiXmlMottatt økonomiXmlMottatt) {
         var melding = økonomiXmlMottatt.getMottattXml();
         var mottattXmlId = økonomiXmlMottatt.getId();
-        var detaljertKravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, melding);
+        var detaljertKravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, melding, false);
         var hentKravgrunnlagDetalj = forberedHentKravgrunnlagRequest(detaljertKravgrunnlag);
         try {
             var kravgrunnlag = kravgrunnlagHenter.hentKravgrunnlagFraOS(null, hentKravgrunnlagDetalj);
@@ -239,7 +239,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
     private KravgrunnlagMedStatus hentSperretKravgrunnlag(ØkonomiXmlMottatt økonomiXmlMottatt) {
         long mottattXmlId = økonomiXmlMottatt.getId();
         String melding = økonomiXmlMottatt.getMottattXml();
-        DetaljertKravgrunnlag detaljertKravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, melding);
+        DetaljertKravgrunnlag detaljertKravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, melding, true);
         Kravgrunnlag431 kravgrunnlag431 = lesKravgrunnlagMapper.mapTilDomene(detaljertKravgrunnlag);
         return KravgrunnlagMedStatus.forSperretKravgrunnlag(kravgrunnlag431);
     }
