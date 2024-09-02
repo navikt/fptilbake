@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 
@@ -32,6 +33,7 @@ public class VarselInfo extends BaseEntitet {
     @Column(name = "varsel_fritekst", nullable = false, updatable = false)
     private String varselTekst;
 
+    @Lob
     @Column(name = "varsel_fritekst_utvidet", nullable = false, updatable = false)
     private String varselTekstUtvidet;
 
