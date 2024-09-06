@@ -41,7 +41,7 @@
     "DOKARKIV_SCOPES": "api://prod-fss.teamdokumenthandtering.dokarkiv/.default",
     "DOKDIST_REST_DISTRIBUER_JOURNALPOST" : "https://dokdistfordeling.nais.adeo.no/rest/v1/distribuerjournalpost",
     "DOKDIST_SCOPES" : "api://prod-fss.teamdokumenthandtering.saf/.default",
-    "ABAC_ATTRIBUTT_DRIFT" : "no.nav.abac.attributter.k9.oppdrag.drift",
+    "ABAC_ATTRIBUTT_DRIFT" : "no.nav.abac.attributter.k9.drift",
     "SENSU_HOST": "sensu.nais",
     "SENSU_PORT": "3030",
     "METRIKKER_KRAVGRUNNLAG_OPPDATERINGSPERIODE" : "P2W",
