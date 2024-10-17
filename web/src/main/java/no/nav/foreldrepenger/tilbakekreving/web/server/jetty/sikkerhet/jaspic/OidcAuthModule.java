@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -170,7 +171,7 @@ public class OidcAuthModule implements ServerAuthModule {
         var valideringsResultat = OidcValidation.validerToken(token);
         var sluttbruker = valideringsResultat.isValid() ? valideringsResultat.subject() : null;
         if (sluttbruker != null) {
-            KontekstHolder.setKontekst(RequestKontekst.forRequest(sluttbruker.uid(), sluttbruker.shortUid(), sluttbruker.identType(), token, sluttbruker.grupper()));
+            KontekstHolder.setKontekst(RequestKontekst.forRequest(sluttbruker.uid(), sluttbruker.shortUid(), sluttbruker.identType(), token, sluttbruker.oid(), sluttbruker.grupper()));
         } else {
             return FAILURE;
         }

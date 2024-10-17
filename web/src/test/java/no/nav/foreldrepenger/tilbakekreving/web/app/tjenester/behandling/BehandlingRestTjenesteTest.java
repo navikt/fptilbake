@@ -124,7 +124,7 @@ class BehandlingRestTjenesteTest {
         when(behandlingTjenesteMock.hentEnhetForEksternBehandling(any())).thenReturn(new OrganisasjonsEnhet("9999", "Generisk"));
         when(revurderingTjenesteMock.opprettRevurdering(any(Long.class), any(BehandlingÅrsakType.class), any(OrganisasjonsEnhet.class), any(String.class)))
                 .thenReturn(mockBehandling());
-        KontekstHolder.setKontekst(RequestKontekst.forRequest("bruker", "bruker", IdentType.InternBruker, null, Set.of()));
+        KontekstHolder.setKontekst(RequestKontekst.forRequest("bruker", "bruker", IdentType.InternBruker, null, UUID.randomUUID(), Set.of()));
         OpprettBehandlingDto opprettBehandlingDto = opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE);
         opprettBehandlingDto.setBehandlingType(BehandlingType.REVURDERING_TILBAKEKREVING);
         opprettBehandlingDto.setBehandlingArsakType(BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
