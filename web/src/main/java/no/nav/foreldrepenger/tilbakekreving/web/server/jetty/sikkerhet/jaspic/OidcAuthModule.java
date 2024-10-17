@@ -170,9 +170,8 @@ public class OidcAuthModule implements ServerAuthModule {
 
         var valideringsResultat = OidcValidation.validerToken(token);
         var sluttbruker = valideringsResultat.isValid() ? valideringsResultat.subject() : null;
-
         if (sluttbruker != null) {
-            KontekstHolder.setKontekst(RequestKontekst.forRequest(sluttbruker.uid(), sluttbruker.shortUid(), sluttbruker.identType(), token, UUID.fromString(sluttbruker.uid()), sluttbruker.grupper()));
+            KontekstHolder.setKontekst(RequestKontekst.forRequest(sluttbruker.uid(), sluttbruker.shortUid(), sluttbruker.identType(), token, sluttbruker.oid(), sluttbruker.grupper()));
         } else {
             return FAILURE;
         }

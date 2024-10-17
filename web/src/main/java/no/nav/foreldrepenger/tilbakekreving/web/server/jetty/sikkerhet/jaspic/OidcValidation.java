@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.jaspic;
 
 import java.util.Set;
+import java.util.UUID;
 
 import no.nav.vedtak.sikkerhet.kontekst.Groups;
 import no.nav.vedtak.sikkerhet.kontekst.IdentType;
@@ -12,7 +13,7 @@ public final class OidcValidation {
     private OidcValidation() {
     }
 
-    public record SluttBruker(String uid, String shortUid, IdentType identType, Set<Groups> grupper) {}
+    public record SluttBruker(String uid, String shortUid, IdentType identType, UUID oid, Set<Groups> grupper) {}
 
     public record Resultat(boolean isValid, SluttBruker subject, String errorMessage) {}
 
@@ -24,7 +25,7 @@ public final class OidcValidation {
         var validateResult = tokenValidator.validate(openIDToken.primary());
         if (validateResult.isValid()) {
             return new Resultat(true, new SluttBruker(validateResult.getSubject(), validateResult.getCompactSubject(),
-                validateResult.getIdentType(), validateResult.getGrupper()),null);
+                validateResult.getIdentType(), validateResult.oid(), validateResult.getGrupper()),null);
         }
         return new Resultat(false, null, validateResult.getErrorMessage());
     }
