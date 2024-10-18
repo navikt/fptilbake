@@ -35,7 +35,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.loginmodu
 import no.nav.vedtak.sikkerhet.kontekst.IdentType;
 import no.nav.vedtak.sikkerhet.oidc.config.AzureProperty;
 import no.nav.vedtak.sikkerhet.oidc.config.OpenIDProvider;
-import no.nav.vedtak.sikkerhet.oidc.config.impl.WellKnownConfigurationHelper;
 import no.nav.vedtak.sikkerhet.oidc.token.OpenIDToken;
 import no.nav.vedtak.sikkerhet.oidc.token.TokenString;
 import no.nav.vedtak.sikkerhet.oidc.validator.OidcTokenValidator;
@@ -73,7 +72,7 @@ class OidcAuthModuleTest {
         authModule.initialize(null, null, callbackHandler, null);
 
         System.setProperty(AzureProperty.AZURE_APP_WELL_KNOWN_URL.name(),
-            OidcTokenGenerator.ISSUER + "/" + WellKnownConfigurationHelper.STANDARD_WELL_KNOWN_PATH);
+            OidcTokenGenerator.ISSUER + "/.well_known");
         System.setProperty(AzureProperty.AZURE_APP_CLIENT_ID.name(), "OIDC");
         System.setProperty(AzureProperty.AZURE_OPENID_CONFIG_ISSUER.name(), OidcTokenGenerator.ISSUER);
         System.setProperty(AzureProperty.AZURE_OPENID_CONFIG_JWKS_URI.name(), OidcTokenGenerator.ISSUER + "/jwks_uri");
@@ -84,7 +83,7 @@ class OidcAuthModuleTest {
 
         OidcTokenValidatorConfig.addValidator(OpenIDProvider.AZUREAD, tokenValidator);
     }
-    
+
     @AfterAll
     public static void teardown() {
         if (WELL_KNOWN != null) System.setProperty(AzureProperty.AZURE_APP_WELL_KNOWN_URL.name(), WELL_KNOWN);
@@ -141,7 +140,7 @@ class OidcAuthModuleTest {
         var gyldigIdToken = getGyldigToken();
         when(tokenLocator.getToken(any(HttpServletRequest.class))).thenReturn(Optional.of(gyldigIdToken));
         when(tokenValidator.validate(gyldigIdToken)).thenReturn(
-            OidcTokenValidatorResult.valid("demo", IdentType.utledIdentType("demo"), System.currentTimeMillis() / 1000 + 121));
+            OidcTokenValidatorResult.valid("demo", IdentType.InternBruker, System.currentTimeMillis() / 1000 + 121));
 
         AuthStatus result = authModule.validateRequest(request, subject, serviceSubject);
         assertThat(result).isEqualTo(AuthStatus.SUCCESS);
@@ -196,7 +195,7 @@ class OidcAuthModuleTest {
 
         var gyldigIdToken = getGyldigToken();
         when(tokenLocator.getToken(any(HttpServletRequest.class))).thenReturn(Optional.of(gyldigIdToken));
-        when(tokenValidator.validate(gyldigIdToken)).thenReturn(OidcTokenValidatorResult.valid("demo", IdentType.utledIdentType("demo"),
+        when(tokenValidator.validate(gyldigIdToken)).thenReturn(OidcTokenValidatorResult.valid("demo", IdentType.InternBruker,
             System.currentTimeMillis() / 1000 + sekunderGjenståendeGyldigTid));
 
         var result = authModule.validateRequest(request, subject, serviceSubject);
@@ -212,7 +211,7 @@ class OidcAuthModuleTest {
 
         var gyldigIdToken = getGyldigToken();
         when(tokenLocator.getToken(any(HttpServletRequest.class))).thenReturn(Optional.of(gyldigIdToken));
-        when(tokenValidator.validate(gyldigIdToken)).thenReturn(OidcTokenValidatorResult.valid("demo", IdentType.utledIdentType("demo"),
+        when(tokenValidator.validate(gyldigIdToken)).thenReturn(OidcTokenValidatorResult.valid("demo", IdentType.InternBruker,
             System.currentTimeMillis() / 1000 + sekunderGjenståendeGyldigTid));
 
         var result = authModule.validateRequest(request, subject, serviceSubject);
