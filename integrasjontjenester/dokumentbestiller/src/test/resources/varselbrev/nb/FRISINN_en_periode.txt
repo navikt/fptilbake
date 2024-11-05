@@ -13,19 +13,19 @@ For å avgjøre om vi kan kreve tilbake, tar vi først stilling til de tre øver
 Vi legger vekt på
 
 *-om du forstod eller burde forstått at beløpet du fikk utbetalt var feil
-om du har gitt riktig informasjon til NAV
-om du har gitt all informasjon til NAV i rett tid
+om du har gitt riktig informasjon til Nav
+om du har gitt all informasjon til Nav i rett tid
 hvor lang tid det har gått siden kompensasjonen ble feilutbetalt
 hvor stort det feilutbetalte beløpet er
-om feilen kan skyldes NAV-*
+om feilen kan skyldes Nav-*
 
-Selv om det er NAV som er skyld i feilutbetalingen, kan vi kreve at du betaler tilbake pengene.
+Selv om det er Nav som er skyld i feilutbetalingen, kan vi kreve at du betaler tilbake pengene.
 
 Dette går fram av folketrygdloven § 22-15.
 _Slik uttaler du deg
-Du har rett til å uttale deg og komme med en tilbakemelding på dette varselet. For å uttale deg logger du deg inn på Ditt NAV, og bruker tjenesten "Skriv til oss". Under tema for hva slags beskjed du skal sende velger du "Jobbsøker".
+Du har rett til å uttale deg og komme med en tilbakemelding på dette varselet. For å uttale deg logger du deg inn på Nav, og bruker tjenesten "Skriv til oss". Under tema for hva slags beskjed du skal sende velger du "Jobbsøker".
 _Har du spørsmål?
 Du finner nyttig informasjon på nav.no. Du kan også kontakte oss på telefon 55553333.
 
 Med vennlig hilsen
-NAV Familie- og pensjonsytelser
+Nav familie- og pensjonsytelser

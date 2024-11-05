@@ -24,7 +24,7 @@ import no.nav.vedtak.util.InputValideringRegex;
 public enum SærligGrunn implements Kodeverdi {
 
     GRAD_AV_UAKTSOMHET("GRAD_UAKTSOMHET", "Graden av uaktsomhet hos den kravet retter seg mot"),
-    HELT_ELLER_DELVIS_NAVS_FEIL("HELT_ELLER_DELVIS_NAVS_FEIL", "Om feilen helt eller delvis kan tilskrives NAV"),
+    HELT_ELLER_DELVIS_NAVS_FEIL("HELT_ELLER_DELVIS_NAVS_FEIL", "Om feilen helt eller delvis kan tilskrives Nav"),
     STØRRELSE_BELØP("STOERRELSE_BELOEP", "Størrelsen på feilutbetalt beløp"),
     TID_FRA_UTBETALING("TID_FRA_UTBETALING", "Hvor lang tid siden utbetalingen fant sted"),
     ANNET("ANNET", "Annet");

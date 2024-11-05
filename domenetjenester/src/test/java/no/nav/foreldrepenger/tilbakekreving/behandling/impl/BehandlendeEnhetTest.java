@@ -19,7 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 class BehandlendeEnhetTest extends FellesTestOppsett {
 
     private static final String NY_ENHET_ID = "4849";
-    private static final String NY_ENHET_NAVN = "NAV Familie- og pensjonsytelser Tromsø";
+    private static final String NY_ENHET_NAVN = "Nav familie- og pensjonsytelser Tromsø";
     private BehandlingEventPubliserer mockEventPubliserer;
     private BehandlendeEnhetTjeneste behandlendeEnhetTjeneste;
 

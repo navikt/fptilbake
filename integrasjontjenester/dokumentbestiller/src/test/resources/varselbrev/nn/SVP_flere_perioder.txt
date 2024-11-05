@@ -17,13 +17,13 @@ For å avgjere om vi kan krevje tilbake, tek vi først stilling til dei tre øvs
 Vi legger vekt på
 
 *-om du forstod eller burde forstått at beløpet du fekk utbetalt var feil
-om du har gitt riktig informasjon til NAV
-om du har gitt all informasjon til NAV i rett tid
+om du har gitt riktig informasjon til Nav
+om du har gitt all informasjon til Nav i rett tid
 kor lang tid det har gått sidan svangerskapspengane blei feilutbetalt
 kor stort det feilutbetalte beløpet er
-om feilen kan vere NAV si skuld-*
+om feilen kan vere Nav si skuld-*
 
-Sjølv om det er NAV som er skuld i feilutbetalinga, kan vi krevje at du betaler tilbake pengane.
+Sjølv om det er Nav som er skuld i feilutbetalinga, kan vi krevje at du betaler tilbake pengane.
 
 Dersom du må betale tilbake, og du har gitt oss feil eller mangelfull informasjon, kan vi krevje at du betaler eit rentetillegg på ti prosent av beløpet du skuldar.
 
@@ -36,4 +36,4 @@ _Har du spørsmål?
 Du finn nyttig informasjon på nav.no/familie.
 
 Med vennleg helsing
-NAV Familie- og pensjonsytelsar
+Nav familie- og pensjonsytelsar

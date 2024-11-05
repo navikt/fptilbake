@@ -83,7 +83,7 @@ class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
                         .setGrunninformasjon(eksternBehandlingsinfoDto)
                         .build());
 
-        OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet("1234", "NAV-TESTENHET");
+        OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet("1234", "Nav Testenhet");
         behandling.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
     }
 

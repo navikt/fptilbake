@@ -50,7 +50,7 @@ public abstract class FellesTestOppsett {
 
     protected static final LocalDate FOM = LocalDate.of(2016, 3, 10);
     protected static final String BEHANDLENDE_ENHET_ID = "4833";
-    protected static final String BEHANDLENDE_ENHET_NAVN = "NAV Familie- og pensjonsytelser Oslo 1";
+    protected static final String BEHANDLENDE_ENHET_NAVN = "Nav familie- og pensjonsytelser Oslo 1";
 
     protected BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     protected PersoninfoAdapter mockTpsTjeneste = mock(PersoninfoAdapter.class);
