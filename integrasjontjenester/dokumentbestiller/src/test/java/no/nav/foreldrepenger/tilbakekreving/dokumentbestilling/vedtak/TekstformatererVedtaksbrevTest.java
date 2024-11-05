@@ -886,7 +886,7 @@ Vedtaket er gjort etter Folketrygdloven § 22-15.
 _Skatt og skatteoppgjør
 Skatten som er trukket fra beløpet du skal betale tilbake, er beregnet etter det du har blitt trukket i skatt i gjennomsnitt per måned. Det betyr at beløpet du skal betale tilbake etter skatt, ikke alltid er likt med det beløpet du fikk inn på konto.
 
-NAV gir opplysninger til Skattetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trukket fra. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
+Nav gir opplysninger til Skattetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trukket fra. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
 _Hvordan betaler du tilbake?
 Du vil få faktura fra Skatteetaten på det beløpet du skal betale tilbake.
 
@@ -903,7 +903,7 @@ _Trenger du mer informasjon?
 Du finner informasjon som kan være nyttig for deg på nav.no/omsorgspenger.
 
 Med vennlig hilsen
-NAV Arbeid og ytelser
+Nav arbeid og ytelser
 
 
 Vedlegg: Resultatet av tilbakebetalingssaken""");
@@ -937,7 +937,7 @@ Vedtaket er gjort etter Folketrygdloven § 22-15.
 _Skatt og skatteoppgjør
 Skatten som er trukket fra beløpet du skal betale tilbake, er beregnet etter det du har blitt trukket i skatt i gjennomsnitt per måned. Det betyr at beløpet du skal betale tilbake etter skatt, ikke alltid er likt med det beløpet du fikk inn på konto.
 
-NAV gir opplysninger til Skattetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trukket fra. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
+Nav gir opplysninger til Skattetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trukket fra. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
 _Hvordan betaler du tilbake?
 Du vil få faktura fra Skatteetaten på det beløpet du skal betale tilbake.
 
@@ -956,7 +956,7 @@ Du finner informasjon som kan være nyttig for deg på nav.no/opplaringspenger.
 Du kan også kontakte oss på telefon 55 55 33 33.
 
 Med vennlig hilsen
-NAV Arbeid og ytelser
+Nav arbeid og ytelser
 
 
 Vedlegg: Resultatet av tilbakebetalingssaken""");

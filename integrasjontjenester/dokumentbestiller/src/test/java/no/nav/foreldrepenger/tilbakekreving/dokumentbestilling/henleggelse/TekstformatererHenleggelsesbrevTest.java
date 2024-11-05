@@ -188,7 +188,7 @@ class TekstformatererHenleggelsesbrevTest {
         henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
         henleggelsesbrevSamletInfo.setVarsletDato(niendeMars);
         String overskrift = TekstformatererHenleggelsesbrev.lagHenleggelsebrevOverskrift(henleggelsesbrevSamletInfo);
-        String fasit = "NAV har avsluttet saken din om tilbakebetaling";
+        String fasit = "Nav har avsluttet saken din om tilbakebetaling";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
 
@@ -221,7 +221,7 @@ class TekstformatererHenleggelsesbrevTest {
         henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
         henleggelsesbrevSamletInfo.setVarsletDato(niendeMars);
         String overskrift = TekstformatererHenleggelsesbrev.lagHenleggelsebrevOverskrift(henleggelsesbrevSamletInfo);
-        String fasit = "NAV har avslutta saka di om tilbakebetaling";
+        String fasit = "Nav har avslutta saka di om tilbakebetaling";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
 

@@ -24,7 +24,7 @@ Vedtaket er gjort etter Folketrygdloven § 22-15.
 _Skatt og skatteoppgjer
 Skatten som er trekt frå beløpet du skal betale tilbake, er berekna etter det du har blitt trekt i skatt i gjennomsnitt per månad. Det betyr at beløpet du skal betale tilbake etter skatt, ikkje alltid er likt med det beløpet du fekk inn på konto.
 
-NAV gjev opplysningar til Skatteetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trekt frå. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjer.
+Nav gjev opplysningar til Skatteetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trekt frå. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjer.
 _Korleis betaler du tilbake?
 Du vil få faktura frå Skatteetaten på det beløpet du skal betale tilbake.
 
@@ -41,7 +41,7 @@ _Har du spørsmål?
 Du finn nyttig informasjon på nav.no/familie.
 
 Med vennleg helsing
-NAV Familie- og pensjonsytelsar
+Nav familie- og pensjonsytelsar
 
 
 Vedlegg: Resultatet av tilbakebetalingssaka

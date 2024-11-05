@@ -127,7 +127,7 @@ class DokumentasjonGeneratorPeriodeSærligeGrunnerTest {
         List<String> deler = new ArrayList<>();
         deler.add("grad av uaktsomhet");
         if (sgNav) {
-            deler.add("NAV helt/delvis skyld");
+            deler.add("Nav helt/delvis skyld");
         }
         if (sgBeløp) {
             deler.add("størrelsen på beløpet");

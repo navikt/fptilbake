@@ -89,7 +89,7 @@ public abstract class FellesTestOppsett {
     protected static final HendelseUnderType HENDELSE_UNDERTYPE = HendelseUnderType.ARBEID_HELTID;
     protected static final String BEGRUNNELSE = "ABC";
     protected static final String BEHANDLENDE_ENHET_ID = "4833";
-    protected static final String BEHANDLENDE_ENHET_NAVN = "NAV Familie- og pensjonsytelser Oslo 1";
+    protected static final String BEHANDLENDE_ENHET_NAVN = "Nav familie- og pensjonsytelser Oslo 1";
     protected static final BehandlingType REVURDERING_BEHANDLING_TYPE = BehandlingType.REVURDERING_TILBAKEKREVING;
     protected static final String SÆRLIG_GRUNNER_BEGRUNNELSE = "særlig grunner begrunnelse";
 

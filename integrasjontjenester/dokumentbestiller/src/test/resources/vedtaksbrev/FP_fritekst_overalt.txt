@@ -40,7 +40,7 @@ Her burde du passet mer på!
 _Perioden fra og med 1. april 2019 til og med 30. april 2019
 Du overførte kvoten til den andre forelderen fordi du var innlagt i helseinstitusjon. I den samme perioden har du likevel fått utbetalt foreldrepenger. Du kan ikke overføre kvoten og samtidig få foreldrepenger. Derfor har du fått 1 krone for mye utbetalt i denne perioden.
 _Hvordan har vi kommet fram til at du må betale tilbake?
-Du har fått informasjon om hvor mye du har rett til å få i foreldrepenger og at du må melde fra om endringer til NAV. Informasjonen du har fått forklarer om du har rett til foreldrepenger og hvor mye du har rett til å få utbetalt.
+Du har fått informasjon om hvor mye du har rett til å få i foreldrepenger og at du må melde fra om endringer til Nav. Informasjonen du har fått forklarer om du har rett til foreldrepenger og hvor mye du har rett til å få utbetalt.
 
 Dette gjorde du med vilje!
 
@@ -50,7 +50,7 @@ Vedtaket er gjort etter Folketrygdloven § 22-15.
 _Skatt og skatteoppgjør
 Skatten som er trukket fra beløpet du skal betale tilbake, er beregnet etter det du har blitt trukket i skatt i gjennomsnitt per måned. Det betyr at beløpet du skal betale tilbake etter skatt, ikke alltid er likt med det beløpet du fikk inn på konto.
 
-NAV gir opplysninger til Skattetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trukket fra. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
+Nav gir opplysninger til Skattetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trukket fra. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
 _Hvordan betaler du tilbake?
 Skatteetaten vil korrigere beløpet du skal betale tilbake. Du finner mer informasjon på nav.no/innbetaling.
 _Du har rett til å klage
@@ -63,7 +63,7 @@ _Har du spørsmål?
 Du finner nyttig informasjon på nav.no/familie.
 
 Med vennlig hilsen
-NAV Familie- og pensjonsytelser
+Nav familie- og pensjonsytelser
 
 
 Vedlegg: Resultatet av tilbakebetalingssaken

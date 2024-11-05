@@ -52,10 +52,10 @@ class DokprodTilHtmlTest {
     void skal_spesialbehandle_hilsen() {
         //halvhjertet avsnitt er hvor det er tatt kun ett linjeskift.
         String resultat = DokprodTilHtml.dokprodInnholdTilHtml(
-                "Med vennlig hilsen\nNAV Familie- og pensjonsytelser"
+                "Med vennlig hilsen\nNav familie- og pensjonsytelser"
         );
         Assertions.assertThat(resultat).isEqualTo(
-                "<p class=\"hilsen\">Med vennlig hilsen<br/>NAV Familie- og pensjonsytelser</p>"
+                "<p class=\"hilsen\">Med vennlig hilsen<br/>Nav familie- og pensjonsytelser</p>"
         );
     }
 }

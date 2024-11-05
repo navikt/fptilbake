@@ -227,7 +227,7 @@ class TekstformatererVarselbrevTest {
                 .build();
 
         String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(brevMetadata);
-        String fasit = "NAV vurderer om du må betale tilbake foreldrepenger";
+        String fasit = "Nav vurderer om du må betale tilbake foreldrepenger";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
 
@@ -239,7 +239,7 @@ class TekstformatererVarselbrevTest {
                 .build();
 
         String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(brevMetadata);
-        String fasit = "NAV vurderer om du må betale tilbake foreldrepengar";
+        String fasit = "Nav vurderer om du må betale tilbake foreldrepengar";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
 
