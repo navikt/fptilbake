@@ -57,6 +57,11 @@
       "cluster": "prod-fss"
     },
     {
+      "app": "ung-sak",
+      "namespace": "k9saksbehandling",
+      "cluster": "prod-gcp"
+    },
+    {
       "app": "k9-swagger",
       "namespace": "k9saksbehandling",
       "cluster": "prod-gcp",
