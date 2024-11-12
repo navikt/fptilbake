@@ -18,8 +18,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum HistorikkEndretFeltType implements Kodeverdi {
 
-    BEHANDLENDE_ENHET("BEHANDLENDE_ENHET", ""),
-    BEHANDLING("BEHANDLING", ""),
+    BEHANDLENDE_ENHET("BEHANDLENDE_ENHET", "Behandlende enhet"),
+    BEHANDLING("BEHANDLING", "Behandling"),
     ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT("ER_VILKARENE_TILBAKEKREVING_OPPFYLT", "Er vilkårene for tilbakekreving oppfylt?"),
     ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON("ER_SARLIGE_GRUNNER_TIL_REDUKSJON", "Er det særlige grunner til reduksjon?"),
     HENDELSE_ÅRSAK("HENDELSE_AARSAK", "Hendelse"),

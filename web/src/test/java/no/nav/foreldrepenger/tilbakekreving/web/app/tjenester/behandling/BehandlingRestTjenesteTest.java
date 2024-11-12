@@ -21,6 +21,10 @@ import java.util.UUID;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response;
 
+import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Adapter;
+
+import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
+
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
@@ -87,11 +91,12 @@ class BehandlingRestTjenesteTest {
     private BehandlendeEnhetTjeneste behandlendeEnhetTjenesteMock = mock(BehandlendeEnhetTjeneste.class);
     private VergeTjeneste vergeTjenesteMock = mock(VergeTjeneste.class);
     private HistorikkTjenesteAdapter historikkTjenesteAdapter = mock(HistorikkTjenesteAdapter.class);
+    private HistorikkV2Tjeneste historikkV2Tjeneste = mock(HistorikkV2Tjeneste.class);
 
     private BehandlingRestTjeneste behandlingRestTjeneste = new BehandlingRestTjeneste(behandlingTjenesteMock, gjenopptaBehandlingTjenesteMock,
         revurderingTjenesteMock, behandlendeEnhetTjenesteMock, behandlingDtoTjenesteMock, taskTjeneste, vergeTjenesteMock,
         mock(TotrinnTjeneste.class), mock(DokumentBehandlingTjeneste.class), henleggBehandlingTjenesteMock,
-        behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock, historikkTjenesteAdapter);
+        behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock, historikkTjenesteAdapter, historikkV2Tjeneste);
 
     private static SaksnummerDto saksnummerDto = new SaksnummerDto(GYLDIG_SAKSNR);
     private static FpsakUuidDto fpsakUuidDto = new FpsakUuidDto(EKSTERN_BEHANDLING_UUID);
