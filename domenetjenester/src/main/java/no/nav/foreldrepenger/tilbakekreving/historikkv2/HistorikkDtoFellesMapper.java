@@ -44,7 +44,7 @@ public class HistorikkDtoFellesMapper {
             .flatMap(Optional::stream)
             .toList();
         if (hendelseFelt.size() > 1) {
-            LOG.warn("Flere deler med HENDELSE-felt for historikkinnslag {} på sak {}. Er alle like? Er det noe grunn til å ha undertittler? ", h.getId(), h.getFagsakId());
+            LOG.info("HistorikkV2: Flere deler med HENDELSE-felt for historikkinnslag {} på sak {}. Er alle like? Er det noe grunn til å ha undertittler? ", h.getId(), h.getFagsakId());
         }
 
         if (hendelseFelt.isEmpty()) {

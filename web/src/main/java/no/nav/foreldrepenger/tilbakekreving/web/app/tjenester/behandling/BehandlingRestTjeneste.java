@@ -53,10 +53,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
 import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkinnslagDtoV2;
@@ -123,6 +125,8 @@ public class BehandlingRestTjeneste {
     private static final String REVURDERING_KAN_OPPRETTES_PART_PATH = "/kan-revurdering-opprettes-v2";
     public static final String REVURDERING_KAN_OPPRETTES_PATH = PATH_FRAGMENT + REVURDERING_KAN_OPPRETTES_PART_PATH;
 
+
+    private Fagsystem application;
     private ProsessTaskTjeneste taskTjeneste;
     private BehandlingTjeneste behandlingTjeneste;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
@@ -171,6 +175,7 @@ public class BehandlingRestTjeneste {
         this.dokumentBehandlingTjeneste = dokumentBehandlingTjeneste;
         this.historikkTjenesteAdapter = historikkTjenesteAdapter;
         this.historikkV2Tjeneste = historikkV2Tjeneste;
+        this.application = ApplicationName.hvilkenTilbake();
     }
 
     @GET
@@ -553,7 +558,10 @@ public class BehandlingRestTjeneste {
         Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
         var hentDokumentPath = historikkTjenesteAdapter.getRequestPath(request);
         var historikkInnslagDtoList = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
-        List<HistorikkinnslagDtoV2> historikkinnslagDtoV2 = !ENV.isProd() ? historikkV2Tjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath) : List.of();
+        List<HistorikkinnslagDtoV2> historikkinnslagDtoV2 = switch (application) { // TODO: Ønsker ikke logge for k9 enn så lenge...
+            case FPSAK -> historikkV2Tjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
+            default -> List.of();
+        };
         var kanOppretteTilbake = behandlingTjeneste.hentBehandlinger(saksnummer).stream().allMatch(Behandling::erSaksbehandlingAvsluttet);
         var kanOppretteRevurdering = behandlingTjeneste.hentBehandlinger(saksnummer).stream().anyMatch(revurderingTjeneste::kanRevurderingOpprettes);
         var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, kanOppretteTilbake),
