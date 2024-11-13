@@ -47,7 +47,7 @@ public class HistorikkV2Tjeneste {
                 .sorted(Comparator.comparing(HistorikkinnslagDtoV2::opprettetTidspunkt))
                 .toList();
         } catch (Exception e) {
-            LOG.warn("Ny historikktjeneste feilet", e);
+            LOG.info("HistorikkV2: Ny historikktjeneste feilet", e);
             return List.of();
         }
     }
