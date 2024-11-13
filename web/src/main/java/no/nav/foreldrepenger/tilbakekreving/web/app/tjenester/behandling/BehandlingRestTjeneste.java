@@ -30,6 +30,7 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjeneste;
@@ -57,6 +58,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVe
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
+import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
+import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkinnslagDtoV2;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDto;
@@ -97,6 +100,9 @@ import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 @RequestScoped
 @Transactional
 public class BehandlingRestTjeneste {
+
+    private static final Environment ENV = Environment.current();
+
     public static final String PATH_FRAGMENT = "/behandlinger";
 
     public static final String STATUS_PATH = PATH_FRAGMENT + "/status";
@@ -130,6 +136,7 @@ public class BehandlingRestTjeneste {
     private DokumentBehandlingTjeneste dokumentBehandlingTjeneste;
     private VergeTjeneste vergeTjeneste;
     private HistorikkTjenesteAdapter historikkTjenesteAdapter;
+    private HistorikkV2Tjeneste historikkV2Tjeneste;
 
     public BehandlingRestTjeneste() {
         // CDI
@@ -148,7 +155,8 @@ public class BehandlingRestTjeneste {
                                   HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                   BehandlingsprosessApplikasjonTjeneste behandlingsprosessTjeneste,
                                   BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste,
-                                  HistorikkTjenesteAdapter historikkTjenesteAdapter) {
+                                  HistorikkTjenesteAdapter historikkTjenesteAdapter,
+                                  HistorikkV2Tjeneste historikkV2Tjeneste) {
         this.behandlingTjeneste = behandlingTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
         this.behandlingDtoTjeneste = behandlingDtoTjeneste;
@@ -162,6 +170,7 @@ public class BehandlingRestTjeneste {
         this.totrinnTjeneste = totrinnTjeneste;
         this.dokumentBehandlingTjeneste = dokumentBehandlingTjeneste;
         this.historikkTjenesteAdapter = historikkTjenesteAdapter;
+        this.historikkV2Tjeneste = historikkV2Tjeneste;
     }
 
     @GET
@@ -544,13 +553,15 @@ public class BehandlingRestTjeneste {
         Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
         var hentDokumentPath = historikkTjenesteAdapter.getRequestPath(request);
         var historikkInnslagDtoList = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
+        List<HistorikkinnslagDtoV2> historikkinnslagDtoV2 = !ENV.isProd() ? historikkV2Tjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath) : List.of();
         var kanOppretteTilbake = behandlingTjeneste.hentBehandlinger(saksnummer).stream().allMatch(Behandling::erSaksbehandlingAvsluttet);
         var kanOppretteRevurdering = behandlingTjeneste.hentBehandlinger(saksnummer).stream().anyMatch(revurderingTjeneste::kanRevurderingOpprettes);
         var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, kanOppretteTilbake),
             new BehandlingOpprettingDto(BehandlingType.REVURDERING_TILBAKEKREVING, kanOppretteRevurdering));
         var behandlinger = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
         behandlinger.forEach(b -> b.setBrevmaler(dokumentBehandlingTjeneste.hentBrevmalerFor(b.getId())));
-        return new SakFullDto(saksnummer.getVerdi(), oppretting, behandlinger, historikkInnslagDtoList);
+
+        return new SakFullDto(saksnummer.getVerdi(), oppretting, behandlinger, historikkInnslagDtoList, historikkinnslagDtoV2);
     }
 
     @GET
