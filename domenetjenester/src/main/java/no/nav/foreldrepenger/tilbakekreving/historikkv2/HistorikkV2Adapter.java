@@ -102,7 +102,7 @@ public class HistorikkV2Adapter {
         var tekster = new ArrayList<String>();
         for(var del : h.getHistorikkinnslagDeler()) {
             var endretFelter = del.getEndredeFelt().stream()
-                .map(HistorikkV2Adapter::fraEndretFelt)
+                .map(HistorikkV2Adapter::fraEndretFeltUtenKodeverk)
                 .toList();
             leggTilAlleTeksterIHovedliste(endretFelter);
         }
@@ -224,20 +224,21 @@ public class HistorikkV2Adapter {
         if (felt.getFraVerdiKode() != null || felt.getTilVerdiKode() != null) {
             throw new IllegalStateException("Finner kodeverdi i endret felt for " + felt.getNavn());
         }
-
         var historikkEndretFeltType = HistorikkEndretFeltType.fraKode(felt.getNavn());
         var fraVerdi = felt.getFraVerdi();
         var tilVerdi = felt.getTilVerdi();
 
-        var visProsentverdi = HistorikkEndretFeltType.ANDEL_TILBAKEKREVES.equals(historikkEndretFeltType);
-        var formatertTilVerdi = visProsentverdi && tilVerdi != null ? String.format("%s%%", tilVerdi) : tilVerdi;
-        if (felt.getFraVerdi() != null) {
-            var formatertFraVerdi = visProsentverdi && fraVerdi != null ? String.format("%s%%", fraVerdi) : fraVerdi;
-            return String.format("__%s__ endret fra %s til __%s__", historikkEndretFeltType.getNavn(), formatertFraVerdi, formatertTilVerdi);
+        if (HistorikkEndretFeltType.ANDEL_TILBAKEKREVES.equals(historikkEndretFeltType)) {
+            fraVerdi = fraVerdi != null ? String.format("%s%%", fraVerdi) : fraVerdi;
+            tilVerdi = tilVerdi != null ? String.format("%s%%", tilVerdi) : tilVerdi;
         } else {
-            return String.format("__%s__ er satt til __%s__.", historikkEndretFeltType.getNavn(), formatertTilVerdi);
+            tilVerdi = hvisBooleanKonveterTilJaNei(felt.getTilVerdi());
+            fraVerdi = hvisBooleanKonveterTilJaNei(felt.getFraVerdi());
         }
 
+        return felt.getFraVerdi() == null
+            ? String.format("__%s__ er satt til __%s__.", historikkEndretFeltType.getNavn(), tilVerdi)
+            : String.format("__%s__ endret fra %s til __%s__", historikkEndretFeltType.getNavn(), fraVerdi, tilVerdi);
     }
 
     private static String fraEndretFeltFeilutbetaling(List<HistorikkinnslagFelt> endretFelt) {
@@ -288,24 +289,14 @@ public class HistorikkV2Adapter {
         return String.format("%s: %s", historikkOpplysningType.getNavn(), opplysning.getTilVerdi());
     }
 
-    private static String fraEndretFelt(HistorikkinnslagFelt felt) {
-        var feltNavn = HistorikkEndretFeltType.fraKode(felt.getNavn()).getNavn();
-        var tilVerdi = Optional.ofNullable(konverterBoolean(felt.getTilVerdi())).orElse(felt.getTilVerdi());
-        if (felt.getFraVerdi() == null) {
-            return String.format("__%s__ er satt til __%s__.", feltNavn, tilVerdi);
-        }
-        var fraVerdi = Optional.ofNullable(konverterBoolean(felt.getFraVerdi())).orElse(felt.getFraVerdi());
-        return String.format("__%s__ endret fra %s til __%s__", feltNavn, fraVerdi, tilVerdi);
-    }
-
-    private static String konverterBoolean(String verdi) {
+    private static String hvisBooleanKonveterTilJaNei(String verdi) {
         if ("true".equalsIgnoreCase(verdi)) {
             return "Ja";
         }
         if ("false".equalsIgnoreCase(verdi)) {
             return "Nei";
         }
-        return null;
+        return verdi;
     }
 
     private static String fraHistorikkResultat(HistorikkinnslagFelt resultat) {
