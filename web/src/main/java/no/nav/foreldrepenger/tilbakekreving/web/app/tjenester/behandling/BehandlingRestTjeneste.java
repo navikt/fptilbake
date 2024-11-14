@@ -559,7 +559,7 @@ public class BehandlingRestTjeneste {
         var hentDokumentPath = historikkTjenesteAdapter.getRequestPath(request);
         var historikkInnslagDtoList = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
         List<HistorikkinnslagDtoV2> historikkinnslagDtoV2 = switch (application) { // TODO: Ønsker ikke logge for k9 enn så lenge...
-            case FPSAK -> historikkV2Tjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
+            case FPTILBAKE -> historikkV2Tjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
             default -> List.of();
         };
         var kanOppretteTilbake = behandlingTjeneste.hentBehandlinger(saksnummer).stream().allMatch(Behandling::erSaksbehandlingAvsluttet);
