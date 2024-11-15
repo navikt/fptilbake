@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,33 +15,30 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
+import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
-import static no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRestTjeneste.HISTORIKK_PATH;
+import static no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkV2RestTjeneste.HISTORIKK_PATH;
 
 @Path(HISTORIKK_PATH)
 @ApplicationScoped
 @Transactional
-public class HistorikkRestTjeneste {
+public class HistorikkV2RestTjeneste {
 
     public static final String HISTORIKK_PATH = "/historikk";
 
-    private HistorikkTjenesteAdapter historikkTjeneste;
+    private HistorikkV2Tjeneste historikkTjeneste;
 
-    public HistorikkRestTjeneste() {
+    public HistorikkV2RestTjeneste() {
         // Rest CDI
     }
 
     @Inject
-    public HistorikkRestTjeneste(HistorikkTjenesteAdapter historikkTjeneste) {
+    public HistorikkV2RestTjeneste(HistorikkV2Tjeneste historikkTjeneste) {
         this.historikkTjeneste = historikkTjeneste;
     }
 
@@ -55,7 +54,7 @@ public class HistorikkRestTjeneste {
 
         var path = HistorikkRequestPath.getRequestPath(request);
 
-        var historikkInnslagDtoList = historikkTjeneste.hentAlleHistorikkInnslagForSak(new Saksnummer(saksnummerDto.getVerdi()), path);
+        var historikkInnslagDtoList = historikkTjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()), path);
         return Response.ok().entity(historikkInnslagDtoList).build();
     }
 
