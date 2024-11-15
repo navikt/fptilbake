@@ -85,6 +85,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Uui
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SøkestrengDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRequestPath;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -556,7 +557,7 @@ public class BehandlingRestTjeneste {
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public SakFullDto hentSaksinformasjon(@Context HttpServletRequest request, @NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto) {
         Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
-        var hentDokumentPath = historikkTjenesteAdapter.getRequestPath(request);
+        var hentDokumentPath = HistorikkRequestPath.getRequestPath(request);
         var historikkInnslagDtoList = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
         List<HistorikkinnslagDtoV2> historikkinnslagDtoV2 = switch (application) { // TODO: Ønsker ikke logge for k9 enn så lenge...
             case FPTILBAKE -> historikkV2Tjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
