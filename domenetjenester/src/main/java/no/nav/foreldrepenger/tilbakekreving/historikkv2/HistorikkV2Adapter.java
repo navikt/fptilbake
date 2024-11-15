@@ -104,7 +104,7 @@ public class HistorikkV2Adapter {
             var endretFelter = del.getEndredeFelt().stream()
                 .map(HistorikkV2Adapter::fraEndretFeltUtenKodeverk)
                 .toList();
-            leggTilAlleTeksterIHovedliste(endretFelter);
+            leggTilAlleTeksterIHovedliste(tekster, endretFelter);
         }
         return tilHistorikkInnslagDto(h, behandlingUUID, tilDokumentlenker(h.getDokumentLinker(), dokumentPath), tekster);
     }
