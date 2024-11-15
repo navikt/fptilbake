@@ -57,6 +57,8 @@ spec:
   env:
     - name: APP_NAME
       value: "fptilbake"
+  envFrom:
+    - secret: fptilbake-avstemming
   kafka:
     pool: {{kafkaPool}}
   observability:
