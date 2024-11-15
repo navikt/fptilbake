@@ -126,15 +126,12 @@ public class ApiConfig extends Application {
             classes.add(GrunnlagRestTestTjenesteLocalDev.class);
         }
 
-        if (Fagsystem.FPTILBAKE.equals(ApplicationName.hvilkenTilbake())) {
-            classes.add(HistorikkV2RestTjeneste.class);
-        } else {
-            classes.add(HistorikkRestTjeneste.class);
-        }
-
         // Standard etter fork av fp-tilbake
         if (Fagsystem.FPTILBAKE.equals(ApplicationName.hvilkenTilbake())) {
+            classes.add(HistorikkV2RestTjeneste.class);
             classes.add(AuthenticationFilter.class); // autentisering etter ny standard
+        } else {
+            classes.add(HistorikkRestTjeneste.class);
         }
 
 
