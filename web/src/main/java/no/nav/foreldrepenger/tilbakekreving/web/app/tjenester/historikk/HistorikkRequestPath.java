@@ -7,7 +7,7 @@ import java.net.URI;
 
 public class HistorikkRequestPath {
 
-    private static final String HENT_DOK_PATH = "/dokument/hent-dokument";
+    private static final String HENT_DOK_PATH = "/dokument/hent-dokument"; // FIXME - her trengs path til sak, ikke tilbake
 
     private HistorikkRequestPath() {
     }
