@@ -103,9 +103,6 @@ import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 @RequestScoped
 @Transactional
 public class BehandlingRestTjeneste {
-
-    private static final Environment ENV = Environment.current();
-
     public static final String PATH_FRAGMENT = "/behandlinger";
 
     public static final String STATUS_PATH = PATH_FRAGMENT + "/status";
@@ -127,7 +124,6 @@ public class BehandlingRestTjeneste {
     public static final String REVURDERING_KAN_OPPRETTES_PATH = PATH_FRAGMENT + REVURDERING_KAN_OPPRETTES_PART_PATH;
 
 
-    private Fagsystem application;
     private ProsessTaskTjeneste taskTjeneste;
     private BehandlingTjeneste behandlingTjeneste;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
@@ -140,7 +136,6 @@ public class BehandlingRestTjeneste {
     private TotrinnTjeneste totrinnTjeneste;
     private DokumentBehandlingTjeneste dokumentBehandlingTjeneste;
     private VergeTjeneste vergeTjeneste;
-    private HistorikkTjenesteAdapter historikkTjenesteAdapter;
     private HistorikkV2Tjeneste historikkV2Tjeneste;
 
     public BehandlingRestTjeneste() {
@@ -174,9 +169,7 @@ public class BehandlingRestTjeneste {
         this.taskTjeneste = taskTjeneste;
         this.totrinnTjeneste = totrinnTjeneste;
         this.dokumentBehandlingTjeneste = dokumentBehandlingTjeneste;
-        this.historikkTjenesteAdapter = historikkTjenesteAdapter;
         this.historikkV2Tjeneste = historikkV2Tjeneste;
-        this.application = ApplicationName.hvilkenTilbake();
     }
 
     @GET
@@ -558,11 +551,7 @@ public class BehandlingRestTjeneste {
     public SakFullDto hentSaksinformasjon(@Context HttpServletRequest request, @NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto) {
         Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
         var hentDokumentPath = HistorikkRequestPath.getRequestPath(request);
-        var historikkInnslagDtoList = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
-        List<HistorikkinnslagDtoV2> historikkinnslagDtoV2 = switch (application) { // TODO: Ønsker ikke logge for k9 enn så lenge...
-            case FPTILBAKE -> historikkV2Tjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
-            default -> List.of();
-        };
+        var historikkinnslag = historikkV2Tjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
         var kanOppretteTilbake = behandlingTjeneste.hentBehandlinger(saksnummer).stream().allMatch(Behandling::erSaksbehandlingAvsluttet);
         var kanOppretteRevurdering = behandlingTjeneste.hentBehandlinger(saksnummer).stream().anyMatch(revurderingTjeneste::kanRevurderingOpprettes);
         var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, kanOppretteTilbake),
@@ -570,7 +559,7 @@ public class BehandlingRestTjeneste {
         var behandlinger = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
         behandlinger.forEach(b -> b.setBrevmaler(dokumentBehandlingTjeneste.hentBrevmalerFor(b.getId())));
 
-        return new SakFullDto(saksnummer.getVerdi(), oppretting, behandlinger, historikkInnslagDtoList, historikkinnslagDtoV2);
+        return new SakFullDto(saksnummer.getVerdi(), oppretting, behandlinger, historikkinnslag, historikkinnslag);
     }
 
     @GET
