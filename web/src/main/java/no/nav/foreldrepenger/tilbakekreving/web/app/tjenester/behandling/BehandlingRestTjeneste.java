@@ -4,6 +4,7 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import java.net.URISyntaxException;
 import java.time.Duration;
+import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -353,9 +354,9 @@ public class BehandlingRestTjeneste {
     private void validerEndreVentetidPåKravgrunnlag(Behandling behandling, SettBehandlingPåVentDto dto) {
         var kravgrunnlagAutopunkt = behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
             .filter(Aksjonspunkt::erÅpentAksjonspunkt);
-        var kortesteTillatteVentetidKravgrunnlag = Duration.ofDays(4 * 7);
+        var kortesteTillatteVentetidKravgrunnlag = Period.ofWeeks(4);
         if (kravgrunnlagAutopunkt.isPresent() && dto.getFrist().isBefore(behandling.getOpprettetTidspunkt().toLocalDate().plus(kortesteTillatteVentetidKravgrunnlag))){
-            throw new IllegalArgumentException("Ikke støttet å sette kortere ventefrist enn " + kortesteTillatteVentetidKravgrunnlag.toDays() + " dager fra behandlingen ble opprettet for venting på kravgrunnlag");
+            throw new IllegalArgumentException("Ikke støttet å sette kortere ventefrist enn " + kortesteTillatteVentetidKravgrunnlag.getDays() + " dager fra behandlingen ble opprettet for venting på kravgrunnlag");
         }
     }
 
