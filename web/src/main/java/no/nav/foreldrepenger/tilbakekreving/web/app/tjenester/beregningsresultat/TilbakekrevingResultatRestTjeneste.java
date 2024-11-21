@@ -157,11 +157,11 @@ public class TilbakekrevingResultatRestTjeneste {
         }
         var overlappendeVilkårsvurdering = overlappendeVurderinger.get(0);
         var vurderingsperiode = vurderingPeriodeFunksjon.apply(overlappendeVilkårsvurdering);
-        if (vurderingsperiode.equals(resultatperiode)) {
+        if (resultatperiode.erOmsluttetAv(vurderingsperiode)) {
             return overlappendeVilkårsvurdering;
         }
         throw new IllegalArgumentException(
-            "Forventet at vurderingsperioden " + vurderingsperiode + " skulle ha samme periode som resulatperioden " + resultatperiode);
+            "Forventet at vurderingsperioden " + vurderingsperiode + " omslutter resulatperioden " + resultatperiode);
     }
 
     private static BigDecimal finnAndelAvBeløp(VilkårVurderingPeriodeEntitet vurdering) {
