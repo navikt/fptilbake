@@ -25,6 +25,8 @@ import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Adapter;
 
 import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
@@ -73,6 +75,17 @@ import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 import no.nav.vedtak.sikkerhet.kontekst.RequestKontekst;
 
 class BehandlingRestTjenesteTest {
+
+    @BeforeAll
+    static void setupAlle() {
+        System.setProperty("app.name", "fptilbake");
+    }
+
+    @AfterAll
+    static void teardown() {
+        System.clearProperty("app.name");
+    }
+
 
     static final String GYLDIG_AKTØR_ID = "12345678901";
     static final String GYLDIG_SAKSNR = "123456";
