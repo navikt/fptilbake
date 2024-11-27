@@ -50,7 +50,7 @@ public class VurderForeldelseSteg implements BehandlingSteg {
         long behandlingId = kontekst.getBehandlingId();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         if (behandling.isAutomatiskSaksbehandlet()) {
-            utførStegAutomatisk(behandling);
+            //utførStegAutomatisk(behandling);
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         } else {
             return vurderForeldelseAksjonspunktUtleder.utledAksjonspunkt(kontekst.getBehandlingId())
