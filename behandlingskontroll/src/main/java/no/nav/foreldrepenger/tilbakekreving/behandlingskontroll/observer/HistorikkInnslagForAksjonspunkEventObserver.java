@@ -65,8 +65,6 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
                     opprettHistorikkinnslagForVenteFristRelaterteInnslag(ktx.getBehandlingId(), ktx.getFagsakId(), HistorikkinnslagType.BEH_GJEN,
                         null, null);
                 }
-                opprettHistorikkinnslagForVenteFristRelaterteInnslag(ktx.getBehandlingId(), ktx.getFagsakId(),
-                        HistorikkinnslagType.BEH_GJEN, null, null);
             }
         }
     }
