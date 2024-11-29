@@ -118,7 +118,7 @@ public abstract class FellesTestOppsett {
                 new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
         var haltGebyrTjeneste = new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository());
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste,
-                behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer, haltGebyrTjeneste, entityManager);
+                behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer, haltGebyrTjeneste);
         kravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
         lesKravgrunnlagTask = new LesKravgrunnlagTask(mottattXmlRepository, kravgrunnlagTjeneste, kravgrunnlagMapper,
                 repositoryProvider, fagsystemKlientMock);

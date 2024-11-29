@@ -167,7 +167,7 @@ public abstract class FellesTestOppsett {
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         var halvtGebyrTjeneste = new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, varselRepository);
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste,
-            mockSlettGrunnlagEventPubliserer, halvtGebyrTjeneste, entityManager);
+            mockSlettGrunnlagEventPubliserer, halvtGebyrTjeneste);
         kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(grunnlagRepository);
         historikkInnslagKonverter = new HistorikkInnslagKonverter(behandlingRepository);
         historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);
