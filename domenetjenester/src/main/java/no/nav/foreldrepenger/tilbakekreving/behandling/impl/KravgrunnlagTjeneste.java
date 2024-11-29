@@ -10,13 +10,13 @@ import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -51,7 +51,6 @@ public class KravgrunnlagTjeneste {
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste;
     private SlettGrunnlagEventPubliserer kravgrunnlagEventPubliserer;
-    private EntityManager entityManager;
 
 
     KravgrunnlagTjeneste() {
@@ -63,8 +62,7 @@ public class KravgrunnlagTjeneste {
                                 GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste,
                                 BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                 SlettGrunnlagEventPubliserer slettGrunnlagEventPubliserer,
-                                AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste,
-                                EntityManager entityManager) {
+                                AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste) {
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.historikkRepository = repositoryProvider.getHistorikkRepository();
@@ -72,7 +70,6 @@ public class KravgrunnlagTjeneste {
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
         this.halvtRettsgebyrTjeneste = halvtRettsgebyrTjeneste;
         this.kravgrunnlagEventPubliserer = slettGrunnlagEventPubliserer;
-        this.entityManager = entityManager;
     }
 
 
@@ -160,20 +157,6 @@ public class KravgrunnlagTjeneste {
             behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
                 BehandlingStegType.TBKGSTEG, skalVenteTil, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         }
-    }
-
-    private void avbrytPlanlagteTasker(Long behandlingId) {
-        Query query = entityManager.createNativeQuery("""
-                        update prosess_task pt set status = 'FERDIG'
-                            where pt.id in (select prosess_task_id from FAGSAK_PROSESS_TASK fpt where behandling_id = :behandlingId)
-                            and status in ('FEILET', 'KLAR')
-            """);
-        query.setParameter("behandlingId", behandlingId);
-        int antallStoppet = query.executeUpdate();
-        if (antallStoppet > 4){
-            throw new IllegalStateException("Var forventet å stoppe 4 tasker, men forsøker å stoppe " + antallStoppet);
-        }
-        LOG.info("Stoppet {} planlagte tasker for behandling {}", antallStoppet, behandlingId);
     }
 
     private void slettVLAnsvarlingSaksbehandler(Behandling behandling) {
