@@ -44,7 +44,7 @@ class ForvaltningTjeneste {
     void hentKorrigertKravgrunnlag(Behandling behandling, String kravgrunnlagId) {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(HentKorrigertKravgrunnlagTask.class);
         prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
-        prosessTaskData.setProperty("KRAVGRUNNLAG_ID", kravgrunnlagId);
+        prosessTaskData.setProperty(HentKorrigertKravgrunnlagTask.KRAVGRUNNLAG_ID, kravgrunnlagId);
         prosessTaskTjeneste.lagre(prosessTaskData);
     }
 

@@ -287,7 +287,7 @@ public class ForvaltningBehandlingRestTjeneste {
             var tilstand = behandlingTilstandTjeneste.hentBehandlingensTilstand(b);
             var taskData = ProsessTaskData.forProsessTask(SendSakshendelserTilDvhTask.class);
             taskData.setPayload(BehandlingTilstandMapper.tilJsonString(tilstand));
-            taskData.setProperty("behandlingId", Long.toString(b.getId()));
+            taskData.setBehandling(b.getSaksnummer().getVerdi(), b.getFagsakId(), b.getId());
             taskTjeneste.lagre(taskData);
 
         });
@@ -470,7 +470,7 @@ public class ForvaltningBehandlingRestTjeneste {
     private void opprettKorrigertHenvisningTask(Behandling behandling, UUID eksternBehandlingUuid) {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(KorrigertHenvisningTask.class);
         prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
-        prosessTaskData.setProperty("eksternUuid", eksternBehandlingUuid.toString());
+        prosessTaskData.setProperty(KorrigertHenvisningTask.PROPERTY_EKSTERN_UUID, eksternBehandlingUuid.toString());
         taskTjeneste.lagre(prosessTaskData);
     }
 

@@ -8,6 +8,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.Aksjonspu
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingEnhetEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingSaksbehandlerEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
@@ -36,34 +38,33 @@ public class SakshendelserEventObserver {
         var aksjonspunkter = event.getAksjonspunkter();
         // Utvider behandlingStatus i DVH med VenteKategori
         if (aksjonspunkter.stream().anyMatch(Aksjonspunkt::erAutopunkt)) {
-            klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
+            klargjørSendingAvBehandlingensTilstand(event);
         }
     }
 
     public void observerBehandlingStatusEvent(@Observes BehandlingStatusEvent event) {
-        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
+        klargjørSendingAvBehandlingensTilstand(event);
     }
 
     public void observerEndretBehandlendeEnhetEvent(@Observes BehandlingEnhetEvent event) {
-        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
+        klargjørSendingAvBehandlingensTilstand(event);
     }
 
     public void observerEndretAnsvarligSaksbehandlerEvent(@Observes BehandlingSaksbehandlerEvent event) {
-        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
+        klargjørSendingAvBehandlingensTilstand(event);
     }
 
-    private void klargjørSendingAvBehandlingensTilstand(long behandlingId) {
-        var tilstand = behandlingTilstandTjeneste.hentBehandlingensTilstand(behandlingId);
+    private void klargjørSendingAvBehandlingensTilstand(BehandlingEvent event) {
+        var tilstand = behandlingTilstandTjeneste.hentBehandlingensTilstand(event.getBehandlingId());
         if (tilstand != null) {
-            opprettProsessTask(behandlingId, tilstand);
+            opprettProsessTask(event, tilstand);
         }
     }
 
-    private void opprettProsessTask(long behandlingId, BehandlingTilstand behandlingTilstand) {
+    private void opprettProsessTask(BehandlingEvent event, BehandlingTilstand behandlingTilstand) {
         ProsessTaskData taskData = ProsessTaskData.forProsessTask(SendSakshendelserTilDvhTask.class);
         taskData.setPayload(BehandlingTilstandMapper.tilJsonString(behandlingTilstand));
-        taskData.setProperty("behandlingId", Long.toString(behandlingId));
-
+        taskData.setBehandling(event.getSaksnummer().getVerdi(), event.getFagsakId(), event.getBehandlingId());
         taskTjeneste.lagre(taskData);
     }
 

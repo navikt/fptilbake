@@ -3,6 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +26,6 @@ import java.util.UUID;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class SendVedtaksbrevTask implements ProsessTaskHandler {
 
-    public static final String BESTILLING_UUID = "bestillingUuid";
-
     private static final Logger log = LoggerFactory.getLogger(SendVedtaksbrevTask.class);
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
@@ -46,7 +46,7 @@ public class SendVedtaksbrevTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
-        var unikBestillingUuid = UUID.fromString(Optional.of(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElseThrow());
+        var unikBestillingUuid = UUID.fromString(Optional.of(prosessTaskData.getPropertyValue(TaskProperties.BESTILLING_UUID)).orElseThrow());
         LOG_CONTEXT.add("behandling", behandlingId);
         if (vergeRepository.finnesVerge(behandlingId)) {
             vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId, BrevMottaker.VERGE, unikBestillingUuid);

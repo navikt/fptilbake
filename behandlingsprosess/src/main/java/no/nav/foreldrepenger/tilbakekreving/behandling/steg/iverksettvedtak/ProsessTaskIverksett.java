@@ -5,6 +5,7 @@ import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -32,24 +33,18 @@ public class ProsessTaskIverksett {
             opprettVedtaksbrevProsessTask(taskGruppe);
         }
         taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(AvsluttBehandlingTask.class));
+        taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(SendVedtakHendelserTilDvhTask.class));
+
         taskGruppe.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         taskGruppe.setCallIdFraEksisterende();
 
-        opprettDvhProsessTask(behandling, taskGruppe);
         taskTjeneste.lagre(taskGruppe);
     }
 
     private static void opprettVedtaksbrevProsessTask(ProsessTaskGruppe taskGruppe) {
         var taskData = ProsessTaskData.forProsessTask(SendVedtaksbrevTask.class);
-        taskData.setProperty(SendVedtaksbrevTask.BESTILLING_UUID,
+        taskData.setProperty(TaskProperties.BESTILLING_UUID,
             UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
         taskGruppe.addNesteSekvensiell(taskData);
     }
-
-    private void opprettDvhProsessTask(Behandling behandling, ProsessTaskGruppe taskGruppe) {
-        var taskData = ProsessTaskData.forProsessTask(SendVedtakHendelserTilDvhTask.class);
-        taskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
-        taskGruppe.addNesteSekvensiell(taskData);
-    }
-
 }

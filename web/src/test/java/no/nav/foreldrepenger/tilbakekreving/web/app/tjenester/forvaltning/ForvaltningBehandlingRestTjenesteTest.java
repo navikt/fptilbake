@@ -281,7 +281,7 @@ class ForvaltningBehandlingRestTjenesteTest {
         assertThat(respons.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         ProsessTaskData korrigertHenvisningProsessTask = assertProsessTask(TaskType.forProsessTask(KorrigertHenvisningTask.class));
         assertThat(korrigertHenvisningProsessTask.getBehandlingId()).isEqualTo(String.valueOf(behandling.getId()));
-        assertThat(korrigertHenvisningProsessTask.getPropertyValue("eksternUuid")).isEqualTo(eksternUuid.toString());
+        assertThat(korrigertHenvisningProsessTask.getPropertyValue(KorrigertHenvisningTask.PROPERTY_EKSTERN_UUID)).isEqualTo(eksternUuid.toString());
     }
 
     @Test

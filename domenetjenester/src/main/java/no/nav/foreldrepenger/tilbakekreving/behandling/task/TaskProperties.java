@@ -8,6 +8,8 @@ public class TaskProperties {
     public static final String FAGSAK_YTELSE_TYPE = "fagYtelseType";
     public static final String BEHANDLING_TYPE = "behandlingType";
 
+    public static final String BESTILLING_UUID = "bestillingUuid";
+
     // Kravgrunnlag + status
     public static final String PROPERTY_MOTTATT_XML_ID = "mottattXmlId";
     public static final String PROPERTY_ORIGINAL_BEHANDLING_ID = "origBehandlingId";

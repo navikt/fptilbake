@@ -7,6 +7,7 @@ import java.util.UUID;
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -26,8 +27,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @ProsessTask("brev.sendInnhentDokumentasjon")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class InnhentDokumentasjonbrevTask implements ProsessTaskHandler {
-
-    public static final String BESTILLING_UUID = "bestillingUuid";
 
     private BehandlingRepository behandlingRepository;
     private VergeRepository vergeRepository;
@@ -49,7 +48,7 @@ public class InnhentDokumentasjonbrevTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         String friTekst = prosessTaskData.getPayloadAsString();
-        var unikBestillingUuid = UUID.fromString(Optional.of(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElseThrow());
+        var unikBestillingUuid = UUID.fromString(Optional.of(prosessTaskData.getPropertyValue(TaskProperties.BESTILLING_UUID)).orElseThrow());
 
         if (vergeRepository.finnesVerge(behandlingId)) {
             innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, friTekst, BrevMottaker.VERGE, unikBestillingUuid);

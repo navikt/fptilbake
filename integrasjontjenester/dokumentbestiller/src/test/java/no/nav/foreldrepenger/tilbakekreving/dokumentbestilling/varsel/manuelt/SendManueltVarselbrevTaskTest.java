@@ -10,6 +10,8 @@ import static org.mockito.Mockito.verify;
 
 import java.util.UUID;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +47,7 @@ class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
         prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         prosessTaskData.setPayload("Sender manuelt varsel brev");
         prosessTaskData.setProperty(SendManueltVarselbrevTask.MAL_TYPE, DokumentMalType.VARSEL_DOK.getKode());
-        prosessTaskData.setProperty(SendManueltVarselbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());
+        prosessTaskData.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString());
 
         varselbrevTask.doTask(prosessTaskData);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
@@ -58,7 +60,7 @@ class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
         prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         prosessTaskData.setPayload("Sender korrigert varsel brev");
         prosessTaskData.setProperty(SendManueltVarselbrevTask.MAL_TYPE, DokumentMalType.KORRIGERT_VARSEL_DOK.getKode());
-        prosessTaskData.setProperty(SendManueltVarselbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());
+        prosessTaskData.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString());
 
         varselbrevTask.doTask(prosessTaskData);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
@@ -71,7 +73,7 @@ class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
         prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         prosessTaskData.setPayload("Sender manuelt varsel brev");
         prosessTaskData.setProperty(SendManueltVarselbrevTask.MAL_TYPE, DokumentMalType.VARSEL_DOK.getKode());
-        prosessTaskData.setProperty(SendManueltVarselbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());
+        prosessTaskData.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString());
 
         vergeRepository.lagreVergeInformasjon(behandling.getId(), lagVerge());
 

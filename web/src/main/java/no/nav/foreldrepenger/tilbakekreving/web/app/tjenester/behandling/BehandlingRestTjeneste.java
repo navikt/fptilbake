@@ -211,11 +211,10 @@ public class BehandlingRestTjeneste {
         var behandling = behandlingTjeneste.opprettKunBehandlingManuell(saksnummer, eksternUuid, fagsakYtelseType, behandlingType);
         var taskGruppe = new ProsessTaskGruppe();
         ProsessTaskData taskDataFortsett = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
-        taskDataFortsett.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         taskGruppe.addNesteSekvensiell(taskDataFortsett);
         ProsessTaskData taskDataFinn = ProsessTaskData.forProsessTask(FinnGrunnlagTask.class);
-        taskDataFinn.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         taskGruppe.addNesteSekvensiell(taskDataFinn);
+        taskGruppe.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         taskGruppe.setCallIdFraEksisterende();
         taskTjeneste.lagre(taskGruppe);
         return behandling.getId();

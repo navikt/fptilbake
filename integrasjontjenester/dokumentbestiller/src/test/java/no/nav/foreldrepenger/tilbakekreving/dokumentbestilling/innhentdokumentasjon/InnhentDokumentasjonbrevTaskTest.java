@@ -11,6 +11,8 @@ import static org.mockito.Mockito.verify;
 
 import java.util.UUID;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +47,7 @@ class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppsett {
         var prosessTaskData = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
         prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         prosessTaskData.setPayload("Ber om flere opplysninger");
-        prosessTaskData.setProperty(InnhentDokumentasjonbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());
+        prosessTaskData.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString());
 
         innhentDokumentasjonBrevTask.doTask(prosessTaskData);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
@@ -56,7 +58,7 @@ class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppsett {
     void skal_sende_innhent_dokumentasjonbrev_og_sett_behandling_på_vent_når_verge_finnes() {
         var prosessTaskData = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
         prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
-        prosessTaskData.setProperty(InnhentDokumentasjonbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());
+        prosessTaskData.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString());
         prosessTaskData.setPayload("Ber om flere opplysninger");
 
         vergeRepository.lagreVergeInformasjon(behandling.getId(), lagVerge());

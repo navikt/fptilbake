@@ -7,6 +7,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -110,7 +111,7 @@ public class HenleggBehandlingTjeneste {
         var henleggelseBrevTask = ProsessTaskData.forTaskType(TaskType.forProsessTask(SendHenleggelsesbrevTask.class));
         henleggelseBrevTask.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         henleggelseBrevTask.setPayload(fritekst);
-        henleggelseBrevTask.setProperty(SendHenleggelsesbrevTask.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
+        henleggelseBrevTask.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
         henleggelseBrevTask.setCallIdFraEksisterende();
         taskTjeneste.lagre(henleggelseBrevTask);
     }
