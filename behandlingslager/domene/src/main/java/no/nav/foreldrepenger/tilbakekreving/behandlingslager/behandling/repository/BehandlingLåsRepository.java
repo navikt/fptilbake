@@ -40,8 +40,8 @@ public class BehandlingLåsRepository {
 
     private Long låsBehandling(final Long behandlingId, LockModeType lockModeType) {
         Object[] result = (Object[]) entityManager
-                .createQuery("select beh.fagsak.id, beh.versjon from Behandling beh where beh.id=:id") //$NON-NLS-1$
-                .setParameter("id", behandlingId) //$NON-NLS-1$
+                .createQuery("select beh.fagsak.id, beh.versjon from Behandling beh where beh.id=:id")
+                .setParameter("id", behandlingId)
                 .setLockMode(lockModeType)
                 .getSingleResult();
         return (Long) result[0];

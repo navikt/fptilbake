@@ -1,13 +1,14 @@
 package no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer;
 
-import jakarta.annotation.Resource;
-import no.nav.foreldrepenger.felles.jms.precond.PreconditionChecker;
-import no.nav.foreldrepenger.felles.jms.precond.PreconditionCheckerResult;
-
 import java.sql.SQLException;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import javax.sql.DataSource;
+
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+
+import no.nav.foreldrepenger.felles.jms.precond.PreconditionChecker;
+import no.nav.foreldrepenger.felles.jms.precond.PreconditionCheckerResult;
 
 
 @ApplicationScoped
@@ -26,7 +27,7 @@ class DatabasePreconditionChecker implements PreconditionChecker {
             // Connection pool validerer connections for oss, så trenger ikke gjøre noen spørring her (ønsker
             // bare å se om db er tilgjengelig)
             return PreconditionCheckerResult.fullfilled();
-        } catch (SQLException e) { // NOSONAR
+        } catch (SQLException e) {
             return PreconditionCheckerResult.notFullfilled(e.getMessage());
         }
     }

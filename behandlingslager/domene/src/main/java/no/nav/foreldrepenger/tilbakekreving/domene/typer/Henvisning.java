@@ -21,7 +21,7 @@ public class Henvisning implements Serializable {
     private static final Pattern BASE64_UUID_PATTERN = Pattern.compile("^[" + CHARS + "]{22}$", Pattern.CASE_INSENSITIVE);
 
     @Column(name = "henvisning")
-    private String henvisning; // NOSONAR
+    private String henvisning;
 
     Henvisning() {
         // for hibernate

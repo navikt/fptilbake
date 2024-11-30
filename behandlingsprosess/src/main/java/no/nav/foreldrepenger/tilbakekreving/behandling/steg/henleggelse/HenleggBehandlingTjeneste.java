@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
@@ -107,7 +108,7 @@ public class HenleggBehandlingTjeneste {
 
     private void sendHenleggelsesbrev(Behandling behandling, String fritekst) {
         var henleggelseBrevTask = ProsessTaskData.forTaskType(TaskType.forProsessTask(SendHenleggelsesbrevTask.class));
-        henleggelseBrevTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        henleggelseBrevTask.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         henleggelseBrevTask.setPayload(fritekst);
         henleggelseBrevTask.setProperty(SendHenleggelsesbrevTask.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
         henleggelseBrevTask.setCallIdFraEksisterende();

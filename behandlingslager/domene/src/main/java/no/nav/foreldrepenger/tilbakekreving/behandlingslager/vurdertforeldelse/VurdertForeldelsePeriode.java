@@ -149,10 +149,10 @@ public class VurdertForeldelsePeriode extends BaseEntitet {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<id=" + id //$NON-NLS-1$
-                + ", periode=" + periode //$NON-NLS-1$
-                + ", foreldelseVurderingType=" + foreldelseVurderingType //$NON-NLS-1$
-                + ">"; //$NON-NLS-1$
+        return getClass().getSimpleName() + "<id=" + id
+                + ", periode=" + periode
+                + ", foreldelseVurderingType=" + foreldelseVurderingType
+                + ">";
 
     }
 }

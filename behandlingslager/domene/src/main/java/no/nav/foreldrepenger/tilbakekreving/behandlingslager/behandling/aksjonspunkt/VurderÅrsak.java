@@ -28,7 +28,7 @@ public enum VurderÅrsak implements Kodeverdi {
     SKJØNN("SKJØNN", "Skjønn"),
     UTREDNING("UTREDNING", "Utredning"),
     ANNET("ANNET", "Annet"),
-    UDEFINERT("-", "Ikke definert"); //$NON-NLS-1$
+    UDEFINERT("-", "Ikke definert");
 
     public static final String KODEVERK = "VURDER_AARSAK";
     private static final Map<String, VurderÅrsak> KODER = new LinkedHashMap<>();

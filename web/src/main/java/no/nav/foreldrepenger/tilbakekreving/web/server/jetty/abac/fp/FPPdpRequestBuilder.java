@@ -29,7 +29,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
 
     public static final String ABAC_DOMAIN = "foreldrepenger";
 
-    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
+    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private PipRepository pipRepository;
     private FpsakPipKlient fpsakPipKlient;

@@ -26,7 +26,7 @@ class FaktaVergeStegTest extends FellesTestOppsett {
     void skal_utføre_steg_hvis_verge_aksjonspunkt_finnes() {
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE);
-        BehandlingskontrollKontekst kontekst = new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), behandlingLås);
+        BehandlingskontrollKontekst kontekst = new BehandlingskontrollKontekst(behandling.getSaksnummer(), behandling.getFagsakId(), behandlingLås);
         BehandleStegResultat stegResultat = faktaVergeSteg.utførSteg(kontekst);
         assertThat(stegResultat.getAksjonspunktListe()).isNotEmpty();
         assertThat(stegResultat.getAksjonspunktListe().contains(AksjonspunktDefinisjon.AVKLAR_VERGE)).isTrue();
@@ -37,7 +37,7 @@ class FaktaVergeStegTest extends FellesTestOppsett {
     @Test
     void skal_ikke_utføre_steg_hvis_verge_aksjonspunkt_ikke_finnes() {
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
-        BehandlingskontrollKontekst kontekst = new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), behandlingLås);
+        BehandlingskontrollKontekst kontekst = new BehandlingskontrollKontekst(behandling.getSaksnummer(), behandling.getFagsakId(), behandlingLås);
         BehandleStegResultat stegResultat = faktaVergeSteg.utførSteg(kontekst);
         assertThat(stegResultat.getAksjonspunktListe()).isEmpty();
     }

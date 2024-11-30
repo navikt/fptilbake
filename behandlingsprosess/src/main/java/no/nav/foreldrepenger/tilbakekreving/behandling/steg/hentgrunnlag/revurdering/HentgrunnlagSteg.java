@@ -42,7 +42,7 @@ public class HentgrunnlagSteg implements BehandlingSteg {
         // opprett prosess task for å hente grunnlag
         ProsessTaskData hentxmlTask = ProsessTaskData.forProsessTask(HentKravgrunnlagTask.class);
         hentxmlTask.setProperty(TaskProperties.PROPERTY_ORIGINAL_BEHANDLING_ID, String.valueOf(origBehandlingId));
-        hentxmlTask.setBehandling(kontekst.getFagsakId(), kontekst.getBehandlingId(), kontekst.getAktørId().getId());
+        hentxmlTask.setBehandling(kontekst.getSaksnummer().getVerdi(), kontekst.getFagsakId(), kontekst.getBehandlingId());
         taskTjeneste.lagre(hentxmlTask);
 
         return BehandleStegResultat.utførtUtenAksjonspunkter();

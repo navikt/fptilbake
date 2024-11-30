@@ -31,7 +31,7 @@ class MottattGrunnlagStegTest extends FellesTestOppsett {
     @Test
     void skal_sette_behandling_på_vent_dersom_mangler_grunnlag() {
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
-        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
+        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), lås));
 
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
@@ -44,7 +44,7 @@ class MottattGrunnlagStegTest extends FellesTestOppsett {
         lagKravgrunnlagMedFeilPostering(behandling.getId(), 100, LocalDateTime.now().minusWeeks(10));
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
-        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
+        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), lås));
 
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.UTFØRT);
         assertThat(behandling.isBehandlingPåVent()).isFalse();
@@ -56,7 +56,7 @@ class MottattGrunnlagStegTest extends FellesTestOppsett {
         lagKravgrunnlagMedFeilPostering(behandling.getId(), 100, LocalDateTime.now().minusWeeks(2));
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
-        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
+        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), lås));
 
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
@@ -70,7 +70,7 @@ class MottattGrunnlagStegTest extends FellesTestOppsett {
         lagKravgrunnlagMedFeilPostering(behandling.getId(), 10000, LocalDateTime.now().minusWeeks(10));
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
-        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
+        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), lås));
 
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.UTFØRT);
         assertThat(behandling.isBehandlingPåVent()).isFalse();
@@ -83,7 +83,7 @@ class MottattGrunnlagStegTest extends FellesTestOppsett {
         grunnlagRepository.sperrGrunnlag(behandling.getId());
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
-        BehandleStegResultat stegResultat = steg().gjenopptaSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
+        BehandleStegResultat stegResultat = steg().gjenopptaSteg(new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), lås));
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
     }

@@ -29,7 +29,7 @@ public class FagsakLås {
      */
     protected FagsakLås(Long fagsakId) {
         if (fagsakId == null) {
-            throw new IllegalArgumentException("Minst en av fagsakId og behandlingId må være forskjellig fra null."); //$NON-NLS-1$
+            throw new IllegalArgumentException("Minst en av fagsakId og behandlingId må være forskjellig fra null.");
         }
         this.fagsakId = fagsakId;
     }
@@ -41,9 +41,9 @@ public class FagsakLås {
     void setFagsakId(Long fagsakId) {
         if (this.fagsakId != null && !Objects.equals(fagsakId, this.fagsakId)) {
             throw new IllegalStateException(
-                    "Kan ikke endre fagsakId til annen verdi, var [" + //$NON-NLS-1$
-                            this.fagsakId + "], forsøkte å sette til [" + //$NON-NLS-1$ // NOSONAR
-                            fagsakId + "]"); //$NON-NLS-1$ // NOSONAR
+                    "Kan ikke endre fagsakId til annen verdi, var [" +
+                            this.fagsakId + "], forsøkte å sette til [" +
+                            fagsakId + "]");
         }
         this.fagsakId = fagsakId;
     }
@@ -67,7 +67,7 @@ public class FagsakLås {
     @Override
     public String toString() {
         return getClass().getSimpleName() +
-                "<fagsak=" + getFagsakId() + //$NON-NLS-1$
-                ">"; //$NON-NLS-1$
+                "<fagsak=" + getFagsakId() +
+                ">";
     }
 }

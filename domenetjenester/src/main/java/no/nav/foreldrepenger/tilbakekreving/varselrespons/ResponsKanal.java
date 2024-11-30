@@ -2,9 +2,9 @@ package no.nav.foreldrepenger.tilbakekreving.varselrespons;
 
 public enum ResponsKanal {
 
-    MANUELL("MANU"), //$NON-NLS-1$
-    JOURNAL("JOUR"), //$NON-NLS-1$
-    SELVBETJENING("SLVB"); //$NON-NLS-1$
+    MANUELL("MANU"),
+    JOURNAL("JOUR"),
+    SELVBETJENING("SLVB");
 
     private final String dbKode;
 
@@ -21,7 +21,7 @@ public enum ResponsKanal {
             case "MANU" -> MANUELL;
             case "JOUR" -> JOURNAL;
             case "SLVB" -> SELVBETJENING;
-            default -> throw new IllegalArgumentException("Ukjent kode: " + kode); //$NON-NLS-1$
+            default -> throw new IllegalArgumentException("Ukjent kode: " + kode);
         };
     }
 

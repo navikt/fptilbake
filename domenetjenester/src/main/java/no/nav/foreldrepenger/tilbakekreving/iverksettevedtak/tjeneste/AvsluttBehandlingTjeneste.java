@@ -40,7 +40,7 @@ public class AvsluttBehandlingTjeneste {
     }
 
     public void avsluttBehandling(Long behandlingId) {
-        log.info("Avslutter behandling: {}", behandlingId); //$NON-NLS-1$
+        log.info("Avslutter behandling: {}", behandlingId);
         BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
 
@@ -52,7 +52,7 @@ public class AvsluttBehandlingTjeneste {
 
         behandlingskontrollTjeneste.prosesserBehandlingGjenopptaHvisStegVenter(kontekst, BehandlingStegType.IVERKSETT_VEDTAK);
 
-        log.info("Har avsluttet behandling: {}", behandlingId); //$NON-NLS-1$
+        log.info("Har avsluttet behandling: {}", behandlingId);
 
     }
 

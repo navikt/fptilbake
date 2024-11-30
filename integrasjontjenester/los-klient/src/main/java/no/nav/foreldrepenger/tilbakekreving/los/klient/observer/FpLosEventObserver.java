@@ -1,11 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.los.klient.observer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingEnhetEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
@@ -68,7 +69,7 @@ public class FpLosEventObserver {
     private void opprettProsessTask(BehandlingEvent behandlingEvent, Hendelse hendelse) {
         if (Fagsystem.FPTILBAKE.equals(fagsystem)) {
             var prosessTaskData = ProsessTaskData.forProsessTask(FpLosPubliserEventTask.class);
-            prosessTaskData.setBehandling(behandlingEvent.getFagsakId(), behandlingEvent.getBehandlingId(), behandlingEvent.getAktørId().getId());
+            prosessTaskData.setBehandling(behandlingEvent.getSaksnummer().getVerdi(), behandlingEvent.getFagsakId(), behandlingEvent.getBehandlingId());
             prosessTaskData.setProperty(FpLosPubliserEventTask.PROPERTY_EVENT_NAME, hendelse.name());
             prosessTaskData.setCallIdFraEksisterende();
             taskTjeneste.lagre(prosessTaskData);

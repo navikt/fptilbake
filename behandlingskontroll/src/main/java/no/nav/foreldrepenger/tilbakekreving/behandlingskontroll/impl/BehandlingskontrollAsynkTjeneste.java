@@ -101,7 +101,7 @@ public class BehandlingskontrollAsynkTjeneste {
      */
     public String asynkProsesserBehandling(Behandling behandling) {
         ProsessTaskData taskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
-        taskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        taskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         taskData.setCallIdFraEksisterende();
         String gruppe = taskTjeneste.lagre(taskData);
         return gruppe;

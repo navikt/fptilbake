@@ -52,9 +52,9 @@ class BehandlingStegModellImpl implements BehandlingStegModell {
     BehandlingStegModellImpl(BehandlingModellImpl behandlingModell,
                              @Any Instance<BehandlingSteg> bean,
                              BehandlingStegType stegType) {
-        Objects.requireNonNull(behandlingModell, "behandlingModell"); //$NON-NLS-1$
-        Objects.requireNonNull(bean, "bean"); //$NON-NLS-1$
-        Objects.requireNonNull(stegType, "stegType"); //$NON-NLS-1$
+        Objects.requireNonNull(behandlingModell, "behandlingModell");
+        Objects.requireNonNull(bean, "bean");
+        Objects.requireNonNull(stegType, "stegType");
         this.stegInstances = bean;
         this.behandlingModell = behandlingModell;
         this.behandlingStegType = stegType;
@@ -64,9 +64,9 @@ class BehandlingStegModellImpl implements BehandlingStegModell {
      * Direkte injisering av {@link BehandlingSteg}. For testing.
      */
     BehandlingStegModellImpl(BehandlingModellImpl behandlingModell, BehandlingSteg steg, BehandlingStegType stegType) {
-        Objects.requireNonNull(behandlingModell, "behandlingModell"); //$NON-NLS-1$
-        Objects.requireNonNull(steg, "steg"); //$NON-NLS-1$ // NOSONAR
-        Objects.requireNonNull(stegType, "stegType"); //$NON-NLS-1$ // NOSONAR
+        Objects.requireNonNull(behandlingModell, "behandlingModell");
+        Objects.requireNonNull(steg, "steg");
+        Objects.requireNonNull(stegType, "stegType");
         this.steg = steg;
         this.behandlingModell = behandlingModell;
         this.behandlingStegType = stegType;
@@ -90,7 +90,7 @@ class BehandlingStegModellImpl implements BehandlingStegModell {
             steg = BehandlingStegRef.Lookup
                     .find(BehandlingSteg.class, stegInstances, behandlingModell.getBehandlingType(), behandlingStegType)
                     .orElseThrow(() -> new IllegalStateException(
-                            "Mangler steg definert for stegKode=" + behandlingStegType + " [behandlingType=" //$NON-NLS-1$ //$NON-NLS-2$
+                            "Mangler steg definert for stegKode=" + behandlingStegType + " [behandlingType="
                                     + behandlingModell.getBehandlingType() + "]"));
         }
     }
@@ -134,10 +134,10 @@ class BehandlingStegModellImpl implements BehandlingStegModell {
      */
     Optional<BehandlingStegStatus> avledStatus(Collection<AksjonspunktDefinisjon> aksjonspunkter) {
 
-        if (!Collections.disjoint(aksjonspunkter, inngangAksjonpunkt)) { // NOSONAR
+        if (!Collections.disjoint(aksjonspunkter, inngangAksjonpunkt)) {
             return Optional.of(BehandlingStegStatus.INNGANG);
         }
-        if (!Collections.disjoint(aksjonspunkter, utgangAksjonpunkt)) { // NOSONAR
+        if (!Collections.disjoint(aksjonspunkter, utgangAksjonpunkt)) {
             return Optional.of(BehandlingStegStatus.UTGANG);
         }
         return Optional.empty();
@@ -145,10 +145,10 @@ class BehandlingStegModellImpl implements BehandlingStegModell {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<" + behandlingStegType.getKode() + ", " //$NON-NLS-1$ //$NON-NLS-2$
-                + "inngangAksjonspunkter=" + inngangAksjonpunkt + ", " //$NON-NLS-1$ //$NON-NLS-2$
-                + "utgangAksjonspunkter=" + utgangAksjonpunkt + ", " //$NON-NLS-1$ //$NON-NLS-2$
-                + "impl=" + steg //$NON-NLS-1$
-                + ">"; //$NON-NLS-1$
+        return getClass().getSimpleName() + "<" + behandlingStegType.getKode() + ", "
+                + "inngangAksjonspunkter=" + inngangAksjonpunkt + ", "
+                + "utgangAksjonspunkter=" + utgangAksjonpunkt + ", "
+                + "impl=" + steg
+                + ">";
     }
 }

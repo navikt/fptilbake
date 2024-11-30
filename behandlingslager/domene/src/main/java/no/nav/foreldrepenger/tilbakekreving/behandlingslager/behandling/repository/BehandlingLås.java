@@ -35,9 +35,9 @@ public class BehandlingLås {
     void setBehandlingId(long behandlingId) {
         if (this.behandlingId != null && !Objects.equals(behandlingId, this.behandlingId)) {
             throw new IllegalStateException(
-                    "Kan ikke endre behandlingId til annen verdi, var [" + //$NON-NLS-1$
-                            this.behandlingId + "], forsøkte å sette til [" + //$NON-NLS-1$ // NOSONAR
-                            behandlingId + "]"); //$NON-NLS-1$ // NOSONAR
+                    "Kan ikke endre behandlingId til annen verdi, var [" +
+                            this.behandlingId + "], forsøkte å sette til [" +
+                            behandlingId + "]");
         }
         this.behandlingId = behandlingId;
     }
@@ -61,7 +61,7 @@ public class BehandlingLås {
     @Override
     public String toString() {
         return getClass().getSimpleName() +
-                "<behandlingId=" + getBehandlingId() + //$NON-NLS-1$
-                ">"; //$NON-NLS-1$
+                "<behandlingId=" + getBehandlingId() +
+                ">";
     }
 }

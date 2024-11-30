@@ -2,12 +2,13 @@ package no.nav.foreldrepenger.tilbakekreving.los.klient.observer;
 
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType.FAKTA_FEILUTBETALING;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingEnhetEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
@@ -19,7 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.los.klient.task.K9LosPubliserEventTask;
 import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
@@ -69,37 +70,37 @@ public class K9LosEventObserver {
                     behandlingId))) {
                     LOG.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_OPPRETTET,
                         aksjonspunkt.getAksjonspunktDefinisjon().getKode());
-                    opprettProsessTask(event.getFagsakId(), behandlingId, event.getAktørId(), EventHendelse.AKSJONSPUNKT_OPPRETTET);
+                    opprettProsessTask(event.getSaksnummer(), event.getFagsakId(), behandlingId, EventHendelse.AKSJONSPUNKT_OPPRETTET);
                 }
                 if (!AksjonspunktStatus.OPPRETTET.equals(aksjonspunkt.getStatus()) && aksjonspunkt.erAutopunkt() && erBehandlingIFaktaEllerSenereSteg(
                     behandlingId)) {
                     LOG.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_UTFØRT, aksjonspunkt.getAksjonspunktDefinisjon().getKode());
-                    opprettProsessTask(event.getFagsakId(), behandlingId, event.getAktørId(), EventHendelse.AKSJONSPUNKT_UTFØRT);
+                    opprettProsessTask(event.getSaksnummer(), event.getFagsakId(), behandlingId, EventHendelse.AKSJONSPUNKT_UTFØRT);
                 }
             }
         }
     }
 
     public void observerBehandlingAvsluttetEvent(@Observes BehandlingStatusEvent.BehandlingAvsluttetEvent event) {
-        opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.AKSJONSPUNKT_AVBRUTT);
+        opprettProsessTask(event.getSaksnummer(), event.getFagsakId(), event.getBehandlingId(), EventHendelse.AKSJONSPUNKT_AVBRUTT);
     }
 
     public void observerAksjonspunktHarEndretBehandlendeEnhetEvent(@Observes BehandlingEnhetEvent event) {
-        opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.AKSJONSPUNKT_HAR_ENDRET_BEHANDLENDE_ENHET);
+        opprettProsessTask(event.getSaksnummer(), event.getFagsakId(), event.getBehandlingId(), EventHendelse.AKSJONSPUNKT_HAR_ENDRET_BEHANDLENDE_ENHET);
     }
 
     public void observerStoppetEvent(@Observes BehandlingskontrollEvent.StoppetEvent event) {
         if (!Fagsystem.FPTILBAKE.equals(fagsystem) && event.getStegStatus().equals(BehandlingStegStatus.INNGANG)) {
-            opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.BEHANDLINGSKONTROLL_EVENT);
+            opprettProsessTask(event.getSaksnummer(), event.getFagsakId(), event.getBehandlingId(), EventHendelse.BEHANDLINGSKONTROLL_EVENT);
         }
     }
 
-    private void opprettProsessTask(long fagsakId, long behandlingId, AktørId aktørId, EventHendelse eventHendelse) {
+    private void opprettProsessTask(Saksnummer saksnummer, long fagsakId, long behandlingId, EventHendelse eventHendelse) {
         if (!Fagsystem.FPTILBAKE.equals(fagsystem)) {
             ProsessTaskData taskData = ProsessTaskData.forProsessTask(K9LosPubliserEventTask.class);
             taskData.setCallIdFraEksisterende();
             taskData.setProperty(K9LosPubliserEventTask.PROPERTY_EVENT_NAME, eventHendelse.name());
-            taskData.setBehandling(fagsakId, behandlingId, aktørId.getId());
+            taskData.setBehandling(saksnummer.getVerdi(), fagsakId, behandlingId);
             taskTjeneste.lagre(taskData);
         }
     }

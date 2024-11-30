@@ -81,7 +81,7 @@ public class AksjonspunktRestTjeneste {
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response getAksjonspunkter(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                      @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) { // NOSONAR
+                                      @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
         Collection<Totrinnsvurdering> totrinnsvurderinger = totrinnRepository.hentTotrinnsvurderinger(behandling);
         Set<AksjonspunktDto> dto = AksjonspunktDtoMapper.lagAksjonspunktDto(behandling, totrinnsvurderinger);
@@ -108,7 +108,7 @@ public class AksjonspunktRestTjeneste {
     @BeskyttetRessurs(actionType = ActionType.UPDATE, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response bekreft(@Context HttpServletRequest request,
-                            @Parameter(description = "Liste over aksjonspunkt som skal bekreftes, inklusiv data som trengs for å løse de.") @Valid BekreftedeAksjonspunkterDto apDto) throws URISyntaxException { // NOSONAR
+                            @Parameter(description = "Liste over aksjonspunkt som skal bekreftes, inklusiv data som trengs for å løse de.") @Valid BekreftedeAksjonspunkterDto apDto) throws URISyntaxException {
         BehandlingReferanse behandlingReferanse = apDto.getBehandlingReferanse();
         Behandling behandling = hentBehandling(behandlingReferanse);
         Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer = apDto.getBekreftedeAksjonspunktDtoer();

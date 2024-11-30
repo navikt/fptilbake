@@ -43,7 +43,7 @@ class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppsett {
     @Test
     void skal_sende_innhent_dokumentasjonbrev_og_sett_behandling_på_vent() {
         var prosessTaskData = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         prosessTaskData.setPayload("Ber om flere opplysninger");
         prosessTaskData.setProperty(InnhentDokumentasjonbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());
 
@@ -55,7 +55,7 @@ class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppsett {
     @Test
     void skal_sende_innhent_dokumentasjonbrev_og_sett_behandling_på_vent_når_verge_finnes() {
         var prosessTaskData = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         prosessTaskData.setProperty(InnhentDokumentasjonbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());
         prosessTaskData.setPayload("Ber om flere opplysninger");
 
@@ -71,7 +71,7 @@ class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppsett {
     @Test
     void skal_feile_om_bestilling_uuid_mangler() {
         var prosessTaskData = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         prosessTaskData.setPayload("Ber om flere opplysninger");
 
         assertThrows(NullPointerException.class, () -> innhentDokumentasjonBrevTask.doTask(prosessTaskData));

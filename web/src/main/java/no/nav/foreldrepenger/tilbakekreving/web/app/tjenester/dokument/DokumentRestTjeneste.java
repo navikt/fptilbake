@@ -28,8 +28,8 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.Henle
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.VedtaksbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
@@ -69,7 +69,7 @@ public class DokumentRestTjeneste {
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentForhåndsvisningVarselbrev(@TilpassetAbacAttributt(supplierClass = ForhåndsvisningVarselbrev.class)
-                                                  @Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @Valid HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) { // NOSONAR
+                                                  @Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @Valid HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) {
         byte[] dokument = varselbrevTjeneste.hentForhåndsvisningVarselbrev(hentForhåndsvisningVarselbrevDto);
         Response.ResponseBuilder responseBuilder = lagRespons(dokument);
         return responseBuilder.build();
@@ -82,7 +82,7 @@ public class DokumentRestTjeneste {
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public ForhåndvisningVedtaksbrevTekstDto hentVedtaksbrevForRedigering(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                                                          @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) { // NOSONAR
+                                                                          @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
         Long behandlingId = hentBehandlingId(behandlingReferanse);
         List<Avsnitt> avsnittene = vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevSomTekst(behandlingId);
         return new ForhåndvisningVedtaksbrevTekstDto(avsnittene);
@@ -100,7 +100,7 @@ public class DokumentRestTjeneste {
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av vedtaksbrevet")
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentForhåndsvisningVedtaksbrev(@TilpassetAbacAttributt(supplierClass = ForhåndvisningVedtaksbrevPdf.class) @Valid @NotNull HentForhåndvisningVedtaksbrevPdfDto vedtaksbrevPdfDto) { // NOSONAR
+    public Response hentForhåndsvisningVedtaksbrev(@TilpassetAbacAttributt(supplierClass = ForhåndvisningVedtaksbrevPdf.class) @Valid @NotNull HentForhåndvisningVedtaksbrevPdfDto vedtaksbrevPdfDto) {
         byte[] dokument = vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(vedtaksbrevPdfDto);
         Response.ResponseBuilder responseBuilder = lagRespons(dokument);
         return responseBuilder.build();
@@ -112,7 +112,7 @@ public class DokumentRestTjeneste {
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av henleggelsesbrevet")
     @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentForhåndsvisningHenleggelsesbrev(@TilpassetAbacAttributt(supplierClass = ForhåndsvisningHenleggelseslbrev.class) @Valid @NotNull HentForhåndsvisningHenleggelseslbrevDto henleggelseslbrevDto) { // NOSONAR
+    public Response hentForhåndsvisningHenleggelsesbrev(@TilpassetAbacAttributt(supplierClass = ForhåndsvisningHenleggelseslbrev.class) @Valid @NotNull HentForhåndsvisningHenleggelseslbrevDto henleggelseslbrevDto) {
         byte[] dokument;
         BehandlingReferanse behandlingReferanse = henleggelseslbrevDto.getBehandlingReferanse();
         String fritekst = henleggelseslbrevDto.getFritekst();

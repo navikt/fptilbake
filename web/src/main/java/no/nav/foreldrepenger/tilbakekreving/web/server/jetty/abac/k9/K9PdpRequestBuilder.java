@@ -34,7 +34,7 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(K9PdpRequestBuilder.class);
 
     public static final String ABAC_DOMAIN = "k9";
-    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
+    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private PipRepository pipRepository;
     private boolean aktiverAbacLogging;

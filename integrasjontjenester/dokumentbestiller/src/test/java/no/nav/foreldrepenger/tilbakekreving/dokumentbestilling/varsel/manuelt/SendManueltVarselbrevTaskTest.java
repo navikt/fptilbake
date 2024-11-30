@@ -8,6 +8,8 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,8 +21,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.D
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-
-import java.util.UUID;
 
 class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
 
@@ -42,7 +42,7 @@ class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
     @Test
     void skal_sende_manuelt_varselbrev_og_sett_behandling_på_vent() {
         var prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         prosessTaskData.setPayload("Sender manuelt varsel brev");
         prosessTaskData.setProperty(SendManueltVarselbrevTask.MAL_TYPE, DokumentMalType.VARSEL_DOK.getKode());
         prosessTaskData.setProperty(SendManueltVarselbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());
@@ -55,7 +55,7 @@ class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
     @Test
     void skal_sende_korrigert_varselbrev_og_sett_behandling_på_vent() {
         var prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         prosessTaskData.setPayload("Sender korrigert varsel brev");
         prosessTaskData.setProperty(SendManueltVarselbrevTask.MAL_TYPE, DokumentMalType.KORRIGERT_VARSEL_DOK.getKode());
         prosessTaskData.setProperty(SendManueltVarselbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());
@@ -68,7 +68,7 @@ class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
     @Test
     void skal_sende_manuelt_varselbrev_med_verge() {
         var prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         prosessTaskData.setPayload("Sender manuelt varsel brev");
         prosessTaskData.setProperty(SendManueltVarselbrevTask.MAL_TYPE, DokumentMalType.VARSEL_DOK.getKode());
         prosessTaskData.setProperty(SendManueltVarselbrevTask.BESTILLING_UUID, UUID.randomUUID().toString());

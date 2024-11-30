@@ -2,11 +2,12 @@ package no.nav.foreldrepenger.tilbakekreving.fagsak;
 
 import java.util.Optional;
 
-import org.hibernate.exception.ConstraintViolationException;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
+
+import org.hibernate.exception.ConstraintViolationException;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRepository;
@@ -74,7 +75,7 @@ public class FagsakTjeneste {
     private Fagsak lagreFagsak(Fagsak fagsak, Saksnummer saksnummer) {
         try {
             fagsakRepository.lagre(fagsak);
-        } catch (PersistenceException e) { // NOSONAR
+        } catch (PersistenceException e) {
             if (e.getCause() instanceof ConstraintViolationException) {
                 throw BehandlingFeil.saksnummerKnyttetTilAnnenBruker(saksnummer);
             } else {

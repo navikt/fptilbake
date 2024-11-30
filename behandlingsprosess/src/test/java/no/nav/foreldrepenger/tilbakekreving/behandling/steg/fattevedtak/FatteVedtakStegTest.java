@@ -5,8 +5,6 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +73,7 @@ class FatteVedtakStegTest {
         repositoryProvider.getFagsakRepository().lagre(fagsak);
         behandling = lagBehandling(fagsak);
         BehandlingLås lås = repositoryProvider.getBehandlingRepository().taSkriveLås(behandling);
-        behandlingskontrollKontekst = new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås);
+        behandlingskontrollKontekst = new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), lås);
 
         when(beregningsresultatTjeneste.finnEllerBeregn(behandling.getId())).thenReturn(lagBeregningResultat());
     }

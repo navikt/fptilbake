@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -31,7 +32,7 @@ public class ProsessTaskIverksett {
             opprettVedtaksbrevProsessTask(taskGruppe);
         }
         taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(AvsluttBehandlingTask.class));
-        taskGruppe.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        taskGruppe.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         taskGruppe.setCallIdFraEksisterende();
 
         opprettDvhProsessTask(behandling, taskGruppe);
@@ -47,7 +48,7 @@ public class ProsessTaskIverksett {
 
     private void opprettDvhProsessTask(Behandling behandling, ProsessTaskGruppe taskGruppe) {
         var taskData = ProsessTaskData.forProsessTask(SendVedtakHendelserTilDvhTask.class);
-        taskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        taskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         taskGruppe.addNesteSekvensiell(taskData);
     }
 

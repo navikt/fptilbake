@@ -30,7 +30,7 @@ public class AktørId implements Serializable, Comparable<AktørId>, IndexKey {
     @JsonValue
     @jakarta.validation.constraints.Pattern(regexp = VALID_REGEXP, flags = {Flag.CASE_INSENSITIVE})
     @Column(name = "aktoer_id", updatable = false, length = 50)
-    private String aktørId;  // NOSONAR
+    private String aktørId;
 
     protected AktørId() {
         // for hibernate

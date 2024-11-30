@@ -22,7 +22,7 @@ public enum HistorikkBegrunnelseType implements Kodeverdi {
     BEH_STARTET_PA_NYTT("BEH_STARTET_PA_NYTT", "Behandling startet på nytt"),
     UDEFINIERT("-", "Ikke definert");
 
-    public static final String KODEVERK = "HISTORIKK_BEGRUNNELSE_TYPE"; //$NON-NLS-1$
+    public static final String KODEVERK = "HISTORIKK_BEGRUNNELSE_TYPE";
     private static final Map<String, HistorikkBegrunnelseType> KODER = new LinkedHashMap<>();
 
     private String kode;

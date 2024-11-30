@@ -78,7 +78,7 @@ public class IndexClasses {
 
         Path fileName = f.getFileName();
         if (fileName != null && fileName.toString().endsWith(".class")) {
-            try (InputStream newInputStream = Files.newInputStream(f, StandardOpenOption.READ)) { // NOSONAR
+            try (InputStream newInputStream = Files.newInputStream(f, StandardOpenOption.READ)) {
                 indexer.index(newInputStream);
             } catch (IOException e) {
                 throw new IllegalStateException("Fikk ikke indeksert klasse " + f + ", kan ikke scanne klasser", e);

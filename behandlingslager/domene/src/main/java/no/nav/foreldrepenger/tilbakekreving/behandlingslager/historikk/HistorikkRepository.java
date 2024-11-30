@@ -47,8 +47,8 @@ public class HistorikkRepository {
     }
 
     private Long getFagsakId(long behandlingId) {
-        return entityManager.createQuery("select b.fagsak.id from Behandling b where b.id = :behandlingId", Long.class) //$NON-NLS-1$
-                .setParameter("behandlingId", behandlingId) // NOSONAR
+        return entityManager.createQuery("select b.fagsak.id from Behandling b where b.id = :behandlingId", Long.class)
+                .setParameter("behandlingId", behandlingId)
                 .getSingleResult();
     }
 
@@ -57,10 +57,10 @@ public class HistorikkRepository {
         Long fagsakId = getFagsakId(behandlingId);
 
         return entityManager.createQuery(
-                        "select h from Historikkinnslag h where (h.behandlingId = :behandlingId OR h.behandlingId = NULL) AND h.fagsakId = :fagsakId ", //$NON-NLS-1$
+                        "select h from Historikkinnslag h where (h.behandlingId = :behandlingId OR h.behandlingId = NULL) AND h.fagsakId = :fagsakId ",
                         Historikkinnslag.class)
-                .setParameter("fagsakId", fagsakId)// NOSONAR //$NON-NLS-1$
-                .setParameter("behandlingId", behandlingId) //$NON-NLS-1$
+                .setParameter("fagsakId", fagsakId)// NOSONAR
+                .setParameter("behandlingId", behandlingId)
                 .getResultList();
     }
 

@@ -11,12 +11,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.jpa.HibernateHints;
-import org.hibernate.query.NativeQuery;
-import org.hibernate.type.StandardBasicTypes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
@@ -24,6 +18,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
+
+import org.hibernate.jpa.HibernateHints;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.type.StandardBasicTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskStatusUtil;
 import no.nav.vedtak.felles.jpa.HibernateVerktøy;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -75,8 +76,8 @@ public class FagsakProsessTaskRepository {
         log.debug("Fjerner link fagsak[{}] -> prosesstask[{}], tasktype=[{}] gruppeSekvensNr=[{}]", fagsakId, prosessTaskId, ptData.getTaskType(), gruppeSekvensNr);
         EntityManager em = getEntityManager();
         Query query = em.createQuery("Delete from FagsakProsessTask Where prosessTaskId = :prosessTaskId and fagsakId=:fagsakId");
-        query.setParameter("prosessTaskId", prosessTaskId); // NOSONAR
-        query.setParameter("fagsakId", fagsakId); // NOSONAR
+        query.setParameter("prosessTaskId", prosessTaskId);
+        query.setParameter("fagsakId", fagsakId);
         query.executeUpdate();
         em.flush();
     }
@@ -107,8 +108,8 @@ public class FagsakProsessTaskRepository {
                 .setParameter("gruppe", gruppeId, StandardBasicTypes.STRING)
                 .setParameter("nesteKjoeringFraOgMed", nesteKjoeringFraOgMed) // max oppløsning på neste_kjoering_etter er sekunder
                 .setParameter("nesteKjoeringTilOgMed", nesteKjoeringTilOgMed)
-                .setParameter("fagsakId", fagsakId) // NOSONAR
-                .setParameter("behandlingId", behandlingId, StandardBasicTypes.LONG) // NOSONAR
+                .setParameter("fagsakId", fagsakId)
+                .setParameter("behandlingId", behandlingId, StandardBasicTypes.LONG)
                 .setHint(HibernateHints.HINT_READ_ONLY, "true");
 
         List<ProsessTaskEntitet> resultList = query.getResultList();
@@ -150,7 +151,7 @@ public class FagsakProsessTaskRepository {
     }
 
     public List<ProsessTaskData> sjekkStatusProsessTasks(Long fagsakId, Long behandlingId, String gruppe) {
-        Objects.requireNonNull(fagsakId, "fagsakId"); // NOSONAR
+        Objects.requireNonNull(fagsakId, "fagsakId");
 
         LocalDateTime now = LocalDateTime.now().withNano(0).withSecond(0);
 
@@ -193,7 +194,7 @@ public class FagsakProsessTaskRepository {
                             "where fpt.fagsakId=:fagsakId and gruppeSekvensNr is not null " +
                             "order by gruppeSekvensNr ",
                     FagsakProsessTask.class);
-            query.setParameter("fagsakId", fagsakId); // NOSONAR
+            query.setParameter("fagsakId", fagsakId);
 
             FagsakProsessTask førsteFagsakProsessTask = query.getResultList().stream()
                     .findFirst()

@@ -327,7 +327,7 @@ class FinnGrunnlagTaskTest extends FellesTestOppsett {
 
     private ProsessTaskData opprettFinngrunnlagProsessTask() {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(FinnGrunnlagTask.class);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         return prosessTaskData;
     }
 
