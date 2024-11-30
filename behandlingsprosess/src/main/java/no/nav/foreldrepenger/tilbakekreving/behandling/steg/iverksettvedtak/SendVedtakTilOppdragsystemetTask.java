@@ -22,7 +22,6 @@ import no.nav.vedtak.felles.jpa.savepoint.RunWithSavepoint;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 @ApplicationScoped
 @ProsessTask(value = "iverksetteVedtak.sendVedtakTilOppdragsystemet", prioritet = 2)
@@ -30,7 +29,6 @@ import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(SendVedtakTilOppdragsystemetTask.class);
-    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private EntityManager entityManager;
     private BehandlingRepository behandlingRepository;
@@ -63,8 +61,6 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        LOG_CONTEXT.add("behandling", behandlingId);
-        LOG_CONTEXT.add("saksnummer", behandling.getFagsak().getSaksnummer().getVerdi());
         beregningsresultatTjeneste.beregnOgLagre(behandlingId); //midlertidig her for å raskere kunne fase ut håndtering av lagret XML
         var tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
         oppdragIverksettingStatusRepository.registrerStarterIverksetting(behandlingId, tilbakekrevingsvedtak.vedtakId().toString());

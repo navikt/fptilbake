@@ -30,12 +30,10 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.log.mdc.MDCOperations;
-import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 @ApplicationScoped
 public class GjenopptaBehandlingTjeneste {
 
-    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
     private static final Logger LOG = LoggerFactory.getLogger(GjenopptaBehandlingTjeneste.class);
 
     private ProsessTaskTjeneste taskTjeneste;
@@ -78,9 +76,6 @@ public class GjenopptaBehandlingTjeneste {
     }
 
     public void gjenopptaBehandlingOmMulig(String callId, Behandling behandling) {
-        LOG_CONTEXT.add("behandling", behandling.getId());
-        LOG_CONTEXT.add("saksnummer", behandling.getFagsak().getSaksnummer());
-
         long behandlingId = behandling.getId();
         String nyCallId = callId + behandlingId;
         KravgrunnlagTilstand status = kanGjennopptaStatus(behandlingId);
