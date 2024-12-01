@@ -6,9 +6,9 @@ import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskPropertie
 import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.EKSTERN_BEHANDLING_UUID;
 import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.FAGSAK_YTELSE_TYPE;
 import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.HENVISNING;
-import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.SAKSNUMMER;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -41,13 +41,11 @@ public class HendelseTaskDataWrapper {
     }
 
     public AktørId getAktørId() {
-        String aktørId = prosessTaskData.getAktørId();
-        return new AktørId(aktørId);
+        return Optional.ofNullable(prosessTaskData.getAktørId()).map(AktørId::new).orElse(null);
     }
 
     public Saksnummer getSaksnummer() {
-        String saksnummer = prosessTaskData.getPropertyValue(SAKSNUMMER);
-        return new Saksnummer(saksnummer);
+        return Optional.ofNullable(prosessTaskData.getSaksnummer()).map(Saksnummer::new).orElse(null);
     }
 
     public FagsakYtelseType getFagsakYtelseType() {
@@ -69,7 +67,7 @@ public class HendelseTaskDataWrapper {
     }
 
     public void setSaksnummer(Saksnummer saksnummer) {
-        prosessTaskData.setProperty(SAKSNUMMER, saksnummer.getVerdi());
+        Optional.ofNullable(saksnummer).map(Saksnummer::getVerdi).ifPresent(prosessTaskData::setSaksnummer);
     }
 
 
@@ -82,15 +80,15 @@ public class HendelseTaskDataWrapper {
             throw new IllegalArgumentException("Trenger minst en av henvisning og ekstern behandling id, manglet begge.");
         }
         Objects.requireNonNull(prosessTaskData.getAktørId());
+        Objects.requireNonNull(prosessTaskData.getSaksnummer());
         Objects.requireNonNull(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_UUID));
-        Objects.requireNonNull(prosessTaskData.getPropertyValue(SAKSNUMMER));
         Objects.requireNonNull(prosessTaskData.getPropertyValue(FAGSAK_YTELSE_TYPE));
     }
 
     public void validerTaskDataHåndterVedtakFattet() {
         Objects.requireNonNull(prosessTaskData.getAktørId());
+        Objects.requireNonNull(prosessTaskData.getSaksnummer());
         Objects.requireNonNull(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_UUID));
-        Objects.requireNonNull(prosessTaskData.getPropertyValue(SAKSNUMMER));
         Objects.requireNonNull(prosessTaskData.getPropertyValue(FAGSAK_YTELSE_TYPE));
     }
 
@@ -100,22 +98,13 @@ public class HendelseTaskDataWrapper {
         Objects.requireNonNull(getFagsakYtelseType());
     }
 
-    public void validerTaskDataOppdaterBehandling() {
-        if (prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_ID) == null && prosessTaskData.getPropertyValue(HENVISNING) == null) {
-            throw new IllegalArgumentException("Trenger minst en av henvisning og ekstern behandling id, manglet begge.");
-        }
-        Objects.requireNonNull(prosessTaskData.getAktørId());
-        Objects.requireNonNull(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_UUID));
-        Objects.requireNonNull(prosessTaskData.getPropertyValue(SAKSNUMMER));
-    }
-
     public static HendelseTaskDataWrapper lagWrapperForOpprettBehandling(UUID behandlingUuid, Henvisning henvisning, AktørId aktørId, Saksnummer saksnummer) {
         ProsessTaskData td = ProsessTaskData.forProsessTask(OpprettBehandlingTask.class);
         td.setAktørId(aktørId.getId());
+        td.setSaksnummer(saksnummer.getVerdi());
         td.setProperty(EKSTERN_BEHANDLING_UUID, behandlingUuid.toString());
         td.setProperty(EKSTERN_BEHANDLING_ID, henvisning.getVerdi()); //TODO k9-tilbake fjern når transisjon til henvisning er ferdig
         td.setProperty(HENVISNING, henvisning.getVerdi());
-        td.setProperty(SAKSNUMMER, saksnummer.getVerdi());
         return new HendelseTaskDataWrapper(td);
     }
 }

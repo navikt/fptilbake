@@ -12,10 +12,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.enterprise.inject.spi.CDI;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.inject.spi.CDI;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModellVisitor;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
@@ -58,7 +59,7 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
      * @param destroyOnClose - hvorvidt #close skal gjøre noe.
      */
     protected BehandlingModellImpl(BehandlingType behandlingType, boolean destroyOnClose) {
-        Objects.requireNonNull(behandlingType, "behandlingType"); //$NON-NLS-1$ // NOSONAR
+        Objects.requireNonNull(behandlingType, "behandlingType");
         this.destroyOnClose = destroyOnClose;
         this.behandlingType = behandlingType;
         this.lookup = new CdiLookup(this);
@@ -67,7 +68,7 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
     /* for testing først og fremst. */
     protected BehandlingModellImpl(BehandlingType behandlingType,
                                    BiFunction<BehandlingStegType, BehandlingType, BehandlingSteg> lookup) {
-        Objects.requireNonNull(behandlingType, "behandlingType"); //$NON-NLS-1$ // NOSONAR
+        Objects.requireNonNull(behandlingType, "behandlingType");
         this.behandlingType = behandlingType;
         this.lookup = (stegType, behType) -> new BehandlingStegModellImpl(this, lookup.apply(stegType, behType), stegType);
     }
@@ -112,7 +113,7 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
 
     @Override
     public BehandlingStegModell finnNesteSteg(BehandlingStegType stegType) {
-        Objects.requireNonNull(stegType, "stegType"); //$NON-NLS-1$ // NOSONAR
+        Objects.requireNonNull(stegType, "stegType");
         var idx = indexOf(stegType);
         if ((idx >= (steg.size() - 1)) || (idx < 0)) {
             return null;
@@ -122,7 +123,7 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
 
     @Override
     public BehandlingStegModell finnForrigeSteg(BehandlingStegType stegType) {
-        Objects.requireNonNull(stegType, "stegType"); //$NON-NLS-1$ // NOSONAR
+        Objects.requireNonNull(stegType, "stegType");
         var idx = indexOf(stegType);
         if ((idx > 0) && (idx < steg.size())) {
             return steg.get(idx - 1);
@@ -173,8 +174,8 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
         }
 
         throw new IllegalArgumentException(
-                "Utvikler-feil: Ingen av forespurte steg er kjent i BehandlingModell: behandlingType=" + behandlingType //$NON-NLS-1$
-                        + ", forspurteSteg=" + Arrays.asList(stegTyper) // NOSONAR //$NON-NLS-1$
+                "Utvikler-feil: Ingen av forespurte steg er kjent i BehandlingModell: behandlingType=" + behandlingType
+                        + ", forspurteSteg=" + Arrays.asList(stegTyper)
         );
     }
 
@@ -215,12 +216,12 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
         }
         var idx = indexOf(fraOgMedSteg);
         if (idx < 0) {
-            throw new IllegalStateException("BehandlingSteg (fraogmed) " + fraOgMedSteg + ER_IKKE_DEFINERT_BLANT + steg); //$NON-NLS-1$
+            throw new IllegalStateException("BehandlingSteg (fraogmed) " + fraOgMedSteg + ER_IKKE_DEFINERT_BLANT + steg);
         }
 
         var idxEnd = tilSteg == null ? steg.size() - 1 : indexOf(tilSteg);
         if (idxEnd < 0) {
-            throw new IllegalStateException("BehandlingSteg (til) " + tilSteg + ER_IKKE_DEFINERT_BLANT + steg); //$NON-NLS-1$
+            throw new IllegalStateException("BehandlingSteg (til) " + tilSteg + ER_IKKE_DEFINERT_BLANT + steg);
         }
         if (idx <= idxEnd) {
             return steg.subList(idx, idxEnd + (inklusivTil ? 1 : 0)).stream().map(e -> e);
@@ -289,7 +290,7 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
     }
 
     protected BehandlingStegModellImpl internFinnSteg(BehandlingStegType stegType) {
-        Objects.requireNonNull(stegType, "stegType"); //$NON-NLS-1$ // NOSONAR
+        Objects.requireNonNull(stegType, "stegType");
         return steg.get(indexOf(stegType));
     }
 
@@ -300,7 +301,7 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
         } else {
             idx = indexOf(stegType);
             if (idx < 0) {
-                throw new IllegalStateException("BehandlingSteg " + stegType + ER_IKKE_DEFINERT_BLANT + steg); //$NON-NLS-1$
+                throw new IllegalStateException("BehandlingSteg " + stegType + ER_IKKE_DEFINERT_BLANT + steg);
             }
             if (idx == (steg.size() - 1)) {
                 return Collections.emptyList();
@@ -321,7 +322,7 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
      */
     @Override
     public BehandlingStegUtfall prosesserFra(BehandlingStegType førsteSteg, BehandlingModellVisitor visitor) {
-        Objects.requireNonNull(visitor, "visitor"); //$NON-NLS-1$ // NOSONAR
+        Objects.requireNonNull(visitor, "visitor");
 
         var idx = førsteSteg == null ? 0 : indexOf(førsteSteg);
         var entry = steg.get(idx);
@@ -353,14 +354,14 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
     }
 
     void leggTil(BehandlingStegType stegType, BehandlingType behandlingType) {
-        Objects.requireNonNull(stegType, "stegType"); //$NON-NLS-1$ // NOSONAR
+        Objects.requireNonNull(stegType, "stegType");
 
         var entry = lookup.apply(stegType, behandlingType);
         if (entry == null) {
             throw new IllegalArgumentException(
-                    "Fant ikke steg for kode: " + //$NON-NLS-1$
+                    "Fant ikke steg for kode: " +
                             stegType.getKode() +
-                            ", [behandlingType=" + behandlingType + "]"); // NOSONAR //$NON-NLS-1$ //$NON-NLS-2$
+                            ", [behandlingType=" + behandlingType + "]");
         }
         this.steg.add(entry);
         leggTilAksjonspunktDefinisjoner(stegType, entry);
@@ -375,22 +376,18 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
     }
 
     void validerErIkkeAlleredeMappet(AksjonspunktDefinisjon aksjonspunktDefinisjon) {
-        Objects.requireNonNull(aksjonspunktDefinisjon, "aksjonspunktDefinisjon"); //$NON-NLS-1$
+        Objects.requireNonNull(aksjonspunktDefinisjon, "aksjonspunktDefinisjon");
 
         for (var bsm : this.steg) {
             if (bsm.getInngangAksjonpunkt().contains(aksjonspunktDefinisjon)) {
-                throw new IllegalStateException("Aksjonpunktkode [" + aksjonspunktDefinisjon + "] allerede mappet til inngang av " + //$NON-NLS-1$ //$NON-NLS-2$
+                throw new IllegalStateException("Aksjonpunktkode [" + aksjonspunktDefinisjon + "] allerede mappet til inngang av " +
                         bsm.getBehandlingStegType().getKode()
-                        + " [behandlingType=" + behandlingType + "]"); //$NON-NLS-1$ //$NON-NLS-2$
-                // //
-                // NOSONAR
+                        + " [behandlingType=" + behandlingType + "]");
             }
             if (bsm.getUtgangAksjonpunkt().contains(aksjonspunktDefinisjon)) {
-                throw new IllegalStateException("Aksjonpunktkode [" + aksjonspunktDefinisjon + "] allerede mappet til utgang av " + //$NON-NLS-1$ //$NON-NLS-2$
+                throw new IllegalStateException("Aksjonpunktkode [" + aksjonspunktDefinisjon + "] allerede mappet til utgang av " +
                         bsm.getBehandlingStegType().getKode()
-                        + " [behandlingType=" + behandlingType + "]"); //$NON-NLS-1$ //$NON-NLS-2$
-                // //
-                // NOSONAR
+                        + " [behandlingType=" + behandlingType + "]");
             }
         }
     }
@@ -405,7 +402,7 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
     }
 
     private int indexOf(BehandlingStegType stegType) {
-        Objects.requireNonNull(stegType, "stegKode"); //$NON-NLS-1$ // NOSONAR
+        Objects.requireNonNull(stegType, "stegKode");
         for (int i = 0, max = steg.size(); i < max; i++) {
             BehandlingStegModell bsModell = steg.get(i);
             if (Objects.equals(stegType, bsModell.getBehandlingStegType())) {
@@ -413,7 +410,7 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
             }
         }
         throw new IllegalArgumentException("Ukjent behandlingssteg: " + stegType.getKode() +
-                ", [behandlingType=" + behandlingType + "]"); //$NON-NLS-1$ //$NON-NLS-2$ // NOSONAR
+                ", [behandlingType=" + behandlingType + "]");
     }
 
     @Override

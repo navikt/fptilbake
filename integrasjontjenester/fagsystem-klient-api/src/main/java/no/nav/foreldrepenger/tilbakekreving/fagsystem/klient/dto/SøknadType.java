@@ -14,8 +14,8 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonDeserialize(using = SøknadType.SøknadTypeDeserializer.class)
 public enum SøknadType {
-    FØDSEL("ST-001"), //$NON-NLS-1$
-    ADOPSJON("ST-002"), //$NON-NLS-1$
+    FØDSEL("ST-001"),
+    ADOPSJON("ST-002"),
     ;
 
     private final String kode;
@@ -34,7 +34,7 @@ public enum SøknadType {
                 return st;
             }
         }
-        throw new IllegalArgumentException("Ukjent " + SøknadType.class.getSimpleName() + ": " + kode); //$NON-NLS-1$ //$NON-NLS-2$
+        throw new IllegalArgumentException("Ukjent " + SøknadType.class.getSimpleName() + ": " + kode);
     }
 
     static class SøknadTypeDeserializer extends StdDeserializer<SøknadType> {
@@ -60,7 +60,7 @@ public enum SøknadType {
                     p.nextToken();
                     String name = p.getCurrentName();
                     String value = p.getValueAsString();
-                    if (Objects.equals("kode", name) && !Objects.equals("kode", value)) { //$NON-NLS-1$ //$NON-NLS-2$
+                    if (Objects.equals("kode", name) && !Objects.equals("kode", value)) {
                         kode = value;
                     }
                 }

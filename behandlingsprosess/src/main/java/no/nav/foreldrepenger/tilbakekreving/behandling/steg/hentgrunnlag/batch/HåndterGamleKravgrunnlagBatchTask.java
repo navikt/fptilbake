@@ -9,6 +9,8 @@ import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +83,7 @@ public class HåndterGamleKravgrunnlagBatchTask implements ProsessTaskHandler {
         var gruppe = "gammel-kravgrunnlag" + batchRun;
         for (var mottattXmlId : alleGamleKravgrunnlag) {
             var prosessTaskData = ProsessTaskData.forProsessTask(HåndterGamleKravgrunnlagTask.class);
-            prosessTaskData.setProperty("mottattXmlId", String.valueOf(mottattXmlId));
+            prosessTaskData.setProperty(TaskProperties.PROPERTY_MOTTATT_XML_ID, String.valueOf(mottattXmlId));
             prosessTaskData.setCallIdFraEksisterende();
             prosessTaskData.setGruppe(gruppe);
             taskTjeneste.lagre(prosessTaskData);

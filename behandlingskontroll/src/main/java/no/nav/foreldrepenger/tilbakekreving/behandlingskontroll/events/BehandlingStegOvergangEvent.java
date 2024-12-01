@@ -7,7 +7,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.Behandlingskontr
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 
 /**
@@ -49,8 +49,8 @@ public class BehandlingStegOvergangEvent implements BehandlingEvent {
     }
 
     @Override
-    public AktørId getAktørId() {
-        return kontekst.getAktørId();
+    public Saksnummer getSaksnummer() {
+        return kontekst.getSaksnummer();
     }
 
     @Override
@@ -73,10 +73,10 @@ public class BehandlingStegOvergangEvent implements BehandlingEvent {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<" + kontekst + //$NON-NLS-1$
-                ", fraTilstand=" + fraTilstand + //$NON-NLS-1$
-                ", tilTilstand=" + tilTilstand + //$NON-NLS-1$
-                ">"; //$NON-NLS-1$
+        return getClass().getSimpleName() + "<" + kontekst +
+                ", fraTilstand=" + fraTilstand +
+                ", tilTilstand=" + tilTilstand +
+                ">";
     }
 
     public BehandlingStegType getTilStegType() {

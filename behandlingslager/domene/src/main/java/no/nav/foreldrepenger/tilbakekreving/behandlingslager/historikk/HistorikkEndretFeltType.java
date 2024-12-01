@@ -37,7 +37,7 @@ public enum HistorikkEndretFeltType implements Kodeverdi {
     private String kode;
     private String navn;
 
-    public static final String KODEVERK = "HISTORIKK_ENDRET_FELT_TYPE"; //$NON-NLS-1$
+    public static final String KODEVERK = "HISTORIKK_ENDRET_FELT_TYPE";
     private static final Map<String, HistorikkEndretFeltType> KODER = new LinkedHashMap<>();
 
     static {

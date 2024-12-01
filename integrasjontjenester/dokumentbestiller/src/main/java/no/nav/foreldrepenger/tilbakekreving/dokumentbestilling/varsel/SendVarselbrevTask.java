@@ -6,6 +6,7 @@ import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Bre
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
@@ -21,8 +22,6 @@ import java.util.UUID;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendVarselbrevTask implements ProsessTaskHandler {
 
-    public static final String BESTILLING_UUID = "bestillingUuid";
-
     private VarselbrevTjeneste varselbrevTjeneste;
     private VergeRepository vergeRepository;
 
@@ -36,7 +35,7 @@ public class SendVarselbrevTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
-        var unikBestillingUuid = UUID.fromString(Optional.of(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElseThrow());
+        var unikBestillingUuid = UUID.fromString(Optional.of(prosessTaskData.getPropertyValue(TaskProperties.BESTILLING_UUID)).orElseThrow());
 
         if (vergeRepository.finnesVerge(behandlingId)) {
             varselbrevTjeneste.sendVarselbrev(behandlingId, VERGE, unikBestillingUuid);

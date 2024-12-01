@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch;
 
 import java.util.Optional;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +37,7 @@ public class HåndterGamleKravgrunnlagTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        Long mottattXmlId = Long.valueOf(prosessTaskData.getPropertyValue("mottattXmlId"));
+        Long mottattXmlId = Long.valueOf(prosessTaskData.getPropertyValue(TaskProperties.PROPERTY_MOTTATT_XML_ID));
         LOG_CONTEXT.add("mottattXmlId", mottattXmlId);
         LOG.info("Håndterer gammelt kravgrunnlag med mottattXmlId={}", mottattXmlId);
         ØkonomiXmlMottatt økonomiXmlMottatt = håndterGamleKravgrunnlagTjeneste.hentGammeltKravgrunnlag(mottattXmlId);

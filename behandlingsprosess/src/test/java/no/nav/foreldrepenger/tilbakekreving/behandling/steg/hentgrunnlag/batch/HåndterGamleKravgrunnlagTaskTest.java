@@ -18,6 +18,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -288,7 +290,7 @@ class HåndterGamleKravgrunnlagTaskTest {
 
     private ProsessTaskData lagProsessTaskData() {
         var prosessTaskData = ProsessTaskData.forProsessTask(HåndterGamleKravgrunnlagTask.class);
-        prosessTaskData.setProperty("mottattXmlId", String.valueOf(mottattXmlId));
+        prosessTaskData.setProperty(TaskProperties.PROPERTY_MOTTATT_XML_ID, String.valueOf(mottattXmlId));
         prosessTaskData.setCallIdFraEksisterende();
         return prosessTaskData;
     }

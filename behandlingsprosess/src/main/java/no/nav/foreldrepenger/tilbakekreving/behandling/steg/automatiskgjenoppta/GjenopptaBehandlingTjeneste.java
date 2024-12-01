@@ -4,11 +4,12 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -29,12 +30,10 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.log.mdc.MDCOperations;
-import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 @ApplicationScoped
 public class GjenopptaBehandlingTjeneste {
 
-    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
     private static final Logger LOG = LoggerFactory.getLogger(GjenopptaBehandlingTjeneste.class);
 
     private ProsessTaskTjeneste taskTjeneste;
@@ -77,9 +76,6 @@ public class GjenopptaBehandlingTjeneste {
     }
 
     public void gjenopptaBehandlingOmMulig(String callId, Behandling behandling) {
-        LOG_CONTEXT.add("behandling", behandling.getId());
-        LOG_CONTEXT.add("saksnummer", behandling.getFagsak().getSaksnummer());
-
         long behandlingId = behandling.getId();
         String nyCallId = callId + behandlingId;
         KravgrunnlagTilstand status = kanGjennopptaStatus(behandlingId);
@@ -174,7 +170,7 @@ public class GjenopptaBehandlingTjeneste {
 
     private String opprettFortsettBehandlingTask(Behandling behandling, String callId) {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         prosessTaskData.setSekvens("1");
         prosessTaskData.setPrioritet(3);
         prosessTaskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
@@ -188,7 +184,7 @@ public class GjenopptaBehandlingTjeneste {
 
     private String opprettHenleggBehandlingTask(Behandling behandling, String callId) {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(HenleggBehandlingTask.class);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         prosessTaskData.setSekvens("1");
 
         // unik per task da det gjelder ulike behandlinger, gjenbruker derfor ikke

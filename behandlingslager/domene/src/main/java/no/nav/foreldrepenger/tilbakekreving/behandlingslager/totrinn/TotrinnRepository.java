@@ -96,19 +96,19 @@ public class TotrinnRepository {
 
     protected Optional<Totrinnresultatgrunnlag> getAktivtTotrinnresultatgrunnlag(Long behandlingId) {
         TypedQuery<Totrinnresultatgrunnlag> query = entityManager.createQuery(
-                "SELECT trg FROM Totrinnresultatgrunnlag trg WHERE trg.behandling.id = :behandling_id AND trg.aktiv = true", //$NON-NLS-1$
+                "SELECT trg FROM Totrinnresultatgrunnlag trg WHERE trg.behandling.id = :behandling_id AND trg.aktiv = true",
                 Totrinnresultatgrunnlag.class);
 
-        query.setParameter("behandling_id", behandlingId); //$NON-NLS-1$
+        query.setParameter("behandling_id", behandlingId);
         return HibernateVerktøy.hentUniktResultat(query);
     }
 
     protected Collection<Totrinnsvurdering> getAktiveTotrinnaksjonspunktvurderinger(Long behandlingId) {
         TypedQuery<Totrinnsvurdering> query = entityManager.createQuery(
-                "FROM Totrinnsvurdering tav WHERE tav.behandling.id = :behandling_id AND tav.aktiv = true", //$NON-NLS-1$
+                "FROM Totrinnsvurdering tav WHERE tav.behandling.id = :behandling_id AND tav.aktiv = true",
                 Totrinnsvurdering.class);
 
-        query.setParameter("behandling_id", behandlingId); //$NON-NLS-1$
+        query.setParameter("behandling_id", behandlingId);
         return query.getResultList();
     }
 

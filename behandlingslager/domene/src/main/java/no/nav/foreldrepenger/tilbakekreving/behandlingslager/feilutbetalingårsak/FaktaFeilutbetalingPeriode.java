@@ -107,11 +107,11 @@ public class FaktaFeilutbetalingPeriode extends BaseEntitet {
     @Override
     public String toString() {
         return getClass().getSimpleName() +
-                "<" //$NON-NLS-1$
-                + "periode=" + periode //$NON-NLS-1$
-                + ", hendelseType=" + hendelseType.getKode() //$NON-NLS-1$
-                + ", hendelseUndertype=" + hendelseUndertype.getKode() //$NON-NLS-1$
-                + ">"; //$NON-NLS-1$
+                "<"
+                + "periode=" + periode
+                + ", hendelseType=" + hendelseType.getKode()
+                + ", hendelseUndertype=" + hendelseUndertype.getKode()
+                + ">";
 
     }
 }

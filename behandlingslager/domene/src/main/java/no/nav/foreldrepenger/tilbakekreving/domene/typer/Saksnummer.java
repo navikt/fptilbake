@@ -21,7 +21,7 @@ public class Saksnummer implements SakId, IndexKey {
     private static final Pattern INVALID = Pattern.compile("[^" + CHARS + "]+", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
     @Column(name = "saksnummer")
-    private String saksnummer; // NOSONAR
+    private String saksnummer;
 
     Saksnummer() {
         // for hibernate
@@ -38,7 +38,7 @@ public class Saksnummer implements SakId, IndexKey {
     }
 
     @SuppressWarnings("unused")
-    public Saksnummer(String sakId, Fagsystem fagsystem) { // NOSONAR
+    public Saksnummer(String sakId, Fagsystem fagsystem) {
         this(sakId);
         // FIXME (FC): Set fagsystem
     }

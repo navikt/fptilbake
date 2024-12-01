@@ -47,6 +47,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Ved
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.BehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
@@ -155,7 +156,7 @@ public class Behandling extends BaseEntitet {
     }
 
     private Behandling(Fagsak fagsak, BehandlingType type) {
-        Objects.requireNonNull(fagsak, "Behandling må tilknyttes parent Fagsak"); //$NON-NLS-1$
+        Objects.requireNonNull(fagsak, "Behandling må tilknyttes parent Fagsak");
         this.fagsak = fagsak;
         if (type != null) {
             this.behandlingType = type;
@@ -214,7 +215,7 @@ public class Behandling extends BaseEntitet {
      * @param stegTilstand - tilstand for steg behandlingen er i
      */
     void oppdaterBehandlingStegOgStatus(BehandlingStegTilstand stegTilstand) {
-        Objects.requireNonNull(stegTilstand, "behandlingStegTilstand"); //$NON-NLS-1$
+        Objects.requireNonNull(stegTilstand, "behandlingStegTilstand");
 
         // legg til ny
         this.behandlingStegTilstander.add(stegTilstand);
@@ -247,7 +248,7 @@ public class Behandling extends BaseEntitet {
                 .filter(t -> !BehandlingStegStatus.erSluttStatus(t.getBehandlingStegStatus()))
                 .collect(Collectors.toList());
         if (tilstander.size() > 1) {
-            throw new IllegalStateException("Utvikler-feil: Kan ikke ha flere steg samtidig åpne: " + tilstander); //$NON-NLS-1$
+            throw new IllegalStateException("Utvikler-feil: Kan ikke ha flere steg samtidig åpne: " + tilstander);
         }
 
         return tilstander.isEmpty() ? Optional.empty() : Optional.of(tilstander.get(0));
@@ -276,7 +277,7 @@ public class Behandling extends BaseEntitet {
                 .collect(Collectors.toList());
         if (tilstander.size() > 1) {
             throw new IllegalStateException(
-                    "Utvikler-feil: Kan ikke ha flere steg samtidig åpne for stegType[" + stegType + "]: " + tilstander); //$NON-NLS-1$ //$NON-NLS-2$
+                    "Utvikler-feil: Kan ikke ha flere steg samtidig åpne for stegType[" + stegType + "]: " + tilstander);
         }
 
         return tilstander.isEmpty() ? Optional.empty() : Optional.of(tilstander.get(0));
@@ -320,14 +321,14 @@ public class Behandling extends BaseEntitet {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<" //$NON-NLS-1$
-                + (id != null ? "id=" + id + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                + "fagsak=" + fagsak + ", " //$NON-NLS-1$ //$NON-NLS-2$
-                + "status=" + status + ", " //$NON-NLS-1$ //$NON-NLS-2$
-                + "type=" + behandlingType + "," //$NON-NLS-1$ //$NON-NLS-2$
-                + "steg=" + (getBehandlingStegTilstand().orElse(null)) + "," //$NON-NLS-1$ //$NON-NLS-2$
-                + "opprettetTs=" + getOpprettetTidspunkt() //$NON-NLS-1$
-                + ">"; //$NON-NLS-1$
+        return getClass().getSimpleName() + "<"
+                + (id != null ? "id=" + id + ", " : "")
+                + "fagsak=" + fagsak + ", "
+                + "status=" + status + ", "
+                + "type=" + behandlingType + ","
+                + "steg=" + (getBehandlingStegTilstand().orElse(null)) + ","
+                + "opprettetTs=" + getOpprettetTidspunkt()
+                + ">";
     }
 
     public Fagsak getFagsak() {
@@ -463,6 +464,10 @@ public class Behandling extends BaseEntitet {
         return getFagsak().getNavBruker().getAktørId();
     }
 
+    public Saksnummer getSaksnummer() {
+        return getFagsak().getSaksnummer();
+    }
+
     public Stream<BehandlingStegTilstand> getBehandlingStegTilstandHistorikk() {
         return behandlingStegTilstander.stream().sorted(COMPARATOR_OPPRETTET_TID);
     }
@@ -585,7 +590,7 @@ public class Behandling extends BaseEntitet {
 
         private Builder(Fagsak fagsak, BehandlingType behandlingType) {
             this(behandlingType);
-            Objects.requireNonNull(fagsak, "fagsak"); //$NON-NLS-1$
+            Objects.requireNonNull(fagsak, "fagsak");
             this.fagsak = fagsak;
         }
 
@@ -595,7 +600,7 @@ public class Behandling extends BaseEntitet {
         }
 
         private Builder(BehandlingType behandlingType) {
-            Objects.requireNonNull(behandlingType, "behandlingType"); //$NON-NLS-1$
+            Objects.requireNonNull(behandlingType, "behandlingType");
             this.behandlingType = behandlingType;
         }
 

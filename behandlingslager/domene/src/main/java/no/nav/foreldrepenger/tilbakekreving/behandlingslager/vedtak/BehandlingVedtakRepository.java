@@ -31,15 +31,15 @@ public class BehandlingVedtakRepository {
 
     public Optional<BehandlingVedtak> hentBehandlingvedtakForBehandlingId(Long behandlingId) {
         TypedQuery<BehandlingVedtak> query = entityManager.createQuery(
-                "FROM BehandlingVedtak vedtak WHERE vedtak.behandlingsresultat.behandling.id = :behandlingId", //$NON-NLS-1$
+                "FROM BehandlingVedtak vedtak WHERE vedtak.behandlingsresultat.behandling.id = :behandlingId",
                 BehandlingVedtak.class);
 
-        query.setParameter("behandlingId", behandlingId); //$NON-NLS-1$
+        query.setParameter("behandlingId", behandlingId);
         return hentUniktResultat(query);
     }
 
     public List<BehandlingVedtak> hentAlleBehandlingVedtak() {
-        TypedQuery<BehandlingVedtak> query = entityManager.createQuery("select vedtak FROM BehandlingVedtak vedtak join fetch vedtak.behandlingsresultat", BehandlingVedtak.class); //$NON-NLS-1$
+        TypedQuery<BehandlingVedtak> query = entityManager.createQuery("select vedtak FROM BehandlingVedtak vedtak join fetch vedtak.behandlingsresultat", BehandlingVedtak.class);
         return query.getResultList();
     }
 }
