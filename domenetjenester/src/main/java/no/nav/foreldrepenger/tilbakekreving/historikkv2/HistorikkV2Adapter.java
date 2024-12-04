@@ -19,9 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagDokumentLinkDto;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +28,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkDtoFellesMapper.TOM_LINJE;
-import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkDtoFellesMapper.leggTilAlleTeksterIHovedliste;
+import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkDtoFellesMapper.konverterTilLinjerMedLinjeskift;
 import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkDtoFellesMapper.tilHistorikkInnslagDto;
 
 public class HistorikkV2Adapter {
-
-    private static final Logger LOG = LoggerFactory.getLogger(HistorikkV2Adapter.class);
 
     public static HistorikkinnslagDtoV2 map(Historikkinnslag h, UUID behandlingUUID, URI dokumentPath) {
         return switch (h.getType()) {
@@ -60,7 +55,7 @@ public class HistorikkV2Adapter {
         var del = innslag.getHistorikkinnslagDeler().getFirst();
         var begrunnelsetekst = begrunnelseFraDel(del).map(List::of);
         var body = begrunnelsetekst.orElse(List.of());
-        return tilHistorikkInnslagDto(innslag, behandlingUUID, tilDokumentlenker(innslag.getDokumentLinker(), dokumentPath), body);
+        return tilHistorikkInnslagDto(innslag, behandlingUUID, tilDokumentlenker(innslag.getDokumentLinker(), dokumentPath), konverterTilLinjerMedLinjeskift(body));
     }
 
     private static HistorikkinnslagDtoV2 fraMaltype2(Historikkinnslag h, UUID behandlingUUID) {
@@ -69,23 +64,23 @@ public class HistorikkV2Adapter {
         var tekst = del.getResultatFelt()
             .map(s -> String.format("%s: %s", hendelse, fraHistorikkResultat(s)))
             .orElse(hendelse);
-        return tilHistorikkInnslagDto(h, behandlingUUID, List.of(tekst));
+        return tilHistorikkInnslagDto(h, behandlingUUID, konverterTilLinjerMedLinjeskift(List.of(tekst)));
     }
 
     private static HistorikkinnslagDtoV2 fraMaltype3(Historikkinnslag h, UUID behandlingUUID) {
-        var tekster = new ArrayList<String>();
+        var tekster = new ArrayList<HistorikkinnslagDtoV2.Linje>();
         for(var del : h.getHistorikkinnslagDeler()) {
             var aksjonspunkt = del.getTotrinnsvurderinger().stream()
                 .map(HistorikkV2Adapter::fraAksjonspunktFelt)
                 .flatMap(List::stream)
                 .toList();
-            leggTilAlleTeksterIHovedliste(tekster, aksjonspunkt);
+            tekster.addAll(konverterTilLinjerMedLinjeskift(aksjonspunkt));
         }
         return tilHistorikkInnslagDto(h, behandlingUUID, tekster);
     }
 
     private static HistorikkinnslagDtoV2 fraMalType4(Historikkinnslag h, UUID behandlingUUID) {
-        var tekster = new ArrayList<String>();
+        var tekster = new ArrayList<HistorikkinnslagDtoV2.Linje>();
         for(var del : h.getHistorikkinnslagDeler()) {
             var årsakTekst = del.getAarsakFelt().stream()
                 .flatMap(felt -> finnÅrsakKodeListe(felt).stream())
@@ -93,36 +88,36 @@ public class HistorikkV2Adapter {
                 .toList();
             var begrunnelsetekst = begrunnelseFraDel(del).stream().toList();
 
-            leggTilAlleTeksterIHovedliste(tekster, årsakTekst, begrunnelsetekst);
+            tekster.addAll(konverterTilLinjerMedLinjeskift(årsakTekst, begrunnelsetekst));
         }
         return tilHistorikkInnslagDto(h, behandlingUUID, tekster);
     }
 
     private static HistorikkinnslagDtoV2 fraMalType5(Historikkinnslag h, UUID behandlingUUID, URI dokumentPath) {
-        var tekster = new ArrayList<String>();
+        var tekster = new ArrayList<HistorikkinnslagDtoV2.Linje>();
         for(var del : h.getHistorikkinnslagDeler()) {
             var endretFelter = del.getEndredeFelt().stream()
                 .map(HistorikkV2Adapter::fraEndretFeltUtenKodeverk)
                 .toList();
-            leggTilAlleTeksterIHovedliste(tekster, endretFelter);
+            tekster.addAll(konverterTilLinjerMedLinjeskift(endretFelter));
         }
         return tilHistorikkInnslagDto(h, behandlingUUID, tilDokumentlenker(h.getDokumentLinker(), dokumentPath), tekster);
     }
 
     private static HistorikkinnslagDtoV2 fraMalType6(Historikkinnslag h, UUID behandlingUUID) {
-        var tekster = new ArrayList<String>();
+        var tekster = new ArrayList<HistorikkinnslagDtoV2.Linje>();
         for (var del : h.getHistorikkinnslagDeler()) {
             var opplysninger = del.getOpplysninger().stream()
                 .map(HistorikkV2Adapter::fraOpplysningMaltype6)
                 .toList();
 
-            leggTilAlleTeksterIHovedliste(tekster, opplysninger);
+            tekster.addAll(konverterTilLinjerMedLinjeskift(opplysninger));
         }
         return tilHistorikkInnslagDto(h, behandlingUUID, tekster);
     }
 
     private static HistorikkinnslagDtoV2 fraMaltypeFeilutbetaling(Historikkinnslag h, UUID behandlingUUID) {
-        var tekster = new ArrayList<String>();
+        var tekster = new ArrayList<HistorikkinnslagDtoV2.Linje>();
         for(var del : h.getHistorikkinnslagDeler()) {
             // Endret felt ehr bruker kodeverdier (unikt for feilutbetaling)
             var endredeFelt = del.getEndredeFelt();
@@ -131,18 +126,18 @@ public class HistorikkV2Adapter {
                 var periodeTom = opplysingFraDel(del, HistorikkOpplysningType.PERIODE_TOM).orElse("");
                 var opplysningTekst = String.format("For perioden __%s - %s__", periodeFom, periodeTom);
                 var endretFelter = fraEndretFeltFeilutbetaling(endredeFelt);
-                leggTilAlleTeksterIHovedliste(tekster, List.of(opplysningTekst), List.of(endretFelter));
+                tekster.addAll(konverterTilLinjerMedLinjeskift(List.of(opplysningTekst), List.of(endretFelter)));
             }
 
         }
         // Henter fra første del slik som frontend
         var begrunnelsetekst = begrunnelseFraDel(h.getHistorikkinnslagDeler().getFirst()).stream().toList();
-        leggTilAlleTeksterIHovedliste(tekster, begrunnelsetekst);
+        tekster.addAll(konverterTilLinjerMedLinjeskift(begrunnelsetekst));
         return tilHistorikkInnslagDto(h, behandlingUUID, tekster);
     }
 
     private static HistorikkinnslagDtoV2 fraMaltypeForeldelse(Historikkinnslag h, UUID behandlingUUID) {
-        var tekster = new ArrayList<String>();
+        var tekster = new ArrayList<HistorikkinnslagDtoV2.Linje>();
         for(var del : h.getHistorikkinnslagDeler()) {
             var periodeFom = opplysingFraDel(del, HistorikkOpplysningType.PERIODE_FOM).orElse("");
             var periodeTom = opplysingFraDel(del, HistorikkOpplysningType.PERIODE_TOM).orElse("");
@@ -153,7 +148,7 @@ public class HistorikkV2Adapter {
                 .toList();
             var begrunnelsetekst = begrunnelseFraDel(h.getHistorikkinnslagDeler().getFirst()).stream().toList();
 
-            leggTilAlleTeksterIHovedliste(tekster, List.of(manuelVurderingTekst), endretFelter, begrunnelsetekst);
+            tekster.addAll(konverterTilLinjerMedLinjeskift(List.of(manuelVurderingTekst), endretFelter, begrunnelsetekst));
 
         }
         return tilHistorikkInnslagDto(h, behandlingUUID, tekster);
@@ -161,7 +156,7 @@ public class HistorikkV2Adapter {
 
 
     private static HistorikkinnslagDtoV2 fraMaltypeTilbakekreving(Historikkinnslag h, UUID behandlingUUID) {
-        var tekster = new ArrayList<String>();
+        var tekster = new ArrayList<HistorikkinnslagDtoV2.Linje>();
         for (var del : h.getHistorikkinnslagDeler()) {
             var periodeFom = opplysingFraDel(del, HistorikkOpplysningType.PERIODE_FOM).orElse("");
             var periodeTom = opplysingFraDel(del, HistorikkOpplysningType.PERIODE_TOM).orElse("");
@@ -177,7 +172,7 @@ public class HistorikkV2Adapter {
                 ? begrunnelseFritekst
                 : Optional.<String>empty();
 
-            leggTilAlleTeksterIHovedliste(tekster, List.of(vurderingAvPerioden, TOM_LINJE), teksterEndretFelt, begrunnelse.stream().toList());
+            tekster.addAll(konverterTilLinjerMedLinjeskift(List.of(vurderingAvPerioden, TOM_LINJE), teksterEndretFelt, begrunnelse.stream().toList()));
         }
         return tilHistorikkInnslagDto(h, behandlingUUID, tekster);
 
