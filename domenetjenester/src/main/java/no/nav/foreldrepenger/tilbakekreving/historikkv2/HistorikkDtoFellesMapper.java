@@ -36,15 +36,8 @@ public class HistorikkDtoFellesMapper {
             h.getOpprettetTidspunkt(),
             lenker,
             skjermlenkeOpt.isEmpty() ? lagTittel(h) : null,
-            tilDeprecatedTekstListe(fjernTrailingAvsnittFraTekst(linjer)),
             fjernTrailingAvsnittFraTekst(linjer)
         );
-    }
-
-    private static List<String> tilDeprecatedTekstListe(List<Linje> linjer) {
-        return linjer.stream()
-            .map(linje -> linje.erLinjeskift() ? TOM_LINJE : linje.tekst())
-            .toList();
     }
 
     private static String lagTittel(Historikkinnslag h) {
