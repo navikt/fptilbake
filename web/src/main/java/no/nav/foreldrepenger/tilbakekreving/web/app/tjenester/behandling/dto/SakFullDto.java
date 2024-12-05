@@ -7,6 +7,5 @@ import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkinnslagDtoV2;
 public record SakFullDto(String saksnummer,
                          List<BehandlingOpprettingDto> behandlingTypeKanOpprettes,
                          List<BehandlingDto> behandlinger,
-                         List<HistorikkinnslagDtoV2> historikkinnslag,
-                         List<HistorikkinnslagDtoV2> historikkinnslagV2) { // TODO: Fjern etter frontend er flyttet over
+                         List<HistorikkinnslagDtoV2> historikkinnslag) {
 }

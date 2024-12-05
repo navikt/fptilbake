@@ -554,7 +554,7 @@ public class BehandlingRestTjeneste {
         var behandlinger = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
         behandlinger.forEach(b -> b.setBrevmaler(dokumentBehandlingTjeneste.hentBrevmalerFor(b.getId())));
 
-        return new SakFullDto(saksnummer.getVerdi(), oppretting, behandlinger, historikkinnslag, historikkinnslag);
+        return new SakFullDto(saksnummer.getVerdi(), oppretting, behandlinger, historikkinnslag);
     }
 
     @GET

@@ -9,17 +9,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.URI;
 import java.util.Comparator;
 import java.util.List;
 
 @ApplicationScoped
 public class HistorikkV2Tjeneste {
-
-    private static final Logger LOG = LoggerFactory.getLogger(HistorikkV2Tjeneste.class);
 
     private HistorikkRepository historikkRepository;
     private BehandlingRepository behandlingRepository;
@@ -35,21 +30,16 @@ public class HistorikkV2Tjeneste {
     }
 
     public List<HistorikkinnslagDtoV2> hentForSak(Saksnummer saksnummer, URI dokumentPath) {
-        try {
-            var historikkinnslag = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-            return historikkinnslag
-                .stream()
-                .map(h -> {
-                    var behandlingId = h.getBehandlingId();
-                    var uuid = behandlingId == null ? null : behandlingRepository.hentBehandling(behandlingId).getUuid();
-                    return HistorikkV2Adapter.map(h, uuid, dokumentPath);
-                })
-                .sorted(Comparator.comparing(HistorikkinnslagDtoV2::opprettetTidspunkt))
-                .toList();
-        } catch (Exception e) {
-            LOG.info("HistorikkV2: Ny historikktjeneste feilet", e);
-            return List.of();
-        }
+        var historikkinnslag = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
+        return historikkinnslag
+            .stream()
+            .map(h -> {
+                var behandlingId = h.getBehandlingId();
+                var uuid = behandlingId == null ? null : behandlingRepository.hentBehandling(behandlingId).getUuid();
+                return HistorikkV2Adapter.map(h, uuid, dokumentPath);
+            })
+            .sorted(Comparator.comparing(HistorikkinnslagDtoV2::opprettetTidspunkt))
+            .toList();
     }
 
 }
