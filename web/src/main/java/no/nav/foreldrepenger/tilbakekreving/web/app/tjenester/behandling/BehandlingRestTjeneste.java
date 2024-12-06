@@ -215,7 +215,6 @@ public class BehandlingRestTjeneste {
         ProsessTaskData taskDataFinn = ProsessTaskData.forProsessTask(FinnGrunnlagTask.class);
         taskGruppe.addNesteSekvensiell(taskDataFinn);
         taskGruppe.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
-        taskGruppe.setCallIdFraEksisterende();
         taskTjeneste.lagre(taskGruppe);
         return behandling.getId();
     }

@@ -71,7 +71,6 @@ public class FpLosEventObserver {
             var prosessTaskData = ProsessTaskData.forProsessTask(FpLosPubliserEventTask.class);
             prosessTaskData.setBehandling(behandlingEvent.getSaksnummer().getVerdi(), behandlingEvent.getFagsakId(), behandlingEvent.getBehandlingId());
             prosessTaskData.setProperty(FpLosPubliserEventTask.PROPERTY_EVENT_NAME, hendelse.name());
-            prosessTaskData.setCallIdFraEksisterende();
             taskTjeneste.lagre(prosessTaskData);
         }
     }

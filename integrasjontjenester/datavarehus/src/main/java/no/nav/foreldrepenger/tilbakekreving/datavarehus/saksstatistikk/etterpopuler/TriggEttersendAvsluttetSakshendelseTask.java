@@ -1,12 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.etterpopuler;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -29,7 +30,7 @@ public class TriggEttersendAvsluttetSakshendelseTask implements ProsessTaskHandl
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        if (prosessTaskData.getBehandlingId() != null) {
+        if (prosessTaskData.getBehandlingIdAsLong() != null) {
             throw new IllegalArgumentException(
                 "Denne tasken tar ikke behandling som parameter. Mente du egentlig å starte 'migrer.beregningsresultat' ?");
         }

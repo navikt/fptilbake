@@ -29,7 +29,7 @@ public class EttersendSakshendelserTilDvhTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        long behandlingId = Long.parseLong(prosessTaskData.getBehandlingId());
+        long behandlingId = prosessTaskData.getBehandlingIdAsLong();
         var behandling = behandlingRepository.hentBehandling(behandlingId);
         if (!behandling.erAvsluttet()) {
             return;

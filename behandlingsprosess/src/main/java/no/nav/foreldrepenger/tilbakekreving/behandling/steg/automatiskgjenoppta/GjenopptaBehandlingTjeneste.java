@@ -77,16 +77,15 @@ public class GjenopptaBehandlingTjeneste {
 
     public void gjenopptaBehandlingOmMulig(String callId, Behandling behandling) {
         long behandlingId = behandling.getId();
-        String nyCallId = callId + behandlingId;
         KravgrunnlagTilstand status = kanGjennopptaStatus(behandlingId);
         var venterPåKravgrunnlagFristPassert = behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
             .filter(Aksjonspunkt::erOpprettet)
             .filter(a -> a.getFristTid() != null && LocalDate.now().isAfter(a.getFristTid().toLocalDate()))
             .isPresent();
         if (status == KravgrunnlagTilstand.KRAVGRUNNLAG_MANGLER && venterPåKravgrunnlagFristPassert) {
-            opprettHenleggBehandlingTask(behandling, nyCallId);
+            opprettHenleggBehandlingTask(behandling, callId);
         } else if (status == KravgrunnlagTilstand.OK || status == KravgrunnlagTilstand.KRAVGRUNNLAG_MANGLER) {
-            opprettFortsettBehandlingTask(behandling, nyCallId);
+            opprettFortsettBehandlingTask(behandling, callId);
         } else if (status == KravgrunnlagTilstand.KRAVGRUNNLAG_ER_SPERRET) {
             LOG.info("Behandling med id={} har et sperret kravgrunnlag, kan ikke gjenopptas,", behandlingId);
         } else if (status == KravgrunnlagTilstand.KRAVGRUNNLAG_ER_UGYLDIG) {
@@ -108,8 +107,7 @@ public class GjenopptaBehandlingTjeneste {
         var kanGjenopptaBehandling = behandling.isBehandlingPåVent() && BehandlingStegType.VARSEL.equals(behandling.getAktivtBehandlingSteg())
             || (!Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(behandling.getVenteårsak()) && kanGjenopptaSteg(behandlingId));
         if (kanGjenopptaBehandling) {
-            var callId = hentCallId() + behandling.getId();
-            var gruppe = opprettFortsettBehandlingTask(behandling, callId);
+            var gruppe = opprettFortsettBehandlingTask(behandling, hentCallId());
             opprettHistorikkInnslagForManueltGjenopptaBehandling(behandlingId, historikkAktør);
             return Optional.ofNullable(gruppe);
         }
@@ -164,8 +162,7 @@ public class GjenopptaBehandlingTjeneste {
     }
 
     private String hentCallId() {
-        String cid = MDCOperations.getCallId();
-        return (cid == null ? MDCOperations.generateCallId() : cid) + "_";
+        return Optional.ofNullable(MDCOperations.getCallId()).orElseGet(MDCOperations::generateCallId);
     }
 
     private String opprettFortsettBehandlingTask(Behandling behandling, String callId) {
@@ -176,7 +173,7 @@ public class GjenopptaBehandlingTjeneste {
         prosessTaskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
 
         // unik per task da det gjelder ulike behandlinger, gjenbruker derfor ikke
-        prosessTaskData.setCallId(callId);
+        prosessTaskData.setCallId(callId + "_" + behandling.getId());
 
         LOG.info("Gjenopptar behandling av behandlingId={}, oppretter {}-prosesstask med callId={}", behandling.getId(), prosessTaskData.getTaskType(), callId);
         return taskTjeneste.lagre(prosessTaskData);
@@ -188,7 +185,7 @@ public class GjenopptaBehandlingTjeneste {
         prosessTaskData.setSekvens("1");
 
         // unik per task da det gjelder ulike behandlinger, gjenbruker derfor ikke
-        prosessTaskData.setCallId(callId);
+        prosessTaskData.setCallId(callId + "_" + behandling.getId());
 
         LOG.info("Henlegger behandling med behandlingId={}", behandling.getId());
         return taskTjeneste.lagre(prosessTaskData);

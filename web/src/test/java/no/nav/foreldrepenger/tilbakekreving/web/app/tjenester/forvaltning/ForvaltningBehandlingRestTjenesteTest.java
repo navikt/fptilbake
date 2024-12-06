@@ -280,7 +280,7 @@ class ForvaltningBehandlingRestTjenesteTest {
         Response respons = forvaltningBehandlingRestTjeneste.korrigerHenvisning(korrigertHenvisningDto);
         assertThat(respons.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         ProsessTaskData korrigertHenvisningProsessTask = assertProsessTask(TaskType.forProsessTask(KorrigertHenvisningTask.class));
-        assertThat(korrigertHenvisningProsessTask.getBehandlingId()).isEqualTo(String.valueOf(behandling.getId()));
+        assertThat(korrigertHenvisningProsessTask.getBehandlingIdAsLong()).isEqualTo(behandling.getId());
         assertThat(korrigertHenvisningProsessTask.getPropertyValue(KorrigertHenvisningTask.PROPERTY_EKSTERN_UUID)).isEqualTo(eksternUuid.toString());
     }
 

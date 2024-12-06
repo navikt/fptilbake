@@ -124,8 +124,6 @@ public class FagsakProsessTaskRepository {
 
         List<ProsessTaskData> matchedTasks = eksisterendeTasks;
 
-        gruppe.setCallIdFraEksisterende();
-
         if (matchedTasks.isEmpty()) {
             // legg inn nye
             return taskTjeneste.lagre(gruppe);

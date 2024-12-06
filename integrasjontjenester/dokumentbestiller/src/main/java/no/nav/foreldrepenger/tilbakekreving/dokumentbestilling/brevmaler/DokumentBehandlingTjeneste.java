@@ -7,11 +7,10 @@ import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -128,7 +127,6 @@ public class DokumentBehandlingTjeneste {
         sendVarselbrev.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
         sendVarselbrev.setPayload(fritekst);
         sendVarselbrev.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandlingId);
-        sendVarselbrev.setCallIdFraEksisterende();
         taskTjeneste.lagre(sendVarselbrev);
     }
 
@@ -142,7 +140,6 @@ public class DokumentBehandlingTjeneste {
         sendInnhentDokumentasjonBrev.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
         sendInnhentDokumentasjonBrev.setPayload(fritekst);
         sendInnhentDokumentasjonBrev.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandlingId);
-        sendInnhentDokumentasjonBrev.setCallIdFraEksisterende();
         taskTjeneste.lagre(sendInnhentDokumentasjonBrev);
     }
 }

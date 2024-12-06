@@ -81,6 +81,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
             .leggTilAktørIdSet(dataAttributter.getVerdier(AppAbacAttributtType.AKTØR_ID));
         Optional.ofNullable(behandlingData).ifPresent(bi -> ressursData.leggTilAbacAktørIdSet(bi.getAktørIdNonNull()));
         Set<String> saksnumre = dataAttributter.getVerdier(AppAbacAttributtType.SAKSNUMMER);
+        saksnumre.stream().findFirst().ifPresent(s -> LOG_CONTEXT.add("fagsak", s));
         saksnumre.forEach(s -> ressursData.leggTilAktørIdSet(fpsakPipKlient.hentAktørIderSomString(new Saksnummer(s))));
         Optional.ofNullable(behandlingData).map(PipBehandlingInfo::fagsakstatus).ifPresent(ressursData::medFagsakStatus);
         Optional.ofNullable(behandlingData).map(PipBehandlingInfo::statusForBehandling).ifPresent(ressursData::medBehandlingStatus);

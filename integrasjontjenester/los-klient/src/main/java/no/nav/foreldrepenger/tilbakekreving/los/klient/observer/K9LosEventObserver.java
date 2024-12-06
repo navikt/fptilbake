@@ -98,7 +98,6 @@ public class K9LosEventObserver {
     private void opprettProsessTask(Saksnummer saksnummer, long fagsakId, long behandlingId, EventHendelse eventHendelse) {
         if (!Fagsystem.FPTILBAKE.equals(fagsystem)) {
             ProsessTaskData taskData = ProsessTaskData.forProsessTask(K9LosPubliserEventTask.class);
-            taskData.setCallIdFraEksisterende();
             taskData.setProperty(K9LosPubliserEventTask.PROPERTY_EVENT_NAME, eventHendelse.name());
             taskData.setBehandling(saksnummer.getVerdi(), fagsakId, behandlingId);
             taskTjeneste.lagre(taskData);

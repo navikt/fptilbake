@@ -155,7 +155,6 @@ public class HendelseHåndtererTjeneste {
     private void lagFortsettBehandlingTask(Behandling behandling) {
         ProsessTaskData taskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
         taskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
-        taskData.setCallIdFraEksisterende();
         taskTjeneste.lagre(taskData);
     }
 }
