@@ -127,7 +127,7 @@ class GjenopptaBehandlingTjenesteTest {
         ProsessTaskData prosessTaskData2 = faktiskeProsessTaskDataListe.get(1);
 
         List<Long> behandlingIderFraProsesstaskData = new ArrayList<>();
-        behandlingIderFraProsesstaskData.add(prosessTaskData1.getBehandlingIdAsLong()));
+        behandlingIderFraProsesstaskData.add(prosessTaskData1.getBehandlingIdAsLong());
         behandlingIderFraProsesstaskData.add(prosessTaskData2.getBehandlingIdAsLong());
 
         assertThat(behandlingIderFraProsesstaskData).contains(behandlingId1, behandlingId2);
