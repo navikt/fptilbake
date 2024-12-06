@@ -23,7 +23,7 @@ import no.nav.vedtak.felles.prosesstask.api.TaskType;
 @Transactional
 public class XmlMottattObserver {
 
-    private static final Logger log = LoggerFactory.getLogger(XmlMottattObserver.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XmlMottattObserver.class);
 
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
     private ProsessTaskTjeneste taskTjeneste;
@@ -47,7 +47,7 @@ public class XmlMottattObserver {
         } else if (innhold.contains(TaskProperties.ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML)) {
             lagreProsesTask(mottattXmlId, TaskType.forProsessTask(LesKravvedtakStatusTask.class));
         } else {
-            log.error("Mottok XML som ikke ble forstått, mottattXmlId={}", mottattXmlId);
+            LOG.error("Mottok XML som ikke ble forstått, mottattXmlId={}", mottattXmlId);
         }
     }
 

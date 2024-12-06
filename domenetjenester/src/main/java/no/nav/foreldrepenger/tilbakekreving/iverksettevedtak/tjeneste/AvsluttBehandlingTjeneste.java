@@ -21,7 +21,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 @ApplicationScoped
 public class AvsluttBehandlingTjeneste {
 
-    private static final Logger log = LoggerFactory.getLogger(AvsluttBehandlingTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AvsluttBehandlingTjeneste.class);
 
     private BehandlingRepository behandlingRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
@@ -40,7 +40,7 @@ public class AvsluttBehandlingTjeneste {
     }
 
     public void avsluttBehandling(Long behandlingId) {
-        log.info("Avslutter behandling: {}", behandlingId);
+        LOG.info("Avslutter behandling: {}", behandlingId);
         BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
 
@@ -52,7 +52,7 @@ public class AvsluttBehandlingTjeneste {
 
         behandlingskontrollTjeneste.prosesserBehandlingGjenopptaHvisStegVenter(kontekst, BehandlingStegType.IVERKSETT_VEDTAK);
 
-        log.info("Har avsluttet behandling: {}", behandlingId);
+        LOG.info("Har avsluttet behandling: {}", behandlingId);
 
     }
 

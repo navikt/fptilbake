@@ -40,7 +40,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 @ApplicationScoped
 public class VarselSteg implements BehandlingSteg {
 
-    private static final Logger log = LoggerFactory.getLogger(VarselSteg.class);
+    private static final Logger LOG = LoggerFactory.getLogger(VarselSteg.class);
 
     private BehandlingRepository behandlingRepository;
     private ProsessTaskTjeneste taskTjeneste;
@@ -90,9 +90,9 @@ public class VarselSteg implements BehandlingSteg {
         Optional<Varselrespons> varselrespons = varselresponsTjeneste.hentRespons(kontekst.getBehandlingId());
         Optional<LocalDate> frist = Optional.ofNullable(behandling.getFristDatoBehandlingPåVent());
         if (frist.isPresent() && iDag.isAfter(frist.get()) && varselrespons.isEmpty()) {
-            log.info("gjenopptar behandling etter utgått frist for venting på brukerrespons");
+            LOG.info("gjenopptar behandling etter utgått frist for venting på brukerrespons");
         } else {
-            log.info("gjenopptar behandling etter registrert respons");
+            LOG.info("gjenopptar behandling etter registrert respons");
         }
         return BehandleStegResultat.utførtUtenAksjonspunkter();
     }
@@ -115,7 +115,7 @@ public class VarselSteg implements BehandlingSteg {
     private boolean sjekkTilbakekrevingOpprettetUtenVarsel(Long behandlingId) {
         Optional<VarselInfo> varselEntitet = varselRepository.finnVarsel(behandlingId);
         if (varselEntitet.isEmpty()) {
-            log.info("VarselTekst finnes ikke for behandlingId={}, ikke sende varsel til bruker!!", behandlingId);
+            LOG.info("VarselTekst finnes ikke for behandlingId={}, ikke sende varsel til bruker!!", behandlingId);
             return true;
         }
         return false;

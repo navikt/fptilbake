@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ForeslåVedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
@@ -23,7 +24,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.DtoTilServiceAdapter;
@@ -33,7 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 @DtoTilServiceAdapter(dto = ForeslåVedtakDto.class, adapter = AksjonspunktOppdaterer.class)
 public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<ForeslåVedtakDto> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ForeslåVedtakOppdaterer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ForeslåVedtakOppdaterer.class);
 
     private ForeslåVedtakTjeneste foreslåVedtakTjeneste;
     private TotrinnTjeneste totrinnTjeneste;
@@ -53,7 +53,7 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
         Long behandlingId = behandling.getId();
         boolean vedtakSendesFraKlagebehandling = erRevurderingOpprettetForKlage(behandling);
         if (vedtakSendesFraKlagebehandling){
-            logger.info("Lagrer ikke fritekster for vedtaksbrev, siden vedtaksbrev skal sendes fra klagebehandlingen");
+            LOG.info("Lagrer ikke fritekster for vedtaksbrev, siden vedtaksbrev skal sendes fra klagebehandlingen");
         } else {
             vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(
                 behandlingId,

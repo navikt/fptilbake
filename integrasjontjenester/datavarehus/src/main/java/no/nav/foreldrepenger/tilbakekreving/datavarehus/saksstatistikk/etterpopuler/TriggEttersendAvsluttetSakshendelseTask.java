@@ -15,7 +15,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @ApplicationScoped
 @ProsessTask(value = "start.ettersend.sakshendelser", prioritet = 4)
 public class TriggEttersendAvsluttetSakshendelseTask implements ProsessTaskHandler {
-    private static final Logger logger = LoggerFactory.getLogger(TriggEttersendAvsluttetSakshendelseTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TriggEttersendAvsluttetSakshendelseTask.class);
 
     private EntityManager entityManager;
 
@@ -43,6 +43,6 @@ public class TriggEttersendAvsluttetSakshendelseTask implements ProsessTaskHandl
                 """
         );
         int rader = query.executeUpdate();
-        logger.info("Opprettet {} tasker av migrer.beregnignsresultat", rader);
+        LOG.info("Opprettet {} tasker av migrer.beregnignsresultat", rader);
     }
 }

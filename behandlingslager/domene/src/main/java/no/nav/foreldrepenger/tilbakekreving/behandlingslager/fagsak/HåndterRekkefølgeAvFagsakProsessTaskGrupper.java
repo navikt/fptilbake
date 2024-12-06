@@ -28,7 +28,7 @@ import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskHandlerRef;
  */
 @ApplicationScoped
 public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTaskLifecycleObserver {
-    private static final Logger log = LoggerFactory.getLogger(HåndterRekkefølgeAvFagsakProsessTaskGrupper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HåndterRekkefølgeAvFagsakProsessTaskGrupper.class);
     private FagsakProsessTaskRepository repository;
     private ProsessTaskTjeneste taskTjeneste;
 
@@ -54,8 +54,8 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
         boolean vetoed = blokkerendeTask.isPresent();
         if (vetoed) {
             ProsessTaskData blokker = taskTjeneste.finn(blokkerendeTask.get().getProsessTaskId());
-            log.info("Vetoer kjøring av prosesstask[{}] av type[{}] for fagsak [{}] , er blokkert av prosesstask[{}] av type[{}] for samme fagsak.",
-                    ptData.getId(), ptData.getTaskType(), ptData.getFagsakId(), blokker.getId(), blokker.getTaskType());
+            LOG.info("Vetoer kjøring av prosesstask[{}] av {} for fagsak [{}] , er blokkert av prosesstask[{}] av {} for samme fagsak.",
+                    ptData.getId(), ptData.taskType(), ptData.getFagsakId(), blokker.getId(), blokker.taskType());
 
             return new ProsessTaskVeto(false, ptData.getId(), blokker.getId(), getClass().getSimpleName()
                     + " vetoer pga definert rekkefølge i FAGSAK_PROSESS_TASK.GRUPPE_SEKVENSNR. Blir pukket når blokkerende task kjøres FERDIG.");

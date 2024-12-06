@@ -149,7 +149,7 @@ class ForvaltningBehandlingRestTjenesteTest {
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
         verify(taskTjeneste, times(1)).lagre(captor.capture());
         var prosessTaskData = captor.getValue();
-        assertThat(prosessTaskData.getTaskType()).isEqualTo("behandlingskontroll.fortsettBehandling");
+        assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(FortsettBehandlingTask.class));
         assertThat(prosessTaskData.getPropertyValue(FortsettBehandlingTask.MANUELL_FORTSETTELSE)).isEqualTo("true");
 
         //for klønete å sette behandlingStegTilstander til å legge til:

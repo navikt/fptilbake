@@ -59,7 +59,7 @@ public class GjenopptaBehandlingMedGrunnlagTjeneste {
         var callId = Optional.ofNullable(MDCOperations.getCallId()).orElseGet(MDCOperations::generateCallId);
         prosessTaskData.setCallId(callId +  "_" + behandling.getId());
 
-        LOG.info("Gjenopptar behandling av behandlingId={}, oppretter {}-prosesstask med callId={}", behandling.getId(), prosessTaskData.getTaskType(), callId);
+        LOG.info("Gjenopptar behandling av behandlingId={}, oppretter {} med callId={}", behandling.getId(), prosessTaskData.taskType(), callId);
         return taskTjeneste.lagre(prosessTaskData);
     }
 
