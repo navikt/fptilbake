@@ -149,7 +149,7 @@ class ForvaltningBehandlingRestTjenesteTest {
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
         verify(taskTjeneste, times(1)).lagre(captor.capture());
         var prosessTaskData = captor.getValue();
-        assertThat(prosessTaskData.getTaskType()).isEqualTo("behandlingskontroll.fortsettBehandling");
+        assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(FortsettBehandlingTask.class));
         assertThat(prosessTaskData.getPropertyValue(FortsettBehandlingTask.MANUELL_FORTSETTELSE)).isEqualTo("true");
 
         //for klønete å sette behandlingStegTilstander til å legge til:
@@ -280,7 +280,7 @@ class ForvaltningBehandlingRestTjenesteTest {
         Response respons = forvaltningBehandlingRestTjeneste.korrigerHenvisning(korrigertHenvisningDto);
         assertThat(respons.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         ProsessTaskData korrigertHenvisningProsessTask = assertProsessTask(TaskType.forProsessTask(KorrigertHenvisningTask.class));
-        assertThat(korrigertHenvisningProsessTask.getBehandlingId()).isEqualTo(String.valueOf(behandling.getId()));
+        assertThat(korrigertHenvisningProsessTask.getBehandlingIdAsLong()).isEqualTo(behandling.getId());
         assertThat(korrigertHenvisningProsessTask.getPropertyValue(KorrigertHenvisningTask.PROPERTY_EKSTERN_UUID)).isEqualTo(eksternUuid.toString());
     }
 

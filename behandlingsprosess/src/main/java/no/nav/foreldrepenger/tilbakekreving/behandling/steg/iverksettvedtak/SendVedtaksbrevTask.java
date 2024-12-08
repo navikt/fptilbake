@@ -24,7 +24,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class SendVedtaksbrevTask implements ProsessTaskHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(SendVedtaksbrevTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SendVedtaksbrevTask.class);
 
     private VergeRepository vergeRepository;
     private VedtaksbrevTjeneste vedtaksbrevTjeneste;
@@ -48,6 +48,6 @@ public class SendVedtaksbrevTask implements ProsessTaskHandler {
             vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId, BrevMottaker.VERGE, unikBestillingUuid);
         }
         vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId, BrevMottaker.BRUKER, unikBestillingUuid);
-        log.info("Utført for behandling: {}", behandlingId);
+        LOG.info("Utført for behandling: {}", behandlingId);
     }
 }

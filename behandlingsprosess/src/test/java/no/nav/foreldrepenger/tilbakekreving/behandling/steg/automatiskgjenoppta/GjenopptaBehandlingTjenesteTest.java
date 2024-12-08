@@ -83,7 +83,7 @@ class GjenopptaBehandlingTjenesteTest {
         ProsessTaskData prosessTaskData = faktiskProsesstaskDataliste.get(0);
         assertThat(prosessTaskData.getSaksnummer()).isEqualTo(behandling.getSaksnummer().getVerdi());
         assertThat(prosessTaskData.getFagsakId()).isEqualTo(fagsakId);
-        assertThat(prosessTaskData.getBehandlingId()).isEqualTo(Long.toString(behandlingId));
+        assertThat(prosessTaskData.getBehandlingIdAsLong()).isEqualTo(behandlingId);
     }
 
     @Test
@@ -127,8 +127,8 @@ class GjenopptaBehandlingTjenesteTest {
         ProsessTaskData prosessTaskData2 = faktiskeProsessTaskDataListe.get(1);
 
         List<Long> behandlingIderFraProsesstaskData = new ArrayList<>();
-        behandlingIderFraProsesstaskData.add(Long.parseLong(prosessTaskData1.getBehandlingId()));
-        behandlingIderFraProsesstaskData.add(Long.parseLong(prosessTaskData2.getBehandlingId()));
+        behandlingIderFraProsesstaskData.add(prosessTaskData1.getBehandlingIdAsLong());
+        behandlingIderFraProsesstaskData.add(prosessTaskData2.getBehandlingIdAsLong());
 
         assertThat(behandlingIderFraProsesstaskData).contains(behandlingId1, behandlingId2);
     }

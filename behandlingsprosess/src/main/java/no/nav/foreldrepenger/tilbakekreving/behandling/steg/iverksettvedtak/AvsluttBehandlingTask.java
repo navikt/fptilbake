@@ -18,7 +18,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class AvsluttBehandlingTask implements ProsessTaskHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(AvsluttBehandlingTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AvsluttBehandlingTask.class);
     private AvsluttBehandlingTjeneste avsluttBehandlingTjeneste;
 
     AvsluttBehandlingTask() {
@@ -34,6 +34,6 @@ public class AvsluttBehandlingTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         avsluttBehandlingTjeneste.avsluttBehandling(behandlingId);
-        log.info("Utført for behandling: {}", behandlingId);
+        LOG.info("Utført for behandling: {}", behandlingId);
     }
 }

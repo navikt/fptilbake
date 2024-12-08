@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
+import java.util.Optional;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -54,11 +56,10 @@ public class GjenopptaBehandlingMedGrunnlagTjeneste {
         prosessTaskData.setPrioritet(3);
         prosessTaskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
 
-        var cid = MDCOperations.getCallId();
-        var callId = (cid == null ? MDCOperations.generateCallId() : cid) + "_" + behandling.getId();
-        prosessTaskData.setCallId(callId);
+        var callId = Optional.ofNullable(MDCOperations.getCallId()).orElseGet(MDCOperations::generateCallId);
+        prosessTaskData.setCallId(callId +  "_" + behandling.getId());
 
-        LOG.info("Gjenopptar behandling av behandlingId={}, oppretter {}-prosesstask med callId={}", behandling.getId(), prosessTaskData.getTaskType(), callId);
+        LOG.info("Gjenopptar behandling av behandlingId={}, oppretter {} med callId={}", behandling.getId(), prosessTaskData.taskType(), callId);
         return taskTjeneste.lagre(prosessTaskData);
     }
 

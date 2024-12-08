@@ -10,7 +10,6 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -20,15 +19,6 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.context.containers.BrukerNavnType;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.loginmodule.LoginContextConfiguration;
-
-import org.eclipse.jetty.ee10.security.jaspi.JaspiMessageInfo;
-import org.eclipse.jetty.server.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-
 import jakarta.security.auth.message.AuthStatus;
 import jakarta.security.auth.message.MessageInfo;
 import jakarta.security.auth.message.MessagePolicy;
@@ -37,7 +27,17 @@ import jakarta.security.auth.message.config.ServerAuthContext;
 import jakarta.security.auth.message.module.ServerAuthModule;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.ee10.security.jaspi.JaspiMessageInfo;
+import org.eclipse.jetty.server.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.context.containers.BrukerNavnType;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.loginmodule.LoginContextConfiguration;
 import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.klient.http.CommonHttpHeaders;
 import no.nav.vedtak.log.mdc.MDCOperations;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 import no.nav.vedtak.sikkerhet.kontekst.RequestKontekst;
@@ -139,15 +139,15 @@ public class OidcAuthModule implements ServerAuthModule {
     }
 
     public void setCallAndConsumerId(HttpServletRequest request) {
-        String callId = Optional.ofNullable(request.getHeader(MDCOperations.HTTP_HEADER_CALL_ID))
-            .orElseGet(() -> request.getHeader(MDCOperations.HTTP_HEADER_ALT_CALL_ID));
+        String callId = Optional.ofNullable(request.getHeader(CommonHttpHeaders.HEADER_NAV_CALLID))
+            .orElseGet(() -> request.getHeader(CommonHttpHeaders.HEADER_NAV_ALT_CALLID));
         if (callId != null) {
             MDCOperations.putCallId(callId);
         } else {
             MDCOperations.putCallId();
         }
 
-        String consumerId = request.getHeader(MDCOperations.HTTP_HEADER_CONSUMER_ID);
+        String consumerId = request.getHeader(CommonHttpHeaders.HEADER_NAV_CONSUMER_ID);
         if (consumerId != null) {
             MDCOperations.putConsumerId(consumerId);
         }

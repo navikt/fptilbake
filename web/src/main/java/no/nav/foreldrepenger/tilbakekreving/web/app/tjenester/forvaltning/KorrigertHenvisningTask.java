@@ -46,7 +46,7 @@ public class KorrigertHenvisningTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        long behandlingId = Long.parseLong(prosessTaskData.getBehandlingId());
+        long behandlingId = prosessTaskData.getBehandlingIdAsLong();
         String eksternUuid = prosessTaskData.getPropertyValue(PROPERTY_EKSTERN_UUID);
         UUID eksternBehandlingUuid = UUID.fromString(eksternUuid);
 

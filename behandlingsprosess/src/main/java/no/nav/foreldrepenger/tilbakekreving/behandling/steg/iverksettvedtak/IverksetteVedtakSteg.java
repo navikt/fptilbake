@@ -29,7 +29,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.Iverksetting
 @ApplicationScoped
 public class IverksetteVedtakSteg implements BehandlingSteg {
 
-    private static final Logger log = LoggerFactory.getLogger(IverksetteVedtakSteg.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IverksetteVedtakSteg.class);
 
     private BehandlingVedtakRepository behandlingVedtakRepository;
     private BehandlingRepository behandlingRepository;
@@ -60,7 +60,7 @@ public class IverksetteVedtakSteg implements BehandlingSteg {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
 
         if (IverksettingStatus.IKKE_IVERKSATT.equals(vedtak.getIverksettingStatus())) {
-            log.info("Behandling {}: Iverksetter vedtak", behandlingId);
+            LOG.info("Behandling {}: Iverksetter vedtak", behandlingId);
             vedtak.setIverksettingStatus(IverksettingStatus.UNDER_IVERKSETTING);
             behandlingVedtakRepository.lagre(vedtak);
 
@@ -73,7 +73,7 @@ public class IverksetteVedtakSteg implements BehandlingSteg {
 
     @Override
     public final BehandleStegResultat gjenopptaSteg(BehandlingskontrollKontekst kontekst) {
-        log.info("Behandling {}: Iverksetting fullført", kontekst.getBehandlingId());
+        LOG.info("Behandling {}: Iverksetting fullført", kontekst.getBehandlingId());
         return BehandleStegResultat.utførtUtenAksjonspunkter();
     }
 

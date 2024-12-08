@@ -27,7 +27,7 @@ public class SensuMetrikkTask implements ProsessTaskHandler {
 
     static final String TASKTYPE = "sensu.metrikk.task";
 
-    private static final Logger log = LoggerFactory.getLogger(SensuMetrikkTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SensuMetrikkTask.class);
     private boolean lansert;
 
     private SensuKlient sensuKlient;
@@ -52,24 +52,24 @@ public class SensuMetrikkTask implements ProsessTaskHandler {
         if (!lansert) {
             return;
         }
-        log.info("Publisering vha sensu er skrudd på");
+        LOG.info("Publisering vha sensu er skrudd på");
 
         long startTime = System.nanoTime();
 
         try {
             var metrikker = statistikkRepository.hentAlle();
             logMetrics(metrikker);
-            log.info("Generert {} metrikker til sensu", metrikker.size());
+            LOG.info("Generert {} metrikker til sensu", metrikker.size());
         } catch (Exception e){
-            log.warn(e.getMessage(), e);
+            LOG.warn(e.getMessage(), e);
             throw e;
         } finally {
             var varighet = Duration.ofNanos(System.nanoTime() - startTime);
             if (Duration.ofSeconds(20).minus(varighet).isNegative()) {
                 // bruker for lang tid på logging av metrikker.
-                log.warn("Generering av sensu metrikker tok : " + varighet);
+                LOG.warn("Generering av sensu metrikker tok : " + varighet);
             } else {
-                log.info("Generering av sensu metrikker tok : " + varighet);
+                LOG.info("Generering av sensu metrikker tok : " + varighet);
             }
         }
 

@@ -112,7 +112,6 @@ public class HenleggBehandlingTjeneste {
         henleggelseBrevTask.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         henleggelseBrevTask.setPayload(fritekst);
         henleggelseBrevTask.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
-        henleggelseBrevTask.setCallIdFraEksisterende();
         taskTjeneste.lagre(henleggelseBrevTask);
     }
 

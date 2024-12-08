@@ -87,7 +87,7 @@ class AutomatiskSaksbehandlingBatchTaskTest {
             var prosessTasker = captor.getAllValues();
             assertThat(prosessTasker).hasSize(1);
             var prosessTaskData = prosessTasker.get(0);
-            assertThat(Long.valueOf(prosessTaskData.getBehandlingId())).isEqualTo(behandling.getId());
+            assertThat(prosessTaskData.getBehandlingIdAsLong()).isEqualTo(behandling.getId());
             assertThat(prosessTaskData.getSekvens()).isEqualTo("10");
         }
     }

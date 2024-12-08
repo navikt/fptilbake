@@ -8,7 +8,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -38,7 +37,7 @@ import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskEntitet;
 @ApplicationScoped
 public class FagsakProsessTaskRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(FagsakProsessTaskRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FagsakProsessTaskRepository.class);
 
     private EntityManager entityManager;
     private ProsessTaskTjeneste taskTjeneste;
@@ -55,7 +54,7 @@ public class FagsakProsessTaskRepository {
 
     public void lagre(FagsakProsessTask fagsakProsessTask) {
         ProsessTaskData ptData = taskTjeneste.finn(fagsakProsessTask.getProsessTaskId());
-        log.debug("Linker fagsak[{}] -> prosesstask[{}], tasktype=[{}] gruppeSekvensNr=[{}]", fagsakProsessTask.getFagsakId(), fagsakProsessTask.getProsessTaskId(), ptData.getTaskType(), fagsakProsessTask.getGruppeSekvensNr());
+        LOG.debug("Linker fagsak[{}] -> prosesstask[{}], {} gruppeSekvensNr=[{}]", fagsakProsessTask.getFagsakId(), fagsakProsessTask.getProsessTaskId(), ptData.taskType(), fagsakProsessTask.getGruppeSekvensNr());
         EntityManager em = getEntityManager();
         em.persist(fagsakProsessTask);
         em.flush();
@@ -73,7 +72,7 @@ public class FagsakProsessTaskRepository {
 
     public void fjern(Long fagsakId, Long prosessTaskId, Long gruppeSekvensNr) {
         ProsessTaskData ptData = taskTjeneste.finn(prosessTaskId);
-        log.debug("Fjerner link fagsak[{}] -> prosesstask[{}], tasktype=[{}] gruppeSekvensNr=[{}]", fagsakId, prosessTaskId, ptData.getTaskType(), gruppeSekvensNr);
+        LOG.debug("Fjerner link fagsak[{}] -> prosesstask[{}], {} gruppeSekvensNr=[{}]", fagsakId, prosessTaskId, ptData.taskType(), gruppeSekvensNr);
         EntityManager em = getEntityManager();
         Query query = em.createQuery("Delete from FagsakProsessTask Where prosessTaskId = :prosessTaskId and fagsakId=:fagsakId");
         query.setParameter("prosessTaskId", prosessTaskId);
@@ -124,8 +123,6 @@ public class FagsakProsessTaskRepository {
 
         List<ProsessTaskData> matchedTasks = eksisterendeTasks;
 
-        gruppe.setCallIdFraEksisterende();
-
         if (matchedTasks.isEmpty()) {
             // legg inn nye
             return taskTjeneste.lagre(gruppe);
@@ -134,8 +131,8 @@ public class FagsakProsessTaskRepository {
             // hvis noen er FEILET så oppretter vi ikke ny
             Optional<ProsessTaskData> feilet = matchedTasks.stream().filter(t -> t.getStatus().equals(ProsessTaskStatus.FEILET)).findFirst();
 
-            Set<String> nyeTaskTyper = nyeTasks.stream().map(t -> t.task().getTaskType()).collect(Collectors.toSet());
-            Set<String> eksisterendeTaskTyper = eksisterendeTasks.stream().map(ProsessTaskData::getTaskType).collect(Collectors.toSet());
+            var nyeTaskTyper = nyeTasks.stream().map(t -> t.task().taskType()).collect(Collectors.toSet());
+            var eksisterendeTaskTyper = eksisterendeTasks.stream().map(ProsessTaskData::taskType).collect(Collectors.toSet());
 
             if (feilet.isEmpty()) {
                 if (eksisterendeTaskTyper.containsAll(nyeTaskTyper)) {

@@ -4,7 +4,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskInfo;
 
 public class ProsessTaskDataWrapper {
 
-    private ProsessTaskInfo data;
+    private final ProsessTaskInfo data;
 
     private ProsessTaskDataWrapper(ProsessTaskInfo data) {
         this.data = data;
@@ -15,6 +15,6 @@ public class ProsessTaskDataWrapper {
     }
 
     public Long getBehandlingId() {
-        return Long.valueOf(data.getBehandlingId());
+        return data.getBehandlingIdAsLong();
     }
 }

@@ -52,7 +52,7 @@ public class OppdaterBehandlendeEnhetTask implements ProsessTaskHandler {
         var enhet = behandlingTjeneste.hentEnhetForEksternBehandling(eksternBehandling.getEksternUuid());
 
         if (!enhet.equals(behandling.getBehandlendeOrganisasjonsEnhet())) {
-            LOG.info("Endrer behandlende enhet for behandling: {}", prosessTaskData.getBehandlingId());
+            LOG.info("Endrer behandlende enhet for behandling: {}", behandlingId);
             behandlendeEnhetTjeneste.byttBehandlendeEnhet(behandling.getId(), enhet, HistorikkAktør.VEDTAKSLØSNINGEN);
         }
     }

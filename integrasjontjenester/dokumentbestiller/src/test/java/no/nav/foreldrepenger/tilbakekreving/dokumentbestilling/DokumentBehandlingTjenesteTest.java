@@ -111,7 +111,7 @@ class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
         verify(taskTjeneste, times(1)).lagre(captor.capture());
         var prosesser = captor.getValue();
-        assertThat(prosesser.getTaskType()).isEqualTo(ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class).getTaskType());
+        assertThat(prosesser.taskType()).isEqualTo(TaskType.forProsessTask(SendManueltVarselbrevTask.class));
 
         var historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
         assertThat(historikkinnslager.size()).isEqualTo(1);
