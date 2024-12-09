@@ -5,7 +5,7 @@ import java.util.Objects;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 
 /**
@@ -24,8 +24,8 @@ public class BehandlingStatusEvent implements BehandlingEvent {
     }
 
     @Override
-    public AktørId getAktørId() {
-        return kontekst.getAktørId();
+    public Saksnummer getSaksnummer() {
+        return kontekst.getSaksnummer();
     }
 
     @Override
@@ -54,9 +54,9 @@ public class BehandlingStatusEvent implements BehandlingEvent {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<" + kontekst + //$NON-NLS-1$
-                ", nyStatus=" + nyStatus + //$NON-NLS-1$
-                ">"; //$NON-NLS-1$
+        return getClass().getSimpleName() + "<" + kontekst +
+                ", nyStatus=" + nyStatus +
+                ">";
     }
 
     public static class BehandlingAvsluttetEvent extends BehandlingStatusEvent {

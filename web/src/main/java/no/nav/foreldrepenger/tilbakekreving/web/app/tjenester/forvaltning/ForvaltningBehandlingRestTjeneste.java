@@ -182,7 +182,7 @@ public class ForvaltningBehandlingRestTjeneste {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         LOG.info("Fortsett behandling. Oppretter task for å fortsettelse av behandlingId={}", behandling.getUuid());
-        var prosessTaskData = opprettFortsettBehandlingTask(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        var prosessTaskData = opprettFortsettBehandlingTask(behandling);
         taskTjeneste.lagre(prosessTaskData);
         return Response.ok().build();
     }
@@ -287,7 +287,7 @@ public class ForvaltningBehandlingRestTjeneste {
             var tilstand = behandlingTilstandTjeneste.hentBehandlingensTilstand(b);
             var taskData = ProsessTaskData.forProsessTask(SendSakshendelserTilDvhTask.class);
             taskData.setPayload(BehandlingTilstandMapper.tilJsonString(tilstand));
-            taskData.setProperty("behandlingId", Long.toString(b.getId()));
+            taskData.setBehandling(b.getSaksnummer().getVerdi(), b.getFagsakId(), b.getId());
             taskTjeneste.lagre(taskData);
 
         });
@@ -447,7 +447,7 @@ public class ForvaltningBehandlingRestTjeneste {
     }
 
     private void opprettGjenopptaBehandlingTask(Behandling behandling) {
-        var fortsettTaskData = opprettFortsettBehandlingTask(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        var fortsettTaskData = opprettFortsettBehandlingTask(behandling);
         fortsettTaskData.setProperty(FortsettBehandlingTask.MANUELL_FORTSETTELSE, "true");
         if (behandling.getAktivtBehandlingSteg() != null) {
             fortsettTaskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
@@ -455,22 +455,22 @@ public class ForvaltningBehandlingRestTjeneste {
         taskTjeneste.lagre(fortsettTaskData);
     }
 
-    private ProsessTaskData opprettFortsettBehandlingTask(long fagsakId, long behandlingId, String aktørId) {
+    private ProsessTaskData opprettFortsettBehandlingTask(Behandling behandling) {
         var fortsettTaskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
-        fortsettTaskData.setBehandling(fagsakId, behandlingId, aktørId);
+        fortsettTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         return fortsettTaskData;
     }
 
     private void opprettHenleggBehandlingTask(Behandling behandling) {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(TvingHenlegglBehandlingTask.class);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         taskTjeneste.lagre(prosessTaskData);
     }
 
     private void opprettKorrigertHenvisningTask(Behandling behandling, UUID eksternBehandlingUuid) {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(KorrigertHenvisningTask.class);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        prosessTaskData.setProperty("eksternUuid", eksternBehandlingUuid.toString());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
+        prosessTaskData.setProperty(KorrigertHenvisningTask.PROPERTY_EKSTERN_UUID, eksternBehandlingUuid.toString());
         taskTjeneste.lagre(prosessTaskData);
     }
 

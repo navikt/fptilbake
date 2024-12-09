@@ -8,7 +8,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 public class BehandlingTransisjonEvent implements BehandlingEvent {
 
@@ -38,8 +38,8 @@ public class BehandlingTransisjonEvent implements BehandlingEvent {
     }
 
     @Override
-    public AktørId getAktørId() {
-        return kontekst.getAktørId();
+    public Saksnummer getSaksnummer() {
+        return kontekst.getSaksnummer();
     }
 
     public BehandlingskontrollKontekst getKontekst() {

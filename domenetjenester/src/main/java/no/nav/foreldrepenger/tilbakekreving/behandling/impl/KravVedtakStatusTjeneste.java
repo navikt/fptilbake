@@ -2,11 +2,12 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import java.time.LocalDateTime;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -124,8 +125,7 @@ public class KravVedtakStatusTjeneste {
     private void taBehandlingAvventOgFortsettBehandling(long behandlingId) {
         var behandling = behandlingRepository.hentBehandling(behandlingId);
         var taskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
-        taskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        taskData.setCallIdFraEksisterende();
+        taskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         taskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
         taskTjeneste.lagre(taskData);
     }

@@ -30,7 +30,7 @@ public enum HistorikkOpplysningType implements Kodeverdi {
     private String kode;
     private String navn;
 
-    public static final String KODEVERK = "HISTORIKK_OPPLYSNING_TYPE"; //$NON-NLS-1$
+    public static final String KODEVERK = "HISTORIKK_OPPLYSNING_TYPE";
     private static Map<String, HistorikkOpplysningType> KODER = new LinkedHashMap<>();
 
     static {

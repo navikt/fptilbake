@@ -7,6 +7,7 @@ import java.util.UUID;
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
@@ -28,7 +29,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 public class SendManueltVarselbrevTask implements ProsessTaskHandler {
 
     public static final String MAL_TYPE = "malType";
-    public static final String BESTILLING_UUID = "bestillingUuid";
 
     private final BehandlingRepository behandlingRepository;
     private final VergeRepository vergeRepository;
@@ -51,7 +51,7 @@ public class SendManueltVarselbrevTask implements ProsessTaskHandler {
         var behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         var malType = DokumentMalType.fraKode(prosessTaskData.getPropertyValue(MAL_TYPE));
         var friTekst = prosessTaskData.getPayloadAsString();
-        var unikBestillingUuid = UUID.fromString(Optional.of(prosessTaskData.getPropertyValue(BESTILLING_UUID)).orElseThrow());
+        var unikBestillingUuid = UUID.fromString(Optional.of(prosessTaskData.getPropertyValue(TaskProperties.BESTILLING_UUID)).orElseThrow());
 
         // sjekk om behandlingen har verge
         var finnesVerge = vergeRepository.finnesVerge(behandlingId);

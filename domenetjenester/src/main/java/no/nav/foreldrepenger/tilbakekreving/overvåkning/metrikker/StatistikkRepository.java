@@ -56,7 +56,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 @Dependent
 public class StatistikkRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(StatistikkRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StatistikkRepository.class);
 
     private static final String UDEFINERT = "-";
 
@@ -148,7 +148,7 @@ public class StatistikkRepository {
         var sensuEvents = collectionSupplier.get();
         var slutt = System.currentTimeMillis();
 
-        log.info("{} benyttet {} ms. Har {} eventer", function, (slutt - start), sensuEvents.size());
+        LOG.info("{} benyttet {} ms. Har {} eventer", function, (slutt - start), sensuEvents.size());
 
         return sensuEvents;
     }

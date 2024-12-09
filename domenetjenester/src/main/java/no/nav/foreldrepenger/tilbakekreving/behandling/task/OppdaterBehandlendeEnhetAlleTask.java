@@ -45,8 +45,7 @@ public class OppdaterBehandlendeEnhetAlleTask implements ProsessTaskHandler {
         var behandlinger = behandlingRepository.finnBehandlingerIkkeAvsluttetPåAngittEnhet(forenhet);
         behandlinger.forEach(beh -> {
             var taskData = ProsessTaskData.forProsessTask(OppdaterBehandlendeEnhetTask.class);
-            taskData.setBehandling(beh.getFagsakId(), beh.getId(), beh.getAktørId().getId());
-            taskData.setCallIdFraEksisterende();
+            taskData.setBehandling(beh.getSaksnummer().getVerdi(), beh.getFagsakId(), beh.getId());
             taskTjeneste.lagre(taskData);
         });
     }

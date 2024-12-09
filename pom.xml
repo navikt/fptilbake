@@ -35,11 +35,11 @@
         <sonar.projectKey>navikt_fptilbake</sonar.projectKey>
 
         <!-- Jakarta deps -->
-        <felles.version>7.3.4</felles.version>
-        <prosesstask.version>5.0.19</prosesstask.version>
-        <fpkontrakter.version>9.1.22</fpkontrakter.version>
+        <felles.version>7.4.1</felles.version>
+        <prosesstask.version>5.0.21</prosesstask.version>
+        <fpkontrakter.version>9.2.0</fpkontrakter.version>
         <abakus-kontrakt.version>2.1.2</abakus-kontrakt.version>
-        <verapdf-validation-model.version>1.26.1</verapdf-validation-model.version>
+        <verapdf-validation-model.version>1.26.2</verapdf-validation-model.version>
         <!-- Jakarta deps end -->
 
         <fp-tidsserie.version>2.7.1</fp-tidsserie.version>
@@ -329,7 +329,7 @@
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>swagger-ui</artifactId>
-                <version>5.17.14</version>
+                <version>5.18.2</version>
             </dependency>
 
             <!-- 3dje parts biblioteker -->

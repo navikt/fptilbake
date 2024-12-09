@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import java.net.URISyntaxException;
-import java.time.Duration;
 import java.time.Period;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +30,6 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjeneste;
@@ -54,15 +52,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
-import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkinnslagDtoV2;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDto;
@@ -216,12 +211,10 @@ public class BehandlingRestTjeneste {
         var behandling = behandlingTjeneste.opprettKunBehandlingManuell(saksnummer, eksternUuid, fagsakYtelseType, behandlingType);
         var taskGruppe = new ProsessTaskGruppe();
         ProsessTaskData taskDataFortsett = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
-        taskDataFortsett.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         taskGruppe.addNesteSekvensiell(taskDataFortsett);
         ProsessTaskData taskDataFinn = ProsessTaskData.forProsessTask(FinnGrunnlagTask.class);
-        taskDataFinn.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         taskGruppe.addNesteSekvensiell(taskDataFinn);
-        taskGruppe.setCallIdFraEksisterende();
+        taskGruppe.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         taskTjeneste.lagre(taskGruppe);
         return behandling.getId();
     }
@@ -560,7 +553,7 @@ public class BehandlingRestTjeneste {
         var behandlinger = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
         behandlinger.forEach(b -> b.setBrevmaler(dokumentBehandlingTjeneste.hentBrevmalerFor(b.getId())));
 
-        return new SakFullDto(saksnummer.getVerdi(), oppretting, behandlinger, historikkinnslag, historikkinnslag);
+        return new SakFullDto(saksnummer.getVerdi(), oppretting, behandlinger, historikkinnslag);
     }
 
     @GET

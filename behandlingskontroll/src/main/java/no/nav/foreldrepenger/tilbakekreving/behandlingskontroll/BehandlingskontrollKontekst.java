@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll;
 import java.util.Objects;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 
 /**
@@ -12,16 +12,16 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 public class BehandlingskontrollKontekst {
 
     private BehandlingLås behandlingLås;
-    private AktørId aktørId;
+    private Saksnummer saksnummer;
     private Long fagsakId;
 
     /**
      * NB: Foretrekk {@link BehandlingskontrollTjeneste#initBehandlingskontroll} i stedet for å opprette her direkte.
      */
-    public BehandlingskontrollKontekst(Long fagsakId, AktørId aktørId, BehandlingLås behandlingLås) {
-        Objects.requireNonNull(behandlingLås, "behandlingLås"); //$NON-NLS-1$
+    public BehandlingskontrollKontekst(Saksnummer saksnummer, Long fagsakId, BehandlingLås behandlingLås) {
+        Objects.requireNonNull(behandlingLås, "behandlingLås");
         this.fagsakId = fagsakId;
-        this.aktørId = aktørId;
+        this.saksnummer = saksnummer;
         this.behandlingLås = behandlingLås;
     }
 
@@ -37,8 +37,8 @@ public class BehandlingskontrollKontekst {
         return fagsakId;
     }
 
-    public AktørId getAktørId() {
-        return aktørId;
+    public Saksnummer getSaksnummer() {
+        return saksnummer;
     }
 
     @Override
@@ -51,17 +51,17 @@ public class BehandlingskontrollKontekst {
         }
         var other = (BehandlingskontrollKontekst) obj;
         return Objects.equals(fagsakId, other.fagsakId)
-                && Objects.equals(aktørId, other.aktørId)
+                && Objects.equals(saksnummer, other.saksnummer)
                 && Objects.equals(getBehandlingId(), other.getBehandlingId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fagsakId, aktørId, getBehandlingId());
+        return Objects.hash(fagsakId, saksnummer, getBehandlingId());
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<fagsakId=" + fagsakId + ", aktørId=" + aktørId + ", behandlingId=" + getBehandlingId() + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        return getClass().getSimpleName() + "<fagsakId=" + fagsakId + ", saksnummer=" + saksnummer + ", behandlingId=" + getBehandlingId() + ">";
     }
 }

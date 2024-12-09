@@ -10,14 +10,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.FlushModeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
@@ -79,7 +80,7 @@ class IverksetteVedtakStegTest {
         entityManager.setFlushMode(FlushModeType.AUTO);
         behandling = simple.lagre(repoProvider);
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
-        behandlingskontrollKontekst = new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), behandlingLås);
+        behandlingskontrollKontekst = new BehandlingskontrollKontekst(behandling.getSaksnummer(), behandling.getFagsakId(), behandlingLås);
         opprettEksternBehandling(behandling);
     }
 
@@ -126,7 +127,7 @@ class IverksetteVedtakStegTest {
 
         opprettBehandlingVedtak(revurdering, IverksettingStatus.IKKE_IVERKSATT);
 
-        BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(new BehandlingskontrollKontekst(revurdering.getFagsakId(), revurdering.getAktørId(), revurderingBehandlingLås));
+        BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(new BehandlingskontrollKontekst(revurdering.getSaksnummer(), revurdering.getFagsakId(), revurderingBehandlingLås));
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
         assertBehandlingVedtak(revurdering);
 
@@ -151,7 +152,7 @@ class IverksetteVedtakStegTest {
         opprettEksternBehandling(revurdering);
         opprettBehandlingVedtak(revurdering, IverksettingStatus.IKKE_IVERKSATT);
 
-        BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(new BehandlingskontrollKontekst(revurdering.getFagsakId(), revurdering.getAktørId(), revurderingBehandlingLås));
+        BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(new BehandlingskontrollKontekst(revurdering.getSaksnummer(), revurdering.getFagsakId(), revurderingBehandlingLås));
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
         assertBehandlingVedtak(revurdering);
 

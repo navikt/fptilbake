@@ -10,11 +10,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.inject.Inject;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 
-import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -31,7 +32,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
@@ -70,7 +70,6 @@ class GjenopptaBehandlingTjenesteTest {
         Behandling behandling = lagBehandling();
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
 
-        final AktørId aktørId = behandling.getAktørId();
         final Long fagsakId = behandling.getFagsakId();
         final Long behandlingId = behandling.getId();
 
@@ -82,9 +81,9 @@ class GjenopptaBehandlingTjenesteTest {
         assertThat(faktiskProsesstaskDataliste).hasSize(1);
 
         ProsessTaskData prosessTaskData = faktiskProsesstaskDataliste.get(0);
-        assertThat(prosessTaskData.getAktørId()).isEqualTo(aktørId.getId());
+        assertThat(prosessTaskData.getSaksnummer()).isEqualTo(behandling.getSaksnummer().getVerdi());
         assertThat(prosessTaskData.getFagsakId()).isEqualTo(fagsakId);
-        assertThat(prosessTaskData.getBehandlingId()).isEqualTo(Long.toString(behandlingId));
+        assertThat(prosessTaskData.getBehandlingIdAsLong()).isEqualTo(behandlingId);
     }
 
     @Test
@@ -128,8 +127,8 @@ class GjenopptaBehandlingTjenesteTest {
         ProsessTaskData prosessTaskData2 = faktiskeProsessTaskDataListe.get(1);
 
         List<Long> behandlingIderFraProsesstaskData = new ArrayList<>();
-        behandlingIderFraProsesstaskData.add(Long.parseLong(prosessTaskData1.getBehandlingId()));
-        behandlingIderFraProsesstaskData.add(Long.parseLong(prosessTaskData2.getBehandlingId()));
+        behandlingIderFraProsesstaskData.add(prosessTaskData1.getBehandlingIdAsLong());
+        behandlingIderFraProsesstaskData.add(prosessTaskData2.getBehandlingIdAsLong());
 
         assertThat(behandlingIderFraProsesstaskData).contains(behandlingId1, behandlingId2);
     }

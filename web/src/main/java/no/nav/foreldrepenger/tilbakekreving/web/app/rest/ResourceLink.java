@@ -41,7 +41,7 @@ public class ResourceLink {
     private Object requestPayload;
 
     @SuppressWarnings("unused")
-    private ResourceLink() { // NOSONAR
+    private ResourceLink() {
         this((URI) null, null, null); // for Jackson
     }
 

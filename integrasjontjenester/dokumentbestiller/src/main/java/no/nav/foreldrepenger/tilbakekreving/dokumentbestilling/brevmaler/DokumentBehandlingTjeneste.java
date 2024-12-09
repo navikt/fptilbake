@@ -10,6 +10,7 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -123,10 +124,9 @@ public class DokumentBehandlingTjeneste {
 
         var sendVarselbrev = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
         sendVarselbrev.setProperty(SendManueltVarselbrevTask.MAL_TYPE, malType.getKode());
-        sendVarselbrev.setProperty(SendManueltVarselbrevTask.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
+        sendVarselbrev.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
         sendVarselbrev.setPayload(fritekst);
-        sendVarselbrev.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
-        sendVarselbrev.setCallIdFraEksisterende();
+        sendVarselbrev.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandlingId);
         taskTjeneste.lagre(sendVarselbrev);
     }
 
@@ -137,10 +137,9 @@ public class DokumentBehandlingTjeneste {
         }
 
         var sendInnhentDokumentasjonBrev = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
-        sendInnhentDokumentasjonBrev.setProperty(InnhentDokumentasjonbrevTask.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
+        sendInnhentDokumentasjonBrev.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
         sendInnhentDokumentasjonBrev.setPayload(fritekst);
-        sendInnhentDokumentasjonBrev.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
-        sendInnhentDokumentasjonBrev.setCallIdFraEksisterende();
+        sendInnhentDokumentasjonBrev.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandlingId);
         taskTjeneste.lagre(sendInnhentDokumentasjonBrev);
     }
 }

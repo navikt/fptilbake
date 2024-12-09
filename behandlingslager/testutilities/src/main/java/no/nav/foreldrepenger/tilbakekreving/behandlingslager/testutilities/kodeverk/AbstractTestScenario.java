@@ -236,7 +236,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         when(fagsakRepository.hentSakGittSaksnummer(any(Saksnummer.class))).thenAnswer(a -> Optional.of(fagsak));
         when(fagsakRepository.hentForBruker(any(AktørId.class))).thenAnswer(a -> singletonList(fagsak));
         when(fagsakRepository.lagre(fagsakCaptor.capture())).thenAnswer(invocation -> {
-            Fagsak fagsak = invocation.getArgument(0); // NOSONAR
+            Fagsak fagsak = invocation.getArgument(0);
             var id = fagsak.getId();
             if (id == null) {
                 id = fagsakId;
@@ -267,7 +267,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         }
         mockBehandlingRepository = mockBehandlingRepository();
 
-        lagre(repositoryProvider); // NOSONAR //$NON-NLS-1$
+        lagre(repositoryProvider);
         return mockBehandlingRepository;
     }
 
@@ -331,7 +331,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
     }
 
     protected void lagFagsak(FagsakRepository fagsakRepo) {
-        fagsakRepo.lagre(fagsak); // NOSONAR //$NON-NLS-1$
+        fagsakRepo.lagre(fagsak);
     }
 
 

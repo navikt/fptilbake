@@ -6,11 +6,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.EntityManager;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import jakarta.persistence.EntityManager;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -73,9 +74,9 @@ class TotrinnRepositoryTest {
 
         // Hent inaktive vurderinger etter flush
         var query = entityManager.createQuery(
-                "FROM Totrinnsvurdering tav WHERE tav.behandling.id = :behandling_id AND tav.aktiv = false", //$NON-NLS-1$
+                "FROM Totrinnsvurdering tav WHERE tav.behandling.id = :behandling_id AND tav.aktiv = false",
                 Totrinnsvurdering.class);
-        query.setParameter("behandling_id", behandling.getId()); //$NON-NLS-1$
+        query.setParameter("behandling_id", behandling.getId());
         var repoInaktiveTotrinnsvurderinger = query.getResultList();
 
         // Sjekk lagrede aktive vurderinger

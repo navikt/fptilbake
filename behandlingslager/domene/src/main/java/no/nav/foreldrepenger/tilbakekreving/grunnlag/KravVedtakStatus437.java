@@ -156,11 +156,11 @@ public class KravVedtakStatus437 extends BaseEntitet {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<" + //$NON-NLS-1$
-                (id != null ? "id=" + id + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$
-                + "vedtakId=" + vedtakId + "," //$NON-NLS-1$ //$NON-NLS-2$
-                + "kravStatusKode='" + kravStatusKode //$NON-NLS-1$ //$NON-NLS-2$
-                + ">"; //$NON-NLS-1$
+        return getClass().getSimpleName() + "<" +
+                (id != null ? "id=" + id + ", " : "")
+                + "vedtakId=" + vedtakId + ","
+                + "kravStatusKode='" + kravStatusKode
+                + ">";
     }
 
 }

@@ -9,12 +9,11 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.SendVedtakTilOppdragsystemetTask;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.AvsluttBehandlingTask;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.SendVedtakTilOppdragsystemetTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.SendVedtaksbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
@@ -198,7 +197,7 @@ class AutomatiskSaksbehandlingProsessTaskTest {
 
     private ProsessTaskData lagProsesTaskData() {
         var prosessTaskData = ProsessTaskData.forProsessTask(AutomatiskSaksbehandlingProsessTask.class);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         return prosessTaskData;
     }
 

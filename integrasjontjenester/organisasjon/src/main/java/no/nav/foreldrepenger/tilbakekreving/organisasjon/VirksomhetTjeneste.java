@@ -14,7 +14,7 @@ import no.nav.vedtak.felles.integrasjon.organisasjon.OrgInfo;
 @ApplicationScoped
 public class VirksomhetTjeneste {
 
-    private static final Logger log = LoggerFactory.getLogger(VirksomhetTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(VirksomhetTjeneste.class);
     private OrgInfo organisasjonConsumer;
 
     VirksomhetTjeneste() {
@@ -36,7 +36,7 @@ public class VirksomhetTjeneste {
         try {
             return hentOrganisasjon(orgNummer) != null;
         } catch (Exception e) {
-            log.warn("Kan ikke hente organisasjon for orgNummer {}", orgNummer, e);
+            LOG.warn("Kan ikke hente organisasjon for orgNummer {}", orgNummer, e);
             return false;
         }
     }

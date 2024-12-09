@@ -47,8 +47,8 @@ class HåndterHendelseTaskTest {
     private ProsessTaskData lagProsessTaskData(YtelseV1 melding) {
         ProsessTaskData td = ProsessTaskData.forProsessTask(HåndterVedtakFattetTask.class);
         td.setAktørId(melding.getAktør().getVerdi());
+        td.setSaksnummer(melding.getSaksnummer());
         td.setProperty(TaskProperties.EKSTERN_BEHANDLING_UUID, melding.getVedtakReferanse());
-        td.setProperty(TaskProperties.SAKSNUMMER, melding.getSaksnummer());
         td.setProperty(TaskProperties.FAGSAK_YTELSE_TYPE, FagsakYtelseType.FORELDREPENGER.getKode());
         return td;
     }

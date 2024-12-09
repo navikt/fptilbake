@@ -15,14 +15,15 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+import jakarta.persistence.Transient;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Converter;
-import jakarta.persistence.Transient;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
@@ -91,7 +92,7 @@ public enum HistorikkinnslagType implements Kodeverdi {
     @Transient
     private String mal;
 
-    public static final String KODEVERK = "HISTORIKKINNSLAG_TYPE"; //$NON-NLS-1$
+    public static final String KODEVERK = "HISTORIKKINNSLAG_TYPE";
     private static Map<String, HistorikkinnslagType> KODER = new LinkedHashMap<>();
 
     static {

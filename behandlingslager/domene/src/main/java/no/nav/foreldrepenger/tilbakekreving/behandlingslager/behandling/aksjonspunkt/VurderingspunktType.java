@@ -1,8 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt;
 
 public enum VurderingspunktType {
-    INN("INN"), //$NON-NLS-1$
-    UT("UT"); //$NON-NLS-1$
+    INN("INN"),
+    UT("UT");
 
     private final String dbKode;
 
@@ -18,7 +18,7 @@ public enum VurderingspunktType {
         return switch (kode) {
             case "INN" -> INN;
             case "UT" -> UT;
-            default -> throw new IllegalArgumentException("Ukjent kode: " + kode); //$NON-NLS-1$
+            default -> throw new IllegalArgumentException("Ukjent kode: " + kode);
         };
     }
 }

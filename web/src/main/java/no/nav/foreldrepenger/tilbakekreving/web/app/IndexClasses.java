@@ -33,7 +33,7 @@ import org.slf4j.Logger;
  * Henter persistert index (hvis generert) eller genererer index for angitt location (typisk matcher en jar/war fil).
  */
 public class IndexClasses {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(IndexClasses.class);
+    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(IndexClasses.class);
 
     private static final ConcurrentMap<URI, IndexClasses> INDEXES = new ConcurrentHashMap<>();
 
@@ -78,7 +78,7 @@ public class IndexClasses {
 
         Path fileName = f.getFileName();
         if (fileName != null && fileName.toString().endsWith(".class")) {
-            try (InputStream newInputStream = Files.newInputStream(f, StandardOpenOption.READ)) { // NOSONAR
+            try (InputStream newInputStream = Files.newInputStream(f, StandardOpenOption.READ)) {
                 indexer.index(newInputStream);
             } catch (IOException e) {
                 throw new IllegalStateException("Fikk ikke indeksert klasse " + f + ", kan ikke scanne klasser", e);
@@ -140,7 +140,7 @@ public class IndexClasses {
                 try {
                     jsonTypes.add(Class.forName(className));
                 } catch (ClassNotFoundException e) {
-                    log.error("Kan ikke finne klasse i Classpath, som funnet i Jandex index", e);// NOSONAR
+                    LOG.error("Kan ikke finne klasse i Classpath, som funnet i Jandex index", e);// NOSONAR
                 }
             }
         }
@@ -167,7 +167,7 @@ public class IndexClasses {
                     }
                 }
             } catch (ClassNotFoundException e) {
-                log.error("Kan ikke finne klasse i Classpath, som funnet i Jandex index", e);// NOSONAR
+                LOG.error("Kan ikke finne klasse i Classpath, som funnet i Jandex index", e);// NOSONAR
             }
         }
         return cls;

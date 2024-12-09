@@ -13,7 +13,7 @@ public class ProsessTaskGruppeIdDto implements AbacDto {
     private String gruppe;
 
     public ProsessTaskGruppeIdDto() {
-        gruppe = null; // NOSONAR
+        gruppe = null;
     }
 
     public ProsessTaskGruppeIdDto(String gruppe) {

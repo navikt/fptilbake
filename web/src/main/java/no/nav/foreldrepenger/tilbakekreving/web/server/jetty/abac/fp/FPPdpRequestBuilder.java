@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -29,7 +30,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
 
     public static final String ABAC_DOMAIN = "foreldrepenger";
 
-    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
+    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private PipRepository pipRepository;
     private FpsakPipKlient fpsakPipKlient;
@@ -80,13 +81,20 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         var ressursData = AppRessursData.builder()
             .leggTilAktørIdSet(dataAttributter.getVerdier(AppAbacAttributtType.AKTØR_ID));
         Optional.ofNullable(behandlingData).ifPresent(bi -> ressursData.leggTilAbacAktørIdSet(bi.getAktørIdNonNull()));
-        Set<String> saksnumre = dataAttributter.getVerdier(AppAbacAttributtType.SAKSNUMMER);
+        var saksnumre = utledSaksnummer(dataAttributter, behandlingData);
         saksnumre.forEach(s -> ressursData.leggTilAktørIdSet(fpsakPipKlient.hentAktørIderSomString(new Saksnummer(s))));
         Optional.ofNullable(behandlingData).map(PipBehandlingInfo::fagsakstatus).ifPresent(ressursData::medFagsakStatus);
         Optional.ofNullable(behandlingData).map(PipBehandlingInfo::statusForBehandling).ifPresent(ressursData::medBehandlingStatus);
         Optional.ofNullable(behandlingData).map(PipBehandlingInfo::ansvarligSaksbehandler).ifPresent(ressursData::medAnsvarligSaksbehandler);
 
         return ressursData.build();
+    }
+
+    private Set<String> utledSaksnummer(AbacDataAttributter attributter, PipBehandlingInfo behandlingData) {
+        Set<String> saksnumre = new HashSet<>(attributter.getVerdier(AppAbacAttributtType.SAKSNUMMER));
+        Optional.ofNullable(behandlingData).map(PipBehandlingInfo::saksnummer).ifPresent(saksnumre::add);
+        saksnumre.stream().findFirst().ifPresent(s -> LOG_CONTEXT.add("fagsak", s));
+        return saksnumre;
     }
 
     private PipBehandlingInfo hentFpsakBehandlingData(UUID fpsakBehandlingUuid) {

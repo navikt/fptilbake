@@ -39,13 +39,13 @@ public enum FagsakYtelseType implements Kodeverdi {
     OMSORGSPENGER_MA("OMP_MA", "Ekstra omsorgsdager midlertidig alene", ""),
 
 
-    UDEFINERT("-", "Ikke definert", "Ikke Definert"); //$NON-NLS-1$
+    UDEFINERT("-", "Ikke definert", "Ikke Definert");
 
     private String kode;
     private String navn; //på bøkmål som standard
     private String navnPåNynorsk;
 
-    public static final String KODEVERK = "FAGSAK_YTELSE"; //$NON-NLS-1$
+    public static final String KODEVERK = "FAGSAK_YTELSE";
     private static final Map<String, FagsakYtelseType> KODER = new LinkedHashMap<>();
 
     static {

@@ -22,6 +22,8 @@ import java.util.Objects;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -82,7 +84,7 @@ class HåndterGamleKravgrunnlagBatchTaskTest {
             assertThat(prosessTasker).isNotEmpty().hasSize(1);
             ProsessTaskData prosessTaskData = prosessTasker.get(0);
             assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(HåndterGamleKravgrunnlagTask.class));
-            assertThat(prosessTaskData.getPropertyValue("mottattXmlId")).isEqualTo(String.valueOf(mottattXmlId));
+            assertThat(prosessTaskData.getPropertyValue(TaskProperties.PROPERTY_MOTTATT_XML_ID)).isEqualTo(String.valueOf(mottattXmlId));
             assertThat(prosessTaskData.getGruppe()).contains("gammel-kravgrunnlag");
         }
     }

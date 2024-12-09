@@ -1,26 +1,18 @@
 package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.etterpopuler;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.BehandlingTilstandTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.aiven.AivenEttersendelserKafkaProducer;
-import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.aiven.AivenSakshendelserKafkaProducer;
-import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 @Dependent
 @ProsessTask(value = "dvh.ettersend.sakshendelser", prioritet = 4)
 public class EttersendSakshendelserTilDvhTask implements ProsessTaskHandler {
-
-    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private final AivenEttersendelserKafkaProducer aivenEttersendelserKafkaProducer;
     private final BehandlingRepository behandlingRepository;
@@ -37,8 +29,7 @@ public class EttersendSakshendelserTilDvhTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        long behandlingId = Long.parseLong(prosessTaskData.getBehandlingId());
-        LOG_CONTEXT.add("behandling", Long.toString(behandlingId));
+        long behandlingId = prosessTaskData.getBehandlingIdAsLong();
         var behandling = behandlingRepository.hentBehandling(behandlingId);
         if (!behandling.erAvsluttet()) {
             return;

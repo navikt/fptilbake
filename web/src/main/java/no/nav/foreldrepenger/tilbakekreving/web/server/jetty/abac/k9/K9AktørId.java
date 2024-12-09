@@ -25,7 +25,7 @@ public class K9AktørId implements Serializable, Comparable<K9AktørId> {
     @NotNull
     @Size(max = 20)
     @Pattern(regexp = "^\\d+$", message = "AktørId [${validatedValue}] matcher ikke tillatt pattern [{regexp}]")
-    private String aktørId; // NOSONAR
+    private String aktørId;
 
     protected K9AktørId() {
         // for hibernate

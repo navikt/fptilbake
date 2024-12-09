@@ -8,9 +8,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagDokumentLinkDto;
 
+import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkinnslagDtoV2.Linje;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,13 +23,12 @@ public class HistorikkDtoFellesMapper {
     private static final Logger LOG = LoggerFactory.getLogger(HistorikkDtoFellesMapper.class);
     protected static final String TOM_LINJE = "";
 
-    public static HistorikkinnslagDtoV2 tilHistorikkInnslagDto(Historikkinnslag h, UUID behandlingUUID, List<String> tekster) {
-        return tilHistorikkInnslagDto(h, behandlingUUID, null, tekster);
+    public static HistorikkinnslagDtoV2 tilHistorikkInnslagDto(Historikkinnslag h, UUID behandlingUUID, List<Linje> linjer) {
+        return tilHistorikkInnslagDto(h, behandlingUUID, null, linjer);
     }
 
-    public static HistorikkinnslagDtoV2 tilHistorikkInnslagDto(Historikkinnslag h, UUID behandlingUUID, List<HistorikkInnslagDokumentLinkDto> lenker, List<String> tekster) {
+    public static HistorikkinnslagDtoV2 tilHistorikkInnslagDto(Historikkinnslag h, UUID behandlingUUID, List<HistorikkInnslagDokumentLinkDto> lenker, List<Linje> linjer) {
         var skjermlenkeOpt = skjermlenkeFra(h);
-
         return new HistorikkinnslagDtoV2(
             behandlingUUID,
             HistorikkinnslagDtoV2.HistorikkAktørDto.fra(h.getAktør(), h.getOpprettetAv()),
@@ -34,7 +36,7 @@ public class HistorikkDtoFellesMapper {
             h.getOpprettetTidspunkt(),
             lenker,
             skjermlenkeOpt.isEmpty() ? lagTittel(h) : null,
-            fjernTrailingAvsnittFraTekst(tekster)
+            fjernTrailingAvsnittFraTekst(linjer)
         );
     }
 
@@ -62,20 +64,21 @@ public class HistorikkDtoFellesMapper {
     }
 
     @SafeVarargs
-    public static void leggTilAlleTeksterIHovedliste(List<String> hovedListe, List<String>... lister) {
-        for (List<String> liste : lister) {
-            hovedListe.addAll(liste);
+    public static List<Linje> konverterTilLinjerMedLinjeskift(List<String>... alleTekster) {
+        var linjer = new ArrayList<Linje>();
+        for (var tekster : alleTekster) {
+            linjer.addAll(tekster.stream().map(Linje::tekstlinje).toList());
         }
-        hovedListe.add(TOM_LINJE);
+        linjer.add(Linje.linjeskift());
+        return linjer;
     }
 
 
-    private static List<String> fjernTrailingAvsnittFraTekst(List<String> tekster) {
+    private static List<Linje> fjernTrailingAvsnittFraTekst(List<Linje> tekster) {
         if (tekster.isEmpty()) {
             return tekster;
         }
-
-        if (tekster.getLast().equals(TOM_LINJE)) {
+        if (tekster.getLast().erLinjeskift()) {
             tekster.removeLast();
         }
         return tekster.stream().toList();

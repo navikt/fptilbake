@@ -49,7 +49,7 @@ public class BehandlingRepository {
      * Hent Behandling med angitt id.
      */
     public Behandling hentBehandling(Long behandlingId) {
-        Objects.requireNonNull(behandlingId, "behandlingId"); // NOSONAR
+        Objects.requireNonNull(behandlingId, "behandlingId");
         return hentEksaktResultat(lagBehandlingQuery(behandlingId));
     }
 
@@ -57,7 +57,7 @@ public class BehandlingRepository {
      * Hent Behandling med angitt UUid.
      */
     public Behandling hentBehandling(UUID uuid) {
-        Objects.requireNonNull(uuid, "behandlingUUID"); // NOSONAR
+        Objects.requireNonNull(uuid, "behandlingUUID");
         return hentEksaktResultat(lagBehandlingQuery(uuid));
     }
 
@@ -172,8 +172,8 @@ public class BehandlingRepository {
      * Lager en ny Behandling basert på en gammel, med samme grunnlag strukturer.
      */
     private Optional<Behandling> finnSisteBehandling(Long fagsakId, BehandlingType behandlingType, boolean readOnly) {
-        Objects.requireNonNull(fagsakId, KEY_FAGSAK_ID); // NOSONAR
-        Objects.requireNonNull(behandlingType, KEY_BEHANDLING_TYPE); // NOSONAR
+        Objects.requireNonNull(fagsakId, KEY_FAGSAK_ID);
+        Objects.requireNonNull(behandlingType, KEY_BEHANDLING_TYPE);
 
         var query = getEntityManager().createQuery(
             "from Behandling where fagsak.id=:fagsakId and behandlingType=:behandlingType order by opprettetTidspunkt desc",

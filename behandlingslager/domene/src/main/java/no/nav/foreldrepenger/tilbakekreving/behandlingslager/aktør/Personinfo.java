@@ -46,7 +46,7 @@ public class Personinfo {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<aktørId=" + aktørId + ">"; //$NON-NLS-1$ //$NON-NLS-2$
+        return getClass().getSimpleName() + "<aktørId=" + aktørId + ">";
     }
 
     public static Builder builder() {
@@ -91,9 +91,9 @@ public class Personinfo {
         }
 
         public Personinfo build() {
-            requireNonNull(personinfoMal.aktørId, "Navbruker må ha aktørId"); //$NON-NLS-1$
-            requireNonNull(personinfoMal.personIdent, "Navbruker må ha fødselsnummer"); //$NON-NLS-1$
-            requireNonNull(personinfoMal.navn, "Navbruker må ha navn"); //$NON-NLS-1$
+            requireNonNull(personinfoMal.aktørId, "Navbruker må ha aktørId");
+            requireNonNull(personinfoMal.personIdent, "Navbruker må ha fødselsnummer");
+            requireNonNull(personinfoMal.navn, "Navbruker må ha navn");
             return personinfoMal;
         }
 

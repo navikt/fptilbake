@@ -273,12 +273,12 @@ public class BehandlingskontrollTjeneste {
      * @param behandlingId - må være med
      */
     public BehandlingskontrollKontekst initBehandlingskontroll(Long behandlingId) {
-        Objects.requireNonNull(behandlingId, "behandlingId"); //$NON-NLS-1$
+        Objects.requireNonNull(behandlingId, "behandlingId");
         // først lås
         var lås = serviceProvider.taLås(behandlingId);
         // så les
         var behandling = serviceProvider.hentBehandling(behandlingId);
-        return new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), lås);
+        return new BehandlingskontrollKontekst(behandling.getSaksnummer(), behandling.getFagsakId(), lås);
     }
 
     /**
@@ -288,12 +288,12 @@ public class BehandlingskontrollTjeneste {
      * @param behandling - må være med
      */
     public BehandlingskontrollKontekst initBehandlingskontroll(Behandling behandling) {
-        Objects.requireNonNull(behandling, "behandling"); //$NON-NLS-1$
+        Objects.requireNonNull(behandling, "behandling");
         // først lås
         var lås = serviceProvider.taLås(behandling.getId());
 
         // så les
-        return new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), lås);
+        return new BehandlingskontrollKontekst(behandling.getSaksnummer(), behandling.getFagsakId(), lås);
     }
 
     public void aksjonspunkterEndretStatus(BehandlingskontrollKontekst kontekst, BehandlingStegType behandlingStegType,
@@ -502,7 +502,7 @@ public class BehandlingskontrollTjeneste {
 
     public void henleggBehandling(BehandlingskontrollKontekst kontekst, BehandlingResultatType årsak) {
         // valider invarianter
-        Objects.requireNonNull(årsak, "årsak"); //$NON-NLS-1$
+        Objects.requireNonNull(årsak, "årsak");
 
         var stegTilstandFør = doHenleggBehandling(kontekst, årsak);
 
@@ -519,7 +519,7 @@ public class BehandlingskontrollTjeneste {
 
     public void henleggBehandlingFraSteg(BehandlingskontrollKontekst kontekst, BehandlingResultatType årsak) {
         // valider invarianter
-        Objects.requireNonNull(årsak, "årsak"); //$NON-NLS-1$
+        Objects.requireNonNull(årsak, "årsak");
 
         var stegTilstandFør = doHenleggBehandling(kontekst, årsak);
 
@@ -598,7 +598,7 @@ public class BehandlingskontrollTjeneste {
         var behandling = hentBehandling(kontekst);
 
         if (Objects.equals(BehandlingStatus.AVSLUTTET.getKode(), behandling.getStatus().getKode())) {
-            throw new IllegalStateException("Utviklerfeil: Kan ikke prosessere avsluttet behandling"); //$NON-NLS-1$
+            throw new IllegalStateException("Utviklerfeil: Kan ikke prosessere avsluttet behandling");
         }
 
         var startSteg = behandling.getAktivtBehandlingSteg();
@@ -614,7 +614,7 @@ public class BehandlingskontrollTjeneste {
                                                        Behandling behandling, BehandlingStegType inneværendeSteg, BehandlingModell modell) {
         if (!erSenereSteg(modell, inneværendeSteg, senereSteg)) {
             throw new IllegalStateException(
-                    "Kan ikke angi steg [" + senereSteg + "] som er før eller lik inneværende steg [" + inneværendeSteg + "]" + "for behandlingId " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                    "Kan ikke angi steg [" + senereSteg + "] som er før eller lik inneværende steg [" + inneværendeSteg + "]" + "for behandlingId "
                             + behandling.getId());
         }
         oppdaterEksisterendeBehandlingStegStatusVedFramføringEllerTilbakeføring(behandling, senereSteg, startStatusForNyttSteg,
@@ -630,7 +630,7 @@ public class BehandlingskontrollTjeneste {
         }
         if (!erLikEllerTidligereSteg(modell, stegType, tidligereStegType)) {
             throw new IllegalStateException(
-                    "Kan ikke angi steg [" + tidligereStegType + "] som er etter [" + stegType + "]" + "for behandlingId " + behandling.getId()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                    "Kan ikke angi steg [" + tidligereStegType + "] som er etter [" + stegType + "]" + "for behandlingId " + behandling.getId());
         }
         if (tidligereStegType.equals(stegType) && (behandling.getBehandlingStegStatus() != null)
                 && behandling.getBehandlingStegStatus().erVedInngang()) {
@@ -689,7 +689,7 @@ public class BehandlingskontrollTjeneste {
         // Oppdater behandling og lagre
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, revidertStegType, behandlingStegStatus, sluttStatusForAndreÅpneSteg);
         var skriveLås = behandlingRepository.taSkriveLås(behandling);
-        var kontekst = new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), skriveLås);
+        var kontekst = new BehandlingskontrollKontekst(behandling.getSaksnummer(), behandling.getFagsakId(), skriveLås);
         behandlingRepository.lagre(behandling, skriveLås);
 
         // Publiser oppdatering
@@ -700,7 +700,7 @@ public class BehandlingskontrollTjeneste {
     }
 
     protected Behandling hentBehandling(BehandlingskontrollKontekst kontekst) {
-        Objects.requireNonNull(kontekst, "kontekst"); //$NON-NLS-1$
+        Objects.requireNonNull(kontekst, "kontekst");
         var behandlingId = kontekst.getBehandlingId();
         return serviceProvider.hentBehandling(behandlingId);
     }
