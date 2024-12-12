@@ -31,6 +31,8 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.Valid;
@@ -44,6 +46,7 @@ import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Context;
 
 import org.junit.jupiter.api.AfterAll;
@@ -86,8 +89,8 @@ class RestApiInputValideringDtoTest extends RestApiTester {
         validerRekursivt(validerteKlasser, dto, null);
     }
 
-    private static final Set<Class<? extends Object>> ALLOWED_ENUM_ANNOTATIONS = Set.of(JsonProperty.class, JsonValue.class, JsonIgnore.class,
-            Valid.class, Null.class, NotNull.class);
+    private static final Set<Class<? extends Object>> ALLOWED_ENUM_ANNOTATIONS = Set.of(JsonAlias.class, JsonProperty.class, JsonValue.class, JsonIgnore.class,
+            Valid.class, Null.class, NotNull.class, PathParam.class);
 
     @SuppressWarnings("rawtypes")
     private static final Map<Class, List<List<Class<? extends Annotation>>>> UNNTATT_FRA_VALIDERING = new HashMap<Class, List<List<Class<? extends Annotation>>>>() {

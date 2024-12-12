@@ -6,10 +6,10 @@ import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import javax.sql.DataSource;
 
+import no.nav.vedtak.server.LiveAndReadinessAware;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import no.nav.vedtak.log.metrics.LiveAndReadinessAware;
 
 @ApplicationScoped
 public class DatabaseHealthCheck implements LiveAndReadinessAware {
