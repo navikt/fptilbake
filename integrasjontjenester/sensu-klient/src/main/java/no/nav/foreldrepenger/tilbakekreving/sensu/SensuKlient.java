@@ -14,13 +14,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import no.nav.vedtak.server.Controllable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.vedtak.log.mdc.MDCOperations;
-import no.nav.vedtak.log.metrics.Controllable;
 
 @ApplicationScoped
 public class SensuKlient implements Controllable {

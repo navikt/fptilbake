@@ -15,7 +15,7 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.vedtak.log.metrics.Controllable;
+import no.nav.vedtak.server.Controllable;
 
 @ApplicationScoped
 public class ApplicationServiceStarter {

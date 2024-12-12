@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer;
 
+import no.nav.vedtak.server.Controllable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +13,6 @@ import jakarta.jms.Message;
 import jakarta.jms.TextMessage;
 import no.nav.foreldrepenger.felles.jms.QueueConsumer;
 import no.nav.foreldrepenger.felles.jms.precond.PreconditionChecker;
-import no.nav.vedtak.log.metrics.Controllable;
 
 
 @ApplicationScoped

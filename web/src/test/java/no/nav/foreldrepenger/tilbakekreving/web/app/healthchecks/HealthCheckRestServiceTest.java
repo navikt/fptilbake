@@ -8,17 +8,15 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.ApplicationServiceStarter;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import no.nav.foreldrepenger.tilbakekreving.web.app.healthchecks.HealthCheckRestService;
-import no.nav.vedtak.log.metrics.LivenessAware;
-import no.nav.vedtak.log.metrics.ReadinessAware;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.ApplicationServiceStarter;
+import no.nav.vedtak.server.LivenessAware;
+import no.nav.vedtak.server.ReadinessAware;
 
 @ExtendWith(MockitoExtension.class)
 class HealthCheckRestServiceTest {
