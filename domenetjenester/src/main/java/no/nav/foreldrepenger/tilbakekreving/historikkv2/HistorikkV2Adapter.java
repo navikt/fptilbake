@@ -27,7 +27,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagTotrinnsvurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
-import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagDokumentLinkDto;
 
 public class HistorikkV2Adapter {
 

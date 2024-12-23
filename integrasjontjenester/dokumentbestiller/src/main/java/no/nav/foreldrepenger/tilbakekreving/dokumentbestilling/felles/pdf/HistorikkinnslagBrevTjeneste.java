@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 
+import java.util.List;
 import java.util.Objects;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -8,38 +9,49 @@ import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 
 @ApplicationScoped
 public class HistorikkinnslagBrevTjeneste {
 
     private BehandlingRepository behandlingRepository;
-    private HistorikkinnslagTjeneste historikkinnslagTjeneste;
+    private HistorikkinnslagRepository historikkRepository;
 
     public HistorikkinnslagBrevTjeneste() {
         //for CDI proxy
     }
 
     @Inject
-    public HistorikkinnslagBrevTjeneste(HistorikkinnslagTjeneste historikkinnslagTjeneste, BehandlingRepository behandlingRepository) {
-        this.historikkinnslagTjeneste = historikkinnslagTjeneste;
+    public HistorikkinnslagBrevTjeneste(HistorikkinnslagRepository historikkRepository, BehandlingRepository behandlingRepository) {
+        this.historikkRepository = historikkRepository;
         this.behandlingRepository = behandlingRepository;
     }
 
     public void opprettHistorikkinnslagBrevSendt(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse, DetaljertBrevType detaljertBrevType, BrevMottaker brevMottaker, String tittel) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        String historikkinnslagTittel = finnHistorikkinnslagTittel(detaljertBrevType, brevMottaker, tittel);
-        opprettHistorikkinnslag(behandling, dokumentreferanse, historikkinnslagTittel);
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
+        var historikkinnslagTittel = finnHistorikkinnslagTittel(detaljertBrevType, brevMottaker, tittel);
+        var historikkinnslag = opprettHistorikkinnslag2ForBrevsending(behandling, dokumentreferanse, historikkinnslagTittel);
+        historikkRepository.lagre(historikkinnslag);
     }
 
-    private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse, String tittel) {
-        historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(
-                behandling,
-                dokumentreferanse.getJournalpostId(),
-                dokumentreferanse.getDokumentId(),
-                tittel);
+    private static Historikkinnslag opprettHistorikkinnslag2ForBrevsending(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse, String tittel) {
+        var doklink = new HistorikkinnslagDokumentLink.Builder()
+            .medLinkTekst(tittel)
+            .medDokumentId(dokumentreferanse.getDokumentId())
+            .medJournalpostId(dokumentreferanse.getJournalpostId())
+            .build();
+        return new Historikkinnslag.Builder()
+            .medAktør(HistorikkAktør.VEDTAKSLØSNINGEN)
+            .medFagsakId(behandling.getFagsakId())
+            .medBehandlingId(behandling.getId())
+            .medTittel("Brev er sendt")
+            .medDokumenter(List.of(doklink))
+            .build();
     }
 
     private String finnHistorikkinnslagTittel(DetaljertBrevType detaljertBrevType, BrevMottaker brevMottaker, String tittel) {
@@ -49,7 +61,6 @@ public class HistorikkinnslagBrevTjeneste {
         return switch (brevMottaker) {
             case BRUKER -> finnHistorikkinnslagTittelBrevTilBruker(detaljertBrevType);
             case VERGE -> finnHistorikkinnslagTittelBrevTilVerge(detaljertBrevType);
-            default -> throw new IllegalArgumentException("Ikke-støttet mottaker: " + brevMottaker);
         };
     }
 
