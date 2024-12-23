@@ -64,7 +64,7 @@ class FordelRestTjenesteTest {
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto("10000", JOURNAL_POST_ID, FORSENDELSE_ID,
                 UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
-        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SØKER);
+        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId, behandling.getFagsakId(), HistorikkAktør.SØKER);
     }
 
     @Test
@@ -73,7 +73,7 @@ class FordelRestTjenesteTest {
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
                 "XYZS", LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
-        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SØKER);
+        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId, behandling.getFagsakId(), HistorikkAktør.SØKER);
     }
 
     @Test
@@ -85,7 +85,7 @@ class FordelRestTjenesteTest {
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
                 UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
-        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SØKER);
+        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId, behandling.getFagsakId(), HistorikkAktør.SØKER);
     }
 
     @Test
@@ -97,7 +97,7 @@ class FordelRestTjenesteTest {
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
                 UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
-        verify(mockGjenopptaBehandlingTjeneste, atLeastOnce()).fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SØKER);
+        verify(mockGjenopptaBehandlingTjeneste, atLeastOnce()).fortsettBehandlingManuelt(behandlingId, behandling.getFagsakId(), HistorikkAktør.SØKER);
         assertThat(varselresponsTjeneste.hentRespons(behandlingId)).isPresent();
     }
 

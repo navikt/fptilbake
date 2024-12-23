@@ -42,7 +42,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.exception.FunksjonellException;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -60,12 +59,8 @@ class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
     @BeforeEach
     void setUp() {
         entityManager.setFlushMode(FlushModeType.AUTO);
-
         brevSporingRepository = repoProvider.getBrevSporingRepository();
-
-        HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository);
-        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, taskTjeneste,
-                behandlingskontrollTjeneste, historikkinnslagTjeneste);
+        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, taskTjeneste, behandlingskontrollTjeneste);
     }
 
     @Test

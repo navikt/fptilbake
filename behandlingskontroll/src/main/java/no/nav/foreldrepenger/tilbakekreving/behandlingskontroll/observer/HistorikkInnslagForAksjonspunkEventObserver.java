@@ -15,8 +15,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag2;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.vedtak.sikkerhet.kontekst.IdentType;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
@@ -28,7 +30,7 @@ import no.nav.vedtak.sikkerhet.kontekst.SikkerhetContext;
 @ApplicationScoped
 public class HistorikkInnslagForAksjonspunkEventObserver {
 
-    private HistorikkRepository historikkRepository;
+    private HistorikkRepositoryTeamAware historikkRepository;
     private BehandlingRepository behandlingRepository;
 
     private HistorikkInnslagForAksjonspunkEventObserver() {
@@ -36,7 +38,7 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
     }
 
     @Inject
-    public HistorikkInnslagForAksjonspunkEventObserver(HistorikkRepository historikkRepository, BehandlingRepository behandlingRepository) {
+    public HistorikkInnslagForAksjonspunkEventObserver(HistorikkRepositoryTeamAware historikkRepository, BehandlingRepository behandlingRepository) {
         this.historikkRepository = historikkRepository;
         this.behandlingRepository = behandlingRepository;
     }
@@ -48,7 +50,7 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
                 LocalDateTime frist = aksjonspunkt.getFristTid();
                 Venteårsak venteårsak = aksjonspunkt.getVenteårsak();
                 opprettHistorikkinnslagForVenteFristRelaterteInnslag(ktx.getBehandlingId(), ktx.getFagsakId(),
-                        HistorikkinnslagType.BEH_VENT, frist, venteårsak);
+                        "Behandling på vent", HistorikkinnslagType.BEH_VENT, frist, venteårsak);
             }
         }
     }
@@ -62,8 +64,8 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
                 var manueltTattAvVent = Optional.ofNullable(behandlingRepository.hentBehandling(ktx.getBehandlingId()))
                     .map(Behandling::getAnsvarligSaksbehandler).isPresent();
                 if (!manueltTattAvVent) {
-                    opprettHistorikkinnslagForVenteFristRelaterteInnslag(ktx.getBehandlingId(), ktx.getFagsakId(), HistorikkinnslagType.BEH_GJEN,
-                        null, null);
+                    opprettHistorikkinnslagForVenteFristRelaterteInnslag(ktx.getBehandlingId(), ktx.getFagsakId(),
+                        "Behandling gjenopptatt", HistorikkinnslagType.BEH_GJEN, null, null);
                 }
             }
         }
@@ -71,9 +73,44 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
 
     private void opprettHistorikkinnslagForVenteFristRelaterteInnslag(Long behandlingId,
                                                                       Long fagsakId,
+                                                                      String tittel,
                                                                       HistorikkinnslagType historikkinnslagType,
                                                                       LocalDateTime frist,
                                                                       Venteårsak venteårsak) {
+        var historikkinnslag = lagHistorikkinnslag(behandlingId, fagsakId, historikkinnslagType, frist, venteårsak);
+        var historikkinnslag2 = lagHistorikkinnslag2(behandlingId, fagsakId, tittel, frist, venteårsak);
+        historikkRepository.lagre(historikkinnslag, historikkinnslag2);
+    }
+
+    private static Historikkinnslag2 lagHistorikkinnslag2(Long behandlingId,
+                                                          Long fagsakId,
+                                                          String tittel,
+                                                          LocalDateTime fristTid,
+                                                          Venteårsak venteårsak) {
+        var historikkinnslagBuilder = new Historikkinnslag2.Builder();
+        if (fristTid != null) {
+            historikkinnslagBuilder.medTittel(tittel + " " + HistorikkinnslagLinjeBuilder.format(fristTid.toLocalDate()));
+        } else {
+            historikkinnslagBuilder.medTittel(tittel);
+        }
+        if (venteårsak != null) {
+            historikkinnslagBuilder.addLinje(venteårsak.getNavn());
+        }
+        var erSystemBruker = SikkerhetContext.SYSTEM.equals(KontekstHolder.getKontekst().getContext()) ||
+            Optional.ofNullable(KontekstHolder.getKontekst().getIdentType()).filter(IdentType::erSystem).isPresent() ||
+            Optional.ofNullable(KontekstHolder.getKontekst().getUid()).map(String::toLowerCase).filter(s -> s.startsWith("srv")).isPresent();
+        historikkinnslagBuilder
+            .medAktør(erSystemBruker ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER)
+            .medBehandlingId(behandlingId)
+            .medFagsakId(fagsakId);
+        return historikkinnslagBuilder.build();
+    }
+
+    private static Historikkinnslag lagHistorikkinnslag(Long behandlingId,
+                                                        Long fagsakId,
+                                                        HistorikkinnslagType historikkinnslagType,
+                                                        LocalDateTime frist,
+                                                        Venteårsak venteårsak) {
         HistorikkInnslagTekstBuilder builder = new HistorikkInnslagTekstBuilder();
         if (frist != null) {
             builder.medHendelse(historikkinnslagType, frist.toLocalDate());
@@ -92,6 +129,6 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
         historikkinnslag.setBehandlingId(behandlingId);
         historikkinnslag.setFagsakId(fagsakId);
         builder.build(historikkinnslag);
-        historikkRepository.lagre(historikkinnslag);
+        return historikkinnslag;
     }
 }

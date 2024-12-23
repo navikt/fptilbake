@@ -9,6 +9,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
@@ -37,7 +39,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandli
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 /**
@@ -97,7 +98,7 @@ public abstract class FellesTestOppsett {
         revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider, behandlingskontrollTjeneste);
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollProvider,
-                fagsakTjeneste, mock(HistorikkinnslagTjeneste.class), mockFagsystemKlient);
+                fagsakTjeneste, mock(BehandlingHistorikkTjeneste.class), mockFagsystemKlient);
         testUtility = new TestUtility(behandlingTjeneste);
         aktørId = testUtility.genererAktørId();
         when(mockTpsTjeneste.hentBrukerForAktør(any(), eq(aktørId))).thenReturn(testUtility.lagPersonInfo(aktørId));

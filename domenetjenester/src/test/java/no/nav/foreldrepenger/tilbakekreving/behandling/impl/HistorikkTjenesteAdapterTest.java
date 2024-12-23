@@ -3,7 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
-import java.util.List;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +13,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermle
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkBegrunnelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDelDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDto;
@@ -22,12 +22,21 @@ class HistorikkTjenesteAdapterTest extends FellesTestOppsett {
 
     @Test
     void opprettHistorikkInnslag() {
-        HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
-        tekstBuilder.medSkjermlenke(SkjermlenkeType.UDEFINERT).medBegrunnelse(HistorikkBegrunnelseType.SAKSBEH_START_PA_NYTT)
-                .medHendelse(HistorikkinnslagType.FAKTA_ENDRET, internBehandlingId)
-                .medEndretFelt(HistorikkEndretFeltType.BEHANDLING, "behandling", 1, 2);
-        historikkTjenesteAdapter.opprettHistorikkInnslag(behandling, HistorikkinnslagType.FAKTA_ENDRET);
-        List<HistorikkinnslagDto> historikkinnslager = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(saksnummer, URI.create("http://dummy/dummy"));
+        var tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
+        tekstBuilder
+            .medSkjermlenke(SkjermlenkeType.UDEFINERT)
+            .medBegrunnelse(HistorikkBegrunnelseType.SAKSBEH_START_PA_NYTT)
+            .medHendelse(HistorikkinnslagType.FAKTA_ENDRET, internBehandlingId)
+            .medEndretFelt(HistorikkEndretFeltType.BEHANDLING, "behandling", 1, 2);
+        var innslag = new Historikkinnslag();
+        innslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
+        innslag.setType(HistorikkinnslagType.FAKTA_ENDRET);
+        innslag.setBehandlingId(behandling.getId());
+        tekstBuilder.build(innslag);
+
+        historikkTjenesteAdapter.lagInnslag(innslag);
+
+        var historikkinnslager = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(saksnummer, URI.create("http://dummy/dummy"));
         assertThat(historikkinnslager).isNotEmpty();
         assertThat(historikkinnslager.size()).isEqualTo(1);
         HistorikkinnslagDto historikkinnslagDto = historikkinnslager.get(0);

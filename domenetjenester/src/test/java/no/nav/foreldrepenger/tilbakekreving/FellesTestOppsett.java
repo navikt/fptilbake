@@ -12,6 +12,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
+
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurderForeldelseHistorikkTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag2Repository;
+import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Adapter;
+
+import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
@@ -71,7 +81,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 /**
@@ -97,7 +106,6 @@ public abstract class FellesTestOppsett {
     protected GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingMedGrunnlagTjeneste.class);
     protected BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste = mock(BehandlingskontrollAsynkTjeneste.class);
     protected PersoninfoAdapter mockTpsTjeneste = mock(PersoninfoAdapter.class);
-    protected HistorikkinnslagTjeneste mockHistorikkTjeneste = mock(HistorikkinnslagTjeneste.class);
     protected FagsystemKlient mockFagsystemKlient = mock(FagsystemKlient.class);
     protected SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
 
@@ -107,6 +115,8 @@ public abstract class FellesTestOppsett {
     protected NavBrukerRepository brukerRepository;
     protected KravgrunnlagRepository grunnlagRepository;
     protected HistorikkRepository historikkRepository;
+    protected Historikkinnslag2Repository historikkinnslag2Repository;
+    protected HistorikkRepositoryTeamAware historikkRepositoryTeamAware;
     protected FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     protected VurdertForeldelseRepository vurdertForeldelseRepository;
     protected VilkårsvurderingRepository vilkårsvurderingRepository;
@@ -117,6 +127,7 @@ public abstract class FellesTestOppsett {
     protected KravgrunnlagTjeneste kravgrunnlagTjeneste;
     protected KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste;
 
+    protected HistorikkV2Tjeneste historikkV2Tjeneste;
     protected HistorikkInnslagKonverter historikkInnslagKonverter;
 
     protected HistorikkTjenesteAdapter historikkTjenesteAdapter;
@@ -158,6 +169,8 @@ public abstract class FellesTestOppsett {
         brukerRepository = new NavBrukerRepository(entityManager);
         grunnlagRepository = repoProvider.getGrunnlagRepository();
         historikkRepository = repoProvider.getHistorikkRepository();
+        historikkinnslag2Repository = repoProvider.getHistorikkinnslag2Repository();
+        historikkRepositoryTeamAware = repoProvider.getHistorikkRepositoryTeamAware();
         faktaFeilutbetalingRepository = repoProvider.getFaktaFeilutbetalingRepository();
         vurdertForeldelseRepository = repoProvider.getVurdertForeldelseRepository();
         vilkårsvurderingRepository = new VilkårsvurderingRepository(entityManager);
@@ -166,19 +179,20 @@ public abstract class FellesTestOppsett {
         varselRepository = repoProvider.getVarselRepository();
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         var halvtGebyrTjeneste = new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, varselRepository);
-        kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste,
-            mockSlettGrunnlagEventPubliserer, halvtGebyrTjeneste);
+        kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer, halvtGebyrTjeneste);
         kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(grunnlagRepository);
         historikkInnslagKonverter = new HistorikkInnslagKonverter(behandlingRepository);
+        historikkV2Tjeneste = new HistorikkV2Tjeneste(historikkRepository, behandlingRepository, historikkinnslag2Repository);
         historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);
-        vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repoProvider, historikkTjenesteAdapter, kravgrunnlagBeregningTjeneste);
+        var vurderForeldelseHistorikkTjeneste = new VurderForeldelseHistorikkTjeneste(historikkRepositoryTeamAware);
+        vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repoProvider, vurderForeldelseHistorikkTjeneste, kravgrunnlagBeregningTjeneste);
         vilkårsvurderingHistorikkInnslagTjeneste = new VilkårsvurderingHistorikkInnslagTjeneste(historikkTjenesteAdapter, repoProvider);
         vilkårsvurderingTjeneste = new VilkårsvurderingTjeneste(vurdertForeldelseTjeneste, repoProvider, vilkårsvurderingHistorikkInnslagTjeneste, kravgrunnlagBeregningTjeneste);
         revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider, behandlingskontrollTjeneste);
         faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repoProvider, kravgrunnlagTjeneste, mockFagsystemKlient);
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollProvider,
-                fagsakTjeneste, mockHistorikkTjeneste, mockFagsystemKlient);
+                fagsakTjeneste, new BehandlingHistorikkTjeneste(historikkRepositoryTeamAware, historikkV2Tjeneste), mockFagsystemKlient);
         testUtility = new TestUtility(behandlingTjeneste);
         aktørId = testUtility.genererAktørId();
         when(mockTpsTjeneste.hentBrukerForAktør(any(), eq(aktørId))).thenReturn(testUtility.lagPersonInfo(aktørId));

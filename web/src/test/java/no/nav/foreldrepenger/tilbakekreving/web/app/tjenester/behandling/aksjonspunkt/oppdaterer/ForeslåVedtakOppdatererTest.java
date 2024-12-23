@@ -11,6 +11,8 @@ import java.util.Optional;
 
 import jakarta.persistence.EntityManager;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,13 +39,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.ForeslåVedtakDto;
 
 @ExtendWith(JpaExtension.class)
@@ -66,8 +66,8 @@ class ForeslåVedtakOppdatererTest {
         var behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(svcProvider);
         vedtaksbrevFritekstRepository = new VedtaksbrevFritekstRepository(entityManager);
         BeregningsresultatTjeneste beregningsresultatTjenesteMock = mock(BeregningsresultatTjeneste.class);
-        HistorikkTjenesteAdapter historikkTjenesteAdapterMock = mock(HistorikkTjenesteAdapter.class);
-        ForeslåVedtakTjeneste foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningsresultatTjenesteMock, historikkTjenesteAdapterMock);
+        HistorikkRepositoryTeamAware historikkRepositoryTeamAware = mock(HistorikkRepositoryTeamAware.class);
+        ForeslåVedtakTjeneste foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningsresultatTjenesteMock, historikkRepositoryTeamAware);
         TotrinnTjeneste totrinnTjenesteMock = mock(TotrinnTjeneste.class);
         VilkårsvurderingRepository vilkårsvurderingRepository = mock(VilkårsvurderingRepository.class);
         FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = mock(FaktaFeilutbetalingRepository.class);
@@ -75,7 +75,6 @@ class ForeslåVedtakOppdatererTest {
         VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste = new VedtaksbrevFritekstTjeneste(vedtaksbrevFritekstValidator, vedtaksbrevFritekstRepository);
         foreslåVedtakOppdaterer = new ForeslåVedtakOppdaterer(foreslåVedtakTjeneste, totrinnTjenesteMock, behandlingskontrollTjeneste, vedtaksbrevFritekstTjeneste);
 
-        when(historikkTjenesteAdapterMock.tekstBuilder()).thenReturn(new HistorikkInnslagTekstBuilder());
         when(beregningsresultatTjenesteMock.finnEllerBeregn(anyLong())).thenReturn(new BeregningResultat(VedtakResultatType.FULL_TILBAKEBETALING, List.of()));
         when(faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(anyLong())).thenReturn(Optional.of(new FaktaFeilutbetaling()));
     }

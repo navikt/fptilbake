@@ -18,8 +18,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag2;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 
 @ApplicationScoped
@@ -29,7 +30,7 @@ public class VergeTjeneste {
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private BehandlingRepository behandlingRepository;
     private VergeRepository vergeRepository;
-    private HistorikkRepository historikkRepository;
+    private HistorikkRepositoryTeamAware historikkRepository;
 
     VergeTjeneste() {
         // for CDI-proxy
@@ -43,7 +44,7 @@ public class VergeTjeneste {
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollAsynkTjeneste;
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.vergeRepository = repositoryProvider.getVergeRepository();
-        this.historikkRepository = repositoryProvider.getHistorikkRepository();
+        this.historikkRepository = repositoryProvider.getHistorikkRepositoryTeamAware();
     }
 
     public void opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(Behandling behandling) {
@@ -68,6 +69,21 @@ public class VergeTjeneste {
     }
 
     private void opprettHistorikkinnslagForFjernetVerge(Behandling behandling) {
+        var historikkinnslag = lagHistorikkinnslag(behandling);
+        var historikkinnslag2 = lagHistorikkinnslag2(behandling);
+        historikkRepository.lagre(historikkinnslag, historikkinnslag2);
+    }
+
+    private static Historikkinnslag2 lagHistorikkinnslag2(Behandling behandling) {
+        return new Historikkinnslag2.Builder()
+            .medAktør(HistorikkAktør.SAKSBEHANDLER)
+            .medFagsakId(behandling.getFagsakId())
+            .medBehandlingId(behandling.getId())
+            .medTittel("Opplysninger om verge/fullmektig fjernet")
+            .build();
+    }
+
+    private static Historikkinnslag lagHistorikkinnslag(Behandling behandling) {
         HistorikkInnslagTekstBuilder historikkInnslagTekstBuilder = new HistorikkInnslagTekstBuilder()
                 .medHendelse(HistorikkinnslagType.FJERNET_VERGE);
         Historikkinnslag historikkinnslag = new Historikkinnslag();
@@ -75,6 +91,6 @@ public class VergeTjeneste {
         historikkinnslag.setType(HistorikkinnslagType.FJERNET_VERGE);
         historikkinnslag.setBehandling(behandling);
         historikkInnslagTekstBuilder.build(historikkinnslag);
-        historikkRepository.lagre(historikkinnslag);
+        return historikkinnslag;
     }
 }

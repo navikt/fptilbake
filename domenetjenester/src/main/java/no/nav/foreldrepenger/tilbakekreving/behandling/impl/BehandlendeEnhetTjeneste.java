@@ -13,14 +13,17 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag2;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.fraTilEquals;
 
 @ApplicationScoped
 public class BehandlendeEnhetTjeneste {
 
-    private HistorikkRepository historikkRepository;
+    private HistorikkRepositoryTeamAware historikkRepository;
     private BehandlingRepository behandlingRepository;
 
     private BehandlingEventPubliserer eventPubliserer;
@@ -32,7 +35,7 @@ public class BehandlendeEnhetTjeneste {
     @Inject
     public BehandlendeEnhetTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                     BehandlingEventPubliserer eventPubliserer) {
-        this.historikkRepository = repositoryProvider.getHistorikkRepository();
+        this.historikkRepository = repositoryProvider.getHistorikkRepositoryTeamAware();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eventPubliserer = eventPubliserer;
     }
@@ -48,6 +51,24 @@ public class BehandlendeEnhetTjeneste {
     }
 
     private void lagHistorikkInnslagForByttBehandlendeEnhet(Behandling behandling, OrganisasjonsEnhet nyEnhet, HistorikkAktør aktør) {
+        var historikkinnslag = lagHistorikkinnslag(behandling, nyEnhet, aktør);
+        var historikkinnslag2 = lagHistorikkinnslag2(behandling, nyEnhet, aktør);
+        historikkRepository.lagre(historikkinnslag, historikkinnslag2);
+    }
+
+    private static Historikkinnslag2 lagHistorikkinnslag2(Behandling behandling, OrganisasjonsEnhet nyEnhet, HistorikkAktør aktør) {
+        var eksisterende = behandling.getBehandlendeOrganisasjonsEnhet();
+        var fraMessage = eksisterende != null ? eksisterende.getEnhetId() + " " + eksisterende.getEnhetId() : "ukjent";
+        return new Historikkinnslag2.Builder()
+            .medAktør(aktør)
+            .medBehandlingId(behandling.getId())
+            .medFagsakId(behandling.getFagsakId())
+            .medTittel("Bytt enhet")
+            .addLinje(fraTilEquals("Behandlende enhet", fraMessage, nyEnhet.getEnhetId() + " " + nyEnhet.getEnhetNavn()))
+            .build();
+    }
+
+    private static Historikkinnslag lagHistorikkinnslag(Behandling behandling, OrganisasjonsEnhet nyEnhet, HistorikkAktør aktør) {
         OrganisasjonsEnhet eksisterende = behandling.getBehandlendeOrganisasjonsEnhet();
         String fraMessage = eksisterende != null ? eksisterende.getEnhetId() + " " + eksisterende.getEnhetNavn() : "ukjent";
         HistorikkInnslagTekstBuilder builder = new HistorikkInnslagTekstBuilder()
@@ -61,6 +82,6 @@ public class BehandlendeEnhetTjeneste {
         innslag.setType(HistorikkinnslagType.BYTT_ENHET);
         innslag.setBehandlingId(behandling.getId());
         builder.build(innslag);
-        historikkRepository.lagre(innslag);
+        return innslag;
     }
 }

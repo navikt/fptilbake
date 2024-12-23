@@ -7,6 +7,10 @@ import java.util.Set;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag2;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +27,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -40,7 +43,7 @@ public class GjenopptaBehandlingTjeneste {
     private BehandlingKandidaterRepository behandlingKandidaterRepository;
     private BehandlingVenterRepository behandlingVenterRepository;
     private KravgrunnlagRepository grunnlagRepository;
-    private HistorikkRepository historikkRepository;
+    private HistorikkRepositoryTeamAware historikkRepository;
     private BehandlingRepository behandlingRepository;
 
     public GjenopptaBehandlingTjeneste() {
@@ -56,7 +59,7 @@ public class GjenopptaBehandlingTjeneste {
         this.behandlingKandidaterRepository = behandlingKandidaterRepository;
         this.behandlingVenterRepository = behandlingVenterRepository;
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        this.historikkRepository = repositoryProvider.getHistorikkRepository();
+        this.historikkRepository = repositoryProvider.getHistorikkRepositoryTeamAware();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
     }
 
@@ -98,7 +101,7 @@ public class GjenopptaBehandlingTjeneste {
     /**
      * Fortsetter behandling manuelt
      */
-    public Optional<String> fortsettBehandlingManuelt(long behandlingId, HistorikkAktør historikkAktør) {
+    public Optional<String> fortsettBehandlingManuelt(long behandlingId, Long fagsakId, HistorikkAktør historikkAktør) {
         var behandling = behandlingRepository.hentBehandling(behandlingId);
         if (behandling.erAvsluttet()) {
             throw new IllegalArgumentException("Kan ikke fortsette avsluttet behandling");
@@ -108,7 +111,7 @@ public class GjenopptaBehandlingTjeneste {
             || (!Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(behandling.getVenteårsak()) && kanGjenopptaSteg(behandlingId));
         if (kanGjenopptaBehandling) {
             var gruppe = opprettFortsettBehandlingTask(behandling, hentCallId());
-            opprettHistorikkInnslagForManueltGjenopptaBehandling(behandlingId, historikkAktør);
+            opprettHistorikkInnslagForManueltGjenopptaBehandling(behandlingId, fagsakId, historikkAktør);
             return Optional.ofNullable(gruppe);
         }
         return Optional.empty();
@@ -191,15 +194,29 @@ public class GjenopptaBehandlingTjeneste {
         return taskTjeneste.lagre(prosessTaskData);
     }
 
-    private void opprettHistorikkInnslagForManueltGjenopptaBehandling(long behandlingId, HistorikkAktør historikkAktør) {
-        Historikkinnslag historikkinnslag = new Historikkinnslag();
+    private void opprettHistorikkInnslagForManueltGjenopptaBehandling(long behandlingId, Long fagsakId, HistorikkAktør historikkAktør) {
+        var historikkinnslag = lagHistorikkinnslag(behandlingId, historikkAktør);
+        var historikkinnslag2 = lagHistorikkinnslag2(behandlingId, fagsakId, historikkAktør);
+        historikkRepository.lagre(historikkinnslag, historikkinnslag2);
+    }
+
+    private static Historikkinnslag lagHistorikkinnslag(long behandlingId, HistorikkAktør historikkAktør) {
+        var historikkinnslag = new Historikkinnslag();
         historikkinnslag.setAktør(historikkAktør);
         historikkinnslag.setType(HistorikkinnslagType.BEH_MAN_GJEN);
         historikkinnslag.setBehandlingId(behandlingId);
-
-        HistorikkInnslagTekstBuilder builder = new HistorikkInnslagTekstBuilder();
+        var builder = new HistorikkInnslagTekstBuilder();
         builder.medHendelse(HistorikkinnslagType.BEH_MAN_GJEN).build(historikkinnslag);
-        historikkRepository.lagre(historikkinnslag);
+        return historikkinnslag;
+    }
+
+    private static Historikkinnslag2 lagHistorikkinnslag2(long behandlingId, Long fagsakId, HistorikkAktør historikkAktør) {
+        return new Historikkinnslag2.Builder()
+            .medAktør(historikkAktør)
+            .medFagsakId(fagsakId)
+            .medBehandlingId(behandlingId)
+            .medTittel("Gjenoppta behandling")
+            .build();
     }
 
 }

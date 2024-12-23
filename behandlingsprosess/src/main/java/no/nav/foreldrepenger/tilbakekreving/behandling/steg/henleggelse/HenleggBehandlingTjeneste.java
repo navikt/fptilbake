@@ -18,10 +18,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag2;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.SendHenleggelsesbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
@@ -32,11 +35,11 @@ public class HenleggBehandlingTjeneste {
     private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
-    private ProsessTaskTjeneste taskTjeneste;
     private BrevSporingRepository brevSporingRepository;
+    private HistorikkRepositoryTeamAware historikkRepository;
 
+    private ProsessTaskTjeneste taskTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
-    private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
     private static final long OPPRETTELSE_DAGER_BEGRENSNING = 6L;
 
@@ -47,16 +50,15 @@ public class HenleggBehandlingTjeneste {
     @Inject
     public HenleggBehandlingTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                      ProsessTaskTjeneste taskTjeneste,
-                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste,
-                                     HistorikkinnslagTjeneste historikkinnslagTjeneste) {
+                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
+        this.historikkRepository = repositoryProvider.getHistorikkRepositoryTeamAware();
         this.taskTjeneste = taskTjeneste;
 
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
-        this.historikkinnslagTjeneste = historikkinnslagTjeneste;
     }
 
     public boolean kanHenleggeBehandlingManuelt(Behandling behandling) {
@@ -129,10 +131,34 @@ public class HenleggBehandlingTjeneste {
     }
 
     private void opprettHistorikkinnslag(Behandling behandling, BehandlingResultatType årsakKode, String begrunnelse) {
-        if (BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT.equals(årsakKode)) {
-            historikkinnslagTjeneste.opprettHistorikkinnslagForHenleggelse(behandling, HistorikkinnslagType.AVBRUTT_BEH, årsakKode, begrunnelse, HistorikkAktør.VEDTAKSLØSNINGEN);
-        } else {
-            historikkinnslagTjeneste.opprettHistorikkinnslagForHenleggelse(behandling, HistorikkinnslagType.AVBRUTT_BEH, årsakKode, begrunnelse, HistorikkAktør.SAKSBEHANDLER);
-        }
+        var aktør = BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT.equals(årsakKode) ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER;
+        var historikkinnslag = opprettHistorikkinnslagForHenleggelse(behandling, HistorikkinnslagType.AVBRUTT_BEH, årsakKode, begrunnelse, aktør);
+        var historikkinnslag2 = opprettHistorikkinnslag2ForHenleggelse(behandling, årsakKode, begrunnelse, aktør);
+        historikkRepository.lagre(historikkinnslag, historikkinnslag2);
+    }
+
+    public static Historikkinnslag2 opprettHistorikkinnslag2ForHenleggelse(Behandling behandling, BehandlingResultatType årsakKode, String begrunnelse, HistorikkAktør aktør) {
+        return new Historikkinnslag2.Builder()
+            .medAktør(aktør)
+            .medBehandlingId(behandling.getId())
+            .medFagsakId(behandling.getFagsakId())
+            .medTittel("Behandling er henlagt")
+            .addLinje(årsakKode.getNavn())
+            .addLinje(begrunnelse)
+            .build();
+    }
+
+    public static Historikkinnslag opprettHistorikkinnslagForHenleggelse(Behandling behandling, HistorikkinnslagType historikkinnslagType, BehandlingResultatType årsak, String begrunnelse, HistorikkAktør aktør) {
+        HistorikkInnslagTekstBuilder builder = new HistorikkInnslagTekstBuilder()
+            .medHendelse(historikkinnslagType)
+            .medÅrsak(årsak)
+            .medBegrunnelse(begrunnelse);
+        Historikkinnslag historikkinnslag = new Historikkinnslag();
+        historikkinnslag.setType(historikkinnslagType);
+        historikkinnslag.setBehandling(behandling);
+        builder.build(historikkinnslag);
+
+        historikkinnslag.setAktør(aktør);
+        return historikkinnslag;
     }
 }

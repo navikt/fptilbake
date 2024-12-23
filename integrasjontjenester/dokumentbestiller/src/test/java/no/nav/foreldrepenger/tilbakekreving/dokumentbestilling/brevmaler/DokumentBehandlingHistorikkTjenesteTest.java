@@ -1,13 +1,5 @@
-package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
+package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
@@ -16,37 +8,16 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 
-class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
+import org.junit.jupiter.api.Test;
 
-    private static final JournalpostId JOURNALPOST_ID = new JournalpostId("389426448");
-    private static final String DOKUMENT_ID = "417743491";
+import java.util.List;
 
-    private HistorikkinnslagTjeneste historikkinnslagTjeneste;
+import static org.assertj.core.api.Assertions.assertThat;
 
-    @BeforeEach
-    void setUp() {
-        historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository);
-    }
 
-    @Test
-    void skal_opprette_historikkinnslag_for_utsendt_brev() {
-        historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(behandling, JOURNALPOST_ID, DOKUMENT_ID, "Vedtaksbrev");
-
-        List<Historikkinnslag> historikkinnslagene = historikkRepository.hentHistorikk(behandling.getId());
-        assertThat(historikkinnslagene).isNotEmpty();
-
-        Historikkinnslag historikkinnslag = historikkinnslagene.get(0);
-        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
-        assertThat(historikkinnslag.getDokumentLinker()).isNotEmpty();
-        HistorikkinnslagDokumentLink historikkinnslagDokumentLink = historikkinnslag.getDokumentLinker().get(0);
-        assertThat(historikkinnslagDokumentLink.getJournalpostId()).isEqualTo(JOURNALPOST_ID);
-    }
+class DokumentBehandlingHistorikkTjenesteTest {
 
     @Test
     void opprettHistorikkinnslagForOpprettetTilbakekreving() {
@@ -78,5 +49,4 @@ class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.TBK_OPPR);
         assertThat(historikkinnslag.getDokumentLinker()).isEmpty();
     }
-
 }

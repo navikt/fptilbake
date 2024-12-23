@@ -103,13 +103,12 @@ class BehandlingRestTjenesteTest {
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjenesteMock = mock(BehandlingskontrollAsynkTjeneste.class);
     private BehandlendeEnhetTjeneste behandlendeEnhetTjenesteMock = mock(BehandlendeEnhetTjeneste.class);
     private VergeTjeneste vergeTjenesteMock = mock(VergeTjeneste.class);
-    private HistorikkTjenesteAdapter historikkTjenesteAdapter = mock(HistorikkTjenesteAdapter.class);
     private HistorikkV2Tjeneste historikkV2Tjeneste = mock(HistorikkV2Tjeneste.class);
 
     private BehandlingRestTjeneste behandlingRestTjeneste = new BehandlingRestTjeneste(behandlingTjenesteMock, gjenopptaBehandlingTjenesteMock,
         revurderingTjenesteMock, behandlendeEnhetTjenesteMock, behandlingDtoTjenesteMock, taskTjeneste, vergeTjenesteMock,
         mock(TotrinnTjeneste.class), mock(DokumentBehandlingTjeneste.class), henleggBehandlingTjenesteMock,
-        behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock, historikkTjenesteAdapter, historikkV2Tjeneste);
+        behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock, historikkV2Tjeneste);
 
     private static SaksnummerDto saksnummerDto = new SaksnummerDto(GYLDIG_SAKSNR);
     private static FpsakUuidDto fpsakUuidDto = new FpsakUuidDto(EKSTERN_BEHANDLING_UUID);

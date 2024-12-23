@@ -12,8 +12,12 @@ import java.util.TreeMap;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag2;
+
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +31,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -46,7 +49,7 @@ public class KravgrunnlagTjeneste {
 
     private KravgrunnlagRepository kravgrunnlagRepository;
     private BehandlingRepository behandlingRepository;
-    private HistorikkRepository historikkRepository;
+    private HistorikkRepositoryTeamAware historikkRepository;
     private GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste;
@@ -65,7 +68,7 @@ public class KravgrunnlagTjeneste {
                                 AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste) {
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.historikkRepository = repositoryProvider.getHistorikkRepository();
+        this.historikkRepository = repositoryProvider.getHistorikkRepositoryTeamAware();
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
         this.halvtRettsgebyrTjeneste = halvtRettsgebyrTjeneste;
@@ -173,6 +176,22 @@ public class KravgrunnlagTjeneste {
     }
 
     private void opprettHistorikkinnslagForBehandlingStartetForfra(Behandling behandling) {
+        var historikkinnslag = lagHistorikkinnslag(behandling);
+        var historikkinnslag2 = lagHistorikkinnslag2(behandling);
+        historikkRepository.lagre(historikkinnslag, historikkinnslag2);
+    }
+
+    private static Historikkinnslag2 lagHistorikkinnslag2(Behandling behandling) {
+        return new Historikkinnslag2.Builder()
+            .medAktør(HistorikkAktør.VEDTAKSLØSNINGEN)
+            .medBehandlingId(behandling.getId())
+            .medFagsakId(behandling.getFagsakId())
+            .medTittel("Behandling startet forfra")
+            .addLinje("Tilbakekreving startes forfra på grunn av endring i feilutbetalt beløp og/eller perioder")
+            .build();
+    }
+
+    private static Historikkinnslag lagHistorikkinnslag(Behandling behandling) {
         var historikkinnslag = new Historikkinnslag();
         historikkinnslag.setType(HistorikkinnslagType.BEH_STARTET_FORFRA);
         historikkinnslag.setAktør(HistorikkAktør.VEDTAKSLØSNINGEN);
@@ -181,6 +200,6 @@ public class KravgrunnlagTjeneste {
             .medBegrunnelse(BEGRUNNELSE_BEHANDLING_STARTET_FORFRA);
         historikkInnslagTekstBuilder.build(historikkinnslag);
         historikkinnslag.setBehandling(behandling);
-        historikkRepository.lagre(historikkinnslag);
+        return historikkinnslag;
     }
 }

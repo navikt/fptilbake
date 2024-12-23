@@ -22,7 +22,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentas
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.ManueltVarselBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.SendManueltVarselbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
@@ -34,9 +33,9 @@ public class DokumentBehandlingTjeneste {
     private BehandlingRepository behandlingRepository;
     private BrevSporingRepository brevSporingRepository;
     private KravgrunnlagRepository grunnlagRepository;
+    private DokumentBehandlingHistorikkTjeneste dokumentBehandlingHistorikkTjeneste;
     private ProsessTaskTjeneste taskTjeneste;
 
-    private HistorikkinnslagTjeneste historikkinnslagTjeneste;
     private ManueltVarselBrevTjeneste manueltVarselBrevTjeneste;
     private InnhentDokumentasjonbrevTjeneste innhentDokumentasjonBrevTjeneste;
 
@@ -48,14 +47,14 @@ public class DokumentBehandlingTjeneste {
     @Inject
     public DokumentBehandlingTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                       ProsessTaskTjeneste taskTjeneste,
-                                      HistorikkinnslagTjeneste historikkinnslagTjeneste,
                                       ManueltVarselBrevTjeneste manueltVarselBrevTjeneste,
+                                      DokumentBehandlingHistorikkTjeneste dokumentBehandlingHistorikkTjeneste,
                                       InnhentDokumentasjonbrevTjeneste innhentDokumentasjonBrevTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
+        this.dokumentBehandlingHistorikkTjeneste = dokumentBehandlingHistorikkTjeneste;
         this.taskTjeneste = taskTjeneste;
-        this.historikkinnslagTjeneste = historikkinnslagTjeneste;
         this.manueltVarselBrevTjeneste = manueltVarselBrevTjeneste;
         this.innhentDokumentasjonBrevTjeneste = innhentDokumentasjonBrevTjeneste;
     }
@@ -79,8 +78,9 @@ public class DokumentBehandlingTjeneste {
             LOG.info("Bestiller dokument type {}", malType.getKode());
             håndteresInnhentDokumentasjon(behandling, fritekst);
         }
-        historikkinnslagTjeneste.opprettHistorikkinnslagForBrevBestilt(behandling, malType);
+        dokumentBehandlingHistorikkTjeneste.opprettHistorikkinnslagForBrevBestilt(malType, behandling);
     }
+
 
     public byte[] forhåndsvisBrev(Long behandlingId, DokumentMalType malType, String fritekst) {
         var dokument = new byte[0];

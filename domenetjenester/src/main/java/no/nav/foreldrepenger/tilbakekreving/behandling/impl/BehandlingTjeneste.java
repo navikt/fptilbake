@@ -47,7 +47,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandli
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VergeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 @ApplicationScoped
@@ -64,7 +63,7 @@ public class BehandlingTjeneste {
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private FagsakTjeneste fagsakTjeneste;
-    private HistorikkinnslagTjeneste historikkinnslagTjeneste;
+    private BehandlingHistorikkTjeneste behandlingHistorikkTjeneste;
     private FagsystemKlient fagsystemKlient;
 
 
@@ -76,12 +75,12 @@ public class BehandlingTjeneste {
     public BehandlingTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
                               BehandlingskontrollProvider behandlingskontrollProvider,
                               FagsakTjeneste fagsakTjeneste,
-                              HistorikkinnslagTjeneste historikkinnslagTjeneste,
+                              BehandlingHistorikkTjeneste behandlingHistorikkTjeneste,
                               FagsystemKlient fagsystemKlient) {
         this.behandlingskontrollTjeneste = behandlingskontrollProvider.getBehandlingskontrollTjeneste();
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollProvider.getBehandlingskontrollAsynkTjeneste();
         this.fagsakTjeneste = fagsakTjeneste;
-        this.historikkinnslagTjeneste = historikkinnslagTjeneste;
+        this.behandlingHistorikkTjeneste = behandlingHistorikkTjeneste;
         this.fagsystemKlient = fagsystemKlient;
 
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
@@ -224,7 +223,7 @@ public class BehandlingTjeneste {
         behandlingskontrollTjeneste.opprettBehandling(kontekst, behandling,
             beh -> eksternBehandlingRepository.lagre(new EksternBehandling(beh, brukHenvisning, eksternUuid)));
 
-        historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling); // FIXME: sjekk om journalpostId skal hentes ///
+        behandlingHistorikkTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling); // FIXME: sjekk om journalpostId skal hentes ///
 
         hentVergeInformasjonFraFpsak(fagsakYtelseType, behandling.getId());
 

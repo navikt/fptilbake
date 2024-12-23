@@ -56,7 +56,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
@@ -151,7 +150,6 @@ public class BehandlingRestTjeneste {
                                   HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                   BehandlingsprosessApplikasjonTjeneste behandlingsprosessTjeneste,
                                   BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste,
-                                  HistorikkTjenesteAdapter historikkTjenesteAdapter,
                                   HistorikkV2Tjeneste historikkV2Tjeneste) {
         this.behandlingTjeneste = behandlingTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
@@ -287,7 +285,7 @@ public class BehandlingRestTjeneste {
         behandlingTjeneste.kanEndreBehandling(behandling.getId(), dto.getBehandlingVersjon());
 
         // gjenoppta behandling
-        Optional<String> gruppeOpt = gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), HistorikkAktør.SAKSBEHANDLER);
+        Optional<String> gruppeOpt = gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), behandling.getFagsakId(), HistorikkAktør.SAKSBEHANDLER);
         if (gruppeOpt.isPresent() && !behandling.erOrdinærSaksbehandlingAvsluttet()) {
             behandlingTjeneste.setAnsvarligSaksbehandlerFraKontekst(behandling);
         }

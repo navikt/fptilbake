@@ -61,7 +61,7 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
                 lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()),
                 behandling.utledVedtaksbrevType());
         }
-        foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(behandlingId);
+        foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(behandling);
 
         opprettEllerReåpne(behandling, AksjonspunktDefinisjon.FATTE_VEDTAK);
         totrinnTjeneste.settNyttTotrinnsgrunnlag(behandling);

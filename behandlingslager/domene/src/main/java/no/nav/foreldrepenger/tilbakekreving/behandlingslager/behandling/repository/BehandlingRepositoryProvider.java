@@ -12,6 +12,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakLåsRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag2Repository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
@@ -29,6 +31,8 @@ public class BehandlingRepositoryProvider {
     private BehandlingRepository behandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
     private HistorikkRepository historikkRepository;
+    private Historikkinnslag2Repository historikkinnslag2Repository;
+    private HistorikkRepositoryTeamAware historikkRepositoryTeamAware;
     private BehandlingLåsRepository behandlingLåsRepository;
     private FagsakLåsRepository fagsakLåsRepository;
     private KravgrunnlagRepository grunnlagRepository;
@@ -56,6 +60,8 @@ public class BehandlingRepositoryProvider {
         this.behandlingresultatRepository = new BehandlingresultatRepository(entityManager);
         this.fagsakRepository = new FagsakRepository(entityManager);
         this.historikkRepository = new HistorikkRepository(entityManager);
+        this.historikkinnslag2Repository = new Historikkinnslag2Repository(entityManager);
+        this.historikkRepositoryTeamAware = new HistorikkRepositoryTeamAware(this.historikkRepository, historikkinnslag2Repository);
         this.behandlingLåsRepository = new BehandlingLåsRepository(entityManager);
         this.fagsakLåsRepository = new FagsakLåsRepository(entityManager);
         this.grunnlagRepository = new KravgrunnlagRepository(entityManager);
@@ -89,6 +95,14 @@ public class BehandlingRepositoryProvider {
 
     public HistorikkRepository getHistorikkRepository() {
         return historikkRepository;
+    }
+
+    public Historikkinnslag2Repository getHistorikkinnslag2Repository() {
+        return historikkinnslag2Repository;
+    }
+
+    public HistorikkRepositoryTeamAware getHistorikkRepositoryTeamAware() {
+        return historikkRepositoryTeamAware;
     }
 
     public BehandlingLåsRepository getBehandlingLåsRepository() {

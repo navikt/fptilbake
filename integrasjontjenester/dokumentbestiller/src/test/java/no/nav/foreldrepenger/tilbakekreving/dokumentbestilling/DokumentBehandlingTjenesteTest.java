@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingHistorikkTjeneste;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -37,7 +39,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
@@ -48,15 +49,14 @@ class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {
 
     private ManueltVarselBrevTjeneste mockManueltVarselBrevTjeneste = mock(ManueltVarselBrevTjeneste.class);
     private InnhentDokumentasjonbrevTjeneste mockInnhentDokumentasjonbrevTjeneste = mock(InnhentDokumentasjonbrevTjeneste.class);
+    private DokumentBehandlingHistorikkTjeneste mockDokumentBehandlingHistorikkTjeneste = mock(DokumentBehandlingHistorikkTjeneste.class);
 
     private DokumentBehandlingTjeneste dokumentBehandlingTjeneste;
 
     @BeforeEach
     void setup() {
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
-        var historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository);
-        dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, taskTjeneste, historikkinnslagTjeneste,
-                mockManueltVarselBrevTjeneste, mockInnhentDokumentasjonbrevTjeneste);
+        dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, taskTjeneste, mockManueltVarselBrevTjeneste, mockDokumentBehandlingHistorikkTjeneste, mockInnhentDokumentasjonbrevTjeneste);
     }
 
     @Test

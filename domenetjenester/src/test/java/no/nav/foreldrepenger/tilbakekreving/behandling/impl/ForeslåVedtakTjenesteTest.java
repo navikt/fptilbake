@@ -27,7 +27,7 @@ class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
     @BeforeEach
     void setUp() {
         beregningsresultatTjeneste = mock(BeregningsresultatTjeneste.class);
-        foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningsresultatTjeneste, historikkTjenesteAdapter);
+        foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningsresultatTjeneste, historikkRepositoryTeamAware);
     }
 
     @Test
@@ -35,7 +35,7 @@ class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
         BeregningResultat beregningResultat = new BeregningResultat(VedtakResultatType.FULL_TILBAKEBETALING, List.of());
         when(beregningsresultatTjeneste.finnEllerBeregn(internBehandlingId)).thenReturn(beregningResultat);
 
-        foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(internBehandlingId);
+        foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(behandling);
 
         List<Historikkinnslag> historikkInnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         assertThat(historikkInnslager).isNotEmpty();

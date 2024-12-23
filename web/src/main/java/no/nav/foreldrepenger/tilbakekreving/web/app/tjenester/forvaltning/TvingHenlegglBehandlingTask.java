@@ -12,12 +12,15 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
+
+import static no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste.opprettHistorikkinnslag2ForHenleggelse;
+import static no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste.opprettHistorikkinnslagForHenleggelse;
 
 @ApplicationScoped
 @ProsessTask(value = "behandlingskontroll.tvingHenleggBehandling", prioritet = 2)
@@ -26,8 +29,8 @@ public class TvingHenlegglBehandlingTask implements ProsessTaskHandler {
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
+    private HistorikkRepositoryTeamAware historikkRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
-    private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
     TvingHenlegglBehandlingTask() {
         // for CDI proxy
@@ -35,12 +38,11 @@ public class TvingHenlegglBehandlingTask implements ProsessTaskHandler {
 
     @Inject
     public TvingHenlegglBehandlingTask(BehandlingRepositoryProvider repositoryProvider,
-                                       BehandlingskontrollTjeneste behandlingskontrollTjeneste,
-                                       HistorikkinnslagTjeneste historikkinnslagTjeneste) {
+                                       BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
+        this.historikkRepository = repositoryProvider.getHistorikkRepositoryTeamAware();
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
-        this.historikkinnslagTjeneste = historikkinnslagTjeneste;
     }
 
     @Override
@@ -58,6 +60,8 @@ public class TvingHenlegglBehandlingTask implements ProsessTaskHandler {
     }
 
     private void opprettHistorikkinnslagForTvingHenleggelse(Behandling behandling) {
-        historikkinnslagTjeneste.opprettHistorikkinnslagForHenleggelse(behandling, HistorikkinnslagType.AVBRUTT_BEH, BehandlingResultatType.HENLAGT_TEKNISK_VEDLIKEHOLD, null, HistorikkAktør.VEDTAKSLØSNINGEN);
+        var historikkinnslag = opprettHistorikkinnslagForHenleggelse(behandling, HistorikkinnslagType.AVBRUTT_BEH, BehandlingResultatType.HENLAGT_TEKNISK_VEDLIKEHOLD, null, HistorikkAktør.VEDTAKSLØSNINGEN);
+        var historikkinnslag2 = opprettHistorikkinnslag2ForHenleggelse(behandling, BehandlingResultatType.HENLAGT_TEKNISK_VEDLIKEHOLD, null, HistorikkAktør.VEDTAKSLØSNINGEN);
+        historikkRepository.lagre(historikkinnslag, historikkinnslag2);
     }
 }

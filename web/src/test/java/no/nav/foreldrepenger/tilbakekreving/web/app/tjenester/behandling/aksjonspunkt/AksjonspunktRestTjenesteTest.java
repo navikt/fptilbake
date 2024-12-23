@@ -18,6 +18,8 @@ import java.util.UUID;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +42,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftedeAksjonspunkterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftetAksjonspunktDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.VurderForeldelseDto;
@@ -73,7 +74,7 @@ class AksjonspunktRestTjenesteTest {
         BehandlingTjeneste behandlingTjeneste = new BehandlingTjeneste(repositoryProviderMock,
                 behandlingskontrollProvider,
                 mock(FagsakTjeneste.class),
-                mock(HistorikkinnslagTjeneste.class),
+                mock(BehandlingHistorikkTjeneste.class),
                 mock(FagsystemKlient.class));
 
         aksjonspunktRestTjeneste = new AksjonspunktRestTjeneste(behandlingRepositoryMock,
