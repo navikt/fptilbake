@@ -51,7 +51,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
@@ -83,7 +82,6 @@ public abstract class FellesTestOppsett {
     protected BehandlingKandidaterRepository behandlingKandidaterRepository;
 
     protected GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste;
-    protected HistorikkinnslagTjeneste historikkinnslagTjeneste;
     protected BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     protected KravgrunnlagTjeneste kravgrunnlagTjeneste;
     protected KravgrunnlagMapper kravgrunnlagMapper;
@@ -112,8 +110,6 @@ public abstract class FellesTestOppsett {
         behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
         behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
         gjenopptaBehandlingTjeneste = new GjenopptaBehandlingMedGrunnlagTjeneste(taskTjeneste, behandlingVenterRepository);
-        historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepositoryOld()
-        );
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager,
                 new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
         var haltGebyrTjeneste = new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository());

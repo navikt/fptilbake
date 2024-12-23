@@ -16,27 +16,18 @@ import jakarta.transaction.Transactional;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeMedBeløpDto;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagEndretEvent;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
 @ApplicationScoped
 @Transactional
@@ -46,7 +37,7 @@ public class VurdertForeldelseTjeneste {
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private BehandlingRepository behandlingRepository;
 
-    private HistorikkTjenesteAdapter historikkTjenesteAdapter;
+    private VurderForeldelseHistorikkTjeneste vurderForeldelseHistorikkTjeneste;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste;
 
@@ -55,13 +46,13 @@ public class VurdertForeldelseTjeneste {
     }
 
     @Inject
-    public VurdertForeldelseTjeneste(BehandlingRepositoryProvider repositoryProvider, HistorikkTjenesteAdapter historikkTjenesteAdapter, KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste) {
+    public VurdertForeldelseTjeneste(BehandlingRepositoryProvider repositoryProvider, VurderForeldelseHistorikkTjeneste vurderForeldelseHistorikkTjeneste, KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste) {
         this.vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
         this.vurdertForeldelseRepository = repositoryProvider.getVurdertForeldelseRepository();
         this.faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
 
-        this.historikkTjenesteAdapter = historikkTjenesteAdapter;
+        this.vurderForeldelseHistorikkTjeneste = vurderForeldelseHistorikkTjeneste;
         this.kravgrunnlagBeregningTjeneste = kravgrunnlagBeregningTjeneste;
     }
 
@@ -73,7 +64,11 @@ public class VurdertForeldelseTjeneste {
         }
         Optional<VurdertForeldelse> forrigeVurdertForeldelse = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId);
         vurdertForeldelseRepository.lagre(behandlingId, vurdertForeldelse);
-        lagInnslag(behandlingId, forrigeVurdertForeldelse, vurdertForeldelse);
+        if (skalVilkårDataSlettes(forrigeVurdertForeldelse, vurdertForeldelse)) {
+            vilkårsvurderingRepository.slettVilkårsvurdering(behandlingId);
+        }
+
+        vurderForeldelseHistorikkTjeneste.lagHistorikkinnslagForeldelse(behandlingRepository.hentBehandling(behandlingId), forrigeVurdertForeldelse, vurdertForeldelse);
     }
 
     public FeilutbetalingPerioderDto hentFaktaPerioder(Long behandlingId) {
@@ -152,109 +147,32 @@ public class VurdertForeldelseTjeneste {
         return periodeBuilder.build();
     }
 
+    private static boolean skalVilkårDataSlettes(Optional<VurdertForeldelse> forrigeVurdertForeldelseOpt, VurdertForeldelse vurdertForeldelseAggregate) {
+        if (forrigeVurdertForeldelseOpt.isEmpty()) {
+            return false;
+        }
 
-    private void lagInnslag(Long behandlingId, Optional<VurdertForeldelse> forrigeVurdertForeldelse, VurdertForeldelse vurdertForeldelseAggregate) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld();
-        historikkinnslag.setType(HistorikkinnslagType.FORELDELSE);
-        historikkinnslag.setBehandlingId(behandlingId);
-        historikkinnslag.setAktør(behandling.isAutomatiskSaksbehandlet() ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER);
-
-        boolean behovForHistorikkInnslag = false;
-        for (VurdertForeldelsePeriode foreldelsePeriode : vurdertForeldelseAggregate.getVurdertForeldelsePerioder()) {
-            HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
-            boolean harEndret;
-            // forrigeVurdertForeldelse finnes ikke
-            if (forrigeVurdertForeldelse.isEmpty()) {
-                harEndret = true;
-                lagNyttInnslag(foreldelsePeriode, tekstBuilder);
-            } else {
-                harEndret = opprettInnslagNårForrigePerioderFinnes(behandlingId, forrigeVurdertForeldelse.get(), foreldelsePeriode, tekstBuilder);
+        var forrigeVurdertForeldelse = forrigeVurdertForeldelseOpt.get();
+        for (var foreldelsePeriode : vurdertForeldelseAggregate.getVurdertForeldelsePerioder()) {
+            var forrigeForeldelsePeriode = forrigeForeldelsePeriode(forrigeVurdertForeldelse, foreldelsePeriode);
+            if (forrigeForeldelsePeriode.isEmpty()) {
+                return true; // hvis saksbehandler deler opp perioder, må vi starte vilkårs på nytt
             }
-            if (harEndret) {
-                tekstBuilder.medSkjermlenke(SkjermlenkeType.FORELDELSE)
-                        .medOpplysning(HistorikkOpplysningType.PERIODE_FOM, foreldelsePeriode.getPeriode().getFom())
-                        .medOpplysning(HistorikkOpplysningType.PERIODE_TOM, foreldelsePeriode.getPeriode().getTom())
-                        .medBegrunnelse(foreldelsePeriode.getBegrunnelse());
 
-                tekstBuilder.build(historikkinnslag);
-                behovForHistorikkInnslag = true;
-            }
-        }
-
-        if (behovForHistorikkInnslag) {
-            historikkTjenesteAdapter.lagInnslag(historikkinnslag);
-        }
-
-    }
-
-    private boolean opprettInnslagNårForrigePerioderFinnes(Long behandlingId,
-                                                           VurdertForeldelse forrigeVurdertForeldelse,
-                                                           VurdertForeldelsePeriode foreldelsePeriode,
-                                                           HistorikkInnslagTekstBuilder tekstBuilder) {
-
-        Optional<VurdertForeldelsePeriode> forrigeForeldelsePeriode = forrigeVurdertForeldelse.getVurdertForeldelsePerioder()
-                .stream()
-                .filter(vurdertForeldelsePeriode -> vurdertForeldelsePeriode.getPeriode().equals(foreldelsePeriode.getPeriode()))
-                .findAny();
-        boolean harEndret = false;
-        // samme perioder med endret foreldelse vurdering type
-        if (forrigeForeldelsePeriode.isPresent()) {
-            harEndret = lagEndretInnslag(behandlingId, foreldelsePeriode, tekstBuilder, forrigeForeldelsePeriode.get());
-            harEndret = harEndret || !foreldelsePeriode.getBegrunnelse().equals(forrigeForeldelsePeriode.get().getBegrunnelse());
-        } else { // nye perioder
-            harEndret = true;
-            lagNyttInnslag(foreldelsePeriode, tekstBuilder);
-            // hvis saksbehandler deler opp perioder, må vi starte vilkårs på nytt
-            sletteVilkårData(behandlingId);
-        }
-        return harEndret;
-    }
-
-    private boolean lagEndretInnslag(Long behandlingId,
-                                     VurdertForeldelsePeriode foreldelsePeriode,
-                                     HistorikkInnslagTekstBuilder tekstBuilder,
-                                     VurdertForeldelsePeriode forrigeForeldelsePeriode) {
-        boolean harEndret = false;
-        if (!foreldelsePeriode.getForeldelseVurderingType().equals(forrigeForeldelsePeriode.getForeldelseVurderingType())) {
-            harEndret = true;
-            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSE,
-                    forrigeForeldelsePeriode.getForeldelseVurderingType().getNavn(),
-                    foreldelsePeriode.getForeldelseVurderingType().getNavn());
             // hvis saksbehandler endret vurdering type, må vi starte vilkårs på nytt
-            if (ForeldelseVurderingType.FORELDET.equals(foreldelsePeriode.getForeldelseVurderingType())) {
-                sletteVilkårData(behandlingId);
+            var vurdertForeldelsePeriode = forrigeForeldelsePeriode.get();
+            if (ForeldelseVurderingType.FORELDET.equals(foreldelsePeriode.getForeldelseVurderingType()) &&
+                !foreldelsePeriode.getForeldelseVurderingType().equals(vurdertForeldelsePeriode.getForeldelseVurderingType())) {
+                return true;
             }
         }
-        if ((ForeldelseVurderingType.FORELDET.equals(foreldelsePeriode.getForeldelseVurderingType()) || ForeldelseVurderingType.TILLEGGSFRIST.equals(foreldelsePeriode.getForeldelseVurderingType()))
-                && ((foreldelsePeriode.getForeldelsesfrist() != null && !foreldelsePeriode.getForeldelsesfrist().equals(forrigeForeldelsePeriode.getForeldelsesfrist()))
-                || (forrigeForeldelsePeriode.getForeldelsesfrist() != null && !forrigeForeldelsePeriode.getForeldelsesfrist().equals(foreldelsePeriode.getForeldelsesfrist())))
-        ) {
-            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSESFRIST, forrigeForeldelsePeriode.getForeldelsesfrist(), foreldelsePeriode.getForeldelsesfrist());
-            harEndret = true;
-        }
-        if (ForeldelseVurderingType.TILLEGGSFRIST.equals(foreldelsePeriode.getForeldelseVurderingType())
-                && (foreldelsePeriode.getOppdagelsesDato() != null && !foreldelsePeriode.getOppdagelsesDato().equals(forrigeForeldelsePeriode.getOppdagelsesDato()))
-                || (forrigeForeldelsePeriode.getOppdagelsesDato() != null && !forrigeForeldelsePeriode.getOppdagelsesDato().equals(foreldelsePeriode.getOppdagelsesDato()))
-        ) {
-            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.OPPDAGELSES_DATO, forrigeForeldelsePeriode.getOppdagelsesDato(), foreldelsePeriode.getOppdagelsesDato());
-            harEndret = true;
-        }
-        return harEndret;
+        return false;
     }
 
-    private void lagNyttInnslag(VurdertForeldelsePeriode foreldelsePeriode, HistorikkInnslagTekstBuilder tekstBuilder) {
-        tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSE, null, foreldelsePeriode.getForeldelseVurderingType().getNavn());
-        if (foreldelsePeriode.getForeldelsesfrist() != null) {
-            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSESFRIST, null, foreldelsePeriode.getForeldelsesfrist());
-        }
-        if (foreldelsePeriode.getOppdagelsesDato() != null) {
-            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.OPPDAGELSES_DATO, null, foreldelsePeriode.getOppdagelsesDato());
-        }
+    protected static Optional<VurdertForeldelsePeriode> forrigeForeldelsePeriode(VurdertForeldelse forrigeVurdertForeldelse, VurdertForeldelsePeriode foreldelsePeriode) {
+        return forrigeVurdertForeldelse.getVurdertForeldelsePerioder()
+            .stream()
+            .filter(vurdertForeldelsePeriode -> vurdertForeldelsePeriode.getPeriode().equals(foreldelsePeriode.getPeriode()))
+            .findAny();
     }
-
-    private void sletteVilkårData(Long behandlingId) {
-        vilkårsvurderingRepository.slettVilkårsvurdering(behandlingId);
-    }
-
 }

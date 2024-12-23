@@ -1,171 +1,116 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering;
 
-import static no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingHjelperUtil.konvertFraBoolean;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType.ANDEL_TILBAKEKREVES;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType.BELØP_TILBAKEKREVES;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType.ER_BELØPET_BEHOLD;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType.ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType.ILEGG_RENTER;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType.TILBAKEKREV_SMÅBELOEP;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.DATE_FORMATTER;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.LINJESKIFT;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.fraTilEquals;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.plainTekstLinje;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingSærligGrunnEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
 @ApplicationScoped
 public class VilkårsvurderingHistorikkInnslagTjeneste {
 
-    private HistorikkTjenesteAdapter historikkTjenesteAdapter;
-    private BehandlingRepositoryProvider repositoryProvider;
+    private HistorikkinnslagRepository historikkRepository;
 
     VilkårsvurderingHistorikkInnslagTjeneste() {
         // for CDI
     }
 
     @Inject
-    public VilkårsvurderingHistorikkInnslagTjeneste(HistorikkTjenesteAdapter historikkTjenesteAdapter, BehandlingRepositoryProvider repositoryProvider) {
-        this.historikkTjenesteAdapter = historikkTjenesteAdapter;
-        this.repositoryProvider = repositoryProvider;
+    public VilkårsvurderingHistorikkInnslagTjeneste(HistorikkinnslagRepository historikkRepository) {
+        this.historikkRepository = historikkRepository;
     }
 
-    public void lagHistorikkInnslag(Long behandlingId, VilkårVurderingEntitet gammel, VilkårVurderingEntitet ny) {
-        List<Vilkårsendring> endringer = finnEndringer(gammel, ny);
-        if (!endringer.isEmpty()) {
-            lagInnslag(behandlingId, endringer);
-        }
+    public void lagHistorikkInnslag(Behandling behandling, VilkårVurderingEntitet gammel, VilkårVurderingEntitet ny) {
+        var historikkinnslag = lagHistorikkinnslag(behandling, gammel, ny);
+        historikkinnslag.ifPresent(innslag -> historikkRepository.lagre(innslag));
     }
 
-    private List<Vilkårsendring> finnEndringer(VilkårVurderingEntitet gammel, VilkårVurderingEntitet ny) {
-        List<Vilkårsendring> resultat = new ArrayList<>();
-        for (VilkårVurderingPeriodeEntitet nyPeriode : ny.getPerioder()) {
-            Periode periode = nyPeriode.getPeriode();
-            VilkårVurderingPeriodeEntitet gammelperiode = finnPeriode(gammel, periode);
-            List<Historikkendring> endringer = finnEndringer(gammelperiode, nyPeriode);
-            if (!endringer.isEmpty()) {
-                String begrunnelseVilkår = nyPeriode.getBegrunnelse();
-                String begrunnelseAktsomhet = nyPeriode.getBegrunnelseAktsomhet();
-                String begrunnelseSærligGrunner = nyPeriode.getBegrunnelseSærligGrunner();
-                resultat.add(new Vilkårsendring(periode, begrunnelseVilkår, begrunnelseAktsomhet, begrunnelseSærligGrunner, endringer));
+    private static List<HistorikkinnslagLinjeBuilder> tekstendringerPeriode(VilkårVurderingEntitet gammel, VilkårVurderingEntitet ny) {
+        var alleEndringer = new ArrayList<HistorikkinnslagLinjeBuilder>();
+        for (var nyPeriode : ny.getPerioder()) {
+            var tekstlinjerPeriode = new ArrayList<HistorikkinnslagLinjeBuilder>();
+            var gammelperiode = finnPeriode(gammel, nyPeriode.getPeriode());
+            tekstlinjerPeriode.add(fraTilEquals("Beløp som skal tilbakekreves", gammelperiode.map(VilkårVurderingPeriodeEntitet::finnManueltBeløp).orElse(null), nyPeriode.finnManueltBeløp()));
+            tekstlinjerPeriode.add(fraTilEquals("Er beløpet i behold?", gammelperiode.map(VilkårVurderingPeriodeEntitet::erBeløpIBehold).orElse(null), nyPeriode.erBeløpIBehold()));
+            tekstlinjerPeriode.add(fraTilEquals("Er vilkårene for tilbakekreving oppfylt?", gammelperiode.map(VilkårVurderingPeriodeEntitet::getVilkårResultat).orElse(null), nyPeriode.getVilkårResultat()));
+            tekstlinjerPeriode.add(fraTilEquals("I hvilken grad har mottaker handlet uaktsomt?", gammelperiode.map(VilkårVurderingPeriodeEntitet::getAktsomhetResultat).orElse(null), nyPeriode.getAktsomhetResultat()));
+            tekstlinjerPeriode.add(fraTilEquals("Andel som tilbakekreves", gammelperiode.map(VilkårVurderingPeriodeEntitet::finnAndelTilbakekreves).orElse(null), nyPeriode.finnAndelTilbakekreves()));
+            tekstlinjerPeriode.add(fraTilEquals("Skal det tilegges renter?", gammelperiode.map(VilkårVurderingPeriodeEntitet::manueltSattIleggRenter).orElse(null), nyPeriode.manueltSattIleggRenter()));
+            tekstlinjerPeriode.add(fraTilEquals("Skal beløp under 4 rettsgebyr (6.ledd) tilbakekreves?", gammelperiode.map(VilkårVurderingPeriodeEntitet::tilbakekrevesSmåbeløp).orElse(null), nyPeriode.tilbakekrevesSmåbeløp()));
+            tekstlinjerPeriode.add(fraTilEquals("Er det særlige grunner til reduksjon?", gammelperiode.map(VilkårsvurderingHistorikkInnslagTjeneste::lagSærligeGrunnerTekst).orElse(null), lagSærligeGrunnerTekst(nyPeriode)));
+            if (!Objects.equals(gammelperiode.map(VilkårVurderingPeriodeEntitet::getBegrunnelse).orElse(null), nyPeriode.getBegrunnelse())) {
+                tekstlinjerPeriode.add(plainTekstLinje(String.format("Begrunnelse for vilkår: %s", nyPeriode.getBegrunnelse())));
+            }
+            if (!Objects.equals(gammelperiode.map(VilkårVurderingPeriodeEntitet::getBegrunnelseAktsomhet).orElse(null), nyPeriode.getBegrunnelseAktsomhet())) {
+                tekstlinjerPeriode.add(plainTekstLinje(String.format("Begrunnelse for aktsomhet: %s", nyPeriode.getBegrunnelseAktsomhet())));
+            }
+            if (!Objects.equals(gammelperiode.map(VilkårVurderingPeriodeEntitet::getBegrunnelseSærligGrunner).orElse(null), nyPeriode.getBegrunnelseSærligGrunner())) {
+                tekstlinjerPeriode.add(plainTekstLinje(String.format("Særlige grunner som er vektlagt: %s", nyPeriode.getBegrunnelseSærligGrunner())));
+            }
+
+            if (tekstlinjerPeriode.stream().anyMatch(Objects::nonNull)) {
+                tekstlinjerPeriode.addFirst(plainTekstLinje(String.format("__Vurdering__ av perioden %s-%s.", DATE_FORMATTER.format(nyPeriode.getPeriode().getFom()), DATE_FORMATTER.format(nyPeriode.getPeriode().getTom()))));
+                tekstlinjerPeriode.addLast(LINJESKIFT);
+                alleEndringer.addAll(tekstlinjerPeriode);
             }
         }
-        return resultat;
+        return alleEndringer;
     }
 
-    private VilkårVurderingPeriodeEntitet finnPeriode(VilkårVurderingEntitet gammel, Periode tidsperiode) {
+    private static Optional<Historikkinnslag> lagHistorikkinnslag(Behandling behandling, VilkårVurderingEntitet gammel, VilkårVurderingEntitet ny) {
+        var linjerMedEndringer = tekstendringerPeriode(gammel, ny);
+        if (linjerMedEndringer.stream().allMatch(Objects::nonNull)) {
+            return Optional.empty();
+        }
+        return Optional.of(new Historikkinnslag.Builder()
+            .medAktør(behandling.isAutomatiskSaksbehandlet() ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER)
+            .medBehandlingId(behandling.getId())
+            .medFagsakId(behandling.getFagsakId())
+            .medTittel(SkjermlenkeType.TILBAKEKREVING)
+            .medLinjer(linjerMedEndringer)
+            .build());
+    }
+
+    private static Optional<VilkårVurderingPeriodeEntitet> finnPeriode(VilkårVurderingEntitet gammel, Periode tidsperiode) {
         if (gammel == null) {
-            return null;
+            return Optional.empty();
         }
         return gammel.getPerioder()
                 .stream()
                 .filter(p -> p.getPeriode().equals(tidsperiode))
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
-    private List<Historikkendring> finnEndringer(VilkårVurderingPeriodeEntitet gammel, VilkårVurderingPeriodeEntitet ny) {
-        var endringer = Arrays.asList(
-                finnEndring(gammel, ny, BELØP_TILBAKEKREVES, VilkårVurderingPeriodeEntitet::finnManueltBeløp),
-                finnEndring(gammel, ny, ER_BELØPET_BEHOLD, r -> fraBoolean(r.erBeløpIBehold())),
-                finnEndring(gammel, ny, ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT, r -> getNavn(r.getVilkårResultat())),
-                finnEndring(gammel, ny, MOTTAKER_UAKTSOMHET_GRAD, r -> getNavn(r.getAktsomhetResultat())),
-                finnEndring(gammel, ny, ANDEL_TILBAKEKREVES, VilkårVurderingPeriodeEntitet::finnAndelTilbakekreves),
-                finnEndring(gammel, ny, ILEGG_RENTER, r -> fraBoolean(r.manueltSattIleggRenter())),
-                finnEndring(gammel, ny, TILBAKEKREV_SMÅBELOEP, r -> fraBoolean(r.tilbakekrevesSmåbeløp())),
-                !(ny != null && ny.getAktsomhet() != null && ny.getAktsomhet().getSærligGrunner().isEmpty()) ?
-                        finnEndring(gammel, ny, ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON, this::lagSærligeGrunnerTekst) : null
-        );
-        return endringer
-                .stream()
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
-
-    private static <T> Historikkendring<T> finnEndring(VilkårVurderingPeriodeEntitet gammel, VilkårVurderingPeriodeEntitet ny, HistorikkEndretFeltType felt, Function<VilkårVurderingPeriodeEntitet, T> oppslag) {
-        T nyVerdi = finn(ny, oppslag);
-        T gammelVerdi = finn(gammel, oppslag);
-        if (Objects.equals(nyVerdi, gammelVerdi)) {
+    private static String lagSærligeGrunnerTekst(VilkårVurderingPeriodeEntitet periode) {
+        var aktsomhet = periode.getAktsomhet();
+        if (aktsomhet == null || aktsomhet.getSærligGrunner().isEmpty()) {
             return null;
         }
-        return new Historikkendring<>(felt, gammelVerdi, nyVerdi);
-    }
 
-    private void lagInnslag(Long behandlingId, List<Vilkårsendring> endringer) {
-        Behandling behandling = repositoryProvider.getBehandlingRepository().hentBehandling(behandlingId);
-        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld();
-        historikkinnslag.setType(HistorikkinnslagType.TILBAKEKREVING);
-        historikkinnslag.setBehandlingId(behandlingId);
-        historikkinnslag.setAktør(behandling.isAutomatiskSaksbehandlet() ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER);
-
-        for (Vilkårsendring vilkårsendring : endringer) {
-            HistorikkInnslagTekstBuilder builder = lagTekstBuilderMedFellesFelt(vilkårsendring);
-            for (Historikkendring historikkendring : vilkårsendring.getEndringer()) {
-                builder.medEndretFelt(historikkendring.getFelt(), historikkendring.getForrigeVerdi(), historikkendring.getNyVerdi());
-            }
-            builder.medSkjermlenke(SkjermlenkeType.TILBAKEKREVING);
-            builder.medBegrunnelse(vilkårsendring.getBegrunnelseAktsomhet());
-            builder.medOpplysning(HistorikkOpplysningType.SÆRLIG_GRUNNER_BEGRUNNELSE, vilkårsendring.getBegrunnelseSærligGrunner());
-            builder.build(historikkinnslag);
-        }
-        historikkTjenesteAdapter.lagInnslag(historikkinnslag);
-    }
-
-    private static <T> T finn(VilkårVurderingPeriodeEntitet periode, Function<VilkårVurderingPeriodeEntitet, T> oppslag) {
-        return periode == null ? null : oppslag.apply(periode);
-    }
-
-
-    private String lagSærligeGrunnerTekst(VilkårVurderingPeriodeEntitet periode) {
-        VilkårVurderingAktsomhetEntitet aktsomhet = periode.getAktsomhet();
-        return aktsomhet != null ? lagSærligeGrunnerTekst(aktsomhet) : null;
-    }
-
-
-    private String lagSærligeGrunnerTekst(VilkårVurderingAktsomhetEntitet aktsomhet) {
-        return aktsomhet.getSærligGrunner().isEmpty() ? null : formGrunnTekst(aktsomhet);
-    }
-
-    private HistorikkInnslagTekstBuilder lagTekstBuilderMedFellesFelt(Vilkårsendring periode) {
-        HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
-
-        tekstBuilder.medSkjermlenke(SkjermlenkeType.TILBAKEKREVING)
-                .medOpplysning(HistorikkOpplysningType.PERIODE_FOM, periode.getFom())
-                .medOpplysning(HistorikkOpplysningType.PERIODE_TOM, periode.getTom())
-                .medOpplysning(HistorikkOpplysningType.TILBAKEKREVING_OPPFYLT_BEGRUNNELSE, periode.getBegrunnelseVilkår());
-        return tekstBuilder;
-    }
-
-    private String formGrunnTekst(VilkårVurderingAktsomhetEntitet aktsomhetEntitet) {
         List<String> grunnTekster = new ArrayList<>();
         StringBuilder grunnTekst = new StringBuilder();
-        grunnTekst.append(konvertFraBoolean(aktsomhetEntitet.getSærligGrunnerTilReduksjon()));
+        grunnTekst.append(HistorikkinnslagLinjeBuilder.format(aktsomhet.getSærligGrunnerTilReduksjon()));
         grunnTekst.append(": ");
-        for (VilkårVurderingSærligGrunnEntitet særligGrunn : aktsomhetEntitet.getSærligGrunner()) {
+        for (VilkårVurderingSærligGrunnEntitet særligGrunn : aktsomhet.getSærligGrunner()) {
             SærligGrunn grunn = særligGrunn.getGrunn();
             StringBuilder tekst = new StringBuilder(grunn.getNavn());
             if (SærligGrunn.ANNET.equals(grunn)) {
@@ -177,20 +122,4 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
         grunnTekst.append(String.join(", ", grunnTekster));
         return grunnTekst.toString();
     }
-
-    private String getNavn(Kodeverdi kode) {
-        if (kode == null) {
-            return null;
-        }
-        return kode.getNavn();
-    }
-
-    private String fraBoolean(Boolean verdi) {
-        if (verdi == null) {
-            return null;
-        }
-        //TODO fjern oppslag, skal lagres med kode
-        return verdi ? "Ja" : "Nei";
-    }
-
 }
