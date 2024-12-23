@@ -67,7 +67,7 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     void setup() {
         kravVedtakStatusRepository = new KravVedtakStatusRepository(entityManager);
         behandlingresultatRepository = new BehandlingresultatRepository(entityManager);
-        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, taskTjeneste, behandlingskontrollTjeneste, historikkinnslagTjeneste);
+        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, taskTjeneste, behandlingskontrollTjeneste);
         var kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
             new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository()), taskTjeneste,
             repositoryProvider.getBehandlingRepository(), repositoryProvider.getGrunnlagRepository(), behandlingskontrollTjeneste);
@@ -123,10 +123,10 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
         assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.AVSLUTTET));
 
-        var historikkinnslager = repositoryProvider.getHistorikkRepositoryOld().hentHistorikk(behandling.getId());
+        var historikkinnslager = repositoryProvider.getHistorikkinnslagRepository().hent(behandling.getId());
         assertThat(historikkinnslager).hasSize(1);
-        var historikkinnslag = historikkinnslager.get(0);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.AVBRUTT_BEH);
+        var historikkinnslag = historikkinnslager.getFirst();
+        assertThat(historikkinnslag.getTittel()).isEqualTo("Behandling er henlagt");
     }
 
     @Test

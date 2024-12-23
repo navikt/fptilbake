@@ -112,9 +112,6 @@ public class VilkårsvurderingHjelperUtil {
         return new VilkårResultatAnnetDto(aktsomhetEntitet.getBegrunnelse(), aktsomhetEntitet.getAktsomhet(), aktsomhetDto);
     }
 
-    static boolean harEndret(Object forrigeVerdi, Object verdi) {
-        return !Objects.equals(forrigeVerdi, verdi);
-    }
 
     static String konvertFraBoolean(Boolean verdi) {
         if (null != verdi) {
