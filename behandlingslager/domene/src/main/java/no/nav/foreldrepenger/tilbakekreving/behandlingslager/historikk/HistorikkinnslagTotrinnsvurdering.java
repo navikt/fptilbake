@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 
+@Deprecated(forRemoval = true)
 public class HistorikkinnslagTotrinnsvurdering {
     private int sekvensNr;
     private String begrunnelse;

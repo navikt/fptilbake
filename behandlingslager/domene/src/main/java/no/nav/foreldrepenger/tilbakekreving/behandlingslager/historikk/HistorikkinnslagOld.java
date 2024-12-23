@@ -17,6 +17,7 @@ import jakarta.persistence.Table;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 
+@Deprecated(forRemoval = true)
 @Entity(name = "Historikkinnslag")
 @Table(name = "HISTORIKKINNSLAG")
 public class HistorikkinnslagOld extends BaseEntitet {

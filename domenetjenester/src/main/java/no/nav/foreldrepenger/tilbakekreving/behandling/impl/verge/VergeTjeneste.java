@@ -17,10 +17,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 
 @ApplicationScoped
 public class VergeTjeneste {
@@ -29,7 +27,7 @@ public class VergeTjeneste {
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private BehandlingRepository behandlingRepository;
     private VergeRepository vergeRepository;
-    private HistorikkRepositoryOld historikkRepository;
+    private HistorikkinnslagRepository historikkRepository;
 
     VergeTjeneste() {
         // for CDI-proxy
@@ -43,7 +41,7 @@ public class VergeTjeneste {
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollAsynkTjeneste;
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.vergeRepository = repositoryProvider.getVergeRepository();
-        this.historikkRepository = repositoryProvider.getHistorikkRepositoryOld();
+        this.historikkRepository = repositoryProvider.getHistorikkinnslagRepository();
     }
 
     public void opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(Behandling behandling) {
@@ -68,13 +66,12 @@ public class VergeTjeneste {
     }
 
     private void opprettHistorikkinnslagForFjernetVerge(Behandling behandling) {
-        HistorikkInnslagTekstBuilder historikkInnslagTekstBuilder = new HistorikkInnslagTekstBuilder()
-                .medHendelse(HistorikkinnslagType.FJERNET_VERGE);
-        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld();
-        historikkinnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
-        historikkinnslag.setType(HistorikkinnslagType.FJERNET_VERGE);
-        historikkinnslag.setBehandling(behandling);
-        historikkInnslagTekstBuilder.build(historikkinnslag);
+        var historikkinnslag = new Historikkinnslag.Builder()
+            .medAktør(HistorikkAktør.SAKSBEHANDLER)
+            .medFagsakId(behandling.getFagsakId())
+            .medBehandlingId(behandling.getId())
+            .medTittel("Opplysninger om verge/fullmektig fjernet")
+            .build();
         historikkRepository.lagre(historikkinnslag);
     }
 }

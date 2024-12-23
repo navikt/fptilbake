@@ -8,6 +8,7 @@ import jakarta.persistence.EntityManager;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
+@Deprecated(forRemoval = true) // Etter migrering
 @ApplicationScoped
 public class HistorikkRepositoryOld {
 
@@ -25,7 +26,7 @@ public class HistorikkRepositoryOld {
     public void lagre(HistorikkinnslagOld historikkinnslag) {
 
         if (historikkinnslag.getFagsakId() == null) {
-            historikkinnslag.setFagsakId(getFagsakId(historikkinnslag.getBehandlingId()));
+        historikkinnslag.setFagsakId(getFagsakId(historikkinnslag.getBehandlingId()));
         }
 
         entityManager.persist(historikkinnslag);

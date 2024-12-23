@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 
+@Deprecated(forRemoval = true)
 @Entity(name = "HistorikkinnslagDel")
 @Table(name = "HISTORIKKINNSLAG_DEL")
 public class HistorikkinnslagOldDel extends BaseEntitet {

@@ -18,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
+@Deprecated(forRemoval = true)
 @Entity(name = "HistorikkinnslagFelt")
 @Table(name = "HISTORIKKINNSLAG_FELT")
 public class HistorikkinnslagOldFelt extends BaseEntitet implements IndexKey {

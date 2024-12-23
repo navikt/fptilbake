@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRestTjeneste;
+
 import org.glassfish.jersey.server.ServerProperties;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -43,7 +45,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.Forval
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningBehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningKravgrunnlagRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fpoversikt.FpOversiktRestTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.init.InitielleLinksRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.konfig.KonfigRestTjeneste;
@@ -109,6 +110,7 @@ public class ApiConfig extends Application {
             VergeRestTjeneste.class,
             LosRestTjeneste.class,
             FpOversiktRestTjeneste.class,
+            HistorikkRestTjeneste.class,
             // swagger
             OpenApiResource.class,
             // Applikasjonsoppsett
@@ -118,8 +120,7 @@ public class ApiConfig extends Application {
             JsonMappingExceptionMapper.class,
             JsonParseExceptionMapper.class,
             // Generell exceptionmapper m/logging for øvrige tilfelle
-            GeneralRestExceptionMapper.class,
-            HistorikkRestTjeneste.class));
+            GeneralRestExceptionMapper.class));
 
         if (ENV.isLocal()) {
             classes.add(GrunnlagRestTestTjenesteLocalDev.class);
@@ -129,7 +130,6 @@ public class ApiConfig extends Application {
         if (Fagsystem.FPTILBAKE.equals(ApplicationName.hvilkenTilbake())) {
             classes.add(AuthenticationFilter.class); // autentisering etter ny standard
         }
-
 
         return Collections.unmodifiableSet(classes);
     }

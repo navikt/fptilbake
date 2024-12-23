@@ -1,11 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn;
 
-import java.time.LocalDateTime;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.plainTekstLinje;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,13 +20,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagTotrinnsvurdering;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.SkjermlenkeTjeneste;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 @ApplicationScoped
@@ -34,7 +31,7 @@ public class FatteVedtakTjeneste {
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private TotrinnTjeneste totrinnTjeneste;
-    private HistorikkRepositoryOld historikkRepository;
+    private HistorikkinnslagRepository historikkRepository;
 
     FatteVedtakTjeneste() {
         // for CDI
@@ -44,7 +41,7 @@ public class FatteVedtakTjeneste {
     public FatteVedtakTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                TotrinnTjeneste totrinnTjeneste) {
-        this.historikkRepository = repositoryProvider.getHistorikkRepositoryOld();
+        this.historikkRepository = repositoryProvider.getHistorikkinnslagRepository();
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.totrinnTjeneste = totrinnTjeneste;
     }
@@ -82,11 +79,24 @@ public class FatteVedtakTjeneste {
     public void lagHistorikkinnslagFattVedtak(Behandling behandling) {
         Collection<Totrinnsvurdering> totrinnsvurderings = totrinnTjeneste.hentTotrinnsvurderinger(behandling);
         if (sendesTilbakeTilSaksbehandler(totrinnsvurderings)) {
-            lagHistorikkInnslagVurderPåNytt(behandling, totrinnsvurderings);
-            return;
+            var historikkinnslag = new Historikkinnslag.Builder()
+                .medAktør(HistorikkAktør.BESLUTTER)
+                .medFagsakId(behandling.getFagsakId())
+                .medBehandlingId(behandling.getId())
+                .medTittel("Sak retur")
+                .medLinjer(lagTekstForHverTotrinnkontroll(totrinnsvurderings))
+                .build();
+            historikkRepository.lagre(historikkinnslag);
+        } else {
+            var historikkinnslag = new Historikkinnslag.Builder()
+                .medAktør(HistorikkAktør.BESLUTTER) // det er alltid totrinnsvurdering for tilbakerkrevingssaker
+                .medFagsakId(behandling.getFagsakId())
+                .medBehandlingId(behandling.getId())
+                .medTittel(SkjermlenkeType.VEDTAK)
+                .addLinje("Vedtak er fattet")
+                .build();
+            historikkRepository.lagre(historikkinnslag);
         }
-
-        lagHistorikkInnslagVedtakFattet(behandling);
     }
 
     private boolean sendesTilbakeTilSaksbehandler(Collection<Totrinnsvurdering> medTotrinnskontroll) {
@@ -94,62 +104,31 @@ public class FatteVedtakTjeneste {
                 .anyMatch(a -> !Boolean.TRUE.equals(a.isGodkjent()));
     }
 
-    private void lagHistorikkInnslagVurderPåNytt(Behandling behandling, Collection<Totrinnsvurdering> medTotrinnskontroll) {
-        Map<SkjermlenkeType, List<HistorikkinnslagTotrinnsvurdering>> vurdering = new HashMap<>();
-        List<HistorikkinnslagTotrinnsvurdering> vurderingUtenLenke = new ArrayList<>();
+    private static List<HistorikkinnslagLinjeBuilder> lagTekstForHverTotrinnkontroll(Collection<Totrinnsvurdering> medTotrinnskontroll) {
+        return medTotrinnskontroll.stream()
+            .sorted(Comparator.comparing(ttv -> ttv.getEndretTidspunkt() != null ? ttv.getEndretTidspunkt() : ttv.getOpprettetTidspunkt()))
+            .map(FatteVedtakTjeneste::tilHistorikkinnslagTekst)
+            .map(FatteVedtakTjeneste::leggTilLinjeskift)
+            .flatMap(Collection::stream)
+            .toList();
+    }
 
-        HistorikkInnslagTekstBuilder delBuilder = new HistorikkInnslagTekstBuilder()
-                .medHendelse(HistorikkinnslagType.SAK_RETUR);
-
-        for (Totrinnsvurdering ttv : medTotrinnskontroll) {
-            HistorikkinnslagTotrinnsvurdering totrinnsVurdering = lagHistorikkinnslagTotrinnsvurdering(ttv);
-            LocalDateTime sistEndret = ttv.getEndretTidspunkt() != null ? ttv.getEndretTidspunkt() : ttv.getOpprettetTidspunkt();
-            totrinnsVurdering.setAksjonspunktSistEndret(sistEndret);
-            SkjermlenkeType skjermlenkeType = SkjermlenkeTjeneste.finnSkjermlenkeType(ttv.getAksjonspunktDefinisjon());
-            if (skjermlenkeType != SkjermlenkeType.UDEFINERT) {
-                List<HistorikkinnslagTotrinnsvurdering> aksjonspktVurderingListe = vurdering.computeIfAbsent(skjermlenkeType,
-                        k -> new ArrayList<>());
-                aksjonspktVurderingListe.add(totrinnsVurdering);
-            } else {
-                vurderingUtenLenke.add(totrinnsVurdering);
-            }
+    private static List<HistorikkinnslagLinjeBuilder> tilHistorikkinnslagTekst(Totrinnsvurdering ttv) {
+        var aksjonspunktNavn = ttv.getAksjonspunktDefinisjon().getNavn();
+        if (Boolean.TRUE.equals(ttv.isGodkjent())) {
+            return List.of(new HistorikkinnslagLinjeBuilder().bold(aksjonspunktNavn + ":").bold("Godkjent"));
         }
-        delBuilder.medTotrinnsvurdering(vurdering, vurderingUtenLenke);
-
-        historikkRepository.lagre(lagHistorikkinnslag(behandling, HistorikkinnslagType.SAK_RETUR, delBuilder));
+        var linjer = new ArrayList<HistorikkinnslagLinjeBuilder>();
+        linjer.add(new HistorikkinnslagLinjeBuilder().bold(aksjonspunktNavn + ":").bold("Må vurderes på nytt"));
+        if (ttv.getBegrunnelse() != null) {
+            linjer.add(plainTekstLinje(String.format("Kommentar: %s", ttv.getBegrunnelse())));
+        }
+        return linjer;
     }
 
-    private HistorikkinnslagOld lagHistorikkinnslag(Behandling behandling, HistorikkinnslagType historikkinnslagType,
-                                                    HistorikkInnslagTekstBuilder builder) {
-        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld();
-        historikkinnslag.setBehandling(behandling);
-        historikkinnslag.setAktør(HistorikkAktør.BESLUTTER);
-        historikkinnslag.setType(historikkinnslagType);
-        builder.build(historikkinnslag);
-
-        return historikkinnslag;
+    private static List<HistorikkinnslagLinjeBuilder> leggTilLinjeskift(List<HistorikkinnslagLinjeBuilder> eksistrendeLinjer) {
+        var linjer = new ArrayList<>(eksistrendeLinjer);
+        linjer.add(HistorikkinnslagLinjeBuilder.LINJESKIFT);
+        return linjer;
     }
-
-    private HistorikkinnslagTotrinnsvurdering lagHistorikkinnslagTotrinnsvurdering(Totrinnsvurdering ttv) {
-        HistorikkinnslagTotrinnsvurdering totrinnsVurdering = new HistorikkinnslagTotrinnsvurdering();
-        totrinnsVurdering.setAksjonspunktDefinisjon(ttv.getAksjonspunktDefinisjon());
-        totrinnsVurdering.setBegrunnelse(ttv.getBegrunnelse());
-        totrinnsVurdering.setGodkjent(Boolean.TRUE.equals(ttv.isGodkjent()));
-        return totrinnsVurdering;
-    }
-
-    private void lagHistorikkInnslagVedtakFattet(Behandling behandling) {
-        HistorikkinnslagType historikkinnslagType = HistorikkinnslagType.VEDTAK_FATTET;
-        HistorikkInnslagTekstBuilder tekstBuilder = new HistorikkInnslagTekstBuilder()
-                .medHendelse(historikkinnslagType)
-                .medSkjermlenke(SkjermlenkeType.VEDTAK);
-        HistorikkinnslagOld innslag = new HistorikkinnslagOld();
-        innslag.setAktør(HistorikkAktør.BESLUTTER); //det er alltid totrinnsvurdering for tilbakerkrevingssaker
-        innslag.setType(historikkinnslagType);
-        innslag.setBehandling(behandling);
-        tekstBuilder.build(innslag);
-
-        historikkRepository.lagre(innslag);
-    }
-
 }

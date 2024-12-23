@@ -6,20 +6,20 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
+
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType.FAKTA_OM_VERGE;
 
 @ApplicationScoped
 public class AvklartVergeTjeneste {
@@ -27,7 +27,7 @@ public class AvklartVergeTjeneste {
     private VergeRepository vergeRepository;
     private PersoninfoAdapter tpsTjeneste;
     private VirksomhetTjeneste virksomhetTjeneste;
-    private HistorikkTjenesteAdapter historikkTjenesteAdapter;
+    private HistorikkinnslagRepository historikkRepository;
 
     AvklartVergeTjeneste() {
         // for CDI
@@ -37,14 +37,14 @@ public class AvklartVergeTjeneste {
     public AvklartVergeTjeneste(VergeRepository vergeRepository,
                                 PersoninfoAdapter tpsTjeneste,
                                 VirksomhetTjeneste virksomhetTjeneste,
-                                HistorikkTjenesteAdapter historikkTjenesteAdapter) {
+                                HistorikkinnslagRepository historikkRepository) {
         this.vergeRepository = vergeRepository;
         this.tpsTjeneste = tpsTjeneste;
         this.virksomhetTjeneste = virksomhetTjeneste;
-        this.historikkTjenesteAdapter = historikkTjenesteAdapter;
+        this.historikkRepository = historikkRepository;
     }
 
-    public void lagreVergeInformasjon(Long behandlingId,
+    public void lagreVergeInformasjon(Behandling behandling,
                                       VergeDto vergeDto) {
         VergeEntitet.Builder builder = VergeEntitet.builder()
                 .medKilde(KildeType.FPTILBAKE.name())
@@ -61,8 +61,8 @@ public class AvklartVergeTjeneste {
             builder.medVergeAktørId(hentAktørId(vergeDto.getFnr()));
         }
         VergeEntitet vergeEntitet = builder.build();
-        vergeRepository.lagreVergeInformasjon(behandlingId, vergeEntitet);
-        lagHistorikkInnslagForVerge(behandlingId);
+        vergeRepository.lagreVergeInformasjon(behandling.getId(), vergeEntitet);
+        lagHistorikkInnslagForVerge(behandling);
     }
 
     private AktørId hentAktørId(String fnr) {
@@ -73,17 +73,15 @@ public class AvklartVergeTjeneste {
         return aktørId.get();
     }
 
-    private void lagHistorikkInnslagForVerge(Long behandlingId) {
-        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld();
-        historikkinnslag.setType(HistorikkinnslagType.REGISTRER_OM_VERGE);
-        historikkinnslag.setBehandlingId(behandlingId);
-        historikkinnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
+    private void lagHistorikkInnslagForVerge(Behandling behandling) {
+        var historikkinnslag = new Historikkinnslag.Builder()
+            .medAktør(HistorikkAktør.SAKSBEHANDLER)
+            .medBehandlingId(behandling.getId())
+            .medFagsakId(behandling.getFagsakId())
+            .medTittel(FAKTA_OM_VERGE)
+            .addLinje("Registering av opplysninger om verge/fullmektig")
+            .build();
 
-        HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
-        tekstBuilder.medSkjermlenke(SkjermlenkeType.FAKTA_OM_VERGE)
-                .medHendelse(HistorikkinnslagType.REGISTRER_OM_VERGE)
-                .build(historikkinnslag);
-
-        historikkTjenesteAdapter.lagInnslag(historikkinnslag);
+        historikkRepository.lagre(historikkinnslag);
     }
 }
