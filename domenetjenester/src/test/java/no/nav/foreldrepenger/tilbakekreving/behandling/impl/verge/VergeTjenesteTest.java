@@ -26,8 +26,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ki
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 
 class VergeTjenesteTest extends FellesTestOppsett {
 
@@ -85,11 +83,12 @@ class VergeTjenesteTest extends FellesTestOppsett {
                 AksjonspunktDefinisjon.AVKLAR_VERGE);
         assertThat(aksjonspunkt).isPresent();
         assertThat(aksjonspunkt.get().erAvbrutt()).isTrue();
-        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikk(internBehandlingId);
-        assertThat(historikkinnslager).isNotEmpty();
-        assertThat(historikkinnslager.size()).isEqualTo(1);
-        assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.FJERNET_VERGE);
-        assertThat(historikkinnslager.get(0).getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
+        var historikkinnslager = historikkinnslagRepository.hent(internBehandlingId);
+        assertThat(historikkinnslager).hasSize(2);
+        assertThat(historikkinnslager.get(0).getAktør()).isEqualTo(HistorikkAktør.VEDTAKSLØSNINGEN);
+        assertThat(historikkinnslager.get(0).getTittel()).isEqualTo("Tilbakekreving opprettet");
+        assertThat(historikkinnslager.get(1).getAktør()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
+        assertThat(historikkinnslager.get(1).getTittel()).isEqualTo("Opplysninger om verge/fullmektig fjernet");
     }
 
 }

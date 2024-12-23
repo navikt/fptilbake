@@ -37,7 +37,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBre
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.exception.FunksjonellException;
 
 class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
@@ -55,8 +54,6 @@ class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     @BeforeEach
     void setup() {
-        HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository);
-
         henleggelsesbrevTjeneste = new HenleggelsesbrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste, mockPdfBrevTjeneste);
         var kontroll = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
         behandlingRevurderingTjeneste = new BehandlingRevurderingTjeneste(repositoryProvider, kontroll);

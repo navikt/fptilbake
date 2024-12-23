@@ -3,8 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,8 +11,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingE
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 
 class BehandlendeEnhetTest extends FellesTestOppsett {
 
@@ -41,10 +37,11 @@ class BehandlendeEnhetTest extends FellesTestOppsett {
         assertThat(behandling.getBehandlendeEnhetId()).isEqualTo(NY_ENHET_ID);
         assertThat(behandling.getBehandlendeEnhetNavn()).isEqualTo(NY_ENHET_NAVN);
 
-        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikk(internBehandlingId);
-        assertThat(historikkinnslager.size()).isEqualTo(1);
-        HistorikkinnslagOld historikkinnslag = historikkinnslager.get(0);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BYTT_ENHET);
-        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
+        var historikkinnslager = historikkinnslagRepository.hent(internBehandlingId);
+        assertThat(historikkinnslager.size()).isEqualTo(2);
+        assertThat(historikkinnslager.get(0).getTittel()).isEqualTo("Tilbakekreving opprettet");
+        assertThat(historikkinnslager.get(0).getAktør()).isEqualTo(HistorikkAktør.VEDTAKSLØSNINGEN);
+        assertThat(historikkinnslager.get(1).getTittel()).isEqualTo("Bytt enhet");
+        assertThat(historikkinnslager.get(1).getAktør()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
     }
 }

@@ -38,8 +38,21 @@ public class BaseCreateableEntitet implements Serializable {
         return opprettetAv;
     }
 
+    public void setOpprettetAv(String opprettetAv) {
+        this.opprettetAv = opprettetAv;
+    }
+
     public LocalDateTime getOpprettetTidspunkt() {
         return opprettetTidspunkt;
+    }
+
+    /**
+     * Kan brukes til å eksplisitt sette opprettet tidspunkt, f.eks. ved migrering
+     * av data fra et annet system. Ivaretar da opprinnelig tidspunkt istdf å sette
+     * likt now().
+     */
+    public void setOpprettetTidspunkt(LocalDateTime opprettetTidspunkt) {
+        this.opprettetTidspunkt = opprettetTidspunkt;
     }
 
     private static String finnBrukernavn() {
