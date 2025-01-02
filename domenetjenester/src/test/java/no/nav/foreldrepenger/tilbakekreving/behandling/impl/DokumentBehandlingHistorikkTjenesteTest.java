@@ -1,5 +1,6 @@
-package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler;
+package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
+import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
@@ -7,9 +8,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -17,11 +21,19 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-class DokumentBehandlingHistorikkTjenesteTest {
+class DokumentBehandlingHistorikkTjenesteTest extends FellesTestOppsett {
+
+    private BehandlingHistorikkTjeneste historikkTjeneste;
+
+    @BeforeEach
+    public void setup() {
+        historikkTjeneste = new BehandlingHistorikkTjeneste(historikkRepositoryTeamAware, historikkV2Tjeneste);
+    }
+
 
     @Test
     void opprettHistorikkinnslagForOpprettetTilbakekreving() {
-        historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling);
+        historikkTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling);
 
         List<Historikkinnslag> historikkinnslagene = historikkRepository.hentHistorikk(behandling.getId());
         assertThat(historikkinnslagene).isNotEmpty();
@@ -39,7 +51,7 @@ class DokumentBehandlingHistorikkTjenesteTest {
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
 
-        historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling);
+        historikkTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling);
 
         List<Historikkinnslag> historikkinnslagene = historikkRepository.hentHistorikk(behandling.getId());
         assertThat(historikkinnslagene).isNotEmpty();

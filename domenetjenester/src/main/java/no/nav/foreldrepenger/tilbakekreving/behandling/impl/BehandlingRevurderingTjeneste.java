@@ -26,7 +26,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag2;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -34,13 +36,15 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.vedtak.exception.FunksjonellException;
 import no.nav.vedtak.exception.TekniskException;
 
+import org.jetbrains.annotations.NotNull;
+
 @ApplicationScoped
 public class BehandlingRevurderingTjeneste {
 
-    private BehandlingRepositoryProvider repositoryProvider;
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private VergeRepository vergeRepository;
+    private HistorikkRepositoryTeamAware historikkRepositoryTeamAware;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
     BehandlingRevurderingTjeneste() {
@@ -50,10 +54,10 @@ public class BehandlingRevurderingTjeneste {
     @Inject
     public BehandlingRevurderingTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                          BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
-        this.repositoryProvider = repositoryProvider;
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.vergeRepository = repositoryProvider.getVergeRepository();
+        this.historikkRepositoryTeamAware = repositoryProvider.getHistorikkRepositoryTeamAware();
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }
 
@@ -147,20 +151,32 @@ public class BehandlingRevurderingTjeneste {
     }
 
     private void lagHistorikkInnslagForOpprettetRevurdering(Behandling behandling, BehandlingÅrsakType revurderingÅrsak) {
-        Historikkinnslag revurderingsInnslag = new Historikkinnslag();
+        var revurderingsInnslag = lagHistorikkinnslag(behandling, revurderingÅrsak);
+        var revurderingsInnslag2 = lagHistorikkinnslag2(behandling, revurderingÅrsak);
+        historikkRepositoryTeamAware.lagre(revurderingsInnslag, revurderingsInnslag2);
+    }
 
+    private static Historikkinnslag lagHistorikkinnslag(Behandling behandling, BehandlingÅrsakType revurderingÅrsak) {
+        var revurderingsInnslag = new Historikkinnslag();
         revurderingsInnslag.setBehandling(behandling);
         revurderingsInnslag.setType(HistorikkinnslagType.REVURD_OPPR);
         revurderingsInnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
-
         HistorikkInnslagTekstBuilder historiebygger = new HistorikkInnslagTekstBuilder()
                 .medHendelse(HistorikkinnslagType.REVURD_OPPR)
                 .medBegrunnelse(revurderingÅrsak);
         historiebygger.build(revurderingsInnslag);
-
-        repositoryProvider.getHistorikkRepository().lagre(revurderingsInnslag);
+        return revurderingsInnslag;
     }
 
+    private static Historikkinnslag2 lagHistorikkinnslag2(Behandling behandling, BehandlingÅrsakType revurderingÅrsak) {
+        return new Historikkinnslag2.Builder()
+            .medAktør(HistorikkAktør.SAKSBEHANDLER)
+            .medFagsakId(behandling.getFagsakId())
+            .medBehandlingId(behandling.getId())
+            .medTittel("Tilbakekreving Revurdering opprettet")
+            .addLinje(revurderingÅrsak.getNavn())
+            .build();
+    }
 
     private static FunksjonellException kanIkkeOppretteRevurdering(Saksnummer saksnummer) {
         return new FunksjonellException("FPT-663487", String.format("saksnummer %s oppfyller ikke kravene for revurdering", saksnummer), "");

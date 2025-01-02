@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,9 +96,9 @@ public class VilkårsvurderingTjeneste {
         return feilutbetalingPerioder;
     }
 
-    public void lagreVilkårsvurdering(Long behandlingId, List<VilkårsvurderingPerioderDto> vilkarsVurdertPerioder) {
+    public void lagreVilkårsvurdering(Behandling behandling, List<VilkårsvurderingPerioderDto> vilkarsVurdertPerioder) {
+        var behandlingId = behandling.getId();
         VilkårVurderingEntitet vilkårVurderingEntitet = new VilkårVurderingEntitet();
-
         for (VilkårsvurderingPerioderDto periode : vilkarsVurdertPerioder) {
             if (erPeriodeForeldet(behandlingId, periode.getFom(), periode.getTom())) {
                 //TODO kaste exception istedet, det skal ikke skje at saksbehandler vurderer en foreldet periode
@@ -120,7 +122,7 @@ public class VilkårsvurderingTjeneste {
         var forrigeEntitet = vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId);
         var forrigeVurdering = forrigeEntitet.orElse(null);
 
-        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandlingId, forrigeVurdering, vilkårVurderingEntitet);
+        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandling, forrigeVurdering, vilkårVurderingEntitet);
 
         vilkårsvurderingRepository.lagre(behandlingId, vilkårVurderingEntitet);
     }

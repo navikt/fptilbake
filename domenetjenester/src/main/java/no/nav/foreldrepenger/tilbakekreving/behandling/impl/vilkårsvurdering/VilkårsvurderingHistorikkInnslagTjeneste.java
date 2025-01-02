@@ -9,6 +9,8 @@ import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Hi
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType.ILEGG_RENTER;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType.TILBAKEKREV_SMÅBELOEP;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.LINJESKIFT;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.fraTilEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,13 +23,15 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag2;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
@@ -36,28 +40,25 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingSærligGrunnEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
 @ApplicationScoped
 public class VilkårsvurderingHistorikkInnslagTjeneste {
 
-    private HistorikkTjenesteAdapter historikkTjenesteAdapter;
-    private BehandlingRepositoryProvider repositoryProvider;
+    private HistorikkRepositoryTeamAware historikkRepository;
 
     VilkårsvurderingHistorikkInnslagTjeneste() {
         // for CDI
     }
 
     @Inject
-    public VilkårsvurderingHistorikkInnslagTjeneste(HistorikkTjenesteAdapter historikkTjenesteAdapter, BehandlingRepositoryProvider repositoryProvider) {
-        this.historikkTjenesteAdapter = historikkTjenesteAdapter;
-        this.repositoryProvider = repositoryProvider;
+    public VilkårsvurderingHistorikkInnslagTjeneste(HistorikkRepositoryTeamAware historikkRepository) {
+        this.historikkRepository = historikkRepository;
     }
 
-    public void lagHistorikkInnslag(Long behandlingId, VilkårVurderingEntitet gammel, VilkårVurderingEntitet ny) {
+    public void lagHistorikkInnslag(Behandling behandling, VilkårVurderingEntitet gammel, VilkårVurderingEntitet ny) {
         List<Vilkårsendring> endringer = finnEndringer(gammel, ny);
         if (!endringer.isEmpty()) {
-            lagInnslag(behandlingId, endringer);
+            lagInnslag(behandling, endringer);
         }
     }
 
@@ -115,11 +116,10 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
         return new Historikkendring<>(felt, gammelVerdi, nyVerdi);
     }
 
-    private void lagInnslag(Long behandlingId, List<Vilkårsendring> endringer) {
-        Behandling behandling = repositoryProvider.getBehandlingRepository().hentBehandling(behandlingId);
+    private void lagInnslag(Behandling behandling, List<Vilkårsendring> endringer) {
         Historikkinnslag historikkinnslag = new Historikkinnslag();
         historikkinnslag.setType(HistorikkinnslagType.TILBAKEKREVING);
-        historikkinnslag.setBehandlingId(behandlingId);
+        historikkinnslag.setBehandlingId(behandling.getId());
         historikkinnslag.setAktør(behandling.isAutomatiskSaksbehandlet() ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER);
 
         for (Vilkårsendring vilkårsendring : endringer) {
@@ -132,7 +132,47 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
             builder.medOpplysning(HistorikkOpplysningType.SÆRLIG_GRUNNER_BEGRUNNELSE, vilkårsendring.getBegrunnelseSærligGrunner());
             builder.build(historikkinnslag);
         }
-        historikkTjenesteAdapter.lagInnslag(historikkinnslag);
+        var historikkinnslag2 = lagHistorikkinnslag2(behandling, endringer);
+        historikkRepository.lagre(historikkinnslag, historikkinnslag2);
+    }
+
+    private static Historikkinnslag2 lagHistorikkinnslag2(Behandling behandling, List<Vilkårsendring> vilkårsendringer) {
+        var historikklinjer = new ArrayList<HistorikkinnslagLinjeBuilder>();
+        for (var vilkårendring : vilkårsendringer) {
+            historikklinjer.addAll(lagTekstForVilkårsendring(vilkårendring));
+            historikklinjer.add(LINJESKIFT);
+        }
+        return new Historikkinnslag2.Builder()
+            .medAktør(behandling.isAutomatiskSaksbehandlet() ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER)
+            .medBehandlingId(behandling.getId())
+            .medFagsakId(behandling.getFagsakId())
+            .medTittel(SkjermlenkeType.TILBAKEKREVING)
+            .medLinjer(historikklinjer)
+            .build();
+    }
+
+    private static List<HistorikkinnslagLinjeBuilder> lagTekstForVilkårsendring(Vilkårsendring vilkårendring) {
+        var tekstlinjerForVilkårsendring = new ArrayList<HistorikkinnslagLinjeBuilder>();
+        var undertittel = String.format("__Vurdering__ av perioden %s-%s.", vilkårendring.getFom(), vilkårendring.getTom());
+        tekstlinjerForVilkårsendring.add(new HistorikkinnslagLinjeBuilder().tekst(undertittel));
+        tekstlinjerForVilkårsendring.add(LINJESKIFT);
+        vilkårendring.getEndringer().forEach(endring -> {
+            // TODO: ANDEL_TILBAKEKREVES er prosent => endret fra x% til y%? Altså legge på %?
+            tekstlinjerForVilkårsendring.add(fraTilEquals(endring.getFelt().getNavn(), endring.getForrigeVerdi(), endring.getNyVerdi()));
+        });
+        if (vilkårendring.getBegrunnelseVilkår() != null) {
+            tekstlinjerForVilkårsendring.add(new HistorikkinnslagLinjeBuilder().tekst(vilkårendring.getBegrunnelseVilkår()));
+            tekstlinjerForVilkårsendring.add(LINJESKIFT);
+        }
+        if (vilkårendring.getBegrunnelseAktsomhet() != null) {
+            tekstlinjerForVilkårsendring.add(new HistorikkinnslagLinjeBuilder().tekst(vilkårendring.getBegrunnelseAktsomhet()));
+            tekstlinjerForVilkårsendring.add(LINJESKIFT);
+        }
+        if (vilkårendring.getBegrunnelseSærligGrunner() != null) {
+            tekstlinjerForVilkårsendring.add(new HistorikkinnslagLinjeBuilder().tekst(vilkårendring.getBegrunnelseSærligGrunner()));
+            tekstlinjerForVilkårsendring.add(LINJESKIFT);
+        }
+        return tekstlinjerForVilkårsendring;
     }
 
     private static <T> T finn(VilkårVurderingPeriodeEntitet periode, Function<VilkårVurderingPeriodeEntitet, T> oppslag) {
@@ -151,8 +191,7 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
     }
 
     private HistorikkInnslagTekstBuilder lagTekstBuilderMedFellesFelt(Vilkårsendring periode) {
-        HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
-
+        HistorikkInnslagTekstBuilder tekstBuilder = new HistorikkInnslagTekstBuilder();
         tekstBuilder.medSkjermlenke(SkjermlenkeType.TILBAKEKREVING)
                 .medOpplysning(HistorikkOpplysningType.PERIODE_FOM, periode.getFom())
                 .medOpplysning(HistorikkOpplysningType.PERIODE_TOM, periode.getTom())

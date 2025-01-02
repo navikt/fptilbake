@@ -45,7 +45,7 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         vurderingEntitet.leggTilPeriode(formGodTroPeriode(vurderingEntitet, FOM, PERIOD_FØRSTE_SISTE_DATO));
         vurderingEntitet.leggTilPeriode(formAktsomhetPeriode(vurderingEntitet, PERIODE_ANDRE_FØRSTE_DATO, TOM));
 
-        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, null, vurderingEntitet);
+        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandling, null, vurderingEntitet);
         List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         Historikkinnslag historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
 
@@ -58,7 +58,7 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         VilkårVurderingEntitet vurderingEntitet = new VilkårVurderingEntitet();
         vurderingEntitet.leggTilPeriode(formGodTroPeriode(vurderingEntitet, FOM, TOM));
 
-        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, vurderingEntitet, vurderingEntitet);
+        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandling, vurderingEntitet, vurderingEntitet);
 
         List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         assertThat(historikkinnslager).isEmpty();
@@ -84,7 +84,7 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         forrigePeriodeEntitet.setAktsomhet(forrigeAktsomhetEntitet);
         gammelVurdering.leggTilPeriode(forrigePeriodeEntitet);
 
-        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, gammelVurdering, nyVurdering);
+        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandling, gammelVurdering, nyVurdering);
 
         List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         Historikkinnslag historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
@@ -119,7 +119,7 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         nyVurdering.leggTilPeriode(formGodTroPeriode(nyVurdering, FOM, PERIOD_FØRSTE_SISTE_DATO));
         nyVurdering.leggTilPeriode(formAktsomhetPeriode(nyVurdering, PERIODE_ANDRE_FØRSTE_DATO, TOM));
 
-        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, gammelVurdering, nyVurdering);
+        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandling, gammelVurdering, nyVurdering);
 
         List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         Historikkinnslag historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
@@ -135,7 +135,7 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         VilkårVurderingEntitet gammelVurdering = new VilkårVurderingEntitet();
         gammelVurdering.leggTilPeriode(formGodTroPeriode(gammelVurdering, FOM, TOM));
 
-        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, gammelVurdering, nyVurdering);
+        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandling, gammelVurdering, nyVurdering);
 
         List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         Historikkinnslag historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
@@ -166,7 +166,7 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         VilkårVurderingEntitet gammelVurdering = new VilkårVurderingEntitet();
         gammelVurdering.leggTilPeriode(formAktsomhetPeriode(gammelVurdering, FOM, TOM));
 
-        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, gammelVurdering, nyVurdering);
+        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandling, gammelVurdering, nyVurdering);
 
         List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         Historikkinnslag historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);

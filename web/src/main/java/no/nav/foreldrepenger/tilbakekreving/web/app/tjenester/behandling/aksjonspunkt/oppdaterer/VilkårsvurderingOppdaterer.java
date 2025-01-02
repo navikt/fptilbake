@@ -21,6 +21,6 @@ public class Vilk책rsvurderingOppdaterer implements AksjonspunktOppdaterer<Vilk�
 
     @Override
     public void oppdater(Vilk책rsVurderingDto dto, Behandling behandling) {
-        vilk책rsvurderingTjeneste.lagreVilk책rsvurdering(behandling.getId(), dto.getVilkarsVurdertePerioder());
+        vilk책rsvurderingTjeneste.lagreVilk책rsvurdering(behandling, dto.getVilkarsVurdertePerioder());
     }
 }

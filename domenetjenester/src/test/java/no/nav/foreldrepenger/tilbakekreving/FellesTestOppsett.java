@@ -18,7 +18,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurderForeldelseHist
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag2Repository;
-import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Adapter;
 
 import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
 
@@ -186,7 +185,7 @@ public abstract class FellesTestOppsett {
         historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);
         var vurderForeldelseHistorikkTjeneste = new VurderForeldelseHistorikkTjeneste(historikkRepositoryTeamAware);
         vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repoProvider, vurderForeldelseHistorikkTjeneste, kravgrunnlagBeregningTjeneste);
-        vilkårsvurderingHistorikkInnslagTjeneste = new VilkårsvurderingHistorikkInnslagTjeneste(historikkTjenesteAdapter, repoProvider);
+        vilkårsvurderingHistorikkInnslagTjeneste = new VilkårsvurderingHistorikkInnslagTjeneste(historikkRepositoryTeamAware);
         vilkårsvurderingTjeneste = new VilkårsvurderingTjeneste(vurdertForeldelseTjeneste, repoProvider, vilkårsvurderingHistorikkInnslagTjeneste, kravgrunnlagBeregningTjeneste);
         revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider, behandlingskontrollTjeneste);
         faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repoProvider, kravgrunnlagTjeneste, mockFagsystemKlient);

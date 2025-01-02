@@ -129,6 +129,10 @@ public class HistorikkinnslagLinjeBuilder {
         return fraTilEquals(hva, format(fra), format(til));
     }
 
+    public static <T> HistorikkinnslagLinjeBuilder fraTilEquals(String hva, T fra, T til) {
+        return fraTilEquals(hva, format(fra), format(til));
+    }
+
     public String tilTekst() {
         if (type == HistorikkinnslagLinjeType.TEKST && stringBuilder.isEmpty()) {
             throw new IllegalArgumentException("Forventer ikke tom streng for type " + type);

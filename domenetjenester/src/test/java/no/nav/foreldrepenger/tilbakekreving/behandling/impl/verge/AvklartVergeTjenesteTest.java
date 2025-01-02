@@ -36,14 +36,14 @@ class AvklartVergeTjenesteTest extends FellesTestOppsett {
     void setUp() {
         vergeRepository = new VergeRepository(entityManager);
         virksomhetTjenesteMock = Mockito.mock(VirksomhetTjeneste.class);
-        avklartVergeTjeneste = new AvklartVergeTjeneste(vergeRepository, mockTpsTjeneste, virksomhetTjenesteMock, historikkTjenesteAdapter);
+        avklartVergeTjeneste = new AvklartVergeTjeneste(vergeRepository, mockTpsTjeneste, virksomhetTjenesteMock, historikkRepositoryTeamAware);
     }
 
     @Test
     void skal_lagre_verge_informasjon_når_verge_er_advokat() {
         VergeDto vergeDto = lagVergeDto(VergeType.ADVOKAT);
         when(virksomhetTjenesteMock.validerOrganisasjon(anyString())).thenReturn(true);
-        avklartVergeTjeneste.lagreVergeInformasjon(internBehandlingId, vergeDto);
+        avklartVergeTjeneste.lagreVergeInformasjon(behandling, vergeDto);
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(internBehandlingId);
         assertThat(vergeEntitet).isNotEmpty();
         VergeEntitet vergeOrg = vergeEntitet.get();
@@ -57,7 +57,7 @@ class AvklartVergeTjenesteTest extends FellesTestOppsett {
     void skal_lagre_verge_informasjon_når_verge_er_ikke_advokat() {
         VergeDto vergeDto = lagVergeDto(VergeType.FBARN);
         when(mockTpsTjeneste.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getAktørId()));
-        avklartVergeTjeneste.lagreVergeInformasjon(internBehandlingId, vergeDto);
+        avklartVergeTjeneste.lagreVergeInformasjon(behandling, vergeDto);
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(internBehandlingId);
         assertThat(vergeEntitet).isNotEmpty();
         VergeEntitet vergePerson = vergeEntitet.get();
@@ -72,7 +72,7 @@ class AvklartVergeTjenesteTest extends FellesTestOppsett {
         VergeDto vergeDto = lagVergeDto(VergeType.ADVOKAT);
         when(virksomhetTjenesteMock.validerOrganisasjon(anyString())).thenReturn(false);
         var e = assertThrows(IllegalStateException.class,
-                () -> avklartVergeTjeneste.lagreVergeInformasjon(internBehandlingId, vergeDto));
+                () -> avklartVergeTjeneste.lagreVergeInformasjon(behandling, vergeDto));
         assertThat(e.getMessage()).contains("OrgansisasjonNummer er ikke gyldig");
     }
 

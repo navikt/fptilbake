@@ -7,6 +7,12 @@ import java.util.Optional;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag2;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +51,10 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(HentKravgrunnlagTask.class);
 
-    private BehandlingRepositoryProvider repositoryProvider;
+    private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
+    private HistorikkRepositoryTeamAware historikkRepositoryTeamAware;
 
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
     private FagsystemKlient fagsystemKlient;
@@ -63,9 +70,10 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
                                 KravgrunnlagTjeneste kravgrunnlagTjeneste,
                                 FagsystemKlient fagsystemKlient,
                                 KravgrunnlagHenter kravgrunnlagHenter) {
-        this.repositoryProvider = repositoryProvider;
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
+        this.historikkRepositoryTeamAware = repositoryProvider.getHistorikkRepositoryTeamAware();
 
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
         this.fagsystemKlient = fagsystemKlient;
@@ -75,7 +83,7 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
-        Behandling behandling = repositoryProvider.getBehandlingRepository().hentBehandling(behandlingId);
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         Long origBehandlingId = Long.valueOf(prosessTaskData.getPropertyValue(TaskProperties.PROPERTY_ORIGINAL_BEHANDLING_ID));
 
         Kravgrunnlag431 kravgrunnlag431 = hentNyttKravgrunnlag(origBehandlingId);
@@ -113,7 +121,19 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
                 .medOpplysning(HistorikkOpplysningType.KRAVGRUNNLAG_STATUS, grunnlagStatus.getNavn());
         historiebygger.build(grunnlagMottattInnslag);
 
-        repositoryProvider.getHistorikkRepository().lagre(grunnlagMottattInnslag);
+        var historikkinnslag2 = lagHistorikkinnslag2GrunnlagMottatt(behandling, kravgrunnlag431, grunnlagStatus);
+        historikkRepositoryTeamAware.lagre(grunnlagMottattInnslag, historikkinnslag2);
+    }
+
+    private static Historikkinnslag2 lagHistorikkinnslag2GrunnlagMottatt(Behandling behandling, Kravgrunnlag431 kravgrunnlag431, KravStatusKode grunnlagStatus) {
+        return new Historikkinnslag2.Builder()
+            .medAktør(HistorikkAktør.VEDTAKSLØSNINGEN)
+            .medFagsakId(behandling.getFagsakId())
+            .medBehandlingId(behandling.getId())
+            .medTittel("Kravgrunnlag mottatt")
+            .addLinje(String.format("ID: %s", kravgrunnlag431.getVedtakId()))
+            .addLinje(String.format("Status: %s", grunnlagStatus.getNavn()))
+            .build();
     }
 
     private void oppdaterHenvisningFraGrunnlag(Behandling behandling, String saksnummer, Henvisning grunnlagHenvisning) {

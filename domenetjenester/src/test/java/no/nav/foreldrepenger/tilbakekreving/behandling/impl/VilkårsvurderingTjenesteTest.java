@@ -227,7 +227,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = List.of(
                 formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
                 formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(behandling, vilkårPerioder);
 
         Optional<VilkårVurderingEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurdering(internBehandlingId);
         assertThat(aggregateEntitet).isNotEmpty();
@@ -262,7 +262,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
                     aktsomhetDto.setAndelTilbakekreves(BigDecimal.TEN);
                 });
 
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(behandling, vilkårPerioder);
 
         Optional<VilkårVurderingEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurdering(internBehandlingId);
         assertThat(aggregateEntitet).isNotEmpty();
@@ -306,7 +306,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = List.of(
                 formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, SISTE_DAG_I_FORELDET_PERIODE, Aktsomhet.SIMPEL_UAKTSOM),
                 formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, FØRSTE_DAG_I_IKKE_FORELDET_PERIODE, TOM, Aktsomhet.GROVT_UAKTSOM));
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(behandling, vilkårPerioder);
 
         Optional<VilkårVurderingEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurdering(internBehandlingId);
         assertThat(aggregateEntitet).isNotEmpty();
@@ -329,7 +329,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = List.of(
                 formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
                 formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(behandling, vilkårPerioder);
 
         formGrunnlag();
 
@@ -367,7 +367,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = List.of(
                 formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, LocalDate.of(2016, 3, 31), Aktsomhet.SIMPEL_UAKTSOM),
                 formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.GROVT_UAKTSOM));
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(behandling, vilkårPerioder);
 
         formGrunnlag();
 
@@ -411,7 +411,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Collections.singletonList(vilkårsvurderingPerioderDto);
 
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(behandling, vilkårPerioder);
 
         formGrunnlag();
 
@@ -437,7 +437,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Collections.singletonList(vilkårsvurderingPerioderDto);
 
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(behandling, vilkårPerioder);
 
         formGrunnlag();
 
