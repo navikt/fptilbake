@@ -48,7 +48,8 @@ class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         nyBehandling = scenario.lagre(repoProvider);
         var historikkInnslagKonverter = new HistorikkInnslagKonverter(behandlingRepository);
         historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);
-        avklartFaktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(faktaFeilutbetalingRepository, historikkTjenesteAdapter);
+        var avklartFaktaFeilutbetalingHistorikkTjeneste = new AvklartFaktaFeilutbetalingHistorikkTjeneste(faktaFeilutbetalingRepository, historikkRepositoryTeamAware);
+        avklartFaktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(faktaFeilutbetalingRepository, avklartFaktaFeilutbetalingHistorikkTjeneste);
     }
 
     @Test

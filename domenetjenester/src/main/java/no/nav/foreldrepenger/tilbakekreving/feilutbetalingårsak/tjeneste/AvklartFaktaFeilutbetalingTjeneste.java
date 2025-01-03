@@ -30,7 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjeneste
 public class AvklartFaktaFeilutbetalingTjeneste {
 
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
-    private HistorikkTjenesteAdapter historikkTjenesteAdapter;
+    private AvklartFaktaFeilutbetalingHistorikkTjeneste avklartFaktaFeilutbetalingHistorikkTjeneste;
 
     AvklartFaktaFeilutbetalingTjeneste() {
         // For CDI
@@ -38,9 +38,9 @@ public class AvklartFaktaFeilutbetalingTjeneste {
 
     @Inject
     public AvklartFaktaFeilutbetalingTjeneste(FaktaFeilutbetalingRepository faktaFeilutbetalingRepository,
-                                              HistorikkTjenesteAdapter historikkTjenesteAdapter) {
+                                              AvklartFaktaFeilutbetalingHistorikkTjeneste avklartFaktaFeilutbetalingHistorikkTjeneste) {
         this.faktaFeilutbetalingRepository = faktaFeilutbetalingRepository;
-        this.historikkTjenesteAdapter = historikkTjenesteAdapter;
+        this.avklartFaktaFeilutbetalingHistorikkTjeneste = avklartFaktaFeilutbetalingHistorikkTjeneste;
     }
 
     public void lagreÅrsakForFeilutbetalingPeriode(Behandling behandling, List<FaktaFeilutbetalingDto> feilutbetalingFaktas, String begrunnelse) {
@@ -73,7 +73,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         faktaFeilutbetalingRepository.lagre(behandling.getId(), faktaFeilutbetaling);
 
         if (behovForHistorikkInnslag) {
-            historikkTjenesteAdapter.lagInnslag(historikkinnslag);
+            avklartFaktaFeilutbetalingHistorikkTjeneste.lagHistorikkinnslagForAvklartFaktaFeilutbetaling(behandling, feilutbetalingFaktas, begrunnelse, historikkinnslag);
         }
     }
 
@@ -86,7 +86,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
                                              FaktaFeilutbetalingDto faktaFeilutbetalingDto,
                                              HistorikkinnslagDelDto historikkinnslagDelDto) {
         boolean harEndret = false;
-        HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
+        HistorikkInnslagTekstBuilder tekstBuilder = new HistorikkInnslagTekstBuilder();
         if (forrigeFakta.isPresent()) {
             List<FaktaFeilutbetalingPeriode> feilutbetalingPerioder = forrigeFakta.get().getFeilutbetaltPerioder();
             String forrigeBegrunnelse = forrigeFakta.get().getBegrunnelse();
@@ -156,7 +156,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         return erEndret;
     }
 
-    private boolean harBegrunnelseEndret(String forrigeBegrunnelse, String begrunnelse) {
+    protected static boolean harBegrunnelseEndret(String forrigeBegrunnelse, String begrunnelse) {
         return forrigeBegrunnelse != null && !forrigeBegrunnelse.isEmpty() && !forrigeBegrunnelse.equalsIgnoreCase(begrunnelse);
     }
 

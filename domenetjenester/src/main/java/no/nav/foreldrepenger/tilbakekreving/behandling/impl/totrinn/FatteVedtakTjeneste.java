@@ -32,6 +32,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvur
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.SkjermlenkeTjeneste;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.plainTekstLinje;
+
 @ApplicationScoped
 public class FatteVedtakTjeneste {
 
@@ -128,7 +130,7 @@ public class FatteVedtakTjeneste {
         var linjer = new ArrayList<HistorikkinnslagLinjeBuilder>();
         linjer.add(new HistorikkinnslagLinjeBuilder().bold(aksjonspunktNavn).bold("må vurderes på nytt"));
         if (ttv.getBegrunnelse() != null) {
-            linjer.add(new HistorikkinnslagLinjeBuilder().tekst("Kommentar:").tekst(ttv.getBegrunnelse()));
+            linjer.add(plainTekstLinje(String.format("Kommentar: %s", ttv.getBegrunnelse())));
         }
         return linjer;
     }

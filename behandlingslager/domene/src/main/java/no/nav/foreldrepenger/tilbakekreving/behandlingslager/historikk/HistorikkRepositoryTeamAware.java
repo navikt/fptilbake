@@ -7,6 +7,9 @@ import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem.FPTILBAKE;
 
 @ApplicationScoped
@@ -26,6 +29,10 @@ public class HistorikkRepositoryTeamAware {
     }
 
 
+    @Deprecated(forRemoval = true)
+    public void lagre(Historikkinnslag historikkinnslag) {
+        historikkRepository.lagre(historikkinnslag);
+    }
 
     public void lagre(Historikkinnslag historikkinnslag, Historikkinnslag2 historikkinnslag2) {
         if (FPTILBAKE.equals(fagsystem)) {

@@ -11,6 +11,7 @@ import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Hi
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType.TILBAKEKREV_SMÅBELOEP;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.LINJESKIFT;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.fraTilEquals;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.plainTekstLinje;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -154,22 +155,22 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
     private static List<HistorikkinnslagLinjeBuilder> lagTekstForVilkårsendring(Vilkårsendring vilkårendring) {
         var tekstlinjerForVilkårsendring = new ArrayList<HistorikkinnslagLinjeBuilder>();
         var undertittel = String.format("__Vurdering__ av perioden %s-%s.", vilkårendring.getFom(), vilkårendring.getTom());
-        tekstlinjerForVilkårsendring.add(new HistorikkinnslagLinjeBuilder().tekst(undertittel));
+        tekstlinjerForVilkårsendring.add(plainTekstLinje(undertittel));
         tekstlinjerForVilkårsendring.add(LINJESKIFT);
         vilkårendring.getEndringer().forEach(endring -> {
             // TODO: ANDEL_TILBAKEKREVES er prosent => endret fra x% til y%? Altså legge på %?
             tekstlinjerForVilkårsendring.add(fraTilEquals(endring.getFelt().getNavn(), endring.getForrigeVerdi(), endring.getNyVerdi()));
         });
         if (vilkårendring.getBegrunnelseVilkår() != null) {
-            tekstlinjerForVilkårsendring.add(new HistorikkinnslagLinjeBuilder().tekst(vilkårendring.getBegrunnelseVilkår()));
+            tekstlinjerForVilkårsendring.add(plainTekstLinje(vilkårendring.getBegrunnelseVilkår()));
             tekstlinjerForVilkårsendring.add(LINJESKIFT);
         }
         if (vilkårendring.getBegrunnelseAktsomhet() != null) {
-            tekstlinjerForVilkårsendring.add(new HistorikkinnslagLinjeBuilder().tekst(vilkårendring.getBegrunnelseAktsomhet()));
+            tekstlinjerForVilkårsendring.add(plainTekstLinje(vilkårendring.getBegrunnelseAktsomhet()));
             tekstlinjerForVilkårsendring.add(LINJESKIFT);
         }
         if (vilkårendring.getBegrunnelseSærligGrunner() != null) {
-            tekstlinjerForVilkårsendring.add(new HistorikkinnslagLinjeBuilder().tekst(vilkårendring.getBegrunnelseSærligGrunner()));
+            tekstlinjerForVilkårsendring.add(plainTekstLinje(vilkårendring.getBegrunnelseSærligGrunner()));
             tekstlinjerForVilkårsendring.add(LINJESKIFT);
         }
         return tekstlinjerForVilkårsendring;

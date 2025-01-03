@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.fraTilEquals;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.plainTekstLinje;
 
 @ApplicationScoped
 public class VurderForeldelseHistorikkTjeneste {
@@ -78,11 +79,11 @@ public class VurderForeldelseHistorikkTjeneste {
     private List<HistorikkinnslagLinjeBuilder> endredeFelterFor(Optional<VurdertForeldelse> forrigeVurdertForeldelse, VurdertForeldelsePeriode foreldelsePeriode) {
         var historikkinnslagLinjer = new ArrayList<HistorikkinnslagLinjeBuilder>();
         var forrigeForeldelsePeriodeOpt = tidligereForeldelsePeriode(forrigeVurdertForeldelse, foreldelsePeriode);
-        historikkinnslagLinjer.add(new HistorikkinnslagLinjeBuilder().tekst(String.format("__Manuell vurdering__ av perioden %s-%s.",  foreldelsePeriode.getPeriode().getFom(), foreldelsePeriode.getPeriode().getTom())));
+        historikkinnslagLinjer.add(plainTekstLinje(String.format("__Manuell vurdering__ av perioden %s-%s.",  foreldelsePeriode.getPeriode().getFom(), foreldelsePeriode.getPeriode().getTom())));
         historikkinnslagLinjer.add(fraTilEquals("Foreldelse", forrigeForeldelsePeriodeOpt.map(VurdertForeldelsePeriode::getForeldelseVurderingType).orElse(null), foreldelsePeriode.getForeldelseVurderingType()));
         historikkinnslagLinjer.add(fraTilEquals("Foreldelsesfrist", forrigeForeldelsePeriodeOpt.map(VurdertForeldelsePeriode::getForeldelsesfrist).orElse(null), foreldelsePeriode.getForeldelsesfrist()));
         historikkinnslagLinjer.add(fraTilEquals("Dato for når feilutbetaling ble oppdaget", forrigeForeldelsePeriodeOpt.map(VurdertForeldelsePeriode::getOppdagelsesDato).orElse(null), foreldelsePeriode.getOppdagelsesDato()));
-        historikkinnslagLinjer.add(new HistorikkinnslagLinjeBuilder().tekst(foreldelsePeriode.getBegrunnelse()));
+        historikkinnslagLinjer.add(plainTekstLinje(foreldelsePeriode.getBegrunnelse()));
         if (historikkinnslagLinjer.stream().filter(Objects::nonNull).toList().size() > 2) { // Har noen endrede felter.. TODO: Litt småhack? Bedre måte å gjøre det på?
             return historikkinnslagLinjer;
         } else {

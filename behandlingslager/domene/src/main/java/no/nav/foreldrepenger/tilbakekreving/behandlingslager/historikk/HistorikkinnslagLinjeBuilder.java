@@ -102,6 +102,14 @@ public class HistorikkinnslagLinjeBuilder {
         return fraTil(hva, null, til);
     }
 
+
+    public static HistorikkinnslagLinjeBuilder plainTekstLinje(String tekst) {
+        if (tekst == null) {
+            return null;
+        }
+        return new HistorikkinnslagLinjeBuilder().tekst(tekst);
+    }
+
     public static HistorikkinnslagLinjeBuilder fraTilEquals(String hva, String fra, String til) {
         if (Objects.equals(fra, til)) {
             return null;
