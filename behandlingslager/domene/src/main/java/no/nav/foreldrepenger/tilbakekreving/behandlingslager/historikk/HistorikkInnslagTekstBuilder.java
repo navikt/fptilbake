@@ -26,7 +26,6 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.exception.VLException;
 
-// TODO: Se bruk hvor historikkTjenesteAdapter blir brukt... newer ikke opp nye instanser, men bruker samme på tvers. Relevant i for løkker...
 @Deprecated(forRemoval = true) // Se HistorikkinnslagLinjeBuilder
 public class HistorikkInnslagTekstBuilder {
 
