@@ -173,7 +173,6 @@ public class FatteVedtakTjeneste {
         historikkinnslag.setAktør(HistorikkAktør.BESLUTTER);
         historikkinnslag.setType(historikkinnslagType);
         builder.build(historikkinnslag);
-
         return historikkinnslag;
     }
 

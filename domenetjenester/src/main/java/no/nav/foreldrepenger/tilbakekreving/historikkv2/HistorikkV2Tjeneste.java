@@ -53,7 +53,6 @@ public class HistorikkV2Tjeneste {
     public List<HistorikkinnslagDtoV2> hentForSak(Saksnummer saksnummer, URI dokumentPath) {
         var historikkV1 = historikkRepository.hentHistorikkForSaksnummer(saksnummer).stream().map(h -> map(dokumentPath, h));
         var historikkV2 = historikkinnslag2Repository.hent(saksnummer).stream().map(h -> map(dokumentPath, h));
-
         return Stream.concat(historikkV1, historikkV2).sorted(Comparator.comparing(HistorikkinnslagDtoV2::opprettetTidspunkt)).toList();
     }
 

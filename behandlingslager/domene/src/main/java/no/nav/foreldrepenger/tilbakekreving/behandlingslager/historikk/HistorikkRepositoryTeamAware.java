@@ -4,21 +4,16 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem.FPTILBAKE;
 
 @ApplicationScoped
 public class HistorikkRepositoryTeamAware {
-    private static final Fagsystem fagsystem = ApplicationName.hvilkenTilbake();
     private HistorikkRepository historikkRepository;
     private Historikkinnslag2Repository historikkinnslag2Repository;
 
-    public HistorikkRepositoryTeamAware() {
+    HistorikkRepositoryTeamAware() {
         // CDI
     }
 
@@ -35,7 +30,7 @@ public class HistorikkRepositoryTeamAware {
     }
 
     public void lagre(Historikkinnslag historikkinnslag, Historikkinnslag2 historikkinnslag2) {
-        if (FPTILBAKE.equals(fagsystem)) {
+        if (FPTILBAKE.equals(ApplicationName.hvilkenTilbake())) {
             historikkinnslag2Repository.lagre(historikkinnslag2);
         } else {
             historikkRepository.lagre(historikkinnslag);

@@ -154,6 +154,7 @@ public class HistorikkinnslagLinjeBuilder {
     public static <T> String format(T verdi) {
         return switch (verdi) {
             case null -> null;
+            case String tekst -> tekst;
             case LocalDate localDate -> DATE_FORMATTER.format(localDate);
             case LocalDateInterval interval -> DATE_FORMATTER.format(interval.getFomDato()) + " - " + DATE_FORMATTER.format(interval.getTomDato());
             case BigDecimal bd -> bd.toString();

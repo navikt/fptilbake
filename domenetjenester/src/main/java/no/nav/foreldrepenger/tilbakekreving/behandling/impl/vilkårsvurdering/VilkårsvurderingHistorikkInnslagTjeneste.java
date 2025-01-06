@@ -123,8 +123,9 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
         historikkinnslag.setBehandlingId(behandling.getId());
         historikkinnslag.setAktør(behandling.isAutomatiskSaksbehandlet() ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER);
 
+        var builder = new HistorikkInnslagTekstBuilder();
         for (Vilkårsendring vilkårsendring : endringer) {
-            HistorikkInnslagTekstBuilder builder = lagTekstBuilderMedFellesFelt(vilkårsendring);
+            lagTekstBuilderMedFellesFelt(builder, vilkårsendring);
             for (Historikkendring historikkendring : vilkårsendring.getEndringer()) {
                 builder.medEndretFelt(historikkendring.getFelt(), historikkendring.getForrigeVerdi(), historikkendring.getNyVerdi());
             }
@@ -191,13 +192,12 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
         return aktsomhet.getSærligGrunner().isEmpty() ? null : formGrunnTekst(aktsomhet);
     }
 
-    private HistorikkInnslagTekstBuilder lagTekstBuilderMedFellesFelt(Vilkårsendring periode) {
-        HistorikkInnslagTekstBuilder tekstBuilder = new HistorikkInnslagTekstBuilder();
-        tekstBuilder.medSkjermlenke(SkjermlenkeType.TILBAKEKREVING)
+    private HistorikkInnslagTekstBuilder lagTekstBuilderMedFellesFelt(HistorikkInnslagTekstBuilder builder, Vilkårsendring periode) {
+        builder.medSkjermlenke(SkjermlenkeType.TILBAKEKREVING)
                 .medOpplysning(HistorikkOpplysningType.PERIODE_FOM, periode.getFom())
                 .medOpplysning(HistorikkOpplysningType.PERIODE_TOM, periode.getTom())
                 .medOpplysning(HistorikkOpplysningType.TILBAKEKREVING_OPPFYLT_BEGRUNNELSE, periode.getBegrunnelseVilkår());
-        return tekstBuilder;
+        return builder;
     }
 
     private String formGrunnTekst(VilkårVurderingAktsomhetEntitet aktsomhetEntitet) {

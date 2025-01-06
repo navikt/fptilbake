@@ -24,7 +24,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagEndretEvent;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDelDto;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
 @ApplicationScoped
 public class AvklartFaktaFeilutbetalingTjeneste {
@@ -51,6 +50,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
 
         // brukte denne objekt for å opprette bare en historikkinnslagDel når saksbehandler endret bare begrunnelse
         HistorikkinnslagDelDto historikkinnslagDelDto = new HistorikkinnslagDelDto();
+        HistorikkInnslagTekstBuilder tekstBuilder = new HistorikkInnslagTekstBuilder();
 
         Optional<FaktaFeilutbetaling> forrigeFakta = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandling.getId());
 
@@ -66,7 +66,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
             faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);
 
             // lag historikkinnslagDeler
-            boolean harEndret = lagHistorikkInnslagDeler(historikkinnslag, begrunnelse, forrigeFakta, faktaFeilutbetalingDto, historikkinnslagDelDto);
+            boolean harEndret = lagHistorikkInnslagDeler(historikkinnslag, tekstBuilder, begrunnelse, forrigeFakta, faktaFeilutbetalingDto, historikkinnslagDelDto);
             behovForHistorikkInnslag = !behovForHistorikkInnslag ? harEndret : behovForHistorikkInnslag;
         }
         faktaFeilutbetaling.setBegrunnelse(begrunnelse);
@@ -81,12 +81,13 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         faktaFeilutbetalingRepository.slettFaktaFeilutbetaling(event.getBehandlingId());
     }
 
-    private boolean lagHistorikkInnslagDeler(Historikkinnslag historikkinnslag, String begrunnelse,
+    private boolean lagHistorikkInnslagDeler(Historikkinnslag historikkinnslag,
+                                             HistorikkInnslagTekstBuilder tekstBuilder,
+                                             String begrunnelse,
                                              Optional<FaktaFeilutbetaling> forrigeFakta,
                                              FaktaFeilutbetalingDto faktaFeilutbetalingDto,
                                              HistorikkinnslagDelDto historikkinnslagDelDto) {
         boolean harEndret = false;
-        HistorikkInnslagTekstBuilder tekstBuilder = new HistorikkInnslagTekstBuilder();
         if (forrigeFakta.isPresent()) {
             List<FaktaFeilutbetalingPeriode> feilutbetalingPerioder = forrigeFakta.get().getFeilutbetaltPerioder();
             String forrigeBegrunnelse = forrigeFakta.get().getBegrunnelse();

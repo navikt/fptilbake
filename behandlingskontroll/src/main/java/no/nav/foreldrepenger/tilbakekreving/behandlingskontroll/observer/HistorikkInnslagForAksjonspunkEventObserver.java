@@ -93,7 +93,7 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
         } else {
             historikkinnslagBuilder.medTittel(tittel);
         }
-        if (venteårsak != null) {
+        if (venteårsak != null && !Venteårsak.UDEFINERT.equals(venteårsak)) {
             historikkinnslagBuilder.addLinje(venteårsak.getNavn());
         }
         var erSystemBruker = SikkerhetContext.SYSTEM.equals(KontekstHolder.getKontekst().getContext()) ||

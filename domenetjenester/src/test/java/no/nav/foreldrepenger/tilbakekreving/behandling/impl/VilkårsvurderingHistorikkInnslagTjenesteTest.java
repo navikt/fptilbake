@@ -6,7 +6,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
@@ -61,7 +63,8 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandling, vurderingEntitet, vurderingEntitet);
 
         List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        assertThat(historikkinnslager).isEmpty();
+        var tilbakekrevingHistorikkinnslag = tilbakekrevingHistorikkinnslag(historikkinnslager);
+        assertThat(tilbakekrevingHistorikkinnslag).isEmpty();
     }
 
     @Test
@@ -188,12 +191,17 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
     }
 
     private Historikkinnslag fellesHistorikkInnslagAssert(List<Historikkinnslag> historikkinnslager) {
-        assertThat(historikkinnslager).isNotEmpty();
-        assertThat(historikkinnslager.size()).isEqualTo(1);
-        Historikkinnslag historikkinnslag = historikkinnslager.get(0);
-        assertThat(historikkinnslag.getBehandlingId()).isEqualTo(internBehandlingId);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.TILBAKEKREVING);
-        return historikkinnslag;
+        assertThat(historikkinnslager).hasSize(2);
+        var historikkinnslagTilbakekreving = tilbakekrevingHistorikkinnslag(historikkinnslager);
+        assertThat(historikkinnslagTilbakekreving).isPresent();
+        assertThat(historikkinnslagTilbakekreving.get().getBehandlingId()).isEqualTo(internBehandlingId);
+        return historikkinnslagTilbakekreving.get();
+    }
+
+    private static Optional<Historikkinnslag> tilbakekrevingHistorikkinnslag(List<Historikkinnslag> historikkinnslager) {
+        return historikkinnslager.stream()
+            .filter(h -> h.getType().equals(HistorikkinnslagType.TILBAKEKREVING))
+            .findFirst();
     }
 
     private VilkårVurderingSærligGrunnEntitet formSærligGrunn(SærligGrunn grunn, VilkårVurderingAktsomhetEntitet aktsomhetEntitet) {

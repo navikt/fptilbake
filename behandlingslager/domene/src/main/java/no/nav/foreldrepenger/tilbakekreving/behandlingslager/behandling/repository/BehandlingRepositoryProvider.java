@@ -61,7 +61,7 @@ public class BehandlingRepositoryProvider {
         this.fagsakRepository = new FagsakRepository(entityManager);
         this.historikkRepository = new HistorikkRepository(entityManager);
         this.historikkinnslag2Repository = new Historikkinnslag2Repository(entityManager);
-        this.historikkRepositoryTeamAware = new HistorikkRepositoryTeamAware(this.historikkRepository, historikkinnslag2Repository);
+        this.historikkRepositoryTeamAware = new HistorikkRepositoryTeamAware(historikkRepository, historikkinnslag2Repository);
         this.behandlingLåsRepository = new BehandlingLåsRepository(entityManager);
         this.fagsakLåsRepository = new FagsakLåsRepository(entityManager);
         this.grunnlagRepository = new KravgrunnlagRepository(entityManager);

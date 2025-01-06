@@ -105,9 +105,9 @@ public class VurderForeldelseHistorikkTjeneste {
         historikkinnslag.setBehandlingId(behandling.getId());
         historikkinnslag.setAktør(behandling.isAutomatiskSaksbehandlet() ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER);
 
+        var tekstBuilder = new HistorikkInnslagTekstBuilder();
         boolean behovForHistorikkInnslag = false;
         for (VurdertForeldelsePeriode foreldelsePeriode : vurdertForeldelseAggregate.getVurdertForeldelsePerioder()) {
-            HistorikkInnslagTekstBuilder tekstBuilder = new HistorikkInnslagTekstBuilder();
             boolean harEndret;
             // forrigeVurdertForeldelse finnes ikke
             if (forrigeVurdertForeldelse.isEmpty()) {
@@ -122,7 +122,7 @@ public class VurderForeldelseHistorikkTjeneste {
                     .medOpplysning(HistorikkOpplysningType.PERIODE_TOM, foreldelsePeriode.getPeriode().getTom())
                     .medBegrunnelse(foreldelsePeriode.getBegrunnelse());
 
-                tekstBuilder.build(historikkinnslag);
+                tekstBuilder.build(historikkinnslag); // Del lagres, ny builder instansieres for neste endring (altså ny del)
                 behovForHistorikkInnslag = true;
             }
         }

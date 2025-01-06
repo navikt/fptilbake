@@ -8,7 +8,9 @@ import java.util.List;
 
 import jakarta.inject.Inject;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -47,6 +49,7 @@ class BehandlingskontrollEventPublisererTest {
 
     @BeforeEach
     void setup() {
+        System.setProperty("app.name", "fptilbake");
         BehandlingModellImpl behandlingModell = byggModell();
 
         kontrollTjeneste = new BehandlingskontrollTjeneste(serviceProvider) {
@@ -62,11 +65,13 @@ class BehandlingskontrollEventPublisererTest {
     @AfterEach
     void after() {
         TestEventObserver.reset();
+        System.clearProperty("app.name");
     }
 
     @Test
     void skal_fyre_event_for_aksjonspunkt_funnet_ved_prosessering() {
         ScenarioSimple scenario = ScenarioSimple.simple();
+
         Behandling behandling = scenario.lagre(repositoryProvider);
 
         BehandlingskontrollKontekst kontekst = kontrollTjeneste.initBehandlingskontroll(behandling.getId());

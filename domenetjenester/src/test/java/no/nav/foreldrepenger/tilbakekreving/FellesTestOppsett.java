@@ -21,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 
 import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
@@ -157,6 +158,12 @@ public abstract class FellesTestOppsett {
 
     protected TestUtility testUtility;
 
+    // TODO: Finn en bedre måte å gjøre dette? Testes ikke k9?
+    @BeforeAll
+    public static void setupAppName() {
+        System.setProperty("app.name", "k9-tilbake");
+    }
+
     //BeforeEach kalles både her og i subklasse
     @BeforeEach
     public final void init(EntityManager entityManager) {
@@ -203,7 +210,6 @@ public abstract class FellesTestOppsett {
             .thenReturn(lagSamletEksternBehandlingInfo(behandlingsinfoDto));
         when(mockFagsystemKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class), any(Tillegsinformasjon.class)))
             .thenReturn(lagSamletEksternBehandlingInfo(behandlingsinfoDto));
-
         TestUtility.SakDetaljer sakDetaljer = testUtility.opprettFørstegangsBehandling(aktørId);
         mapSakDetaljer(sakDetaljer);
     }
