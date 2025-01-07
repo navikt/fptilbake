@@ -56,7 +56,7 @@ public class MottattGrunnlagSteg implements BehandlingSteg {
     public BehandleStegResultat utførSteg(BehandlingskontrollKontekst kontekst) {
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
 
-        var fristTid = kanFortsetteEtter(kontekst.getBehandlingId(), LocalDateTime.now().plus(Frister.KRAVGRUNNLAG_FØRSTE));
+        var fristTid = kanFortsetteEtter(behandling, LocalDateTime.now().plus(Frister.KRAVGRUNNLAG_FØRSTE));
 
         if (fristTid.isBefore(LocalDateTime.now())) {
             return BehandleStegResultat.utførtUtenAksjonspunkter();
@@ -72,7 +72,7 @@ public class MottattGrunnlagSteg implements BehandlingSteg {
     public BehandleStegResultat gjenopptaSteg(BehandlingskontrollKontekst kontekst) {
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
 
-        var fristTid = kanFortsetteEtter(kontekst.getBehandlingId(), hentFrist(behandling));
+        var fristTid = kanFortsetteEtter(behandling, hentFrist(behandling));
         if (fristTid.isBefore(LocalDateTime.now())) {
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
