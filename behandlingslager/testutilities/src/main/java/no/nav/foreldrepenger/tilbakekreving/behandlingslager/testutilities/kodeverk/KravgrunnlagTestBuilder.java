@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -195,7 +196,7 @@ public class KravgrunnlagTestBuilder {
                 .medAnsvarligEnhet("8020")
                 .medBehandlendeEnhet("8020")
                 .medBostedEnhet("8020")
-                .medFeltKontroll("kontrollfelt-123")
+                .medFeltKontroll(LocalDateTime.now().format(Kravgrunnlag431.KONTROLL_FELT_FORMAT))
                 .medGjelderType(GjelderType.PERSON)
                 .medGjelderVedtakId("???")
                 .medSaksBehId("Z111111")

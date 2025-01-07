@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 
@@ -190,7 +191,7 @@ class KravgrunnlagValidatorTest {
                 .medAnsvarligEnhet("8020")
                 .medBehandlendeEnhet("8020")
                 .medBostedEnhet("8020")
-                .medFeltKontroll("kontrollfelt-123")
+                .medFeltKontroll(LocalDateTime.now().format(Kravgrunnlag431.KONTROLL_FELT_FORMAT))
                 .medGjelderType(GjelderType.PERSON)
                 .medGjelderVedtakId("???")
                 .medSaksBehId("Z111111")
