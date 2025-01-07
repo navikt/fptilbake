@@ -2,8 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
-import java.math.BigDecimal;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -17,8 +15,8 @@ import jakarta.ws.rs.QueryParam;
 import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.felles.Satser;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.DetaljerteFeilutbetalingsperioderDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.VilkårsvurderteDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
@@ -36,7 +34,7 @@ public class VilkårsvurderingRestTjeneste {
     public static final String PATH_FRAGMENT = "/vilkarsvurdering";
     private VilkårsvurderingTjeneste vilkårsvurderingTjeneste;
     private BehandlingTjeneste behandlingTjeneste;
-    private BigDecimal rettsgebyr;
+    private KravgrunnlagBeregningTjeneste beregningTjeneste;
 
     public VilkårsvurderingRestTjeneste() {
         // for CDI
@@ -44,10 +42,11 @@ public class VilkårsvurderingRestTjeneste {
 
     @Inject
     public VilkårsvurderingRestTjeneste(VilkårsvurderingTjeneste vilkårsvurderingTjeneste,
-                                        BehandlingTjeneste behandlingTjeneste) {
+                                        BehandlingTjeneste behandlingTjeneste,
+                                        KravgrunnlagBeregningTjeneste beregningTjeneste) {
         this.vilkårsvurderingTjeneste = vilkårsvurderingTjeneste;
         this.behandlingTjeneste = behandlingTjeneste;
-        this.rettsgebyr = Satser.rettsgebyr();
+        this.beregningTjeneste = beregningTjeneste;
     }
 
     @GET
@@ -57,9 +56,11 @@ public class VilkårsvurderingRestTjeneste {
     public DetaljerteFeilutbetalingsperioderDto hentDetailjertFeilutbetalingPerioder(
             @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
             @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+        var behandlingId = hentBehandlingId(behandlingReferanse);
+        var behandling = behandlingTjeneste.hentBehandling(behandlingId);
         DetaljerteFeilutbetalingsperioderDto perioderDto = new DetaljerteFeilutbetalingsperioderDto();
         perioderDto.setPerioder(vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(hentBehandlingId(behandlingReferanse)));
-        perioderDto.setRettsgebyr(rettsgebyr);
+        perioderDto.setRettsgebyr(beregningTjeneste.heltRettsgebyrFor(behandlingId, behandling.getOpprettetTidspunkt()));
         return perioderDto;
     }
 

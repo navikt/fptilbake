@@ -13,19 +13,21 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.jknack.handlebars.internal.text.WordUtils;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstValidator;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
@@ -119,6 +121,7 @@ public class VedtaksbrevTjeneste {
     private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository;
     private BrevSporingRepository brevSporingRepository;
     private VergeRepository vergeRepository;
+    private KravgrunnlagBeregningTjeneste beregningTjeneste;
 
     private BehandlingTjeneste behandlingTjeneste;
     private BeregningsresultatTjeneste beregningsresultatTjeneste;
@@ -130,6 +133,7 @@ public class VedtaksbrevTjeneste {
     public VedtaksbrevTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
                                BeregningsresultatTjeneste beregningsresultatTjeneste,
                                BehandlingTjeneste behandlingTjeneste,
+                               KravgrunnlagBeregningTjeneste beregningTjeneste,
                                EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                                PdfBrevTjeneste pdfBrevTjeneste) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
@@ -142,6 +146,7 @@ public class VedtaksbrevTjeneste {
         this.vedtaksbrevFritekstRepository = behandlingRepositoryProvider.getVedtaksbrevFritekstRepository();
         this.brevSporingRepository = behandlingRepositoryProvider.getBrevSporingRepository();
         this.vergeRepository = behandlingRepositoryProvider.getVergeRepository();
+        this.beregningTjeneste = beregningTjeneste;
 
         this.behandlingTjeneste = behandlingTjeneste;
         this.beregningsresultatTjeneste = beregningsresultatTjeneste;
@@ -272,6 +277,9 @@ public class VedtaksbrevTjeneste {
         Long varsletBeløp = finnVarsletBeløp(behandling.getId());
         LocalDate varsletDato = finnVarsletDato(behandling.getId());
         boolean erFeilutbetaltBeløpKorrigertNed = varsletBeløp != null && hbVedtaksResultatBeløp.totaltFeilutbetaltBeløp.longValue() < varsletBeløp;
+
+        var fireRettsgebyr = beregningTjeneste.heltRettsgebyrFor(behandling.getId(), behandling.getOpprettetTidspunkt()).multiply(BigDecimal.valueOf(4));
+
         HbVedtaksbrevFelles.Builder vedtakDataBuilder = HbVedtaksbrevFelles.builder()
                 .medSak(sak)
                 .medBehandling(hbBehandling)
@@ -284,6 +292,7 @@ public class VedtaksbrevTjeneste {
                 .medLovhjemmelVedtak(hjemmelstekst)
                 .medVedtakResultat(hbTotalresultat)
                 .medKonfigurasjon(HbKonfigurasjon.builder()
+                        .medFireRettsgebyr(fireRettsgebyr)
                         .medKlagefristUker(KLAGEFRIST_UKER)
                         .build())
                 .medDatoer(HbVedtaksbrevDatoer.builder()

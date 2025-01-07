@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.AutomatiskSaksbehandlingVurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -61,6 +62,7 @@ class AutomatiskSaksbehandlingBatchTaskTest {
     private BehandlingRepositoryProvider repositoryProvider;
     private ProsessTaskTjeneste taskTjeneste;
     private AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository;
+    private AutomatiskSaksbehandlingVurderingTjeneste vurderingTjeneste;
     private final Clock clock = Clock.fixed(Instant.parse(getDateString()), ZoneId.systemDefault());
     private AutomatiskSaksbehandlingBatchTask automatiskSaksbehandlingBatchTask;
 
@@ -71,7 +73,7 @@ class AutomatiskSaksbehandlingBatchTaskTest {
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         automatiskSaksbehandlingRepository = new AutomatiskSaksbehandlingRepository(entityManager);
-        automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, clock);
+        automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, repositoryProvider.getGrunnlagRepository(), clock);
         behandling = scenarioSimple.medBehandlingType(BehandlingType.TILBAKEKREVING).lagre(repositoryProvider);
         lagKravgrunnlag(behandling.getId(), BigDecimal.valueOf(500L), behandling.getFagsak().getSaksnummer().getVerdi(),
                 123L);
@@ -95,7 +97,7 @@ class AutomatiskSaksbehandlingBatchTaskTest {
     @Test
     void skal_ikke_kjøre_batch_i_helgen() {
         var helgeClock = Clock.fixed(Instant.parse("2020-05-03T12:00:00.00Z"), ZoneId.systemDefault());
-        var automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, helgeClock);
+        var automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, repositoryProvider.getGrunnlagRepository(), helgeClock);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
         verifyNoInteractions(taskTjeneste);
@@ -104,7 +106,7 @@ class AutomatiskSaksbehandlingBatchTaskTest {
     @Test
     void skal_ikke_kjøre_batch_hvis_hellidag() {
         var helgeClock = Clock.fixed(Instant.parse("2021-05-17T12:00:00.00Z"), ZoneId.systemDefault());
-        var automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, helgeClock);
+        var automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, repositoryProvider.getGrunnlagRepository(), helgeClock);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
         verifyNoInteractions(taskTjeneste);

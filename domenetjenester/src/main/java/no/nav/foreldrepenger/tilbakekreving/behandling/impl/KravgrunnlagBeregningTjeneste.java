@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -46,14 +48,23 @@ public class KravgrunnlagBeregningTjeneste {
         return map;
     }
 
-    public static boolean samletFeilutbetaltKanAutomatiskBehandles(Kravgrunnlag431 kravgrunnlag) {
+    public static boolean samletFeilutbetaltKanAutomatiskBehandles(Kravgrunnlag431 kravgrunnlag, LocalDateTime tilbakekrevingOpprettetTid) {
         var feilutbetalt = kravgrunnlag.getPerioder().stream()
             .map(KravgrunnlagPeriode432::getKravgrunnlagBeloper433)
             .flatMap(Collection::stream)
             .filter(kgBeløp -> KlasseType.FEIL.equals(kgBeløp.getKlasseType()))
             .map(KravgrunnlagBelop433::getNyBelop)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return feilutbetalt.compareTo(Satser.halvtRettsgebyr()) <= 0;
+        var velgRettsgebyrDatoTid = tilbakekrevingOpprettetTid.isBefore(kravgrunnlag.getKontrollFeltAsLocalDateTime()) ?
+            tilbakekrevingOpprettetTid : kravgrunnlag.getKontrollFeltAsLocalDateTime();
+        return feilutbetalt.compareTo(Satser.halvtRettsgebyr(Year.from(velgRettsgebyrDatoTid))) <= 0;
+    }
+
+    public BigDecimal heltRettsgebyrFor(Long behandlingId, LocalDateTime tilbakekrevingOpprettetTid) {
+        var kravgrunnlag = grunnlagRepository.finnKravgrunnlagOpt(behandlingId).orElse(null);
+        var velgRettsgebyrDatoTid = kravgrunnlag == null || tilbakekrevingOpprettetTid.isBefore(kravgrunnlag.getKontrollFeltAsLocalDateTime()) ?
+            tilbakekrevingOpprettetTid : kravgrunnlag.getKontrollFeltAsLocalDateTime();
+        return Satser.rettsgebyr(Year.from(velgRettsgebyrDatoTid));
     }
 
     public Map<Periode, BigDecimal> beregnFeilutbetaltBeløp(Long behandlingId, List<Periode> perioder) {

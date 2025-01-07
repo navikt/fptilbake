@@ -3,11 +3,12 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.først
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.AutomatiskSaksbehandlingVurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatiskgjenoppta.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
@@ -93,11 +94,11 @@ public class MottattGrunnlagSteg implements BehandlingSteg {
         return fristTid != null && LocalDate.now().isAfter(fristTid.toLocalDate());
     }
 
-    private LocalDateTime kanFortsetteEtter(Long behandlingId, LocalDateTime gjeldendeFrist) {
-        if (gjenopptaBehandlingTjeneste.kanGjenopptaSteg(behandlingId)) {
+    private LocalDateTime kanFortsetteEtter(Behandling behandling, LocalDateTime gjeldendeFrist) {
+        if (gjenopptaBehandlingTjeneste.kanGjenopptaSteg(behandling.getId())) {
             // Sørg for at de under halvt rettegebyr blir liggende til de kan behandles automatisk uten å ha aktivt aksjonspunkt i fakta mer enn en halv time.
-            if (halvtRettsgebyrTjeneste.lavFeilutbetalingKanVentePåAutomatiskBehandling(behandlingId)) {
-                var fristFraGrunnlag = halvtRettsgebyrTjeneste.ventefristForTilfelleSomKanAutomatiskSaksbehandles(behandlingId);
+            if (halvtRettsgebyrTjeneste.lavFeilutbetalingKanVentePåAutomatiskBehandling(behandling)) {
+                var fristFraGrunnlag = halvtRettsgebyrTjeneste.ventefristForTilfelleSomKanAutomatiskSaksbehandles(behandling.getId());
                 return gjeldendeFrist == null || fristFraGrunnlag.isAfter(gjeldendeFrist) ? fristFraGrunnlag : gjeldendeFrist;
             } else {
                 return LocalDateTime.now().minusHours(1);

@@ -2,12 +2,14 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.automat
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.Year;
 import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -36,6 +38,9 @@ public class AutomatiskSaksbehandlingRepository {
     }
 
     public List<Behandling> hentAlleBehandlingerSomErKlarForAutomatiskSaksbehandling(LocalDate bestemtDato) {
+
+        var kontrollFeltFørDato = bestemtDato.minus(getKravgrunnlagAlderNårGammel());
+
         TypedQuery<Behandling> query = entityManager.createQuery("""
                 from Behandling beh where beh.id in
                 (select b.id as behandlingId from Behandling b
@@ -75,10 +80,10 @@ public class AutomatiskSaksbehandlingRepository {
         query.setParameter("aksjonspunktStatus", AksjonspunktStatus.OPPRETTET);
         query.setParameter("behandlingStatus", BehandlingStatus.UTREDES);
         query.setParameter("behandlingTyper", List.of(BehandlingType.TILBAKEKREVING, BehandlingType.REVURDERING_TILBAKEKREVING));
-        query.setParameter("bestemtDato", bestemtDato.minus(getKravgrunnlagAlderNårGammel()).atStartOfDay());
+        query.setParameter("bestemtDato", kontrollFeltFørDato.atStartOfDay());
         query.setParameter("klasseType", KlasseType.FEIL);
-        query.setParameter("heltRettsgebyr", Satser.rettsgebyr());
-        query.setParameter("halvtRettsgebyr", Satser.halvtRettsgebyr());
+        query.setParameter("heltRettsgebyr", Satser.rettsgebyr(Year.from(kontrollFeltFørDato)));
+        query.setParameter("halvtRettsgebyr", Satser.halvtRettsgebyr(Year.from(kontrollFeltFørDato)));
         query.setParameter("aktiv", true);
         query.setParameter("sperret", false);
         return query.getResultList();

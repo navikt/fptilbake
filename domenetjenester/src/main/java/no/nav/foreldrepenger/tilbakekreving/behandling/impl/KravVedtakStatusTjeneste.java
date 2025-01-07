@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
@@ -102,14 +103,14 @@ public class KravVedtakStatusTjeneste {
             var kravgrunnlag431 = grunnlagRepository.finnKravgrunnlag(behandlingId);
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
 
-            if (halvtRettsgebyrTjeneste.lavFeilutbetalingKanVentePåAutomatiskBehandling(behandlingId)) {
+            var behandling = behandlingRepository.hentBehandling(behandlingId);
+            if (halvtRettsgebyrTjeneste.lavFeilutbetalingKanVentePåAutomatiskBehandling(behandling)) {
                 // Bli stående på vent til 8 uker.
                 var fristDato = AutomatiskSaksbehandlingVurderingTjeneste.ventefristForTilfelleSomKanAutomatiskSaksbehandles(kravgrunnlag431);
-                var behandling = behandlingRepository.hentBehandling(behandlingId);
                 behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
                     BehandlingStegType.TBKGSTEG, fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
             } else {
-                taBehandlingAvventOgFortsettBehandling(behandlingId);
+                taBehandlingAvventOgFortsettBehandling(behandling);
             }
             grunnlagRepository.opphevGrunnlag(behandlingId);
         } else {
@@ -122,8 +123,7 @@ public class KravVedtakStatusTjeneste {
         return new TekniskException("FPT-107929", message + suffix);
     }
 
-    private void taBehandlingAvventOgFortsettBehandling(long behandlingId) {
-        var behandling = behandlingRepository.hentBehandling(behandlingId);
+    private void taBehandlingAvventOgFortsettBehandling(Behandling behandling) {
         var taskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
         taskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
         taskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
