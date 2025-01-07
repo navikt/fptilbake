@@ -11,6 +11,8 @@ import java.util.UUID;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
@@ -82,6 +84,16 @@ public abstract class FellesTestOppsett {
     protected BehandlingTjeneste behandlingTjeneste;
 
     protected TestUtility testUtility;
+
+    @BeforeAll
+    static void beforeAll() {
+        System.setProperty("app.name", "k9-tilbake");
+    }
+
+    @AfterAll
+    static void cleanup() {
+        System.clearProperty("app.name");
+    }
 
     //BeforeEach kalles både her og i subklasse
     @BeforeEach

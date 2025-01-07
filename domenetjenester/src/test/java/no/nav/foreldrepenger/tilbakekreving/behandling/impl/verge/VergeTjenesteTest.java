@@ -86,10 +86,11 @@ class VergeTjenesteTest extends FellesTestOppsett {
         assertThat(aksjonspunkt).isPresent();
         assertThat(aksjonspunkt.get().erAvbrutt()).isTrue();
         List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(internBehandlingId);
-        assertThat(historikkinnslager).isNotEmpty();
-        assertThat(historikkinnslager.size()).isEqualTo(1);
-        assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.FJERNET_VERGE);
-        assertThat(historikkinnslager.get(0).getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
+        assertThat(historikkinnslager).hasSize(2);
+        assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.TBK_OPPR);
+        assertThat(historikkinnslager.get(0).getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
+        assertThat(historikkinnslager.get(1).getType()).isEqualByComparingTo(HistorikkinnslagType.FJERNET_VERGE);
+        assertThat(historikkinnslager.get(1).getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
     }
 
 }

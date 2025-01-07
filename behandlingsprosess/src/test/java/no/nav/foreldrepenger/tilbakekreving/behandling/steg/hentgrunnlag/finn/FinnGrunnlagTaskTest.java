@@ -52,7 +52,7 @@ class FinnGrunnlagTaskTest extends FellesTestOppsett {
     void setup() {
         kravVedtakStatusRepository = new KravVedtakStatusRepository(entityManager);
         HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider,
-                taskTjeneste, behandlingskontrollTjeneste, historikkinnslagTjeneste);
+                taskTjeneste, behandlingskontrollTjeneste);
         KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
             new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository()), taskTjeneste,
             repositoryProvider.getBehandlingRepository(), repositoryProvider.getGrunnlagRepository(), behandlingskontrollTjeneste);

@@ -66,6 +66,7 @@ public abstract class DokumentBestillerTestOppsett {
     //BeforeEach kalles både her og i subklasse
     @BeforeEach
     public void init() {
+        System.setProperty("app.name", "k9-tilbake"); // TODO
         entityManager.setFlushMode(FlushModeType.AUTO);
         fagsak = TestFagsakUtil.opprettFagsak();
         fagsakRepository.lagre(fagsak);

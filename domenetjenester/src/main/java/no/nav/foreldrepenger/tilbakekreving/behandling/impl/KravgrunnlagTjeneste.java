@@ -17,7 +17,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag2;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

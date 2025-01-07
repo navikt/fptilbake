@@ -81,7 +81,6 @@ public class DokumentBehandlingTjeneste {
         dokumentBehandlingHistorikkTjeneste.opprettHistorikkinnslagForBrevBestilt(malType, behandling);
     }
 
-
     public byte[] forhåndsvisBrev(Long behandlingId, DokumentMalType malType, String fritekst) {
         var dokument = new byte[0];
         if (DokumentMalType.VARSEL_DOK.equals(malType) || DokumentMalType.KORRIGERT_VARSEL_DOK.equals(malType)) {

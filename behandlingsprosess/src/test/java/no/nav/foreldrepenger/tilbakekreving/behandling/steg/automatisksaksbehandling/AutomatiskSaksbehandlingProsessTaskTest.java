@@ -9,6 +9,8 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -59,6 +61,16 @@ class AutomatiskSaksbehandlingProsessTaskTest {
     ScenarioSimple scenarioSimple = ScenarioSimple.simple();
     private Behandling behandling;
     private Long behandlingId;
+
+    @BeforeAll
+    static void beforeAll() {
+        System.setProperty("app.name", "k9-tilbake");
+    }
+
+    @AfterAll
+    static void cleanup() {
+        System.clearProperty("app.name");
+    }
 
     @BeforeEach
     void setup(EntityManager entityManager) {

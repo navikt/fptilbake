@@ -42,9 +42,10 @@ class BehandlendeEnhetTest extends FellesTestOppsett {
         assertThat(behandling.getBehandlendeEnhetNavn()).isEqualTo(NY_ENHET_NAVN);
 
         List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(internBehandlingId);
-        assertThat(historikkinnslager.size()).isEqualTo(1);
-        Historikkinnslag historikkinnslag = historikkinnslager.get(0);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BYTT_ENHET);
-        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
+        assertThat(historikkinnslager.size()).isEqualTo(2);
+        assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.TBK_OPPR);
+        assertThat(historikkinnslager.get(0).getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
+        assertThat(historikkinnslager.get(1).getType()).isEqualByComparingTo(HistorikkinnslagType.BYTT_ENHET);
+        assertThat(historikkinnslager.get(1).getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
     }
 }

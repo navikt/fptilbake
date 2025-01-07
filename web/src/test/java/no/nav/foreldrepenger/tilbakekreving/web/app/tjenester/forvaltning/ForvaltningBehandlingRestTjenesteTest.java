@@ -18,6 +18,9 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.core.Response;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryTeamAware;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag2Repository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -286,22 +289,25 @@ class ForvaltningBehandlingRestTjenesteTest {
 
     @Test
     void skal_flytte_behandling_til_fakta_steg_når_behandling_er_i_foreslå_steg() {
+        System.setProperty("app.name", "k9-tilbake");
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FORESLÅ_VEDTAK);
 
         forvaltningBehandlingRestTjeneste.tilbakeførBehandlingTilFaktaSteg(new BehandlingReferanse(behandling.getId()));
+
         assertEquals(BehandlingStegType.FAKTA_FEILUTBETALING, behandling.getAktivtBehandlingSteg());
         List<Historikkinnslag> historikkinnslags = historikkRepository.hentHistorikk(behandling.getId());
-        assertThat(historikkinnslags).isNotEmpty().hasSize(1);
+        assertThat(historikkinnslags).hasSize(1);
         Historikkinnslag historikkinnslag = historikkinnslags.get(0);
         assertEquals(HistorikkinnslagType.BEH_STARTET_FORFRA, historikkinnslag.getType());
         assertEquals(HistorikkAktør.VEDTAKSLØSNINGEN, historikkinnslag.getAktør());
-        assertThat(historikkinnslag.getHistorikkinnslagDeler()).isNotEmpty().hasSize(1);
+        assertThat(historikkinnslag.getHistorikkinnslagDeler()).hasSize(1);
         boolean begrunnelseFinnes = historikkinnslag.getHistorikkinnslagDeler()
             .stream()
             .anyMatch(historikkinnslagDel -> historikkinnslagDel.getBegrunnelse().isPresent()
                 && KravgrunnlagTjeneste.BEGRUNNELSE_BEHANDLING_STARTET_FORFRA.equals(
                 historikkinnslagDel.getBegrunnelse().get()));
         assertTrue(begrunnelseFinnes);
+        System.clearProperty("app.name");
     }
 
     @Test

@@ -62,12 +62,8 @@ class FatteVedtakStegTest {
         repositoryProvider = new BehandlingRepositoryProvider(em);
         behandlingRepository = repositoryProvider.getBehandlingRepository();
         totrinnRepository = new TotrinnRepository(em);
-        HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(behandlingRepository);
-        HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(
-                repositoryProvider.getHistorikkRepository(), historikkInnslagKonverter);
         BeregningsresultatTjeneste beregningsresultatTjeneste = Mockito.mock(BeregningsresultatTjeneste.class);
-        fatteVedtakSteg = new FatteVedtakSteg(repositoryProvider, totrinnRepository, beregningsresultatTjeneste,
-                historikkTjenesteAdapter);
+        fatteVedtakSteg = new FatteVedtakSteg(repositoryProvider, totrinnRepository, beregningsresultatTjeneste);
 
         Fagsak fagsak = TestFagsakUtil.opprettFagsak();
         repositoryProvider.getFagsakRepository().lagre(fagsak);

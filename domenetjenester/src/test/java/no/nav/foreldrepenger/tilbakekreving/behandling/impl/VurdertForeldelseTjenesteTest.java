@@ -270,13 +270,14 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
 
     private Historikkinnslag fellesHistorikkInnslagAssert() {
         List<Historikkinnslag> historikkInnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        assertThat(historikkInnslager).isNotEmpty();
-        assertThat(historikkInnslager.size()).isEqualTo(1);
-        Historikkinnslag historikkinnslag = historikkInnslager.get(0);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.FORELDELSE);
-        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
-        assertThat(historikkinnslag.getBehandlingId()).isEqualTo(internBehandlingId);
-        return historikkinnslag;
+        assertThat(historikkInnslager).hasSize(2);
+        assertThat(historikkInnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.TBK_OPPR);
+        assertThat(historikkInnslager.get(0).getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
+        var foreldelseHistorikkinnslag = historikkInnslager.get(1);
+        assertThat(foreldelseHistorikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.FORELDELSE);
+        assertThat(foreldelseHistorikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
+        assertThat(foreldelseHistorikkinnslag.getBehandlingId()).isEqualTo(internBehandlingId);
+        return foreldelseHistorikkinnslag;
     }
 
 }

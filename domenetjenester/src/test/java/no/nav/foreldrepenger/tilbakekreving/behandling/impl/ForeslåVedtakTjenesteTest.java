@@ -39,18 +39,19 @@ class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
 
         List<Historikkinnslag> historikkInnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         assertThat(historikkInnslager).isNotEmpty();
-        assertThat(historikkInnslager.size()).isEqualTo(1);
-        Historikkinnslag historikkinnslag = historikkInnslager.get(0);
-        assertThat(historikkinnslag.getBehandlingId()).isEqualTo(internBehandlingId);
-        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.FORSLAG_VEDTAK);
+        assertThat(historikkInnslager).hasSize(2);
+        assertThat(historikkInnslager.get(0).getBehandlingId()).isEqualTo(internBehandlingId);
+        assertThat(historikkInnslager.get(0).getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
+        assertThat(historikkInnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.TBK_OPPR);
 
-        List<HistorikkinnslagDel> historikkinnslagDeler = historikkinnslag.getHistorikkinnslagDeler();
+        assertThat(historikkInnslager.get(1).getBehandlingId()).isEqualTo(internBehandlingId);
+        assertThat(historikkInnslager.get(1).getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
+        assertThat(historikkInnslager.get(1).getType()).isEqualByComparingTo(HistorikkinnslagType.FORSLAG_VEDTAK);
+        List<HistorikkinnslagDel> historikkinnslagDeler = historikkInnslager.get(1).getHistorikkinnslagDeler();
         assertThat(historikkinnslagDeler.size()).isEqualTo(1);
         HistorikkinnslagDel historikkinnslagDel = historikkinnslagDeler.get(0);
         assertThat(historikkinnslagDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.VEDTAK.getKode());
-        assertThat(historikkinnslagDel.getResultat().get())
-            .isEqualTo(beregningResultat.getVedtakResultatType().getKode());
+        assertThat(historikkinnslagDel.getResultat().get()).isEqualTo(beregningResultat.getVedtakResultatType().getKode());
     }
 
 }

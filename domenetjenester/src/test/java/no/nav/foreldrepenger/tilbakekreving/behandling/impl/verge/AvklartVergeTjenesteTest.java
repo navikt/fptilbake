@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -86,15 +88,17 @@ class AvklartVergeTjenesteTest extends FellesTestOppsett {
 
     private void fellesHistorikkAssert() {
         List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(internBehandlingId);
-        assertThat(historikkinnslager).isNotEmpty();
-        assertThat(historikkinnslager.size()).isEqualTo(1);
-        assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.REGISTRER_OM_VERGE);
-        List<HistorikkinnslagDel> historikkinnslagDeler = historikkinnslager.get(0).getHistorikkinnslagDeler();
-        assertThat(historikkinnslagDeler).isNotEmpty();
-        assertThat(historikkinnslagDeler.size()).isEqualTo(1);
-        assertThat(historikkinnslagDeler.get(0).getSkjermlenke()).isNotEmpty();
-        assertThat(historikkinnslagDeler.get(0).getSkjermlenke().get()).contains(SkjermlenkeType.FAKTA_OM_VERGE.getKode());
-        assertThat(historikkinnslagDeler.get(0).getHendelse()).isNotEmpty();
+        assertThat(historikkinnslager).hasSize(2);
+        var historikkinnslagTbkOpprettet = historikkinnslager.get(0);
+        assertThat(historikkinnslagTbkOpprettet.getType()).isEqualByComparingTo(HistorikkinnslagType.TBK_OPPR);
+        assertThat(historikkinnslagTbkOpprettet.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
+
+        var historikkinnslagRegistrerOmVerge = historikkinnslager.get(1);
+        assertThat(historikkinnslagRegistrerOmVerge.getType()).isEqualByComparingTo(HistorikkinnslagType.REGISTRER_OM_VERGE);
+        assertThat(historikkinnslagRegistrerOmVerge.getHistorikkinnslagDeler()).hasSize(1);
+        assertThat(historikkinnslagRegistrerOmVerge.getHistorikkinnslagDeler().get(0).getSkjermlenke()).isNotEmpty();
+        assertThat(historikkinnslagRegistrerOmVerge.getHistorikkinnslagDeler().get(0).getSkjermlenke().get()).contains(SkjermlenkeType.FAKTA_OM_VERGE.getKode());
+        assertThat(historikkinnslagRegistrerOmVerge.getHistorikkinnslagDeler().get(0).getHendelse()).isNotEmpty();
     }
 
     private VergeDto lagVergeDto(VergeType vergeType) {

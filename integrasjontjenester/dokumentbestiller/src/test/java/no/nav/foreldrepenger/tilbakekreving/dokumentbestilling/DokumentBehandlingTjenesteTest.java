@@ -45,18 +45,17 @@ import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {
 
-    private ProsessTaskTjeneste taskTjeneste;
-
     private ManueltVarselBrevTjeneste mockManueltVarselBrevTjeneste = mock(ManueltVarselBrevTjeneste.class);
     private InnhentDokumentasjonbrevTjeneste mockInnhentDokumentasjonbrevTjeneste = mock(InnhentDokumentasjonbrevTjeneste.class);
-    private DokumentBehandlingHistorikkTjeneste mockDokumentBehandlingHistorikkTjeneste = mock(DokumentBehandlingHistorikkTjeneste.class);
 
+    private ProsessTaskTjeneste taskTjeneste;
     private DokumentBehandlingTjeneste dokumentBehandlingTjeneste;
 
     @BeforeEach
     void setup() {
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
-        dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, taskTjeneste, mockManueltVarselBrevTjeneste, mockDokumentBehandlingHistorikkTjeneste, mockInnhentDokumentasjonbrevTjeneste);
+        var dokumentBehandlingHistorikkTjeneste = new DokumentBehandlingHistorikkTjeneste(repositoryProvider.getHistorikkRepositoryTeamAware());
+        dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, taskTjeneste, mockManueltVarselBrevTjeneste, dokumentBehandlingHistorikkTjeneste, mockInnhentDokumentasjonbrevTjeneste);
     }
 
     @Test
