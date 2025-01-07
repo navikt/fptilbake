@@ -6,8 +6,8 @@ import java.math.RoundingMode;
 public class Satser {
 
     //se https://www.skatteetaten.no/satser/rettsgebyr/
-    private static final BigDecimal RETTSGEBYR = BigDecimal.valueOf(1277);
-    private static final BigDecimal HALVT_RETTSGEBYR = BigDecimal.valueOf(638);
+    private static final BigDecimal RETTSGEBYR = BigDecimal.valueOf(1314);
+    private static final BigDecimal HALVT_RETTSGEBYR = BigDecimal.valueOf(657);
 
     //se https://www.skatteetaten.no/satser/grunnbelopet-i-folketrygden/
     private static final BigDecimal GRUNNBELØP = BigDecimal.valueOf(124028);
