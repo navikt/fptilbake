@@ -245,10 +245,10 @@ public class HistorikkV2Adapter {
             .filter(felt -> HistorikkEndretFeltType.HENDELSE_UNDER_ÅRSAK.getKode().equals(felt.getNavn()))
             .findFirst();
         var underÅrsakFraVerdi = underårsakFelt.isPresent() && underårsakFelt.get().getKlFraVerdi() != null
-            ? HendelseUnderType.fraKode(underårsakFelt.get().getFraVerdi())
+            ? HendelseUnderType.fraKode(underårsakFelt.get().getFraVerdi()).getNavn()
             : null;
         var underÅrsakTilVerdi = underårsakFelt.isPresent() && underårsakFelt.get().getKlTilVerdi() != null
-            ? HendelseUnderType.fraKode(underårsakFelt.get().getTilVerdi())
+            ? HendelseUnderType.fraKode(underårsakFelt.get().getTilVerdi()).getNavn()
             : null;
         var endret = endretFelt.stream().anyMatch(felt -> felt.getFraVerdi() != null);
 
