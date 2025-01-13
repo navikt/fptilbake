@@ -6,7 +6,12 @@ import java.time.Year;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Satser {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Satser.class);
 
     //se https://www.skatteetaten.no/satser/rettsgebyr/
     private static final Map<Year, BigDecimal> RETTSGEBYR_HISTORISK = Map.ofEntries(
@@ -21,6 +26,8 @@ public class Satser {
         Map.entry(Year.of(2023), BigDecimal.valueOf(622))
     );
 
+    private static final Year SENESTE_ÅR = RETTSGEBYR_HISTORISK.keySet().stream().max(Year::compareTo).orElseThrow();
+
     //se https://www.skatteetaten.no/satser/grunnbelopet-i-folketrygden/
     private static final BigDecimal GRUNNBELØP = BigDecimal.valueOf(124028);
     private static final BigDecimal HALVT_GRUNNBELØP = GRUNNBELØP.divide(BigDecimal.valueOf(2), 0, RoundingMode.UP);
@@ -30,8 +37,9 @@ public class Satser {
     }
 
     public static BigDecimal rettsgebyr(Year år) {
-        return Optional.ofNullable(RETTSGEBYR_HISTORISK.get(år))
-            .orElseThrow(() -> new IllegalArgumentException("Mangler rettsgebyr for år " + år));
+        var brukÅr = senesteÅrMedDefinertRettsgebyr(år);
+        return Optional.ofNullable(RETTSGEBYR_HISTORISK.get(brukÅr))
+            .orElseThrow(() -> new IllegalArgumentException("Mangler rettsgebyr for år " + brukÅr));
     }
 
     public static BigDecimal rettsgebyr(Year år, int antall) {
@@ -39,8 +47,17 @@ public class Satser {
     }
 
     public static BigDecimal halvtRettsgebyr(Year år) {
-        return Optional.ofNullable(HALVT_RETTSGEBYR_HISTORISK.get(år))
-            .orElseThrow(() -> new IllegalArgumentException("Mangler rettsgebyr for år " + år));
+        var brukÅr = senesteÅrMedDefinertRettsgebyr(år);
+        return Optional.ofNullable(HALVT_RETTSGEBYR_HISTORISK.get(brukÅr))
+            .orElseThrow(() -> new IllegalArgumentException("Mangler rettsgebyr for år " + brukÅr));
+    }
+
+    private static Year senesteÅrMedDefinertRettsgebyr(Year år) {
+        if (år.isAfter(SENESTE_ÅR)) {
+            LOG.warn("Mangler rettsgebyr for år {}. Legg det inn i koden. Med en gang.", år);
+            return SENESTE_ÅR;
+        }
+        return år;
     }
 
 
