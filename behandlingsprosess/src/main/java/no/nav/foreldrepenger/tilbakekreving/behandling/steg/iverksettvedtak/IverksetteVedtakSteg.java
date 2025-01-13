@@ -64,7 +64,7 @@ public class IverksetteVedtakSteg implements BehandlingSteg {
             vedtak.setIverksettingStatus(IverksettingStatus.UNDER_IVERKSETTING);
             behandlingVedtakRepository.lagre(vedtak);
 
-            boolean sendVedtaksbrev = !behandling.isAutomatiskSaksbehandlet() && !erRevurderingOpprettetForKlage(behandling);
+            boolean sendVedtaksbrev = !behandling.isAutomatiskSaksbehandlet() && !erRevurderingOpprettetForKlage(behandling) && !erVedtakFattetAvAnnenInstans(behandling);
             prosessTaskIverksett.opprettIverksettingstasker(behandling, sendVedtaksbrev);
             return BehandleStegResultat.settPåVent();
         }
@@ -81,5 +81,10 @@ public class IverksetteVedtakSteg implements BehandlingSteg {
         return BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) &&
                 behandling.getBehandlingÅrsaker().stream()
                         .anyMatch(årsak -> BehandlingÅrsakType.KLAGE_ÅRSAKER.contains(årsak.getBehandlingÅrsakType()));
+    }
+
+    private boolean erVedtakFattetAvAnnenInstans(Behandling behandling) {
+        return behandling.getBehandlingÅrsaker().stream()
+                .anyMatch(årsak -> BehandlingÅrsakType.VEDTAK_FATTET_AV_ANNEN_INSTANS == årsak.getBehandlingÅrsakType());
     }
 }

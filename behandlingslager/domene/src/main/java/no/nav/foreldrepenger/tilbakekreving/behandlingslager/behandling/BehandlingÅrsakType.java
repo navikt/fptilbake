@@ -27,6 +27,7 @@ public enum BehandlingÅrsakType implements Kodeverdi {
     RE_OPPLYSNINGER_OM_VILKÅR("RE_VILKÅR", "Nye opplysninger om vilkårsvurdering"),
     RE_OPPLYSNINGER_OM_FORELDELSE("RE_FORELDELSE", "Nye opplysninger om foreldelse"),
     RE_FEILUTBETALT_BELØP_HELT_ELLER_DELVIS_BORTFALT("RE_FEILUTBETALT_BELØP_REDUSERT", "Feilutbetalt beløp helt eller delvis bortfalt"),
+    VEDTAK_FATTET_AV_ANNEN_INSTANS("FATTET_AV_ANNEN_INSTANS", "Vedtak fattet av annen instans"),
 
     UDEFINERT("-", "Ikke Definert");
 

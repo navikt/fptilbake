@@ -51,9 +51,10 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
     @Override
     public void oppdater(ForeslåVedtakDto dto, Behandling behandling) {
         Long behandlingId = behandling.getId();
-        boolean vedtakSendesFraKlagebehandling = erRevurderingOpprettetForKlage(behandling);
-        if (vedtakSendesFraKlagebehandling){
+        if (erRevurderingOpprettetForKlage(behandling)) {
             LOG.info("Lagrer ikke fritekster for vedtaksbrev, siden vedtaksbrev skal sendes fra klagebehandlingen");
+        } else if (utførerVedtakFattetAvAnnenInstans(behandling)){
+            LOG.info("Lagrer ikke fritekster for vedtaksbrev, siden vedtaksbrev skal sendes av annen instans");
         } else {
             vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(
                 behandlingId,
@@ -120,5 +121,10 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
         return BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) &&
             behandling.getBehandlingÅrsaker().stream()
                 .anyMatch(årsak -> BehandlingÅrsakType.KLAGE_ÅRSAKER.contains(årsak.getBehandlingÅrsakType()));
+    }
+
+    private boolean utførerVedtakFattetAvAnnenInstans(Behandling behandling) {
+        return behandling.getBehandlingÅrsaker().stream()
+                .anyMatch(årsak -> BehandlingÅrsakType.VEDTAK_FATTET_AV_ANNEN_INSTANS == årsak.getBehandlingÅrsakType());
     }
 }
