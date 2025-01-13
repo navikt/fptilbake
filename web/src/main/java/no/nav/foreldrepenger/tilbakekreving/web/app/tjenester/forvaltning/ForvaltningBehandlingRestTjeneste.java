@@ -23,6 +23,9 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -327,6 +330,33 @@ public class ForvaltningBehandlingRestTjeneste {
             throw new IllegalArgumentException("Behandligen har allerede en ansvarlg saksbehandler");
         }
         behandling.setAnsvarligSaksbehandler(input.getSaksbehandlerIdent());
+
+        behandlingRepository.lagre(behandling, behandlingLås);
+
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/sett-behanlingsårsak-fattet-av-annen-instans")
+    @Operation(
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å sette på årsaken fattet av annen instans, brukes for å hindre utsending av vedtaksbrev",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "ukjent feil.")
+        })
+    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
+    public Response settBehandlingsårsakFattetAnnenInstans(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                                               @QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+        Behandling behandling = hentBehandling(behandlingReferanse);
+        BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
+        if (behandling.erAvsluttet() || behandling.erUnderIverksettelse()) {
+            throw new IllegalArgumentException("Kan ikke endre på behandling som er ferdig/under iverksettelse");
+        }
+        if (behandling.getBehandlingÅrsaker().stream().anyMatch(å->å.getBehandlingÅrsakType() == BehandlingÅrsakType.VEDTAK_FATTET_AV_ANNEN_INSTANS)){
+            throw new IllegalArgumentException("Har allerede årsaken satt");
+        }
+        BehandlingÅrsak.builder(BehandlingÅrsakType.VEDTAK_FATTET_AV_ANNEN_INSTANS).buildFor(behandling);
 
         behandlingRepository.lagre(behandling, behandlingLås);
 

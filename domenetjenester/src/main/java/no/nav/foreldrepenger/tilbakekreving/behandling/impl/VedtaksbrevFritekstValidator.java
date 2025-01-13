@@ -2,13 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering.maxFritekstLengde;
 
-import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
@@ -62,6 +57,11 @@ public class VedtaksbrevFritekstValidator {
                                                   VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering,
                                                   VedtaksbrevType brevType) {
 
+        if (gjennomførerVedtakFattetAvAnnenInstans(behandlingId)){
+            //ingenting å validere, vedtaksbrevet skal sendes fra et annet sted
+            return;
+        }
+
         if (brevType == VedtaksbrevType.ORDINÆR) {
             var vurderingEntitet = vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId);
             vurderingEntitet.ifPresent(vurdering -> validerSærligeGrunnerAnnet(vurdering, vedtaksbrevFritekstPerioder));
@@ -90,6 +90,12 @@ public class VedtaksbrevFritekstValidator {
                 (vedtaksbrevFritekstOppsummering == null || vedtaksbrevFritekstOppsummering.getOppsummeringFritekst() == null || vedtaksbrevFritekstOppsummering.getOppsummeringFritekst().isEmpty())) {
             throw manglerPåkrevetOppsumering();
         }
+    }
+
+    private boolean gjennomførerVedtakFattetAvAnnenInstans(Long behandlingId) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        return behandling.getBehandlingÅrsaker().stream()
+            .anyMatch(ba -> ba.getBehandlingÅrsakType() == BehandlingÅrsakType.VEDTAK_FATTET_AV_ANNEN_INSTANS);
     }
 
     private void validerSærligeGrunnerAnnet(VilkårVurderingEntitet vilkårVurdering, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
