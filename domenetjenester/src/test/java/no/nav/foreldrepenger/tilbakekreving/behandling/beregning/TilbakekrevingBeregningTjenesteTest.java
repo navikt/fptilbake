@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -423,7 +424,7 @@ class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
                 .medAnsvarligEnhet("8020")
                 .medBostedEnhet("8020")
                 .medBehandlendeEnhet("8020")
-                .medFeltKontroll("kontroll-123")
+                .medFeltKontroll(LocalDateTime.now().format(Kravgrunnlag431.KONTROLL_FELT_FORMAT))
                 .medSaksBehId("VL")
                 .build();
     }

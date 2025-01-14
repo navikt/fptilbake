@@ -4,7 +4,6 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -12,9 +11,11 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.automatisksaksbehandling.AutomatiskSaksbehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.felles.Helligdager;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -27,24 +28,26 @@ public class AutomatiskSaksbehandlingBatchTask implements ProsessTaskHandler {
     private static final Logger LOG = LoggerFactory.getLogger(AutomatiskSaksbehandlingBatchTask.class);
     private static final String EXECUTION_ID_SEPARATOR = "-";
 
-    private ProsessTaskTjeneste taskTjeneste;
-    private AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository;
+    private final ProsessTaskTjeneste taskTjeneste;
+    private final AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository;
+    private final KravgrunnlagRepository grunnlagRepository;
     private Clock clock;
 
     @Inject
     public AutomatiskSaksbehandlingBatchTask(ProsessTaskTjeneste taskTjeneste,
-                                             AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository) {
-        this.taskTjeneste = taskTjeneste;
-        this.automatiskSaksbehandlingRepository = automatiskSaksbehandlingRepository;
-        this.clock = Clock.systemDefaultZone();
+                                             AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository,
+                                             KravgrunnlagRepository grunnlagRepository) {
+        this(taskTjeneste, automatiskSaksbehandlingRepository, grunnlagRepository, Clock.systemDefaultZone());
     }
 
     // kun for testbruk
     protected AutomatiskSaksbehandlingBatchTask(ProsessTaskTjeneste taskTjeneste,
                                                 AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository,
+                                                KravgrunnlagRepository grunnlagRepository,
                                                 Clock clock) {
         this.taskTjeneste = taskTjeneste;
         this.automatiskSaksbehandlingRepository = automatiskSaksbehandlingRepository;
+        this.grunnlagRepository = grunnlagRepository;
         this.clock = clock;
     }
 
@@ -60,9 +63,12 @@ public class AutomatiskSaksbehandlingBatchTask implements ProsessTaskHandler {
             LocalDate loggDato = iDag.minus(AutomatiskSaksbehandlingRepository.getKravgrunnlagAlderNårGammel());
             LOG.info("Henter behandlinger som er eldre enn {} i batch {}", loggDato, batchRun);
             List<Behandling> behandlinger = automatiskSaksbehandlingRepository.hentAlleBehandlingerSomErKlarForAutomatiskSaksbehandling(iDag);
-            behandlinger = behandlinger.stream().filter(behandling -> !behandling.isBehandlingPåVent()).collect(Collectors.toList());
-            LOG.info("Det finnes {} behandlinger som er klar for automatisk saksbehandling", behandlinger.size());
-            behandlinger.forEach(behandling -> opprettAutomatiskSaksbehandlingProsessTask(batchRun, behandling));
+            var opprettTaskForBehandlinger  = behandlinger.stream()
+                .filter(behandling -> !behandling.isBehandlingPåVent())
+                .filter(this::lavFeilutbetalingSomHarVentetKanBehandlesAutomatisk)
+                .toList();
+            LOG.info("Det finnes {} behandlinger som er klar for automatisk saksbehandling", opprettTaskForBehandlinger.size());
+            opprettTaskForBehandlinger.forEach(behandling -> opprettAutomatiskSaksbehandlingProsessTask(batchRun, behandling));
         }
     }
 
@@ -76,5 +82,12 @@ public class AutomatiskSaksbehandlingBatchTask implements ProsessTaskHandler {
 
     private String getGruppeNavn(String batchRun) {
         return batchRun.substring(batchRun.indexOf(EXECUTION_ID_SEPARATOR.charAt(0)) + 1);
+    }
+
+
+    // Sikre match for aktuelt rettsgebyr
+    private boolean lavFeilutbetalingSomHarVentetKanBehandlesAutomatisk(Behandling behandling) {
+        var kravgrunnlag = grunnlagRepository.finnKravgrunnlagOpt(behandling.getId()).orElse(null);
+        return kravgrunnlag != null && KravgrunnlagBeregningTjeneste.samletFeilutbetaltKanAutomatiskBehandles(kravgrunnlag, behandling.getOpprettetTidspunkt());
     }
 }

@@ -8,17 +8,19 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import jakarta.inject.Inject;
+import jakarta.persistence.FlushModeType;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import jakarta.inject.Inject;
-import jakarta.persistence.FlushModeType;
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
@@ -156,7 +158,7 @@ class KravgrunnlagTjenesteTest extends FellesTestOppsett {
                 .medBostedEnhet(ENHET)
                 .medBehandlendeEnhet(ENHET)
                 .medSaksBehId("Z991036")
-                .medFeltKontroll("42354353453454")
+                .medFeltKontroll(LocalDateTime.now().format(Kravgrunnlag431.KONTROLL_FELT_FORMAT))
                 .build();
     }
 

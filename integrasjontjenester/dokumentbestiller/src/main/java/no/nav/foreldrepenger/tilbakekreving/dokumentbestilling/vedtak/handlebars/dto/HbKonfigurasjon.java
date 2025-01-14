@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto;
 
 import java.math.BigDecimal;
+import java.time.Year;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,7 +14,7 @@ public class HbKonfigurasjon {
 
     @JsonProperty("fire-rettsgebyr")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
-    private BigDecimal fireRettsgebyr = Satser.rettsgebyr(4);
+    private BigDecimal fireRettsgebyr = Satser.rettsgebyr(Year.now(), 4);
     @JsonProperty("halvt-grunnbeløp")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
     private BigDecimal halvtGrunnbeløp = Satser.halvtGrunnbeløp();

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -279,7 +280,7 @@ class VedtakOppsummeringTjenesteTest {
             .medUtbetIdType(GjelderType.PERSON)
             .medGjelderVedtakId("1234567890")
             .medGjelderType(GjelderType.PERSON)
-            .medFeltKontroll("2020")
+            .medFeltKontroll(LocalDateTime.now().format(Kravgrunnlag431.KONTROLL_FELT_FORMAT))
             .medSaksBehId(ANSVARLIG_SAKSBEHANDLER)
             .medFagSystemId(saksnummer.getVerdi() + "100")
             .medReferanse(Henvisning.fraEksternBehandlingId(1L))

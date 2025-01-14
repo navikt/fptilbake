@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -162,7 +163,7 @@ class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {
                 .medAnsvarligEnhet("enhet")
                 .medBostedEnhet("enhet")
                 .medBehandlendeEnhet("enhet")
-                .medFeltKontroll("132323")
+                .medFeltKontroll(LocalDateTime.now().format(Kravgrunnlag431.KONTROLL_FELT_FORMAT))
                 .medSaksBehId("23454334").build();
         var periode = KravgrunnlagPeriode432.builder()
                 .medPeriode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 31))

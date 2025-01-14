@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.AutomatiskSaksbehandlingVurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -42,8 +43,8 @@ public class HalvtRettsGebyrTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         var behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         var behandling = behandlingRepository.hentBehandling(behandlingId);
-        if (halvtRettsgebyrTjeneste.lavFeilutbetalingKanVentePåAutomatiskBehandling(behandlingId)) {
-            var fristDato = halvtRettsgebyrTjeneste.ventefristForTilfelleSomKanAutomatiskSaksbehandles(behandlingId);
+        if (halvtRettsgebyrTjeneste.lavFeilutbetalingKanVentePåAutomatiskBehandling(behandling)) {
+            var fristDato = halvtRettsgebyrTjeneste.ventefristForTilfelleSomKanAutomatiskSaksbehandles(behandling.getId());
             behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
                 BehandlingStegType.TBKGSTEG, fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 

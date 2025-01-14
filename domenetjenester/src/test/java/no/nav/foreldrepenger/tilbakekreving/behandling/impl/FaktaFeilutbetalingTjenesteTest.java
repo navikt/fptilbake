@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -104,7 +105,7 @@ class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
                 .medAnsvarligEnhet("8020")
                 .medBehandlendeEnhet("8020")
                 .medBostedEnhet("8020")
-                .medFeltKontroll("00")
+                .medFeltKontroll(LocalDateTime.now().format(Kravgrunnlag431.KONTROLL_FELT_FORMAT))
                 .medSaksBehId("Z991035")
                 .medReferanse(henvisning)
                 .build();

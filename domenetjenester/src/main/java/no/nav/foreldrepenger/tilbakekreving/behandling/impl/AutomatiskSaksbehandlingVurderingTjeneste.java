@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.automatisksaksbehandling.AutomatiskSaksbehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -25,14 +27,14 @@ public class AutomatiskSaksbehandlingVurderingTjeneste {
         this.varselRepository = varselRepository;
     }
 
-    public boolean lavFeilutbetalingKanVentePåAutomatiskBehandling(Long behandlingId) {
-        var kravgrunnlag = grunnlagRepository.finnKravgrunnlagOpt(behandlingId).orElse(null);
-        return lavFeilutbetalingKanVentePåAutomatiskBehandling(behandlingId, kravgrunnlag);
+    public boolean lavFeilutbetalingKanVentePåAutomatiskBehandling(Behandling behandling) {
+        var kravgrunnlag = grunnlagRepository.finnKravgrunnlagOpt(behandling.getId()).orElse(null);
+        return lavFeilutbetalingKanVentePåAutomatiskBehandling(behandling, kravgrunnlag);
     }
 
-    public boolean lavFeilutbetalingKanVentePåAutomatiskBehandling(Long behandlingId, Kravgrunnlag431 kravgrunnlag) {
-        return kravgrunnlag != null && varselRepository.finnVarsel(behandlingId).isEmpty() &&
-            KravgrunnlagBeregningTjeneste.samletFeilutbetaltKanAutomatiskBehandles(kravgrunnlag) &&
+    public boolean lavFeilutbetalingKanVentePåAutomatiskBehandling(Behandling behandling, Kravgrunnlag431 kravgrunnlag) {
+        return kravgrunnlag != null && varselRepository.finnVarsel(behandling.getId()).isEmpty() &&
+            KravgrunnlagBeregningTjeneste.samletFeilutbetaltKanAutomatiskBehandles(kravgrunnlag, behandling.getOpprettetTidspunkt()) &&
             !harLavFeilutbetaltLiggetLengeNokForAutomatiskSaksbehandling(kravgrunnlag);
     }
 

@@ -245,7 +245,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>jms-integrasjon</artifactId>
-                <version>3.2.9</version>
+                <version>3.2.10</version>
             </dependency>
 
             <dependency>
@@ -408,7 +408,7 @@
                 <!-- denne tas inn av com.ibm.mq.jakarta.client, overstyrer med nyere versjon. Trengs denne? -->
                 <groupId>org.json</groupId>
                 <artifactId>json</artifactId>
-                <version>20241224</version>
+                <version>20250107</version>
             </dependency>
             <dependency>
                 <groupId>org.xerial.snappy</groupId>
