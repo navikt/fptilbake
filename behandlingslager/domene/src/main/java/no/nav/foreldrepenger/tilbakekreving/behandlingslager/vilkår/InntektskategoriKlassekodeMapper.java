@@ -26,9 +26,9 @@ public class InntektskategoriKlassekodeMapper {
         KlasseKode.FPENAD_OP, ADOPSJON_ES
     );
 
-    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_FØDSEL = Map.of(
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_ADOPSJON = Map.of(
         KlasseKode.FPADATORD, ARBEIDSTAKER,
-        KlasseKode.FPATFRI, FRILANSER,
+        KlasseKode.FPADATFRI, FRILANSER,
         KlasseKode.FPADSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
         KlasseKode.FPADATAL, ARBEIDSLEDIG,
         KlasseKode.FPADATSJO, SJØMANN,
@@ -37,7 +37,7 @@ public class InntektskategoriKlassekodeMapper {
         KlasseKode.FPADSNDFI, FISKER
     );
 
-    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_ADOPSJON = Map.of(
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_FØDSEL = Map.of(
         KlasseKode.FPATORD, ARBEIDSTAKER,
         KlasseKode.FPATFRI, FRILANSER,
         KlasseKode.FPSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
