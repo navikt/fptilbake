@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.historikk.dto;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldFelt;
 
 class HistorikkInnslagTemaDto {
     private HistorikkEndretFeltType endretFeltNavn;
@@ -33,7 +33,7 @@ class HistorikkInnslagTemaDto {
     }
 
 
-    static HistorikkInnslagTemaDto mapFra(HistorikkinnslagFelt felt) {
+    static HistorikkInnslagTemaDto mapFra(HistorikkinnslagOldFelt felt) {
         HistorikkInnslagTemaDto dto = new HistorikkInnslagTemaDto();
         HistorikkEndretFeltType endretFeltNavn = HistorikkEndretFeltType.fraKode(felt.getNavn());
         dto.setEndretFeltNavn(endretFeltNavn);

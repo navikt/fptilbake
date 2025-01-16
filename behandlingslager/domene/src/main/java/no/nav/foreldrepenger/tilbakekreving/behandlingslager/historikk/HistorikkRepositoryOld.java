@@ -9,39 +9,39 @@ import jakarta.persistence.EntityManager;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 @ApplicationScoped
-public class HistorikkRepository {
+public class HistorikkRepositoryOld {
 
     private EntityManager entityManager;
 
-    HistorikkRepository() {
+    HistorikkRepositoryOld() {
         // CDI
     }
 
     @Inject
-    public HistorikkRepository(EntityManager entityManager) {
+    public HistorikkRepositoryOld(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
-    public void lagre(Historikkinnslag historikkinnslag) {
+    public void lagre(HistorikkinnslagOld historikkinnslag) {
 
         if (historikkinnslag.getFagsakId() == null) {
             historikkinnslag.setFagsakId(getFagsakId(historikkinnslag.getBehandlingId()));
         }
 
         entityManager.persist(historikkinnslag);
-        for (HistorikkinnslagDel historikkinnslagDel : historikkinnslag.getHistorikkinnslagDeler()) {
+        for (HistorikkinnslagOldDel historikkinnslagDel : historikkinnslag.getHistorikkinnslagDeler()) {
             entityManager.persist(historikkinnslagDel);
-            for (HistorikkinnslagFelt historikkinnslagFelt : historikkinnslagDel.getHistorikkinnslagFelt()) {
+            for (HistorikkinnslagOldFelt historikkinnslagFelt : historikkinnslagDel.getHistorikkinnslagFelt()) {
                 entityManager.persist(historikkinnslagFelt);
             }
         }
         entityManager.flush();
     }
 
-    public List<Historikkinnslag> hentHistorikkForSaksnummer(Saksnummer saksnummer) {
+    public List<HistorikkinnslagOld> hentHistorikkForSaksnummer(Saksnummer saksnummer) {
         return entityManager.createQuery(
                         "select h from Historikkinnslag h inner join Fagsak f On f.id = h.fagsakId where f.saksnummer= :saksnummer",
-                        Historikkinnslag.class)
+                        HistorikkinnslagOld.class)
                 .setParameter("saksnummer", saksnummer)
                 .getResultList();
     }
@@ -52,13 +52,13 @@ public class HistorikkRepository {
                 .getSingleResult();
     }
 
-    public List<Historikkinnslag> hentHistorikk(Long behandlingId) {
+    public List<HistorikkinnslagOld> hentHistorikk(Long behandlingId) {
 
         Long fagsakId = getFagsakId(behandlingId);
 
         return entityManager.createQuery(
                         "select h from Historikkinnslag h where (h.behandlingId = :behandlingId OR h.behandlingId = NULL) AND h.fagsakId = :fagsakId ",
-                        Historikkinnslag.class)
+                        HistorikkinnslagOld.class)
                 .setParameter("fagsakId", fagsakId)// NOSONAR
                 .setParameter("behandlingId", behandlingId)
                 .getResultList();

@@ -31,8 +31,8 @@ public class HistorikkInnslagTekstBuilder {
     private boolean begrunnelseEndret = false;
     private boolean gjeldendeFraSatt = false;
 
-    private HistorikkinnslagDel.Builder historikkinnslagDelBuilder = HistorikkinnslagDel.builder();
-    private List<HistorikkinnslagDel> historikkinnslagDeler = new ArrayList<>();
+    private HistorikkinnslagOldDel.Builder historikkinnslagDelBuilder = HistorikkinnslagOldDel.builder();
+    private List<HistorikkinnslagOldDel> historikkinnslagDeler = new ArrayList<>();
     private int antallEndredeFelter = 0;
     private int antallAksjonspunkter = 0;
     private int antallOpplysninger = 0;
@@ -47,7 +47,7 @@ public class HistorikkInnslagTekstBuilder {
         //
     }
 
-    public List<HistorikkinnslagDel> getHistorikkinnslagDeler() {
+    public List<HistorikkinnslagOldDel> getHistorikkinnslagDeler() {
         return historikkinnslagDeler;
     }
 
@@ -60,7 +60,7 @@ public class HistorikkInnslagTekstBuilder {
                 && !HistorikkinnslagType.OVERSTYRT.equals(historikkinnslagType)
                 && !HistorikkinnslagType.OPPTJENING.equals(historikkinnslagType)) { // PKMANTIS-753 FPFEIL-805
             String verdiStr = formatString(verdi);
-            HistorikkinnslagFelt.builder()
+            HistorikkinnslagOldFelt.builder()
                     .medFeltType(HistorikkinnslagFeltType.HENDELSE)
                     .medNavn(historikkinnslagType)
                     .medTilVerdi(verdiStr)
@@ -73,7 +73,7 @@ public class HistorikkInnslagTekstBuilder {
         if (SkjermlenkeType.UDEFINERT.equals(skjermlenkeType)) {
             return this;
         }
-        HistorikkinnslagFelt.builder()
+        HistorikkinnslagOldFelt.builder()
                 .medFeltType(HistorikkinnslagFeltType.SKJERMLENKE)
                 .medTilVerdi(skjermlenkeType)
                 .build(historikkinnslagDelBuilder);
@@ -84,7 +84,7 @@ public class HistorikkInnslagTekstBuilder {
         if (gjeldendeFraDato != null) {
             gjeldendeFraSatt = true;
         }
-        HistorikkinnslagFelt.builder()
+        HistorikkinnslagOldFelt.builder()
                 .medFeltType(HistorikkinnslagFeltType.GJELDENDE_FRA)
                 .medNavn(endretFelt)
                 .medNavnVerdi(navnVerdi)
@@ -98,7 +98,7 @@ public class HistorikkInnslagTekstBuilder {
         if (localDate != null) {
             gjeldendeFraSatt = true;
         }
-        HistorikkinnslagFelt.builder()
+        HistorikkinnslagOldFelt.builder()
                 .medFeltType(HistorikkinnslagFeltType.GJELDENDE_FRA)
                 .medTilVerdi(formatString(localDate))
                 .build(historikkinnslagDelBuilder);
@@ -106,7 +106,7 @@ public class HistorikkInnslagTekstBuilder {
     }
 
     public <K extends Kodeverdi> HistorikkInnslagTekstBuilder medÅrsak(K årsak) {
-        HistorikkinnslagFelt.builder()
+        HistorikkinnslagOldFelt.builder()
                 .medFeltType(HistorikkinnslagFeltType.AARSAK)
                 .medTilVerdi(årsak)
                 .build(historikkinnslagDelBuilder);
@@ -114,7 +114,7 @@ public class HistorikkInnslagTekstBuilder {
     }
 
     public HistorikkInnslagTekstBuilder medTema(HistorikkEndretFeltType endretFeltType, String verdi) {
-        HistorikkinnslagFelt.builder()
+        HistorikkinnslagOldFelt.builder()
                 .medFeltType(HistorikkinnslagFeltType.ANGÅR_TEMA)
                 .medNavn(endretFeltType)
                 .medNavnVerdi(verdi)
@@ -123,7 +123,7 @@ public class HistorikkInnslagTekstBuilder {
     }
 
     public HistorikkInnslagTekstBuilder medResultat(Kodeverdi resultat) {
-        HistorikkinnslagFelt.builder()
+        HistorikkinnslagOldFelt.builder()
                 .medFeltType(HistorikkinnslagFeltType.RESULTAT)
                 .medTilVerdi(resultat)
                 .build(historikkinnslagDelBuilder);
@@ -148,7 +148,7 @@ public class HistorikkInnslagTekstBuilder {
     }
 
     public HistorikkInnslagTekstBuilder medBegrunnelse(String begrunnelse, boolean erBegrunnelseEndret) {
-        HistorikkinnslagFelt.builder()
+        HistorikkinnslagOldFelt.builder()
                 .medFeltType(HistorikkinnslagFeltType.BEGRUNNELSE)
                 .medTilVerdi(begrunnelse)
                 .build(historikkinnslagDelBuilder);
@@ -157,7 +157,7 @@ public class HistorikkInnslagTekstBuilder {
     }
 
     public <K extends Kodeverdi> HistorikkInnslagTekstBuilder medBegrunnelse(K begrunnelse, boolean erBegrunnelseEndret) {
-        HistorikkinnslagFelt.builder()
+        HistorikkinnslagOldFelt.builder()
                 .medFeltType(HistorikkinnslagFeltType.BEGRUNNELSE)
                 .medTilVerdi(begrunnelse)
                 .build(historikkinnslagDelBuilder);
@@ -169,7 +169,7 @@ public class HistorikkInnslagTekstBuilder {
         String fraVerdiStr = formatString(fraVerdi);
         String tilVerdiStr = formatString(tilVerdi);
 
-        HistorikkinnslagFelt.builder()
+        HistorikkinnslagOldFelt.builder()
                 .medFeltType(HistorikkinnslagFeltType.ENDRET_FELT)
                 .medNavn(historikkEndretFeltType)
                 .medNavnVerdi(navnVerdi)
@@ -181,7 +181,7 @@ public class HistorikkInnslagTekstBuilder {
     }
 
     public <K extends Kodeverdi> HistorikkInnslagTekstBuilder medEndretFelt(HistorikkEndretFeltType historikkEndretFeltType, K fraVerdi, K tilVerdi) {
-        HistorikkinnslagFelt.builder()
+        HistorikkinnslagOldFelt.builder()
                 .medFeltType(HistorikkinnslagFeltType.ENDRET_FELT)
                 .medNavn(historikkEndretFeltType)
                 .medFraVerdi(fraVerdi)
@@ -200,7 +200,7 @@ public class HistorikkInnslagTekstBuilder {
         String fraVerdiStr = formatString(fraVerdi);
         String tilVerdiStr = formatString(tilVerdi);
 
-        HistorikkinnslagFelt.builder()
+        HistorikkinnslagOldFelt.builder()
                 .medFeltType(HistorikkinnslagFeltType.ENDRET_FELT)
                 .medNavn(historikkEndretFeltType)
                 .medFraVerdi(fraVerdiStr)
@@ -219,7 +219,7 @@ public class HistorikkInnslagTekstBuilder {
     public <T> HistorikkInnslagTekstBuilder medOpplysning(HistorikkOpplysningType opplysningType, T verdi) {
         String tilVerdi = formatString(verdi);
         int sekvensNr = hentNesteOpplysningSekvensNr();
-        HistorikkinnslagFelt.builder()
+        HistorikkinnslagOldFelt.builder()
                 .medFeltType(HistorikkinnslagFeltType.OPPLYSNINGER)
                 .medNavn(opplysningType)
                 .medTilVerdi(tilVerdi)
@@ -289,7 +289,7 @@ public class HistorikkInnslagTekstBuilder {
     }
 
     private <T> void leggTilFelt(HistorikkinnslagFeltType feltType, T verdi, int sekvensNr) {
-        HistorikkinnslagFelt.builder()
+        HistorikkinnslagOldFelt.builder()
                 .medFeltType(feltType)
                 .medTilVerdi(verdi != null ? verdi.toString() : null)
                 .medSekvensNr(sekvensNr)
@@ -325,7 +325,7 @@ public class HistorikkInnslagTekstBuilder {
             return this;
         }
         historikkinnslagDeler.add(historikkinnslagDelBuilder.build());
-        historikkinnslagDelBuilder = HistorikkinnslagDel.builder();
+        historikkinnslagDelBuilder = HistorikkinnslagOldDel.builder();
         antallEndredeFelter = 0;
         antallAksjonspunkter = 0;
         antallOpplysninger = 0;
@@ -333,7 +333,7 @@ public class HistorikkInnslagTekstBuilder {
         return this;
     }
 
-    public List<HistorikkinnslagDel> build(Historikkinnslag historikkinnslag) {
+    public List<HistorikkinnslagOldDel> build(HistorikkinnslagOld historikkinnslag) {
         ferdigstillHistorikkinnslagDel();
         verify(historikkinnslag.getType());
         historikkinnslag.setHistorikkinnslagDeler(historikkinnslagDeler);
@@ -357,7 +357,7 @@ public class HistorikkInnslagTekstBuilder {
         }
     }
 
-    private Optional<VLException> verify(HistorikkinnslagType historikkinnslagType, HistorikkinnslagDel historikkinnslagDel) {
+    private Optional<VLException> verify(HistorikkinnslagType historikkinnslagType, HistorikkinnslagOldDel historikkinnslagDel) {
         String type = historikkinnslagType.getMal();
 
         if (HistorikkInnslagMal.MAL_TYPE_1.equals(type)) {
@@ -388,7 +388,7 @@ public class HistorikkInnslagTekstBuilder {
         throw new TekniskException("FPT-876692", String.format("Ukjent historikkinnslagstype: %s", type));
     }
 
-    private Optional<VLException> checkFieldsPresent(String type, HistorikkinnslagDel del, HistorikkinnslagFeltType... fields) {
+    private Optional<VLException> checkFieldsPresent(String type, HistorikkinnslagOldDel del, HistorikkinnslagFeltType... fields) {
         List<HistorikkinnslagFeltType> fieldList = Arrays.asList(fields);
         Set<HistorikkinnslagFeltType> harFelt = findFields(del, fieldList).collect(Collectors.toCollection(LinkedHashSet::new));
 
@@ -401,7 +401,7 @@ public class HistorikkInnslagTekstBuilder {
         }
     }
 
-    private Optional<VLException> checkAtLeastOnePresent(String type, HistorikkinnslagDel del, HistorikkinnslagFeltType... fields) {
+    private Optional<VLException> checkAtLeastOnePresent(String type, HistorikkinnslagOldDel del, HistorikkinnslagFeltType... fields) {
         List<HistorikkinnslagFeltType> fieldList = Arrays.asList(fields);
         Optional<HistorikkinnslagFeltType> opt = findFields(del, fieldList).findAny();
 
@@ -413,8 +413,8 @@ public class HistorikkInnslagTekstBuilder {
         }
     }
 
-    private Stream<HistorikkinnslagFeltType> findFields(HistorikkinnslagDel del, List<HistorikkinnslagFeltType> fieldList) {
-        return del.getHistorikkinnslagFelt().stream().map(HistorikkinnslagFelt::getFeltType).filter(fieldList::contains);
+    private Stream<HistorikkinnslagFeltType> findFields(HistorikkinnslagOldDel del, List<HistorikkinnslagFeltType> fieldList) {
+        return del.getHistorikkinnslagFelt().stream().map(HistorikkinnslagOldFelt::getFeltType).filter(fieldList::contains);
     }
 
     /*

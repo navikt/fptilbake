@@ -46,8 +46,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldFelt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
@@ -106,7 +106,7 @@ public abstract class FellesTestOppsett {
     protected BehandlingRepositoryProvider repoProvider;
     protected NavBrukerRepository brukerRepository;
     protected KravgrunnlagRepository grunnlagRepository;
-    protected HistorikkRepository historikkRepository;
+    protected HistorikkRepositoryOld historikkRepository;
     protected FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     protected VurdertForeldelseRepository vurdertForeldelseRepository;
     protected VilkårsvurderingRepository vilkårsvurderingRepository;
@@ -157,7 +157,7 @@ public abstract class FellesTestOppsett {
         repoProvider = new BehandlingRepositoryProvider(entityManager);
         brukerRepository = new NavBrukerRepository(entityManager);
         grunnlagRepository = repoProvider.getGrunnlagRepository();
-        historikkRepository = repoProvider.getHistorikkRepository();
+        historikkRepository = repoProvider.getHistorikkRepositoryOld();
         faktaFeilutbetalingRepository = repoProvider.getFaktaFeilutbetalingRepository();
         vurdertForeldelseRepository = repoProvider.getVurdertForeldelseRepository();
         vilkårsvurderingRepository = new VilkårsvurderingRepository(entityManager);
@@ -199,14 +199,14 @@ public abstract class FellesTestOppsett {
         return localDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
     }
 
-    protected String getTilVerdi(Optional<HistorikkinnslagFelt> felt) {
+    protected String getTilVerdi(Optional<HistorikkinnslagOldFelt> felt) {
         if (felt.isPresent()) {
             return felt.get().getTilVerdi();
         }
         return null;
     }
 
-    protected String getFraVerdi(Optional<HistorikkinnslagFelt> felt) {
+    protected String getFraVerdi(Optional<HistorikkinnslagOldFelt> felt) {
         if (felt.isPresent()) {
             return felt.get().getFraVerdi();
         }

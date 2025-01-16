@@ -20,7 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagEndretEvent;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDelDto;
@@ -44,7 +44,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
     }
 
     public void lagreÅrsakForFeilutbetalingPeriode(Behandling behandling, List<FaktaFeilutbetalingDto> feilutbetalingFaktas, String begrunnelse) {
-        Historikkinnslag historikkinnslag = new Historikkinnslag();
+        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld();
         historikkinnslag.setType(HistorikkinnslagType.FAKTA_OM_FEILUTBETALING);
         historikkinnslag.setBehandlingId(behandling.getId());
         historikkinnslag.setAktør(behandling.isAutomatiskSaksbehandlet() ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER);
@@ -81,7 +81,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         faktaFeilutbetalingRepository.slettFaktaFeilutbetaling(event.getBehandlingId());
     }
 
-    private boolean lagHistorikkInnslagDeler(Historikkinnslag historikkinnslag, String begrunnelse,
+    private boolean lagHistorikkInnslagDeler(HistorikkinnslagOld historikkinnslag, String begrunnelse,
                                              Optional<FaktaFeilutbetaling> forrigeFakta,
                                              FaktaFeilutbetalingDto faktaFeilutbetalingDto,
                                              HistorikkinnslagDelDto historikkinnslagDelDto) {

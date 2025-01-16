@@ -13,7 +13,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingE
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 
 class BehandlendeEnhetTest extends FellesTestOppsett {
@@ -41,9 +41,9 @@ class BehandlendeEnhetTest extends FellesTestOppsett {
         assertThat(behandling.getBehandlendeEnhetId()).isEqualTo(NY_ENHET_ID);
         assertThat(behandling.getBehandlendeEnhetNavn()).isEqualTo(NY_ENHET_NAVN);
 
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(internBehandlingId);
+        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikk(internBehandlingId);
         assertThat(historikkinnslager.size()).isEqualTo(1);
-        Historikkinnslag historikkinnslag = historikkinnslager.get(0);
+        HistorikkinnslagOld historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BYTT_ENHET);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
     }

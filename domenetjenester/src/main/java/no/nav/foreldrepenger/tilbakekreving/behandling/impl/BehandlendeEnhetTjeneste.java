@@ -13,14 +13,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 
 @ApplicationScoped
 public class BehandlendeEnhetTjeneste {
 
-    private HistorikkRepository historikkRepository;
+    private HistorikkRepositoryOld historikkRepository;
     private BehandlingRepository behandlingRepository;
 
     private BehandlingEventPubliserer eventPubliserer;
@@ -32,7 +32,7 @@ public class BehandlendeEnhetTjeneste {
     @Inject
     public BehandlendeEnhetTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                     BehandlingEventPubliserer eventPubliserer) {
-        this.historikkRepository = repositoryProvider.getHistorikkRepository();
+        this.historikkRepository = repositoryProvider.getHistorikkRepositoryOld();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eventPubliserer = eventPubliserer;
     }
@@ -56,7 +56,7 @@ public class BehandlendeEnhetTjeneste {
                         fraMessage,
                         nyEnhet.getEnhetId() + " " + nyEnhet.getEnhetNavn());
 
-        Historikkinnslag innslag = new Historikkinnslag();
+        HistorikkinnslagOld innslag = new HistorikkinnslagOld();
         innslag.setAktør(aktør);
         innslag.setType(HistorikkinnslagType.BYTT_ENHET);
         innslag.setBehandlingId(behandling.getId());

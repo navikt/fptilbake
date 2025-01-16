@@ -26,8 +26,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -45,7 +45,7 @@ public class KravgrunnlagTjeneste {
 
     private KravgrunnlagRepository kravgrunnlagRepository;
     private BehandlingRepository behandlingRepository;
-    private HistorikkRepository historikkRepository;
+    private HistorikkRepositoryOld historikkRepository;
     private GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste;
@@ -64,7 +64,7 @@ public class KravgrunnlagTjeneste {
                                 AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste) {
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.historikkRepository = repositoryProvider.getHistorikkRepository();
+        this.historikkRepository = repositoryProvider.getHistorikkRepositoryOld();
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
         this.halvtRettsgebyrTjeneste = halvtRettsgebyrTjeneste;
@@ -172,7 +172,7 @@ public class KravgrunnlagTjeneste {
     }
 
     private void opprettHistorikkinnslagForBehandlingStartetForfra(Behandling behandling) {
-        var historikkinnslag = new Historikkinnslag();
+        var historikkinnslag = new HistorikkinnslagOld();
         historikkinnslag.setType(HistorikkinnslagType.BEH_STARTET_FORFRA);
         historikkinnslag.setAktør(HistorikkAktør.VEDTAKSLØSNINGEN);
         var historikkInnslagTekstBuilder = new HistorikkInnslagTekstBuilder()

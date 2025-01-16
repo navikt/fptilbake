@@ -109,7 +109,7 @@ class HåndterGamleKravgrunnlagTaskTest {
         var behandlingskontrollProvider = new BehandlingskontrollProvider(
                 behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
         var historikkinnslagTjeneste = new HistorikkinnslagTjeneste(
-                repositoryProvider.getHistorikkRepository());
+                repositoryProvider.getHistorikkRepositoryOld());
         var fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repositoryProvider,
                 behandlingskontrollProvider, fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock);

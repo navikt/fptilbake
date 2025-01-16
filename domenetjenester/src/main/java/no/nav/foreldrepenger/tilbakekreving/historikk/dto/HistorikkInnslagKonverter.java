@@ -9,8 +9,8 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.core.UriBuilder;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDokumentLink;
 
 @ApplicationScoped
 public class HistorikkInnslagKonverter {
@@ -25,7 +25,7 @@ public class HistorikkInnslagKonverter {
     public HistorikkInnslagKonverter() {// NOSONAR
     }
 
-    public HistorikkinnslagDto mapFra(Historikkinnslag historikkinnslag, URI dokumentPath) {
+    public HistorikkinnslagDto mapFra(HistorikkinnslagOld historikkinnslag, URI dokumentPath) {
         HistorikkinnslagDto dto = new HistorikkinnslagDto();
         if (historikkinnslag.getBehandlingId() != null) {
             dto.setBehandlingId(historikkinnslag.getBehandlingId());
@@ -44,11 +44,11 @@ public class HistorikkInnslagKonverter {
         return dto;
     }
 
-    private List<HistorikkInnslagDokumentLinkDto> mapLenker(List<HistorikkinnslagDokumentLink> lenker, URI dokumentPath) {
+    private List<HistorikkInnslagDokumentLinkDto> mapLenker(List<HistorikkinnslagOldDokumentLink> lenker, URI dokumentPath) {
         return lenker.stream().map(lenke -> map(lenke, dokumentPath)).collect(Collectors.toList());
     }
 
-    private HistorikkInnslagDokumentLinkDto map(HistorikkinnslagDokumentLink lenke, URI dokumentPath) {
+    private HistorikkInnslagDokumentLinkDto map(HistorikkinnslagOldDokumentLink lenke, URI dokumentPath) {
         HistorikkInnslagDokumentLinkDto dto = new HistorikkInnslagDokumentLinkDto();
         dto.setTag(lenke.getLinkTekst());
         dto.setUtgått(false);

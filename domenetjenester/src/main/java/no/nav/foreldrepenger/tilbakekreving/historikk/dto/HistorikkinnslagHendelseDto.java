@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.historikk.dto;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldFelt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 
 public class HistorikkinnslagHendelseDto {
@@ -23,7 +23,7 @@ public class HistorikkinnslagHendelseDto {
         this.verdi = verdi;
     }
 
-    public static HistorikkinnslagHendelseDto mapFra(HistorikkinnslagFelt hendelse) {
+    public static HistorikkinnslagHendelseDto mapFra(HistorikkinnslagOldFelt hendelse) {
         HistorikkinnslagHendelseDto dto = new HistorikkinnslagHendelseDto();
         dto.navn = HistorikkinnslagType.fraKode(hendelse.getNavn());
         dto.verdi = hendelse.getTilVerdi();

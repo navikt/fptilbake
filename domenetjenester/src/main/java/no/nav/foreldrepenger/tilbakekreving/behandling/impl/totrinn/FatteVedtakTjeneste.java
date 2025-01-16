@@ -21,8 +21,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagTotrinnsvurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
@@ -34,7 +34,7 @@ public class FatteVedtakTjeneste {
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private TotrinnTjeneste totrinnTjeneste;
-    private HistorikkRepository historikkRepository;
+    private HistorikkRepositoryOld historikkRepository;
 
     FatteVedtakTjeneste() {
         // for CDI
@@ -44,7 +44,7 @@ public class FatteVedtakTjeneste {
     public FatteVedtakTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                TotrinnTjeneste totrinnTjeneste) {
-        this.historikkRepository = repositoryProvider.getHistorikkRepository();
+        this.historikkRepository = repositoryProvider.getHistorikkRepositoryOld();
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.totrinnTjeneste = totrinnTjeneste;
     }
@@ -119,9 +119,9 @@ public class FatteVedtakTjeneste {
         historikkRepository.lagre(lagHistorikkinnslag(behandling, HistorikkinnslagType.SAK_RETUR, delBuilder));
     }
 
-    private Historikkinnslag lagHistorikkinnslag(Behandling behandling, HistorikkinnslagType historikkinnslagType,
-                                                 HistorikkInnslagTekstBuilder builder) {
-        Historikkinnslag historikkinnslag = new Historikkinnslag();
+    private HistorikkinnslagOld lagHistorikkinnslag(Behandling behandling, HistorikkinnslagType historikkinnslagType,
+                                                    HistorikkInnslagTekstBuilder builder) {
+        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld();
         historikkinnslag.setBehandling(behandling);
         historikkinnslag.setAktør(HistorikkAktør.BESLUTTER);
         historikkinnslag.setType(historikkinnslagType);
@@ -143,7 +143,7 @@ public class FatteVedtakTjeneste {
         HistorikkInnslagTekstBuilder tekstBuilder = new HistorikkInnslagTekstBuilder()
                 .medHendelse(historikkinnslagType)
                 .medSkjermlenke(SkjermlenkeType.VEDTAK);
-        Historikkinnslag innslag = new Historikkinnslag();
+        HistorikkinnslagOld innslag = new HistorikkinnslagOld();
         innslag.setAktør(HistorikkAktør.BESLUTTER); //det er alltid totrinnsvurdering for tilbakerkrevingssaker
         innslag.setType(historikkinnslagType);
         innslag.setBehandling(behandling);

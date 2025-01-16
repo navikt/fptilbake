@@ -13,8 +13,8 @@ import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDel;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
@@ -46,8 +46,8 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         vurderingEntitet.leggTilPeriode(formAktsomhetPeriode(vurderingEntitet, PERIODE_ANDRE_FØRSTE_DATO, TOM));
 
         vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, null, vurderingEntitet);
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        Historikkinnslag historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
+        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
+        HistorikkinnslagOld historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
 
         flerePerioderAssert(historikkinnslag);
 
@@ -60,7 +60,7 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
 
         vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, vurderingEntitet, vurderingEntitet);
 
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
+        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         assertThat(historikkinnslager).isEmpty();
     }
 
@@ -86,11 +86,11 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
 
         vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, gammelVurdering, nyVurdering);
 
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        Historikkinnslag historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
+        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
+        HistorikkinnslagOld historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
 
         assertThat(historikkinnslag.getHistorikkinnslagDeler().size()).isEqualTo(1);
-        HistorikkinnslagDel førsteDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
+        HistorikkinnslagOldDel førsteDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
         fellesHistorikkinnslagDelAssert(førsteDel, FOM, TOM, AKTSOMHET_BEGRUNNELSE, ANDRE_PERIODE_BEGRUNNELSE);
         assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
                 .isEqualTo(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn());
@@ -121,8 +121,8 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
 
         vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, gammelVurdering, nyVurdering);
 
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        Historikkinnslag historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
+        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
+        HistorikkinnslagOld historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
 
         flerePerioderAssert(historikkinnslag);
     }
@@ -137,11 +137,11 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
 
         vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, gammelVurdering, nyVurdering);
 
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        Historikkinnslag historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
+        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
+        HistorikkinnslagOld historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
         assertThat(historikkinnslag.getHistorikkinnslagDeler().size()).isEqualTo(1);
 
-        HistorikkinnslagDel historikkinnslagDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
+        HistorikkinnslagOldDel historikkinnslagDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
         fellesHistorikkinnslagDelAssert(historikkinnslagDel, FOM, TOM, AKTSOMHET_BEGRUNNELSE, ANDRE_PERIODE_BEGRUNNELSE);
 
         assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
@@ -168,11 +168,11 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
 
         vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, gammelVurdering, nyVurdering);
 
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        Historikkinnslag historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
+        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
+        HistorikkinnslagOld historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
         assertThat(historikkinnslag.getHistorikkinnslagDeler().size()).isEqualTo(1);
 
-        HistorikkinnslagDel historikkinnslagDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
+        HistorikkinnslagOldDel historikkinnslagDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
         fellesHistorikkinnslagDelAssert(historikkinnslagDel, FOM, TOM, GOD_TRO_BEGRUNNELSE, FØRSTE_PERIODE_BEGRUNNELSE);
 
         assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
@@ -187,10 +187,10 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.ER_BELØPET_BEHOLD))).isNull();
     }
 
-    private Historikkinnslag fellesHistorikkInnslagAssert(List<Historikkinnslag> historikkinnslager) {
+    private HistorikkinnslagOld fellesHistorikkInnslagAssert(List<HistorikkinnslagOld> historikkinnslager) {
         assertThat(historikkinnslager).isNotEmpty();
         assertThat(historikkinnslager.size()).isEqualTo(1);
-        Historikkinnslag historikkinnslag = historikkinnslager.get(0);
+        HistorikkinnslagOld historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getBehandlingId()).isEqualTo(internBehandlingId);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.TILBAKEKREVING);
         return historikkinnslag;
@@ -236,7 +236,7 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         return førstePeriode;
     }
 
-    private void fellesHistorikkinnslagDelAssert(HistorikkinnslagDel historikkinnslagDel, LocalDate fom, LocalDate tom, String vilkårBegrunnelse, String periodeBegrunnelse) {
+    private void fellesHistorikkinnslagDelAssert(HistorikkinnslagOldDel historikkinnslagDel, LocalDate fom, LocalDate tom, String vilkårBegrunnelse, String periodeBegrunnelse) {
         assertThat(historikkinnslagDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.TILBAKEKREVING.getKode());
         assertThat(historikkinnslagDel.getBegrunnelse().get()).isEqualTo(vilkårBegrunnelse);
 
@@ -266,9 +266,9 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         return grunnTekst.toString();
     }
 
-    private void flerePerioderAssert(Historikkinnslag historikkinnslag) {
+    private void flerePerioderAssert(HistorikkinnslagOld historikkinnslag) {
         assertThat(historikkinnslag.getHistorikkinnslagDeler().size()).isEqualTo(2);
-        HistorikkinnslagDel førsteDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
+        HistorikkinnslagOldDel førsteDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
 
         fellesHistorikkinnslagDelAssert(førsteDel, FOM, PERIOD_FØRSTE_SISTE_DATO, GOD_TRO_BEGRUNNELSE, FØRSTE_PERIODE_BEGRUNNELSE);
 
@@ -283,7 +283,7 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
                 .isNull();
 
-        HistorikkinnslagDel andreDel = historikkinnslag.getHistorikkinnslagDeler().get(1);
+        HistorikkinnslagOldDel andreDel = historikkinnslag.getHistorikkinnslagDeler().get(1);
         fellesHistorikkinnslagDelAssert(andreDel, PERIODE_ANDRE_FØRSTE_DATO, TOM, AKTSOMHET_BEGRUNNELSE, ANDRE_PERIODE_BEGRUNNELSE);
 
         assertThat(getTilVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))

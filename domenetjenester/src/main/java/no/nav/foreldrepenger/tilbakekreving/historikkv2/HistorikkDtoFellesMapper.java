@@ -1,10 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.historikkv2;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDel;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldFelt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagDokumentLinkDto;
 
@@ -23,11 +23,11 @@ public class HistorikkDtoFellesMapper {
     private static final Logger LOG = LoggerFactory.getLogger(HistorikkDtoFellesMapper.class);
     protected static final String TOM_LINJE = "";
 
-    public static HistorikkinnslagDtoV2 tilHistorikkInnslagDto(Historikkinnslag h, UUID behandlingUUID, List<Linje> linjer) {
+    public static HistorikkinnslagDtoV2 tilHistorikkInnslagDto(HistorikkinnslagOld h, UUID behandlingUUID, List<Linje> linjer) {
         return tilHistorikkInnslagDto(h, behandlingUUID, null, linjer);
     }
 
-    public static HistorikkinnslagDtoV2 tilHistorikkInnslagDto(Historikkinnslag h, UUID behandlingUUID, List<HistorikkInnslagDokumentLinkDto> lenker, List<Linje> linjer) {
+    public static HistorikkinnslagDtoV2 tilHistorikkInnslagDto(HistorikkinnslagOld h, UUID behandlingUUID, List<HistorikkInnslagDokumentLinkDto> lenker, List<Linje> linjer) {
         var skjermlenkeOpt = skjermlenkeFra(h);
         return new HistorikkinnslagDtoV2(
             behandlingUUID,
@@ -40,9 +40,9 @@ public class HistorikkDtoFellesMapper {
         );
     }
 
-    private static String lagTittel(Historikkinnslag h) {
+    private static String lagTittel(HistorikkinnslagOld h) {
         var hendelseFelt = h.getHistorikkinnslagDeler().stream()
-            .map(HistorikkinnslagDel::getHendelse)
+            .map(HistorikkinnslagOldDel::getHendelse)
             .flatMap(Optional::stream)
             .toList();
         if (hendelseFelt.size() > 1) {
@@ -56,7 +56,7 @@ public class HistorikkDtoFellesMapper {
     }
 
     // BEH_VENT har satt tilverdi som brukes i tittelen (Behandling på vent 05.12.2024)
-    public static String fraHendelseFelt(HistorikkinnslagFelt felt) {
+    public static String fraHendelseFelt(HistorikkinnslagOldFelt felt) {
         var hendelsetekst = HistorikkinnslagType.fraKode(felt.getNavn()).getNavn();
         return felt.getTilVerdi() != null
             ? String.format("%s %s", hendelsetekst, felt.getTilVerdi())
@@ -84,7 +84,7 @@ public class HistorikkDtoFellesMapper {
         return tekster.stream().toList();
     }
 
-    private static Optional<SkjermlenkeType> skjermlenkeFra(Historikkinnslag h) {
+    private static Optional<SkjermlenkeType> skjermlenkeFra(HistorikkinnslagOld h) {
         var skjermlenker = h.getHistorikkinnslagDeler().stream()
             .flatMap(del -> del.getSkjermlenke().stream())
             .distinct()

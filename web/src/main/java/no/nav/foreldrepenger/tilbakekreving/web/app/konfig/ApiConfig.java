@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkV2RestTjeneste;
-
 import org.glassfish.jersey.server.ServerProperties;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -120,7 +118,8 @@ public class ApiConfig extends Application {
             JsonMappingExceptionMapper.class,
             JsonParseExceptionMapper.class,
             // Generell exceptionmapper m/logging for øvrige tilfelle
-            GeneralRestExceptionMapper.class));
+            GeneralRestExceptionMapper.class,
+            HistorikkRestTjeneste.class));
 
         if (ENV.isLocal()) {
             classes.add(GrunnlagRestTestTjenesteLocalDev.class);
@@ -128,10 +127,7 @@ public class ApiConfig extends Application {
 
         // Standard etter fork av fp-tilbake
         if (Fagsystem.FPTILBAKE.equals(ApplicationName.hvilkenTilbake())) {
-            classes.add(HistorikkV2RestTjeneste.class);
             classes.add(AuthenticationFilter.class); // autentisering etter ny standard
-        } else {
-            classes.add(HistorikkRestTjeneste.class);
         }
 
 

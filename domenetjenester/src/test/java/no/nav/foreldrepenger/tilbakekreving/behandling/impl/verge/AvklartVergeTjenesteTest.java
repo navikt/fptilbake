@@ -20,8 +20,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermle
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDel;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
@@ -85,11 +85,11 @@ class AvklartVergeTjenesteTest extends FellesTestOppsett {
     }
 
     private void fellesHistorikkAssert() {
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(internBehandlingId);
+        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikk(internBehandlingId);
         assertThat(historikkinnslager).isNotEmpty();
         assertThat(historikkinnslager.size()).isEqualTo(1);
         assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.REGISTRER_OM_VERGE);
-        List<HistorikkinnslagDel> historikkinnslagDeler = historikkinnslager.get(0).getHistorikkinnslagDeler();
+        List<HistorikkinnslagOldDel> historikkinnslagDeler = historikkinnslager.get(0).getHistorikkinnslagDeler();
         assertThat(historikkinnslagDeler).isNotEmpty();
         assertThat(historikkinnslagDeler.size()).isEqualTo(1);
         assertThat(historikkinnslagDeler.get(0).getSkjermlenke()).isNotEmpty();

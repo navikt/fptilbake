@@ -23,7 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProses
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -101,7 +101,7 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
     }
 
     private void lagHistorikkInnslagForMotattKravgrunnlag(Behandling behandling, Kravgrunnlag431 kravgrunnlag431) {
-        Historikkinnslag grunnlagMottattInnslag = new Historikkinnslag();
+        HistorikkinnslagOld grunnlagMottattInnslag = new HistorikkinnslagOld();
         grunnlagMottattInnslag.setBehandling(behandling);
         grunnlagMottattInnslag.setType(HistorikkinnslagType.NY_KRAVGRUNNLAG_MOTTAT);
         grunnlagMottattInnslag.setAktør(HistorikkAktør.VEDTAKSLØSNINGEN);
@@ -113,7 +113,7 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
                 .medOpplysning(HistorikkOpplysningType.KRAVGRUNNLAG_STATUS, grunnlagStatus.getNavn());
         historiebygger.build(grunnlagMottattInnslag);
 
-        repositoryProvider.getHistorikkRepository().lagre(grunnlagMottattInnslag);
+        repositoryProvider.getHistorikkRepositoryOld().lagre(grunnlagMottattInnslag);
     }
 
     private void oppdaterHenvisningFraGrunnlag(Behandling behandling, String saksnummer, Henvisning grunnlagHenvisning) {

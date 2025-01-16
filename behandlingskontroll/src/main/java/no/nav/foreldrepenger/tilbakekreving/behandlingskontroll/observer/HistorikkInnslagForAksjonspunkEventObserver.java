@@ -15,8 +15,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.vedtak.sikkerhet.kontekst.IdentType;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
@@ -28,7 +28,7 @@ import no.nav.vedtak.sikkerhet.kontekst.SikkerhetContext;
 @ApplicationScoped
 public class HistorikkInnslagForAksjonspunkEventObserver {
 
-    private HistorikkRepository historikkRepository;
+    private HistorikkRepositoryOld historikkRepository;
     private BehandlingRepository behandlingRepository;
 
     private HistorikkInnslagForAksjonspunkEventObserver() {
@@ -36,7 +36,7 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
     }
 
     @Inject
-    public HistorikkInnslagForAksjonspunkEventObserver(HistorikkRepository historikkRepository, BehandlingRepository behandlingRepository) {
+    public HistorikkInnslagForAksjonspunkEventObserver(HistorikkRepositoryOld historikkRepository, BehandlingRepository behandlingRepository) {
         this.historikkRepository = historikkRepository;
         this.behandlingRepository = behandlingRepository;
     }
@@ -83,7 +83,7 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
         if (venteårsak != null) {
             builder.medÅrsak(venteårsak);
         }
-        Historikkinnslag historikkinnslag = new Historikkinnslag();
+        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld();
         var erSystemBruker = SikkerhetContext.SYSTEM.equals(KontekstHolder.getKontekst().getContext()) ||
             Optional.ofNullable(KontekstHolder.getKontekst().getIdentType()).filter(IdentType::erSystem).isPresent() ||
             Optional.ofNullable(KontekstHolder.getKontekst().getUid()).map(String::toLowerCase).filter(s -> s.startsWith("srv")).isPresent();

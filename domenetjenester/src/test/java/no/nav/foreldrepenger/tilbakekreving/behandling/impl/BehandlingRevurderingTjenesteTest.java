@@ -25,7 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ki
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.vedtak.exception.FunksjonellException;
 
@@ -71,11 +71,11 @@ class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         Aksjonspunkt aksjonspunkt = revurdering.getAksjonspunkter().iterator().next();
         assertThat(aksjonspunkt.getAksjonspunktDefinisjon()).isEqualTo(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
 
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(revurdering.getId());
+        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikk(revurdering.getId());
         assertThat(historikkinnslager).isNotEmpty();
         assertThat(historikkinnslager.size()).isEqualTo(1);
 
-        Historikkinnslag historikkinnslag = historikkinnslager.get(0);
+        HistorikkinnslagOld historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.REVURD_OPPR);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
     }

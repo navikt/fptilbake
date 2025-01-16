@@ -11,23 +11,23 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDokumentLink;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 
 @ApplicationScoped
 public class HistorikkinnslagTjeneste {
 
-    private HistorikkRepository historikkRepository;
+    private HistorikkRepositoryOld historikkRepository;
 
     HistorikkinnslagTjeneste() {
         // for CDI proxy
     }
 
     @Inject
-    public HistorikkinnslagTjeneste(HistorikkRepository historikkRepository) {
+    public HistorikkinnslagTjeneste(HistorikkRepositoryOld historikkRepository) {
         this.historikkRepository = historikkRepository;
     }
 
@@ -35,9 +35,9 @@ public class HistorikkinnslagTjeneste {
                                          Long fagsakId,
                                          HistorikkinnslagType historikkinnslagType,
                                          HistorikkAktør historikkAktør,
-                                         List<HistorikkinnslagDokumentLink> dokumentLinks) {
+                                         List<HistorikkinnslagOldDokumentLink> dokumentLinks) {
 
-        Historikkinnslag historikkinnslag = new Historikkinnslag.Builder()
+        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld.Builder()
                 .medAktør(historikkAktør)
                 .medType(historikkinnslagType)
                 .medBehandlingId(behandlingId)
@@ -53,8 +53,8 @@ public class HistorikkinnslagTjeneste {
         historikkRepository.lagre(historikkinnslag);
     }
 
-    private void settHistorikkinnslagIHverDokumentLink(List<HistorikkinnslagDokumentLink> dokumentLinks, Historikkinnslag historikkinnslag) {
-        for (HistorikkinnslagDokumentLink dokumentLink : dokumentLinks) {
+    private void settHistorikkinnslagIHverDokumentLink(List<HistorikkinnslagOldDokumentLink> dokumentLinks, HistorikkinnslagOld historikkinnslag) {
+        for (HistorikkinnslagOldDokumentLink dokumentLink : dokumentLinks) {
             dokumentLink.setHistorikkinnslag(historikkinnslag);
         }
     }
@@ -63,7 +63,7 @@ public class HistorikkinnslagTjeneste {
                                                       JournalpostId journalpostId,
                                                       String dokumentId,
                                                       String tittel) {
-        HistorikkinnslagDokumentLink dokumentLink = new HistorikkinnslagDokumentLink();
+        HistorikkinnslagOldDokumentLink dokumentLink = new HistorikkinnslagOldDokumentLink();
         dokumentLink.setJournalpostId(journalpostId);
         dokumentLink.setDokumentId(dokumentId);
         dokumentLink.setLinkTekst(tittel);
@@ -77,7 +77,7 @@ public class HistorikkinnslagTjeneste {
     }
 
     public void opprettHistorikkinnslagForBrevBestilt(Behandling behandling, DokumentMalType malType) {
-        Historikkinnslag historikkinnslag = new Historikkinnslag.Builder()
+        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld.Builder()
                 .medAktør(HistorikkAktør.SAKSBEHANDLER)
                 .medType(HistorikkinnslagType.BREV_BESTILT)
                 .medBehandlingId(behandling.getId())
@@ -106,11 +106,11 @@ public class HistorikkinnslagTjeneste {
     }
 
     private boolean historikkinnslagForBehandlingStartetErLoggetTidligere(Long behandlingId, HistorikkinnslagType historikkinnslagType) {
-        List<Historikkinnslag> eksisterendeHistorikkListe = historikkRepository.hentHistorikk(behandlingId);
+        List<HistorikkinnslagOld> eksisterendeHistorikkListe = historikkRepository.hentHistorikk(behandlingId);
 
 
         if (!eksisterendeHistorikkListe.isEmpty()) {
-            for (Historikkinnslag eksisterendeHistorikk : eksisterendeHistorikkListe) {
+            for (HistorikkinnslagOld eksisterendeHistorikk : eksisterendeHistorikkListe) {
                 if (historikkinnslagType.equals(eksisterendeHistorikk.getType())) {
                     return true;
                 }
@@ -124,7 +124,7 @@ public class HistorikkinnslagTjeneste {
                 .medHendelse(historikkinnslagType)
                 .medÅrsak(årsak)
                 .medBegrunnelse(begrunnelse);
-        Historikkinnslag historikkinnslag = new Historikkinnslag();
+        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld();
         historikkinnslag.setType(historikkinnslagType);
         historikkinnslag.setBehandling(behandling);
         builder.build(historikkinnslag);

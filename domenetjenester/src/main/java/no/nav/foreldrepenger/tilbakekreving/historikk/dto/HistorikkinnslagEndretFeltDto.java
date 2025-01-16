@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldFelt;
 
 public class HistorikkinnslagEndretFeltDto {
 
@@ -72,15 +72,15 @@ public class HistorikkinnslagEndretFeltDto {
         this.tilVerdi = tilVerdi;
     }
 
-    static List<HistorikkinnslagEndretFeltDto> mapFra(List<HistorikkinnslagFelt> endretFeltList) {
+    static List<HistorikkinnslagEndretFeltDto> mapFra(List<HistorikkinnslagOldFelt> endretFeltList) {
         List<HistorikkinnslagEndretFeltDto> dto = new ArrayList<>();
-        for (HistorikkinnslagFelt felt : endretFeltList) {
+        for (HistorikkinnslagOldFelt felt : endretFeltList) {
             dto.add(mapFra(felt));
         }
         return dto;
     }
 
-    private static HistorikkinnslagEndretFeltDto mapFra(HistorikkinnslagFelt endretFelt) {
+    private static HistorikkinnslagEndretFeltDto mapFra(HistorikkinnslagOldFelt endretFelt) {
         HistorikkinnslagEndretFeltDto dto = new HistorikkinnslagEndretFeltDto();
         HistorikkEndretFeltType endretFeltNavn = HistorikkEndretFeltType.fraKode(endretFelt.getNavn());
         dto.setEndretFeltNavn(endretFeltNavn);

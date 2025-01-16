@@ -20,7 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 @Entity(name = "HistorikkinnslagFelt")
 @Table(name = "HISTORIKKINNSLAG_FELT")
-public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
+public class HistorikkinnslagOldFelt extends BaseEntitet implements IndexKey {
 
     private static final String DISCRIMINATOR = "HISTORIKKINNSLAG_FELT_TYPE";
 
@@ -31,7 +31,7 @@ public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
     @ManyToOne(optional = false)
     @JoinColumn(name = "historikkinnslag_del_id", nullable = false, updatable = false)
     @JsonBackReference
-    private HistorikkinnslagDel historikkinnslagDel;
+    private HistorikkinnslagOldDel historikkinnslagDel;
 
     @Convert(converter = HistorikkinnslagFeltType.KodeverdiConverter.class)
     @Column(name = "historikkinnslag_felt_type", nullable = false)
@@ -67,7 +67,7 @@ public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
     @Column(name = "sekvens_nr")
     private Integer sekvensNr;
 
-    protected HistorikkinnslagFelt() {
+    protected HistorikkinnslagOldFelt() {
 
     }
 
@@ -84,11 +84,11 @@ public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
         return id;
     }
 
-    public HistorikkinnslagDel getHistorikkinnslagDel() {
+    public HistorikkinnslagOldDel getHistorikkinnslagDel() {
         return historikkinnslagDel;
     }
 
-    void setHistorikkinnslagDel(HistorikkinnslagDel historikkinnslagDel) {
+    void setHistorikkinnslagDel(HistorikkinnslagOldDel historikkinnslagDel) {
         this.historikkinnslagDel = historikkinnslagDel;
     }
 
@@ -141,10 +141,10 @@ public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof HistorikkinnslagFelt)) {
+        if (!(o instanceof HistorikkinnslagOldFelt)) {
             return false;
         }
-        HistorikkinnslagFelt that = (HistorikkinnslagFelt) o;
+        HistorikkinnslagOldFelt that = (HistorikkinnslagOldFelt) o;
         return Objects.equals(feltType, that.feltType)
                 && Objects.equals(navn, that.navn)
                 && Objects.equals(navnVerdi, that.navnVerdi)
@@ -160,10 +160,10 @@ public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
     }
 
     public static class Builder {
-        private HistorikkinnslagFelt kladd;
+        private HistorikkinnslagOldFelt kladd;
 
         private Builder() {
-            kladd = new HistorikkinnslagFelt();
+            kladd = new HistorikkinnslagOldFelt();
         }
 
 
@@ -216,7 +216,7 @@ public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
             return this;
         }
 
-        public HistorikkinnslagFelt build(HistorikkinnslagDel.Builder historikkinnslagDelBuilder) {
+        public HistorikkinnslagOldFelt build(HistorikkinnslagOldDel.Builder historikkinnslagDelBuilder) {
             historikkinnslagDelBuilder.leggTilFelt(kladd);
             return kladd;
         }
