@@ -41,7 +41,7 @@ public class DokdistKlient {
      */
     public DistribuerJournalpostResponse distribuerJournalpost(DistribuerJournalpostRequest request) {
         var rrequest = RestRequest.newPOSTJson(request, restConfig.endpoint(), restConfig);
-        return restClient.send(rrequest, DistribuerJournalpostResponse.class);
+        return restClient.sendExpectConflict(rrequest, DistribuerJournalpostResponse.class);
     }
 
     public void distribuerJournalpost(JournalpostId journalpostId, BrevMottaker mottaker, Distribusjonstype distribusjonstype) {
