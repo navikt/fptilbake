@@ -86,7 +86,6 @@ class GjenopptaBehandlingTjenesteTest {
 
     @Test
     void skal_lage_forsett_behandling_prosess_task_når_behandling_er_manuelt_gjenopptatt() {
-        final String gruppe = "44";
         Behandling behandling = lagBehandling();
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
         final Long behandlingId = behandling.getId();
@@ -97,7 +96,7 @@ class GjenopptaBehandlingTjenesteTest {
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         var historikkinnslag2List = repositoryProvider.getHistorikkinnslagRepository().hent(behandlingId);
         assertThat(historikkinnslag2List).hasSize(1);
-        assertThat(historikkinnslag2List.get(0).getTittel()).isEqualTo("Gjenoppta behandling");
+        assertThat(historikkinnslag2List.get(0).getTittel()).isEqualTo("Behandlingen er gjenopptatt");
         assertThat(historikkinnslag2List.get(0).getAktør()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
     }
 

@@ -11,9 +11,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingHistorikkTjeneste;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +22,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.BrevmalDto;
@@ -54,8 +50,7 @@ class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {
     @BeforeEach
     void setup() {
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
-        var dokumentBehandlingHistorikkTjeneste = new DokumentBehandlingHistorikkTjeneste(repositoryProvider.getHistorikkinnslagRepository());
-        dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, taskTjeneste, mockManueltVarselBrevTjeneste, dokumentBehandlingHistorikkTjeneste, mockInnhentDokumentasjonbrevTjeneste);
+        dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, taskTjeneste, mockManueltVarselBrevTjeneste, mockInnhentDokumentasjonbrevTjeneste);
     }
 
     @Test
@@ -111,12 +106,6 @@ class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {
         verify(taskTjeneste, times(1)).lagre(captor.capture());
         var prosesser = captor.getValue();
         assertThat(prosesser.taskType()).isEqualTo(TaskType.forProsessTask(SendManueltVarselbrevTask.class));
-
-        var historikkinnslager = historikkRepository.hent(behandlingId);
-        assertThat(historikkinnslager).hasSize(1);
-        var historikkinnslag = historikkinnslager.getFirst();
-        assertThat(historikkinnslag.getAktør()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
-        assertThat(historikkinnslag.getTittel()).isEqualTo("Brev bestilt");
     }
 
     @Test
@@ -134,12 +123,7 @@ class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
         verify(taskTjeneste, times(1)).lagre(captor.capture());
         var prosesser = captor.getAllValues();
-        assertThat(prosesser.stream().filter(t -> TaskType.forProsessTask(InnhentDokumentasjonbrevTask.class).equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
-        var historikkinnslager = historikkRepository.hent(behandlingId);
-        assertThat(historikkinnslager).hasSize(1);
-        var historikkinnslag = historikkinnslager.getFirst();
-        assertThat(historikkinnslag.getAktør()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
-        assertThat(historikkinnslag.getTittel()).isEqualTo("Brev bestilt");
+        assertThat(prosesser.stream().filter(t -> TaskType.forProsessTask(InnhentDokumentasjonbrevTask.class).equals(t.taskType())).toList()).isNotEmpty();
     }
 
     @Test

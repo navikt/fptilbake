@@ -8,8 +8,6 @@ import java.util.UUID;
 
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
@@ -101,7 +100,7 @@ class VarselStegTest {
         var historikkinnslager = historikkRepository.hent(behandling.getId());
         assertThat(historikkinnslager).hasSize(1);
         assertThat(historikkinnslager.getFirst().getAktør()).isEqualTo(HistorikkAktør.VEDTAKSLØSNINGEN);
-        assertThat(historikkinnslager.getFirst().getTittel()).contains("Behandling på vent");
+        assertThat(historikkinnslager.getFirst().getTittel()).contains("Behandlingen er satt på vent");
         assertThat(historikkinnslager.getFirst().getBehandlingId()).isEqualTo(behandling.getId());
         assertThat(historikkinnslager.getFirst().getFagsakId()).isEqualTo(behandling.getFagsakId());
     }
@@ -116,10 +115,10 @@ class VarselStegTest {
 
     @Test
     void skal_ikke_sette_behandling_på_vent_når_behandling_er_manuelt_opprettet() {
-        Behandling behandling = lagBehandling(fagsak, true);
+        var nyBehandling = lagBehandling(fagsak, true);
         varselRepository.lagre(behandling.getId(), "hello", 23000l);
 
-        BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
+        BehandlingLås lås = behandlingRepository.taSkriveLås(nyBehandling);
         BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), lås));
 
         assertThat(stegResultat.getAksjonspunktListe()).isEmpty();
@@ -127,9 +126,9 @@ class VarselStegTest {
     }
 
     private Behandling lagBehandling(Fagsak fagsak, boolean manueltOpprettet) {
-        Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).medManueltOpprettet(manueltOpprettet).build();
-        BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
-        Long behandlingId = behandlingRepository.lagre(behandling, lås);
+        var nyBehandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).medManueltOpprettet(manueltOpprettet).build();
+        BehandlingLås lås = behandlingRepository.taSkriveLås(nyBehandling);
+        Long behandlingId = behandlingRepository.lagre(nyBehandling, lås);
         return behandlingRepository.hentBehandling(behandlingId);
     }
 
