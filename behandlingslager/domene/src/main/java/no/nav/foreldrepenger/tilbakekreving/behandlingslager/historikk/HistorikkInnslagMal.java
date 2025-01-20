@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk;
 
+@Deprecated(forRemoval = true)
 public class HistorikkInnslagMal {
     public static final String MAL_TYPE_1 = "TYPE1";
     public static final String MAL_TYPE_2 = "TYPE2";

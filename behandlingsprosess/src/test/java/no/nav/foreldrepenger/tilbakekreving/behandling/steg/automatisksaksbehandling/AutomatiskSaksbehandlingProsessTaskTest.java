@@ -154,11 +154,8 @@ class AutomatiskSaksbehandlingProsessTaskTest {
                 .stream()
                 .allMatch(VilkårVurderingPeriodeEntitet::tilbakekrevesSmåbeløp)).isFalse();
 
-        var historikkinnslager = repositoryProvider.getHistorikkRepositoryOld()
-                .hentHistorikk(behandlingId);
-        assertThat(historikkinnslager.stream()
-                .allMatch(
-                        historikkinnslag -> HistorikkAktør.VEDTAKSLØSNINGEN.equals(historikkinnslag.getAktør()))).isTrue();
+        var historikkinnslager = repositoryProvider.getHistorikkinnslagRepository().hent(behandlingId);
+        assertThat(historikkinnslager.stream().allMatch(historikkinnslag -> HistorikkAktør.VEDTAKSLØSNINGEN.equals(historikkinnslag.getAktør()))).isTrue();
 
         assertThat(totrinnRepository.hentTotrinngrunnlag(behandling)).isEmpty();
     }
