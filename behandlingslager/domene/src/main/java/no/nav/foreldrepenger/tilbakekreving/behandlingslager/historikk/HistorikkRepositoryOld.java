@@ -8,7 +8,7 @@ import jakarta.persistence.EntityManager;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
-@Deprecated(forRemoval = true)
+@Deprecated(forRemoval = true) // Etter migrering
 @ApplicationScoped
 public class HistorikkRepositoryOld {
 
