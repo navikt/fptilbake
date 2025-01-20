@@ -112,7 +112,7 @@ public abstract class FellesTestOppsett {
         behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
         behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
         gjenopptaBehandlingTjeneste = new GjenopptaBehandlingMedGrunnlagTjeneste(taskTjeneste, behandlingVenterRepository);
-        historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository()
+        historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepositoryOld()
         );
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager,
                 new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));

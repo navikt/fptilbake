@@ -15,13 +15,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDokumentLink;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 
-class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
+class HistorikkinnslagOldTjenesteTest extends FellesTestOppsett {
 
     private static final JournalpostId JOURNALPOST_ID = new JournalpostId("389426448");
     private static final String DOKUMENT_ID = "417743491";
@@ -37,14 +37,14 @@ class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
     void skal_opprette_historikkinnslag_for_utsendt_brev() {
         historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(behandling, JOURNALPOST_ID, DOKUMENT_ID, "Vedtaksbrev");
 
-        List<Historikkinnslag> historikkinnslagene = historikkRepository.hentHistorikk(behandling.getId());
+        List<HistorikkinnslagOld> historikkinnslagene = historikkRepository.hentHistorikk(behandling.getId());
         assertThat(historikkinnslagene).isNotEmpty();
 
-        Historikkinnslag historikkinnslag = historikkinnslagene.get(0);
+        HistorikkinnslagOld historikkinnslag = historikkinnslagene.get(0);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
         assertThat(historikkinnslag.getDokumentLinker()).isNotEmpty();
-        HistorikkinnslagDokumentLink historikkinnslagDokumentLink = historikkinnslag.getDokumentLinker().get(0);
+        HistorikkinnslagOldDokumentLink historikkinnslagDokumentLink = historikkinnslag.getDokumentLinker().get(0);
         assertThat(historikkinnslagDokumentLink.getJournalpostId()).isEqualTo(JOURNALPOST_ID);
     }
 
@@ -52,10 +52,10 @@ class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
     void opprettHistorikkinnslagForOpprettetTilbakekreving() {
         historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling);
 
-        List<Historikkinnslag> historikkinnslagene = historikkRepository.hentHistorikk(behandling.getId());
+        List<HistorikkinnslagOld> historikkinnslagene = historikkRepository.hentHistorikk(behandling.getId());
         assertThat(historikkinnslagene).isNotEmpty();
 
-        Historikkinnslag historikkinnslag = historikkinnslagene.get(0);
+        HistorikkinnslagOld historikkinnslag = historikkinnslagene.get(0);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.TBK_OPPR);
         assertThat(historikkinnslag.getDokumentLinker()).isEmpty();
@@ -70,10 +70,10 @@ class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
 
         historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling);
 
-        List<Historikkinnslag> historikkinnslagene = historikkRepository.hentHistorikk(behandling.getId());
+        List<HistorikkinnslagOld> historikkinnslagene = historikkRepository.hentHistorikk(behandling.getId());
         assertThat(historikkinnslagene).isNotEmpty();
 
-        Historikkinnslag historikkinnslag = historikkinnslagene.get(0);
+        HistorikkinnslagOld historikkinnslag = historikkinnslagene.get(0);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.TBK_OPPR);
         assertThat(historikkinnslag.getDokumentLinker()).isEmpty();

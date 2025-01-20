@@ -15,7 +15,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
@@ -26,7 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ve
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
@@ -51,7 +50,7 @@ public abstract class DokumentBestillerTestOppsett {
     @Inject
     protected BrevSporingRepository brevSporingRepository;
     @Inject
-    protected HistorikkRepository historikkRepository;
+    protected HistorikkRepositoryOld historikkRepository;
     @Inject
     protected VergeRepository vergeRepository;
     @Inject

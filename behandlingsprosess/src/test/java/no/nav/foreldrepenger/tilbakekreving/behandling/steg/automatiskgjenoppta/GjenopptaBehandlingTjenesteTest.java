@@ -28,7 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
@@ -97,9 +97,9 @@ class GjenopptaBehandlingTjenesteTest {
 
         gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SAKSBEHANDLER);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
-        List<Historikkinnslag> historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
+        List<HistorikkinnslagOld> historikkinnslager = repositoryProvider.getHistorikkRepositoryOld().hentHistorikk(behandlingId);
         assertThat(historikkinnslager).hasSize(1);
-        Historikkinnslag historikkinnslag = historikkinnslager.get(0);
+        HistorikkinnslagOld historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BEH_MAN_GJEN);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
     }

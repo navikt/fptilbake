@@ -29,7 +29,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
@@ -147,7 +147,7 @@ public class FatteVedtakSteg implements BehandlingSteg {
     }
 
     private void lagHistorikksinnslagForAutomatiskSaksbehandling(Behandling behandling) {
-        Historikkinnslag historikkinnslag = new Historikkinnslag();
+        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld();
         historikkinnslag.setType(HistorikkinnslagType.VEDTAK_FATTET_AUTOMATISK);
         historikkinnslag.setBehandling(behandling);
         historikkinnslag.setAktør(HistorikkAktør.VEDTAKSLØSNINGEN);

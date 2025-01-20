@@ -114,7 +114,7 @@ class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {
         var prosesser = captor.getValue();
         assertThat(prosesser.taskType()).isEqualTo(TaskType.forProsessTask(SendManueltVarselbrevTask.class));
 
-        var historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
+        var historikkinnslager = repositoryProvider.getHistorikkRepositoryOld().hentHistorikk(behandlingId);
         assertThat(historikkinnslager.size()).isEqualTo(1);
         var historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
@@ -137,7 +137,7 @@ class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {
         verify(taskTjeneste, times(1)).lagre(captor.capture());
         var prosesser = captor.getAllValues();
         assertThat(prosesser.stream().filter(t -> TaskType.forProsessTask(InnhentDokumentasjonbrevTask.class).equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
-        var historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
+        var historikkinnslager = repositoryProvider.getHistorikkRepositoryOld().hentHistorikk(behandlingId);
         assertThat(historikkinnslager.size()).isEqualTo(1);
         var historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);

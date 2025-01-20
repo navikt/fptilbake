@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -26,8 +25,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDel;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
@@ -59,9 +58,9 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         assertThat(vurdertForeldelsePerioder.get(0).getBegrunnelse()).isEqualTo("ABC");
 
         // test historikkinnslag
-        Historikkinnslag historikkinnslag = fellesHistorikkInnslagAssert();
+        HistorikkinnslagOld historikkinnslag = fellesHistorikkInnslagAssert();
         assertThat(historikkinnslag.getHistorikkinnslagDeler().size()).isEqualTo(1);
-        HistorikkinnslagDel historikkinnslagDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
+        HistorikkinnslagOldDel historikkinnslagDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
         assertThat(getTilVerdi(historikkinnslagDel.getOpplysning(HistorikkOpplysningType.PERIODE_FOM))).isEqualTo(formatDate(FØRSTE_DATO));
         assertThat(getTilVerdi(historikkinnslagDel.getOpplysning(HistorikkOpplysningType.PERIODE_TOM))).isEqualTo(formatDate(sisteDato));
         assertThat(historikkinnslagDel.getBegrunnelse().get()).isEqualTo("ABC");
@@ -99,10 +98,10 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         assertThat(vurdertForeldelsePerioder.get(1).getBegrunnelse()).isEqualTo("CDE");
 
         // test historikkinnslag
-        Historikkinnslag historikkinnslag = fellesHistorikkInnslagAssert();
+        HistorikkinnslagOld historikkinnslag = fellesHistorikkInnslagAssert();
         assertThat(historikkinnslag.getHistorikkinnslagDeler().size()).isEqualTo(2);
 
-        HistorikkinnslagDel førsteDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
+        HistorikkinnslagOldDel førsteDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
         assertThat(getTilVerdi(førsteDel.getOpplysning(HistorikkOpplysningType.PERIODE_FOM))).isEqualTo(formatDate(FØRSTE_DATO));
         assertThat(getTilVerdi(førsteDel.getOpplysning(HistorikkOpplysningType.PERIODE_TOM))).isEqualTo(formatDate(førstePeriodeSisteDato));
         assertThat(førsteDel.getBegrunnelse().get()).isEqualTo("ABC");
@@ -112,7 +111,7 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
                 .isEqualTo(null);
 
-        HistorikkinnslagDel andreDel = historikkinnslag.getHistorikkinnslagDeler().get(1);
+        HistorikkinnslagOldDel andreDel = historikkinnslag.getHistorikkinnslagDeler().get(1);
         assertThat(getTilVerdi(andreDel.getOpplysning(HistorikkOpplysningType.PERIODE_FOM))).isEqualTo(formatDate(andrePeriodeFørsteDato));
         assertThat(getTilVerdi(andreDel.getOpplysning(HistorikkOpplysningType.PERIODE_TOM))).isEqualTo(formatDate(andrePeriodeSisteDato));
         assertThat(andreDel.getBegrunnelse().get()).isEqualTo("CDE");
@@ -268,11 +267,11 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
                 .medFeilutbetalinger(faktaFeilutbetaling).build();
     }
 
-    private Historikkinnslag fellesHistorikkInnslagAssert() {
-        List<Historikkinnslag> historikkInnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
+    private HistorikkinnslagOld fellesHistorikkInnslagAssert() {
+        List<HistorikkinnslagOld> historikkInnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         assertThat(historikkInnslager).isNotEmpty();
         assertThat(historikkInnslager.size()).isEqualTo(1);
-        Historikkinnslag historikkinnslag = historikkInnslager.get(0);
+        HistorikkinnslagOld historikkinnslag = historikkInnslager.get(0);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.FORELDELSE);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
         assertThat(historikkinnslag.getBehandlingId()).isEqualTo(internBehandlingId);

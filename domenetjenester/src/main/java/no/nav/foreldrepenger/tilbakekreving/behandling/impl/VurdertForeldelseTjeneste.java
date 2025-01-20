@@ -28,7 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
@@ -155,7 +155,7 @@ public class VurdertForeldelseTjeneste {
 
     private void lagInnslag(Long behandlingId, Optional<VurdertForeldelse> forrigeVurdertForeldelse, VurdertForeldelse vurdertForeldelseAggregate) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        Historikkinnslag historikkinnslag = new Historikkinnslag();
+        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld();
         historikkinnslag.setType(HistorikkinnslagType.FORELDELSE);
         historikkinnslag.setBehandlingId(behandlingId);
         historikkinnslag.setAktør(behandling.isAutomatiskSaksbehandlet() ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER);

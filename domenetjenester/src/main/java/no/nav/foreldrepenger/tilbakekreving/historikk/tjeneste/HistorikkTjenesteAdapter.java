@@ -6,14 +6,12 @@ import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.core.UriBuilder;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
@@ -22,7 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDto;
 // RequestScoped fordi HistorikkInnslagTekstBuilder inneholder state og denne deles på tvers av AksjonspunktOppdaterere
 @RequestScoped
 public class HistorikkTjenesteAdapter {
-    private HistorikkRepository historikkRepository;
+    private HistorikkRepositoryOld historikkRepository;
     private HistorikkInnslagTekstBuilder builder;
     private HistorikkInnslagKonverter historikkinnslagKonverter;
 
@@ -31,7 +29,7 @@ public class HistorikkTjenesteAdapter {
     }
 
     @Inject
-    public HistorikkTjenesteAdapter(HistorikkRepository historikkRepository,
+    public HistorikkTjenesteAdapter(HistorikkRepositoryOld historikkRepository,
                                     HistorikkInnslagKonverter historikkinnslagKonverter) {
         this.historikkRepository = historikkRepository;
         this.historikkinnslagKonverter = historikkinnslagKonverter;
@@ -47,7 +45,7 @@ public class HistorikkTjenesteAdapter {
                 .collect(Collectors.toList());
     }
 
-    public void lagInnslag(Historikkinnslag historikkinnslag) {
+    public void lagInnslag(HistorikkinnslagOld historikkinnslag) {
         resetBuilder();
         historikkRepository.lagre(historikkinnslag);
     }
@@ -62,7 +60,7 @@ public class HistorikkTjenesteAdapter {
         if (!builder.getHistorikkinnslagDeler().isEmpty() || builder.antallEndredeFelter() > 0 ||
                 builder.getErBegrunnelseEndret() || builder.getErGjeldendeFraSatt()) {
 
-            Historikkinnslag innslag = new Historikkinnslag();
+            HistorikkinnslagOld innslag = new HistorikkinnslagOld();
 
             builder.medHendelse(hisType);
             innslag.setAktør(HistorikkAktør.SAKSBEHANDLER);

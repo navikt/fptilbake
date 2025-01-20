@@ -2,21 +2,22 @@ package no.nav.foreldrepenger.tilbakekreving.historikkv2;
 
 import jakarta.ws.rs.core.UriBuilder;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDel;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDokumentLink;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldFelt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagTotrinnsvurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
-
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagDokumentLinkDto;
 
 import java.net.URI;
@@ -33,7 +34,7 @@ import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkDtoFelle
 
 public class HistorikkV2Adapter {
 
-    public static HistorikkinnslagDtoV2 map(Historikkinnslag h, UUID behandlingUUID, URI dokumentPath) {
+    public static HistorikkinnslagDtoV2 map(HistorikkinnslagOld h, UUID behandlingUUID, URI dokumentPath) {
         return switch (h.getType()) {
             case BEH_GJEN, BEH_MAN_GJEN, BEH_STARTET, BEH_STARTET_PÅ_NYTT, BEH_STARTET_FORFRA,
                  VEDLEGG_MOTTATT, BREV_SENT, BREV_BESTILT, REVURD_OPPR, REGISTRER_PAPIRSØK, MANGELFULL_SØKNAD, INNSYN_OPPR,
@@ -51,14 +52,14 @@ public class HistorikkV2Adapter {
         };
     }
 
-    private static HistorikkinnslagDtoV2 fraMaltype1(Historikkinnslag innslag, UUID behandlingUUID, URI dokumentPath) {
+    private static HistorikkinnslagDtoV2 fraMaltype1(HistorikkinnslagOld innslag, UUID behandlingUUID, URI dokumentPath) {
         var del = innslag.getHistorikkinnslagDeler().getFirst();
         var begrunnelsetekst = begrunnelseFraDel(del).map(List::of);
         var body = begrunnelsetekst.orElse(List.of());
         return tilHistorikkInnslagDto(innslag, behandlingUUID, tilDokumentlenker(innslag.getDokumentLinker(), dokumentPath), konverterTilLinjerMedLinjeskift(body));
     }
 
-    private static HistorikkinnslagDtoV2 fraMaltype2(Historikkinnslag h, UUID behandlingUUID) {
+    private static HistorikkinnslagDtoV2 fraMaltype2(HistorikkinnslagOld h, UUID behandlingUUID) {
         var del = h.getHistorikkinnslagDeler().getFirst();
         var hendelse = del.getHendelse().map(HistorikkDtoFellesMapper::fraHendelseFelt).orElseThrow();
         var tekst = del.getResultatFelt()
@@ -67,7 +68,7 @@ public class HistorikkV2Adapter {
         return tilHistorikkInnslagDto(h, behandlingUUID, konverterTilLinjerMedLinjeskift(List.of(tekst)));
     }
 
-    private static HistorikkinnslagDtoV2 fraMaltype3(Historikkinnslag h, UUID behandlingUUID) {
+    private static HistorikkinnslagDtoV2 fraMaltype3(HistorikkinnslagOld h, UUID behandlingUUID) {
         var tekster = new ArrayList<HistorikkinnslagDtoV2.Linje>();
         for(var del : h.getHistorikkinnslagDeler()) {
             var aksjonspunkt = del.getTotrinnsvurderinger().stream()
@@ -79,7 +80,7 @@ public class HistorikkV2Adapter {
         return tilHistorikkInnslagDto(h, behandlingUUID, tekster);
     }
 
-    private static HistorikkinnslagDtoV2 fraMalType4(Historikkinnslag h, UUID behandlingUUID) {
+    private static HistorikkinnslagDtoV2 fraMalType4(HistorikkinnslagOld h, UUID behandlingUUID) {
         var tekster = new ArrayList<HistorikkinnslagDtoV2.Linje>();
         for(var del : h.getHistorikkinnslagDeler()) {
             var årsakTekst = del.getAarsakFelt().stream()
@@ -93,7 +94,7 @@ public class HistorikkV2Adapter {
         return tilHistorikkInnslagDto(h, behandlingUUID, tekster);
     }
 
-    private static HistorikkinnslagDtoV2 fraMalType5(Historikkinnslag h, UUID behandlingUUID, URI dokumentPath) {
+    private static HistorikkinnslagDtoV2 fraMalType5(HistorikkinnslagOld h, UUID behandlingUUID, URI dokumentPath) {
         var tekster = new ArrayList<HistorikkinnslagDtoV2.Linje>();
         for(var del : h.getHistorikkinnslagDeler()) {
             var endretFelter = del.getEndredeFelt().stream()
@@ -104,7 +105,7 @@ public class HistorikkV2Adapter {
         return tilHistorikkInnslagDto(h, behandlingUUID, tilDokumentlenker(h.getDokumentLinker(), dokumentPath), tekster);
     }
 
-    private static HistorikkinnslagDtoV2 fraMalType6(Historikkinnslag h, UUID behandlingUUID) {
+    private static HistorikkinnslagDtoV2 fraMalType6(HistorikkinnslagOld h, UUID behandlingUUID) {
         var tekster = new ArrayList<HistorikkinnslagDtoV2.Linje>();
         for (var del : h.getHistorikkinnslagDeler()) {
             var opplysninger = del.getOpplysninger().stream()
@@ -116,7 +117,7 @@ public class HistorikkV2Adapter {
         return tilHistorikkInnslagDto(h, behandlingUUID, tekster);
     }
 
-    private static HistorikkinnslagDtoV2 fraMaltypeFeilutbetaling(Historikkinnslag h, UUID behandlingUUID) {
+    private static HistorikkinnslagDtoV2 fraMaltypeFeilutbetaling(HistorikkinnslagOld h, UUID behandlingUUID) {
         var tekster = new ArrayList<HistorikkinnslagDtoV2.Linje>();
         for(var del : h.getHistorikkinnslagDeler()) {
             // Endret felt ehr bruker kodeverdier (unikt for feilutbetaling)
@@ -136,7 +137,7 @@ public class HistorikkV2Adapter {
         return tilHistorikkInnslagDto(h, behandlingUUID, tekster);
     }
 
-    private static HistorikkinnslagDtoV2 fraMaltypeForeldelse(Historikkinnslag h, UUID behandlingUUID) {
+    private static HistorikkinnslagDtoV2 fraMaltypeForeldelse(HistorikkinnslagOld h, UUID behandlingUUID) {
         var tekster = new ArrayList<HistorikkinnslagDtoV2.Linje>();
         for(var del : h.getHistorikkinnslagDeler()) {
             var periodeFom = opplysingFraDel(del, HistorikkOpplysningType.PERIODE_FOM).orElse("");
@@ -155,7 +156,7 @@ public class HistorikkV2Adapter {
     }
 
 
-    private static HistorikkinnslagDtoV2 fraMaltypeTilbakekreving(Historikkinnslag h, UUID behandlingUUID) {
+    private static HistorikkinnslagDtoV2 fraMaltypeTilbakekreving(HistorikkinnslagOld h, UUID behandlingUUID) {
         var tekster = new ArrayList<HistorikkinnslagDtoV2.Linje>();
         for (var del : h.getHistorikkinnslagDeler()) {
             var periodeFom = opplysingFraDel(del, HistorikkOpplysningType.PERIODE_FOM).orElse("");
@@ -178,10 +179,10 @@ public class HistorikkV2Adapter {
 
     }
 
-    private static ArrayList<String> tekstFraEndredeFelter(HistorikkinnslagDel del,
-                                                Optional<String> begrunnelseFritekst,
-                                                Optional<String> sarligGrunnerBegrunnelseFelt,
-                                                Optional<String> opplysningBegrunnelse) {
+    private static ArrayList<String> tekstFraEndredeFelter(HistorikkinnslagOldDel del,
+                                                           Optional<String> begrunnelseFritekst,
+                                                           Optional<String> sarligGrunnerBegrunnelseFelt,
+                                                           Optional<String> opplysningBegrunnelse) {
         var teksterEndretFelt = new ArrayList<String>();
         var antallEndredeFelter = del.getEndredeFelt().size();
         for (int i = 0; i < antallEndredeFelter; i++) {
@@ -215,7 +216,7 @@ public class HistorikkV2Adapter {
         return teksterEndretFelt;
     }
 
-    private static String fraEndretFeltUtenKodeverk(HistorikkinnslagFelt felt) {
+    private static String fraEndretFeltUtenKodeverk(HistorikkinnslagOldFelt felt) {
         if (felt.getFraVerdiKode() != null || felt.getTilVerdiKode() != null) {
             throw new IllegalStateException("Finner kodeverdi i endret felt for " + felt.getNavn());
         }
@@ -236,7 +237,7 @@ public class HistorikkV2Adapter {
             : String.format("__%s__ endret fra %s til __%s__", historikkEndretFeltType.getNavn(), fraVerdi, tilVerdi);
     }
 
-    private static String fraEndretFeltFeilutbetaling(List<HistorikkinnslagFelt> endretFelt) {
+    private static String fraEndretFeltFeilutbetaling(List<HistorikkinnslagOldFelt> endretFelt) {
         var årsakFelt = endretFelt.stream()
             .filter(felt -> HistorikkEndretFeltType.HENDELSE_ÅRSAK.getKode().equals(felt.getNavn()))
             .findFirst()
@@ -271,15 +272,15 @@ public class HistorikkV2Adapter {
         }
     }
 
-    private static Optional<String> opplysingFraDel(HistorikkinnslagDel del, HistorikkOpplysningType opplysningType) {
+    private static Optional<String> opplysingFraDel(HistorikkinnslagOldDel del, HistorikkOpplysningType opplysningType) {
         return del.getOpplysninger().stream()
             .filter(o -> opplysningType.getKode().equals(o.getNavn()))
-            .map(HistorikkinnslagFelt::getTilVerdi)
+            .map(HistorikkinnslagOldFelt::getTilVerdi)
             .filter(Objects::nonNull)
             .findFirst();
     }
 
-    private static String fraOpplysningMaltype6(HistorikkinnslagFelt opplysning) {
+    private static String fraOpplysningMaltype6(HistorikkinnslagOldFelt opplysning) {
         var historikkOpplysningType = HistorikkOpplysningType.fraKode(opplysning.getNavn());
         return String.format("%s: %s", historikkOpplysningType.getNavn(), opplysning.getTilVerdi());
     }
@@ -294,7 +295,7 @@ public class HistorikkV2Adapter {
         return verdi;
     }
 
-    private static String fraHistorikkResultat(HistorikkinnslagFelt resultat) {
+    private static String fraHistorikkResultat(HistorikkinnslagOldFelt resultat) {
         var vedtakResultatType = VedtakResultatType.valueOf(resultat.getTilVerdiKode());
         return switch (vedtakResultatType) {
             case FULL_TILBAKEBETALING -> "Full tilbakebetaling";
@@ -302,15 +303,29 @@ public class HistorikkV2Adapter {
         };
     }
 
-    private static Optional<String> begrunnelseFraDel(HistorikkinnslagDel historikkinnslagDel) {
+    private static Optional<String> begrunnelseFraDel(HistorikkinnslagOldDel historikkinnslagDel) {
         return historikkinnslagDel.getBegrunnelseFelt()
-            .flatMap(HistorikkV2Adapter::finnÅrsakKodeListe)
+            .flatMap(HistorikkV2Adapter::finnBegrunnelseKodeListe)
             .map(Kodeverdi::getNavn)
             .or(historikkinnslagDel::getBegrunnelse);
     }
 
-    // Fra HistorikkinnslagDelTo
-    private static Optional<Kodeverdi> finnÅrsakKodeListe(HistorikkinnslagFelt aarsak) {
+    private static Optional<Kodeverdi> finnBegrunnelseKodeListe(HistorikkinnslagOldFelt begrunnelseFelt) {
+        var begrunnelseVerdi = begrunnelseFelt.getTilVerdi();
+        if (Objects.equals("-", begrunnelseVerdi)) {
+            return Optional.empty();
+        }
+        if (begrunnelseFelt.getKlTilVerdi() == null) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(switch (begrunnelseFelt.getKlTilVerdi()) {
+            case "BEHANDLING_AARSAK" -> BehandlingÅrsakType.kodeMap().get(begrunnelseVerdi);
+            default -> throw new IllegalStateException("Ikke støttet kodeverk for historikkinnslagfelt type BEGRUNNELSE med kodeverk=" + begrunnelseFelt.getKlTilVerdi());
+        });
+    }
+
+    private static Optional<Kodeverdi> finnÅrsakKodeListe(HistorikkinnslagOldFelt aarsak) {
         var aarsakVerdi = aarsak.getTilVerdi();
         if (Objects.equals("-", aarsakVerdi)) {
             return Optional.empty();
@@ -319,14 +334,15 @@ public class HistorikkV2Adapter {
             return Optional.empty();
         }
 
-        var kodeverdiMap = HistorikkInnslagTekstBuilder.KODEVERK_KODEVERDI_MAP.get(aarsak.getKlTilVerdi());
-        if (kodeverdiMap == null) {
-            throw new IllegalStateException("Har ikke støtte for HistorikkinnslagFelt#klTilVerdi=" + aarsak.getKlTilVerdi());
-        }
-        return Optional.ofNullable(kodeverdiMap.get(aarsakVerdi));
+        return Optional.of(switch (aarsak.getKlTilVerdi()) {
+                case "VENT_AARSAK" -> Venteårsak.kodeMap().get(aarsakVerdi);
+                case "BEHANDLING_RESULTAT_TYPE" -> BehandlingResultatType.kodeMap().get(aarsakVerdi);
+                default -> throw new IllegalStateException("Ikke støttet kodeverk for historikkinnslagfelt type AARSAK med kodeverk=" + aarsak.getKlTilVerdi());
+            }
+        );
     }
 
-    private static List<HistorikkInnslagDokumentLinkDto> tilDokumentlenker(List<HistorikkinnslagDokumentLink> dokumentLinker, URI dokumentPath) {
+    private static List<HistorikkInnslagDokumentLinkDto> tilDokumentlenker(List<HistorikkinnslagOldDokumentLink> dokumentLinker, URI dokumentPath) {
         if (dokumentLinker == null) {
             return List.of();
         }
@@ -334,7 +350,7 @@ public class HistorikkV2Adapter {
             .toList();
     }
 
-    private static HistorikkInnslagDokumentLinkDto tilDokumentlenker(HistorikkinnslagDokumentLink lenke, URI dokumentPath) {
+    private static HistorikkInnslagDokumentLinkDto tilDokumentlenker(HistorikkinnslagOldDokumentLink lenke, URI dokumentPath) {
         var dto = new HistorikkInnslagDokumentLinkDto();
         dto.setTag(lenke.getLinkTekst());
         dto.setUtgått(false);

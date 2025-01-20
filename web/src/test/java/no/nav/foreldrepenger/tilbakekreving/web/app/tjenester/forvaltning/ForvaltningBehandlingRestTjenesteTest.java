@@ -49,8 +49,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
@@ -79,7 +79,7 @@ class ForvaltningBehandlingRestTjenesteTest {
     @Inject
     ØkonomiMottattXmlRepository mottattXmlRepository;
     @Inject
-    HistorikkRepository historikkRepository;
+    HistorikkRepositoryOld historikkRepository;
     @Inject
     KravgrunnlagTjeneste kravgrunnlagTjeneste;
     @Inject
@@ -290,9 +290,9 @@ class ForvaltningBehandlingRestTjenesteTest {
 
         forvaltningBehandlingRestTjeneste.tilbakeførBehandlingTilFaktaSteg(new BehandlingReferanse(behandling.getId()));
         assertEquals(BehandlingStegType.FAKTA_FEILUTBETALING, behandling.getAktivtBehandlingSteg());
-        List<Historikkinnslag> historikkinnslags = historikkRepository.hentHistorikk(behandling.getId());
+        List<HistorikkinnslagOld> historikkinnslags = historikkRepository.hentHistorikk(behandling.getId());
         assertThat(historikkinnslags).isNotEmpty().hasSize(1);
-        Historikkinnslag historikkinnslag = historikkinnslags.get(0);
+        HistorikkinnslagOld historikkinnslag = historikkinnslags.get(0);
         assertEquals(HistorikkinnslagType.BEH_STARTET_FORFRA, historikkinnslag.getType());
         assertEquals(HistorikkAktør.VEDTAKSLØSNINGEN, historikkinnslag.getAktør());
         assertThat(historikkinnslag.getHistorikkinnslagDeler()).isNotEmpty().hasSize(1);

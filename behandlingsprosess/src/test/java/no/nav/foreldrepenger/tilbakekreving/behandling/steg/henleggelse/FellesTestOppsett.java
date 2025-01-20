@@ -24,7 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRep
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -61,7 +61,7 @@ public abstract class FellesTestOppsett {
     protected BehandlingRepositoryProvider repoProvider;
     protected NavBrukerRepository brukerRepository;
     protected KravgrunnlagRepository grunnlagRepository;
-    protected HistorikkRepository historikkRepository;
+    protected HistorikkRepositoryOld historikkRepository;
     protected BehandlingRepository behandlingRepository;
     protected ProsessTaskTjeneste taskTjeneste;
     protected BehandlingRevurderingTjeneste revurderingTjeneste;
@@ -91,7 +91,7 @@ public abstract class FellesTestOppsett {
         repoProvider = new BehandlingRepositoryProvider(entityManager);
         brukerRepository = new NavBrukerRepository(entityManager);
         grunnlagRepository = repoProvider.getGrunnlagRepository();
-        historikkRepository = repoProvider.getHistorikkRepository();
+        historikkRepository = repoProvider.getHistorikkRepositoryOld();
         behandlingRepository = repoProvider.getBehandlingRepository();
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider, behandlingskontrollTjeneste);

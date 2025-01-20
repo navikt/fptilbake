@@ -26,7 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -147,7 +147,7 @@ public class BehandlingRevurderingTjeneste {
     }
 
     private void lagHistorikkInnslagForOpprettetRevurdering(Behandling behandling, BehandlingÅrsakType revurderingÅrsak) {
-        Historikkinnslag revurderingsInnslag = new Historikkinnslag();
+        HistorikkinnslagOld revurderingsInnslag = new HistorikkinnslagOld();
 
         revurderingsInnslag.setBehandling(behandling);
         revurderingsInnslag.setType(HistorikkinnslagType.REVURD_OPPR);
@@ -158,7 +158,7 @@ public class BehandlingRevurderingTjeneste {
                 .medBegrunnelse(revurderingÅrsak);
         historiebygger.build(revurderingsInnslag);
 
-        repositoryProvider.getHistorikkRepository().lagre(revurderingsInnslag);
+        repositoryProvider.getHistorikkRepositoryOld().lagre(revurderingsInnslag);
     }
 
 

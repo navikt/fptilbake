@@ -8,7 +8,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.Beregningsresul
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
@@ -30,7 +30,7 @@ public class ForeslåVedtakTjeneste {
     }
 
     public void lagHistorikkInnslagForForeslåVedtak(Long behandlingId) {
-        Historikkinnslag historikkinnslag = new Historikkinnslag();
+        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld();
         historikkinnslag.setType(HistorikkinnslagType.FORSLAG_VEDTAK);
         historikkinnslag.setBehandlingId(behandlingId);
         historikkinnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);

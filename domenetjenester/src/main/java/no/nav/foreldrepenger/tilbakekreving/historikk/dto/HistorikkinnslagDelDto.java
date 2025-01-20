@@ -7,8 +7,8 @@ import java.util.Optional;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDel;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldFelt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 public class HistorikkinnslagDelDto {
@@ -28,15 +28,15 @@ public class HistorikkinnslagDelDto {
     private List<HistorikkinnslagEndretFeltDto> endredeFelter;
     private List<HistorikkinnslagTotrinnsVurderingDto> aksjonspunkter;
 
-    static List<HistorikkinnslagDelDto> mapFra(List<HistorikkinnslagDel> historikkinnslagDelList) {
+    static List<HistorikkinnslagDelDto> mapFra(List<HistorikkinnslagOldDel> historikkinnslagDelList) {
         List<HistorikkinnslagDelDto> historikkinnslagDelDtoList = new ArrayList<>();
-        for (HistorikkinnslagDel historikkinnslagDel : historikkinnslagDelList) {
+        for (HistorikkinnslagOldDel historikkinnslagDel : historikkinnslagDelList) {
             historikkinnslagDelDtoList.add(mapFra(historikkinnslagDel));
         }
         return historikkinnslagDelDtoList;
     }
 
-    private static HistorikkinnslagDelDto mapFra(HistorikkinnslagDel historikkinnslagDel) {
+    private static HistorikkinnslagDelDto mapFra(HistorikkinnslagOldDel historikkinnslagDel) {
         HistorikkinnslagDelDto dto = new HistorikkinnslagDelDto();
         var begrunnelseKodeverdi = historikkinnslagDel.getBegrunnelseFelt().flatMap(HistorikkinnslagDelDto::finnÅrsakKodeListe);
         dto.setBegrunnelse(begrunnelseKodeverdi.orElse(null)); // Fjernes når K9 slutter å bruke den
@@ -80,7 +80,7 @@ public class HistorikkinnslagDelDto {
         return dto;
     }
 
-    private static Optional<Kodeverdi> finnÅrsakKodeListe(HistorikkinnslagFelt aarsak) {
+    private static Optional<Kodeverdi> finnÅrsakKodeListe(HistorikkinnslagOldFelt aarsak) {
         String aarsakVerdi = aarsak.getTilVerdi();
         if (Objects.equals("-", aarsakVerdi)) {
             return Optional.empty();

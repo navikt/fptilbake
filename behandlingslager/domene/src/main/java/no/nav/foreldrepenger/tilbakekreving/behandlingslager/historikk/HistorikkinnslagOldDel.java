@@ -24,7 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 
 @Entity(name = "HistorikkinnslagDel")
 @Table(name = "HISTORIKKINNSLAG_DEL")
-public class HistorikkinnslagDel extends BaseEntitet {
+public class HistorikkinnslagOldDel extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_HISTORIKKINNSLAG_DEL")
@@ -33,20 +33,20 @@ public class HistorikkinnslagDel extends BaseEntitet {
     @ManyToOne(optional = false)
     @JoinColumn(name = "historikkinnslag_id", nullable = false, updatable = false)
     @JsonBackReference
-    private Historikkinnslag historikkinnslag;
+    private HistorikkinnslagOld historikkinnslag;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "historikkinnslagDel")
-    private List<HistorikkinnslagFelt> historikkinnslagFelt = new ArrayList<>();
+    private List<HistorikkinnslagOldFelt> historikkinnslagFelt = new ArrayList<>();
 
     public Long getId() {
         return id;
     }
 
-    public Historikkinnslag getHistorikkinnslag() {
+    public HistorikkinnslagOld getHistorikkinnslag() {
         return historikkinnslag;
     }
 
-    public List<HistorikkinnslagFelt> getHistorikkinnslagFelt() {
+    public List<HistorikkinnslagOldFelt> getHistorikkinnslagFelt() {
         return historikkinnslagFelt;
     }
 
@@ -54,16 +54,16 @@ public class HistorikkinnslagDel extends BaseEntitet {
         return finnFeltTilVerdi(HistorikkinnslagFeltType.AARSAK);
     }
 
-    public Optional<HistorikkinnslagFelt> getAarsakFelt() {
+    public Optional<HistorikkinnslagOldFelt> getAarsakFelt() {
         return finnFelt(HistorikkinnslagFeltType.AARSAK);
     }
 
-    public Optional<HistorikkinnslagFelt> getTema() {
+    public Optional<HistorikkinnslagOldFelt> getTema() {
         return finnFelt(HistorikkinnslagFeltType.ANGÅR_TEMA);
     }
 
 
-    public Optional<HistorikkinnslagFelt> getAvklartSoeknadsperiode() {
+    public Optional<HistorikkinnslagOldFelt> getAvklartSoeknadsperiode() {
         return finnFelt(HistorikkinnslagFeltType.AVKLART_SOEKNADSPERIODE);
     }
 
@@ -71,7 +71,7 @@ public class HistorikkinnslagDel extends BaseEntitet {
         return finnFeltTilVerdi(HistorikkinnslagFeltType.BEGRUNNELSE);
     }
 
-    public Optional<HistorikkinnslagFelt> getBegrunnelseFelt() {
+    public Optional<HistorikkinnslagOldFelt> getBegrunnelseFelt() {
         return finnFelt(HistorikkinnslagFeltType.BEGRUNNELSE);
     }
 
@@ -80,7 +80,7 @@ public class HistorikkinnslagDel extends BaseEntitet {
      *
      * @return Et HistorikkinnslagFelt fordi vi trenger navn (f.eks. BEH_VENT) og tilVerdi (f.eks. <fristDato>)
      */
-    public Optional<HistorikkinnslagFelt> getHendelse() {
+    public Optional<HistorikkinnslagOldFelt> getHendelse() {
         return finnFelt(HistorikkinnslagFeltType.HENDELSE);
     }
 
@@ -88,7 +88,7 @@ public class HistorikkinnslagDel extends BaseEntitet {
         return finnFeltTilVerdi(HistorikkinnslagFeltType.RESULTAT);
     }
 
-    public Optional<HistorikkinnslagFelt> getResultatFelt() {
+    public Optional<HistorikkinnslagOldFelt> getResultatFelt() {
         return finnFelt(HistorikkinnslagFeltType.RESULTAT);
     }
 
@@ -96,7 +96,7 @@ public class HistorikkinnslagDel extends BaseEntitet {
         return finnFeltTilVerdi(HistorikkinnslagFeltType.GJELDENDE_FRA);
     }
 
-    public Optional<HistorikkinnslagFelt> getGjeldendeFraFelt() {
+    public Optional<HistorikkinnslagOldFelt> getGjeldendeFraFelt() {
         return finnFelt(HistorikkinnslagFeltType.GJELDENDE_FRA);
     }
 
@@ -104,26 +104,26 @@ public class HistorikkinnslagDel extends BaseEntitet {
         return finnFeltTilVerdi(HistorikkinnslagFeltType.SKJERMLENKE);
     }
 
-    public Optional<HistorikkinnslagFelt> getEndretFelt(HistorikkEndretFeltType endretFeltVerdiType) {
-        List<HistorikkinnslagFelt> endredeFelt = getEndredeFelt();
+    public Optional<HistorikkinnslagOldFelt> getEndretFelt(HistorikkEndretFeltType endretFeltVerdiType) {
+        List<HistorikkinnslagOldFelt> endredeFelt = getEndredeFelt();
         return endredeFelt
                 .stream()
                 .filter(felt -> Objects.equals(endretFeltVerdiType.getKode(), felt.getNavn()))
                 .findFirst();
     }
 
-    public List<HistorikkinnslagFelt> getEndredeFelt() {
+    public List<HistorikkinnslagOldFelt> getEndredeFelt() {
         return finnFeltListe(HistorikkinnslagFeltType.ENDRET_FELT);
     }
 
-    public Optional<HistorikkinnslagFelt> getOpplysning(HistorikkOpplysningType historikkOpplysningType) {
-        List<HistorikkinnslagFelt> opplysninger = getOpplysninger();
+    public Optional<HistorikkinnslagOldFelt> getOpplysning(HistorikkOpplysningType historikkOpplysningType) {
+        List<HistorikkinnslagOldFelt> opplysninger = getOpplysninger();
         return opplysninger.stream()
                 .filter(felt -> Objects.equals(historikkOpplysningType.getKode(), felt.getNavn()))
                 .findFirst();
     }
 
-    public List<HistorikkinnslagFelt> getOpplysninger() {
+    public List<HistorikkinnslagOldFelt> getOpplysninger() {
         return finnFeltListe(HistorikkinnslagFeltType.OPPLYSNINGER);
     }
 
@@ -132,12 +132,12 @@ public class HistorikkinnslagDel extends BaseEntitet {
                 HistorikkinnslagFeltType.AKSJONSPUNKT_GODKJENT,
                 HistorikkinnslagFeltType.AKSJONSPUNKT_KODE);
 
-        List<HistorikkinnslagFelt> alleAksjonspunktFelt = historikkinnslagFelt.stream()
+        List<HistorikkinnslagOldFelt> alleAksjonspunktFelt = historikkinnslagFelt.stream()
                 .filter(felt -> aksjonspunktFeltTypeKoder.contains(felt.getFeltType()))
                 .collect(Collectors.toList());
 
         List<HistorikkinnslagTotrinnsvurdering> totrinnsvurderinger = alleAksjonspunktFelt.stream()
-                .collect(Collectors.groupingBy(HistorikkinnslagFelt::getSekvensNr))
+                .collect(Collectors.groupingBy(HistorikkinnslagOldFelt::getSekvensNr))
                 .entrySet()
                 .stream()
                 .map(entry -> lagHistorikkinnslagAksjonspunkt(entry.getKey(), entry.getValue()))
@@ -146,7 +146,7 @@ public class HistorikkinnslagDel extends BaseEntitet {
         return totrinnsvurderinger;
     }
 
-    private HistorikkinnslagTotrinnsvurdering lagHistorikkinnslagAksjonspunkt(Integer sekvensNr, List<HistorikkinnslagFelt> aksjonspunktFeltListe) {
+    private HistorikkinnslagTotrinnsvurdering lagHistorikkinnslagAksjonspunkt(Integer sekvensNr, List<HistorikkinnslagOldFelt> aksjonspunktFeltListe) {
         HistorikkinnslagTotrinnsvurdering aksjonspunkt = new HistorikkinnslagTotrinnsvurdering(sekvensNr);
         aksjonspunktFeltListe.forEach(felt -> {
             if (HistorikkinnslagFeltType.AKSJONSPUNKT_BEGRUNNELSE.equals(felt.getFeltType())) {
@@ -163,7 +163,7 @@ public class HistorikkinnslagDel extends BaseEntitet {
         return aksjonspunkt;
     }
 
-    private Optional<HistorikkinnslagFelt> finnFelt(HistorikkinnslagFeltType historikkinnslagFeltType) {
+    private Optional<HistorikkinnslagOldFelt> finnFelt(HistorikkinnslagFeltType historikkinnslagFeltType) {
         return historikkinnslagFelt.stream()
                 .filter(felt -> historikkinnslagFeltType.equals(felt.getFeltType()))
                 .findFirst();
@@ -171,13 +171,13 @@ public class HistorikkinnslagDel extends BaseEntitet {
 
     private Optional<String> finnFeltTilVerdi(HistorikkinnslagFeltType historikkinnslagFeltType) {
         return finnFelt(historikkinnslagFeltType)
-                .map(HistorikkinnslagFelt::getTilVerdi);
+                .map(HistorikkinnslagOldFelt::getTilVerdi);
     }
 
-    private List<HistorikkinnslagFelt> finnFeltListe(HistorikkinnslagFeltType feltType) {
+    private List<HistorikkinnslagOldFelt> finnFeltListe(HistorikkinnslagFeltType feltType) {
         return historikkinnslagFelt.stream()
                 .filter(felt -> felt.getFeltType().equals(feltType))
-                .sorted(Comparator.comparing(HistorikkinnslagFelt::getSekvensNr))
+                .sorted(Comparator.comparing(HistorikkinnslagOldFelt::getSekvensNr))
                 .collect(Collectors.toList());
     }
 
@@ -185,29 +185,29 @@ public class HistorikkinnslagDel extends BaseEntitet {
         return new Builder();
     }
 
-    public static HistorikkinnslagDel.Builder builder(HistorikkinnslagDel del) {
+    public static HistorikkinnslagOldDel.Builder builder(HistorikkinnslagOldDel del) {
         return new Builder(del);
     }
 
     public static class Builder {
-        private HistorikkinnslagDel kladd;
+        private HistorikkinnslagOldDel kladd;
 
 
         private Builder() {
-            this(new HistorikkinnslagDel());
+            this(new HistorikkinnslagOldDel());
         }
 
-        public Builder(HistorikkinnslagDel del) {
+        public Builder(HistorikkinnslagOldDel del) {
             kladd = del;
         }
 
-        public Builder leggTilFelt(HistorikkinnslagFelt felt) {
+        public Builder leggTilFelt(HistorikkinnslagOldFelt felt) {
             kladd.historikkinnslagFelt.add(felt);
             felt.setHistorikkinnslagDel(kladd);
             return this;
         }
 
-        public Builder medHistorikkinnslag(Historikkinnslag historikkinnslag) {
+        public Builder medHistorikkinnslag(HistorikkinnslagOld historikkinnslag) {
             kladd.historikkinnslag = historikkinnslag;
             return this;
         }
@@ -216,7 +216,7 @@ public class HistorikkinnslagDel extends BaseEntitet {
             return !kladd.getHistorikkinnslagFelt().isEmpty();
         }
 
-        public HistorikkinnslagDel build() {
+        public HistorikkinnslagOldDel build() {
             return kladd;
         }
     }
@@ -226,10 +226,10 @@ public class HistorikkinnslagDel extends BaseEntitet {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof HistorikkinnslagDel)) {
+        if (!(o instanceof HistorikkinnslagOldDel)) {
             return false;
         }
-        HistorikkinnslagDel that = (HistorikkinnslagDel) o;
+        HistorikkinnslagOldDel that = (HistorikkinnslagOldDel) o;
         return Objects.equals(getId(), that.getId());
     }
 

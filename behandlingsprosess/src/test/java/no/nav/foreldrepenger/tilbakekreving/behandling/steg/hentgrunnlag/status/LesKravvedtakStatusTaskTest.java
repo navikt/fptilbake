@@ -123,7 +123,7 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
         assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.AVSLUTTET));
 
-        var historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandling.getId());
+        var historikkinnslager = repositoryProvider.getHistorikkRepositoryOld().hentHistorikk(behandling.getId());
         assertThat(historikkinnslager).hasSize(1);
         var historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.AVBRUTT_BEH);

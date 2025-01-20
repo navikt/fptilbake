@@ -29,8 +29,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
@@ -54,7 +54,7 @@ class VarselStegTest {
     @Inject
     private FagsakRepository fagsakRepository;
     @Inject
-    private HistorikkRepository historikkRepository;
+    private HistorikkRepositoryOld historikkRepository;
     @Inject
     private BehandlingRepository behandlingRepository;
     @Inject
@@ -100,9 +100,9 @@ class VarselStegTest {
         Aksjonspunkt ap = behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING);
         assertThat(ap.getFristTid().toLocalDate()).isEqualTo(LocalDate.now().plus(Frister.BEHANDLING_TILSVAR).plusDays(1));
 
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(behandling.getId());
+        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikk(behandling.getId());
         assertThat(historikkinnslager).isNotEmpty();
-        Historikkinnslag historikkinnslag = historikkinnslager.get(0);
+        HistorikkinnslagOld historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BEH_VENT);
         KontekstHolder.fjernKontekst();

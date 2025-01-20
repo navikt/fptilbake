@@ -64,7 +64,7 @@ class FatteVedtakStegTest {
         totrinnRepository = new TotrinnRepository(em);
         HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(behandlingRepository);
         HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(
-                repositoryProvider.getHistorikkRepository(), historikkInnslagKonverter);
+                repositoryProvider.getHistorikkRepositoryOld(), historikkInnslagKonverter);
         BeregningsresultatTjeneste beregningsresultatTjeneste = Mockito.mock(BeregningsresultatTjeneste.class);
         fatteVedtakSteg = new FatteVedtakSteg(repositoryProvider, totrinnRepository, beregningsresultatTjeneste,
                 historikkTjenesteAdapter);

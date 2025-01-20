@@ -26,7 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ki
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 
 class VergeTjenesteTest extends FellesTestOppsett {
@@ -85,7 +85,7 @@ class VergeTjenesteTest extends FellesTestOppsett {
                 AksjonspunktDefinisjon.AVKLAR_VERGE);
         assertThat(aksjonspunkt).isPresent();
         assertThat(aksjonspunkt.get().erAvbrutt()).isTrue();
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(internBehandlingId);
+        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikk(internBehandlingId);
         assertThat(historikkinnslager).isNotEmpty();
         assertThat(historikkinnslager.size()).isEqualTo(1);
         assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.FJERNET_VERGE);

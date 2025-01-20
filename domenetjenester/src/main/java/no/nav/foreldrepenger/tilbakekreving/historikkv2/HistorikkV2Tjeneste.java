@@ -5,7 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
@@ -16,11 +16,11 @@ import java.util.List;
 @ApplicationScoped
 public class HistorikkV2Tjeneste {
 
-    private HistorikkRepository historikkRepository;
+    private HistorikkRepositoryOld historikkRepository;
     private BehandlingRepository behandlingRepository;
 
     @Inject
-    public HistorikkV2Tjeneste(HistorikkRepository historikkRepository, BehandlingRepository behandlingRepository) {
+    public HistorikkV2Tjeneste(HistorikkRepositoryOld historikkRepository, BehandlingRepository behandlingRepository) {
         this.historikkRepository = historikkRepository;
         this.behandlingRepository = behandlingRepository;
     }

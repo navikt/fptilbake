@@ -23,8 +23,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -40,7 +40,7 @@ public class GjenopptaBehandlingTjeneste {
     private BehandlingKandidaterRepository behandlingKandidaterRepository;
     private BehandlingVenterRepository behandlingVenterRepository;
     private KravgrunnlagRepository grunnlagRepository;
-    private HistorikkRepository historikkRepository;
+    private HistorikkRepositoryOld historikkRepository;
     private BehandlingRepository behandlingRepository;
 
     public GjenopptaBehandlingTjeneste() {
@@ -56,7 +56,7 @@ public class GjenopptaBehandlingTjeneste {
         this.behandlingKandidaterRepository = behandlingKandidaterRepository;
         this.behandlingVenterRepository = behandlingVenterRepository;
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        this.historikkRepository = repositoryProvider.getHistorikkRepository();
+        this.historikkRepository = repositoryProvider.getHistorikkRepositoryOld();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
     }
 
@@ -192,7 +192,7 @@ public class GjenopptaBehandlingTjeneste {
     }
 
     private void opprettHistorikkInnslagForManueltGjenopptaBehandling(long behandlingId, HistorikkAktør historikkAktør) {
-        Historikkinnslag historikkinnslag = new Historikkinnslag();
+        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld();
         historikkinnslag.setAktør(historikkAktør);
         historikkinnslag.setType(HistorikkinnslagType.BEH_MAN_GJEN);
         historikkinnslag.setBehandlingId(behandlingId);

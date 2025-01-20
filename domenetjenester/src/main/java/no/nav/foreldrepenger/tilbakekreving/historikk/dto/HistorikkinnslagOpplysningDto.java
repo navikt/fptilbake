@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldFelt;
 
 public class HistorikkinnslagOpplysningDto {
 
@@ -27,11 +27,11 @@ public class HistorikkinnslagOpplysningDto {
         this.tilVerdi = tilVerdi;
     }
 
-    static List<HistorikkinnslagOpplysningDto> mapFra(List<HistorikkinnslagFelt> opplysninger) {
+    static List<HistorikkinnslagOpplysningDto> mapFra(List<HistorikkinnslagOldFelt> opplysninger) {
         return opplysninger.stream().map(HistorikkinnslagOpplysningDto::mapFra).collect(Collectors.toList());
     }
 
-    private static HistorikkinnslagOpplysningDto mapFra(HistorikkinnslagFelt opplysning) {
+    private static HistorikkinnslagOpplysningDto mapFra(HistorikkinnslagOldFelt opplysning) {
         HistorikkinnslagOpplysningDto dto = new HistorikkinnslagOpplysningDto();
         HistorikkOpplysningType opplysningType = HistorikkOpplysningType.fraKode(opplysning.getNavn());
         dto.setOpplysningType(opplysningType);

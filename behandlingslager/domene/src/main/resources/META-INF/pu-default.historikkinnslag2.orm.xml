@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="https://jakarta.ee/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence/orm
+                 https://jakarta.ee/xml/ns/persistence/orm/orm_3_0.xsd"
+                 version="3.0">
+
+    <sequence-generator name="SEQ_HISTORIKKINNSLAG2" allocation-size="50" sequence-name="SEQ_HISTORIKKINNSLAG2" />
+    <sequence-generator name="SEQ_HISTORIKKINNSLAG2_LINJE" allocation-size="50" sequence-name="SEQ_HISTORIKKINNSLAG2_LINJE" />
+    <sequence-generator name="SEQ_HISTORIKKINNSLAG2_DOK_LINK" allocation-size="50" sequence-name="SEQ_HISTORIKKINNSLAG2_DOK_LINK" />
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag" />
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinje" />
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink" />
+</entity-mappings>
