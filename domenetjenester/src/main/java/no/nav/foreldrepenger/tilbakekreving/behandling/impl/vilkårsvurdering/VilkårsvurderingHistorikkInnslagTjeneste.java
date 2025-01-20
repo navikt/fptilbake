@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering;
 
-import static no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingHjelperUtil.konvertFraBoolean;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.DATE_FORMATTER;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.LINJESKIFT;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.fraTilEquals;
@@ -18,8 +17,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingSærligGrunnEntitet;
@@ -109,7 +108,7 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
 
         List<String> grunnTekster = new ArrayList<>();
         StringBuilder grunnTekst = new StringBuilder();
-        grunnTekst.append(konvertFraBoolean(aktsomhet.getSærligGrunnerTilReduksjon()));
+        grunnTekst.append(HistorikkinnslagLinjeBuilder.format(aktsomhet.getSærligGrunnerTilReduksjon()));
         grunnTekst.append(": ");
         for (VilkårVurderingSærligGrunnEntitet særligGrunn : aktsomhet.getSærligGrunner()) {
             SærligGrunn grunn = særligGrunn.getGrunn();

@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn;
 
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.plainTekstLinje;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -19,12 +21,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
-
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.plainTekstLinje;
 
 @ApplicationScoped
 public class FatteVedtakTjeneste {
@@ -93,7 +93,7 @@ public class FatteVedtakTjeneste {
                 .medFagsakId(behandling.getFagsakId())
                 .medBehandlingId(behandling.getId())
                 .medTittel(SkjermlenkeType.VEDTAK)
-                .addLinje("Vedtak fattet")
+                .addLinje("Vedtak er fattet")
                 .build();
             historikkRepository.lagre(historikkinnslag);
         }

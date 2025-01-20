@@ -33,7 +33,6 @@ public class DokumentBehandlingTjeneste {
     private BehandlingRepository behandlingRepository;
     private BrevSporingRepository brevSporingRepository;
     private KravgrunnlagRepository grunnlagRepository;
-    private DokumentBehandlingHistorikkTjeneste dokumentBehandlingHistorikkTjeneste;
     private ProsessTaskTjeneste taskTjeneste;
 
     private ManueltVarselBrevTjeneste manueltVarselBrevTjeneste;
@@ -48,12 +47,10 @@ public class DokumentBehandlingTjeneste {
     public DokumentBehandlingTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                       ProsessTaskTjeneste taskTjeneste,
                                       ManueltVarselBrevTjeneste manueltVarselBrevTjeneste,
-                                      DokumentBehandlingHistorikkTjeneste dokumentBehandlingHistorikkTjeneste,
                                       InnhentDokumentasjonbrevTjeneste innhentDokumentasjonBrevTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        this.dokumentBehandlingHistorikkTjeneste = dokumentBehandlingHistorikkTjeneste;
         this.taskTjeneste = taskTjeneste;
         this.manueltVarselBrevTjeneste = manueltVarselBrevTjeneste;
         this.innhentDokumentasjonBrevTjeneste = innhentDokumentasjonBrevTjeneste;
@@ -78,7 +75,6 @@ public class DokumentBehandlingTjeneste {
             LOG.info("Bestiller dokument type {}", malType.getKode());
             håndteresInnhentDokumentasjon(behandling, fritekst);
         }
-        dokumentBehandlingHistorikkTjeneste.opprettHistorikkinnslagForBrevBestilt(malType, behandling);
     }
 
     public byte[] forhåndsvisBrev(Long behandlingId, DokumentMalType malType, String fritekst) {

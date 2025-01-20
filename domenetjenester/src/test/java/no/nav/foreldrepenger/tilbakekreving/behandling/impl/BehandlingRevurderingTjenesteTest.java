@@ -71,7 +71,7 @@ class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         var historikkinnslager = historikkinnslagRepository.hent(revurdering.getId());
         assertThat(historikkinnslager).hasSize(1);
         var historikkinnslag = historikkinnslager.get(0);
-        assertThat(historikkinnslag.getTittel()).isEqualTo("Tilbakekreving Revurdering opprettet");
+        assertThat(historikkinnslag.getTittel()).isEqualTo("Tilbakekreving revurdering opprettet");
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
     }
 

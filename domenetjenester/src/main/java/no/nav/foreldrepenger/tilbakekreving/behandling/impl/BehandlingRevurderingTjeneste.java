@@ -150,7 +150,7 @@ public class BehandlingRevurderingTjeneste {
             .medAktør(HistorikkAktør.SAKSBEHANDLER)
             .medFagsakId(behandling.getFagsakId())
             .medBehandlingId(behandling.getId())
-            .medTittel("Tilbakekreving Revurdering opprettet")
+            .medTittel("Tilbakekreving revurdering opprettet")
             .addLinje(revurderingÅrsak.getNavn())
             .build();
         historikkRepository.lagre(revurderingsInnslag);

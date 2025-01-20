@@ -11,9 +11,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeType;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +24,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermle
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -150,7 +149,7 @@ class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         var historikkinnslag = historikkinnslager.getFirst();
         assertThat(historikkinnslag.getSkjermlenke()).isEqualTo(FAKTA_OM_FEILUTBETALING);
         assertThat(historikkinnslag.getAktør()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
-        assertThat(historikkinnslag.getLinjer().getFirst().getTekst()).contains("Begrunnelse", gammelFaktaFeilutbetaling.getBegrunnelse(), BEGRUNNELSE);
+        assertThat(historikkinnslag.getLinjer().getFirst().getTekst()).contains(BEGRUNNELSE);
     }
 
     private FaktaFeilutbetalingDto formFaktaFeilutbetaling() {

@@ -49,7 +49,7 @@ public class HistorikkinnslagBrevTjeneste {
             .medAktør(HistorikkAktør.VEDTAKSLØSNINGEN)
             .medFagsakId(behandling.getFagsakId())
             .medBehandlingId(behandling.getId())
-            .medTittel("Brev sendt")
+            .medTittel("Brev er sendt")
             .medDokumenter(List.of(doklink))
             .build();
     }

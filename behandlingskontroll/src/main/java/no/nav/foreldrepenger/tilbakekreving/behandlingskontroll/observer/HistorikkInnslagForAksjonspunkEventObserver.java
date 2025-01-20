@@ -6,6 +6,7 @@ import java.util.Optional;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -15,8 +16,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.vedtak.sikkerhet.kontekst.IdentType;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 import no.nav.vedtak.sikkerhet.kontekst.SikkerhetContext;
@@ -47,7 +48,7 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
                 LocalDateTime frist = aksjonspunkt.getFristTid();
                 Venteårsak venteårsak = aksjonspunkt.getVenteårsak();
                 opprettHistorikkinnslagForVenteFristRelaterteInnslag(ktx.getBehandlingId(), ktx.getFagsakId(),
-                        "Behandling på vent", frist, venteårsak);
+                        "Behandlingen er satt på vent", frist, venteårsak);
             }
         }
     }
@@ -62,7 +63,7 @@ public class HistorikkInnslagForAksjonspunkEventObserver {
                     .map(Behandling::getAnsvarligSaksbehandler).isPresent();
                 if (!manueltTattAvVent) {
                     opprettHistorikkinnslagForVenteFristRelaterteInnslag(ktx.getBehandlingId(), ktx.getFagsakId(),
-                        "Behandling gjenopptatt", null, null);
+                        "Behandling er gjenopptatt", null, null);
                 }
             }
         }

@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.fraTilEquals;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -13,8 +15,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
-
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.fraTilEquals;
 
 @ApplicationScoped
 public class BehandlendeEnhetTjeneste {
@@ -39,7 +39,7 @@ public class BehandlendeEnhetTjeneste {
     public void byttBehandlendeEnhet(Long behandlingId, OrganisasjonsEnhet nyEnhet, HistorikkAktør aktør) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
-        historikkRepository.lagre(lagHistorikkinnslag2(behandling, nyEnhet, aktør));;
+        historikkRepository.lagre(lagHistorikkinnslag2(behandling, nyEnhet, aktør));
 
         behandling.setBehandlendeOrganisasjonsEnhet(nyEnhet);
         behandlingRepository.lagre(behandling, lås);
