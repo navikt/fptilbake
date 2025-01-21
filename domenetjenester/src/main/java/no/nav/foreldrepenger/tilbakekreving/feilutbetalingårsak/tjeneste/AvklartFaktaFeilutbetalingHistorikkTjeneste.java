@@ -1,5 +1,16 @@
 package no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste;
 
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType.FAKTA_OM_FEILUTBETALING;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.DATE_FORMATTER;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.LINJESKIFT;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.fraTilEquals;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.plainTekstLinje;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -7,22 +18,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FaktaFeilutbetalingDt
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType.FAKTA_OM_FEILUTBETALING;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.DATE_FORMATTER;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.LINJESKIFT;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.fraTilEquals;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.plainTekstLinje;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 
 @ApplicationScoped
 public class AvklartFaktaFeilutbetalingHistorikkTjeneste {
@@ -50,12 +51,14 @@ public class AvklartFaktaFeilutbetalingHistorikkTjeneste {
         var tekstlinjerMedEndringer = new ArrayList<HistorikkinnslagLinjeBuilder>();
         for (var nyFakta : faktaFeilutbetalinger) {
             var tidligereVurdering = forrigeFaktaFeilutbetalingMedSammePeriode(nyFakta, forrigeFakta);
-            var hendelseTekst = fraTilEquals("Hendelse", tidligereVurdering.map(FaktaFeilutbetalingPeriode::getHendelseType).orElse(null), nyFakta.getHendelseType());
-            var hendelseUnderÅrsakTekst = fraTilEquals("Hendelse Under Årsak", tidligereVurdering.map(FaktaFeilutbetalingPeriode::getHendelseUndertype).orElse(null), nyFakta.getHendelseUndertype());
-            if (hendelseTekst != null || hendelseUnderÅrsakTekst != null) {
+            var tidligereÅrsak = årsakTilFeilutbetalingTekst(
+                tidligereVurdering.map(FaktaFeilutbetalingPeriode::getHendelseType).orElse(null),
+                tidligereVurdering.map(FaktaFeilutbetalingPeriode::getHendelseUndertype).orElse(null)
+            );
+            var årsakTilFeilutbetaling = fraTilEquals("Årsak til feilutbetaling", tidligereÅrsak, årsakTilFeilutbetalingTekst(nyFakta.getHendelseType(), nyFakta.getHendelseUndertype()));
+            if (årsakTilFeilutbetaling != null) {
                 tekstlinjerMedEndringer.add(plainTekstLinje(String.format("Vurdering av perioden %s-%s.", DATE_FORMATTER.format(nyFakta.getFom()), DATE_FORMATTER.format(nyFakta.getTom()))));
-                tekstlinjerMedEndringer.add(hendelseTekst);
-                tekstlinjerMedEndringer.add(hendelseUnderÅrsakTekst);
+                tekstlinjerMedEndringer.add(årsakTilFeilutbetaling);
                 tekstlinjerMedEndringer.add(LINJESKIFT);
             }
         }
@@ -74,6 +77,14 @@ public class AvklartFaktaFeilutbetalingHistorikkTjeneste {
             .medTittel(FAKTA_OM_FEILUTBETALING)
             .medLinjer(tekstlinjerMedEndringer)
             .build());
+    }
+
+    private static String årsakTilFeilutbetalingTekst(HendelseType hendelseType, HendelseUnderType hendelseUnderType) {
+        if (hendelseType == null || hendelseUnderType == null) {
+            return null;
+        }
+
+        return String.format("%s, %s", hendelseType.getNavn(), hendelseUnderType.getNavn());
     }
 
     private static Optional<FaktaFeilutbetalingPeriode> forrigeFaktaFeilutbetalingMedSammePeriode(FaktaFeilutbetalingDto nyFakta, Optional<FaktaFeilutbetaling> forrigeFakta) {

@@ -69,12 +69,11 @@ class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         var historikkinnslag = historikkinnslagene.getFirst();
         assertThat(historikkinnslag.getSkjermlenke()).isEqualTo(FAKTA_OM_FEILUTBETALING);
         assertThat(historikkinnslag.getAktør()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
-        assertThat(historikkinnslag.getLinjer()).hasSize(5);
+        assertThat(historikkinnslag.getLinjer()).hasSize(4);
         assertThat(historikkinnslag.getLinjer().get(0).getTekst()).contains("Vurdering av perioden", DATE_FORMATTER.format(faktaFeilutbetalingDto.getFom()), DATE_FORMATTER.format(faktaFeilutbetalingDto.getTom()));
-        assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Hendelse", "er satt til", faktaFeilutbetalingDto.getHendelseType().getNavn());
-        assertThat(historikkinnslag.getLinjer().get(2).getTekst()).contains("Hendelse Under Årsak", "er satt til", faktaFeilutbetalingDto.getHendelseUndertype().getNavn());
-        assertThat(historikkinnslag.getLinjer().get(3).getType()).isEqualTo(HistorikkinnslagLinjeType.LINJESKIFT);
-        assertThat(historikkinnslag.getLinjer().get(4).getTekst()).contains(BEGRUNNELSE);
+        assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Årsak til feilutbetaling", "er satt til", faktaFeilutbetalingDto.getHendelseType().getNavn(), faktaFeilutbetalingDto.getHendelseUndertype().getNavn());
+        assertThat(historikkinnslag.getLinjer().get(2).getType()).isEqualTo(HistorikkinnslagLinjeType.LINJESKIFT);
+        assertThat(historikkinnslag.getLinjer().get(3).getTekst()).contains(BEGRUNNELSE);
 
     }
 
@@ -112,15 +111,13 @@ class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         assertThat(historikkinnslag.getSkjermlenke()).isEqualTo(FAKTA_OM_FEILUTBETALING);
         assertThat(historikkinnslag.getAktør()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
         assertThat(historikkinnslag.getLinjer().get(0).getTekst()).contains("Vurdering av perioden", DATE_FORMATTER.format(førstePeriode.getPeriode().getFom()), DATE_FORMATTER.format(førstePeriode.getPeriode().getTom()));
-        assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Hendelse", "er satt til", førstePeriode.getHendelseType().getNavn());
-        assertThat(historikkinnslag.getLinjer().get(2).getTekst()).contains("Hendelse Under Årsak", "er satt til", førstePeriode.getHendelseUndertype().getNavn());
-        assertThat(historikkinnslag.getLinjer().get(3).getType()).isEqualTo(HistorikkinnslagLinjeType.LINJESKIFT);
+        assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Årsak til feilutbetaling", "er satt til", førstePeriode.getHendelseType().getNavn(), førstePeriode.getHendelseUndertype().getNavn());
+        assertThat(historikkinnslag.getLinjer().get(2).getType()).isEqualTo(HistorikkinnslagLinjeType.LINJESKIFT);
 
-        assertThat(historikkinnslag.getLinjer().get(4).getTekst()).contains("Vurdering av perioden", DATE_FORMATTER.format(andrePeriode.getPeriode().getFom()), DATE_FORMATTER.format(andrePeriode.getPeriode().getFom()));
-        assertThat(historikkinnslag.getLinjer().get(5).getTekst()).contains("Hendelse", "er satt til", andrePeriode.getHendelseType().getNavn());
-        assertThat(historikkinnslag.getLinjer().get(6).getTekst()).contains("Hendelse Under Årsak", "er satt til", andrePeriode.getHendelseUndertype().getNavn());
-        assertThat(historikkinnslag.getLinjer().get(7).getType()).isEqualTo(HistorikkinnslagLinjeType.LINJESKIFT);
-        assertThat(historikkinnslag.getLinjer().get(8).getTekst()).contains(BEGRUNNELSE);
+        assertThat(historikkinnslag.getLinjer().get(3).getTekst()).contains("Vurdering av perioden", DATE_FORMATTER.format(andrePeriode.getPeriode().getFom()), DATE_FORMATTER.format(andrePeriode.getPeriode().getFom()));
+        assertThat(historikkinnslag.getLinjer().get(4).getTekst()).contains("Årsak til feilutbetaling", "er satt til", andrePeriode.getHendelseType().getNavn(), andrePeriode.getHendelseUndertype().getNavn());
+        assertThat(historikkinnslag.getLinjer().get(5).getType()).isEqualTo(HistorikkinnslagLinjeType.LINJESKIFT);
+        assertThat(historikkinnslag.getLinjer().get(6).getTekst()).contains(BEGRUNNELSE);
     }
 
     @Test
