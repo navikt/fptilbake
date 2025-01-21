@@ -1,15 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import jakarta.enterprise.context.ApplicationScoped;
-
 import jakarta.inject.Inject;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 
@@ -72,14 +70,13 @@ public class VurderForeldelseHistorikkTjeneste {
         tekstlinjer.add(fraTilEquals("Foreldelsesfrist", forrigeForeldelsePeriodeOpt.map(VurdertForeldelsePeriode::getForeldelsesfrist).orElse(null), foreldelsePeriode.getForeldelsesfrist()));
         tekstlinjer.add(fraTilEquals("Dato for når feilutbetaling ble oppdaget", forrigeForeldelsePeriodeOpt.map(VurdertForeldelsePeriode::getOppdagelsesDato).orElse(null), foreldelsePeriode.getOppdagelsesDato()));
 
-        if (tekstlinjer.stream().filter(Objects::nonNull).toList().isEmpty()) {
-            return List.of();
+        if (tekstlinjer.stream().anyMatch(Objects::nonNull)) {
+            tekstlinjer.addFirst(plainTekstLinje(String.format("__Manuell vurdering__ av perioden %s-%s.",  DATE_FORMATTER.format(foreldelsePeriode.getPeriode().getFom()), DATE_FORMATTER.format(foreldelsePeriode.getPeriode().getTom()))));
+            tekstlinjer.addLast(plainTekstLinje(foreldelsePeriode.getBegrunnelse()));
+            tekstlinjer.addLast(LINJESKIFT);
+            return tekstlinjer;
         }
-
-        tekstlinjer.addFirst(plainTekstLinje(String.format("__Manuell vurdering__ av perioden %s-%s.",  DATE_FORMATTER.format(foreldelsePeriode.getPeriode().getFom()), DATE_FORMATTER.format(foreldelsePeriode.getPeriode().getTom()))));
-        tekstlinjer.addLast(plainTekstLinje(foreldelsePeriode.getBegrunnelse()));
-        tekstlinjer.addLast(LINJESKIFT);
-        return tekstlinjer;
+        return List.of();
 
     }
 

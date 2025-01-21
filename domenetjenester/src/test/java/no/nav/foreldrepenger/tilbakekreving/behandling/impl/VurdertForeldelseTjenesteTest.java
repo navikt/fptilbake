@@ -11,10 +11,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeType;
-
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
@@ -28,6 +24,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -49,9 +47,9 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
                 new ForeldelsePeriodeDto(FØRSTE_DATO, sisteDato,
                         ForeldelseVurderingType.FORELDET, foreldelseFrist, null, "ABC")));
 
-        Optional<VurdertForeldelse> vurdertForeldelseOptional = vurdertForeldelseRepository.finnVurdertForeldelse(internBehandlingId);
+        var vurdertForeldelseOptional = vurdertForeldelseRepository.finnVurdertForeldelse(internBehandlingId);
         assertThat(vurdertForeldelseOptional).isPresent();
-        List<VurdertForeldelsePeriode> vurdertForeldelsePerioder = new ArrayList<>(vurdertForeldelseOptional.get().getVurdertForeldelsePerioder());
+        var vurdertForeldelsePerioder = new ArrayList<>(vurdertForeldelseOptional.get().getVurdertForeldelsePerioder());
         assertThat(vurdertForeldelsePerioder).hasSize(1);
         var vurdertForeldelsePeriode1 = vurdertForeldelsePerioder.get(0);
         assertThat(vurdertForeldelsePeriode1.getForeldelseVurderingType()).isEqualByComparingTo(ForeldelseVurderingType.FORELDET);
