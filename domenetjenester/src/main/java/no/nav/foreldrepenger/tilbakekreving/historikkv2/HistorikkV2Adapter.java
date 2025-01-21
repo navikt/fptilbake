@@ -123,7 +123,7 @@ public class HistorikkV2Adapter {
             if (!endredeFelt.isEmpty()) {
                 var periodeFom = opplysingFraDel(del, HistorikkOpplysningType.PERIODE_FOM).orElse("");
                 var periodeTom = opplysingFraDel(del, HistorikkOpplysningType.PERIODE_TOM).orElse("");
-                var opplysningTekst = String.format("Vurdering av perioden __%s - %s__", periodeFom, periodeTom);
+                var opplysningTekst = String.format("Vurdering av perioden __%s-%s__", periodeFom, periodeTom);
                 var endretFelter = fraEndretFeltFeilutbetaling(endredeFelt);
                 tekster.addAll(konverterTilLinjerMedLinjeskift(List.of(opplysningTekst), List.of(endretFelter)));
             }
