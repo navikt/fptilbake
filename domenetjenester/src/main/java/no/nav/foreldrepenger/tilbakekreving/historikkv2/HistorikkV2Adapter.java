@@ -1,5 +1,17 @@
 package no.nav.foreldrepenger.tilbakekreving.historikkv2;
 
+import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkDtoFellesMapper.TOM_LINJE;
+import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkDtoFellesMapper.konverterTilLinjerMedLinjeskift;
+import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkDtoFellesMapper.tilHistorikkInnslagDto;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
 import jakarta.ws.rs.core.UriBuilder;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
@@ -10,27 +22,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDel;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDokumentLink;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldFelt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagTotrinnsvurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagDokumentLinkDto;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-
-import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkDtoFellesMapper.TOM_LINJE;
-import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkDtoFellesMapper.konverterTilLinjerMedLinjeskift;
-import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkDtoFellesMapper.tilHistorikkInnslagDto;
 
 public class HistorikkV2Adapter {
 
@@ -125,7 +123,7 @@ public class HistorikkV2Adapter {
             if (!endredeFelt.isEmpty()) {
                 var periodeFom = opplysingFraDel(del, HistorikkOpplysningType.PERIODE_FOM).orElse("");
                 var periodeTom = opplysingFraDel(del, HistorikkOpplysningType.PERIODE_TOM).orElse("");
-                var opplysningTekst = String.format("For perioden __%s - %s__", periodeFom, periodeTom);
+                var opplysningTekst = String.format("Vurdering av perioden __%s - %s__", periodeFom, periodeTom);
                 var endretFelter = fraEndretFeltFeilutbetaling(endredeFelt);
                 tekster.addAll(konverterTilLinjerMedLinjeskift(List.of(opplysningTekst), List.of(endretFelter)));
             }
@@ -262,13 +260,13 @@ public class HistorikkV2Adapter {
             var årsakNavn = årsakFelt.getKlFraVerdi() != null
                 ? HendelseType.fraKode(årsakFelt.getFraVerdiKode()).getNavn()
                 : "";
-            var fraVerdi = underÅrsakFraVerdi != null ? String.format("%s (%s)", årsakNavn, underÅrsakFraVerdi) : årsakNavn;
-            var tilVerdi = underÅrsakTilVerdi != null ? String.format("%s (%s)", tilVerdiNavn, underÅrsakTilVerdi) : tilVerdiNavn;
+            var fraVerdi = underÅrsakFraVerdi != null ? String.format("%s, %s", årsakNavn, underÅrsakFraVerdi) : årsakNavn;
+            var tilVerdi = underÅrsakTilVerdi != null ? String.format("%s, %s", tilVerdiNavn, underÅrsakTilVerdi) : tilVerdiNavn;
 
-            return String.format("__Hendelse__ er endret fra %s til __%s__", fraVerdi, tilVerdi);
+            return String.format("__Årsak til feilutbetaling__ er endret fra %s til __%s__", fraVerdi, tilVerdi);
         } else {
-            var feltverdi = underÅrsakTilVerdi != null ? String.format("%s (%s)", tilVerdiNavn, underÅrsakTilVerdi) : tilVerdiNavn;
-            return String.format("__Hendelse__ er satt til __%s__", feltverdi);
+            var feltverdi = underÅrsakTilVerdi != null ? String.format("%s, %s", tilVerdiNavn, underÅrsakTilVerdi) : tilVerdiNavn;
+            return String.format("__Årsak til feilutbetaling__ er satt til __%s__", feltverdi);
         }
     }
 
