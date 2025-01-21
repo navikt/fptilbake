@@ -17,13 +17,21 @@ public class Satser {
     private static final Map<Year, BigDecimal> RETTSGEBYR_HISTORISK = Map.ofEntries(
         Map.entry(Year.of(2025), BigDecimal.valueOf(1314)),
         Map.entry(Year.of(2024), BigDecimal.valueOf(1277)),
-        Map.entry(Year.of(2023), BigDecimal.valueOf(1243))
+        Map.entry(Year.of(2023), BigDecimal.valueOf(1243)),
+        Map.entry(Year.of(2022), BigDecimal.valueOf(1223)),
+        Map.entry(Year.of(2021), BigDecimal.valueOf(1199)),
+        Map.entry(Year.of(2020), BigDecimal.valueOf(1172)),
+        Map.entry(Year.of(2019), BigDecimal.valueOf(1150))
     );
 
     private static final Map<Year, BigDecimal> HALVT_RETTSGEBYR_HISTORISK = Map.ofEntries(
         Map.entry(Year.of(2025), BigDecimal.valueOf(657)),
         Map.entry(Year.of(2024), BigDecimal.valueOf(638)),
-        Map.entry(Year.of(2023), BigDecimal.valueOf(622))
+        Map.entry(Year.of(2023), BigDecimal.valueOf(622)),
+        Map.entry(Year.of(2022), BigDecimal.valueOf(611)),
+        Map.entry(Year.of(2021), BigDecimal.valueOf(599)),
+        Map.entry(Year.of(2020), BigDecimal.valueOf(586)),
+        Map.entry(Year.of(2019), BigDecimal.valueOf(575))
     );
 
     private static final Year SENESTE_ÅR = RETTSGEBYR_HISTORISK.keySet().stream().max(Year::compareTo).orElseThrow();
