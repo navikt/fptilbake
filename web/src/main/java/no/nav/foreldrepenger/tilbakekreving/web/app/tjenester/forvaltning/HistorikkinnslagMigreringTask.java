@@ -83,7 +83,7 @@ public class HistorikkinnslagMigreringTask implements ProsessTaskHandler {
     }
 
     private boolean erMigrert(Long id) {
-        var rader = entityManager.createQuery("select count(1) from Historikkinnslag where migrertFraId=:id", Long.class)
+        var rader = entityManager.createQuery("select count(1) from Historikkinnslag2 where migrertFraId=:id", Long.class)
             .setParameter("id", id)
             .getSingleResult();
         return rader == 1;
