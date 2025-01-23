@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.historikkv2;
 
-import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkDtoFellesMapper.TOM_LINJE;
 import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkDtoFellesMapper.konverterTilLinjerMedLinjeskift;
 import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkDtoFellesMapper.tilHistorikkInnslagDto;
 
@@ -165,7 +164,6 @@ public class HistorikkV2Adapter {
             var vurderingAvPerioden = String.format("__Vurdering__ av perioden %s-%s.", periodeFom, periodeTom);
             var teksterEndretFelt = tekstFraEndredeFelter(del, begrunnelseFritekst, sarligGrunnerBegrunnelseFelt, opplysningBegrunnelse);
 
-
             var begrunnelse = del.getEndredeFelt().isEmpty()
                 ? begrunnelseFritekst
                 : Optional.<String>empty();
@@ -176,10 +174,10 @@ public class HistorikkV2Adapter {
 
     }
 
-    private static ArrayList<String> tekstFraEndredeFelter(HistorikkinnslagOldDel del,
-                                                           Optional<String> begrunnelseFritekst,
-                                                           Optional<String> sarligGrunnerBegrunnelseFelt,
-                                                           Optional<String> opplysningBegrunnelse) {
+    private static List<String> tekstFraEndredeFelter(HistorikkinnslagOldDel del,
+                                                      Optional<String> begrunnelseFritekst,
+                                                      Optional<String> sarligGrunnerBegrunnelseFelt,
+                                                      Optional<String> opplysningBegrunnelse) {
         var teksterEndretFelt = new ArrayList<String>();
         for (var endretfelt : del.getEndredeFelt()) {
             var historikkEndretFeltType = HistorikkEndretFeltType.fraKode(endretfelt.getNavn());
@@ -191,7 +189,6 @@ public class HistorikkV2Adapter {
         opplysningBegrunnelse.ifPresent(string -> teksterEndretFelt.add(String.format("Begrunnelse for vilkår: %s", string)));
         begrunnelseFritekst.ifPresent(string -> teksterEndretFelt.add(String.format("Begrunnelse for aktsomhet: %s", string)));
         sarligGrunnerBegrunnelseFelt.ifPresent(string -> teksterEndretFelt.add(String.format("Særlige grunner som er vektlagt: %s", string)));
-        teksterEndretFelt.add(TOM_LINJE);
         return teksterEndretFelt;
     }
 
