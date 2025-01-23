@@ -1,13 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.historikkv2;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagDokumentLinkDto;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagDokumentLinkDto;
 
 public record HistorikkinnslagDtoV2(UUID behandlingUuid,
                                     HistorikkAktørDto aktør,
@@ -39,7 +39,7 @@ public record HistorikkinnslagDtoV2(UUID behandlingUuid,
             return Type.LINJESKIFT.equals(type);
         }
 
-        enum Type {
+        public enum Type {
             TEKST,
             LINJESKIFT
         }
