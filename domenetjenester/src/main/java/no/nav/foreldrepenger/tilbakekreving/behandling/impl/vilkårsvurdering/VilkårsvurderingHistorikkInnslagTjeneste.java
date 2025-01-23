@@ -52,10 +52,10 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
             tekstlinjerPeriode.add(fraTilEquals("Beløp som skal tilbakekreves", gammelperiode.map(VilkårVurderingPeriodeEntitet::finnManueltBeløp).orElse(null), nyPeriode.finnManueltBeløp()));
             tekstlinjerPeriode.add(fraTilEquals("Er beløpet i behold?", gammelperiode.map(VilkårVurderingPeriodeEntitet::erBeløpIBehold).orElse(null), nyPeriode.erBeløpIBehold()));
             tekstlinjerPeriode.add(fraTilEquals("Er vilkårene for tilbakekreving oppfylt?", gammelperiode.map(VilkårVurderingPeriodeEntitet::getVilkårResultat).orElse(null), nyPeriode.getVilkårResultat()));
-            tekstlinjerPeriode.add(fraTilEquals("I hvilken grad har mottaker handlet uaktsomhet?", gammelperiode.map(VilkårVurderingPeriodeEntitet::getAktsomhetResultat).orElse(null), nyPeriode.getAktsomhetResultat()));
+            tekstlinjerPeriode.add(fraTilEquals("I hvilken grad har mottaker handlet uaktsomt?", gammelperiode.map(VilkårVurderingPeriodeEntitet::getAktsomhetResultat).orElse(null), nyPeriode.getAktsomhetResultat()));
             tekstlinjerPeriode.add(fraTilEquals("Andel som tilbakekreves", gammelperiode.map(VilkårVurderingPeriodeEntitet::finnAndelTilbakekreves).orElse(null), nyPeriode.finnAndelTilbakekreves()));
             tekstlinjerPeriode.add(fraTilEquals("Skal det tilegges renter?", gammelperiode.map(VilkårVurderingPeriodeEntitet::manueltSattIleggRenter).orElse(null), nyPeriode.manueltSattIleggRenter()));
-            tekstlinjerPeriode.add(fraTilEquals("Skal beløp under 4 rettsgebyr(6.ledd) tilbakekreves?", gammelperiode.map(VilkårVurderingPeriodeEntitet::tilbakekrevesSmåbeløp).orElse(null), nyPeriode.tilbakekrevesSmåbeløp()));
+            tekstlinjerPeriode.add(fraTilEquals("Skal beløp under 4 rettsgebyr (6.ledd) tilbakekreves?", gammelperiode.map(VilkårVurderingPeriodeEntitet::tilbakekrevesSmåbeløp).orElse(null), nyPeriode.tilbakekrevesSmåbeløp()));
             tekstlinjerPeriode.add(fraTilEquals("Er det særlige grunner til reduksjon?", gammelperiode.map(VilkårsvurderingHistorikkInnslagTjeneste::lagSærligeGrunnerTekst).orElse(null), lagSærligeGrunnerTekst(nyPeriode)));
             if (!Objects.equals(gammelperiode.map(VilkårVurderingPeriodeEntitet::getBegrunnelse).orElse(null), nyPeriode.getBegrunnelse())) {
                 tekstlinjerPeriode.add(plainTekstLinje(String.format("Begrunnelse for vilkår: %s", nyPeriode.getBegrunnelse())));

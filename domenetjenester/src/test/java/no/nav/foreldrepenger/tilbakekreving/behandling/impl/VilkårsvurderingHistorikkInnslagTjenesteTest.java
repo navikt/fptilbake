@@ -9,14 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeType;
-
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet;
@@ -93,7 +91,7 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         assertThat(historikkinnslag.getLinjer().get(0).getTekst()).contains("__Vurdering__ av perioden", DATE_FORMATTER.format(FOM), DATE_FORMATTER.format(TOM));
         assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Beløp som skal tilbakekreves", "satt til", BELØP_TILBAKEKREVES);
         assertThat(historikkinnslag.getLinjer().get(2).getTekst()).contains("Er vilkårene for tilbakekreving oppfylt?", "endret fra", VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn(), VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER.getNavn());
-        assertThat(historikkinnslag.getLinjer().get(3).getTekst()).contains("I hvilken grad har mottaker handlet uaktsomhet?", "endret fra", Aktsomhet.SIMPEL_UAKTSOM.getNavn(), Aktsomhet.GROVT_UAKTSOM.getNavn());
+        assertThat(historikkinnslag.getLinjer().get(3).getTekst()).contains("I hvilken grad har mottaker handlet uaktsomt?", "endret fra", Aktsomhet.SIMPEL_UAKTSOM.getNavn(), Aktsomhet.GROVT_UAKTSOM.getNavn());
         assertThat(historikkinnslag.getLinjer().get(4).getTekst()).contains("Skal det tilegges renter?", NEI, "er fjernet");
         assertThat(historikkinnslag.getLinjer().get(5).getTekst()).contains("Er det særlige grunner til reduksjon?", "endret fra", formGrunnTekst(forrigeAktsomhetEntitet), formGrunnTekst(nyVurdering.getPerioder().get(0).getAktsomhet()));
         // assertThat(historikkinnslag.getLinjer().get(6).getTekst()).contains(ANDRE_PERIODE_BEGRUNNELSE); Lik som forrige og derfor ikke inkludert
@@ -135,7 +133,7 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Beløp som skal tilbakekreves", "endret fra", BELØP_TILBAKEKREVES, "1000");
         assertThat(historikkinnslag.getLinjer().get(2).getTekst()).contains("Er beløpet i behold?", "er fjernet");
         assertThat(historikkinnslag.getLinjer().get(3).getTekst()).contains("Er vilkårene for tilbakekreving oppfylt?", "endret fra", VilkårResultat.GOD_TRO.getNavn(), VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn());
-        assertThat(historikkinnslag.getLinjer().get(4).getTekst()).contains("I hvilken grad har mottaker handlet uaktsomhet?", "er satt til ", Aktsomhet.GROVT_UAKTSOM.getNavn());
+        assertThat(historikkinnslag.getLinjer().get(4).getTekst()).contains("I hvilken grad har mottaker handlet uaktsomt?", "er satt til ", Aktsomhet.GROVT_UAKTSOM.getNavn());
         assertThat(historikkinnslag.getLinjer().get(5).getTekst()).contains("Er det særlige grunner til reduksjon?", "er satt til ", formGrunnTekst(nyVurdering.getPerioder().get(0).getAktsomhet()));
         assertThat(historikkinnslag.getLinjer().get(6).getTekst()).contains(ANDRE_PERIODE_BEGRUNNELSE);
         assertThat(historikkinnslag.getLinjer().get(7).getTekst()).contains(AKTSOMHET_BEGRUNNELSE);
@@ -160,7 +158,7 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Beløp som skal tilbakekreves", "endret fra", "2000", String.valueOf(SUM_INNTREKK));
         assertThat(historikkinnslag.getLinjer().get(2).getTekst()).contains("Er beløpet i behold?", "satt til", JA);
         assertThat(historikkinnslag.getLinjer().get(3).getTekst()).contains("Er vilkårene for tilbakekreving oppfylt?", "endret fra", VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn(), VilkårResultat.GOD_TRO.getNavn());
-        assertThat(historikkinnslag.getLinjer().get(4).getTekst()).contains("I hvilken grad har mottaker handlet uaktsomhet?", Aktsomhet.GROVT_UAKTSOM.getNavn(), "er fjernet");
+        assertThat(historikkinnslag.getLinjer().get(4).getTekst()).contains("I hvilken grad har mottaker handlet uaktsomt?", Aktsomhet.GROVT_UAKTSOM.getNavn(), "er fjernet");
         assertThat(historikkinnslag.getLinjer().get(5).getTekst()).contains("Er det særlige grunner til reduksjon?", "Nei", SærligGrunn.STØRRELSE_BELØP.getNavn(), SærligGrunn.ANNET.getNavn(), "Annet begrunnelse", "er fjernet");
         assertThat(historikkinnslag.getLinjer().get(6).getTekst()).contains(FØRSTE_PERIODE_BEGRUNNELSE);
         assertThat(historikkinnslag.getLinjer().get(7).getTekst()).contains(GOD_TRO_BEGRUNNELSE);
@@ -256,7 +254,7 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         assertThat(historikkinnslag.getLinjer().get(7).getTekst()).contains("__Vurdering__ av perioden", DATE_FORMATTER.format(PERIODE_ANDRE_FØRSTE_DATO), DATE_FORMATTER.format(TOM));
         assertThat(historikkinnslag.getLinjer().get(8).getTekst()).contains("Beløp som skal tilbakekreves", "satt til", BELØP_TILBAKEKREVES);
         assertThat(historikkinnslag.getLinjer().get(9).getTekst()).contains("Er vilkårene for tilbakekreving oppfylt?", "satt til", VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn());
-        assertThat(historikkinnslag.getLinjer().get(10).getTekst()).contains("I hvilken grad har mottaker handlet uaktsomhet?", "satt til", Aktsomhet.GROVT_UAKTSOM.getNavn());
+        assertThat(historikkinnslag.getLinjer().get(10).getTekst()).contains("I hvilken grad har mottaker handlet uaktsomt?", "satt til", Aktsomhet.GROVT_UAKTSOM.getNavn());
         assertThat(historikkinnslag.getLinjer().get(11).getTekst()).contains("Er det særlige grunner til reduksjon?", "satt til", "Nei", SærligGrunn.STØRRELSE_BELØP.getNavn(), SærligGrunn.ANNET.getNavn(), "Annet begrunnelse");
         assertThat(historikkinnslag.getLinjer().get(12).getTekst()).contains(ANDRE_PERIODE_BEGRUNNELSE);
         assertThat(historikkinnslag.getLinjer().get(13).getTekst()).contains(AKTSOMHET_BEGRUNNELSE);
