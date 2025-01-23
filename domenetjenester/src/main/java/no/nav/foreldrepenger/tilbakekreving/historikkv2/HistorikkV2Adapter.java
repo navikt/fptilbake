@@ -148,7 +148,6 @@ public class HistorikkV2Adapter {
             var begrunnelsetekst = begrunnelseFraDel(h.getHistorikkinnslagDeler().getFirst()).stream().toList();
 
             tekster.addAll(konverterTilLinjerMedLinjeskift(List.of(manuelVurderingTekst), endretFelter, begrunnelsetekst));
-
         }
         return tilHistorikkInnslagDto(h, behandlingUUID, tekster);
     }
@@ -171,7 +170,7 @@ public class HistorikkV2Adapter {
                 ? begrunnelseFritekst
                 : Optional.<String>empty();
 
-            tekster.addAll(konverterTilLinjerMedLinjeskift(List.of(vurderingAvPerioden, TOM_LINJE), teksterEndretFelt, begrunnelse.stream().toList()));
+            tekster.addAll(konverterTilLinjerMedLinjeskift(List.of(vurderingAvPerioden), teksterEndretFelt, begrunnelse.stream().toList()));
         }
         return tilHistorikkInnslagDto(h, behandlingUUID, tekster);
 
@@ -182,35 +181,17 @@ public class HistorikkV2Adapter {
                                                            Optional<String> sarligGrunnerBegrunnelseFelt,
                                                            Optional<String> opplysningBegrunnelse) {
         var teksterEndretFelt = new ArrayList<String>();
-        var antallEndredeFelter = del.getEndredeFelt().size();
-        for (int i = 0; i < antallEndredeFelter; i++) {
-            var endretfelt = del.getEndredeFelt().get(i);
+        for (var endretfelt : del.getEndredeFelt()) {
             var historikkEndretFeltType = HistorikkEndretFeltType.fraKode(endretfelt.getNavn());
             if (Set.of(HistorikkEndretFeltType.BELØP_TILBAKEKREVES, HistorikkEndretFeltType.ANDEL_TILBAKEKREVES, HistorikkEndretFeltType.ILEGG_RENTER).contains(historikkEndretFeltType) && endretfelt.getTilVerdi() == null) {
                 continue;
             }
-
-            var visBegrunnelse = HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT.equals(historikkEndretFeltType);
-            var erSisteEndretFeltElement = i == antallEndredeFelter - 1;
-            var visAktsomhetBegrunnelse = begrunnelseFritekst.isPresent() && erSisteEndretFeltElement;
-            var visSarligGrunnerBegrunnelse = sarligGrunnerBegrunnelseFelt.isPresent() && erSisteEndretFeltElement;
-
-            if (visBegrunnelse && opplysningBegrunnelse.isPresent()) {
-                teksterEndretFelt.add(opplysningBegrunnelse.get());
-                teksterEndretFelt.add(TOM_LINJE);
-            }
-            if (visAktsomhetBegrunnelse) {
-                teksterEndretFelt.add(begrunnelseFritekst.get());
-                teksterEndretFelt.add(TOM_LINJE);
-            }
-
-            teksterEndretFelt.add(fraEndretFeltUtenKodeverk(endretfelt)); // Bruker samme
-            teksterEndretFelt.add(TOM_LINJE);
-            if (visSarligGrunnerBegrunnelse) {
-                teksterEndretFelt.add(sarligGrunnerBegrunnelseFelt.get());
-                teksterEndretFelt.add(TOM_LINJE);
-            }
+            teksterEndretFelt.add(fraEndretFeltUtenKodeverk(endretfelt));
         }
+        opplysningBegrunnelse.ifPresent(string -> teksterEndretFelt.add(String.format("Begrunnelse for vilkår: %s", string)));
+        begrunnelseFritekst.ifPresent(string -> teksterEndretFelt.add(String.format("Begrunnelse for aktsomhet: %s", string)));
+        sarligGrunnerBegrunnelseFelt.ifPresent(string -> teksterEndretFelt.add(String.format("Særlige grunner som er vektlagt: %s", string)));
+        teksterEndretFelt.add(TOM_LINJE);
         return teksterEndretFelt;
     }
 
@@ -294,7 +275,7 @@ public class HistorikkV2Adapter {
     }
 
     private static String fraHistorikkResultat(HistorikkinnslagOldFelt resultat) {
-        var vedtakResultatType = VedtakResultatType.valueOf(resultat.getTilVerdiKode());
+        var vedtakResultatType = VedtakResultatType.kodeMap().get(resultat.getTilVerdiKode());
         return switch (vedtakResultatType) {
             case FULL_TILBAKEBETALING -> "Full tilbakebetaling";
             default -> vedtakResultatType.getNavn();
