@@ -78,8 +78,10 @@ public class BehandlingTilstandTjeneste {
         boolean venterPåBruker = behandling.getÅpneAksjonspunkter().stream().anyMatch(aksjonspunkt -> Venteårsak.venterPåBruker(aksjonspunkt.getVenteårsak()));
         boolean venterPåØkonomi = behandling.getÅpneAksjonspunkter().stream().anyMatch(aksjonspunkt -> Venteårsak.venterPåØkonomi(aksjonspunkt.getVenteårsak()));
 
-        Optional<BehandlingÅrsak> behandlingsårsak = behandling.getBehandlingÅrsaker().stream().findFirst();
-        Optional<Behandling> forrigeBehandling = behandlingsårsak
+        Optional<BehandlingÅrsak> revurderingBehandlingsårsak = behandling.getBehandlingÅrsaker().stream()
+            .filter(it->it.getBehandlingÅrsakType().erRevurderingÅrsak())
+            .findFirst();
+        Optional<Behandling> forrigeBehandling = revurderingBehandlingsårsak
             .map(BehandlingÅrsak::getOriginalBehandling)
             .filter(Optional::isPresent)
             .map(Optional::get);
@@ -105,8 +107,7 @@ public class BehandlingTilstandTjeneste {
         tilstand.setVenterPåBruker(venterPåBruker);
         tilstand.setVenterPåØkonomi(venterPåØkonomi);
         forrigeBehandling.ifPresent(forrige -> tilstand.setForrigeBehandling(forrige.getUuid()));
-        behandlingsårsak.ifPresent(årsak -> tilstand.setRevurderingOpprettetÅrsak(BehandlingÅrsakMapper.getRevurderingÅrsak(årsak)));
-
+        revurderingBehandlingsårsak.ifPresent(årsak -> tilstand.setRevurderingOpprettetÅrsak(BehandlingÅrsakMapper.getRevurderingÅrsak(årsak)));
         Optional<PeriodeMedBeløp> totaltFraKravgrunnlag = kravgrunnlagTjeneste.finnTotaltForKravgrunnlag(behandling.getId());
         totaltFraKravgrunnlag.ifPresent(totalt -> {
             var periode = totalt.getPeriode();
