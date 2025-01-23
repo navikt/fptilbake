@@ -1,28 +1,27 @@
 package no.nav.foreldrepenger.tilbakekreving.historikkv2;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.core.UriBuilder;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinje;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeType;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkinnslagDtoV2.Linje.linjeskift;
+import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkinnslagDtoV2.Linje.tekstlinje;
 
 import java.net.URI;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
-import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkinnslagDtoV2.Linje.*;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.UriBuilder;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinje;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 @ApplicationScoped
 public class HistorikkV2Tjeneste {
@@ -43,16 +42,26 @@ public class HistorikkV2Tjeneste {
         //CDI
     }
 
-    public List<HistorikkinnslagDtoV2> hentForSak(long behandlingId, URI dokumentPath) {
-        var historikkV1 = historikkRepositoryOld.hentHistorikk(behandlingId).stream().map(h -> map(dokumentPath, h));
-        var historikkV2 = historikkinnslagRepository.hent(behandlingId).stream().map(h -> map(dokumentPath, h));
-        return Stream.concat(historikkV1, historikkV2).sorted(Comparator.comparing(HistorikkinnslagDtoV2::opprettetTidspunkt)).toList();
+    public List<HistorikkinnslagDtoV2> hentForSak(long behandlingId) {
+        var historikkV1 = historikkRepositoryOld.hentHistorikk(behandlingId);
+        var historikkV2 = historikkinnslagRepository.hent(behandlingId);
+        return filtrerUtMigrerteHistorikkinnslag(historikkV1, historikkV2, null);
     }
 
     public List<HistorikkinnslagDtoV2> hentForSak(Saksnummer saksnummer, URI dokumentPath) {
-        var historikkV1 = historikkRepositoryOld.hentHistorikkForSaksnummer(saksnummer).stream().map(h -> map(dokumentPath, h));
-        var historikkV2 = historikkinnslagRepository.hent(saksnummer).stream().map(h -> map(dokumentPath, h));
-        return Stream.concat(historikkV1, historikkV2).sorted(Comparator.comparing(HistorikkinnslagDtoV2::opprettetTidspunkt)).toList();
+        var historikkV1 = historikkRepositoryOld.hentHistorikkForSaksnummer(saksnummer);
+        var historikkV2 = historikkinnslagRepository.hent(saksnummer);
+        return filtrerUtMigrerteHistorikkinnslag(historikkV1, historikkV2, dokumentPath);
+    }
+
+    private List<HistorikkinnslagDtoV2> filtrerUtMigrerteHistorikkinnslag(List<HistorikkinnslagOld> historikkV1, List<Historikkinnslag> historikkV2, URI dokumentPath) {
+        var historikkV1SomIkkeErMigrert = historikkV1.stream()
+            .filter(h -> historikkV2.stream().noneMatch(v2 -> Objects.equals(v2.getMigrertFraId(), h.getId())))
+            .map(h -> map(dokumentPath, h));
+        var nyeHistorikkinnslag = historikkV2.stream().map(h -> map(dokumentPath, h));
+        return Stream.concat(historikkV1SomIkkeErMigrert, nyeHistorikkinnslag)
+            .sorted(Comparator.comparing(HistorikkinnslagDtoV2::opprettetTidspunkt))
+            .toList();
     }
 
     private HistorikkinnslagDtoV2 map(URI dokumentPath, HistorikkinnslagOld h) {

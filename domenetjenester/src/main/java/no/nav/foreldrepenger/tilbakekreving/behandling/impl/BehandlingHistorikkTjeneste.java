@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import jakarta.enterprise.context.ApplicationScoped;
-
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -40,7 +39,7 @@ public class BehandlingHistorikkTjeneste {
     }
 
     private boolean historikkinnslagForBehandlingStartetErLoggetTidligere(Long behandlingId) {
-        var eksisterendeHistorikkListe = historikkV2Tjeneste.hentForSak(behandlingId, null);
+        var eksisterendeHistorikkListe = historikkV2Tjeneste.hentForSak(behandlingId);
 
         if (!eksisterendeHistorikkListe.isEmpty()) {
             for (var eksisterendeHistorikk : eksisterendeHistorikkListe) {
