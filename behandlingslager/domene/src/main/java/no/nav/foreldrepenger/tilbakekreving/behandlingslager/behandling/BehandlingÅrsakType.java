@@ -68,6 +68,10 @@ public enum BehandlingÅrsakType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
+    public boolean erRevurderingÅrsak (){
+        return this != VEDTAK_FATTET_AV_ANNEN_INSTANS;
+    }
+
     @JsonProperty
     @Override
     public String getKode() {
