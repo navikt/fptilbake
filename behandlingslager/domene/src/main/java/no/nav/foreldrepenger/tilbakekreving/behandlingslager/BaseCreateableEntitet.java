@@ -25,8 +25,8 @@ public class BaseCreateableEntitet implements Serializable {
 
     @PrePersist
     protected void onCreate() {
-        this.opprettetAv = finnBrukernavn();
-        this.opprettetTidspunkt = LocalDateTime.now();
+        this.opprettetAv = opprettetAv != null ? opprettetAv : BaseCreateableEntitet.finnBrukernavn();
+        this.opprettetTidspunkt = opprettetTidspunkt != null ? opprettetTidspunkt : LocalDateTime.now();
     }
 
     @PreUpdate
