@@ -25,9 +25,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ve
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
@@ -37,10 +36,10 @@ import no.nav.vedtak.exception.TekniskException;
 @ApplicationScoped
 public class BehandlingRevurderingTjeneste {
 
-    private BehandlingRepositoryProvider repositoryProvider;
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private VergeRepository vergeRepository;
+    private HistorikkinnslagRepository historikkRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
     BehandlingRevurderingTjeneste() {
@@ -50,10 +49,10 @@ public class BehandlingRevurderingTjeneste {
     @Inject
     public BehandlingRevurderingTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                          BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
-        this.repositoryProvider = repositoryProvider;
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.vergeRepository = repositoryProvider.getVergeRepository();
+        this.historikkRepository = repositoryProvider.getHistorikkinnslagRepository();
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }
 
@@ -147,20 +146,15 @@ public class BehandlingRevurderingTjeneste {
     }
 
     private void lagHistorikkInnslagForOpprettetRevurdering(Behandling behandling, BehandlingÅrsakType revurderingÅrsak) {
-        HistorikkinnslagOld revurderingsInnslag = new HistorikkinnslagOld();
-
-        revurderingsInnslag.setBehandling(behandling);
-        revurderingsInnslag.setType(HistorikkinnslagType.REVURD_OPPR);
-        revurderingsInnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
-
-        HistorikkInnslagTekstBuilder historiebygger = new HistorikkInnslagTekstBuilder()
-                .medHendelse(HistorikkinnslagType.REVURD_OPPR)
-                .medBegrunnelse(revurderingÅrsak);
-        historiebygger.build(revurderingsInnslag);
-
-        repositoryProvider.getHistorikkRepositoryOld().lagre(revurderingsInnslag);
+        var revurderingsInnslag = new Historikkinnslag.Builder()
+            .medAktør(HistorikkAktør.SAKSBEHANDLER)
+            .medFagsakId(behandling.getFagsakId())
+            .medBehandlingId(behandling.getId())
+            .medTittel("Tilbakekreving revurdering opprettet")
+            .addLinje(revurderingÅrsak.getNavn())
+            .build();
+        historikkRepository.lagre(revurderingsInnslag);
     }
-
 
     private static FunksjonellException kanIkkeOppretteRevurdering(Saksnummer saksnummer) {
         return new FunksjonellException("FPT-663487", String.format("saksnummer %s oppfyller ikke kravene for revurdering", saksnummer), "");

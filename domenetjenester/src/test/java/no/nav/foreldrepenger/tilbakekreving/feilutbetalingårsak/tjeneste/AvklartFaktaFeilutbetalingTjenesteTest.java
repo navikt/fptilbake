@@ -1,8 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste;
 
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType.FAKTA_OM_FEILUTBETALING;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.DATE_FORMATTER;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,18 +24,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermle
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
-import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDto;
-import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagEndretFeltDto;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
 class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
-
-    private HistorikkTjenesteAdapter historikkTjenesteAdapter;
 
     private AvklartFaktaFeilutbetalingTjeneste avklartFaktaFeilutbetalingTjeneste;
 
@@ -46,9 +42,9 @@ class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         scenario.medBehandlingType(BehandlingType.TILBAKEKREVING);
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
         nyBehandling = scenario.lagre(repoProvider);
-        var historikkInnslagKonverter = new HistorikkInnslagKonverter(behandlingRepository);
-        historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);
-        avklartFaktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(faktaFeilutbetalingRepository, historikkTjenesteAdapter);
+        var avklartFaktaFeilutbetalingHistorikkTjeneste = new AvklartFaktaFeilutbetalingHistorikkTjeneste(
+            historikkinnslagRepository);
+        avklartFaktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(faktaFeilutbetalingRepository, avklartFaktaFeilutbetalingHistorikkTjeneste);
     }
 
     @Test
@@ -64,11 +60,21 @@ class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         assertThat(feilutbetalingPerioder.size()).isEqualTo(1);
 
         FaktaFeilutbetalingPeriode faktaPeriode = feilutbetalingPerioder.get(0);
-        assertThat(faktaPeriode.getPeriode()).isEqualTo(Periode.of(FOM, TOM));
-        assertThat(faktaPeriode.getHendelseType()).isEqualTo(HENDELSE_TYPE);
-        assertThat(faktaPeriode.getHendelseUndertype()).isEqualTo(HENDELSE_UNDERTYPE);
+        assertThat(faktaPeriode.getPeriode()).isEqualTo(Periode.of(faktaFeilutbetalingDto.getFom(), faktaFeilutbetalingDto.getTom()));
+        assertThat(faktaPeriode.getHendelseType()).isEqualTo(faktaFeilutbetalingDto.getHendelseType());
+        assertThat(faktaPeriode.getHendelseUndertype()).isEqualTo(faktaFeilutbetalingDto.getHendelseUndertype());
 
-        testHistorikkInnslag();
+        var historikkinnslagene = historikkinnslagRepository.hent(nyBehandling.getFagsak().getSaksnummer());
+        assertThat(historikkinnslagene).hasSize(1);
+        var historikkinnslag = historikkinnslagene.getFirst();
+        assertThat(historikkinnslag.getSkjermlenke()).isEqualTo(FAKTA_OM_FEILUTBETALING);
+        assertThat(historikkinnslag.getAktør()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
+        assertThat(historikkinnslag.getLinjer()).hasSize(4);
+        assertThat(historikkinnslag.getLinjer().get(0).getTekst()).contains("Vurdering av perioden", DATE_FORMATTER.format(faktaFeilutbetalingDto.getFom()), DATE_FORMATTER.format(faktaFeilutbetalingDto.getTom()));
+        assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Årsak til feilutbetaling", "er satt til", faktaFeilutbetalingDto.getHendelseType().getNavn(), faktaFeilutbetalingDto.getHendelseUndertype().getNavn());
+        assertThat(historikkinnslag.getLinjer().get(2).getType()).isEqualTo(HistorikkinnslagLinjeType.LINJESKIFT);
+        assertThat(historikkinnslag.getLinjer().get(3).getTekst()).contains(BEGRUNNELSE);
+
     }
 
     @Test
@@ -100,15 +106,25 @@ class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         assertThat(andrePeriode.getHendelseType()).isEqualTo(HENDELSE_TYPE);
         assertThat(andrePeriode.getHendelseUndertype()).isEqualTo(HENDELSE_UNDERTYPE);
 
-        List<HistorikkinnslagDto> historikkinnslager = testHistorikkInnslag();
-        assertThat(historikkinnslager.get(0).getHistorikkinnslagDeler()).isNotEmpty();
-        assertThat(historikkinnslager.get(0).getHistorikkinnslagDeler().size()).isEqualTo(2);
+        var historikkinnslager = testHistorikkInnslag();
+        var historikkinnslag = historikkinnslager.getFirst();
+        assertThat(historikkinnslag.getSkjermlenke()).isEqualTo(FAKTA_OM_FEILUTBETALING);
+        assertThat(historikkinnslag.getAktør()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
+        assertThat(historikkinnslag.getLinjer().get(0).getTekst()).contains("Vurdering av perioden", DATE_FORMATTER.format(førstePeriode.getPeriode().getFom()), DATE_FORMATTER.format(førstePeriode.getPeriode().getTom()));
+        assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Årsak til feilutbetaling", "er satt til", førstePeriode.getHendelseType().getNavn(), førstePeriode.getHendelseUndertype().getNavn());
+        assertThat(historikkinnslag.getLinjer().get(2).getType()).isEqualTo(HistorikkinnslagLinjeType.LINJESKIFT);
+
+        assertThat(historikkinnslag.getLinjer().get(3).getTekst()).contains("Vurdering av perioden", DATE_FORMATTER.format(andrePeriode.getPeriode().getFom()), DATE_FORMATTER.format(andrePeriode.getPeriode().getFom()));
+        assertThat(historikkinnslag.getLinjer().get(4).getTekst()).contains("Årsak til feilutbetaling", "er satt til", andrePeriode.getHendelseType().getNavn(), andrePeriode.getHendelseUndertype().getNavn());
+        assertThat(historikkinnslag.getLinjer().get(5).getType()).isEqualTo(HistorikkinnslagLinjeType.LINJESKIFT);
+        assertThat(historikkinnslag.getLinjer().get(6).getTekst()).contains(BEGRUNNELSE);
     }
 
     @Test
     void lagreÅrsakForFeilutbetalingPeriode_nårForrigeÅrsakAlleredeFinnes() {
 
-        faktaFeilutbetalingRepository.lagre(internBehandlingId, lagFaktaFeilutbetaling());
+        var gammelFaktaFeilutbetaling = lagFaktaFeilutbetaling();
+        faktaFeilutbetalingRepository.lagre(nyBehandling.getId(), gammelFaktaFeilutbetaling);
 
         HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto = new HendelseTypeMedUndertypeDto(HENDELSE_TYPE, HENDELSE_UNDERTYPE);
 
@@ -126,11 +142,11 @@ class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         assertThat(faktaPeriode.getHendelseType()).isEqualTo(HENDELSE_TYPE);
         assertThat(faktaPeriode.getHendelseUndertype()).isEqualTo(HENDELSE_UNDERTYPE);
 
-        List<HistorikkinnslagDto> historikkinnslager = testHistorikkInnslag();
-        List<HistorikkinnslagEndretFeltDto> endredeFelter = historikkinnslager.get(0).getHistorikkinnslagDeler().get(0).getEndredeFelter();
-        assertThat(endredeFelter).isNotEmpty();
-        assertThat(endredeFelter.size()).isEqualTo(2);
-
+        var historikkinnslager = testHistorikkInnslag();
+        var historikkinnslag = historikkinnslager.getFirst();
+        assertThat(historikkinnslag.getSkjermlenke()).isEqualTo(FAKTA_OM_FEILUTBETALING);
+        assertThat(historikkinnslag.getAktør()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
+        assertThat(historikkinnslag.getLinjer().getFirst().getTekst()).contains(BEGRUNNELSE);
     }
 
     private FaktaFeilutbetalingDto formFaktaFeilutbetaling() {
@@ -138,14 +154,11 @@ class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         return new FaktaFeilutbetalingDto(FOM, TOM, feilutbetalingÅrsakDto);
     }
 
-    private List<HistorikkinnslagDto> testHistorikkInnslag() {
-        List<HistorikkinnslagDto> historikkinnslager = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(nyBehandling.getFagsak().getSaksnummer(), URI.create("http://dummy/dummy"));
+    private List<Historikkinnslag> testHistorikkInnslag() {
+        var historikkinnslager = historikkinnslagRepository.hent(nyBehandling.getFagsak().getSaksnummer());
         assertThat(historikkinnslager).isNotEmpty();
-        assertThat(historikkinnslager.get(0).getAktoer()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
-        assertThat(historikkinnslager.get(0).getType()).isEqualTo(HistorikkinnslagType.FAKTA_OM_FEILUTBETALING);
-        assertThat(historikkinnslager.get(0).getHistorikkinnslagDeler().get(0).getSkjermlenke()).isEqualTo(SkjermlenkeType.FAKTA_OM_FEILUTBETALING);
-        assertThat(historikkinnslager.get(0).getHistorikkinnslagDeler().get(0).getBegrunnelseFritekst()).isEqualTo(BEGRUNNELSE);
-
+        assertThat(historikkinnslager.getFirst().getAktør()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
+        assertThat(historikkinnslager.getFirst().getSkjermlenke()).isEqualTo(SkjermlenkeType.FAKTA_OM_FEILUTBETALING);
         return historikkinnslager;
     }
 

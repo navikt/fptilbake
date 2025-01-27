@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.fraTilEquals;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -11,16 +13,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 
 @ApplicationScoped
 public class BehandlendeEnhetTjeneste {
 
-    private HistorikkRepositoryOld historikkRepository;
+    private HistorikkinnslagRepository historikkRepository;
     private BehandlingRepository behandlingRepository;
 
     private BehandlingEventPubliserer eventPubliserer;
@@ -32,7 +31,7 @@ public class BehandlendeEnhetTjeneste {
     @Inject
     public BehandlendeEnhetTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                     BehandlingEventPubliserer eventPubliserer) {
-        this.historikkRepository = repositoryProvider.getHistorikkRepositoryOld();
+        this.historikkRepository = repositoryProvider.getHistorikkinnslagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eventPubliserer = eventPubliserer;
     }
@@ -40,27 +39,22 @@ public class BehandlendeEnhetTjeneste {
     public void byttBehandlendeEnhet(Long behandlingId, OrganisasjonsEnhet nyEnhet, HistorikkAktør aktør) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
-        lagHistorikkInnslagForByttBehandlendeEnhet(behandling, nyEnhet, aktør);
+        historikkRepository.lagre(lagHistorikkinnslag2(behandling, nyEnhet, aktør));
 
         behandling.setBehandlendeOrganisasjonsEnhet(nyEnhet);
         behandlingRepository.lagre(behandling, lås);
         eventPubliserer.fireEvent(new BehandlingEnhetEvent(behandling));
     }
 
-    private void lagHistorikkInnslagForByttBehandlendeEnhet(Behandling behandling, OrganisasjonsEnhet nyEnhet, HistorikkAktør aktør) {
-        OrganisasjonsEnhet eksisterende = behandling.getBehandlendeOrganisasjonsEnhet();
-        String fraMessage = eksisterende != null ? eksisterende.getEnhetId() + " " + eksisterende.getEnhetNavn() : "ukjent";
-        HistorikkInnslagTekstBuilder builder = new HistorikkInnslagTekstBuilder()
-                .medHendelse(HistorikkinnslagType.BYTT_ENHET)
-                .medEndretFelt(HistorikkEndretFeltType.BEHANDLENDE_ENHET,
-                        fraMessage,
-                        nyEnhet.getEnhetId() + " " + nyEnhet.getEnhetNavn());
-
-        HistorikkinnslagOld innslag = new HistorikkinnslagOld();
-        innslag.setAktør(aktør);
-        innslag.setType(HistorikkinnslagType.BYTT_ENHET);
-        innslag.setBehandlingId(behandling.getId());
-        builder.build(innslag);
-        historikkRepository.lagre(innslag);
+    private static Historikkinnslag lagHistorikkinnslag2(Behandling behandling, OrganisasjonsEnhet nyEnhet, HistorikkAktør aktør) {
+        var eksisterende = behandling.getBehandlendeOrganisasjonsEnhet();
+        var fraMessage = eksisterende != null ? eksisterende.getEnhetId() + " " + eksisterende.getEnhetId() : "ukjent";
+        return new Historikkinnslag.Builder()
+            .medAktør(aktør)
+            .medBehandlingId(behandling.getId())
+            .medFagsakId(behandling.getFagsakId())
+            .medTittel("Bytt enhet")
+            .addLinje(fraTilEquals("Behandlende enhet", fraMessage, nyEnhet.getEnhetId() + " " + nyEnhet.getEnhetNavn()))
+            .build();
     }
 }
