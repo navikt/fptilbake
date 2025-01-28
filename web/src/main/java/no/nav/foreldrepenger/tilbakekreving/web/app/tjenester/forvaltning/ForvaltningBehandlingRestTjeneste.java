@@ -455,13 +455,13 @@ public class ForvaltningBehandlingRestTjeneste {
     @Path("/hent-vedtak")
     @Operation(
         tags = "FORVALTNING-behandling",
-        description = "Tjeneste for å tvinge en behandling til å bli henlagt, selvom normale regler for saksbehandling ikke tillater henleggelse",
+        description = "Tjeneste for å hente tilbakekrevingsvedtak som sendes til oppdragsystemet. Kan kun brukes på behandling som er under iverksettelse",
         responses = {
             @ApiResponse(responseCode = "200", description = "Returnerer vedtak"),
             @ApiResponse(responseCode = "400", description = "Behandlingen har feil status"),
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
     public Response hentTilbakekrevingVedtak(
         @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
         @QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
