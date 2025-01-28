@@ -23,8 +23,12 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
+
+import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +94,8 @@ public class ForvaltningBehandlingRestTjeneste {
     private EksternBehandlingRepository eksternBehandlingRepository;
     private BehandlingTilstandTjeneste behandlingTilstandTjeneste;
 
+    private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
+
     public ForvaltningBehandlingRestTjeneste() {
         // for CDI
     }
@@ -102,7 +108,8 @@ public class ForvaltningBehandlingRestTjeneste {
                                              KravgrunnlagMapper kravgrunnlagMapper,
                                              KravgrunnlagTjeneste kravgrunnlagTjeneste,
                                              EksternBehandlingRepository eksternBehandlingRepository,
-                                             BehandlingTilstandTjeneste behandlingTilstandTjeneste) {
+                                             BehandlingTilstandTjeneste behandlingTilstandTjeneste,
+                                             TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.behandlingresultatRepository = behandlingresultatRepository;
         this.taskTjeneste = taskTjeneste;
@@ -112,6 +119,7 @@ public class ForvaltningBehandlingRestTjeneste {
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
         this.eksternBehandlingRepository = eksternBehandlingRepository;
         this.behandlingTilstandTjeneste = behandlingTilstandTjeneste;
+        this.tilbakekrevingsvedtakTjeneste = tilbakekrevingsvedtakTjeneste;
     }
 
     @POST
@@ -441,6 +449,29 @@ public class ForvaltningBehandlingRestTjeneste {
         grunnlagRepository.lagre(behandlingId, kravgrunnlag);
         mottattXmlRepository.opprettTilkobling(mottattXmlId);
         LOG.info("Behandling med behandlingId={} ble tvunget koblet til kravgrunnlag med mottattXmlId={}", behandlingId, mottattXmlId);
+    }
+
+    @POST
+    @Path("/hent-vedtak")
+    @Operation(
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å tvinge en behandling til å bli henlagt, selvom normale regler for saksbehandling ikke tillater henleggelse",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Returnerer vedtak"),
+            @ApiResponse(responseCode = "400", description = "Behandlingen har feil status"),
+            @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
+        })
+    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
+    public Response hentTilbakekrevingVedtak(
+        @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+        @QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+        Behandling behandling = hentBehandling(behandlingReferanse);
+        if (behandling.getStatus() != BehandlingStatus.IVERKSETTER_VEDTAK) {
+            LOG.info("Endepunktet brukes til feilsøking i iverksetting, men denne behandlingen har status {}", behandling.getStatus());
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        TilbakekrevingVedtakDTO vedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandling.getId());
+        return Response.ok(vedtak).build();
     }
 
     private void fjernKoblingTilHenlagteBehandlinger(ØkonomiXmlMottatt mottattXml, Long behandlingIdSomTilkobles) {
