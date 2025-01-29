@@ -1,14 +1,8 @@
 FROM ghcr.io/navikt/fp-baseimages/java:21
 
 LABEL org.opencontainers.image.source=https://github.com/navikt/fptilbake
-ENV TZ=Europe/Oslo
 
-RUN mkdir lib
-RUN mkdir conf
-
-ENV JAVA_OPTS="-XX:-OmitStackTraceInFastThrow \
-    -Djava.security.egd=file:/dev/urandom \
-    -Dlogback.configurationFile=conf/logback.xml"
+ENV JAVA_OPTS="-XX:-OmitStackTraceInFastThrow"
 
 # Config
 COPY web/target/classes/logback*.xml ./conf/
