@@ -84,7 +84,7 @@ class K9LosPubliserEventTaskAivenTest {
         SlettGrunnlagEventPubliserer mockEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
         FagsystemKlient mockFagsystemKlient = mock(FagsystemKlient.class);
         KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider,
-                mockGjenopptaBehandlingTjeneste, mockBehandlingskontrollTjeneste, mockEventPubliserer, mock(AutomatiskSaksbehandlingVurderingTjeneste.class));
+                mockGjenopptaBehandlingTjeneste, mockBehandlingskontrollTjeneste, mockEventPubliserer, mock(AutomatiskSaksbehandlingVurderingTjeneste.class), entityManager);
         FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repositoryProvider,
                 kravgrunnlagTjeneste, mockFagsystemKlient);
         losPubliserEventTask = new K9LosPubliserEventTask(repositoryProvider, faktaFeilutbetalingTjeneste, mockKafkaProducerAiven, Fagsystem.K9TILBAKE);
