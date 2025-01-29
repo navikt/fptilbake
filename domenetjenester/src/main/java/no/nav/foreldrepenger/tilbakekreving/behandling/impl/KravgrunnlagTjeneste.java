@@ -13,6 +13,8 @@ import java.util.TreeMap;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +52,7 @@ public class KravgrunnlagTjeneste {
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste;
     private SlettGrunnlagEventPubliserer kravgrunnlagEventPubliserer;
-
+    private EntityManager entityManager;
 
     KravgrunnlagTjeneste() {
         // For CDI
@@ -61,7 +63,7 @@ public class KravgrunnlagTjeneste {
                                 GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste,
                                 BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                 SlettGrunnlagEventPubliserer slettGrunnlagEventPubliserer,
-                                AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste) {
+                                AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste, EntityManager entityManager) {
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.historikkRepository = repositoryProvider.getHistorikkRepositoryOld();
@@ -69,8 +71,8 @@ public class KravgrunnlagTjeneste {
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
         this.halvtRettsgebyrTjeneste = halvtRettsgebyrTjeneste;
         this.kravgrunnlagEventPubliserer = slettGrunnlagEventPubliserer;
+        this.entityManager = entityManager;
     }
-
 
     public List<LogiskPeriode> utledLogiskPeriode(Long behandlingId) {
         return LogiskPeriodeTjeneste.utledLogiskPeriode(finnFeilutbetalingPrPeriode(behandlingId));
@@ -142,6 +144,10 @@ public class KravgrunnlagTjeneste {
         // forutsatt at FPTILBAKE allerede har fått SPER melding for den behandlingen og sett behandling på vent med VenteÅrsak VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
         if (erForbiFaktaSteg) {
             LOG.info("Hopper tilbake til {} pga endret kravgrunnlag for behandlingId={}", FAKTA_FEILUTBETALING.getKode(), behandlingId);
+            if (behandling.getFagsak().getSaksnummer().getVerdi().equals("152262779")){
+                //avbryter planlagte tasker for å unngå doble iverksett-tasker når prosessen kjøres på nytt
+                avbrytPlanlagteTasker(behandling.getId());
+            }
             var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
             behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
             behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, FAKTA_FEILUTBETALING);
@@ -156,6 +162,20 @@ public class KravgrunnlagTjeneste {
             behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
                 BehandlingStegType.TBKGSTEG, skalVenteTil, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         }
+    }
+
+    private void avbrytPlanlagteTasker(Long behandlingId) {
+        Query query = entityManager.createNativeQuery("""
+                        update prosess_task pt set status = 'FERDIG'
+                            where pt.id in (select prosess_task_id from FAGSAK_PROSESS_TASK fpt where behandling_id = :behandlingId)
+                            and status in ('FEILET', 'KLAR')
+            """);
+        query.setParameter("behandlingId", behandlingId);
+        int antallStoppet = query.executeUpdate();
+        if (antallStoppet > 4){
+            throw new IllegalStateException("Var forventet å stoppe 4 tasker, men forsøker å stoppe " + antallStoppet);
+        }
+        LOG.info("Stoppet {} planlagte tasker for behandling {}", antallStoppet, behandlingId);
     }
 
     private void slettVLAnsvarlingSaksbehandler(Behandling behandling) {
