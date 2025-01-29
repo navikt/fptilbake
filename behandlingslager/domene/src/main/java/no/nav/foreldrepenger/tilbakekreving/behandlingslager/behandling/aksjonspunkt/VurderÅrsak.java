@@ -1,34 +1,38 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Converter;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum VurderÅrsak implements Kodeverdi {
 
-    FEIL_FAKTA("FEIL_FAKTA", "Feil fakta"),
-    FEIL_LOV("FEIL_LOV", "Feil lovanvendelse"),
-    FEIL_REGEL("FEIL_REGEL", "Feil regelforståelse"), // UTGÅTT, beholdes pga historikk og K9
+    FEIL_FAKTA("FEIL_FAKTA", "Fakta"),
+    FEIL_LOV("FEIL_LOV", "Regel-/lovanvendelse"),
     SKJØNN("SKJØNN", "Skjønn"),
     UTREDNING("UTREDNING", "Utredning"),
-    ANNET("ANNET", "Annet"),
-    UDEFINERT("-", "Ikke definert");
+    SAKSFLYT("SAKSFLYT", "Saksflyt"),
+    BEGRUNNELSE("BEGRUNNELSE", "Begrunnelse"),
+    UDEFINERT("-", "Ikke definert"),
+
+    @Deprecated
+    ANNET("ANNET", "Annet"), // UTGÅTT, beholdes pga historikk
+    @Deprecated
+    FEIL_REGEL("FEIL_REGEL", "Feil regelforståelse"), // UTGÅTT, beholdes pga historikk
+    ;
 
     public static final String KODEVERK = "VURDER_AARSAK";
     private static final Map<String, VurderÅrsak> KODER = new LinkedHashMap<>();
