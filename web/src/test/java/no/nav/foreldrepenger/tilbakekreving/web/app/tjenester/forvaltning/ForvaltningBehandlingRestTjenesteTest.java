@@ -102,7 +102,7 @@ class ForvaltningBehandlingRestTjenesteTest {
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, behandlingModellRepository, eventPubliserer));
 
         forvaltningBehandlingRestTjeneste = new ForvaltningBehandlingRestTjeneste(repositoryProvider, taskTjeneste, behandlingresultatRepository,
-            mottattXmlRepository, kravgrunnlagMapper, kravgrunnlagTjeneste, eksternBehandlingRepository, null);
+            mottattXmlRepository, kravgrunnlagMapper, kravgrunnlagTjeneste, eksternBehandlingRepository, null, null);
         behandling = scenario.lagre(repositoryProvider);
     }
 
