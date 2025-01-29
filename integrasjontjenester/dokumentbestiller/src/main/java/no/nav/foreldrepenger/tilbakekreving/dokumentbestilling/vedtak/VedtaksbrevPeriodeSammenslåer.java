@@ -64,7 +64,7 @@ public class VedtaksbrevPeriodeSammenslåer {
         return fakta.getFeilutbetaltPerioder().stream()
             .filter(vp -> vp.getPeriode().overlapper(periode))
             .findFirst()
-            .orElseThrow();
+            .orElseThrow(() -> new IllegalStateException("Finner ikke fakta som overlapper med perioden " + periode));
     }
 
     private boolean like(FaktaFeilutbetalingPeriode f1, FaktaFeilutbetalingPeriode f2) {
