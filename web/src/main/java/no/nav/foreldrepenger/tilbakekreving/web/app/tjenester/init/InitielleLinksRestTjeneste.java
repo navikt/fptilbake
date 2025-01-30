@@ -1,8 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.init;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -11,8 +9,6 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-
-import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
@@ -21,6 +17,9 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkR
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Path("/init-fetch")
 @ApplicationScoped
@@ -53,6 +52,7 @@ public class InitielleLinksRestTjeneste {
         List<ResourceLink> saklenker = new ArrayList<>();
         saklenker.add(get(BehandlingRestTjeneste.SAK_FULL_PATH, "tilbake-fagsak-full"));
         saklenker.add(get(HistorikkRestTjeneste.HISTORIKK_PATH, "tilbake-historikk"));
+        saklenker.add(get(HistorikkRestTjeneste.HISTORIKK_PATH + "/v2", "tilbake-historikkinnslag"));
         saklenker.add(get(BehandlingRestTjeneste.SAK_RETTIGHETER_PATH, "tilbake-sak-rettigheter"));
         saklenker.add(get(BehandlingRestTjeneste.BEHANDLING_ALLE_PATH, "tilbake-alle-behandlinger"));
         saklenker.add(get(BehandlingRestTjeneste.BEHANDLING_KAN_OPPRETTES_PATH, "tilbake-kan-opprette-behandling"));
