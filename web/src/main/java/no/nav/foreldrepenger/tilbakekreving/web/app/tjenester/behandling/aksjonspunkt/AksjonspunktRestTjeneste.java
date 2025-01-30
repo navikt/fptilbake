@@ -21,6 +21,9 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -30,6 +33,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
@@ -44,11 +48,19 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 
-@Path("/behandling/aksjonspunkt")
+@Path(AksjonspunktRestTjeneste.BASE_PATH)
 @RequestScoped
 @Transactional
 @Produces(MediaType.APPLICATION_JSON)
 public class AksjonspunktRestTjeneste {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AksjonspunktRestTjeneste.class);
+
+    static final String BASE_PATH = "/behandling";
+    private static final String AKSJONSPUNKT_BESLUTT_PART_PATH = "/aksjonspunkt/beslutt";
+    private static final String AKSJONSPUNKT_PART_PATH = "/aksjonspunkt";
+    public static final String AKSJONSPUNKT_BESLUTT_PATH = BASE_PATH + AKSJONSPUNKT_BESLUTT_PART_PATH;
+    public static final String AKSJONSPUNKT_PATH = BASE_PATH + AKSJONSPUNKT_PART_PATH;
 
     private BehandlingRepository behandlingRepository;
     private TotrinnRepository totrinnRepository;
@@ -71,6 +83,7 @@ public class AksjonspunktRestTjeneste {
     }
 
     @GET
+    @Path(AKSJONSPUNKT_PART_PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(
             tags = "aksjonspunkt",
@@ -101,6 +114,7 @@ public class AksjonspunktRestTjeneste {
      * @throws URISyntaxException
      */
     @POST
+    @Path(AKSJONSPUNKT_PART_PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(
             tags = "aksjonspunkt",
@@ -109,12 +123,39 @@ public class AksjonspunktRestTjeneste {
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response bekreft(@Context HttpServletRequest request,
                             @Parameter(description = "Liste over aksjonspunkt som skal bekreftes, inklusiv data som trengs for å løse de.") @Valid BekreftedeAksjonspunkterDto apDto) throws URISyntaxException {
+        if (apDto.getBekreftedeAksjonspunktDtoer().stream().anyMatch(a -> a.getAksjonspunktDefinisjon() == AksjonspunktDefinisjon.FATTE_VEDTAK)) {
+            LOG.info("Bekreft kalles for fatte vedtak"); //Endre til exception når frontend ikke har cachet lenke og autotest er endret
+        }
+        return bekreftAksjonspunkt(request, apDto);
+    }
+
+    private Response bekreftAksjonspunkt(HttpServletRequest request, BekreftedeAksjonspunkterDto apDto) throws URISyntaxException {
         BehandlingReferanse behandlingReferanse = apDto.getBehandlingReferanse();
         Behandling behandling = hentBehandling(behandlingReferanse);
         Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer = apDto.getBekreftedeAksjonspunktDtoer();
         behandlingTjeneste.kanEndreBehandling(behandling.getId(), apDto.getBehandlingVersjon());
         aksjonspunktApplikasjonTjeneste.bekreftAksjonspunkter(bekreftedeAksjonspunktDtoer, behandling.getId());
         return Redirect.tilBehandlingPollStatus(request, behandling.getUuid());
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path(AKSJONSPUNKT_BESLUTT_PART_PATH)
+    @Operation(
+        tags = "aksjonspunkt",
+        description = "Lagre endringer gitt av aksjonspunktene og rekjør behandling fra gjeldende steg")
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, property = AbacProperty.FAGSAK)
+    public Response beslutt(@Context HttpServletRequest request,
+                            @Parameter(description = "Liste over aksjonspunkt som skal bekreftes, inklusiv data som trengs for å løse de.") @Valid BekreftedeAksjonspunkterDto apDto) throws URISyntaxException {
+        var bekreftedeAksjonspunktDtoer = apDto.getBekreftedeAksjonspunktDtoer();
+        if (bekreftedeAksjonspunktDtoer.size() > 1) {
+            throw new IllegalArgumentException("Forventer kun ett aksjonspunkt");
+        }
+        var bekreftetAksjonspunktDto = bekreftedeAksjonspunktDtoer.stream().findFirst().orElseThrow();
+        if (bekreftetAksjonspunktDto.getAksjonspunktDefinisjon() != AksjonspunktDefinisjon.FATTE_VEDTAK) {
+            throw new IllegalArgumentException("Forventer aksjonspunkt FATTE_VEDTAK");
+        }
+        return bekreftAksjonspunkt(request, apDto);
     }
 
     private Behandling hentBehandling(BehandlingReferanse behandlingReferanse) {
