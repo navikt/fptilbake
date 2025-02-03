@@ -135,9 +135,17 @@ class AksjonspunktRestTjenesteTest {
 
     @Test
     void skal_ikke_kunne_sende_andre_ap_til_beslutter_endepunkt() {
+        var dto = BekreftedeAksjonspunkterDto.lagDto(1L, 1L,
+            List.of(new VurderForeldelseDto()));
         assertThatThrownBy(() -> aksjonspunktRestTjeneste.beslutt(mock(HttpServletRequest.class),
-            BekreftedeAksjonspunkterDto.lagDto(1L, 1L,
-                List.of(new VurderForeldelseDto())))).isExactlyInstanceOf(IllegalArgumentException.class);
+            dto)).isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void skal_ikke_kunne_sende_fatter_vedtak_ap_til_aksjonspunkt_endepunkt() {
+        var dto = BekreftedeAksjonspunkterDto.lagDto(1L, 1L, List.of(new FatteVedtakDto(List.of())));
+        assertThatThrownBy(() -> aksjonspunktRestTjeneste.bekreft(mock(HttpServletRequest.class), dto)).isExactlyInstanceOf(
+            IllegalArgumentException.class);
     }
 
 }
