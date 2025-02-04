@@ -123,10 +123,14 @@ public class AksjonspunktRestTjeneste {
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response bekreft(@Context HttpServletRequest request,
                             @Parameter(description = "Liste over aksjonspunkt som skal bekreftes, inklusiv data som trengs for å løse de.") @Valid BekreftedeAksjonspunkterDto apDto) throws URISyntaxException {
-        if (apDto.getBekreftedeAksjonspunktDtoer().stream().anyMatch(a -> a.getAksjonspunktDefinisjon() == AksjonspunktDefinisjon.FATTE_VEDTAK)) {
-            LOG.info("Bekreft kalles for fatte vedtak"); //Endre til exception når frontend ikke har cachet lenke og autotest er endret
+        if (fatterVedtak(apDto.getBekreftedeAksjonspunktDtoer())) {
+            throw new IllegalArgumentException("Fatter vedtak aksjonspunkt løses i eget endepunkt");
         }
         return bekreftAksjonspunkt(request, apDto);
+    }
+
+    private static boolean fatterVedtak(Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer) {
+        return bekreftedeAksjonspunktDtoer.stream().anyMatch(dto -> dto.getAksjonspunktDefinisjon() == AksjonspunktDefinisjon.FATTE_VEDTAK);
     }
 
     private Response bekreftAksjonspunkt(HttpServletRequest request, BekreftedeAksjonspunkterDto apDto) throws URISyntaxException {
@@ -151,8 +155,7 @@ public class AksjonspunktRestTjeneste {
         if (bekreftedeAksjonspunktDtoer.size() > 1) {
             throw new IllegalArgumentException("Forventer kun ett aksjonspunkt");
         }
-        var bekreftetAksjonspunktDto = bekreftedeAksjonspunktDtoer.stream().findFirst().orElseThrow();
-        if (bekreftetAksjonspunktDto.getAksjonspunktDefinisjon() != AksjonspunktDefinisjon.FATTE_VEDTAK) {
+        if (!fatterVedtak(bekreftedeAksjonspunktDtoer)) {
             throw new IllegalArgumentException("Forventer aksjonspunkt FATTE_VEDTAK");
         }
         return bekreftAksjonspunkt(request, apDto);
