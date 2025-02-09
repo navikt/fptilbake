@@ -18,9 +18,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyperPrYtelseTypeDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste.FeilutbetalingÅrsakTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
 @Path("/feilutbetalingaarsak")
 @Produces(APPLICATION_JSON)
@@ -46,7 +46,7 @@ public class FeilutbetalingÅrsakRestTjeneste {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Kodeverk", content = @Content(schema = @Schema(implementation = HendelseTypeMedUndertypeDto.class)))
             })
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.APPLIKASJON)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.APPLIKASJON)
     public List<HendelseTyperPrYtelseTypeDto> hentAlleFeilutbetalingÅrsaker() {
         return feilutbetalingÅrsakTjeneste.hentFeilutbetalingårsaker();
     }

@@ -3,11 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -22,19 +17,24 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.HentKorrigertKravgrunnlagDto;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
 @Path("/forvaltning/kravgrunnlag")
 @ApplicationScoped
@@ -71,7 +71,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
             @ApiResponse(responseCode = "200", description = "Hent korrigerte grunnlag og tilkoblet det med en behandling"),
             @ApiResponse(responseCode = "400", description = "Behandling er avsluttet eller ikke gyldig")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
     public Response hentKorrigertKravgrunnlag(@Valid @NotNull @TilpassetAbacAttributt(supplierClass = AbacIngen.class) HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
         Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
         if (behandling.erAvsluttet()) {
@@ -106,7 +106,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Finnes ikke kravgrunnlag."),
             @ApiResponse(responseCode = "500", description = "Ukjent feil!")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
     public Response annullerKravgrunnlag(@Valid @NotNull @TilpassetAbacAttributt(supplierClass = AbacIngen.class) HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
         Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
         try {
@@ -129,7 +129,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Ukjent feil!")
         })
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
     public Response hentForvaltninginfo(@Valid @NotNull @QueryParam("saksnummer") SaksnummerDto saksnummer) {
         try {
             return Response.ok(forvaltningTjeneste.hentForvaltningsinfo(new Saksnummer(saksnummer.getVerdi()))).build();

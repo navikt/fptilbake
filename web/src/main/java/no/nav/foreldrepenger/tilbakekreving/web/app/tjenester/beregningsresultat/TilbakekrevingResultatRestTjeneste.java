@@ -35,10 +35,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
 @Path(TilbakekrevingResultatRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -70,7 +70,7 @@ public class TilbakekrevingResultatRestTjeneste {
     @GET
     @Path("/resultat")
     @Operation(tags = "beregning", description = "Henter beregningsresultat for tilbakekreving")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
     public BeregningResultatDto hentBeregningResultat(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class) @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         var behandlingId = hentBehandlingId(behandlingReferanse);
         var beregningsresultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);

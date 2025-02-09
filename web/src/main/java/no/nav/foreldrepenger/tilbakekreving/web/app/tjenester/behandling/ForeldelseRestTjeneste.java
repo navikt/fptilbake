@@ -25,12 +25,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
 @Path(ForeldelseRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -59,7 +59,7 @@ public class ForeldelseRestTjeneste {
 
     @GET
     @Operation(tags = "foreldelse", description = "Henter perioder som skal vurderes for foreldelse")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
     public FeilutbetalingPerioderDto hentLogiskePerioder(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class) @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         return vurdertForeldelseTjeneste.hentFaktaPerioder(hentBehandlingId(behandlingReferanse));
     }
@@ -67,7 +67,7 @@ public class ForeldelseRestTjeneste {
     @GET
     @Operation(tags = "foreldelse", description = "Hente allerede vurdert foreldelse perioder")
     @Path("/vurdert")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
     public FeilutbetalingPerioderDto hentVurdertPerioder(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class) @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         return vurdertForeldelseTjeneste.henteVurdertForeldelse(hentBehandlingId(behandlingReferanse));
     }
@@ -75,7 +75,7 @@ public class ForeldelseRestTjeneste {
     @POST
     @Operation(tags = "foreldelse", description = "Beregn feilutbetalingsbeløp for oppgitte perioder")
     @Path("/belop")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
     public FeilutbetalingPerioderDto beregnBeløp(@TilpassetAbacAttributt(supplierClass = AbacDataPerioder.class) @NotNull @Valid FeilutbetalingPerioderDto perioderDto) {
         var perioderFraDto = perioderDto.getPerioder()
                 .stream()

@@ -2,7 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp;
 
 import java.util.List;
 
-import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
@@ -15,26 +15,36 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.Xa
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.log.util.LoggerUtils;
 import no.nav.vedtak.sikkerhet.abac.AbacResultat;
-import no.nav.vedtak.sikkerhet.abac.Tilgangsbeslutning;
+import no.nav.vedtak.sikkerhet.abac.TokenProvider;
 import no.nav.vedtak.sikkerhet.abac.internal.BeskyttetRessursAttributter;
 import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
 
-@Dependent
+@ApplicationScoped
 public class AppPdpKlientImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(AppPdpKlientImpl.class);
 
-    private final AppPdpConsumerImpl pdp;
+    private AppPdpConsumerImpl pdp;
+    private TokenProvider tokenProvider;
+    private K9AbacAuditlogger abacAuditlogger;
+
+    public AppPdpKlientImpl() {
+        // CDI
+    }
 
     @Inject
-    public AppPdpKlientImpl(AppPdpConsumerImpl pdp) {
+    public AppPdpKlientImpl(AppPdpConsumerImpl pdp, TokenProvider tokenProvider, K9AbacAuditlogger abacAuditlogger) {
         this.pdp = pdp;
+        this.tokenProvider = tokenProvider;
+        this.abacAuditlogger = abacAuditlogger;
     }
 
     public Tilgangsbeslutning forespørTilgang(BeskyttetRessursAttributter beskyttetRessursAttributter, String domene, AppRessursData appRessursData) {
-        var request = XacmlRequestMapper.lagXacmlRequest(beskyttetRessursAttributter, domene, appRessursData);
+        var token = Token.withOidcToken(tokenProvider.openIdToken());
+        var request = XacmlRequestMapper.lagXacmlRequest(beskyttetRessursAttributter, domene, appRessursData, token);
         var response = pdp.evaluate(request);
         var hovedresultat = resultatFraResponse(response);
+        abacAuditlogger.loggUtfall(hovedresultat, beskyttetRessursAttributter, appRessursData);
         return new Tilgangsbeslutning(hovedresultat, beskyttetRessursAttributter, appRessursData);
     }
 

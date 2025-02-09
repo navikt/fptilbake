@@ -36,10 +36,10 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
 @Path(GrunnlagRestTestTjenesteLocalDev.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -65,7 +65,7 @@ public class GrunnlagRestTestTjenesteLocalDev {
 
     @POST
     @Operation(tags = "kravgrunnlag", description = "Lagre tilbakekrevingsgrunnlag fra økonomi")
-    @BeskyttetRessurs(actionType = ActionType.UPDATE, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK)
     public Response lagreUtbetalinger(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                       @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse idDto,
                                       @NotNull @Valid KravgrunnlagDto kravgrunnlagDto) {

@@ -95,12 +95,6 @@ spec:
   {{/each}}
    - name: APP_NAME
      value: "k9-tilbake"
-   - name: ABAC_ATTRIBUTT_APPLIKASJON
-     value: "no.nav.abac.attributter.k9"
-   - name: ABAC_ATTRIBUTT_FAGSAK
-     value: "no.nav.abac.attributter.k9.fagsak"
-   - name: ABAC_ATTRIBUTT_VENTEFRIST
-     value: "no.nav.abac.attributter.k9.fagsak.ventefrist"
    - name: AUDITLOGGER_ENABLED
      value: "true"
    - name: AUDITLOGGER_VENDOR

@@ -27,10 +27,10 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.Dokumen
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.BrevmalDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BestillBrevDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
 @Path(BrevRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -59,7 +59,7 @@ public class BrevRestTjeneste {
     @Path("/maler")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(tags = "brev", description = "Henter liste over tilgjengelige brevtyper")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK, sporingslogg = false)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
     public List<BrevmalDto> hentMaler(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                       @Valid @QueryParam("uuid") BehandlingReferanse behandlingReferanse) {
         var behandlingId = hentBehandlingId(behandlingReferanse);
@@ -70,7 +70,7 @@ public class BrevRestTjeneste {
     @Path("/bestill")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(tags = "brev", description = "bestiller brev")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK, sporingslogg = false)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
     public Response bestillBrev(@NotNull @Valid BestillBrevDto bestillBrevDto) {
         var malType = DokumentMalType.fraKode(bestillBrevDto.getBrevmalkode());
         var behandlingId = hentBehandlingId(bestillBrevDto.getBehandlingReferanse());
@@ -82,7 +82,7 @@ public class BrevRestTjeneste {
     @Path("/forhandsvis")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "brev", description = "Returnerer en pdf som er en forhåndsvisning av brevet")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
     public Response forhåndsvisBrev(@Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @NotNull @Valid BestillBrevDto forhåndsvisBestillBrevDto) {
         var malType = DokumentMalType.fraKode(forhåndsvisBestillBrevDto.getBrevmalkode());
         var fritekst = forhåndsvisBestillBrevDto.getFritekst();

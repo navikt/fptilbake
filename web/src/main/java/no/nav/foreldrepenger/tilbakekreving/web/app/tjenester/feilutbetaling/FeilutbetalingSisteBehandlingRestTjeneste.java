@@ -7,13 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -24,6 +17,14 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
@@ -34,9 +35,9 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
 @Path("/feilutbetaling")
 @Produces(APPLICATION_JSON)
@@ -70,7 +71,7 @@ public class FeilutbetalingSisteBehandlingRestTjeneste {
             @ApiResponse(responseCode = "200", description = "Feilutbetalte perioder og evt. avsluttet dato for siste ordinære tilbakekrevingsbehandling", content = @Content(schema = @Schema(implementation = BehandlingStatusOgFeilutbetalinger.class))),
             @ApiResponse(responseCode = "204", description = "Det finnes ingen tilbakekrevigsbehandlnig for saken")
         })
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
     public Response hentInfoForSisteFørstegangsBehandling(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummer) {
         Saksnummer saksnummeret = new Saksnummer(saksnummer.getVerdi());
 

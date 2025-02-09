@@ -20,10 +20,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.Vi
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.DetaljerteFeilutbetalingsperioderDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.VilkårsvurderteDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
 @Path(VilkårsvurderingRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -52,7 +52,7 @@ public class VilkårsvurderingRestTjeneste {
     @GET
     @Path("/perioder")
     @Operation(tags = "vilkårsvurdering", description = "Henter perioder som skal vurderes for vilkårsvurdering")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
     public DetaljerteFeilutbetalingsperioderDto hentDetailjertFeilutbetalingPerioder(
             @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
             @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
@@ -67,7 +67,7 @@ public class VilkårsvurderingRestTjeneste {
     @GET
     @Path("/vurdert")
     @Operation(tags = "vilkårsvurdering", description = "Henter allerede vurdert vilkårsvurdering")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
     public VilkårsvurderteDto hentVurdertPerioder(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                                   @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         VilkårsvurderteDto vilkårsvurderteDto = new VilkårsvurderteDto();

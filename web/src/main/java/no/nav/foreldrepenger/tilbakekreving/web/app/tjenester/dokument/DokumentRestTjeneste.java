@@ -28,12 +28,12 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.Henle
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.VedtaksbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
 @Path("/dokument")
 @ApplicationScoped
@@ -66,7 +66,7 @@ public class DokumentRestTjeneste {
     @Path("/forhandsvis-varselbrev")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av varselbrevet")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentForhåndsvisningVarselbrev(@TilpassetAbacAttributt(supplierClass = ForhåndsvisningVarselbrev.class)
                                                   @Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @Valid HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) {
@@ -79,7 +79,7 @@ public class DokumentRestTjeneste {
     @Path("/hent-vedtaksbrev")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "dokument", description = "Returnerer forhåndsvisning av vedtaksbrevet som tekst, slik at det kan vises i GUI for redigering")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public ForhåndvisningVedtaksbrevTekstDto hentVedtaksbrevForRedigering(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                                                           @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
@@ -98,7 +98,7 @@ public class DokumentRestTjeneste {
     @Path("/forhandsvis-vedtaksbrev")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av vedtaksbrevet")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentForhåndsvisningVedtaksbrev(@TilpassetAbacAttributt(supplierClass = ForhåndvisningVedtaksbrevPdf.class) @Valid @NotNull HentForhåndvisningVedtaksbrevPdfDto vedtaksbrevPdfDto) {
         byte[] dokument = vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(vedtaksbrevPdfDto);
@@ -110,7 +110,7 @@ public class DokumentRestTjeneste {
     @Path("/forhandsvis-henleggelsesbrev")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av henleggelsesbrevet")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentForhåndsvisningHenleggelsesbrev(@TilpassetAbacAttributt(supplierClass = ForhåndsvisningHenleggelseslbrev.class) @Valid @NotNull HentForhåndsvisningHenleggelseslbrevDto henleggelseslbrevDto) {
         byte[] dokument;

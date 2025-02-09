@@ -4,28 +4,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.Category;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.NavFellesAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.XacmlRequest;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 import no.nav.vedtak.sikkerhet.abac.internal.BeskyttetRessursAttributter;
 import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
 
 
 public class XacmlRequestMapper {
 
-    private static final Environment ENV = Environment.current();
-
     public static XacmlRequest lagXacmlRequest(BeskyttetRessursAttributter beskyttetRessursAttributter,
-                                               String domene,
-                                               AppRessursData appRessursData) {
+                                               String domene, AppRessursData appRessursData, Token token) {
         var actionAttributes = new XacmlRequest.Attributes(List.of(actionInfo(beskyttetRessursAttributter)));
 
         List<XacmlRequest.AttributeAssignment> envList = new ArrayList<>();
-        envList.add(getPepIdInfo(beskyttetRessursAttributter));
-        envList.addAll(getTokenEnvironmentAttrs(beskyttetRessursAttributter));
+        envList.add(getPepIdInfo());
+        envList.addAll(getTokenEnvironmentAttrs(token));
 
         var envAttributes = new XacmlRequest.Attributes(envList);
 
@@ -52,7 +50,7 @@ public class XacmlRequestMapper {
 
         attributes.add(new XacmlRequest.AttributeAssignment(NavFellesAttributter.RESOURCE_FELLES_DOMENE, domene));
         attributes.add(
-            new XacmlRequest.AttributeAssignment(NavFellesAttributter.RESOURCE_FELLES_RESOURCE_TYPE, beskyttetRessursAttributter.getResourceType()));
+            new XacmlRequest.AttributeAssignment(NavFellesAttributter.RESOURCE_FELLES_RESOURCE_TYPE, mapResourceType(beskyttetRessursAttributter.getResourceType())));
 
         appRessursData.getResources()
             .values()
@@ -67,26 +65,20 @@ public class XacmlRequestMapper {
     }
 
     private static XacmlRequest.AttributeAssignment actionInfo(final BeskyttetRessursAttributter beskyttetRessursAttributter) {
-        return new XacmlRequest.AttributeAssignment(NavFellesAttributter.XACML10_ACTION_ID,
-            beskyttetRessursAttributter.getActionType().getEksternKode());
+        return new XacmlRequest.AttributeAssignment(NavFellesAttributter.XACML10_ACTION_ID, mapActionType(beskyttetRessursAttributter.getActionType()));
     }
 
-    private static XacmlRequest.AttributeAssignment getPepIdInfo(final BeskyttetRessursAttributter beskyttetRessursAttributter) {
-        return new XacmlRequest.AttributeAssignment(NavFellesAttributter.ENVIRONMENT_FELLES_PEP_ID,
-            Optional.ofNullable(beskyttetRessursAttributter.getPepId()).orElse(getPepId()));
+    private static XacmlRequest.AttributeAssignment getPepIdInfo() {
+        return new XacmlRequest.AttributeAssignment(NavFellesAttributter.ENVIRONMENT_FELLES_PEP_ID, ApplicationName.hvilkenTilbakeAppName());
     }
 
-    private static List<XacmlRequest.AttributeAssignment> getTokenEnvironmentAttrs(final BeskyttetRessursAttributter beskyttetRessursAttributter) {
-        String envTokenBodyAttributt = switch (beskyttetRessursAttributter.getToken().getTokenType()) {
+    private static List<XacmlRequest.AttributeAssignment> getTokenEnvironmentAttrs(Token token) {
+        String envTokenBodyAttributt = switch (token.getTokenType()) {
             case OIDC -> NavFellesAttributter.ENVIRONMENT_FELLES_OIDC_TOKEN_BODY;
             case TOKENX -> NavFellesAttributter.ENVIRONMENT_FELLES_TOKENX_TOKEN_BODY;
         };
-        var assignement = new XacmlRequest.AttributeAssignment(envTokenBodyAttributt, beskyttetRessursAttributter.getToken().getTokenBody());
+        var assignement = new XacmlRequest.AttributeAssignment(envTokenBodyAttributt, token.getTokenBody());
         return List.of(assignement);
-    }
-
-    private static String getPepId() {
-        return ENV.getNaisAppName();
     }
 
     private static List<Ident> hentIdenter(AppRessursData appRessursData) {
@@ -102,5 +94,25 @@ public class XacmlRequestMapper {
     }
 
     public record Ident(String key, String ident) {
+    }
+
+    static String mapActionType(ActionType actionType) {
+        return switch (actionType) {
+            case READ -> "read";
+            case UPDATE -> "update";
+            case CREATE -> "create";
+            case DELETE -> "delete";
+            case DUMMY -> null;
+        };
+    }
+
+    static String mapResourceType(ResourceType resourceType) {
+        return switch (resourceType) {
+            case APPLIKASJON -> "no.nav.abac.attributter.k9";
+            case FAGSAK -> "nno.nav.abac.attributter.k9.fagsak";
+            case VENTEFRIST -> "no.nav.abac.attributter.k9.fagsak.ventefrist";
+            case DRIFT -> "no.nav.abac.attributter.k9.drift";
+            default -> throw new IllegalStateException("Unexpected value: " + resourceType);
+        };
     }
 }

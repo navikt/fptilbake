@@ -11,9 +11,9 @@ import jakarta.ws.rs.Produces;
 
 import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
+import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
 @Path("/konfig")
 @RequestScoped
@@ -37,7 +37,7 @@ public class KonfigRestTjeneste {
     @Path("/rettskilde")
     @Produces("application/json")
     @Operation(tags = "konfigurasjon", description = "Henter lenke til rettskilde.")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK, sporingslogg = false)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Konfig hentRettskildeUrl() {
         return new Konfig(rettskildeUrl.toString());
@@ -47,7 +47,7 @@ public class KonfigRestTjeneste {
     @Path("/systemrutine")
     @Produces("application/json")
     @Operation(tags = "konfigurasjon", description = "Henter lenge til systemrutine")
-    @BeskyttetRessurs(actionType = ActionType.READ, property = AbacProperty.FAGSAK, sporingslogg = false)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Konfig hentSystemrutine() {
         return new Konfig(systemrutineUrl.toString());

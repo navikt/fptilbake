@@ -28,8 +28,6 @@ import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
 @Fptilbake
 public class FPPdpRequestBuilder implements PdpRequestBuilder {
 
-    public static final String ABAC_DOMAIN = "foreldrepenger";
-
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private PipRepository pipRepository;
@@ -43,11 +41,6 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
     public FPPdpRequestBuilder(PipRepository pipRepository, FpsakPipKlient fpsakPipKlient) {
         this.pipRepository = pipRepository;
         this.fpsakPipKlient = fpsakPipKlient;
-    }
-
-    @Override
-    public String abacDomene() {
-        return ABAC_DOMAIN;
     }
 
     @Override
