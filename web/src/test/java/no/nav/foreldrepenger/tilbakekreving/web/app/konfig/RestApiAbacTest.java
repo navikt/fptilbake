@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacProperty;
 import no.nav.vedtak.felles.testutilities.cdi.WeldContext;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -85,7 +83,7 @@ class RestApiAbacTest {
                 }
             }
         }
-        if (feilmeldinger.length() > 0) {
+        if (!feilmeldinger.isEmpty()) {
             fail("Følgende inputparametre til REST_MED_INNTEKTSMELDING-tjenester mangler AbacDto-impl\n" + feilmeldinger);
         }
     }
@@ -93,30 +91,10 @@ class RestApiAbacTest {
     private void assertPropertyIAnnotering(Method metode) {
         var klasse = metode.getDeclaringClass();
         var annotation = metode.getAnnotation(BeskyttetRessurs.class);
-        if (annotation == null) {
-            fail(klasse.getSimpleName() + "." + metode.getName() + " Mangler @" + annotation.getClass().getSimpleName());
-        }
-        if (annotation.property().isEmpty()) {
-            fail(klasse.getSimpleName() + "." + metode.getName() + " Tom property @" + annotation.getClass().getSimpleName());
-        }
-        var godkjenteProperties = List.of(
-                AbacProperty.APPLIKASJON,
-                AbacProperty.DRIFT,
-                AbacProperty.FAGSAK,
-                AbacProperty.VENTEFRIST
-        );
-        if (!annotation.resource().isEmpty() || annotation.resourceType() != ResourceType.DUMMY) {
-            fail(klasse.getSimpleName() + "." + metode.getName() + " Skal ikke bruke ressurs, bruk property i @" + annotation.getClass().getSimpleName());
-        }
-        if (!annotation.resource().isEmpty()) {
-            fail(klasse.getSimpleName() + "." + metode.getName() + " Skal ikke bruke resource " + annotation.resource() + " , bruk property i @" + annotation.getClass().getSimpleName());
-        }
-        if (!godkjenteProperties.contains(annotation.property())) {
-            fail(klasse.getSimpleName() + "." + metode.getName() + " Skal ikke bruke ukjent property " + annotation.property() + " , bruk en av " + godkjenteProperties + "i @" + annotation.getClass().getSimpleName());
-        }
-        if (annotation.actionType() == ActionType.DUMMY) {
-            fail(klasse.getSimpleName() + "." + metode.getName() + " Ikke bruk DUMMY-verdi for "
-                    + ActionType.class.getSimpleName());
+        if (annotation != null && annotation.actionType() == ActionType.DUMMY) {
+            fail(klasse.getSimpleName() + "." + metode.getName() + " Ikke bruk DUMMY-verdi for " + ActionType.class.getSimpleName());
+        } else if (annotation != null && annotation.resourceType() == ResourceType.DUMMY) {
+            fail(klasse.getSimpleName() + "." + metode.getName() + " En verdi for resource må være satt!");
         }
     }
 

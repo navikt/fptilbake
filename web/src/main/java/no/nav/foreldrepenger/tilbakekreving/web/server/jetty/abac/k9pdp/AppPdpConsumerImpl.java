@@ -26,7 +26,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.Xa
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.exception.ManglerTilgangException;
 import no.nav.vedtak.mapper.json.DefaultJsonMapper;
-import no.nav.vedtak.sikkerhet.kontekst.Systembruker;
 
 @ApplicationScoped
 public class AppPdpConsumerImpl {
@@ -44,9 +43,11 @@ public class AppPdpConsumerImpl {
     } // CDI
 
     @Inject
-    public AppPdpConsumerImpl(@KonfigVerdi(value = "abac.pdp.endpoint.url", defaultVerdi = "http://abac-foreldrepenger.teamabac/application/authorize") String pdpUrl) {
+    public AppPdpConsumerImpl(@KonfigVerdi("systembruker.username") String bruker,
+                              @KonfigVerdi("systembruker.password") String passord,
+                              @KonfigVerdi(value = "abac.pdp.endpoint.url", defaultVerdi = "http://abac-foreldrepenger.teamabac/application/authorize") String pdpUrl) {
         this.pdpUrl = URI.create(pdpUrl);
-        this.basicCredentials = basicCredentials(Systembruker.username(), Systembruker.password());
+        this.basicCredentials = basicCredentials(bruker, passord);
         // TODO - vurder om bør settes static final?
         this.client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).proxy(HttpClient.Builder.NO_PROXY).build();
         this.reader = DefaultJsonMapper.getObjectMapper().readerFor(XacmlResponse.class);

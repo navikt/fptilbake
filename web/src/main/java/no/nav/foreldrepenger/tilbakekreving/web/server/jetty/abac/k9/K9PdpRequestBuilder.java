@@ -33,7 +33,6 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(K9PdpRequestBuilder.class);
 
-    public static final String ABAC_DOMAIN = "k9";
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private PipRepository pipRepository;
@@ -48,11 +47,6 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
                                @KonfigVerdi(value = "aktiver.abac.logging", required = false, defaultVerdi = "false") boolean aktiverAbacLogging) {
         this.pipRepository = pipRepository;
         this.aktiverAbacLogging = aktiverAbacLogging;
-    }
-
-    @Override
-    public String abacDomene() {
-        return ABAC_DOMAIN;
     }
 
     @Override
