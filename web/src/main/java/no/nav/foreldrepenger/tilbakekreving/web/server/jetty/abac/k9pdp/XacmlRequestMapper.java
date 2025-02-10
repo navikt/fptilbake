@@ -109,7 +109,7 @@ public class XacmlRequestMapper {
     static String mapResourceType(ResourceType resourceType) {
         return switch (resourceType) {
             case APPLIKASJON -> "no.nav.abac.attributter.k9";
-            case FAGSAK -> "nno.nav.abac.attributter.k9.fagsak";
+            case FAGSAK -> "no.nav.abac.attributter.k9.fagsak";
             case VENTEFRIST -> "no.nav.abac.attributter.k9.fagsak.ventefrist";
             case DRIFT -> "no.nav.abac.attributter.k9.drift";
             default -> throw new IllegalStateException("Unexpected value: " + resourceType);
