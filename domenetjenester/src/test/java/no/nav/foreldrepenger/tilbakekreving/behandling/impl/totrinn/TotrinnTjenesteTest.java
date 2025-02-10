@@ -54,7 +54,7 @@ class TotrinnTjenesteTest extends FellesTestOppsett {
                 new ForeldelsePeriodeDto(FOM, TOM,
                         ForeldelseVurderingType.FORELDET, FOM.plusYears(3), null, "ABC")));
         List<VilkårsvurderingPerioderDto> vilkårPerioder = List.of(formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, TOM, Aktsomhet.FORSETT));
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(behandling, vilkårPerioder);
 
         totrinnTjeneste.settNyttTotrinnsgrunnlag(behandling);
 

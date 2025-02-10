@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
+@Deprecated(forRemoval = true)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum HistorikkEndretFeltType implements Kodeverdi {
@@ -24,7 +25,7 @@ public enum HistorikkEndretFeltType implements Kodeverdi {
     ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON("ER_SARLIGE_GRUNNER_TIL_REDUKSJON", "Er det særlige grunner til reduksjon?"),
     HENDELSE_ÅRSAK("HENDELSE_AARSAK", "Hendelse"),
     HENDELSE_UNDER_ÅRSAK("HENDELSE_UNDER_AARSAK", "Hendelse Under Årsak"),
-    MOTTAKER_UAKTSOMHET_GRAD("MOTTAKER_UAKTSOMHET_GRAD", "I hvilken grad har mottaker handlet uaktsomhet?"),
+    MOTTAKER_UAKTSOMHET_GRAD("MOTTAKER_UAKTSOMHET_GRAD", "I hvilken grad har mottaker handlet uaktsomt?"),
     ANDEL_TILBAKEKREVES("ANDEL_TILBAKEKREVES", "Andel som tilbakekreves"),
     BELØP_TILBAKEKREVES("BELOEP_TILBAKEKREVES", "Beløp som skal tilbakekreves"),
     TILBAKEKREV_SMÅBELOEP("TILBAKEKREV_SMAABELOEP", "Skal beløp under 4 rettsgebyr(6.ledd) tilbakekreves?"),

@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -25,8 +24,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ki
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.vedtak.exception.FunksjonellException;
 
 class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
@@ -71,12 +68,10 @@ class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         Aksjonspunkt aksjonspunkt = revurdering.getAksjonspunkter().iterator().next();
         assertThat(aksjonspunkt.getAksjonspunktDefinisjon()).isEqualTo(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
 
-        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikk(revurdering.getId());
-        assertThat(historikkinnslager).isNotEmpty();
-        assertThat(historikkinnslager.size()).isEqualTo(1);
-
-        HistorikkinnslagOld historikkinnslag = historikkinnslager.get(0);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.REVURD_OPPR);
+        var historikkinnslager = historikkinnslagRepository.hent(revurdering.getId());
+        assertThat(historikkinnslager).hasSize(1);
+        var historikkinnslag = historikkinnslager.get(0);
+        assertThat(historikkinnslag.getTittel()).isEqualTo("Tilbakekreving revurdering opprettet");
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
     }
 

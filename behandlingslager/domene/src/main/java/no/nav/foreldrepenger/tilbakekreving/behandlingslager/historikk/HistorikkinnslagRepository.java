@@ -27,6 +27,22 @@ public class HistorikkinnslagRepository {
             Historikkinnslag.class).setParameter("saksnummer", saksnummer).getResultStream().toList();
     }
 
+    public List<Historikkinnslag> hent(Long behandlingId) {
+        var fagsakId = getFagsakId(behandlingId);
+        return entityManager.createQuery(
+                "select h from Historikkinnslag2 h where (h.behandlingId = :behandlingId OR h.behandlingId = NULL) AND h.fagsakId = :fagsakId ",
+                Historikkinnslag.class)
+            .setParameter("fagsakId", fagsakId)// NOSONAR
+            .setParameter("behandlingId", behandlingId)
+            .getResultList();
+    }
+
+    private Long getFagsakId(long behandlingId) {
+        return entityManager.createQuery("select b.fagsak.id from Behandling b where b.id = :behandlingId", Long.class)
+            .setParameter("behandlingId", behandlingId)
+            .getSingleResult();
+    }
+
     public void lagre(Historikkinnslag historikkinnslag) {
         entityManager.persist(historikkinnslag);
         for (var linje : historikkinnslag.getLinjer()) {

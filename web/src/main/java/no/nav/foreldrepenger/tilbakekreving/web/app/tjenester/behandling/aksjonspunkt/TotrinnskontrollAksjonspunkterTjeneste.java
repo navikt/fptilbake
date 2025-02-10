@@ -17,11 +17,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjene
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.VurderÅrsakTotrinnsvurdering;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.SkjermlenkeTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.totrinn.TotrinnskontrollAksjonspunkterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.totrinn.TotrinnskontrollSkjermlenkeContextDto;
 
@@ -87,7 +87,7 @@ public class TotrinnskontrollAksjonspunkterTjeneste {
 
     private void lagTotrinnsaksjonspunkt(Map<SkjermlenkeType, List<TotrinnskontrollAksjonspunkterDto>> skjermlenkeMap, Totrinnsvurdering vurdering) {
         TotrinnskontrollAksjonspunkterDto totrinnsAksjonspunkt = lagTotrinnskontrollAksjonspunktDto(vurdering);
-        SkjermlenkeType skjermlenkeType = SkjermlenkeTjeneste.finnSkjermlenkeType(vurdering.getAksjonspunktDefinisjon());
+        SkjermlenkeType skjermlenkeType = finnSkjermlenkeType(vurdering.getAksjonspunktDefinisjon());
         if (skjermlenkeType != SkjermlenkeType.UDEFINERT) {
             List<TotrinnskontrollAksjonspunkterDto> aksjonspktContextListe = skjermlenkeMap.computeIfAbsent(skjermlenkeType,
                     k -> new ArrayList<>());
@@ -109,5 +109,14 @@ public class TotrinnskontrollAksjonspunkterTjeneste {
                 .collect(Collectors.toSet());
     }
 
+    private static SkjermlenkeType finnSkjermlenkeType(AksjonspunktDefinisjon aksjonspunktDefinisjon) {
+        return switch (aksjonspunktDefinisjon) {
+            case AVKLART_FAKTA_FEILUTBETALING -> SkjermlenkeType.FAKTA_OM_FEILUTBETALING;
+            case VURDER_FORELDELSE -> SkjermlenkeType.FORELDELSE;
+            case VURDER_TILBAKEKREVING -> SkjermlenkeType.TILBAKEKREVING;
+            case FORESLÅ_VEDTAK -> SkjermlenkeType.VEDTAK;
+            default -> SkjermlenkeType.UDEFINERT;
+        };
+    }
 
 }

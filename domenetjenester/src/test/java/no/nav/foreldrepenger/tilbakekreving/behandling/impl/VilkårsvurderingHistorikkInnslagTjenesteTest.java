@@ -1,21 +1,20 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.DATE_FORMATTER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDel;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet;
@@ -45,12 +44,11 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         vurderingEntitet.leggTilPeriode(formGodTroPeriode(vurderingEntitet, FOM, PERIOD_FØRSTE_SISTE_DATO));
         vurderingEntitet.leggTilPeriode(formAktsomhetPeriode(vurderingEntitet, PERIODE_ANDRE_FØRSTE_DATO, TOM));
 
-        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, null, vurderingEntitet);
-        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        HistorikkinnslagOld historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
+        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandling, null, vurderingEntitet);
+        var historikkinnslager = historikkinnslagRepository.hent(saksnummer);
+        var historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
 
         flerePerioderAssert(historikkinnslag);
-
     }
 
     @Test
@@ -58,10 +56,11 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         VilkårVurderingEntitet vurderingEntitet = new VilkårVurderingEntitet();
         vurderingEntitet.leggTilPeriode(formGodTroPeriode(vurderingEntitet, FOM, TOM));
 
-        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, vurderingEntitet, vurderingEntitet);
+        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandling, vurderingEntitet, vurderingEntitet);
 
-        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        assertThat(historikkinnslager).isEmpty();
+        var historikkinnslager = historikkinnslagRepository.hent(saksnummer);
+        var tilbakekrevingHistorikkinnslag = tilbakekrevingHistorikkinnslag(historikkinnslager);
+        assertThat(tilbakekrevingHistorikkinnslag).isEmpty();
     }
 
     @Test
@@ -84,30 +83,20 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         forrigePeriodeEntitet.setAktsomhet(forrigeAktsomhetEntitet);
         gammelVurdering.leggTilPeriode(forrigePeriodeEntitet);
 
-        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, gammelVurdering, nyVurdering);
+        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandling, gammelVurdering, nyVurdering);
 
-        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        HistorikkinnslagOld historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
-
-        assertThat(historikkinnslag.getHistorikkinnslagDeler().size()).isEqualTo(1);
-        HistorikkinnslagOldDel førsteDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
-        fellesHistorikkinnslagDelAssert(førsteDel, FOM, TOM, AKTSOMHET_BEGRUNNELSE, ANDRE_PERIODE_BEGRUNNELSE);
-        assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
-                .isEqualTo(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn());
-        assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
-                .isEqualTo(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER.getNavn());
-        assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-                .isEqualTo(Aktsomhet.SIMPEL_UAKTSOM.getNavn());
-        assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-                .isEqualTo(Aktsomhet.GROVT_UAKTSOM.getNavn());
-        assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON))).isEqualTo(formGrunnTekst(forrigeAktsomhetEntitet));
-        assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON))).isEqualTo(formGrunnTekst(nyVurdering.getPerioder().get(0).getAktsomhet()));
-        assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES))).isNull();
-        assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES))).isEqualTo(BELØP_TILBAKEKREVES);
-        assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ILEGG_RENTER))).isEqualTo(NEI);
-        assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ILEGG_RENTER))).isNull();
-        assertThat(getTilVerdi(førsteDel.getOpplysning(HistorikkOpplysningType.SÆRLIG_GRUNNER_BEGRUNNELSE))).isEqualTo(SÆRLIG_GRUNNER_BEGRUNNELSE);
-
+        var historikkinnslager = historikkinnslagRepository.hent(saksnummer);
+        var historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
+        assertThat(historikkinnslag.getSkjermlenke()).isEqualTo(SkjermlenkeType.TILBAKEKREVING);
+        assertThat(historikkinnslag.getLinjer().get(0).getTekst()).contains("__Vurdering__ av perioden", DATE_FORMATTER.format(FOM), DATE_FORMATTER.format(TOM));
+        assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Beløp som skal tilbakekreves", "satt til", BELØP_TILBAKEKREVES);
+        assertThat(historikkinnslag.getLinjer().get(2).getTekst()).contains("Er vilkårene for tilbakekreving oppfylt?", "endret fra", VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn(), VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER.getNavn());
+        assertThat(historikkinnslag.getLinjer().get(3).getTekst()).contains("I hvilken grad har mottaker handlet uaktsomt?", "endret fra", Aktsomhet.SIMPEL_UAKTSOM.getNavn(), Aktsomhet.GROVT_UAKTSOM.getNavn());
+        assertThat(historikkinnslag.getLinjer().get(4).getTekst()).contains("Skal det tilegges renter?", NEI, "er fjernet");
+        assertThat(historikkinnslag.getLinjer().get(5).getTekst()).contains("Er det særlige grunner til reduksjon?", "endret fra", formGrunnTekst(forrigeAktsomhetEntitet), formGrunnTekst(nyVurdering.getPerioder().get(0).getAktsomhet()));
+        // assertThat(historikkinnslag.getLinjer().get(6).getTekst()).contains(ANDRE_PERIODE_BEGRUNNELSE); Lik som forrige og derfor ikke inkludert
+        assertThat(historikkinnslag.getLinjer().get(6).getTekst()).contains(AKTSOMHET_BEGRUNNELSE);
+        // assertThat(historikkinnslag.getLinjer().get(7).getTekst()).contains(SÆRLIG_GRUNNER_BEGRUNNELSE); lik
     }
 
     @Test
@@ -119,10 +108,10 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         nyVurdering.leggTilPeriode(formGodTroPeriode(nyVurdering, FOM, PERIOD_FØRSTE_SISTE_DATO));
         nyVurdering.leggTilPeriode(formAktsomhetPeriode(nyVurdering, PERIODE_ANDRE_FØRSTE_DATO, TOM));
 
-        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, gammelVurdering, nyVurdering);
+        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandling, gammelVurdering, nyVurdering);
 
-        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        HistorikkinnslagOld historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
+        var historikkinnslager = historikkinnslagRepository.hent(saksnummer);
+        var historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
 
         flerePerioderAssert(historikkinnslag);
     }
@@ -135,27 +124,20 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         VilkårVurderingEntitet gammelVurdering = new VilkårVurderingEntitet();
         gammelVurdering.leggTilPeriode(formGodTroPeriode(gammelVurdering, FOM, TOM));
 
-        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, gammelVurdering, nyVurdering);
+        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandling, gammelVurdering, nyVurdering);
 
-        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        HistorikkinnslagOld historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
-        assertThat(historikkinnslag.getHistorikkinnslagDeler().size()).isEqualTo(1);
-
-        HistorikkinnslagOldDel historikkinnslagDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
-        fellesHistorikkinnslagDelAssert(historikkinnslagDel, FOM, TOM, AKTSOMHET_BEGRUNNELSE, ANDRE_PERIODE_BEGRUNNELSE);
-
-        assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
-                .isEqualTo(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn());
-        assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
-                .isEqualTo(VilkårResultat.GOD_TRO.getNavn());
-        assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-                .isEqualTo(Aktsomhet.GROVT_UAKTSOM.getNavn());
-        assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-                .isEqualTo(null);
-        assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
-                .isEqualTo(BELØP_TILBAKEKREVES);
-        assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
-                .isEqualTo("1000");
+        var historikkinnslager = historikkinnslagRepository.hent(saksnummer);
+        var historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
+        assertThat(historikkinnslag.getSkjermlenke()).isEqualTo(SkjermlenkeType.TILBAKEKREVING);
+        assertThat(historikkinnslag.getLinjer().get(0).getTekst()).contains("__Vurdering__ av perioden", DATE_FORMATTER.format(FOM), DATE_FORMATTER.format(TOM));
+        assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Beløp som skal tilbakekreves", "endret fra", BELØP_TILBAKEKREVES, "1000");
+        assertThat(historikkinnslag.getLinjer().get(2).getTekst()).contains("Er beløpet i behold?", "er fjernet");
+        assertThat(historikkinnslag.getLinjer().get(3).getTekst()).contains("Er vilkårene for tilbakekreving oppfylt?", "endret fra", VilkårResultat.GOD_TRO.getNavn(), VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn());
+        assertThat(historikkinnslag.getLinjer().get(4).getTekst()).contains("I hvilken grad har mottaker handlet uaktsomt?", "er satt til ", Aktsomhet.GROVT_UAKTSOM.getNavn());
+        assertThat(historikkinnslag.getLinjer().get(5).getTekst()).contains("Er det særlige grunner til reduksjon?", "er satt til ", formGrunnTekst(nyVurdering.getPerioder().get(0).getAktsomhet()));
+        assertThat(historikkinnslag.getLinjer().get(6).getTekst()).contains(ANDRE_PERIODE_BEGRUNNELSE);
+        assertThat(historikkinnslag.getLinjer().get(7).getTekst()).contains(AKTSOMHET_BEGRUNNELSE);
+        assertThat(historikkinnslag.getLinjer().get(8).getTekst()).contains(SÆRLIG_GRUNNER_BEGRUNNELSE);
     }
 
     @Test
@@ -166,34 +148,35 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         VilkårVurderingEntitet gammelVurdering = new VilkårVurderingEntitet();
         gammelVurdering.leggTilPeriode(formAktsomhetPeriode(gammelVurdering, FOM, TOM));
 
-        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(internBehandlingId, gammelVurdering, nyVurdering);
+        vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandling, gammelVurdering, nyVurdering);
 
-        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        HistorikkinnslagOld historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
-        assertThat(historikkinnslag.getHistorikkinnslagDeler().size()).isEqualTo(1);
+        var historikkinnslager = historikkinnslagRepository.hent(saksnummer);
+        var historikkinnslag = fellesHistorikkInnslagAssert(historikkinnslager);
 
-        HistorikkinnslagOldDel historikkinnslagDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
-        fellesHistorikkinnslagDelAssert(historikkinnslagDel, FOM, TOM, GOD_TRO_BEGRUNNELSE, FØRSTE_PERIODE_BEGRUNNELSE);
-
-        assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
-                .isEqualTo(VilkårResultat.GOD_TRO.getNavn());
-        assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
-                .isEqualTo(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn());
-
-        assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES))).isEqualTo(String.valueOf(SUM_INNTREKK));
-        assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES))).isEqualTo("2000");
-
-        assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.ER_BELØPET_BEHOLD))).isEqualTo(JA);
-        assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.ER_BELØPET_BEHOLD))).isNull();
+        assertThat(historikkinnslag.getSkjermlenke()).isEqualTo(SkjermlenkeType.TILBAKEKREVING);
+        assertThat(historikkinnslag.getLinjer().get(0).getTekst()).contains("__Vurdering__ av perioden", DATE_FORMATTER.format(FOM), DATE_FORMATTER.format(TOM));
+        assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Beløp som skal tilbakekreves", "endret fra", "2000", String.valueOf(SUM_INNTREKK));
+        assertThat(historikkinnslag.getLinjer().get(2).getTekst()).contains("Er beløpet i behold?", "satt til", JA);
+        assertThat(historikkinnslag.getLinjer().get(3).getTekst()).contains("Er vilkårene for tilbakekreving oppfylt?", "endret fra", VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn(), VilkårResultat.GOD_TRO.getNavn());
+        assertThat(historikkinnslag.getLinjer().get(4).getTekst()).contains("I hvilken grad har mottaker handlet uaktsomt?", Aktsomhet.GROVT_UAKTSOM.getNavn(), "er fjernet");
+        assertThat(historikkinnslag.getLinjer().get(5).getTekst()).contains("Er det særlige grunner til reduksjon?", "Nei", SærligGrunn.STØRRELSE_BELØP.getNavn(), SærligGrunn.ANNET.getNavn(), "Annet begrunnelse", "er fjernet");
+        assertThat(historikkinnslag.getLinjer().get(6).getTekst()).contains(FØRSTE_PERIODE_BEGRUNNELSE);
+        assertThat(historikkinnslag.getLinjer().get(7).getTekst()).contains(GOD_TRO_BEGRUNNELSE);
     }
 
-    private HistorikkinnslagOld fellesHistorikkInnslagAssert(List<HistorikkinnslagOld> historikkinnslager) {
-        assertThat(historikkinnslager).isNotEmpty();
-        assertThat(historikkinnslager.size()).isEqualTo(1);
-        HistorikkinnslagOld historikkinnslag = historikkinnslager.get(0);
-        assertThat(historikkinnslag.getBehandlingId()).isEqualTo(internBehandlingId);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.TILBAKEKREVING);
-        return historikkinnslag;
+    private Historikkinnslag fellesHistorikkInnslagAssert(List<Historikkinnslag> historikkinnslager) {
+        assertThat(historikkinnslager).hasSize(2);
+        assertThat(historikkinnslager).extracting(Historikkinnslag::getSkjermlenke).containsOnlyOnce(SkjermlenkeType.TILBAKEKREVING);
+        var historikkinnslagTilbakekreving = tilbakekrevingHistorikkinnslag(historikkinnslager);
+        assertThat(historikkinnslagTilbakekreving).isPresent();
+        assertThat(historikkinnslagTilbakekreving.get().getBehandlingId()).isEqualTo(internBehandlingId);
+        return historikkinnslagTilbakekreving.get();
+    }
+
+    private static Optional<Historikkinnslag> tilbakekrevingHistorikkinnslag(List<Historikkinnslag> historikkinnslager) {
+        return historikkinnslager.stream()
+            .filter(h -> SkjermlenkeType.TILBAKEKREVING.equals(h.getSkjermlenke()))
+            .findFirst();
     }
 
     private VilkårVurderingSærligGrunnEntitet formSærligGrunn(SærligGrunn grunn, VilkårVurderingAktsomhetEntitet aktsomhetEntitet) {
@@ -236,18 +219,6 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         return førstePeriode;
     }
 
-    private void fellesHistorikkinnslagDelAssert(HistorikkinnslagOldDel historikkinnslagDel, LocalDate fom, LocalDate tom, String vilkårBegrunnelse, String periodeBegrunnelse) {
-        assertThat(historikkinnslagDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.TILBAKEKREVING.getKode());
-        assertThat(historikkinnslagDel.getBegrunnelse().get()).isEqualTo(vilkårBegrunnelse);
-
-        assertThat(historikkinnslagDel.getOpplysning(HistorikkOpplysningType.TILBAKEKREVING_OPPFYLT_BEGRUNNELSE).get()
-                .getTilVerdi()).isEqualTo(periodeBegrunnelse);
-        assertThat(historikkinnslagDel.getOpplysning(HistorikkOpplysningType.PERIODE_FOM).get().getTilVerdi())
-                .isEqualTo(formatDate(fom));
-        assertThat(historikkinnslagDel.getOpplysning(HistorikkOpplysningType.PERIODE_TOM).get().getTilVerdi())
-                .isEqualTo(formatDate(tom));
-    }
-
     private String formGrunnTekst(VilkårVurderingAktsomhetEntitet aktsomhetEntitet) {
         List<String> grunnTekster = new ArrayList<>();
         StringBuilder grunnTekst = new StringBuilder();
@@ -266,35 +237,28 @@ class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOppsett {
         return grunnTekst.toString();
     }
 
-    private void flerePerioderAssert(HistorikkinnslagOld historikkinnslag) {
-        assertThat(historikkinnslag.getHistorikkinnslagDeler().size()).isEqualTo(2);
-        HistorikkinnslagOldDel førsteDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
+    private void flerePerioderAssert(Historikkinnslag historikkinnslag) {
+        assertThat(historikkinnslag.getLinjer()).hasSizeGreaterThan(0);
+        assertThat(historikkinnslag.getSkjermlenke()).isEqualTo(SkjermlenkeType.TILBAKEKREVING);
 
-        fellesHistorikkinnslagDelAssert(førsteDel, FOM, PERIOD_FØRSTE_SISTE_DATO, GOD_TRO_BEGRUNNELSE, FØRSTE_PERIODE_BEGRUNNELSE);
+        // Periode 1
+        assertThat(historikkinnslag.getLinjer().get(0).getTekst()).contains("__Vurdering__ av perioden", DATE_FORMATTER.format(FOM), DATE_FORMATTER.format(PERIOD_FØRSTE_SISTE_DATO));
+        assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Beløp som skal tilbakekreves", "satt til", BigDecimal.valueOf(SUM_INNTREKK).toString());
+        assertThat(historikkinnslag.getLinjer().get(2).getTekst()).contains("Er beløpet i behold?", "satt til", JA);
+        assertThat(historikkinnslag.getLinjer().get(3).getTekst()).contains("Er vilkårene for tilbakekreving oppfylt?", "satt til", VilkårResultat.GOD_TRO.getNavn());
+        assertThat(historikkinnslag.getLinjer().get(4).getTekst()).contains(FØRSTE_PERIODE_BEGRUNNELSE);
+        assertThat(historikkinnslag.getLinjer().get(5).getTekst()).contains(GOD_TRO_BEGRUNNELSE);
+        assertThat(historikkinnslag.getLinjer().get(6).getType()).isEqualTo(HistorikkinnslagLinjeType.LINJESKIFT);
 
-        assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
-                .isEqualTo(VilkårResultat.GOD_TRO.getNavn());
-        assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_BELØPET_BEHOLD)))
-                .isEqualTo(JA);
-        assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_BELØPET_BEHOLD)))
-                .isNull();
-        assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
-                .isEqualTo(BigDecimal.valueOf(SUM_INNTREKK).toString());
-        assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
-                .isNull();
-
-        HistorikkinnslagOldDel andreDel = historikkinnslag.getHistorikkinnslagDeler().get(1);
-        fellesHistorikkinnslagDelAssert(andreDel, PERIODE_ANDRE_FØRSTE_DATO, TOM, AKTSOMHET_BEGRUNNELSE, ANDRE_PERIODE_BEGRUNNELSE);
-
-        assertThat(getTilVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-                .isEqualTo(Aktsomhet.GROVT_UAKTSOM.getNavn());
-        assertThat(getFraVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-                .isNull();
-        assertThat(getTilVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
-                .isEqualTo(BELØP_TILBAKEKREVES);
-        assertThat(getFraVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
-                .isNull();
-        assertThat(getTilVerdi(andreDel.getOpplysning(HistorikkOpplysningType.SÆRLIG_GRUNNER_BEGRUNNELSE))).isEqualTo(SÆRLIG_GRUNNER_BEGRUNNELSE);
+        // Periode 2
+        assertThat(historikkinnslag.getLinjer().get(7).getTekst()).contains("__Vurdering__ av perioden", DATE_FORMATTER.format(PERIODE_ANDRE_FØRSTE_DATO), DATE_FORMATTER.format(TOM));
+        assertThat(historikkinnslag.getLinjer().get(8).getTekst()).contains("Beløp som skal tilbakekreves", "satt til", BELØP_TILBAKEKREVES);
+        assertThat(historikkinnslag.getLinjer().get(9).getTekst()).contains("Er vilkårene for tilbakekreving oppfylt?", "satt til", VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER.getNavn());
+        assertThat(historikkinnslag.getLinjer().get(10).getTekst()).contains("I hvilken grad har mottaker handlet uaktsomt?", "satt til", Aktsomhet.GROVT_UAKTSOM.getNavn());
+        assertThat(historikkinnslag.getLinjer().get(11).getTekst()).contains("Er det særlige grunner til reduksjon?", "satt til", "Nei", SærligGrunn.STØRRELSE_BELØP.getNavn(), SærligGrunn.ANNET.getNavn(), "Annet begrunnelse");
+        assertThat(historikkinnslag.getLinjer().get(12).getTekst()).contains(ANDRE_PERIODE_BEGRUNNELSE);
+        assertThat(historikkinnslag.getLinjer().get(13).getTekst()).contains(AKTSOMHET_BEGRUNNELSE);
+        assertThat(historikkinnslag.getLinjer().get(14).getTekst()).contains(SÆRLIG_GRUNNER_BEGRUNNELSE);
     }
 
 

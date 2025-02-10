@@ -60,53 +60,54 @@ class FordelRestTjenesteTest {
 
     @Test
     void mottaJournalpost_når_saksnummer_ikke_finnes() {
-        Long behandlingId = lagBehandling();
+        var behandling = lagBehandling();
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto("10000", JOURNAL_POST_ID, FORSENDELSE_ID,
                 UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
-        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SØKER);
+        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandling.getId(), behandling.getFagsakId(), HistorikkAktør.SØKER);
     }
 
     @Test
     void mottaJournalpost_når_dokument_type_id_ikke_gyldig() {
-        Long behandlingId = lagBehandling();
+        var behandling = lagBehandling();
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
                 "XYZS", LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
-        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SØKER);
+        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandling.getId(), behandling.getFagsakId(), HistorikkAktør.SØKER);
     }
 
     @Test
     void mottaJournalpost_når_behandling_er_avsluttet() {
-        Long behandlingId = lagBehandling();
+        Long behandlingId = lagBehandling().getId();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         behandling.avsluttBehandling();
 
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
                 UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
-        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SØKER);
+        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId, behandling.getFagsakId(), HistorikkAktør.SØKER);
     }
 
     @Test
     void mottaJournalpost_når_behandling_er_på_vent() {
-        Long behandlingId = lagBehandling();
+        Long behandlingId = lagBehandling().getId();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.FAKTA_FEILUTBETALING);
 
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
                 UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
-        verify(mockGjenopptaBehandlingTjeneste, atLeastOnce()).fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SØKER);
+        verify(mockGjenopptaBehandlingTjeneste, atLeastOnce()).fortsettBehandlingManuelt(behandlingId, behandling.getFagsakId(), HistorikkAktør.SØKER);
         assertThat(varselresponsTjeneste.hentRespons(behandlingId)).isPresent();
     }
 
-    private Long lagBehandling() {
+    private Behandling lagBehandling() {
         NavBruker navBruker = NavBruker.opprettNy(AKTØR_ID, Språkkode.nb);
         Fagsak fagsak = Fagsak.opprettNy(SAKSNUMMER, navBruker);
         repositoryProvider.getFagsakRepository().lagre(fagsak);
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
-        return behandlingRepository.lagre(behandling, behandlingLås);
+        behandlingRepository.lagre(behandling, behandlingLås);
+        return behandling;
     }
 }
