@@ -101,3 +101,5 @@ spec:
      value: "k9"
    - name: AUDITLOGGER_PRODUCT
      value: "k9-tilbake"
+  envFrom:
+    - secret: k9-tilbake-avstemming
