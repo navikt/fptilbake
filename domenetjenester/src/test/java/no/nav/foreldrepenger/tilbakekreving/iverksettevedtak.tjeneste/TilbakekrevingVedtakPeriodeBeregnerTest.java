@@ -15,8 +15,6 @@ import java.util.function.Function;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeResultat;
-
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -677,47 +675,6 @@ class TilbakekrevingVedtakPeriodeBeregnerTest {
             tilbakekrevingPeriode("2022-07-01,2022-07-31", 51555, 0, 51555, 0  , 16087),
             tilbakekrevingPeriode("2022-08-01,2022-08-02", 4910, 0, 4910,  0,1495),
             tilbakekrevingPeriode("2022-09-07,2022-09-30", 44190, 0, 44190, 0  , 15113));
-    }
-
-    @Test
-    void skal_utlede_resultatkode_separat_for_feriepenger_og_ytelse() {
-        Behandling behandling = simple.lagre(behandlingRepositoryProvider);
-        Long behandlingId = behandling.getId();
-
-        Periode periode1 = Periode.of(LocalDate.of(2025, 5, 2), LocalDate.of(2025, 5, 4));
-        Periode periode2 = Periode.of(LocalDate.of(2025, 5, 23), LocalDate.of(2025, 5, 30));
-        Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            periode1, List.of (
-                KgBeløp.feil(1),
-                KgBeløp.ytelse(KlasseKode.PNBSATORD).medUtbetBeløp(1).medTilbakekrevBeløp(1).medSkattProsent(25)
-            ),
-            periode2, List.of(
-                KgBeløp.feil(2),
-                KgBeløp.ytelse(KlasseKode.PNBSATORD).medUtbetBeløp(1).medTilbakekrevBeløp(1).medSkattProsent(25),
-                KgBeløp.ytelse(KlasseKode.SPATFER).medUtbetBeløp(1).medTilbakekrevBeløp(1).medSkattProsent(0))
-        ), false);
-
-        VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            periode1, VilkårsvurderingTestBuilder.VVurdering.grovtUaktsom(50),
-            periode2, VilkårsvurderingTestBuilder.VVurdering.grovtUaktsom(50)
-        ));
-
-        flushAndClear();
-
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
-        assertThat(resultat).containsOnly(
-            TilbakekrevingPeriode.med(periode1).medRenter(0)
-                .medBeløp(TbkBeløp.feil(1))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.PNBSATORD).medNyttBeløp(0).medUtbetBeløp(1).medTilbakekrevBeløp(1).medUinnkrevdBeløp(0).medSkattBeløp(125)),
-            TilbakekrevingPeriode.med(periode2).medRenter(0)
-                .medBeløp(TbkBeløp.feil(2))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.PNBSATORD).medNyttBeløp(0).medUtbetBeløp(1).medTilbakekrevBeløp(1).medUinnkrevdBeløp(0).medSkattBeløp(125))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.SPATFER).medNyttBeløp(0).medUtbetBeløp(1).medTilbakekrevBeløp(0).medUinnkrevdBeløp(1).medSkattBeløp(0))
-        );
-        //separat sjekk for klassekode siden den ikke er i equals-metoden på TilbakekrevingBeløp
-        TilbakekrevingPeriode resultatPeriode2 = resultat.stream().filter(p -> p.getPeriode().equals(periode2)).findFirst().get();
-        assertThat(resultatPeriode2.getBeløp().stream().filter(b->b.getKlassekode().equals(KlasseKode.PNBSATORD.getKode())).findFirst().get().getKodeResultat()).isEqualTo(KodeResultat.FULL_TILBAKEKREVING);
-        assertThat(resultatPeriode2.getBeløp().stream().filter(b->b.getKlassekode().equals(KlasseKode.SPATFER.getKode())).findFirst().get().getKodeResultat()).isEqualTo(KodeResultat.INGEN_TILBAKEKREVING);
     }
 
     private static BigDecimal finSumAv(Collection<TilbakekrevingPeriode> perioder, Function<TilbakekrevingBeløp, BigDecimal> hva, KlasseType klasseType) {

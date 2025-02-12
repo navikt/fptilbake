@@ -284,19 +284,19 @@ public class TilbakekrevingVedtakPeriodeBeregner {
     }
 
     private static void leggPåKodeResultat(VurdertForeldelse vurdertForeldelse, BeregningResultatPeriode bgPeriode, List<TilbakekrevingPeriode> tmp) {
-        tmp.stream().flatMap(p -> p.getBeløp().stream()).forEach(b -> b.medKodeResultat(utledKodeResultat(vurdertForeldelse, bgPeriode, b)));
+        tmp.stream().flatMap(p -> p.getBeløp().stream()).forEach(b -> b.medKodeResultat(utledKodeResultat(vurdertForeldelse, bgPeriode)));
     }
 
-    private static KodeResultat utledKodeResultat(VurdertForeldelse vurdertForeldelse, BeregningResultatPeriode bgPeriode, TilbakekrevingBeløp andel) {
+    private static KodeResultat utledKodeResultat(VurdertForeldelse vurdertForeldelse, BeregningResultatPeriode bgPeriode) {
         if (vurdertForeldelse != null && vurdertForeldelse.getVurdertForeldelsePerioder()
             .stream()
             .anyMatch(vfp -> vfp.erForeldet() && vfp.getPeriode().overlapper(bgPeriode.getPeriode()))) {
             return KodeResultat.FORELDET;
         }
-        if (andel.getTilbakekrevBeløp().signum() == 0) {
+        if (bgPeriode.getTilbakekrevingBeløpUtenRenter().signum() == 0) {
             return KodeResultat.INGEN_TILBAKEKREVING;
         }
-        if (andel.getUinnkrevdBeløp().signum() == 0) {
+        if (bgPeriode.getFeilutbetaltBeløp().compareTo(bgPeriode.getTilbakekrevingBeløpUtenRenter()) == 0) {
             return KodeResultat.FULL_TILBAKEKREVING;
         }
         return KodeResultat.DELVIS_TILBAKEKREVING;
