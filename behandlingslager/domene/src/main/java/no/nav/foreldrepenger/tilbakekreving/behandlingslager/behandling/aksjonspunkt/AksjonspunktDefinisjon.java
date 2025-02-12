@@ -30,7 +30,7 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
     // Manuelle
 
     VURDER_TILBAKEKREVING(AksjonspunktKodeDefinisjon.VURDER_TILBAKEKREVING, AksjonspunktType.MANUELL,
-            "Vurder tilbakekreving.", BehandlingStegType.VTILBSTEG, VurderingspunktType.UT, TOTRINN),
+            "Vurder tilbakekreving", BehandlingStegType.VTILBSTEG, VurderingspunktType.UT, TOTRINN),
     VURDER_FORELDELSE(AksjonspunktKodeDefinisjon.VURDER_FORELDELSE, AksjonspunktType.MANUELL,
             "Vurder foreldelse", BehandlingStegType.FORELDELSEVURDERINGSTEG, VurderingspunktType.UT, TOTRINN),
     FORESLÅ_VEDTAK(AksjonspunktKodeDefinisjon.FORESLÅ_VEDTAK, AksjonspunktType.MANUELL,
@@ -40,7 +40,7 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
     AVKLAR_VERGE(AksjonspunktKodeDefinisjon.AVKLAR_VERGE, AksjonspunktType.MANUELL,
             "Avklar verge", BehandlingStegType.FAKTA_VERGE, VurderingspunktType.UT, ENTRINN),
     AVKLART_FAKTA_FEILUTBETALING(AksjonspunktKodeDefinisjon.AVKLART_FAKTA_FEILUTBETALING, AksjonspunktType.MANUELL,
-            "Avklart fakta for feilutbetaling", BehandlingStegType.FAKTA_FEILUTBETALING, VurderingspunktType.UT, TOTRINN),
+            "Avklar fakta for feilutbetaling", BehandlingStegType.FAKTA_FEILUTBETALING, VurderingspunktType.UT, TOTRINN),
 
     // Autopunkter
 
