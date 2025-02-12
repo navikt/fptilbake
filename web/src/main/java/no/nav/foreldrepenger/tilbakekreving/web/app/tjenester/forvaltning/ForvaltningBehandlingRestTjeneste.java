@@ -30,7 +30,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårsvurderingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagXmlUnmarshaller;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
@@ -52,6 +55,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.BehandlingTilstandTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendSakshendelserTilDvhTask;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
+import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
@@ -93,6 +97,7 @@ public class ForvaltningBehandlingRestTjeneste {
     private BehandlingTilstandTjeneste behandlingTilstandTjeneste;
 
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
+    private VilkårsvurderingTjeneste vilkårsvurderingTjeneste;
 
     public ForvaltningBehandlingRestTjeneste() {
         // for CDI
@@ -323,14 +328,15 @@ public class ForvaltningBehandlingRestTjeneste {
         Set<String> saksbehandlerePåBehandlingen = behandling.getAksjonspunkter()
             .stream()
             .filter(a -> !a.erAutopunkt())
-            .filter(a->a.erUtført())
-            .filter(a->a.getAksjonspunktDefinisjon() != AksjonspunktDefinisjon.FATTE_VEDTAK)
+            .filter(a -> a.erUtført())
+            .filter(a -> a.getAksjonspunktDefinisjon() != AksjonspunktDefinisjon.FATTE_VEDTAK)
             .map(a -> a.getEndretAv())
             .filter(Objects::nonNull)
             .collect(Collectors.toSet());
 
-        if (!saksbehandlerePåBehandlingen.contains(input.getSaksbehandlerIdent())){
-            throw new IllegalArgumentException("Saksbehandler er ikke på behandlingen fra før, avbryter. Aktuelle er: " + saksbehandlerePåBehandlingen);
+        if (!saksbehandlerePåBehandlingen.contains(input.getSaksbehandlerIdent())) {
+            throw new IllegalArgumentException(
+                "Saksbehandler er ikke på behandlingen fra før, avbryter. Aktuelle er: " + saksbehandlerePåBehandlingen);
         }
         if (behandling.getAnsvarligSaksbehandler() != null) {
             throw new IllegalArgumentException("Behandligen har allerede en ansvarlg saksbehandler");
@@ -353,13 +359,15 @@ public class ForvaltningBehandlingRestTjeneste {
         })
     @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
     public Response settBehandlingsårsakFattetAnnenInstans(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                                               @QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+                                                           @QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         if (behandling.erAvsluttet() || behandling.erUnderIverksettelse()) {
             throw new IllegalArgumentException("Kan ikke endre på behandling som er ferdig/under iverksettelse");
         }
-        if (behandling.getBehandlingÅrsaker().stream().anyMatch(å->å.getBehandlingÅrsakType() == BehandlingÅrsakType.VEDTAK_FATTET_AV_ANNEN_INSTANS)){
+        if (behandling.getBehandlingÅrsaker()
+            .stream()
+            .anyMatch(å -> å.getBehandlingÅrsakType() == BehandlingÅrsakType.VEDTAK_FATTET_AV_ANNEN_INSTANS)) {
             throw new IllegalArgumentException("Har allerede årsaken satt");
         }
         BehandlingÅrsak.builder(BehandlingÅrsakType.VEDTAK_FATTET_AV_ANNEN_INSTANS).buildFor(behandling);
@@ -368,6 +376,39 @@ public class ForvaltningBehandlingRestTjeneste {
 
         return Response.ok().build();
     }
+
+    @POST
+    @Path("/fjern-vilkarsvurdering-utenfor-kravgrunnlagperiode")
+    @Operation(
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å sette på årsaken fattet av annen instans, brukes for å hindre utsending av vedtaksbrev",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "ukjent feil.")
+        })
+    @BeskyttetRessurs(actionType = ActionType.CREATE, property = AbacProperty.DRIFT)
+    public Response fjernVilkårsvurderingUtenforKravgrunnlagperiode(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                                                    @QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+        Behandling behandling = hentBehandling(behandlingReferanse);
+        BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
+        if (behandling.erAvsluttet() || behandling.erUnderIverksettelse()) {
+            throw new IllegalArgumentException("Kan ikke endre på behandling som er ferdig/under iverksettelse");
+        }
+        List<LogiskPeriode> logiskPeriode = kravgrunnlagTjeneste.utledLogiskPeriode(behandling.getId());
+        List<VilkårsvurderingPerioderDto> vurderinger = vilkårsvurderingTjeneste.hentVilkårsvurdering(behandling.getId());
+
+        List<VilkårsvurderingPerioderDto> overlappendeVurderinger = vurderinger.stream()
+            .filter(vp -> {
+                Periode vurdertPeriode = Periode.of(vp.getFom(), vp.getTom());
+                return logiskPeriode.stream().anyMatch(lp -> lp.getPeriode().overlapper(vurdertPeriode));
+            })
+            .toList();
+
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(behandling.getId(), overlappendeVurderinger);
+
+        return Response.ok().build();
+    }
+
 
     public static class SettAnsvarligSaksbehandlerDto implements AbacDto {
 
