@@ -75,5 +75,4 @@ public class SendManueltVarselbrevTask implements ProsessTaskHandler {
                 fristTid, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
         }
     }
-    }
 }
