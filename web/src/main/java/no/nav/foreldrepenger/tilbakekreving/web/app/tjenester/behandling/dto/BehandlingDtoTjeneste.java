@@ -54,6 +54,8 @@ public class BehandlingDtoTjeneste {
     private static final String FORELDELSE = "perioderForeldelse";
     private static final long OPPRETTELSE_DAGER_BEGRENSNING = 6L;
 
+    private static final Fagsystem FAGSYSTEM = ApplicationName.hvilkenTilbake();
+
     private BehandlingTjeneste behandlingTjeneste;
     private TotrinnTjeneste totrinnTjeneste;
     private TotrinnskontrollAksjonspunkterTjeneste totrinnskontrollTjeneste;
@@ -253,7 +255,7 @@ public class BehandlingDtoTjeneste {
                 .medKanSettesPaVent(!b.isBehandlingPåVent())
                 .medKanGjenopptas(b.isBehandlingPåVent())
                 .medKanOpnesForEndringer(false)
-                .medKanSendeMelding(!b.isBehandlingPåVent())
+                .medKanSendeMelding(Fagsystem.FPTILBAKE.equals(FAGSYSTEM) || !b.isBehandlingPåVent())
                 .medVergemeny(viseVerge(b, finnesVerge))
                 .build();
         }

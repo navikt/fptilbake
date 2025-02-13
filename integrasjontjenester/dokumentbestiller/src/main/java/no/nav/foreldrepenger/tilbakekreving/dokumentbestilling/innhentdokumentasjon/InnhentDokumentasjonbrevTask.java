@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumenta
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.enterprise.context.Dependent;
@@ -57,7 +58,9 @@ public class InnhentDokumentasjonbrevTask implements ProsessTaskHandler {
 
         LocalDateTime fristTid = LocalDateTime.now().plus(Frister.BEHANDLING_TILSVAR).plusDays(1);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
+        if (!behandling.isBehandlingPåVent() || !behandling.getÅpneAksjonspunkter(Set.of(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING)).isEmpty()) {
+            behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
                 fristTid, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+        }
     }
 }
