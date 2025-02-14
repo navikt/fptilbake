@@ -7,12 +7,6 @@ import java.util.Optional;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +17,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwspro
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
@@ -49,7 +46,7 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
     private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
-    private HistorikkinnslagRepository historikkRepositoryTeamAware;
+    private HistorikkinnslagRepository historikkinnslagRepository;
 
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
     private FagsystemKlient fagsystemKlient;
@@ -68,7 +65,7 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
-        this.historikkRepositoryTeamAware = repositoryProvider.getHistorikkinnslagRepository();
+        this.historikkinnslagRepository = repositoryProvider.getHistorikkinnslagRepository();
 
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
         this.fagsystemKlient = fagsystemKlient;
@@ -131,7 +128,7 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
             .addLinje(String.format("ID: %s", kravgrunnlag431.getVedtakId()))
             .addLinje(String.format("Status: %s", kravgrunnlag431.getKravStatusKode().getNavn()))
             .build();
-        historikkRepositoryTeamAware.lagre(historikkinnslagMottattKravgrunnlag);
+        historikkinnslagRepository.lagre(historikkinnslagMottattKravgrunnlag);
     }
 
 }
