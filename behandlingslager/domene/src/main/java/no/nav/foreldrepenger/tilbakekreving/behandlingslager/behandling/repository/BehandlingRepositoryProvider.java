@@ -11,7 +11,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Ved
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakLåsRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
@@ -29,7 +28,6 @@ public class BehandlingRepositoryProvider {
     private FagsakRepository fagsakRepository;
     private BehandlingRepository behandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
-    private HistorikkRepositoryOld historikkRepositoryOld;
     private HistorikkinnslagRepository historikkinnslagRepository;
     private BehandlingLåsRepository behandlingLåsRepository;
     private FagsakLåsRepository fagsakLåsRepository;
@@ -57,7 +55,6 @@ public class BehandlingRepositoryProvider {
         this.behandlingRepository = new BehandlingRepository(entityManager);
         this.behandlingresultatRepository = new BehandlingresultatRepository(entityManager);
         this.fagsakRepository = new FagsakRepository(entityManager);
-        this.historikkRepositoryOld = new HistorikkRepositoryOld(entityManager);
         this.historikkinnslagRepository = new HistorikkinnslagRepository(entityManager);
         this.behandlingLåsRepository = new BehandlingLåsRepository(entityManager);
         this.fagsakLåsRepository = new FagsakLåsRepository(entityManager);
@@ -88,10 +85,6 @@ public class BehandlingRepositoryProvider {
     public FagsakRepository getFagsakRepository() {
         // bridge metode før sammenkobling medBehandling
         return fagsakRepository;
-    }
-
-    public HistorikkRepositoryOld getHistorikkRepositoryOld() {
-        return historikkRepositoryOld;
     }
 
     public HistorikkinnslagRepository getHistorikkinnslagRepository() {

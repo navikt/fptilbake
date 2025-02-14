@@ -1,5 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -9,25 +14,20 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 class DokumentBehandlingHistorikkTjenesteTest extends FellesTestOppsett {
 
-    private BehandlingHistorikkTjeneste historikkTjeneste;
+    private BehandlingHistorikkTjeneste behandlingHistorikkTjeneste;
 
     @BeforeEach
     public void setup() {
-        historikkTjeneste = new BehandlingHistorikkTjeneste(historikkinnslagRepository, historikkV2Tjeneste);
+        behandlingHistorikkTjeneste = new BehandlingHistorikkTjeneste(historikkinnslagRepository, historikkTjeneste);
     }
 
 
     @Test
     void opprettHistorikkinnslagForOpprettetTilbakekreving() {
-        historikkTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling);
+        behandlingHistorikkTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling);
 
         var historikkinnslagene = historikkinnslagRepository.hent(behandling.getId());
         assertThat(historikkinnslagene).isNotEmpty();
@@ -45,7 +45,7 @@ class DokumentBehandlingHistorikkTjenesteTest extends FellesTestOppsett {
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
 
-        historikkTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling);
+        behandlingHistorikkTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling);
 
         var historikkinnslagene = historikkinnslagRepository.hent(behandling.getId());
         assertThat(historikkinnslagene).isNotEmpty();

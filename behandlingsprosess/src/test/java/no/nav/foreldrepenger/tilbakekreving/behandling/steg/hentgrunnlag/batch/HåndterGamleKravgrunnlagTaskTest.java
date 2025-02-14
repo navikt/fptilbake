@@ -18,17 +18,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
-
-import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
+import jakarta.persistence.EntityManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import jakarta.persistence.EntityManager;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.HentKravgrunnlagMapperProxy;
@@ -38,6 +35,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwspro
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.UkjentKvitteringFraOSException;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
@@ -69,6 +67,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.FagsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
+import no.nav.foreldrepenger.tilbakekreving.historikk.HistorikkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
@@ -110,12 +109,8 @@ class HåndterGamleKravgrunnlagTaskTest {
         var lesKravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
         var behandlingskontrollProvider = new BehandlingskontrollProvider(
                 behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
-        var historikkV2Tjeneste = new HistorikkV2Tjeneste(
-            repositoryProvider.getHistorikkRepositoryOld(),
-            behandlingRepository,
-            repositoryProvider.getHistorikkinnslagRepository()
-        );
-        var behandlingHistorikkTjeneste = new BehandlingHistorikkTjeneste(repositoryProvider.getHistorikkinnslagRepository(), historikkV2Tjeneste);
+        var historikkTjeneste = new HistorikkTjeneste(behandlingRepository, repositoryProvider.getHistorikkinnslagRepository());
+        var behandlingHistorikkTjeneste = new BehandlingHistorikkTjeneste(repositoryProvider.getHistorikkinnslagRepository(), historikkTjeneste);
         var fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repositoryProvider,
                 behandlingskontrollProvider, fagsakTjeneste, behandlingHistorikkTjeneste, fagsystemKlientMock);
