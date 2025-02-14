@@ -344,10 +344,10 @@ public class HistorikkV2Adapter {
     private static List<String> fraAksjonspunktFelt(HistorikkinnslagTotrinnsvurdering aksjonspunktFelt) {
         var aksjonspunktTekst = aksjonspunktFelt.getAksjonspunktDefinisjon().getNavn();
         if (aksjonspunktFelt.erGodkjent()) {
-            return List.of(String.format("__%s er godkjent__", aksjonspunktTekst));
+            return List.of(String.format("__%s: Godkjent__", aksjonspunktTekst));
         } else {
             return List.of(
-                String.format("__%s må vurderes på nytt__", aksjonspunktTekst),
+                String.format("__%s: Må vurderes på nytt__", aksjonspunktTekst),
                 String.format("Kommentar: %s", aksjonspunktFelt.getBegrunnelse())
             );
         }
