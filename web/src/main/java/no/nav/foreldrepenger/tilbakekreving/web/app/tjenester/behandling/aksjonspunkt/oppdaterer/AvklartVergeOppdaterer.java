@@ -22,7 +22,7 @@ public class AvklartVergeOppdaterer implements AksjonspunktOppdaterer<AvklartVer
 
     @Override
     public void oppdater(AvklartVergeDto avklartVergeDto, Behandling behandling) {
-        avklartVergeTjeneste.lagreVergeInformasjon(behandling.getId(), lagVergeDto(avklartVergeDto));
+        avklartVergeTjeneste.lagreVergeInformasjon(behandling, lagVergeDto(avklartVergeDto));
     }
 
     private VergeDto lagVergeDto(AvklartVergeDto avklartVergeDto) {

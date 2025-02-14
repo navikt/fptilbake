@@ -1,12 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.dto.DetaljertFeilutbetalingPeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatAktsomhetDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatAnnetDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatInfoDto;
@@ -38,12 +34,11 @@ public class AutomatiskVurdertVilkårTjeneste {
 
     public void automatiskVurdertVilkår(Behandling behandling, String begrunnelse) {
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
-        long behandlingId = behandling.getId();
-        var feilutbetaltePerioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(behandlingId);
+        var feilutbetaltePerioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(behandling.getId());
         var vilkårsvurdertePerioder = feilutbetaltePerioder.stream().filter(periode -> !periode.isForeldet())
                 .map(periode -> lagVilkårsvurderingPeriode(periode.tilPeriode(), begrunnelse))
                 .toList();
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(behandlingId, vilkårsvurdertePerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(behandling, vilkårsvurdertePerioder);
         //Aksjonpunkt oppretter ikke automatisk for automatisk saksbehandling. Det opprettes manuelt for å vise vilkår data i frontend.
         lagUtførtAksjonspunkt(kontekst, behandling);
     }

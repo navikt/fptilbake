@@ -73,7 +73,7 @@ public class FordelRestTjeneste {
             if (erTilbakemeldingFraBruker(dokumentTypeId)) {
                 LOG.info("Mottok dokument og tok behandlingId={} av vent. Saksnummer={} dokumentTypeId={} forsendelseId={}", behandling.getId(), saksnummer, dokumentTypeId, forsendelseId);
                 varselresponsTjeneste.lagreRespons(behandling.getId(), ResponsKanal.SELVBETJENING);
-                gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), HistorikkAktør.SØKER);
+                gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), behandling.getFagsakId(), HistorikkAktør.SØKER);
             } else {
                 LOG.info("Mottok og ignorerte dokument pga dokumentTypeId. Saksnummer={} dokumentTypeId={} forsendelseId={}", saksnummer, dokumentTypeId, forsendelseId);
             }

@@ -7,6 +7,8 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
@@ -25,7 +27,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ve
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
@@ -50,7 +51,7 @@ public abstract class DokumentBestillerTestOppsett {
     @Inject
     protected BrevSporingRepository brevSporingRepository;
     @Inject
-    protected HistorikkRepositoryOld historikkRepository;
+    protected HistorikkinnslagRepository historikkRepository;
     @Inject
     protected VergeRepository vergeRepository;
     @Inject

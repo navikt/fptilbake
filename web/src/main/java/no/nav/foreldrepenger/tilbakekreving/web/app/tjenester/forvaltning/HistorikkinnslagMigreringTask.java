@@ -144,7 +144,9 @@ public class HistorikkinnslagMigreringTask implements ProsessTaskHandler {
             where ROWNUM <= 100
             """;
 
-        var query = entityManager.createNativeQuery(sql, HistorikkinnslagOld.class).setParameter("fraId", fraId).setParameter("medId", medId);
+        var query = entityManager.createNativeQuery(sql, HistorikkinnslagOld.class)
+            .setParameter("fraId", fraId)
+            .setParameter("medId", medId);
         return query.getResultList();
     }
 }
