@@ -52,7 +52,6 @@ public class InitielleLinksRestTjeneste {
         lenkene.add(get(KodeverkRestTjeneste.KODERVERK_PATH, "tilbake-kodeverk"));
         List<ResourceLink> saklenker = new ArrayList<>();
         saklenker.add(get(BehandlingRestTjeneste.SAK_FULL_PATH, "tilbake-fagsak-full"));
-        saklenker.add(get(HistorikkRestTjeneste.HISTORIKK_PATH, "tilbake-historikk"));
         saklenker.add(get(HistorikkRestTjeneste.HISTORIKK_PATH + "/v2", "tilbake-historikkinnslag"));
         saklenker.add(get(BehandlingRestTjeneste.SAK_RETTIGHETER_PATH, "tilbake-sak-rettigheter"));
         saklenker.add(get(BehandlingRestTjeneste.BEHANDLING_ALLE_PATH, "tilbake-alle-behandlinger"));

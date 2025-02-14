@@ -7,34 +7,28 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
-
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurderForeldelseHistorikkTjeneste;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
-
-import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
+import jakarta.persistence.EntityManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
-import jakarta.persistence.EntityManager;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatAktsomhetDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatAnnetDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatGodTroDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårsvurderingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.AutomatiskSaksbehandlingVurderingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.GjenopptaBehandlingMedGrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurderForeldelseHistorikkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingHistorikkInnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingTjeneste;
@@ -54,7 +48,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldFelt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
@@ -76,6 +70,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.Personopplysnin
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
+import no.nav.foreldrepenger.tilbakekreving.historikk.HistorikkTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 /**
@@ -120,7 +115,7 @@ public abstract class FellesTestOppsett {
     protected KravgrunnlagTjeneste kravgrunnlagTjeneste;
     protected KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste;
 
-    protected HistorikkV2Tjeneste historikkV2Tjeneste;
+    protected HistorikkTjeneste historikkTjeneste;
     protected VurdertForeldelseTjeneste vurdertForeldelseTjeneste;
 
     protected VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste;
@@ -169,7 +164,7 @@ public abstract class FellesTestOppsett {
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste,
             mockSlettGrunnlagEventPubliserer, halvtGebyrTjeneste, entityManager);
         kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(grunnlagRepository);
-        historikkV2Tjeneste = new HistorikkV2Tjeneste(repoProvider.getHistorikkRepositoryOld(), behandlingRepository, historikkinnslagRepository);
+        historikkTjeneste = new HistorikkTjeneste(behandlingRepository, historikkinnslagRepository);
         var vurderForeldelseHistorikkTjeneste = new VurderForeldelseHistorikkTjeneste(historikkinnslagRepository);
         vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repoProvider, vurderForeldelseHistorikkTjeneste, kravgrunnlagBeregningTjeneste);
         vilkårsvurderingHistorikkInnslagTjeneste = new VilkårsvurderingHistorikkInnslagTjeneste(historikkinnslagRepository);
@@ -178,7 +173,7 @@ public abstract class FellesTestOppsett {
         faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repoProvider, kravgrunnlagTjeneste, mockFagsystemKlient);
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollProvider,
-                fagsakTjeneste, new BehandlingHistorikkTjeneste(historikkinnslagRepository, historikkV2Tjeneste), mockFagsystemKlient);
+                fagsakTjeneste, new BehandlingHistorikkTjeneste(historikkinnslagRepository, historikkTjeneste), mockFagsystemKlient);
         testUtility = new TestUtility(behandlingTjeneste);
         aktørId = testUtility.genererAktørId();
         when(mockTpsTjeneste.hentBrukerForAktør(any(), eq(aktørId))).thenReturn(testUtility.lagPersonInfo(aktørId));
@@ -192,24 +187,6 @@ public abstract class FellesTestOppsett {
             .thenReturn(lagSamletEksternBehandlingInfo(behandlingsinfoDto));
         TestUtility.SakDetaljer sakDetaljer = testUtility.opprettFørstegangsBehandling(aktørId);
         mapSakDetaljer(sakDetaljer);
-    }
-
-    protected String formatDate(LocalDate localDate) {
-        return localDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-    }
-
-    protected String getTilVerdi(Optional<HistorikkinnslagOldFelt> felt) {
-        if (felt.isPresent()) {
-            return felt.get().getTilVerdi();
-        }
-        return null;
-    }
-
-    protected String getFraVerdi(Optional<HistorikkinnslagOldFelt> felt) {
-        if (felt.isPresent()) {
-            return felt.get().getFraVerdi();
-        }
-        return null;
     }
 
     protected FaktaFeilutbetaling lagFaktaFeilutbetaling() {

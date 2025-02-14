@@ -1,76 +1,54 @@
-package no.nav.foreldrepenger.tilbakekreving.historikkv2;
+package no.nav.foreldrepenger.tilbakekreving.historikk;
 
-import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkinnslagDtoV2.Linje.linjeskift;
-import static no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkinnslagDtoV2.Linje.tekstlinje;
+import static no.nav.foreldrepenger.tilbakekreving.historikk.HistorikkinnslagDto.Linje.linjeskift;
+import static no.nav.foreldrepenger.tilbakekreving.historikk.HistorikkinnslagDto.Linje.tekstlinje;
 
 import java.net.URI;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.UriBuilder;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinje;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 @ApplicationScoped
-public class HistorikkV2Tjeneste {
+public class HistorikkTjeneste {
 
-    private HistorikkRepositoryOld historikkRepositoryOld;
     private BehandlingRepository behandlingRepository;
     private HistorikkinnslagRepository historikkinnslagRepository;
 
     @Inject
-    public HistorikkV2Tjeneste(HistorikkRepositoryOld historikkRepositoryOld, BehandlingRepository behandlingRepository,
-                               HistorikkinnslagRepository historikkinnslagRepository) {
-        this.historikkRepositoryOld = historikkRepositoryOld;
+    public HistorikkTjeneste(BehandlingRepository behandlingRepository,
+                             HistorikkinnslagRepository historikkinnslagRepository) {
         this.behandlingRepository = behandlingRepository;
         this.historikkinnslagRepository = historikkinnslagRepository;
     }
 
-    HistorikkV2Tjeneste() {
+    HistorikkTjeneste() {
         //CDI
     }
 
-    public List<HistorikkinnslagDtoV2> hentForSak(long behandlingId) {
-        var historikkV1 = historikkRepositoryOld.hentHistorikk(behandlingId);
-        var historikkV2 = historikkinnslagRepository.hent(behandlingId);
-        return filtrerUtMigrerteHistorikkinnslag(historikkV1, historikkV2, null);
-    }
-
-    public List<HistorikkinnslagDtoV2> hentForSak(Saksnummer saksnummer, URI dokumentPath) {
-        var historikkV1 = historikkRepositoryOld.hentHistorikkForSaksnummer(saksnummer);
-        var historikkV2 = historikkinnslagRepository.hent(saksnummer);
-        return filtrerUtMigrerteHistorikkinnslag(historikkV1, historikkV2, dokumentPath);
-    }
-
-    private List<HistorikkinnslagDtoV2> filtrerUtMigrerteHistorikkinnslag(List<HistorikkinnslagOld> historikkV1, List<Historikkinnslag> historikkV2, URI dokumentPath) {
-        var historikkV1SomIkkeErMigrert = historikkV1.stream()
-            .filter(h -> historikkV2.stream().noneMatch(v2 -> Objects.equals(v2.getMigrertFraId(), h.getId())))
-            .map(h -> map(dokumentPath, h));
-        var nyeHistorikkinnslag = historikkV2.stream().map(h -> map(dokumentPath, h));
-        return Stream.concat(historikkV1SomIkkeErMigrert, nyeHistorikkinnslag)
-            .sorted(Comparator.comparing(HistorikkinnslagDtoV2::opprettetTidspunkt))
+    public List<HistorikkinnslagDto> hentForSak(long behandlingId) {
+        return historikkinnslagRepository.hent(behandlingId).stream()
+            .map(h -> map(null, h))
             .toList();
     }
 
-    private HistorikkinnslagDtoV2 map(URI dokumentPath, HistorikkinnslagOld h) {
-        var behandlingId = h.getBehandlingId();
-        var uuid = behandlingId == null ? null : behandlingRepository.hentBehandling(behandlingId).getUuid();
-        return HistorikkV2Adapter.map(h, uuid, dokumentPath);
+    public List<HistorikkinnslagDto> hentForSak(Saksnummer saksnummer, URI dokumentPath) {
+        return historikkinnslagRepository.hent(saksnummer).stream()
+            .map(h -> map(dokumentPath, h))
+            .toList();
     }
 
-    private HistorikkinnslagDtoV2 map(URI dokumentPath, Historikkinnslag h) {
+    private HistorikkinnslagDto map(URI dokumentPath, Historikkinnslag h) {
         var behandlingId = h.getBehandlingId();
         var uuid = behandlingId == null ? null : behandlingRepository.hentBehandling(behandlingId).getUuid();
         List<HistorikkInnslagDokumentLinkDto> dokumenter = tilDokumentlenker(h.getDokumentLinker(), dokumentPath);
@@ -79,7 +57,7 @@ public class HistorikkV2Tjeneste {
             .sorted(Comparator.comparing(HistorikkinnslagLinje::getSekvensNr))
             .map(t -> t.getType() == HistorikkinnslagLinjeType.TEKST ? tekstlinje(t.getTekst()) : linjeskift())
             .toList();
-        return new HistorikkinnslagDtoV2(uuid, HistorikkinnslagDtoV2.HistorikkAktørDto.fra(h.getAktør(), h.getOpprettetAv()), h.getSkjermlenke(),
+        return new HistorikkinnslagDto(uuid, HistorikkinnslagDto.HistorikkAktørDto.fra(h.getAktør(), h.getOpprettetAv()), h.getSkjermlenke(),
             h.getOpprettetTidspunkt(), dokumenter, h.getTittel(), linjer);
     }
 
@@ -87,7 +65,8 @@ public class HistorikkV2Tjeneste {
         if (dokumentLinker == null) {
             return List.of();
         }
-        return dokumentLinker.stream().map(d -> tilDokumentlenker(d, dokumentPath)) //
+        return dokumentLinker.stream()
+            .map(d -> tilDokumentlenker(d, dokumentPath))
             .toList();
     }
 
