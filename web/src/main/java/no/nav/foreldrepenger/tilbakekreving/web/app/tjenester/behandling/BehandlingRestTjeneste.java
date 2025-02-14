@@ -52,10 +52,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
@@ -118,6 +120,8 @@ public class BehandlingRestTjeneste {
     public static final String BEHANDLING_KAN_OPPRETTES_PATH = PATH_FRAGMENT + BEHANDLING_KAN_OPPRETTES_PART_PATH;
     private static final String REVURDERING_KAN_OPPRETTES_PART_PATH = "/kan-revurdering-opprettes-v2";
     public static final String REVURDERING_KAN_OPPRETTES_PATH = PATH_FRAGMENT + REVURDERING_KAN_OPPRETTES_PART_PATH;
+
+    private static final Fagsystem FAGSYSTEM = ApplicationName.hvilkenTilbake();
 
 
     private ProsessTaskTjeneste taskTjeneste;
@@ -600,7 +604,7 @@ public class BehandlingRestTjeneste {
                 .medKanSettesPaVent(!b.isBehandlingPåVent())
                 .medKanGjenopptas(b.isBehandlingPåVent())
                 .medKanOpnesForEndringer(false)
-                .medKanSendeMelding(!b.isBehandlingPåVent())
+                .medKanSendeMelding(Fagsystem.FPTILBAKE.equals(FAGSYSTEM) || !b.isBehandlingPåVent())
                 .medVergemeny(viseVerge(b, finnesVerge))
                 .build();
         }

@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,6 +72,16 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 
 @ExtendWith(JpaExtension.class)
 class BehandlingDtoTjenesteTest {
+
+    @BeforeAll
+    static void setupAlle() {
+        System.setProperty("app.name", "fptilbake");
+    }
+
+    @AfterAll
+    static void teardown() {
+        System.clearProperty("app.name");
+    }
 
     static final String GYLDIG_AKTØR_ID = "12345678901";
     static final String GYLDIG_SAKSNR = "123456";
