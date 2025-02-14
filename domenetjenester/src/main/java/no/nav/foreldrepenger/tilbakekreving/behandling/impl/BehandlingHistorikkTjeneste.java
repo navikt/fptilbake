@@ -7,22 +7,22 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
-import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
+import no.nav.foreldrepenger.tilbakekreving.historikk.HistorikkTjeneste;
 
 @ApplicationScoped
 public class BehandlingHistorikkTjeneste {
 
     private HistorikkinnslagRepository historikkinnslagRepository;
-    private HistorikkV2Tjeneste historikkV2Tjeneste;
+    private HistorikkTjeneste historikkTjeneste;
 
     public BehandlingHistorikkTjeneste() {
         // CDI
     }
 
     @Inject
-    public BehandlingHistorikkTjeneste(HistorikkinnslagRepository historikkinnslagRepository, HistorikkV2Tjeneste historikkV2Tjeneste) {
+    public BehandlingHistorikkTjeneste(HistorikkinnslagRepository historikkinnslagRepository, HistorikkTjeneste historikkTjeneste) {
         this.historikkinnslagRepository = historikkinnslagRepository;
-        this.historikkV2Tjeneste = historikkV2Tjeneste;
+        this.historikkTjeneste = historikkTjeneste;
     }
 
     public void opprettHistorikkinnslagForOpprettetBehandling(Behandling behandling) {
@@ -39,7 +39,7 @@ public class BehandlingHistorikkTjeneste {
     }
 
     private boolean historikkinnslagForBehandlingStartetErLoggetTidligere(Long behandlingId) {
-        var eksisterendeHistorikkListe = historikkV2Tjeneste.hentForSak(behandlingId);
+        var eksisterendeHistorikkListe = historikkTjeneste.hentForSak(behandlingId);
 
         if (!eksisterendeHistorikkListe.isEmpty()) {
             for (var eksisterendeHistorikk : eksisterendeHistorikkListe) {
