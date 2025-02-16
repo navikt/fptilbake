@@ -1,8 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9;
 
-import no.nav.vedtak.sikkerhet.abac.pdp.RessursDataKey;
-
-public enum K9DataKeys implements RessursDataKey {
+public enum K9DataKeys{
     SAKSBEHANDLER("no.nav.abac.attributter.resource.k9.sak.ansvarlig_saksbehandler"),
     BEHANDLING_STATUS("no.nav.abac.attributter.resource.k9.sak.behandlingsstatus"),
     FAGSAK_STATUS("no.nav.abac.attributter.resource.k9.sak.saksstatus"),

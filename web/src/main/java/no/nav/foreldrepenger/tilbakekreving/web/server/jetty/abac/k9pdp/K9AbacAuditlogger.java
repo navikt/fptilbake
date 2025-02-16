@@ -40,7 +40,6 @@ import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacResultat;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.internal.BeskyttetRessursAttributter;
-import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
 import no.nav.vedtak.sikkerhet.kontekst.IdentType;
 
 /**
@@ -60,7 +59,7 @@ public class K9AbacAuditlogger {
         this.auditlogger = auditlogger;
     }
 
-    public void loggUtfall(AbacResultat utfall, BeskyttetRessursAttributter beskyttetRessursAttributter, AppRessursData appRessursData) {
+    public void loggUtfall(AbacResultat utfall, BeskyttetRessursAttributter beskyttetRessursAttributter, K9AppRessursData appRessursData) {
         if (IdentType.Systemressurs.equals(beskyttetRessursAttributter.getIdentType())) {
             // Skal ikke auditlogge systemkall
             if (!utfall.fikkTilgang()) {
@@ -71,7 +70,7 @@ public class K9AbacAuditlogger {
         }
     }
 
-    private void logg(BeskyttetRessursAttributter beskyttetRessursAttributter, AppRessursData appRessursData, Access access) {
+    private void logg(BeskyttetRessursAttributter beskyttetRessursAttributter, K9AppRessursData appRessursData, Access access) {
         requireNonNull(beskyttetRessursAttributter);
         requireNonNull(beskyttetRessursAttributter.getDataAttributter());
 
@@ -121,7 +120,7 @@ public class K9AbacAuditlogger {
         return Set.copyOf(fields);
     }
 
-    private List<String> getBerortBrukerId(AppRessursData appRessursData) {
+    private List<String> getBerortBrukerId(K9AppRessursData appRessursData) {
         /*
          * Arcsight foretrekker FNR fremfor AktørID, men det er uklart hvordan de
          * håndterer blanding (har sendt forespørsel, men ikke fått svar). Velger derfor

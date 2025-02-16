@@ -12,13 +12,12 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.Xa
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 import no.nav.vedtak.sikkerhet.abac.internal.BeskyttetRessursAttributter;
-import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
 
 
 public class XacmlRequestMapper {
 
     public static XacmlRequest lagXacmlRequest(BeskyttetRessursAttributter beskyttetRessursAttributter,
-                                               String domene, AppRessursData appRessursData, Token token) {
+                                               String domene, K9AppRessursData appRessursData, Token token) {
         var actionAttributes = new XacmlRequest.Attributes(List.of(actionInfo(beskyttetRessursAttributter)));
 
         List<XacmlRequest.AttributeAssignment> envList = new ArrayList<>();
@@ -44,7 +43,7 @@ public class XacmlRequestMapper {
 
     private static XacmlRequest.Attributes resourceInfo(BeskyttetRessursAttributter beskyttetRessursAttributter,
                                                         String domene,
-                                                        AppRessursData appRessursData,
+                                                        K9AppRessursData appRessursData,
                                                         Ident ident) {
         List<XacmlRequest.AttributeAssignment> attributes = new ArrayList<>();
 
@@ -81,7 +80,7 @@ public class XacmlRequestMapper {
         return List.of(assignement);
     }
 
-    private static List<Ident> hentIdenter(AppRessursData appRessursData) {
+    private static List<Ident> hentIdenter(K9AppRessursData appRessursData) {
         List<Ident> identer = new ArrayList<>();
         appRessursData.getAktørIdSet()
             .stream()

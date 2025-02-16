@@ -13,23 +13,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.PipBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.K9AppRessursData;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
-import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
-import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
 
 /**
  * Implementasjon av PDP request for k9-tilbake.
  */
 @ApplicationScoped
-@K9tilbake
-public class K9PdpRequestBuilder implements PdpRequestBuilder {
+public class K9PdpRequestBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(K9PdpRequestBuilder.class);
 
@@ -49,8 +45,7 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
         this.aktiverAbacLogging = aktiverAbacLogging;
     }
 
-    @Override
-    public AppRessursData lagAppRessursData(AbacDataAttributter dataAttributter) {
+    public K9AppRessursData lagAppRessursData(AbacDataAttributter dataAttributter) {
         LOG_CONTEXT.remove("saksnummer");
         LOG_CONTEXT.remove("behandling");
         LOG_CONTEXT.remove("k9sakBehandlingUuid");
@@ -69,14 +64,14 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
             throw ugyldigInputFlereBehandlinger(behandlingId.get(), behandlingUuid.get());
         }
 
-        PipBehandlingInfo behandlingData = null;
+        K9PipBehandlingInfo behandlingData = null;
         if (behandlingId.isPresent()) {
             behandlingData = lagBehandlingData(behandlingId.get());
         } else if (behandlingUuid.isPresent()) {
             behandlingData = lagBehandlingData(behandlingUuid.get());
         }
 
-        var ressursData = AppRessursData.builder()
+        var ressursData = K9AppRessursData.builder()
             .leggTilAktørIdSet(dataAttributter.getVerdier(AppAbacAttributtType.AKTØR_ID));
 
         Optional<String> saksnummer = utledSaksnummer(dataAttributter, behandlingData);
@@ -86,14 +81,14 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
             Optional.ofNullable(behandlingData).ifPresent(bi -> ressursData.leggTilAbacAktørIdSet(bi.getAktørIdNonNull()));
         }
 
-        Optional.ofNullable(behandlingData).map(PipBehandlingInfo::fagsakstatus)
+        Optional.ofNullable(behandlingData).map(K9PipBehandlingInfo::fagsakstatus)
             .ifPresent(fss -> ressursData.leggTilRessurs(K9DataKeys.FAGSAK_STATUS, fss));
-        Optional.ofNullable(behandlingData).map(PipBehandlingInfo::statusForBehandling)
+        Optional.ofNullable(behandlingData).map(K9PipBehandlingInfo::statusForBehandling)
             .ifPresent(bs -> ressursData.leggTilRessurs(K9DataKeys.BEHANDLING_STATUS, bs));
-        Optional.ofNullable(behandlingData).map(PipBehandlingInfo::ansvarligSaksbehandler)
+        Optional.ofNullable(behandlingData).map(K9PipBehandlingInfo::ansvarligSaksbehandler)
             .ifPresent(sbh -> ressursData.leggTilRessurs(K9DataKeys.SAKSBEHANDLER, sbh));
 
-        AppRessursData ressursDataBuild = ressursData.build();
+        var ressursDataBuild = ressursData.build();
 
         if (aktiverAbacLogging) {
             logg(ressursDataBuild);
@@ -102,7 +97,7 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
         return ressursDataBuild;
     }
 
-    private static void logg(AppRessursData build) {
+    private static void logg(K9AppRessursData build) {
         String melding = String.format(
             "Abac Ressursdata: saksnummer=%s behandlingstatus=%s fagsakstatus=%s harSaksbehandler=%s  antallAktørIdSet=%d antallFnr=%d",
             build.getResource(K9DataKeys.SAKSNUMMER),
@@ -116,9 +111,9 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
         LOG.info(melding);
     }
 
-    private Optional<String> utledSaksnummer(AbacDataAttributter attributter, PipBehandlingInfo behandlingData) {
+    private Optional<String> utledSaksnummer(AbacDataAttributter attributter, K9PipBehandlingInfo behandlingData) {
         Set<String> saksnumre = new HashSet<>(attributter.getVerdier(AppAbacAttributtType.SAKSNUMMER));
-        Optional.ofNullable(behandlingData).map(PipBehandlingInfo::saksnummer).ifPresent(saksnumre::add);
+        Optional.ofNullable(behandlingData).map(K9PipBehandlingInfo::saksnummer).ifPresent(saksnumre::add);
         if (saksnumre.isEmpty()) {
             return Optional.empty();
         }
@@ -130,17 +125,17 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
         throw new IllegalArgumentException("Ikke støttet å ha to saksnumre samtidig");
     }
 
-    private PipBehandlingInfo lagBehandlingData(Long behandlingId) {
+    private K9PipBehandlingInfo lagBehandlingData(Long behandlingId) {
         LOG_CONTEXT.add("behandling", behandlingId);
         return pipRepository.hentBehandlingData(behandlingId)
-            .map(PipBehandlingInfo::new)
+            .map(K9PipBehandlingInfo::new)
             .orElseThrow(() -> fantIkkeBehandling(behandlingId));
     }
 
-    private PipBehandlingInfo lagBehandlingData(UUID behandlingUuid) {
+    private K9PipBehandlingInfo lagBehandlingData(UUID behandlingUuid) {
         LOG_CONTEXT.add("behandlingUuid", behandlingUuid);
         return pipRepository.hentBehandlingData(behandlingUuid)
-            .map(PipBehandlingInfo::new)
+            .map(K9PipBehandlingInfo::new)
             .orElseThrow(() -> fantIkkeBehandling(behandlingUuid));
     }
 

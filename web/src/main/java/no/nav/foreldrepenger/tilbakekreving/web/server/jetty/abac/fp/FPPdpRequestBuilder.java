@@ -10,10 +10,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.PipBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
@@ -25,7 +23,6 @@ import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
  * Implementasjon av PDP request for fptilbake.
  */
 @ApplicationScoped
-@Fptilbake
 public class FPPdpRequestBuilder implements PdpRequestBuilder {
 
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
@@ -62,7 +59,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
             throw ugyldigInputFlereBehandlinger(behandlingId.get(), behandlingUuid.get());
         }
 
-        PipBehandlingInfo behandlingData = null;
+        FpPipBehandlingInfo behandlingData = null;
         if (behandlingId.isPresent()) {
             behandlingData = lagBehandlingData(behandlingId.get());
         } else if (behandlingUuid.isPresent()) {
@@ -76,36 +73,36 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         Optional.ofNullable(behandlingData).ifPresent(bi -> ressursData.leggTilAbacAktørIdSet(bi.getAktørIdNonNull()));
         var saksnumre = utledSaksnummer(dataAttributter, behandlingData);
         saksnumre.forEach(s -> ressursData.leggTilAktørIdSet(fpsakPipKlient.hentAktørIderSomString(new Saksnummer(s))));
-        Optional.ofNullable(behandlingData).map(PipBehandlingInfo::fagsakstatus).ifPresent(ressursData::medFagsakStatus);
-        Optional.ofNullable(behandlingData).map(PipBehandlingInfo::statusForBehandling).ifPresent(ressursData::medBehandlingStatus);
-        Optional.ofNullable(behandlingData).map(PipBehandlingInfo::ansvarligSaksbehandler).ifPresent(ressursData::medAnsvarligSaksbehandler);
+        Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::fagsakstatus).ifPresent(ressursData::medFagsakStatus);
+        Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::statusForBehandling).ifPresent(ressursData::medBehandlingStatus);
+        Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::ansvarligSaksbehandler).ifPresent(ressursData::medAnsvarligSaksbehandler);
 
         return ressursData.build();
     }
 
-    private Set<String> utledSaksnummer(AbacDataAttributter attributter, PipBehandlingInfo behandlingData) {
+    private Set<String> utledSaksnummer(AbacDataAttributter attributter, FpPipBehandlingInfo behandlingData) {
         Set<String> saksnumre = new HashSet<>(attributter.getVerdier(AppAbacAttributtType.SAKSNUMMER));
-        Optional.ofNullable(behandlingData).map(PipBehandlingInfo::saksnummer).ifPresent(saksnumre::add);
+        Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::saksnummer).ifPresent(saksnumre::add);
         saksnumre.stream().findFirst().ifPresent(s -> LOG_CONTEXT.add("fagsak", s));
         return saksnumre;
     }
 
-    private PipBehandlingInfo hentFpsakBehandlingData(UUID fpsakBehandlingUuid) {
+    private FpPipBehandlingInfo hentFpsakBehandlingData(UUID fpsakBehandlingUuid) {
         LOG_CONTEXT.add("fpsakBehandlingUuid", fpsakBehandlingUuid);
-        return new PipBehandlingInfo(fpsakPipKlient.hentPipdataForFpsakBehandling(fpsakBehandlingUuid));
+        return new FpPipBehandlingInfo(fpsakPipKlient.hentPipdataForFpsakBehandling(fpsakBehandlingUuid));
     }
 
-    private PipBehandlingInfo lagBehandlingData(Long behandlingId) {
+    private FpPipBehandlingInfo lagBehandlingData(Long behandlingId) {
         LOG_CONTEXT.add("behandling", behandlingId);
         return pipRepository.hentBehandlingData(behandlingId)
-            .map(PipBehandlingInfo::new)
+            .map(FpPipBehandlingInfo::new)
             .orElseThrow(() -> fantIkkeBehandling(behandlingId));
     }
 
-    private PipBehandlingInfo lagBehandlingData(UUID behandlingUuid) {
+    private FpPipBehandlingInfo lagBehandlingData(UUID behandlingUuid) {
         LOG_CONTEXT.add("behandlingUuid", behandlingUuid);
         return pipRepository.hentBehandlingData(behandlingUuid)
-            .map(PipBehandlingInfo::new)
+            .map(FpPipBehandlingInfo::new)
             .orElseThrow(() -> fantIkkeBehandling(behandlingUuid));
     }
 
