@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatAktsomhetDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatAnnetDto;
@@ -110,16 +109,5 @@ public class VilkårsvurderingHjelperUtil {
             aktsomhetDto.setSærligeGrunner(særligGrunner);
         }
         return new VilkårResultatAnnetDto(aktsomhetEntitet.getBegrunnelse(), aktsomhetEntitet.getAktsomhet(), aktsomhetDto);
-    }
-
-    static boolean harEndret(Object forrigeVerdi, Object verdi) {
-        return !Objects.equals(forrigeVerdi, verdi);
-    }
-
-    static String konvertFraBoolean(Boolean verdi) {
-        if (null != verdi) {
-            return verdi ? "Ja" : "Nei";
-        }
-        return null;
     }
 }

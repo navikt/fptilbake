@@ -7,8 +7,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,9 +21,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermle
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDel;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
 
@@ -36,14 +34,14 @@ class AvklartVergeTjenesteTest extends FellesTestOppsett {
     void setUp() {
         vergeRepository = new VergeRepository(entityManager);
         virksomhetTjenesteMock = Mockito.mock(VirksomhetTjeneste.class);
-        avklartVergeTjeneste = new AvklartVergeTjeneste(vergeRepository, mockTpsTjeneste, virksomhetTjenesteMock, historikkTjenesteAdapter);
+        avklartVergeTjeneste = new AvklartVergeTjeneste(vergeRepository, mockTpsTjeneste, virksomhetTjenesteMock, historikkinnslagRepository);
     }
 
     @Test
     void skal_lagre_verge_informasjon_når_verge_er_advokat() {
         VergeDto vergeDto = lagVergeDto(VergeType.ADVOKAT);
         when(virksomhetTjenesteMock.validerOrganisasjon(anyString())).thenReturn(true);
-        avklartVergeTjeneste.lagreVergeInformasjon(internBehandlingId, vergeDto);
+        avklartVergeTjeneste.lagreVergeInformasjon(behandling, vergeDto);
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(internBehandlingId);
         assertThat(vergeEntitet).isNotEmpty();
         VergeEntitet vergeOrg = vergeEntitet.get();
@@ -57,7 +55,7 @@ class AvklartVergeTjenesteTest extends FellesTestOppsett {
     void skal_lagre_verge_informasjon_når_verge_er_ikke_advokat() {
         VergeDto vergeDto = lagVergeDto(VergeType.FBARN);
         when(mockTpsTjeneste.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getAktørId()));
-        avklartVergeTjeneste.lagreVergeInformasjon(internBehandlingId, vergeDto);
+        avklartVergeTjeneste.lagreVergeInformasjon(behandling, vergeDto);
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(internBehandlingId);
         assertThat(vergeEntitet).isNotEmpty();
         VergeEntitet vergePerson = vergeEntitet.get();
@@ -72,7 +70,7 @@ class AvklartVergeTjenesteTest extends FellesTestOppsett {
         VergeDto vergeDto = lagVergeDto(VergeType.ADVOKAT);
         when(virksomhetTjenesteMock.validerOrganisasjon(anyString())).thenReturn(false);
         var e = assertThrows(IllegalStateException.class,
-                () -> avklartVergeTjeneste.lagreVergeInformasjon(internBehandlingId, vergeDto));
+                () -> avklartVergeTjeneste.lagreVergeInformasjon(behandling, vergeDto));
         assertThat(e.getMessage()).contains("OrgansisasjonNummer er ikke gyldig");
     }
 
@@ -85,16 +83,16 @@ class AvklartVergeTjenesteTest extends FellesTestOppsett {
     }
 
     private void fellesHistorikkAssert() {
-        List<HistorikkinnslagOld> historikkinnslager = historikkRepository.hentHistorikk(internBehandlingId);
-        assertThat(historikkinnslager).isNotEmpty();
-        assertThat(historikkinnslager.size()).isEqualTo(1);
-        assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.REGISTRER_OM_VERGE);
-        List<HistorikkinnslagOldDel> historikkinnslagDeler = historikkinnslager.get(0).getHistorikkinnslagDeler();
-        assertThat(historikkinnslagDeler).isNotEmpty();
-        assertThat(historikkinnslagDeler.size()).isEqualTo(1);
-        assertThat(historikkinnslagDeler.get(0).getSkjermlenke()).isNotEmpty();
-        assertThat(historikkinnslagDeler.get(0).getSkjermlenke().get()).contains(SkjermlenkeType.FAKTA_OM_VERGE.getKode());
-        assertThat(historikkinnslagDeler.get(0).getHendelse()).isNotEmpty();
+        var historikkinnslager = historikkinnslagRepository.hent(internBehandlingId);
+        assertThat(historikkinnslager).hasSize(2);
+        var historikkinnslagTbkOpprettet = historikkinnslager.get(0);
+        assertThat(historikkinnslagTbkOpprettet.getTittel()).isEqualTo("Tilbakekreving opprettet");
+        assertThat(historikkinnslagTbkOpprettet.getAktør()).isEqualTo(HistorikkAktør.VEDTAKSLØSNINGEN);
+
+        var historikkinnslagRegistrerOmVerge = historikkinnslager.get(1);
+        assertThat(historikkinnslagRegistrerOmVerge.getSkjermlenke()).isEqualTo(SkjermlenkeType.FAKTA_OM_VERGE);
+        assertThat(historikkinnslagRegistrerOmVerge.getLinjer()).hasSize(1);
+        assertThat(historikkinnslagRegistrerOmVerge.getLinjer().getFirst().getTekst()).contains("Registering av opplysninger om verge/fullmektig");
     }
 
     private VergeDto lagVergeDto(VergeType vergeType) {

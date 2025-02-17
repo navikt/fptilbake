@@ -9,6 +9,10 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
@@ -24,7 +28,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRep
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -37,7 +40,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandli
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 /**
@@ -61,7 +63,7 @@ public abstract class FellesTestOppsett {
     protected BehandlingRepositoryProvider repoProvider;
     protected NavBrukerRepository brukerRepository;
     protected KravgrunnlagRepository grunnlagRepository;
-    protected HistorikkRepositoryOld historikkRepository;
+    protected HistorikkinnslagRepository historikkRepository;
     protected BehandlingRepository behandlingRepository;
     protected ProsessTaskTjeneste taskTjeneste;
     protected BehandlingRevurderingTjeneste revurderingTjeneste;
@@ -91,13 +93,13 @@ public abstract class FellesTestOppsett {
         repoProvider = new BehandlingRepositoryProvider(entityManager);
         brukerRepository = new NavBrukerRepository(entityManager);
         grunnlagRepository = repoProvider.getGrunnlagRepository();
-        historikkRepository = repoProvider.getHistorikkRepositoryOld();
+        historikkRepository = repoProvider.getHistorikkinnslagRepository();
         behandlingRepository = repoProvider.getBehandlingRepository();
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider, behandlingskontrollTjeneste);
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollProvider,
-                fagsakTjeneste, mock(HistorikkinnslagTjeneste.class), mockFagsystemKlient);
+                fagsakTjeneste, mock(BehandlingHistorikkTjeneste.class), mockFagsystemKlient);
         testUtility = new TestUtility(behandlingTjeneste);
         aktørId = testUtility.genererAktørId();
         when(mockTpsTjeneste.hentBrukerForAktør(any(), eq(aktørId))).thenReturn(testUtility.lagPersonInfo(aktørId));

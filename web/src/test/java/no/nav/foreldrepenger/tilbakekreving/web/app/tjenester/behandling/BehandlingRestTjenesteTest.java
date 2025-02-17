@@ -21,8 +21,6 @@ import java.util.UUID;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response;
 
-import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Adapter;
-
 import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
 
 import org.junit.jupiter.api.AfterAll;
@@ -58,7 +56,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.Dokumen
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDtoTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
@@ -103,13 +100,12 @@ class BehandlingRestTjenesteTest {
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjenesteMock = mock(BehandlingskontrollAsynkTjeneste.class);
     private BehandlendeEnhetTjeneste behandlendeEnhetTjenesteMock = mock(BehandlendeEnhetTjeneste.class);
     private VergeTjeneste vergeTjenesteMock = mock(VergeTjeneste.class);
-    private HistorikkTjenesteAdapter historikkTjenesteAdapter = mock(HistorikkTjenesteAdapter.class);
     private HistorikkV2Tjeneste historikkV2Tjeneste = mock(HistorikkV2Tjeneste.class);
 
     private BehandlingRestTjeneste behandlingRestTjeneste = new BehandlingRestTjeneste(behandlingTjenesteMock, gjenopptaBehandlingTjenesteMock,
         revurderingTjenesteMock, behandlendeEnhetTjenesteMock, behandlingDtoTjenesteMock, taskTjeneste, vergeTjenesteMock,
         mock(TotrinnTjeneste.class), mock(DokumentBehandlingTjeneste.class), henleggBehandlingTjenesteMock,
-        behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock, historikkTjenesteAdapter, historikkV2Tjeneste);
+        behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock, historikkV2Tjeneste);
 
     private static SaksnummerDto saksnummerDto = new SaksnummerDto(GYLDIG_SAKSNR);
     private static FpsakUuidDto fpsakUuidDto = new FpsakUuidDto(EKSTERN_BEHANDLING_UUID);

@@ -22,10 +22,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
@@ -40,7 +38,7 @@ public class GjenopptaBehandlingTjeneste {
     private BehandlingKandidaterRepository behandlingKandidaterRepository;
     private BehandlingVenterRepository behandlingVenterRepository;
     private KravgrunnlagRepository grunnlagRepository;
-    private HistorikkRepositoryOld historikkRepository;
+    private HistorikkinnslagRepository historikkRepository;
     private BehandlingRepository behandlingRepository;
 
     public GjenopptaBehandlingTjeneste() {
@@ -56,7 +54,7 @@ public class GjenopptaBehandlingTjeneste {
         this.behandlingKandidaterRepository = behandlingKandidaterRepository;
         this.behandlingVenterRepository = behandlingVenterRepository;
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        this.historikkRepository = repositoryProvider.getHistorikkRepositoryOld();
+        this.historikkRepository = repositoryProvider.getHistorikkinnslagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
     }
 
@@ -98,7 +96,7 @@ public class GjenopptaBehandlingTjeneste {
     /**
      * Fortsetter behandling manuelt
      */
-    public Optional<String> fortsettBehandlingManuelt(long behandlingId, HistorikkAktør historikkAktør) {
+    public Optional<String> fortsettBehandlingManuelt(long behandlingId, Long fagsakId, HistorikkAktør historikkAktør) {
         var behandling = behandlingRepository.hentBehandling(behandlingId);
         if (behandling.erAvsluttet()) {
             throw new IllegalArgumentException("Kan ikke fortsette avsluttet behandling");
@@ -108,7 +106,7 @@ public class GjenopptaBehandlingTjeneste {
             || (!Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(behandling.getVenteårsak()) && kanGjenopptaSteg(behandlingId));
         if (kanGjenopptaBehandling) {
             var gruppe = opprettFortsettBehandlingTask(behandling, hentCallId());
-            opprettHistorikkInnslagForManueltGjenopptaBehandling(behandlingId, historikkAktør);
+            opprettHistorikkInnslagForManueltGjenopptaBehandling(behandlingId, fagsakId, historikkAktør);
             return Optional.ofNullable(gruppe);
         }
         return Optional.empty();
@@ -191,15 +189,13 @@ public class GjenopptaBehandlingTjeneste {
         return taskTjeneste.lagre(prosessTaskData);
     }
 
-    private void opprettHistorikkInnslagForManueltGjenopptaBehandling(long behandlingId, HistorikkAktør historikkAktør) {
-        HistorikkinnslagOld historikkinnslag = new HistorikkinnslagOld();
-        historikkinnslag.setAktør(historikkAktør);
-        historikkinnslag.setType(HistorikkinnslagType.BEH_MAN_GJEN);
-        historikkinnslag.setBehandlingId(behandlingId);
-
-        HistorikkInnslagTekstBuilder builder = new HistorikkInnslagTekstBuilder();
-        builder.medHendelse(HistorikkinnslagType.BEH_MAN_GJEN).build(historikkinnslag);
+    private void opprettHistorikkInnslagForManueltGjenopptaBehandling(long behandlingId, Long fagsakId, HistorikkAktør historikkAktør) {
+        var historikkinnslag = new Historikkinnslag.Builder()
+            .medAktør(historikkAktør)
+            .medFagsakId(fagsakId)
+            .medBehandlingId(behandlingId)
+            .medTittel("Behandlingen er gjenopptatt")
+            .build();
         historikkRepository.lagre(historikkinnslag);
     }
-
 }

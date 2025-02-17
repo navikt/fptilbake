@@ -14,9 +14,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResult
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDel;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 
 class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
@@ -27,7 +24,7 @@ class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
     @BeforeEach
     void setUp() {
         beregningsresultatTjeneste = mock(BeregningsresultatTjeneste.class);
-        foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningsresultatTjeneste, historikkTjenesteAdapter);
+        foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningsresultatTjeneste, historikkinnslagRepository);
     }
 
     @Test
@@ -35,22 +32,19 @@ class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
         BeregningResultat beregningResultat = new BeregningResultat(VedtakResultatType.FULL_TILBAKEBETALING, List.of());
         when(beregningsresultatTjeneste.finnEllerBeregn(internBehandlingId)).thenReturn(beregningResultat);
 
-        foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(internBehandlingId);
+        foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(behandling);
 
-        List<HistorikkinnslagOld> historikkInnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
+        var historikkInnslager = historikkinnslagRepository.hent(saksnummer);
         assertThat(historikkInnslager).isNotEmpty();
-        assertThat(historikkInnslager.size()).isEqualTo(1);
-        HistorikkinnslagOld historikkinnslag = historikkInnslager.get(0);
-        assertThat(historikkinnslag.getBehandlingId()).isEqualTo(internBehandlingId);
-        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.FORSLAG_VEDTAK);
+        assertThat(historikkInnslager).hasSize(2);
+        assertThat(historikkInnslager.get(0).getBehandlingId()).isEqualTo(internBehandlingId);
+        assertThat(historikkInnslager.get(0).getAktør()).isEqualTo(HistorikkAktør.VEDTAKSLØSNINGEN);
+        assertThat(historikkInnslager.get(0).getTittel()).isEqualTo("Tilbakekreving opprettet");
 
-        List<HistorikkinnslagOldDel> historikkinnslagDeler = historikkinnslag.getHistorikkinnslagDeler();
-        assertThat(historikkinnslagDeler.size()).isEqualTo(1);
-        HistorikkinnslagOldDel historikkinnslagDel = historikkinnslagDeler.get(0);
-        assertThat(historikkinnslagDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.VEDTAK.getKode());
-        assertThat(historikkinnslagDel.getResultat().get())
-            .isEqualTo(beregningResultat.getVedtakResultatType().getKode());
+        assertThat(historikkInnslager.get(1).getBehandlingId()).isEqualTo(internBehandlingId);
+        assertThat(historikkInnslager.get(1).getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
+        assertThat(historikkInnslager.get(1).getSkjermlenke()).isEqualTo(SkjermlenkeType.VEDTAK);
+        assertThat(historikkInnslager.get(1).getLinjer().getFirst().getTekst()).contains("Vedtak foreslått og sendt til beslutter", beregningResultat.getVedtakResultatType().getNavn());
     }
 
 }

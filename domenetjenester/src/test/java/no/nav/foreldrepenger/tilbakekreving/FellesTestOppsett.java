@@ -12,6 +12,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
+
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurderForeldelseHistorikkTjeneste;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
+
+import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
@@ -46,7 +54,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldFelt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
@@ -69,9 +76,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.Personopplysnin
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
-import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 /**
@@ -97,7 +101,6 @@ public abstract class FellesTestOppsett {
     protected GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingMedGrunnlagTjeneste.class);
     protected BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste = mock(BehandlingskontrollAsynkTjeneste.class);
     protected PersoninfoAdapter mockTpsTjeneste = mock(PersoninfoAdapter.class);
-    protected HistorikkinnslagTjeneste mockHistorikkTjeneste = mock(HistorikkinnslagTjeneste.class);
     protected FagsystemKlient mockFagsystemKlient = mock(FagsystemKlient.class);
     protected SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
 
@@ -106,7 +109,7 @@ public abstract class FellesTestOppsett {
     protected BehandlingRepositoryProvider repoProvider;
     protected NavBrukerRepository brukerRepository;
     protected KravgrunnlagRepository grunnlagRepository;
-    protected HistorikkRepositoryOld historikkRepository;
+    protected HistorikkinnslagRepository historikkinnslagRepository;
     protected FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     protected VurdertForeldelseRepository vurdertForeldelseRepository;
     protected VilkårsvurderingRepository vilkårsvurderingRepository;
@@ -117,10 +120,7 @@ public abstract class FellesTestOppsett {
     protected KravgrunnlagTjeneste kravgrunnlagTjeneste;
     protected KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste;
 
-    protected HistorikkInnslagKonverter historikkInnslagKonverter;
-
-    protected HistorikkTjenesteAdapter historikkTjenesteAdapter;
-
+    protected HistorikkV2Tjeneste historikkV2Tjeneste;
     protected VurdertForeldelseTjeneste vurdertForeldelseTjeneste;
 
     protected VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste;
@@ -157,7 +157,7 @@ public abstract class FellesTestOppsett {
         repoProvider = new BehandlingRepositoryProvider(entityManager);
         brukerRepository = new NavBrukerRepository(entityManager);
         grunnlagRepository = repoProvider.getGrunnlagRepository();
-        historikkRepository = repoProvider.getHistorikkRepositoryOld();
+        historikkinnslagRepository = repoProvider.getHistorikkinnslagRepository();
         faktaFeilutbetalingRepository = repoProvider.getFaktaFeilutbetalingRepository();
         vurdertForeldelseRepository = repoProvider.getVurdertForeldelseRepository();
         vilkårsvurderingRepository = new VilkårsvurderingRepository(entityManager);
@@ -169,16 +169,16 @@ public abstract class FellesTestOppsett {
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste,
             mockSlettGrunnlagEventPubliserer, halvtGebyrTjeneste, entityManager);
         kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(grunnlagRepository);
-        historikkInnslagKonverter = new HistorikkInnslagKonverter(behandlingRepository);
-        historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);
-        vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repoProvider, historikkTjenesteAdapter, kravgrunnlagBeregningTjeneste);
-        vilkårsvurderingHistorikkInnslagTjeneste = new VilkårsvurderingHistorikkInnslagTjeneste(historikkTjenesteAdapter, repoProvider);
+        historikkV2Tjeneste = new HistorikkV2Tjeneste(repoProvider.getHistorikkRepositoryOld(), behandlingRepository, historikkinnslagRepository);
+        var vurderForeldelseHistorikkTjeneste = new VurderForeldelseHistorikkTjeneste(historikkinnslagRepository);
+        vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repoProvider, vurderForeldelseHistorikkTjeneste, kravgrunnlagBeregningTjeneste);
+        vilkårsvurderingHistorikkInnslagTjeneste = new VilkårsvurderingHistorikkInnslagTjeneste(historikkinnslagRepository);
         vilkårsvurderingTjeneste = new VilkårsvurderingTjeneste(vurdertForeldelseTjeneste, repoProvider, vilkårsvurderingHistorikkInnslagTjeneste, kravgrunnlagBeregningTjeneste);
         revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider, behandlingskontrollTjeneste);
         faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repoProvider, kravgrunnlagTjeneste, mockFagsystemKlient);
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollProvider,
-                fagsakTjeneste, mockHistorikkTjeneste, mockFagsystemKlient);
+                fagsakTjeneste, new BehandlingHistorikkTjeneste(historikkinnslagRepository, historikkV2Tjeneste), mockFagsystemKlient);
         testUtility = new TestUtility(behandlingTjeneste);
         aktørId = testUtility.genererAktørId();
         when(mockTpsTjeneste.hentBrukerForAktør(any(), eq(aktørId))).thenReturn(testUtility.lagPersonInfo(aktørId));
@@ -190,7 +190,6 @@ public abstract class FellesTestOppsett {
             .thenReturn(lagSamletEksternBehandlingInfo(behandlingsinfoDto));
         when(mockFagsystemKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class), any(Tillegsinformasjon.class)))
             .thenReturn(lagSamletEksternBehandlingInfo(behandlingsinfoDto));
-
         TestUtility.SakDetaljer sakDetaljer = testUtility.opprettFørstegangsBehandling(aktørId);
         mapSakDetaljer(sakDetaljer);
     }

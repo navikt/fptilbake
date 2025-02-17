@@ -17,6 +17,7 @@ import jakarta.persistence.Table;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
 
+@Deprecated(forRemoval = true)
 @Entity(name = "HistorikkinnslagDokumentLink")
 @Table(name = "HISTORIKKINNSLAG_DOK_LINK")
 public class HistorikkinnslagOldDokumentLink extends BaseEntitet implements IndexKey {

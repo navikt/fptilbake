@@ -18,7 +18,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
+
+import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,7 +69,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.FagsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
@@ -108,11 +110,15 @@ class HåndterGamleKravgrunnlagTaskTest {
         var lesKravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
         var behandlingskontrollProvider = new BehandlingskontrollProvider(
                 behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
-        var historikkinnslagTjeneste = new HistorikkinnslagTjeneste(
-                repositoryProvider.getHistorikkRepositoryOld());
+        var historikkV2Tjeneste = new HistorikkV2Tjeneste(
+            repositoryProvider.getHistorikkRepositoryOld(),
+            behandlingRepository,
+            repositoryProvider.getHistorikkinnslagRepository()
+        );
+        var behandlingHistorikkTjeneste = new BehandlingHistorikkTjeneste(repositoryProvider.getHistorikkinnslagRepository(), historikkV2Tjeneste);
         var fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repositoryProvider,
-                behandlingskontrollProvider, fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock);
+                behandlingskontrollProvider, fagsakTjeneste, behandlingHistorikkTjeneste, fagsystemKlientMock);
         var kravgrunnlagHenter = new KravgrunnlagHenter(økonomiProxyKlient, hentKravgrunnlagMapperProxy);
         var håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(
                 mottattXmlRepository, grunnlagRepository, lesKravgrunnlagMapper, behandlingTjeneste,

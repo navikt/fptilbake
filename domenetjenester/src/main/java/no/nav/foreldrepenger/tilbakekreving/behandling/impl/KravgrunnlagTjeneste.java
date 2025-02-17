@@ -13,6 +13,10 @@ import java.util.TreeMap;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import org.slf4j.Logger;
@@ -27,10 +31,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
@@ -47,7 +47,7 @@ public class KravgrunnlagTjeneste {
 
     private KravgrunnlagRepository kravgrunnlagRepository;
     private BehandlingRepository behandlingRepository;
-    private HistorikkRepositoryOld historikkRepository;
+    private HistorikkinnslagRepository historikkRepository;
     private GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste;
@@ -66,7 +66,7 @@ public class KravgrunnlagTjeneste {
                                 AutomatiskSaksbehandlingVurderingTjeneste halvtRettsgebyrTjeneste, EntityManager entityManager) {
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.historikkRepository = repositoryProvider.getHistorikkRepositoryOld();
+        this.historikkRepository = repositoryProvider.getHistorikkinnslagRepository();
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
         this.halvtRettsgebyrTjeneste = halvtRettsgebyrTjeneste;
@@ -192,14 +192,13 @@ public class KravgrunnlagTjeneste {
     }
 
     private void opprettHistorikkinnslagForBehandlingStartetForfra(Behandling behandling) {
-        var historikkinnslag = new HistorikkinnslagOld();
-        historikkinnslag.setType(HistorikkinnslagType.BEH_STARTET_FORFRA);
-        historikkinnslag.setAktør(HistorikkAktør.VEDTAKSLØSNINGEN);
-        var historikkInnslagTekstBuilder = new HistorikkInnslagTekstBuilder()
-            .medHendelse(HistorikkinnslagType.BEH_STARTET_FORFRA)
-            .medBegrunnelse(BEGRUNNELSE_BEHANDLING_STARTET_FORFRA);
-        historikkInnslagTekstBuilder.build(historikkinnslag);
-        historikkinnslag.setBehandling(behandling);
+        var historikkinnslag = new Historikkinnslag.Builder()
+            .medAktør(HistorikkAktør.VEDTAKSLØSNINGEN)
+            .medBehandlingId(behandling.getId())
+            .medFagsakId(behandling.getFagsakId())
+            .medTittel("Behandling startet forfra")
+            .addLinje(BEGRUNNELSE_BEHANDLING_STARTET_FORFRA)
+            .build();
         historikkRepository.lagre(historikkinnslag);
     }
 }

@@ -28,8 +28,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -88,20 +86,18 @@ class GjenopptaBehandlingTjenesteTest {
 
     @Test
     void skal_lage_forsett_behandling_prosess_task_når_behandling_er_manuelt_gjenopptatt() {
-        final String gruppe = "44";
         Behandling behandling = lagBehandling();
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
         final Long behandlingId = behandling.getId();
 
         when(mockTaskTjeneste.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
 
-        gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SAKSBEHANDLER);
+        gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandlingId, behandling.getFagsakId(), HistorikkAktør.SAKSBEHANDLER);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
-        List<HistorikkinnslagOld> historikkinnslager = repositoryProvider.getHistorikkRepositoryOld().hentHistorikk(behandlingId);
-        assertThat(historikkinnslager).hasSize(1);
-        HistorikkinnslagOld historikkinnslag = historikkinnslager.get(0);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BEH_MAN_GJEN);
-        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
+        var historikkinnslag2List = repositoryProvider.getHistorikkinnslagRepository().hent(behandlingId);
+        assertThat(historikkinnslag2List).hasSize(1);
+        assertThat(historikkinnslag2List.get(0).getTittel()).isEqualTo("Behandlingen er gjenopptatt");
+        assertThat(historikkinnslag2List.get(0).getAktør()).isEqualTo(HistorikkAktør.SAKSBEHANDLER);
     }
 
     @Test

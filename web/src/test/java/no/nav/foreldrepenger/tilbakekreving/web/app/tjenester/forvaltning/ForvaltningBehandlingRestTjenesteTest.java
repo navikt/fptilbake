@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -11,12 +10,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.core.Response;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,9 +49,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepositoryOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -79,7 +76,7 @@ class ForvaltningBehandlingRestTjenesteTest {
     @Inject
     ØkonomiMottattXmlRepository mottattXmlRepository;
     @Inject
-    HistorikkRepositoryOld historikkRepository;
+    HistorikkinnslagRepository historikkRepository;
     @Inject
     KravgrunnlagTjeneste kravgrunnlagTjeneste;
     @Inject
@@ -289,19 +286,14 @@ class ForvaltningBehandlingRestTjenesteTest {
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FORESLÅ_VEDTAK);
 
         forvaltningBehandlingRestTjeneste.tilbakeførBehandlingTilFaktaSteg(new BehandlingReferanse(behandling.getId()));
+
         assertEquals(BehandlingStegType.FAKTA_FEILUTBETALING, behandling.getAktivtBehandlingSteg());
-        List<HistorikkinnslagOld> historikkinnslags = historikkRepository.hentHistorikk(behandling.getId());
-        assertThat(historikkinnslags).isNotEmpty().hasSize(1);
-        HistorikkinnslagOld historikkinnslag = historikkinnslags.get(0);
-        assertEquals(HistorikkinnslagType.BEH_STARTET_FORFRA, historikkinnslag.getType());
-        assertEquals(HistorikkAktør.VEDTAKSLØSNINGEN, historikkinnslag.getAktør());
-        assertThat(historikkinnslag.getHistorikkinnslagDeler()).isNotEmpty().hasSize(1);
-        boolean begrunnelseFinnes = historikkinnslag.getHistorikkinnslagDeler()
-            .stream()
-            .anyMatch(historikkinnslagDel -> historikkinnslagDel.getBegrunnelse().isPresent()
-                && KravgrunnlagTjeneste.BEGRUNNELSE_BEHANDLING_STARTET_FORFRA.equals(
-                historikkinnslagDel.getBegrunnelse().get()));
-        assertTrue(begrunnelseFinnes);
+        var historikkinnslags = historikkRepository.hent(behandling.getId());
+        assertThat(historikkinnslags).hasSize(1);
+        var historikkinnslag = historikkinnslags.getFirst();
+        assertThat(historikkinnslag.getAktør()).isEqualTo(HistorikkAktør.VEDTAKSLØSNINGEN);
+        assertThat(historikkinnslag.getLinjer()).hasSize(1);
+        assertThat(historikkinnslag.getLinjer().getFirst().getTekst()).contains(KravgrunnlagTjeneste.BEGRUNNELSE_BEHANDLING_STARTET_FORFRA);
     }
 
     @Test

@@ -39,8 +39,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.Iverksetting
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
 @ExtendWith(JpaExtension.class)
 class FatteVedtakStegTest {
@@ -62,12 +60,8 @@ class FatteVedtakStegTest {
         repositoryProvider = new BehandlingRepositoryProvider(em);
         behandlingRepository = repositoryProvider.getBehandlingRepository();
         totrinnRepository = new TotrinnRepository(em);
-        HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(behandlingRepository);
-        HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(
-                repositoryProvider.getHistorikkRepositoryOld(), historikkInnslagKonverter);
         BeregningsresultatTjeneste beregningsresultatTjeneste = Mockito.mock(BeregningsresultatTjeneste.class);
-        fatteVedtakSteg = new FatteVedtakSteg(repositoryProvider, totrinnRepository, beregningsresultatTjeneste,
-                historikkTjenesteAdapter);
+        fatteVedtakSteg = new FatteVedtakSteg(repositoryProvider, totrinnRepository, beregningsresultatTjeneste);
 
         Fagsak fagsak = TestFagsakUtil.opprettFagsak();
         repositoryProvider.getFagsakRepository().lagre(fagsak);

@@ -113,10 +113,10 @@ public class HistorikkinnslagDokumentLink extends BaseCreateableEntitet implemen
             return false;
         }
         return
-                Objects.equals(getLinkTekst(), that.getLinkTekst()) &&
-                        Objects.equals(historikkinnslag, that.historikkinnslag) &&
-                        Objects.equals(getJournalpostId(), that.getJournalpostId()) &&
-                        Objects.equals(getDokumentId(), that.getDokumentId());
+            Objects.equals(getLinkTekst(), that.getLinkTekst()) &&
+            Objects.equals(historikkinnslag, that.historikkinnslag) &&
+            Objects.equals(getJournalpostId(), that.getJournalpostId()) &&
+            Objects.equals(getDokumentId(), that.getDokumentId());
     }
 
     @Override

@@ -34,7 +34,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -67,7 +66,7 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     void setup() {
         kravVedtakStatusRepository = new KravVedtakStatusRepository(entityManager);
         behandlingresultatRepository = new BehandlingresultatRepository(entityManager);
-        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, taskTjeneste, behandlingskontrollTjeneste, historikkinnslagTjeneste);
+        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, taskTjeneste, behandlingskontrollTjeneste);
         var kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
             new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository()), taskTjeneste,
             repositoryProvider.getBehandlingRepository(), repositoryProvider.getGrunnlagRepository(), behandlingskontrollTjeneste);
@@ -123,10 +122,10 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
         assertThat(kravVedtakStatusRepository.finnKravStatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.AVSLUTTET));
 
-        var historikkinnslager = repositoryProvider.getHistorikkRepositoryOld().hentHistorikk(behandling.getId());
+        var historikkinnslager = repositoryProvider.getHistorikkinnslagRepository().hent(behandling.getId());
         assertThat(historikkinnslager).hasSize(1);
-        var historikkinnslag = historikkinnslager.get(0);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.AVBRUTT_BEH);
+        var historikkinnslag = historikkinnslager.getFirst();
+        assertThat(historikkinnslag.getTittel()).isEqualTo("Behandling er henlagt");
     }
 
     @Test

@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeBuilder.DATE_FORMATTER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
@@ -23,11 +24,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOld;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagOldDel;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagLinjeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -44,31 +42,26 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
     @Test
     void skal_lagreVurdertForeldelseGrunnlag() {
         LocalDate sisteDato = LocalDate.of(2019, 2, 19);
+        var foreldelseFrist = FØRSTE_DATO.plusMonths(6);
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Collections.singletonList(
                 new ForeldelsePeriodeDto(FØRSTE_DATO, sisteDato,
-                        ForeldelseVurderingType.FORELDET, FØRSTE_DATO.plusMonths(6), null, "ABC")));
+                        ForeldelseVurderingType.FORELDET, foreldelseFrist, null, "ABC")));
 
-        Optional<VurdertForeldelse> vurdertForeldelseOptional = vurdertForeldelseRepository.finnVurdertForeldelse(internBehandlingId);
+        var vurdertForeldelseOptional = vurdertForeldelseRepository.finnVurdertForeldelse(internBehandlingId);
         assertThat(vurdertForeldelseOptional).isPresent();
-        List<VurdertForeldelsePeriode> vurdertForeldelsePerioder = new ArrayList<>(vurdertForeldelseOptional.get().getVurdertForeldelsePerioder());
-        assertThat(vurdertForeldelsePerioder).isNotEmpty();
-        assertThat(vurdertForeldelsePerioder.size()).isEqualTo(1);
-        assertThat(vurdertForeldelsePerioder.get(0).getForeldelseVurderingType()).isEqualByComparingTo(ForeldelseVurderingType.FORELDET);
-        assertThat(vurdertForeldelsePerioder.get(0).getPeriode().getTom()).isEqualTo(LocalDate.of(2019, 2, 19));
-        assertThat(vurdertForeldelsePerioder.get(0).getBegrunnelse()).isEqualTo("ABC");
+        var vurdertForeldelsePerioder = new ArrayList<>(vurdertForeldelseOptional.get().getVurdertForeldelsePerioder());
+        assertThat(vurdertForeldelsePerioder).hasSize(1);
+        var vurdertForeldelsePeriode1 = vurdertForeldelsePerioder.get(0);
+        assertThat(vurdertForeldelsePeriode1.getForeldelseVurderingType()).isEqualByComparingTo(ForeldelseVurderingType.FORELDET);
+        assertThat(vurdertForeldelsePeriode1.getPeriode().getTom()).isEqualTo(LocalDate.of(2019, 2, 19));
+        assertThat(vurdertForeldelsePeriode1.getBegrunnelse()).isEqualTo("ABC");
 
         // test historikkinnslag
-        HistorikkinnslagOld historikkinnslag = fellesHistorikkInnslagAssert();
-        assertThat(historikkinnslag.getHistorikkinnslagDeler().size()).isEqualTo(1);
-        HistorikkinnslagOldDel historikkinnslagDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
-        assertThat(getTilVerdi(historikkinnslagDel.getOpplysning(HistorikkOpplysningType.PERIODE_FOM))).isEqualTo(formatDate(FØRSTE_DATO));
-        assertThat(getTilVerdi(historikkinnslagDel.getOpplysning(HistorikkOpplysningType.PERIODE_TOM))).isEqualTo(formatDate(sisteDato));
-        assertThat(historikkinnslagDel.getBegrunnelse().get()).isEqualTo("ABC");
-        assertThat(historikkinnslagDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.FORELDELSE.getKode());
-        assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-                .isEqualTo(ForeldelseVurderingType.FORELDET.getNavn());
-        assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-                .isEqualTo(null);
+        var historikkinnslag = fellesHistorikkInnslagAssert();
+        assertThat(historikkinnslag.getLinjer().get(0).getTekst()).contains("Manuell vurdering", "av perioden", DATE_FORMATTER.format(vurdertForeldelsePeriode1.getFom()), DATE_FORMATTER.format(vurdertForeldelsePeriode1.getPeriode().getTom()));
+        assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Foreldelse", "er satt til", vurdertForeldelsePeriode1.getForeldelseVurderingType().getNavn());
+        assertThat(historikkinnslag.getLinjer().get(2).getTekst()).contains("Foreldelsesfrist", "er satt til", DATE_FORMATTER.format(vurdertForeldelsePeriode1.getForeldelsesfrist()));
+        assertThat(historikkinnslag.getLinjer().get(3).getTekst()).contains(vurdertForeldelsePeriode1.getBegrunnelse());
     }
 
     @Test
@@ -90,36 +83,31 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         vurdertForeldelsePerioder.sort(Comparator.comparing(VurdertForeldelsePeriode::getFom));
         assertThat(vurdertForeldelsePerioder.size()).isEqualTo(2);
 
-        assertThat(vurdertForeldelsePerioder.get(0).getForeldelseVurderingType()).isEqualByComparingTo(ForeldelseVurderingType.FORELDET);
-        assertThat(vurdertForeldelsePerioder.get(0).getPeriode().getTom()).isEqualTo(LocalDate.of(2019, 2, 4));
-        assertThat(vurdertForeldelsePerioder.get(0).getBegrunnelse()).isEqualTo("ABC");
+        var vurdertForeldelsePeriode1 = vurdertForeldelsePerioder.get(0);
+        assertThat(vurdertForeldelsePeriode1.getForeldelseVurderingType()).isEqualByComparingTo(ForeldelseVurderingType.FORELDET);
+        assertThat(vurdertForeldelsePeriode1.getPeriode().getTom()).isEqualTo(LocalDate.of(2019, 2, 4));
+        assertThat(vurdertForeldelsePeriode1.getBegrunnelse()).isEqualTo("ABC");
 
-        assertThat(vurdertForeldelsePerioder.get(1).getForeldelseVurderingType()).isEqualByComparingTo(ForeldelseVurderingType.TILLEGGSFRIST);
-        assertThat(vurdertForeldelsePerioder.get(1).getBegrunnelse()).isEqualTo("CDE");
+        var vurdertForeldelsePeriode2 = vurdertForeldelsePerioder.get(1);
+        assertThat(vurdertForeldelsePeriode2.getForeldelseVurderingType()).isEqualByComparingTo(ForeldelseVurderingType.TILLEGGSFRIST);
+        assertThat(vurdertForeldelsePeriode2.getBegrunnelse()).isEqualTo("CDE");
 
         // test historikkinnslag
-        HistorikkinnslagOld historikkinnslag = fellesHistorikkInnslagAssert();
-        assertThat(historikkinnslag.getHistorikkinnslagDeler().size()).isEqualTo(2);
+        var historikkinnslag = fellesHistorikkInnslagAssert();
 
-        HistorikkinnslagOldDel førsteDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
-        assertThat(getTilVerdi(førsteDel.getOpplysning(HistorikkOpplysningType.PERIODE_FOM))).isEqualTo(formatDate(FØRSTE_DATO));
-        assertThat(getTilVerdi(førsteDel.getOpplysning(HistorikkOpplysningType.PERIODE_TOM))).isEqualTo(formatDate(førstePeriodeSisteDato));
-        assertThat(førsteDel.getBegrunnelse().get()).isEqualTo("ABC");
-        assertThat(førsteDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.FORELDELSE.getKode());
-        assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-                .isEqualTo(ForeldelseVurderingType.FORELDET.getNavn());
-        assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-                .isEqualTo(null);
+        // Periode 1
+        assertThat(historikkinnslag.getLinjer().get(0).getTekst()).contains("Manuell vurdering", "av perioden", DATE_FORMATTER.format(vurdertForeldelsePeriode1.getFom()), DATE_FORMATTER.format(vurdertForeldelsePeriode1.getPeriode().getTom()));
+        assertThat(historikkinnslag.getLinjer().get(1).getTekst()).contains("Foreldelse", "er satt til", vurdertForeldelsePeriode1.getForeldelseVurderingType().getNavn());
+        assertThat(historikkinnslag.getLinjer().get(2).getTekst()).contains("Foreldelsesfrist", "er satt til", DATE_FORMATTER.format(vurdertForeldelsePeriode1.getForeldelsesfrist()));
+        assertThat(historikkinnslag.getLinjer().get(3).getTekst()).contains(vurdertForeldelsePeriode1.getBegrunnelse());
+        assertThat(historikkinnslag.getLinjer().get(4).getType()).isEqualTo(HistorikkinnslagLinjeType.LINJESKIFT);
 
-        HistorikkinnslagOldDel andreDel = historikkinnslag.getHistorikkinnslagDeler().get(1);
-        assertThat(getTilVerdi(andreDel.getOpplysning(HistorikkOpplysningType.PERIODE_FOM))).isEqualTo(formatDate(andrePeriodeFørsteDato));
-        assertThat(getTilVerdi(andreDel.getOpplysning(HistorikkOpplysningType.PERIODE_TOM))).isEqualTo(formatDate(andrePeriodeSisteDato));
-        assertThat(andreDel.getBegrunnelse().get()).isEqualTo("CDE");
-        assertThat(andreDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.FORELDELSE.getKode());
-        assertThat(getTilVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-                .isEqualTo(ForeldelseVurderingType.TILLEGGSFRIST.getNavn());
-        assertThat(getFraVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-                .isEqualTo(null);
+        // Periode 2
+        assertThat(historikkinnslag.getLinjer().get(5).getTekst()).contains("Manuell vurdering", "av perioden", DATE_FORMATTER.format(vurdertForeldelsePeriode2.getFom()), DATE_FORMATTER.format(vurdertForeldelsePeriode2.getPeriode().getTom()));
+        assertThat(historikkinnslag.getLinjer().get(6).getTekst()).contains("Foreldelse", "er satt til", vurdertForeldelsePeriode2.getForeldelseVurderingType().getNavn());
+        assertThat(historikkinnslag.getLinjer().get(7).getTekst()).contains("Foreldelsesfrist", "er satt til", DATE_FORMATTER.format(vurdertForeldelsePeriode2.getForeldelsesfrist()));
+        assertThat(historikkinnslag.getLinjer().get(8).getTekst()).contains("Dato for når feilutbetaling ble oppdaget", "er satt til", DATE_FORMATTER.format(vurdertForeldelsePeriode2.getOppdagelsesDato()));
+        assertThat(historikkinnslag.getLinjer().get(9).getTekst()).contains(vurdertForeldelsePeriode2.getBegrunnelse());
     }
 
     @Test
@@ -267,15 +255,16 @@ class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
                 .medFeilutbetalinger(faktaFeilutbetaling).build();
     }
 
-    private HistorikkinnslagOld fellesHistorikkInnslagAssert() {
-        List<HistorikkinnslagOld> historikkInnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        assertThat(historikkInnslager).isNotEmpty();
-        assertThat(historikkInnslager.size()).isEqualTo(1);
-        HistorikkinnslagOld historikkinnslag = historikkInnslager.get(0);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.FORELDELSE);
-        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
-        assertThat(historikkinnslag.getBehandlingId()).isEqualTo(internBehandlingId);
-        return historikkinnslag;
+    private Historikkinnslag fellesHistorikkInnslagAssert() {
+        var historikkInnslager = historikkinnslagRepository.hent(saksnummer);
+        assertThat(historikkInnslager).hasSize(2);
+        assertThat(historikkInnslager.get(0).getTittel()).isEqualTo("Tilbakekreving opprettet");
+        assertThat(historikkInnslager.get(0).getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
+        var foreldelseHistorikkinnslag = historikkInnslager.get(1);
+        assertThat(foreldelseHistorikkinnslag.getSkjermlenke()).isEqualTo(SkjermlenkeType.FORELDELSE);
+        assertThat(foreldelseHistorikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
+        assertThat(foreldelseHistorikkinnslag.getBehandlingId()).isEqualTo(internBehandlingId);
+        return foreldelseHistorikkinnslag;
     }
 
 }
