@@ -1,5 +1,31 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9DataKeys;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9PdpRequestBuilder;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9PipBehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.Category;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.NavFellesAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.XacmlRequest;
@@ -12,24 +38,10 @@ import no.nav.vedtak.sikkerhet.abac.TokenProvider;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 import no.nav.vedtak.sikkerhet.abac.internal.BeskyttetRessursAttributter;
-import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
-import no.nav.vedtak.sikkerhet.abac.pipdata.PipBehandlingStatus;
 import no.nav.vedtak.sikkerhet.kontekst.IdentType;
 import no.nav.vedtak.sikkerhet.oidc.config.OpenIDProvider;
 import no.nav.vedtak.sikkerhet.oidc.token.OpenIDToken;
 import no.nav.vedtak.sikkerhet.oidc.token.TokenString;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -50,6 +62,8 @@ class PdpKlientImplTest {
     private AppPdpConsumerImpl pdpConsumerMock;
     @Mock
     private K9AbacAuditlogger abacAuditloggerMock;
+    @Mock
+    private K9PdpRequestBuilder pdpRequestBuilder;
 
     @BeforeAll
     static void beforeAll() {
@@ -68,7 +82,7 @@ class PdpKlientImplTest {
 
     @BeforeEach
     public void setUp() {
-        pdpKlient = new AppPdpKlientImpl(pdpConsumerMock, tokenProvider, abacAuditloggerMock);
+        pdpKlient = new AppPdpKlientImpl(pdpConsumerMock, tokenProvider, abacAuditloggerMock, pdpRequestBuilder);
     }
 
     @Test
@@ -79,10 +93,10 @@ class PdpKlientImplTest {
 
         when(pdpConsumerMock.evaluate(captor.capture())).thenReturn(responseWrapper);
         when(tokenProvider.openIdToken()).thenReturn(JWT_TOKEN);
+        when(pdpRequestBuilder.lagAppRessursData(any())).thenReturn(K9AppRessursData.builder().build());
 
         var felles = lagBeskyttetRessursAttributter(idToken, AbacDataAttributter.opprett());
-        var ressurs = AppRessursData.builder().build();
-        pdpKlient.forespørTilgang(felles, DOMENE, ressurs);
+        pdpKlient.forespørTilgang(felles);
 
         assertThat(captor.getValue().toString()).doesNotContain(NavFellesAttributter.RESOURCE_FELLES_PERSON_FNR);
     }
@@ -95,10 +109,10 @@ class PdpKlientImplTest {
 
         when(pdpConsumerMock.evaluate(captor.capture())).thenReturn(responseWrapper);
         when(tokenProvider.openIdToken()).thenReturn(JWT_TOKEN);
+        when(pdpRequestBuilder.lagAppRessursData(any())).thenReturn(K9AppRessursData.builder().leggTilFødselsnummer("12345678900").build());
 
         var felles = lagBeskyttetRessursAttributter(idToken, AbacDataAttributter.opprett());
-        var ressurs = AppRessursData.builder().leggTilFødselsnummer("12345678900").build();
-        pdpKlient.forespørTilgang(felles, DOMENE, ressurs);
+        pdpKlient.forespørTilgang(felles);
 
         assertThat(captor.getValue().toString()).contains(NavFellesAttributter.ENVIRONMENT_FELLES_OIDC_TOKEN_BODY);
     }
@@ -111,10 +125,10 @@ class PdpKlientImplTest {
 
         when(pdpConsumerMock.evaluate(captor.capture())).thenReturn(responseWrapper);
         when(tokenProvider.openIdToken()).thenReturn(JWT_TOKENX_TOKEN);
+        when(pdpRequestBuilder.lagAppRessursData(any())).thenReturn(K9AppRessursData.builder().leggTilFødselsnummer("12345678900").build());
 
         var felles = lagBeskyttetRessursAttributter(idToken, AbacDataAttributter.opprett());
-        var ressurs = AppRessursData.builder().leggTilFødselsnummer("12345678900").build();
-        pdpKlient.forespørTilgang(felles, DOMENE, ressurs);
+        pdpKlient.forespørTilgang(felles);
 
         assertThat(captor.getValue().toString()).contains(NavFellesAttributter.ENVIRONMENT_FELLES_TOKENX_TOKEN_BODY);
     }
@@ -131,16 +145,14 @@ class PdpKlientImplTest {
         personnr.add("00987654321");
         personnr.add("15151515151");
         when(tokenProvider.openIdToken()).thenReturn(JWT_TOKEN);
+        when(pdpRequestBuilder.lagAppRessursData(any())).thenReturn(K9AppRessursData.builder().leggTilFødselsnumre(personnr).build());
 
         var felles = lagBeskyttetRessursAttributter(idToken, AbacDataAttributter.opprett());
-        var ressurs = AppRessursData.builder().leggTilFødselsnumre(personnr).build();
-        pdpKlient.forespørTilgang(felles, DOMENE, ressurs);
+        pdpKlient.forespørTilgang(felles);
 
         String xacmlRequestString = captor.getValue().toString();
 
-        assertThat(xacmlRequestString).contains("12345678900");
-        assertThat(xacmlRequestString).contains("00987654321");
-        assertThat(xacmlRequestString).contains("15151515151");
+        assertThat(xacmlRequestString).contains("12345678900", "00987654321", "15151515151");
     }
 
     @Test
@@ -155,16 +167,14 @@ class PdpKlientImplTest {
         personnr.add("12345678900");
         personnr.add("00987654321");
         personnr.add("15151515151");
+        when(pdpRequestBuilder.lagAppRessursData(any())).thenReturn(K9AppRessursData.builder().leggTilFødselsnumre(personnr).build());
 
         var felles = lagBeskyttetRessursAttributter(idToken, AbacDataAttributter.opprett());
-        var ressurs = AppRessursData.builder().leggTilFødselsnumre(personnr).build();
-        pdpKlient.forespørTilgang(felles, DOMENE, ressurs);
+        pdpKlient.forespørTilgang(felles);
 
         String xacmlRequestString = captor.getValue().toString();
 
-        assertThat(xacmlRequestString).contains("12345678900");
-        assertThat(xacmlRequestString).contains("00987654321");
-        assertThat(xacmlRequestString).contains("15151515151");
+        assertThat(xacmlRequestString).contains("12345678900", "00987654321", "15151515151");
     }
 
     @Test
@@ -179,10 +189,11 @@ class PdpKlientImplTest {
         personnr.add("12345678900");
         personnr.add("00987654321");
         personnr.add("15151515151");
+        when(pdpRequestBuilder.lagAppRessursData(any())).thenReturn(K9AppRessursData.builder().leggTilFødselsnumre(personnr)
+            .leggTilRessurs(K9DataKeys.BEHANDLING_STATUS, K9PipBehandlingStatus.UTREDES).build());
 
         var felles = lagBeskyttetRessursAttributter(idToken, AbacDataAttributter.opprett());
-        var ressurs = AppRessursData.builder().leggTilFødselsnumre(personnr).medBehandlingStatus(PipBehandlingStatus.UTREDES).build();
-        pdpKlient.forespørTilgang(felles, DOMENE, ressurs);
+        pdpKlient.forespørTilgang(felles);
 
         var xacmlRequest = captor.getValue();
         var resourceArray = xacmlRequest.request().get(Category.Resource);
@@ -192,9 +203,9 @@ class PdpKlientImplTest {
             .filter(a -> NavFellesAttributter.RESOURCE_FELLES_PERSON_FNR.equals(a.attributeId()))
             .toList();
 
-        var personer = new ArrayList<>(ressurs.getFødselsnumre());
+        var personer = new ArrayList<>(personnr);
 
-        for (int i = 0; i < personer.size(); i++) {
+        for (int i = 0; i < personnr.size(); i++) {
             assertThat(personArray.get(i).value().toString()).contains(personer.get(i));
         }
     }
@@ -211,12 +222,12 @@ class PdpKlientImplTest {
         Set<String> personnr = new HashSet<>();
         personnr.add("12345678900");
         personnr.add("07078515206");
+        when(pdpRequestBuilder.lagAppRessursData(any())).thenReturn(K9AppRessursData.builder().leggTilFødselsnumre(personnr).build());
 
         var felles = lagBeskyttetRessursAttributter(idToken, AbacDataAttributter.opprett(), IdentType.EksternBruker);
-        var ressurs = AppRessursData.builder().leggTilFødselsnumre(personnr).build();
-        var resultat = pdpKlient.forespørTilgang(felles, DOMENE, ressurs);
+        var resultat = pdpKlient.forespørTilgang(felles);
 
-        assertThat(resultat.beslutningKode()).isEqualTo(AbacResultat.AVSLÅTT_EGEN_ANSATT);
+        assertThat(resultat).isEqualTo(AbacResultat.AVSLÅTT_EGEN_ANSATT);
     }
 
     private void assertHasAttribute(List<XacmlRequest.Attributes> attributes, String attributeName, String expectedValue) {
@@ -239,11 +250,12 @@ class PdpKlientImplTest {
         var responseWrapper = createResponse("xacmlresponse_multiple_obligation.json");
 
         when(tokenProvider.openIdToken()).thenReturn(new OpenIDToken(OpenIDProvider.TOKENX, new TokenString("OIDC")));
+        when(pdpRequestBuilder.lagAppRessursData(any())).thenReturn(K9AppRessursData.builder().leggTilFødselsnumre(Set.of("12345678900")).build());
+
         String feilKode = "";
         try {
             var felles = lagBeskyttetRessursAttributter(idToken, AbacDataAttributter.opprett());
-            var ressurs = AppRessursData.builder().leggTilFødselsnumre(Set.of("12345678900")).build();
-            pdpKlient.forespørTilgang(felles, DOMENE, ressurs);
+            pdpKlient.forespørTilgang(felles);
         } catch (VLException e) {
             feilKode = e.getKode();
         }
@@ -264,10 +276,10 @@ class PdpKlientImplTest {
         Set<String> aktørId = new HashSet<>();
         aktørId.add("11111");
         aktørId.add("22222");
+        when(pdpRequestBuilder.lagAppRessursData(any())).thenReturn(K9AppRessursData.builder().leggTilFødselsnumre(personnr).leggTilAktørIdSet(aktørId).build());
 
         var felles = lagBeskyttetRessursAttributter(idToken, AbacDataAttributter.opprett());
-        var ressurs = AppRessursData.builder().leggTilFødselsnumre(personnr).leggTilAktørIdSet(aktørId).build();
-        pdpKlient.forespørTilgang(felles, DOMENE, ressurs);
+        pdpKlient.forespørTilgang(felles);
 
         var xacmlRequestString = DefaultJsonMapper.toJson(captor.getValue());
 
@@ -317,7 +329,7 @@ class PdpKlientImplTest {
 
 
         var felles = lagBeskyttetRessursAttributter(token1, AbacDataAttributter.opprett());
-        var ressurs = AppRessursData.builder().leggTilAktørId("11111").leggTilFødselsnummer("12345678900").build();
+        var ressurs = K9AppRessursData.builder().leggTilAktørId("11111").leggTilFødselsnummer("12345678900").build();
         var request = XacmlRequestMapper.lagXacmlRequest(felles, DOMENE, ressurs, token2);
 
         assertThat(request.request().get(Category.Action)).isEqualTo(target.request().get(Category.Action));

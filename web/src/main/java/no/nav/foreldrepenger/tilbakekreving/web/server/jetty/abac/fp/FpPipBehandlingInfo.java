@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac;
+package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp;
 
 import java.util.Optional;
 import java.util.Set;
@@ -12,16 +12,16 @@ import no.nav.vedtak.sikkerhet.abac.pipdata.PipAktørId;
 import no.nav.vedtak.sikkerhet.abac.pipdata.PipBehandlingStatus;
 import no.nav.vedtak.sikkerhet.abac.pipdata.PipFagsakStatus;
 
-public record PipBehandlingInfo(Set<PipAktørId> aktørId, String saksnummer, PipFagsakStatus fagsakstatus,
-                                PipBehandlingStatus statusForBehandling, String ansvarligSaksbehandler) {
+public record FpPipBehandlingInfo(Set<PipAktørId> aktørId, String saksnummer, PipFagsakStatus fagsakstatus,
+                                  PipBehandlingStatus statusForBehandling, String ansvarligSaksbehandler) {
 
-    public PipBehandlingInfo(PipBehandlingData data) {
+    public FpPipBehandlingInfo(PipBehandlingData data) {
         this(Optional.ofNullable(data.getAktørId()).orElse(Set.of()).stream().map(AktørId::getId).map(PipAktørId::new).collect(Collectors.toSet()),
             data.getSaksnummer(), oversettAbacFagstatus(),
             oversettAbacBehandlingStatus(data.getStatusForBehandling()), data.getAnsvarligSaksbehandler().orElse(null));
     }
 
-    public PipBehandlingInfo(AbacPipDto data) {
+    public FpPipBehandlingInfo(AbacPipDto data) {
         this(data.aktørIder(), null, oversettPipFagstatus(data.fagsakStatus()), data.behandlingStatus(), null);
     }
 

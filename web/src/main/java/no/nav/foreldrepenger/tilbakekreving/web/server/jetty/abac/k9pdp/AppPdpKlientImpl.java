@@ -8,6 +8,7 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9PdpRequestBuilder;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.Advice;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.Decision;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.XacmlResponse;
@@ -17,35 +18,40 @@ import no.nav.vedtak.log.util.LoggerUtils;
 import no.nav.vedtak.sikkerhet.abac.AbacResultat;
 import no.nav.vedtak.sikkerhet.abac.TokenProvider;
 import no.nav.vedtak.sikkerhet.abac.internal.BeskyttetRessursAttributter;
-import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
 
 @ApplicationScoped
 public class AppPdpKlientImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(AppPdpKlientImpl.class);
 
+    private static final String DOMENE = "k9";
+
     private AppPdpConsumerImpl pdp;
     private TokenProvider tokenProvider;
     private K9AbacAuditlogger abacAuditlogger;
+    private K9PdpRequestBuilder pdpRequestBuilder;
 
     public AppPdpKlientImpl() {
         // CDI
     }
 
     @Inject
-    public AppPdpKlientImpl(AppPdpConsumerImpl pdp, TokenProvider tokenProvider, K9AbacAuditlogger abacAuditlogger) {
+    public AppPdpKlientImpl(AppPdpConsumerImpl pdp, TokenProvider tokenProvider, K9AbacAuditlogger abacAuditlogger,
+                            K9PdpRequestBuilder pdpRequestBuilder) {
         this.pdp = pdp;
         this.tokenProvider = tokenProvider;
         this.abacAuditlogger = abacAuditlogger;
+        this.pdpRequestBuilder = pdpRequestBuilder;
     }
 
-    public Tilgangsbeslutning forespørTilgang(BeskyttetRessursAttributter beskyttetRessursAttributter, String domene, AppRessursData appRessursData) {
+    public AbacResultat forespørTilgang(BeskyttetRessursAttributter beskyttetRessursAttributter) {
+        var appRessursData = pdpRequestBuilder.lagAppRessursData(beskyttetRessursAttributter.getDataAttributter());
         var token = Token.withOidcToken(tokenProvider.openIdToken());
-        var request = XacmlRequestMapper.lagXacmlRequest(beskyttetRessursAttributter, domene, appRessursData, token);
+        var request = XacmlRequestMapper.lagXacmlRequest(beskyttetRessursAttributter, DOMENE, appRessursData, token);
         var response = pdp.evaluate(request);
         var hovedresultat = resultatFraResponse(response);
         abacAuditlogger.loggUtfall(hovedresultat, beskyttetRessursAttributter, appRessursData);
-        return new Tilgangsbeslutning(hovedresultat, beskyttetRessursAttributter, appRessursData);
+        return hovedresultat;
     }
 
     private static AbacResultat resultatFraResponse(XacmlResponse response) {
