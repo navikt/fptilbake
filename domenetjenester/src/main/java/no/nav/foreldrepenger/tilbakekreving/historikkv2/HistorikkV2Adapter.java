@@ -229,13 +229,13 @@ public class HistorikkV2Adapter {
         var endret = endretFelt.stream().anyMatch(felt -> felt.getFraVerdi() != null);
 
         var tilVerdiNavn = årsakFelt.getKlTilVerdi() != null
-            ? HendelseType.fraKode(årsakFelt.getTilVerdiKode()).getNavn()
+            ? fraHendelseType(årsakFelt.getTilVerdiKode())
             : "";
 
 
         if (endret) {
             var årsakNavn = årsakFelt.getKlFraVerdi() != null
-                ? HendelseType.fraKode(årsakFelt.getFraVerdiKode()).getNavn()
+                ? fraHendelseType(årsakFelt.getFraVerdiKode())
                 : "";
             var fraVerdi = underÅrsakFraVerdi != null ? String.format("%s, %s", årsakNavn, underÅrsakFraVerdi) : årsakNavn;
             var tilVerdi = underÅrsakTilVerdi != null ? String.format("%s, %s", tilVerdiNavn, underÅrsakTilVerdi) : tilVerdiNavn;
@@ -245,6 +245,17 @@ public class HistorikkV2Adapter {
             var feltverdi = underÅrsakTilVerdi != null ? String.format("%s, %s", tilVerdiNavn, underÅrsakTilVerdi) : tilVerdiNavn;
             return String.format("__Årsak til feilutbetaling__ er satt til __%s__", feltverdi);
         }
+    }
+
+    private static String fraHendelseType(String verdikode) {
+        var hendelseType = switch (verdikode) {
+            case "PSB_TYPE" -> HendelseType.PSB_ANNET_TYPE;
+            case "PPN_TYPE" -> HendelseType.PPN_ANNET_TYPE;
+            case "OMP_TYPE" -> HendelseType.OMP_ANNET_TYPE;
+            case "OLP_TYPE" -> HendelseType.OLP_ANNET_TYPE;
+            default -> HendelseType.fraKode(verdikode);
+        };
+        return hendelseType.getNavn();
     }
 
     private static Optional<String> opplysingFraDel(HistorikkinnslagOldDel del, HistorikkOpplysningType opplysningType) {
