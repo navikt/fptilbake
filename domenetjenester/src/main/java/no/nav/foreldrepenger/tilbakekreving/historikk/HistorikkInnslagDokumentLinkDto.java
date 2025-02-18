@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.historikkv2;
+package no.nav.foreldrepenger.tilbakekreving.historikk;
 
 import java.net.URI;
 

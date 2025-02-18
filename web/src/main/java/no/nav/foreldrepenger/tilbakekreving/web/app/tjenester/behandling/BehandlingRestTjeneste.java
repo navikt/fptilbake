@@ -57,7 +57,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.historikkv2.HistorikkV2Tjeneste;
+import no.nav.foreldrepenger.tilbakekreving.historikk.HistorikkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
@@ -135,7 +135,7 @@ public class BehandlingRestTjeneste {
     private TotrinnTjeneste totrinnTjeneste;
     private DokumentBehandlingTjeneste dokumentBehandlingTjeneste;
     private VergeTjeneste vergeTjeneste;
-    private HistorikkV2Tjeneste historikkV2Tjeneste;
+    private HistorikkTjeneste historikkTjeneste;
 
     public BehandlingRestTjeneste() {
         // CDI
@@ -154,7 +154,7 @@ public class BehandlingRestTjeneste {
                                   HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                   BehandlingsprosessApplikasjonTjeneste behandlingsprosessTjeneste,
                                   BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste,
-                                  HistorikkV2Tjeneste historikkV2Tjeneste) {
+                                  HistorikkTjeneste historikkTjeneste) {
         this.behandlingTjeneste = behandlingTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
         this.behandlingDtoTjeneste = behandlingDtoTjeneste;
@@ -167,7 +167,7 @@ public class BehandlingRestTjeneste {
         this.taskTjeneste = taskTjeneste;
         this.totrinnTjeneste = totrinnTjeneste;
         this.dokumentBehandlingTjeneste = dokumentBehandlingTjeneste;
-        this.historikkV2Tjeneste = historikkV2Tjeneste;
+        this.historikkTjeneste = historikkTjeneste;
     }
 
     @GET
@@ -547,7 +547,7 @@ public class BehandlingRestTjeneste {
     public SakFullDto hentSaksinformasjon(@Context HttpServletRequest request, @NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto) {
         Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
         var hentDokumentPath = HistorikkRequestPath.getRequestPath(request);
-        var historikkinnslag = historikkV2Tjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
+        var historikkinnslag = historikkTjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
         var kanOppretteTilbake = behandlingTjeneste.hentBehandlinger(saksnummer).stream().allMatch(Behandling::erSaksbehandlingAvsluttet);
         var kanOppretteRevurdering = behandlingTjeneste.hentBehandlinger(saksnummer).stream().anyMatch(revurderingTjeneste::kanRevurderingOpprettes);
         var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, kanOppretteTilbake),

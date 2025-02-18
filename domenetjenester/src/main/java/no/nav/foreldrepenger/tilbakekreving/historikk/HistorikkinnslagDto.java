@@ -1,20 +1,20 @@
-package no.nav.foreldrepenger.tilbakekreving.historikkv2;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+package no.nav.foreldrepenger.tilbakekreving.historikk;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public record HistorikkinnslagDtoV2(UUID behandlingUuid,
-                                    HistorikkAktørDto aktør,
-                                    SkjermlenkeType skjermlenke,
-                                    LocalDateTime opprettetTidspunkt,
-                                    List<HistorikkInnslagDokumentLinkDto> dokumenter,
-                                    String tittel,
-                                    List<Linje> linjer) {
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+
+public record HistorikkinnslagDto(UUID behandlingUuid,
+                                  HistorikkAktørDto aktør,
+                                  SkjermlenkeType skjermlenke,
+                                  LocalDateTime opprettetTidspunkt,
+                                  List<HistorikkInnslagDokumentLinkDto> dokumenter,
+                                  String tittel,
+                                  List<Linje> linjer) {
 
     public record HistorikkAktørDto(HistorikkAktør type, String ident) {
         public static HistorikkAktørDto fra(HistorikkAktør aktør, String opprettetAv) {
