@@ -44,12 +44,12 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.init.InitielleLink
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.konfig.KonfigRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.los.LosRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.openapi.OpenApiTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjenesteLocalDev;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
 import no.nav.openapi.spec.utils.jackson.DynamicJacksonJsonProvider;
-import no.nav.openapi.spec.utils.openapi.OpenApiResource;
 import no.nav.openapi.spec.utils.openapi.OpenApiSetupHelper;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
@@ -88,12 +88,6 @@ public class ApiConfig extends Application {
         return resolvedOpenAPI;
     }
 
-    private class AdaptedOpenapiResource extends OpenApiResource {
-        public AdaptedOpenapiResource() {
-            super(ApiConfig.this.resolvedOpenAPI);
-        }
-    }
-
     @Override
     public Set<Class<?>> getClasses() {
         var classes = new HashSet<>(Set.of(
@@ -123,7 +117,7 @@ public class ApiConfig extends Application {
             FpOversiktRestTjeneste.class,
             HistorikkRestTjeneste.class,
             // swagger
-            AdaptedOpenapiResource.class,
+            OpenApiTjeneste.class,
             // Applikasjonsoppsett
             DynamicJacksonJsonProvider.class,
             JacksonJsonConfig.class,
