@@ -17,6 +17,7 @@
     <properties>
         <!-- versjon brukes fra webapp-modulen under resources/web.swagger/index.html og må være samme som faktisk avhengighet som brukes -->
         <swagger-ui.version>5.18.3</swagger-ui.version>
+        <openapi-spec-utils.version>1.0.0</openapi-spec-utils.version>
     </properties>
 
     <build>
@@ -91,7 +92,7 @@
                     <mainClass>no.nav.foreldrepenger.tilbakekreving.web.app.util.OpenapiGenerate</mainClass>
                     <classpathScope>compile</classpathScope>
                     <arguments>
-                        <argument>${project.build.sourceDirectory}/../resources/openapi-ts-client/XXk9-tilbake.openapi.json</argument>
+                        <argument>${project.build.sourceDirectory}/../resources/openapi-ts-client/k9/k9-tilbake.openapi.json</argument>
                     </arguments>
                 </configuration>
             </plugin>
@@ -104,6 +105,11 @@
                 <groupId>org.webjars</groupId>
                 <artifactId>swagger-ui</artifactId>
                 <version>${swagger-ui.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.openapi.spec.utils</groupId>
+                <artifactId>openapi-spec-utils</artifactId>
+                <version>${openapi-spec-utils.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -244,6 +250,10 @@
         <dependency>
             <groupId>org.glassfish.jersey.inject</groupId>
             <artifactId>jersey-hk2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.openapi.spec.utils</groupId>
+            <artifactId>openapi-spec-utils</artifactId>
         </dependency>
 
         <!-- CDI -->
