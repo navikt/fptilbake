@@ -13,7 +13,6 @@ import no.nav.openapi.spec.utils.http.DynamicObjectMapperResolverVaryFilter;
 
 import org.glassfish.jersey.server.ServerProperties;
 
-import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -53,6 +52,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.Vars
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
 import no.nav.openapi.spec.utils.jackson.DynamicJacksonJsonProvider;
+import no.nav.openapi.spec.utils.openapi.OpenApiResource;
 import no.nav.openapi.spec.utils.openapi.OpenApiSetupHelper;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
