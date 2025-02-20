@@ -52,7 +52,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.Vars
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
 import no.nav.openapi.spec.utils.jackson.DynamicJacksonJsonProvider;
-import no.nav.openapi.spec.utils.openapi.OpenApiResource;
 import no.nav.openapi.spec.utils.openapi.OpenApiSetupHelper;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
