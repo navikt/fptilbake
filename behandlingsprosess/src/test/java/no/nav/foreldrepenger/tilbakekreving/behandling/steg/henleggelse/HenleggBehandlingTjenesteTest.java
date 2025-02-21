@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevSporingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.SendHenleggelsesbrevTask;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 import org.assertj.core.api.Assertions;
@@ -60,7 +61,7 @@ class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
     void setUp() {
         entityManager.setFlushMode(FlushModeType.AUTO);
         brevSporingRepository = repoProvider.getBrevSporingRepository();
-        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, taskTjeneste, behandlingskontrollTjeneste);
+        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, taskTjeneste, behandlingskontrollTjeneste, new BrevSporingTjeneste(brevSporingRepository));
     }
 
     @Test
