@@ -1,4 +1,5 @@
 const defaultValue = "default";
+const optionValues = [defaultValue, "openapi-compat", "kodeverdi-objekt", "kodeverdi-string"]
 
 // JsonSerializerOptionPlugin adds a select input for choosing a value for the X-Json-Serializer-Option header value to be used for subsequent requests
 // from the swagger ui, and state to keep the selected value.
@@ -27,7 +28,7 @@ const JsonSerializerOptionPlugin = () => {
         wrapComponents: {
             ServersContainer: (Original, system) => props => {
                 const React = system.React;
-                const options = [defaultValue, "openapi-compat"].map(opt => React.createElement("option", {value: opt}, `${opt}`))
+                const options = optionValues.map(opt => React.createElement("option", {value: opt}, `${opt}`))
                 const selectId = "JsonSerializerOptionSelect"
                 const onChange = (ev) => {
                     system.jsonSerializerOptionActions.updateJsonSerializerOption(ev.target.value);
@@ -64,7 +65,7 @@ window.onload = function() {
         if(this.ui != null) {
             const serializerOptionVal = this.ui.jsonSerializerOptionSelectors.xJsonSerializerOption()
             if(serializerOptionVal != null && serializerOptionVal !== defaultValue) {
-                req.headers["X-Json-Serializer-Option"] = "openapi-compat";
+                req.headers["X-Json-Serializer-Option"] = serializerOptionVal
             }
         }
         return req
