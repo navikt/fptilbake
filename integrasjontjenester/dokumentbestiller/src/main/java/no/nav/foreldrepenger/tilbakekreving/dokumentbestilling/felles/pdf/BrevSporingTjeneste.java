@@ -22,7 +22,7 @@ public class BrevSporingTjeneste {
         this.brevSporingRepository = brevSporingRepository;
     }
 
-    public void lagreInfoOmUtsendtBrev(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse, DetaljertBrevType detaljertBrevType) {
+    public void lagreInfoOmUtsendtBrev(long behandlingId, JournalpostIdOgDokumentId dokumentreferanse, DetaljertBrevType detaljertBrevType) {
         BrevSporing brevSporing = new BrevSporing.Builder()
                 .medBehandlingId(behandlingId)
                 .medDokumentId(dokumentreferanse.getDokumentId())
@@ -30,5 +30,9 @@ public class BrevSporingTjeneste {
                 .medBrevType(detaljertBrevType.getBrevType())
                 .build();
         brevSporingRepository.lagre(brevSporing);
+    }
+
+    public boolean erVarselBrevSendtFor(long behandlingId) {
+        return brevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId);
     }
 }

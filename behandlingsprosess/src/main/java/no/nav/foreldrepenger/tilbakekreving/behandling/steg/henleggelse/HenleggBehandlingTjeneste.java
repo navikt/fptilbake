@@ -13,13 +13,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.Behandlings
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevSporingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.SendHenleggelsesbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -32,8 +32,9 @@ public class HenleggBehandlingTjeneste {
     private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
-    private BrevSporingRepository brevSporingRepository;
     private HistorikkinnslagRepository historikkRepository;
+
+    private BrevSporingTjeneste brevSporingTjeneste;
 
     private ProsessTaskTjeneste taskTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
@@ -47,15 +48,16 @@ public class HenleggBehandlingTjeneste {
     @Inject
     public HenleggBehandlingTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                      ProsessTaskTjeneste taskTjeneste,
-                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
+                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste,
+                                     BrevSporingTjeneste brevSporingTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
-        this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
         this.historikkRepository = repositoryProvider.getHistorikkinnslagRepository();
-        this.taskTjeneste = taskTjeneste;
 
+        this.taskTjeneste = taskTjeneste;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
+        this.brevSporingTjeneste = brevSporingTjeneste;
     }
 
     public boolean kanHenleggeBehandlingManuelt(Behandling behandling) {
@@ -124,7 +126,7 @@ public class HenleggBehandlingTjeneste {
     }
 
     private boolean varselSendt(long behandlingId) {
-        return brevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId);
+        return brevSporingTjeneste.erVarselBrevSendtFor(behandlingId);
     }
 
     private void opprettHistorikkinnslag(Behandling behandling, BehandlingResultatType årsakKode, String begrunnelse) {

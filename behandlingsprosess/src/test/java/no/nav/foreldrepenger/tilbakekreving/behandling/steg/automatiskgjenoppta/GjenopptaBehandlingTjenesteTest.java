@@ -50,15 +50,16 @@ class GjenopptaBehandlingTjenesteTest {
     @Inject
     private BehandlingRepositoryProvider repositoryProvider;
 
-    private InternalAksjonspunktManipulator internalAksjonspunktManipulator = new InternalAksjonspunktManipulator();
     private ProsessTaskTjeneste mockTaskTjeneste = mock(ProsessTaskTjeneste.class);
+    private InternalAksjonspunktManipulator internalAksjonspunktManipulator = new InternalAksjonspunktManipulator();
 
     @BeforeEach
     void setup() {
         gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(mockTaskTjeneste,
-                behandlingKandidaterRepository,
-                behandlingVenterRepository,
-                repositoryProvider);
+            behandlingKandidaterRepository,
+            behandlingVenterRepository,
+            repositoryProvider,
+            null);
     }
 
     @Test
@@ -66,7 +67,8 @@ class GjenopptaBehandlingTjenesteTest {
         final String gruppe = "66";
 
         Behandling behandling = lagBehandling();
-        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER,
+            BehandlingStegStatus.VENTER);
 
         final Long fagsakId = behandling.getFagsakId();
         final Long behandlingId = behandling.getId();
@@ -87,7 +89,8 @@ class GjenopptaBehandlingTjenesteTest {
     @Test
     void skal_lage_forsett_behandling_prosess_task_når_behandling_er_manuelt_gjenopptatt() {
         Behandling behandling = lagBehandling();
-        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER,
+            BehandlingStegStatus.VENTER);
         final Long behandlingId = behandling.getId();
 
         when(mockTaskTjeneste.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
@@ -105,9 +108,11 @@ class GjenopptaBehandlingTjenesteTest {
         final String gruppe = "55";
 
         Behandling behandling1 = lagBehandling();
-        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling1, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling1, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER,
+            BehandlingStegStatus.VENTER);
         Behandling behandling2 = lagBehandling();
-        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling2, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling2, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER,
+            BehandlingStegStatus.VENTER);
 
         Long behandlingId1 = behandling1.getId();
         Long behandlingId2 = behandling2.getId();
@@ -137,8 +142,10 @@ class GjenopptaBehandlingTjenesteTest {
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.VARSEL);
         scenario.medDefaultKravgrunnlag();
         Behandling behandling = scenario.lagre(repositoryProvider);
-        internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().minusDays(10));
-        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
+        internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
+            LocalDateTime.now().minusDays(10));
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER,
+            BehandlingStegStatus.VENTER);
 
         List<ProsessTaskData> faktiskeProsessTaskDataListe = new ArrayList<>();
         prosessTaskCapture(gruppe, faktiskeProsessTaskDataListe);
@@ -155,8 +162,10 @@ class GjenopptaBehandlingTjenesteTest {
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.VARSEL);
         scenario.medDefaultKravgrunnlag();
         Behandling behandling = scenario.lagre(repositoryProvider);
-        internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().minusDays(10));
-        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
+        internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
+            LocalDateTime.now().minusDays(10));
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER,
+            BehandlingStegStatus.VENTER);
         repositoryProvider.getGrunnlagRepository().sperrGrunnlag(behandling.getId());
 
         List<ProsessTaskData> faktiskeProsessTaskDataListe = new ArrayList<>();
@@ -171,7 +180,8 @@ class GjenopptaBehandlingTjenesteTest {
         scenario.medBehandlingType(BehandlingType.TILBAKEKREVING);
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.VARSEL);
         Behandling behandling = scenario.lagre(behandlingRepositoryProvider);
-        internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().minusDays(10));
+        internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
+            LocalDateTime.now().minusDays(10));
         BehandlingLås lås = behandlingRepositoryProvider.getBehandlingRepository().taSkriveLås(behandling);
         behandlingRepositoryProvider.getBehandlingRepository().lagre(behandling, lås);
         return behandling;
