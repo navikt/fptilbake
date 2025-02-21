@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevSporingTjeneste;
+
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.AutomatiskSaksbehandlingVurderingTjeneste;
@@ -90,7 +92,7 @@ class MottattGrunnlagStegTest extends FellesTestOppsett {
 
     private MottattGrunnlagSteg steg() {
         var gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskTjeneste, behandlingKandidaterRepository, behandlingVenterRepository,
-            repositoryProvider);
+            repositoryProvider, new BrevSporingTjeneste(repositoryProvider.getBrevSporingRepository()));
         return new MottattGrunnlagSteg(behandlingRepository, behandlingskontrollTjeneste, gjenopptaBehandlingTjeneste,
             new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository()));
     }

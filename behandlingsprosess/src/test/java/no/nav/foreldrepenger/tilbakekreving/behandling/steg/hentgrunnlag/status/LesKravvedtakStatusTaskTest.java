@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevSporingTjeneste;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -66,7 +68,7 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     void setup() {
         kravVedtakStatusRepository = new KravVedtakStatusRepository(entityManager);
         behandlingresultatRepository = new BehandlingresultatRepository(entityManager);
-        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, taskTjeneste, behandlingskontrollTjeneste);
+        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, taskTjeneste, behandlingskontrollTjeneste, new BrevSporingTjeneste(repositoryProvider.getBrevSporingRepository()));
         var kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
             new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository()), taskTjeneste,
             repositoryProvider.getBehandlingRepository(), repositoryProvider.getGrunnlagRepository(), behandlingskontrollTjeneste);
