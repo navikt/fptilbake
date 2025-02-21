@@ -48,7 +48,8 @@ class GjenopptaBehandlingHenleggingTjenesteTest {
     @Test
     void skal_henlegge_behandling_nar_kravgrunnlag_mangler_og_varselbrev_ikke_sendt() {
         // Arrange
-        var behandlingMock = mockBehandlingUtenKravgrunnlag(false);
+        var behandlingMock = mockBehandlingUtenKravgrunnlag();
+        when(mockBrevSporingTjeneste.erVarselBrevSendtFor(behandlingMock.getId())).thenReturn(false);
 
         // Act
         gjenopptaBehandlingTjeneste.gjenopptaBehandlingOmMulig("testCallId", behandlingMock);
@@ -61,7 +62,8 @@ class GjenopptaBehandlingHenleggingTjenesteTest {
     @Test
     void skal_ikke_henlegge_behandling_nar_kravgrunnlag_mangler_og_varselbrev_er_sendt() {
         // Arrange
-        var behandlingMock = mockBehandlingUtenKravgrunnlag(true);
+        var behandlingMock = mockBehandlingUtenKravgrunnlag();
+        when(mockBrevSporingTjeneste.erVarselBrevSendtFor(behandlingMock.getId())).thenReturn(true);
 
         // Act
         gjenopptaBehandlingTjeneste.gjenopptaBehandlingOmMulig("testCallId", behandlingMock);
@@ -71,23 +73,19 @@ class GjenopptaBehandlingHenleggingTjenesteTest {
         verify(mockBrevSporingTjeneste).erVarselBrevSendtFor(behandlingMock.getId());
     }
 
-    private Behandling mockBehandlingUtenKravgrunnlag(boolean erVarselSendt) {
+    private Behandling mockBehandlingUtenKravgrunnlag() {
         var behandlingMock = mock(Behandling.class);
         final var behandlingId = behandlingMock.getId();
 
-        var ventPåGrunnlalAksjonspunktMock = mock(Aksjonspunkt.class);
-        when(ventPåGrunnlalAksjonspunktMock.getFristTid()).thenReturn(LocalDateTime.now().minusDays(1));
-        when(ventPåGrunnlalAksjonspunktMock.erOpprettet()).thenReturn(true);
+        var ventPåGrunnlagAksjonspunktMock = mock(Aksjonspunkt.class);
+        when(ventPåGrunnlagAksjonspunktMock.getFristTid()).thenReturn(LocalDateTime.now().minusDays(1));
+        when(ventPåGrunnlagAksjonspunktMock.erOpprettet()).thenReturn(true);
 
         when(behandlingMock.getSaksnummer()).thenReturn(Saksnummer.infotrygd("123456"));
         when(behandlingMock.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).thenReturn(
-            Optional.of(ventPåGrunnlalAksjonspunktMock));
+            Optional.of(ventPåGrunnlagAksjonspunktMock));
 
         when(mockGrunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).thenReturn(false);
-        when(mockBrevSporingTjeneste.erVarselBrevSendtFor(behandlingId)).thenReturn(erVarselSendt);
-
         return behandlingMock;
     }
-
-
 }
