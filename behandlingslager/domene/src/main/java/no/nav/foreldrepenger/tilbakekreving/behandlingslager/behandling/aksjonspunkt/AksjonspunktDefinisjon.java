@@ -212,7 +212,7 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
     @JsonCreator
     public static AksjonspunktDefinisjon fraKode(@JsonProperty("kode") String kode) {
         if (kode == null) {
-            return null;
+            return UNDEFINED;
         }
         var ad = KODER.get(kode);
         if (ad == null) {
