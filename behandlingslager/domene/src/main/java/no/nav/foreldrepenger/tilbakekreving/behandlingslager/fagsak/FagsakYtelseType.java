@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,20 +7,13 @@ import java.util.Map;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum FagsakYtelseType implements Kodeverdi {
-
-
     ENGANGSTØNAD("ES", "Engangsstønad", "Eingongsstønad"),
     FORELDREPENGER("FP", "Foreldrepenger", "Foreldrepengar"),
     SVANGERSKAPSPENGER("SVP", "Svangerskapspenger", "Svangerskapspengar"),
@@ -62,8 +53,9 @@ public enum FagsakYtelseType implements Kodeverdi {
         this.navnPåNynorsk = navnPåNynorsk;
     }
 
-    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static FagsakYtelseType fraKode(@JsonProperty(value = "kode") Object node) {
+    // Beholdt sidan den er brukt i HendelseTaskDataWrapper. Ikkje brukt til vanleg json deserialisering lengre.
+    // Kanskje HendelseTaskDataWrapper kan bruke KODER.get istadenfor denne metoden?
+    public static FagsakYtelseType fraKode(Object node) {
         if (node == null) {
             return null;
         }
@@ -79,25 +71,22 @@ public enum FagsakYtelseType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonProperty
+    @JsonValue
     @Override
     public String getKode() {
         return kode;
     }
 
-    @JsonProperty
     @Override
     public String getKodeverk() {
         return KODEVERK;
     }
 
-    @JsonProperty
     @Override
     public String getNavn() {
         return navn;
     }
 
-    @JsonProperty
     public String getNavnPåNynorsk() {
         return navnPåNynorsk;
     }
@@ -111,7 +100,7 @@ public enum FagsakYtelseType implements Kodeverdi {
 
         @Override
         public FagsakYtelseType convertToEntityAttribute(String dbData) {
-            return dbData == null ? null : fraKode(dbData);
+            return dbData == null ? null : KODER.get(dbData);
         }
     }
 
