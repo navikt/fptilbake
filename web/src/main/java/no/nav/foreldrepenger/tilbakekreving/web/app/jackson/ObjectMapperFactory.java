@@ -13,6 +13,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.web.app.IndexClasses;
 import no.nav.openapi.spec.utils.jackson.JsonParserPreProcessingDeserializerModifier;
 import no.nav.openapi.spec.utils.jackson.ObjectToPropertyPreProcessor;
+import no.nav.openapi.spec.utils.jackson.OpenapiCompatObjectMapperModifier;
 
 import java.net.URISyntaxException;
 import java.util.List;
@@ -43,6 +44,12 @@ public class ObjectMapperFactory {
     public static ObjectMapper getDefaultObjectMapperCopy(final boolean serialiserKodeverdiSomObjekt) {
         return getBaseObjectMapperCopy()
             .registerModule(createOverstyrendeKodelisteSerializerModule(serialiserKodeverdiSomObjekt));
+    }
+
+    public static ObjectMapper getOpenapiObjectMapper() {
+        return OpenapiCompatObjectMapperModifier
+            .withDefaultModifications()
+            .modify(getBaseObjectMapperCopy());
     }
 
     /**

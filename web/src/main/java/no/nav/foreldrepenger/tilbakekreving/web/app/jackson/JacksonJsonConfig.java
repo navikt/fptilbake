@@ -18,9 +18,7 @@ public class JacksonJsonConfig extends DynamicObjectMapperResolver {
 
     public JacksonJsonConfig() {
         super(defaultObjectMapper());
-        final ObjectMapper openapiObjectMapper = OpenapiCompatObjectMapperModifier
-            .withDefaultModifications()
-            .modify(ObjectMapperFactory.getBaseObjectMapperCopy());
+        final ObjectMapper openapiObjectMapper = ObjectMapperFactory.getOpenapiObjectMapper();
         super.addObjectMapper(DynamicObjectMapperResolver.JSON_SERIALIZER_OPENAPI, openapiObjectMapper);
         final ObjectMapper kodeverdiObjektMapper = ObjectMapperFactory.getDefaultObjectMapperCopy(true);
         super.addObjectMapper(JSON_SERIALIZER_KODEVERDI_SOM_OBJEKT, kodeverdiObjektMapper);
