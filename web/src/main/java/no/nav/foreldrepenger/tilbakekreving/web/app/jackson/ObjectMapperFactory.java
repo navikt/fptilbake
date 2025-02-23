@@ -9,7 +9,10 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.web.app.IndexClasses;
+import no.nav.openapi.spec.utils.jackson.JsonParserPreProcessingDeserializerModifier;
+import no.nav.openapi.spec.utils.jackson.ObjectToPropertyPreProcessor;
 
 import java.net.URISyntaxException;
 import java.util.List;
@@ -59,6 +62,9 @@ public class ObjectMapperFactory {
     private static SimpleModule createOverstyrendeKodelisteSerializerModule(boolean serialiserKodeverdiSomObjekt) {
         final SimpleModule module = new SimpleModule("VL-REST_MED_INNTEKTSMELDING", new Version(1, 0, 0, null, null, null));
         module.addSerializer(new KodelisteSerializer(serialiserKodeverdiSomObjekt));
+        // Støtt deserialisering frå Kodeverdi serialisert som json objekt utan at typen sjølv støtter det.
+        final var kodelisteDeserializerModifier = new JsonParserPreProcessingDeserializerModifier(new ObjectToPropertyPreProcessor(Kodeverdi.class, "kode"));
+        module.setDeserializerModifier(kodelisteDeserializerModifier);
         return module;
     }
 
