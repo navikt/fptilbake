@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVergeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,24 +25,24 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ve
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
 
-class AvklartVergeTjenesteTest extends FellesTestOppsett {
+class OpprettVergeTjenesteTest extends FellesTestOppsett {
 
     private VergeRepository vergeRepository;
     private VirksomhetTjeneste virksomhetTjenesteMock;
-    private AvklartVergeTjeneste avklartVergeTjeneste;
+    private OpprettVergeTjeneste opprettVergeTjeneste;
 
     @BeforeEach
     void setUp() {
         vergeRepository = new VergeRepository(entityManager);
         virksomhetTjenesteMock = Mockito.mock(VirksomhetTjeneste.class);
-        avklartVergeTjeneste = new AvklartVergeTjeneste(vergeRepository, mockTpsTjeneste, virksomhetTjenesteMock, historikkinnslagRepository);
+        opprettVergeTjeneste = new OpprettVergeTjeneste(vergeRepository, mockTpsTjeneste, virksomhetTjenesteMock, historikkinnslagRepository);
     }
 
     @Test
     void skal_lagre_verge_informasjon_når_verge_er_advokat() {
-        VergeDto vergeDto = lagVergeDto(VergeType.ADVOKAT);
+        var vergeDto = lagVergeDto(VergeType.ADVOKAT);
         when(virksomhetTjenesteMock.validerOrganisasjon(anyString())).thenReturn(true);
-        avklartVergeTjeneste.lagreVergeInformasjon(behandling, vergeDto);
+        opprettVergeTjeneste.lagreVergeInformasjon(behandling, vergeDto);
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(internBehandlingId);
         assertThat(vergeEntitet).isNotEmpty();
         VergeEntitet vergeOrg = vergeEntitet.get();
@@ -53,9 +54,9 @@ class AvklartVergeTjenesteTest extends FellesTestOppsett {
 
     @Test
     void skal_lagre_verge_informasjon_når_verge_er_ikke_advokat() {
-        VergeDto vergeDto = lagVergeDto(VergeType.FBARN);
+        var vergeDto = lagVergeDto(VergeType.FBARN);
         when(mockTpsTjeneste.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getAktørId()));
-        avklartVergeTjeneste.lagreVergeInformasjon(behandling, vergeDto);
+        opprettVergeTjeneste.lagreVergeInformasjon(behandling, vergeDto);
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(internBehandlingId);
         assertThat(vergeEntitet).isNotEmpty();
         VergeEntitet vergePerson = vergeEntitet.get();
@@ -67,17 +68,17 @@ class AvklartVergeTjenesteTest extends FellesTestOppsett {
 
     @Test
     void skal_ikke_lagre_verge_informasjon_når_verge_er_advokat_men_orgnummer_ikke_finnes() {
-        VergeDto vergeDto = lagVergeDto(VergeType.ADVOKAT);
+        var vergeDto = lagVergeDto(VergeType.ADVOKAT);
         when(virksomhetTjenesteMock.validerOrganisasjon(anyString())).thenReturn(false);
         var e = assertThrows(IllegalStateException.class,
-                () -> avklartVergeTjeneste.lagreVergeInformasjon(behandling, vergeDto));
+                () -> opprettVergeTjeneste.lagreVergeInformasjon(behandling, vergeDto));
         assertThat(e.getMessage()).contains("OrgansisasjonNummer er ikke gyldig");
     }
 
-    private void fellesVergeAssert(VergeDto vergeDto, VergeEntitet vergeEntitet) {
-        assertThat(vergeEntitet.getGyldigFom()).isEqualTo(vergeDto.getFom());
-        assertThat(vergeEntitet.getGyldigTom()).isEqualTo(vergeDto.getTom());
-        assertThat(vergeEntitet.getNavn()).isEqualTo(vergeDto.getNavn());
+    private void fellesVergeAssert(OpprettVergeDto vergeDto, VergeEntitet vergeEntitet) {
+        assertThat(vergeEntitet.getGyldigFom()).isEqualTo(vergeDto.gyldigFom());
+        assertThat(vergeEntitet.getGyldigTom()).isEqualTo(vergeDto.gyldigTom());
+        assertThat(vergeEntitet.getNavn()).isEqualTo(vergeDto.navn());
         assertThat(vergeEntitet.getKilde()).isEqualTo(KildeType.FPTILBAKE.name());
         assertThat(vergeEntitet.getBegrunnelse()).isEqualTo("begrunnelse");
     }
@@ -95,15 +96,15 @@ class AvklartVergeTjenesteTest extends FellesTestOppsett {
         assertThat(historikkinnslagRegistrerOmVerge.getLinjer().getFirst().getTekst()).contains("Registering av opplysninger om verge/fullmektig");
     }
 
-    private VergeDto lagVergeDto(VergeType vergeType) {
-        VergeDto vergeDto = new VergeDto();
-        vergeDto.setFnr("12345678901");
-        vergeDto.setFom(LocalDate.now().minusYears(1));
-        vergeDto.setTom(LocalDate.now());
-        vergeDto.setNavn("John Doe");
-        vergeDto.setOrganisasjonsnummer("123456789");
-        vergeDto.setVergeType(vergeType);
-        vergeDto.setBegrunnelse("begrunnelse");
-        return vergeDto;
+    private OpprettVergeDto lagVergeDto(VergeType vergeType) {
+        return new OpprettVergeDto(
+                "John Doe",
+                "12345678901",
+                LocalDate.now().minusYears(1),
+                LocalDate.now(),
+                vergeType,
+                null,
+                "begrunnelse"
+        );
     }
 }

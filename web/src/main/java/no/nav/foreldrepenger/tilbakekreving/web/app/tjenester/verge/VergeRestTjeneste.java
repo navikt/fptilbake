@@ -30,6 +30,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVergeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
@@ -37,7 +38,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ve
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.dto.NyVergeDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.dto.VergeDto;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
@@ -52,6 +56,14 @@ import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 public class VergeRestTjeneste {
 
     public static final String BASE_PATH = "/verge";
+
+
+    private static final String VERGE_FJERN_PART_PATH = "/fjern-verge";
+    public static final String VERGE_FJERN_PATH = BASE_PATH + VERGE_FJERN_PART_PATH;
+
+    private static final String VERGE_OPPRETT_PART_PATH = "/opprett-verge";
+    public static final String VERGE_OPPRETT_PATH = BASE_PATH + VERGE_OPPRETT_PART_PATH;
+
     private BehandlingTjeneste behandlingTjeneste;
     private VergeTjeneste vergeTjeneste;
     private PersoninfoAdapter tpsTjeneste;
@@ -67,6 +79,44 @@ public class VergeRestTjeneste {
         this.vergeTjeneste = vergeTjeneste;
         this.tpsTjeneste = tpsTjeneste;
     }
+
+    @GET
+    @Operation(description = "Henter verge/fullmektig på behandlingen", tags = "verge", responses = {@ApiResponse(responseCode = "200", description = "Verge/fullmektig funnet"), @ApiResponse(responseCode = "204", description = "Ingen verge/fullmektig")})
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
+    public VergeDto hentVerge(@QueryParam(UuidDto.NAME) @Parameter(description = "Behandling uuid") @Valid UuidDto queryParam) {
+        var behandling = behandlingTjeneste.hentBehandling(queryParam.getBehandlingUuid());
+
+        return vergeTjeneste.hentVergeInformasjon(behandling.getId()).map(v -> map(behandling.getFagsak().getFagsakYtelseType(), v)).orElse(null);
+    }
+
+    @POST
+    @Path(VERGE_OPPRETT_PART_PATH)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Operation(description = "Oppretter verge/fullmektig på behandlingen", tags = "verge", responses = {@ApiResponse(responseCode = "200", description = "Verge/fullmektig opprettes", headers = @Header(name = HttpHeaders.LOCATION))})
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK)
+    public Response opprettVerge(@QueryParam(UuidDto.NAME) @Parameter(description = "Behandling uuid") @Valid UuidDto queryParam,
+                                 @Valid NyVergeDto body) {
+
+        var behandling = behandlingTjeneste.hentBehandling(queryParam.getBehandlingUuid());
+
+        vergeTjeneste.opprettVerge(behandling, map(body));
+
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path(VERGE_FJERN_PART_PATH)
+    @Operation(tags = "verge", description = "Fjerner verge/fullmektig på behandlingen", responses = {@ApiResponse(responseCode = "200", description = "Verge/fullmektig fjernet", headers = @Header(name = HttpHeaders.LOCATION))})
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK)
+    public Response fjernVerge(@QueryParam(UuidDto.NAME) @Parameter(description = "Behandling uuid") @Valid UuidDto queryParam) {
+
+        var behandling = behandlingTjeneste.hentBehandling(queryParam.getBehandlingUuid());
+
+        vergeTjeneste.fjernVerge(behandling);
+
+        return Response.ok().build();
+    }
+
 
     @POST
     @Path("/opprett")
@@ -197,5 +247,10 @@ public class VergeRestTjeneste {
             behandling = behandlingTjeneste.hentBehandling(behandlingReferanse.getBehandlingUuid());
         }
         return behandling;
+    }
+
+    private OpprettVergeDto map(NyVergeDto dto) {
+        return new OpprettVergeDto(dto.getNavn(), dto.getFnr(), dto.getGyldigFom(), dto.getGyldigTom(), dto.getVergeType(),
+                dto.getOrganisasjonsnummer(), null);
     }
 }

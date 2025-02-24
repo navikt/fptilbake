@@ -44,6 +44,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.dokument.DokumentR
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.FeilutbetalingÅrsakRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.dto.NyVergeDto;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 import static no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLinks.get;
@@ -297,6 +298,16 @@ public class BehandlingDtoTjeneste {
         if (!BehandlingStatus.AVSLUTTET.equals(dto.getStatus()) && !dto.isBehandlingPåVent()) {
             dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/opprett", "opprett-verge"));
             dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/fjern", "fjern-verge"));
+        }
+
+        if (ApplicationName.hvilkenTilbake().equals(Fagsystem.FPTILBAKE)){
+            var uuidDto = new UuidDto(dto.getUuid());
+            if (vergeRepository.finnesVerge(dto.getId())) {
+                dto.leggTil(get(VergeRestTjeneste.BASE_PATH, "verge-hent", uuidDto));
+                dto.leggTil(post(VergeRestTjeneste.VERGE_FJERN_PATH, "verge-fjern", null, uuidDto));
+            } else {
+                dto.leggTil(post(VergeRestTjeneste.VERGE_OPPRETT_PATH, "verge-opprett", new NyVergeDto(), uuidDto));
+            }
         }
     }
 
