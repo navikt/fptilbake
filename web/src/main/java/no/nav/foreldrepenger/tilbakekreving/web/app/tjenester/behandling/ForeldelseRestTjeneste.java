@@ -32,14 +32,14 @@ import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
-@Path(ForeldelseRestTjeneste.PATH_FRAGMENT)
+@Path(ForeldelseRestTjeneste.BASE_PATH)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
 @ApplicationScoped
 @Transactional
 public class ForeldelseRestTjeneste {
 
-    public static final String PATH_FRAGMENT = "/foreldelse";
+    public static final String BASE_PATH = "/foreldelse";
     private VurdertForeldelseTjeneste vurdertForeldelseTjeneste;
     private KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste;
     private BehandlingTjeneste behandlingTjeneste;

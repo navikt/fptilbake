@@ -40,13 +40,13 @@ import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
-@Path(TilbakekrevingResultatRestTjeneste.PATH_FRAGMENT)
+@Path(TilbakekrevingResultatRestTjeneste.BASE_PATH)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
 @ApplicationScoped
 public class TilbakekrevingResultatRestTjeneste {
 
-    public static final String PATH_FRAGMENT = "/beregning";
+    public static final String BASE_PATH = "/beregning";
     private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private BehandlingTjeneste behandlingTjeneste;
     private VilkårsvurderingRepository vilkårsvurderingRepository;

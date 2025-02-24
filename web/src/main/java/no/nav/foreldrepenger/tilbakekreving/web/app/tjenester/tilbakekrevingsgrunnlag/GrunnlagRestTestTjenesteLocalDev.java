@@ -41,14 +41,14 @@ import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
-@Path(GrunnlagRestTestTjenesteLocalDev.PATH_FRAGMENT)
+@Path(GrunnlagRestTestTjenesteLocalDev.BASE_PATH)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
 @ApplicationScoped
 @Transactional
 public class GrunnlagRestTestTjenesteLocalDev {
 
-    static final String PATH_FRAGMENT = "/grunnlag";
+    static final String BASE_PATH = "/grunnlag";
 
     private PersoninfoAdapter tpsTjeneste;
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;

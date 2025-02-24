@@ -94,31 +94,31 @@ import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 import no.nav.vedtak.sikkerhet.kontekst.Kontekst;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
-@Path(BehandlingRestTjeneste.PATH_FRAGMENT)
+@Path(BehandlingRestTjeneste.BASE_PATH)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
 @RequestScoped
 @Transactional
 public class BehandlingRestTjeneste {
-    public static final String PATH_FRAGMENT = "/behandlinger";
+    public static final String BASE_PATH = "/behandlinger";
 
-    public static final String STATUS_PATH = PATH_FRAGMENT + "/status";
+    public static final String STATUS_PATH = BASE_PATH + "/status";
 
     private static final String SAK_FULL_PART_PATH = "/fagsak-full";
-    public static final String SAK_FULL_PATH = PATH_FRAGMENT + SAK_FULL_PART_PATH;
+    public static final String SAK_FULL_PATH = BASE_PATH + SAK_FULL_PART_PATH;
 
     private static final String SAK_RETTIGHETER_PART_PATH = "/sak-rettigheter";
-    public static final String SAK_RETTIGHETER_PATH = PATH_FRAGMENT + SAK_RETTIGHETER_PART_PATH;
+    public static final String SAK_RETTIGHETER_PATH = BASE_PATH + SAK_RETTIGHETER_PART_PATH;
     private static final String BEHANDLING_RETTIGHETER_PART_PATH = "/behandling-rettigheter";
-    public static final String BEHANDLING_RETTIGHETER_PATH = PATH_FRAGMENT + BEHANDLING_RETTIGHETER_PART_PATH;
+    public static final String BEHANDLING_RETTIGHETER_PATH = BASE_PATH + BEHANDLING_RETTIGHETER_PART_PATH;
 
     private static final String BEHANDLING_ALLE_PART_PATH = "/alle";
-    public static final String BEHANDLING_ALLE_PATH = PATH_FRAGMENT + BEHANDLING_ALLE_PART_PATH;
+    public static final String BEHANDLING_ALLE_PATH = BASE_PATH + BEHANDLING_ALLE_PART_PATH;
 
     private static final String BEHANDLING_KAN_OPPRETTES_PART_PATH = "/kan-opprettes";
-    public static final String BEHANDLING_KAN_OPPRETTES_PATH = PATH_FRAGMENT + BEHANDLING_KAN_OPPRETTES_PART_PATH;
+    public static final String BEHANDLING_KAN_OPPRETTES_PATH = BASE_PATH + BEHANDLING_KAN_OPPRETTES_PART_PATH;
     private static final String REVURDERING_KAN_OPPRETTES_PART_PATH = "/kan-revurdering-opprettes-v2";
-    public static final String REVURDERING_KAN_OPPRETTES_PATH = PATH_FRAGMENT + REVURDERING_KAN_OPPRETTES_PART_PATH;
+    public static final String REVURDERING_KAN_OPPRETTES_PATH = BASE_PATH + REVURDERING_KAN_OPPRETTES_PART_PATH;
 
     private static final Fagsystem FAGSYSTEM = ApplicationName.hvilkenTilbake();
 

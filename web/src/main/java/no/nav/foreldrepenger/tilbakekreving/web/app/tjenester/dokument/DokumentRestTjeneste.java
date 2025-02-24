@@ -35,9 +35,11 @@ import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
-@Path("/dokument")
+@Path(DokumentRestTjeneste.BASE_PATH)
 @ApplicationScoped
 public class DokumentRestTjeneste {
+
+    public static final String BASE_PATH = "/dokument";
 
     private static final String PDF_CONTENT_TYPE = "application/pdf";
     private static final String CONTENT_DISPOSITION = "Content-Disposition";

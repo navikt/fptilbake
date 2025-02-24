@@ -25,13 +25,13 @@ import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
-@Path(VilkårsvurderingRestTjeneste.PATH_FRAGMENT)
+@Path(VilkårsvurderingRestTjeneste.BASE_PATH)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
 @ApplicationScoped
 public class VilkårsvurderingRestTjeneste {
 
-    public static final String PATH_FRAGMENT = "/vilkarsvurdering";
+    public static final String BASE_PATH = "/vilkarsvurdering";
     private VilkårsvurderingTjeneste vilkårsvurderingTjeneste;
     private BehandlingTjeneste behandlingTjeneste;
     private KravgrunnlagBeregningTjeneste beregningTjeneste;
