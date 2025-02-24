@@ -51,7 +51,7 @@ import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 @Transactional
 public class VergeRestTjeneste {
 
-    static final String BASE_PATH = "/verge";
+    public static final String BASE_PATH = "/verge";
     private BehandlingTjeneste behandlingTjeneste;
     private VergeTjeneste vergeTjeneste;
     private PersoninfoAdapter tpsTjeneste;

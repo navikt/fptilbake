@@ -22,11 +22,13 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
-@Path("/feilutbetalingaarsak")
+@Path(FeilutbetalingÅrsakRestTjeneste.BASE_PATH)
 @Produces(APPLICATION_JSON)
 @RequestScoped
 @Transactional
 public class FeilutbetalingÅrsakRestTjeneste {
+
+    public static final String BASE_PATH = "/feilutbetalingaarsak";
 
     private FeilutbetalingÅrsakTjeneste feilutbetalingÅrsakTjeneste;
 

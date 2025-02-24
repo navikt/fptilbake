@@ -124,7 +124,7 @@ public class ResourceLink {
         return new ResourceLink(href, rel, HttpMethod.POST, requestPayload);
     }
 
-    public static ResourceLink get(String href, String rel, Object requestPayload) {
-        return new ResourceLink(href, rel, HttpMethod.GET, requestPayload);
+    public static ResourceLink get(String href, String rel) {
+        return new ResourceLink(href, rel, HttpMethod.GET, null);
     }
 }

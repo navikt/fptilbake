@@ -35,13 +35,20 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.Vilkårsvur
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.*;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.AksjonspunktRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.TotrinnskontrollAksjonspunkterTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AksjonspunktDtoMapper;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.beregningsresultat.TilbakekrevingResultatRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.dokument.DokumentRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.FeilutbetalingÅrsakRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
+
+import static no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLinks.get;
+import static no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLinks.post;
+
 
 /**
  * Bygger BehandlingDto og UtvidetBehandlingDto
@@ -70,8 +77,6 @@ public class BehandlingDtoTjeneste {
 
     private BehandlingModellRepository behandlingModellRepository;
 
-    private String kontekstPath;
-
     public BehandlingDtoTjeneste() {
         // CDI
     }
@@ -85,19 +90,6 @@ public class BehandlingDtoTjeneste {
                                  BeregningsresultatTjeneste beregningsresultatTjeneste,
                                  BehandlingRepositoryProvider repositoryProvider,
                                  BehandlingModellRepository behandlingModellRepository) {
-        this(behandlingTjeneste, totrinnTjeneste, totrinnskontrollTjeneste, henleggBehandlingTjeneste, vurdertForeldelseTjeneste,
-            beregningsresultatTjeneste, repositoryProvider, behandlingModellRepository, ApplicationName.hvilkenTilbake());
-    }
-
-    public BehandlingDtoTjeneste(BehandlingTjeneste behandlingTjeneste,
-                                 TotrinnTjeneste totrinnTjeneste,
-                                 TotrinnskontrollAksjonspunkterTjeneste totrinnskontrollTjeneste,
-                                 HenleggBehandlingTjeneste henleggBehandlingTjeneste,
-                                 VurdertForeldelseTjeneste vurdertForeldelseTjeneste,
-                                 BeregningsresultatTjeneste beregningsresultatTjeneste,
-                                 BehandlingRepositoryProvider repositoryProvider,
-                                 BehandlingModellRepository behandlingModellRepository,
-                                 Fagsystem applikasjon) {
         this.behandlingTjeneste = behandlingTjeneste;
         this.vurdertForeldelseTjeneste = vurdertForeldelseTjeneste;
         this.faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
@@ -110,12 +102,6 @@ public class BehandlingDtoTjeneste {
         this.totrinnskontrollTjeneste = totrinnskontrollTjeneste;
         this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
         this.beregningsresultatTjeneste = beregningsresultatTjeneste;
-
-        kontekstPath = switch (applikasjon) {
-            case FPTILBAKE -> "/fptilbake";
-            case K9TILBAKE -> "/k9/tilbake";
-            default -> throw new IllegalStateException("applikasjonsnavn er satt til " + applikasjon + " som ikke er en støttet verdi");
-        };
     }
 
     public List<BehandlingDto> hentAlleBehandlinger(Saksnummer saksnummer) {
@@ -134,23 +120,22 @@ public class BehandlingDtoTjeneste {
         dto.setBehandlingsresultat(lagBehandlingsresultat(behandling));
 
         // Behandlingsmeny-operasjoner
-        dto.leggTil(get(kontekstPath + "/api/behandlinger/handling-rettigheter", "handling-rettigheter", uuidDto));
-        dto.leggTil(get(kontekstPath + "/api" + BehandlingRestTjeneste.BEHANDLING_RETTIGHETER_PATH, "behandling-rettigheter", uuidDto));
+        dto.leggTil(get(BehandlingRestTjeneste.BASE_PATH + "/handling-rettigheter", "handling-rettigheter", uuidDto));
+        dto.leggTil(get(BehandlingRestTjeneste.BEHANDLING_RETTIGHETER_PATH, "behandling-rettigheter", uuidDto));
         // Denne håndteres litt spesielt i frontend, så må gjøres på denne måten
-        dto.leggTil(get(kontekstPath + "/api/verge/behandlingsmeny?uuid=" + uuid, "finn-menyvalg-for-verge"));
+        dto.leggTil(get("/verge/behandlingsmeny?uuid=" + uuid, "finn-menyvalg-for-verge"));
 
         // Totrinnsbehandling
         if (BehandlingStatus.FATTER_VEDTAK.equals(behandling.getStatus())) {
-            dto.leggTil(get(kontekstPath + "/api/behandling/totrinnskontroll/arsaker", "totrinnskontroll-arsaker", uuidDto));
-            dto.leggTil(new ResourceLink(kontekstPath + "/api" + AksjonspunktRestTjeneste.AKSJONSPUNKT_BESLUTT_PATH, "bekreft-totrinnsaksjonspunkt", ResourceLink.HttpMethod.POST));
+            dto.leggTil(get(TotrinnskontrollRestTjeneste.BASE_PATH + "/arsaker", "totrinnskontroll-arsaker", uuidDto));
+            dto.leggTil(post(AksjonspunktRestTjeneste.AKSJONSPUNKT_BESLUTT_PATH, "bekreft-totrinnsaksjonspunkt"));
         } else if (BehandlingStatus.UTREDES.equals(behandling.getStatus())) {
-            dto.leggTil(get(kontekstPath + "/api/behandling/totrinnskontroll/arsaker_read_only", "totrinnskontroll-arsaker-readOnly", uuidDto));
+            dto.leggTil(get(TotrinnskontrollRestTjeneste.BASE_PATH + "/arsaker_read_only", "totrinnskontroll-arsaker-readOnly", uuidDto));
         }
 
-        dto.leggTil(get(kontekstPath + "/api/brev/maler", "brev-maler", uuidDto));
-        dto.leggTil(get(kontekstPath + "/api/brev/maler", "fpsak-brev-maler", uuidDto));
-        dto.leggTil(new ResourceLink(kontekstPath + "/api/brev/bestill", "brev-bestill", ResourceLink.HttpMethod.POST));
-        dto.leggTil(new ResourceLink(kontekstPath + "/api/brev/forhandsvis", "brev-forhandvis", ResourceLink.HttpMethod.POST));
+        dto.leggTil(get(BrevRestTjeneste.BASE_PATH + "/maler", "brev-maler", uuidDto));
+        dto.leggTil(post(BrevRestTjeneste.BASE_PATH + "/bestill", "brev-bestill"));
+        dto.leggTil(post(BrevRestTjeneste.BASE_PATH + "/forhandsvis", "brev-forhandvis"));
         return dto;
     }
 
@@ -175,11 +160,11 @@ public class BehandlingDtoTjeneste {
         }
         var dto = new BehandlingsresultatDto();
         var type = behandlingresultatRepository.hent(behandling)
-            .map(Behandlingsresultat::getBehandlingResultatType)
-            .or(() -> Optional.ofNullable(beregningsresultatTjeneste.finnEllerBeregn(behandling.getId()))
-                .map(BeregningResultat::getVedtakResultatType)
-                .map(BehandlingResultatType::fraVedtakResultatType))
-            .orElse(BehandlingResultatType.IKKE_FASTSATT);
+                .map(Behandlingsresultat::getBehandlingResultatType)
+                .or(() -> Optional.ofNullable(beregningsresultatTjeneste.finnEllerBeregn(behandling.getId()))
+                        .map(BeregningResultat::getVedtakResultatType)
+                        .map(BehandlingResultatType::fraVedtakResultatType))
+                .orElse(BehandlingResultatType.IKKE_FASTSATT);
         dto.setType(type);
         return dto;
     }
@@ -243,21 +228,21 @@ public class BehandlingDtoTjeneste {
             return BehandlingOperasjonerDto.builder(b.getUuid()).build(); // Skal ikke foreta menyvalg lenger
         } else if (BehandlingStatus.FATTER_VEDTAK.equals(b.getStatus())) {
             var tilgokjenning = b.getAnsvarligSaksbehandler() != null &&
-                !b.getAnsvarligSaksbehandler().equalsIgnoreCase(KontekstHolder.getKontekst().getUid());
+                    !b.getAnsvarligSaksbehandler().equalsIgnoreCase(KontekstHolder.getKontekst().getUid());
             return BehandlingOperasjonerDto.builder(b.getUuid()).medTilGodkjenning(tilgokjenning).build();
         } else {
             var totrinnRetur = totrinnTjeneste.hentTotrinnsvurderinger(b).stream().anyMatch(tt -> !tt.isGodkjent());
             return BehandlingOperasjonerDto.builder(b.getUuid())
-                .medTilGodkjenning(false)
-                .medFraBeslutter(!b.isBehandlingPåVent() && totrinnRetur)
-                .medKanBytteEnhet(true)
-                .medKanHenlegges(henleggBehandlingTjeneste.kanHenleggeBehandlingManuelt(b))
-                .medKanSettesPaVent(!b.isBehandlingPåVent())
-                .medKanGjenopptas(b.isBehandlingPåVent())
-                .medKanOpnesForEndringer(false)
-                .medKanSendeMelding(Fagsystem.FPTILBAKE.equals(FAGSYSTEM) || !b.isBehandlingPåVent())
-                .medVergemeny(viseVerge(b, finnesVerge))
-                .build();
+                    .medTilGodkjenning(false)
+                    .medFraBeslutter(!b.isBehandlingPåVent() && totrinnRetur)
+                    .medKanBytteEnhet(true)
+                    .medKanHenlegges(henleggBehandlingTjeneste.kanHenleggeBehandlingManuelt(b))
+                    .medKanSettesPaVent(!b.isBehandlingPåVent())
+                    .medKanGjenopptas(b.isBehandlingPåVent())
+                    .medKanOpnesForEndringer(false)
+                    .medKanSendeMelding(Fagsystem.FPTILBAKE.equals(FAGSYSTEM) || !b.isBehandlingPåVent())
+                    .medVergemeny(viseVerge(b, finnesVerge))
+                    .build();
         }
     }
 
@@ -300,19 +285,18 @@ public class BehandlingDtoTjeneste {
     }
 
     private void leggTilLenkerForBehandlingsoperasjoner(BehandlingDto dto) {
-        dto.leggTil(new ResourceLink(kontekstPath + "/api/behandlinger/bytt-enhet", "bytt-behandlende-enhet", ResourceLink.HttpMethod.POST));
-        dto.leggTil(new ResourceLink(kontekstPath + "/api/behandlinger/opne-for-endringer", "opne-for-endringer", ResourceLink.HttpMethod.POST));
-        dto.leggTil(new ResourceLink(kontekstPath + "/api/behandlinger/henlegg", "henlegg-behandling", ResourceLink.HttpMethod.POST));
-        dto.leggTil(new ResourceLink(kontekstPath + "/api/behandlinger/gjenoppta", "gjenoppta-behandling", ResourceLink.HttpMethod.POST));
-        dto.leggTil(new ResourceLink(kontekstPath + "/api/behandlinger/sett-pa-vent", "sett-behandling-pa-vent", ResourceLink.HttpMethod.POST));
-        dto.leggTil(new ResourceLink(kontekstPath + "/api/behandlinger/endre-pa-vent", "endre-pa-vent", ResourceLink.HttpMethod.POST));
+        dto.leggTil(post(BehandlingRestTjeneste.BASE_PATH + "/bytt-enhet", "bytt-behandlende-enhet"));
+        dto.leggTil(post(BehandlingRestTjeneste.BASE_PATH + "/henlegg", "henlegg-behandling"));
+        dto.leggTil(post(BehandlingRestTjeneste.BASE_PATH + "/gjenoppta", "gjenoppta-behandling"));
+        dto.leggTil(post(BehandlingRestTjeneste.BASE_PATH + "/sett-pa-vent", "sett-behandling-pa-vent"));
+        dto.leggTil(post(BehandlingRestTjeneste.BASE_PATH + "/endre-pa-vent", "endre-pa-vent"));
 
-        dto.leggTil(new ResourceLink(kontekstPath + "/api" + AksjonspunktRestTjeneste.AKSJONSPUNKT_PATH, "lagre-aksjonspunkter", ResourceLink.HttpMethod.POST));
+        dto.leggTil(post(AksjonspunktRestTjeneste.AKSJONSPUNKT_PATH, "lagre-aksjonspunkter"));
 
-        dto.leggTil(new ResourceLink(kontekstPath + "/api/foreldelse/belop", "beregne-feilutbetalt-belop", ResourceLink.HttpMethod.POST));
+        dto.leggTil(post(ForeldelseRestTjeneste.BASE_PATH + "/belop", "beregne-feilutbetalt-belop"));
         if (!BehandlingStatus.AVSLUTTET.equals(dto.getStatus()) && !dto.isBehandlingPåVent()) {
-            dto.leggTil(new ResourceLink(kontekstPath + "/api/verge/opprett", "opprett-verge", ResourceLink.HttpMethod.POST));
-            dto.leggTil(new ResourceLink(kontekstPath + "/api/verge/fjern", "fjern-verge", ResourceLink.HttpMethod.POST));
+            dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/opprett", "opprett-verge"));
+            dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/fjern", "fjern-verge"));
         }
     }
 
@@ -330,31 +314,31 @@ public class BehandlingDtoTjeneste {
         var harVergeAksjonspunkt = behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.AVKLAR_VERGE).isPresent();
         leggTilLenkerForBehandlingsoperasjoner(dto);
 
-        dto.leggTil(get(kontekstPath + "/api" + AksjonspunktRestTjeneste.AKSJONSPUNKT_PATH, "aksjonspunkter", uuidDto));
+        dto.leggTil(get(AksjonspunktRestTjeneste.AKSJONSPUNKT_PATH, "aksjonspunkter", uuidDto));
         if (BehandlingStegType.FAKTA_FEILUTBETALING.equals(bst) || harDataForFaktaFeilutbetaling) {
-            dto.leggTil(get(kontekstPath + "/api/feilutbetalingaarsak", "feilutbetalingAarsak"));
-            dto.leggTil(get(kontekstPath + "/api/behandlingfakta/hent-fakta/feilutbetaling", "feilutbetalingFakta", uuidDto));
+            dto.leggTil(get(FeilutbetalingÅrsakRestTjeneste.BASE_PATH, "feilutbetalingAarsak"));
+            dto.leggTil(get(BehandlingFaktaRestTjeneste.BASE_PATH + "/hent-fakta/feilutbetaling", "feilutbetalingFakta", uuidDto));
         }
 
         //FIXME det er i beste fall forvirrende å returnere både resultat og perioder som skal vurderes på samme navn "perioderForeldelse". Bør splittes tilsvarende hvordan det er for vilkårsvurdering
         if (harVurdertForeldelse) {
-            dto.leggTil(get(kontekstPath + "/api/foreldelse/vurdert", FORELDELSE, uuidDto));
+            dto.leggTil(get(ForeldelseRestTjeneste.BASE_PATH + "/vurdert", FORELDELSE, uuidDto));
         } else if (harDataForFaktaFeilutbetaling) {
-            dto.leggTil(get(kontekstPath + "/api/foreldelse", FORELDELSE, uuidDto));
+            dto.leggTil(get(ForeldelseRestTjeneste.BASE_PATH, FORELDELSE, uuidDto));
         }
         if (harDataForFaktaFeilutbetaling) {
-            dto.leggTil(get(kontekstPath + "/api/vilkarsvurdering/perioder", "vilkarvurderingsperioder", uuidDto));
+            dto.leggTil(get(VilkårsvurderingRestTjeneste.BASE_PATH + "/perioder", "vilkarvurderingsperioder", uuidDto));
         }
         if (iVilkårSteg || harDataForVilkårsvurdering) {
-            dto.leggTil(get(kontekstPath + "/api/vilkarsvurdering/vurdert", "vilkarvurdering", uuidDto));
+            dto.leggTil(get(VilkårsvurderingRestTjeneste.BASE_PATH + "/vurdert", "vilkarvurdering", uuidDto));
         }
         if (iEllerEtterForeslåVedtakSteg && !behandlingHenlagt) {
             dto.setBehandlingsresultat(lagUtledetBehandlingsresultat(behandling));
-            dto.leggTil(get(kontekstPath + "/api/beregning/resultat", "beregningsresultat", uuidDto));
-            dto.leggTil(get(kontekstPath + "/api/dokument/hent-vedtaksbrev", "vedtaksbrev", uuidDto));
+            dto.leggTil(get(TilbakekrevingResultatRestTjeneste.BASE_PATH + "/resultat", "beregningsresultat", uuidDto));
+            dto.leggTil(get(DokumentRestTjeneste.BASE_PATH + "/hent-vedtaksbrev", "vedtaksbrev", uuidDto));
         }
         if (harVergeAksjonspunkt) {
-            dto.leggTil(get(kontekstPath + "/api/verge", "soeker-verge", uuidDto));
+            dto.leggTil(get(VergeRestTjeneste.BASE_PATH, "soeker-verge", uuidDto));
         }
 
     }
@@ -374,13 +358,4 @@ public class BehandlingDtoTjeneste {
         }
         return Optional.empty();
     }
-
-    private ResourceLink get(String url, String relasjon) {
-        return get(url, relasjon, null);
-    }
-
-    private ResourceLink get(String url, String relasjon, Object requestPayload) {
-        return ResourceLink.get(url, relasjon, requestPayload);
-    }
-
 }

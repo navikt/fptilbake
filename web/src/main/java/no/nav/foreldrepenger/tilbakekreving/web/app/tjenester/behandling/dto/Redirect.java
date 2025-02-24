@@ -36,7 +36,7 @@ public final class Redirect {
 
     public static Response tilBehandlingEllerPollStatus(HttpServletRequest request, UUID uuid, AsyncPollingStatus status) throws URISyntaxException {
         var uriBuilder = getUriBuilder(request)
-                .path(BehandlingRestTjeneste.PATH_FRAGMENT)
+                .path(BehandlingRestTjeneste.BASE_PATH)
                 .queryParam("uuid", uuid);
         return buildResponse(request, status, uriBuilder.build());
     }

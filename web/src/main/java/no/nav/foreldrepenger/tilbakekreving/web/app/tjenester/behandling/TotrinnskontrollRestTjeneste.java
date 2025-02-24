@@ -23,10 +23,13 @@ import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
-@Path("/behandling/totrinnskontroll")
+
+@Path(TotrinnskontrollRestTjeneste.BASE_PATH)
 @ApplicationScoped
 @Transactional
 public class TotrinnskontrollRestTjeneste {
+
+    public static final String BASE_PATH = "/behandling/totrinnskontroll";
 
     private BehandlingRepository behandlingRepository;
     private TotrinnskontrollAksjonspunkterTjeneste totrinnskontrollTjeneste;

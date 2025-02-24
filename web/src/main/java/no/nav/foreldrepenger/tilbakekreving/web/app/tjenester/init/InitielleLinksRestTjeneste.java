@@ -22,14 +22,15 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
+import static no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLinks.get;
+import static no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLinks.post;
+
 @Path("/init-fetch")
 @ApplicationScoped
 @Transactional
 
 @Produces(MediaType.APPLICATION_JSON)
 public class InitielleLinksRestTjeneste {
-
-    private static final String API_URI = "/api";
 
     private String kontekstPath;
 
@@ -59,9 +60,4 @@ public class InitielleLinksRestTjeneste {
         saklenker.add(get(BehandlingRestTjeneste.REVURDERING_KAN_OPPRETTES_PATH, "tilbake-kan-opprette-revurdering"));
         return new InitLinksDto(lenkene, List.of(), saklenker);
     }
-
-    private ResourceLink get(String url, String relasjon) {
-        return ResourceLink.get(kontekstPath + API_URI + url, relasjon, null);
-    }
-
 }

@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -13,7 +14,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
@@ -44,7 +44,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
@@ -113,7 +112,7 @@ class BehandlingDtoTjenesteTest {
         var behandlingModellRepository = new BehandlingModellRepository();
         behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, mock(TotrinnTjeneste.class),
             mock(TotrinnskontrollAksjonspunkterTjeneste.class), mock(HenleggBehandlingTjeneste.class), foreldelseTjeneste,
-            mock(BeregningsresultatTjeneste.class), repositoryProvider, behandlingModellRepository, Fagsystem.FPTILBAKE);
+            mock(BeregningsresultatTjeneste.class), repositoryProvider, behandlingModellRepository);
 
         entityManager.setFlushMode(FlushModeType.AUTO);
     }
@@ -126,10 +125,10 @@ class BehandlingDtoTjenesteTest {
         var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
-        var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList());
-        assertTrue(lenker.containsAll(List.of("bytt-behandlende-enhet", "opne-for-endringer", "henlegg-behandling", "gjenoppta-behandling",
+        var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
+        assertThat(lenker).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
             "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
-            "feilutbetalingAarsak", "opprett-verge", "fjern-verge")));
+            "feilutbetalingAarsak", "opprett-verge", "fjern-verge");
     }
 
     @Test
@@ -142,9 +141,9 @@ class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertTrue(lenker.containsAll(List.of("bytt-behandlende-enhet", "opne-for-endringer", "henlegg-behandling", "gjenoppta-behandling",
+        assertThat(lenker).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
             "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
-            "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurderingsperioder", "opprett-verge", "fjern-verge")));
+            "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurderingsperioder", "opprett-verge", "fjern-verge");
     }
 
     @Test
@@ -157,9 +156,9 @@ class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertTrue(lenker.containsAll(List.of("bytt-behandlende-enhet", "opne-for-endringer", "henlegg-behandling", "gjenoppta-behandling",
+        assertThat(lenker).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
             "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
-            "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurdering", "vilkarvurderingsperioder", "opprett-verge", "fjern-verge")));
+            "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurdering", "vilkarvurderingsperioder", "opprett-verge", "fjern-verge");
     }
 
     @Test
@@ -173,9 +172,9 @@ class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertTrue(lenker.containsAll(List.of("bytt-behandlende-enhet", "opne-for-endringer", "henlegg-behandling", "gjenoppta-behandling",
+        assertThat(lenker).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
             "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
-            "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurderingsperioder", "vilkarvurdering", "opprett-verge", "fjern-verge")));
+            "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurderingsperioder", "vilkarvurdering", "opprett-verge", "fjern-verge");
     }
 
     @Test
@@ -189,10 +188,10 @@ class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertTrue(lenker.containsAll(List.of("bytt-behandlende-enhet", "opne-for-endringer", "henlegg-behandling", "gjenoppta-behandling",
+        assertThat(lenker).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
             "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
             "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurdering", "vilkarvurderingsperioder", "beregningsresultat", "vedtaksbrev",
-            "opprett-verge", "fjern-verge")));
+            "opprett-verge", "fjern-verge");
     }
 
     @Test
@@ -205,8 +204,8 @@ class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertTrue(lenker.containsAll(List.of("bytt-behandlende-enhet", "opne-for-endringer", "henlegg-behandling", "gjenoppta-behandling",
-            "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter")));
+        assertThat(lenker).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
+            "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "opprett-verge", "fjern-verge");
         assertFalse(utvidetBehandlingDto.isKanHenleggeBehandling());
     }
 
@@ -220,9 +219,9 @@ class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertTrue(lenker.containsAll(List.of("bytt-behandlende-enhet", "opne-for-endringer", "henlegg-behandling", "gjenoppta-behandling",
+        assertThat(lenker).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
             "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
-            "feilutbetalingAarsak", "opprett-verge", "fjern-verge", "soeker-verge")));
+            "feilutbetalingAarsak", "opprett-verge", "fjern-verge", "soeker-verge");
     }
 
     @Test
@@ -234,8 +233,8 @@ class BehandlingDtoTjenesteTest {
         var behandlingDto = assertBehandlingDto(behandling, behandlingDtoListe, BehandlingResultatType.IKKE_FASTSATT);
 
         var lenker = behandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertTrue(lenker.containsAll(List.of("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
-                "behandling-rettigheter", "finn-menyvalg-for-verge")));
+        assertThat(lenker).containsExactlyInAnyOrder("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
+                "behandling-rettigheter", "finn-menyvalg-for-verge");
     }
 
     @Test
@@ -247,9 +246,8 @@ class BehandlingDtoTjenesteTest {
         var behandlingDto = assertBehandlingDto(behandling, behandlingDtoListe, BehandlingResultatType.IKKE_FASTSATT);
 
         var lenker = behandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertTrue(lenker.containsAll(
-            List.of("totrinnskontroll-arsaker", "bekreft-totrinnsaksjonspunkt", "brev-maler", "brev-bestill", "brev-forhandvis",
-                "handling-rettigheter", "behandling-rettigheter", "finn-menyvalg-for-verge")));
+        assertThat(lenker).containsExactlyInAnyOrder("totrinnskontroll-arsaker", "bekreft-totrinnsaksjonspunkt", "brev-maler", "brev-bestill", "brev-forhandvis",
+                "handling-rettigheter", "behandling-rettigheter", "finn-menyvalg-for-verge");
     }
 
     @Test
@@ -268,9 +266,8 @@ class BehandlingDtoTjenesteTest {
         assertEquals(BehandlingType.TILBAKEKREVING, behandlingDto.getType());
 
         var lenker = behandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertTrue(lenker.containsAll(
-            List.of("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
-                "behandling-rettigheter", "finn-menyvalg-for-verge")));
+        assertThat(lenker).containsExactlyInAnyOrder("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
+                "behandling-rettigheter", "finn-menyvalg-for-verge");
 
         assertFalse(behandlingDto.isKanHenleggeBehandling());
     }
@@ -295,9 +292,8 @@ class BehandlingDtoTjenesteTest {
         assertEquals(BehandlingType.TILBAKEKREVING, behandlingDto.getType());
 
         var lenker = behandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertTrue(lenker.containsAll(
-            List.of("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
-                "behandling-rettigheter", "finn-menyvalg-for-verge")));
+        assertThat(lenker).containsExactlyInAnyOrder("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
+                "behandling-rettigheter", "finn-menyvalg-for-verge");
 
         assertTrue(behandlingDto.isKanHenleggeBehandling());
     }

@@ -25,14 +25,14 @@ import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
-@Path(BehandlingFaktaRestTjeneste.PATH_FRAGMENT)
+@Path(BehandlingFaktaRestTjeneste.BASE_PATH)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
 @ApplicationScoped
 @Transactional
 public class BehandlingFaktaRestTjeneste {
 
-    public static final String PATH_FRAGMENT = "/behandlingfakta";
+    public static final String BASE_PATH = "/behandlingfakta";
 
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste;
     private BehandlingTjeneste behandlingTjeneste;

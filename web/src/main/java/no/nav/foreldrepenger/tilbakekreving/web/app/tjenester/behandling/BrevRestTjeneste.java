@@ -32,14 +32,14 @@ import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
-@Path(BrevRestTjeneste.PATH_FRAGMENT)
+@Path(BrevRestTjeneste.BASE_PATH)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
 @RequestScoped
 @Transactional
 public class BrevRestTjeneste {
 
-    public static final String PATH_FRAGMENT = "/brev";
+    public static final String BASE_PATH = "/brev";
 
     private DokumentBehandlingTjeneste dokumentBehandlingTjeneste;
     private BehandlingTjeneste behandlingTjeneste;
