@@ -23,9 +23,8 @@ import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
-import static no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.TotrinnskontrollRestTjeneste.BASE_PATH;
 
-@Path(BASE_PATH)
+@Path(TotrinnskontrollRestTjeneste.BASE_PATH)
 @ApplicationScoped
 @Transactional
 public class TotrinnskontrollRestTjeneste {
