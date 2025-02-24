@@ -22,7 +22,6 @@ import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.pdp.ForeldrepengerDataKeys;
-import no.nav.vedtak.sikkerhet.abac.pipdata.AbacPipDto;
 import no.nav.vedtak.sikkerhet.abac.pipdata.PipAktørId;
 import no.nav.vedtak.sikkerhet.abac.pipdata.PipBehandlingStatus;
 import no.nav.vedtak.sikkerhet.abac.pipdata.PipFagsakStatus;
@@ -77,28 +76,26 @@ class FPPdpRequestBuilderTest {
     void skal_hente_behandlinginfo_fra_fpsak_når_input_er_fpsak_behandlingid() {
         var attributter = AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID);
 
-        var pipDto = new AbacPipDto(Set.of(new PipAktørId(PERSON1)), PipFagsakStatus.OPPRETTET, PipBehandlingStatus.OPPRETTET);
-        when(fpsakPipKlient.hentPipdataForFpsakBehandling(FPSAK_BEHANDLING_UUID)).thenReturn(pipDto);
+        when(fpsakPipKlient.hentAktørIdForBehandling(FPSAK_BEHANDLING_UUID)).thenReturn(Set.of(new PipAktørId(PERSON1)));
 
         var request = requestBuilder.lagAppRessursData(attributter);
         assertThat(request.getAktørIdSet()).containsOnly(PERSON1);
         assertThat(request.getResource(ForeldrepengerDataKeys.SAKSBEHANDLER)).isNull();
-        assertThat(request.getResource(ForeldrepengerDataKeys.FAGSAK_STATUS).verdi()).isEqualTo(PipFagsakStatus.OPPRETTET.getVerdi());
-        assertThat(request.getResource(ForeldrepengerDataKeys.BEHANDLING_STATUS).verdi()).isEqualTo(PipBehandlingStatus.OPPRETTET.getVerdi());
+        assertThat(request.getResource(ForeldrepengerDataKeys.FAGSAK_STATUS).verdi()).isEqualTo(PipFagsakStatus.UNDER_BEHANDLING.getVerdi());
+        assertThat(request.getResource(ForeldrepengerDataKeys.BEHANDLING_STATUS).verdi()).isEqualTo(PipBehandlingStatus.UTREDES.getVerdi());
     }
 
     @Test
     void skal_hente_behandlinginfo_fra_fpsak_når_input_er_fpsak_behandlingid_avsluttet_sak() {
         var attributter = AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID);
 
-        var pipDto = new AbacPipDto(Set.of(new PipAktørId(PERSON1)), null, null);
-        when(fpsakPipKlient.hentPipdataForFpsakBehandling(FPSAK_BEHANDLING_UUID)).thenReturn(pipDto);
+        when(fpsakPipKlient.hentAktørIdForBehandling(FPSAK_BEHANDLING_UUID)).thenReturn(Set.of(new PipAktørId(PERSON1)));
 
         var request = requestBuilder.lagAppRessursData(attributter);
         assertThat(request.getAktørIdSet()).containsOnly(PERSON1);
         assertThat(request.getResource(ForeldrepengerDataKeys.SAKSBEHANDLER)).isNull();
         assertThat(request.getResource(ForeldrepengerDataKeys.FAGSAK_STATUS).verdi()).isEqualTo(PipFagsakStatus.UNDER_BEHANDLING.getVerdi());
-        assertThat(request.getResource(ForeldrepengerDataKeys.BEHANDLING_STATUS)).isNull();
+        assertThat(request.getResource(ForeldrepengerDataKeys.BEHANDLING_STATUS).verdi()).isEqualTo(PipBehandlingStatus.UTREDES.getVerdi());
     }
 
 

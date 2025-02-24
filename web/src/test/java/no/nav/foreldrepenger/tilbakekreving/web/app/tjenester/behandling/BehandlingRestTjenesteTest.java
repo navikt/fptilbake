@@ -86,7 +86,7 @@ class BehandlingRestTjenesteTest {
     static final String GYLDIG_AKTØR_ID = "12345678901";
     static final String GYLDIG_SAKSNR = "123456";
     static final String UGYLDIG_SAKSNR = "(#2141##";
-    static final String EKSTERN_BEHANDLING_UUID = UUID.randomUUID().toString();
+    static final UUID EKSTERN_BEHANDLING_UUID = UUID.randomUUID();
     private static final FagsakYtelseType FP_YTELSE_TYPE = FagsakYtelseType.FORELDREPENGER;
 
     private ProsessTaskTjeneste taskTjeneste = mock(ProsessTaskTjeneste.class);
@@ -289,7 +289,7 @@ class BehandlingRestTjenesteTest {
     }
 
 
-    private OpprettBehandlingDto opprettBehandlingDto(String saksnr, String eksternUuid, FagsakYtelseType ytelseType) {
+    private OpprettBehandlingDto opprettBehandlingDto(String saksnr, UUID eksternUuid, FagsakYtelseType ytelseType) {
         OpprettBehandlingDto dto = new OpprettBehandlingDto();
         dto.setSaksnummer(new SaksnummerDto(saksnr));
         dto.setEksternUuid(eksternUuid);
@@ -318,7 +318,7 @@ class BehandlingRestTjenesteTest {
     }
 
     private Optional<EksternBehandling> opprettEksternBehandling() {
-        return Optional.of(new EksternBehandling(mockBehandling(), Henvisning.fraEksternBehandlingId(1L), UUID.fromString(EKSTERN_BEHANDLING_UUID)));
+        return Optional.of(new EksternBehandling(mockBehandling(), Henvisning.fraEksternBehandlingId(1L), EKSTERN_BEHANDLING_UUID));
     }
 
 }

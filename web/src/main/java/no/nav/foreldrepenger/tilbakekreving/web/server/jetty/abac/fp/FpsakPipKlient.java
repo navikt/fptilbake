@@ -14,13 +14,15 @@ import no.nav.vedtak.felles.integrasjon.rest.RestClientConfig;
 import no.nav.vedtak.felles.integrasjon.rest.RestConfig;
 import no.nav.vedtak.felles.integrasjon.rest.RestRequest;
 import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
-import no.nav.vedtak.sikkerhet.abac.pipdata.AbacPipDto;
+import no.nav.vedtak.sikkerhet.abac.pipdata.PipAktørId;
 
 @Dependent
 @RestClientConfig(tokenConfig = TokenFlow.AZUREAD_CC, application = FpApplication.FPSAK)
 public class FpsakPipKlient {
 
     private static final String PIP_PATH = "/api/pip";
+    private static final String AKTOER_FOR_SAK = "/aktoer-for-sak";
+    private static final String AKTOER_FOR_BEHANDLING = "/aktoer-for-behandling";
 
     private final RestClient restClient;
     private final RestConfig restConfig;
@@ -30,21 +32,23 @@ public class FpsakPipKlient {
         this.restConfig = RestConfig.forClient(FpsakPipKlient.class);
     }
 
-    public AbacPipDto hentPipdataForFpsakBehandling(UUID behandlingUUid) {
+    public Set<PipAktørId> hentAktørIdForBehandling(UUID behandlingUUid) {
         var uri = UriBuilder.fromUri(restConfig.fpContextPath())
             .path(PIP_PATH)
-            .path("/pipdata-for-behandling-appintern")
+            .path(AKTOER_FOR_BEHANDLING)
             .queryParam("behandlingUuid", behandlingUUid.toString())
             .build();
-        return restClient.send(RestRequest.newGET(uri, restConfig), AbacPipDto.class);
+        var respons = restClient.sendReturnList(RestRequest.newGET(uri, restConfig), PipAktørId.class);
+        return new HashSet<>(respons);
     }
 
     public Set<String> hentAktørIderSomString(Saksnummer saksnummer) {
         var uri = UriBuilder.fromUri(restConfig.fpContextPath())
                 .path(PIP_PATH)
-                .path("/aktoer-for-sak")
+                .path(AKTOER_FOR_SAK)
                 .queryParam("saksnummer", saksnummer.getVerdi())
                 .build();
-        return restClient.send(RestRequest.newGET(uri, restConfig), HashSet.class);
+        var aktører = restClient.sendReturnList(RestRequest.newGET(uri, restConfig), String.class);
+        return new HashSet<>(aktører);
     }
 }
