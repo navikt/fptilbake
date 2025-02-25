@@ -7,7 +7,6 @@ import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -68,9 +67,9 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Beh
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingOpprettingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingRettigheterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ByttBehandlendeEnhetDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.GjenopptaBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.HenleggBehandlingDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KanOppretteBehandlingFpsakUuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KlageTilbakekrevingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.OpprettBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ProsessTaskGruppeIdDto;
@@ -88,7 +87,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandl
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
-import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
@@ -230,19 +228,11 @@ public class BehandlingRestTjeneste {
             description = "Sjekk om behandling kan opprettes")
     @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
     public Response kanOpprettesBehandling(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto,
-                                           @NotNull @QueryParam("uuid") @TilpassetAbacAttributt(supplierClass = AbacDataBehandlingKanOpprettes.class) @Valid FpsakUuidDto fpsakUuidDto) {
+                                           @NotNull @QueryParam("uuid") @Valid KanOppretteBehandlingFpsakUuidDto fpsakUuidDto) {
         Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
         UUID eksternUUID = fpsakUuidDto.uuid();
 
         return Response.ok(behandlingTjeneste.kanOppretteBehandling(saksnummer, eksternUUID)).build();
-    }
-
-    // Får tilstrekkelig tilgangsinformasjon fra saksnummer
-    public static class AbacDataBehandlingKanOpprettes implements Function<Object, AbacDataAttributter> {
-        @Override
-        public AbacDataAttributter apply(Object obj) {
-            return AbacDataAttributter.opprett();
-        }
     }
 
     // TODO: k9-tilbake. fjern når endringen er merget og prodsatt også i fpsak-frontend

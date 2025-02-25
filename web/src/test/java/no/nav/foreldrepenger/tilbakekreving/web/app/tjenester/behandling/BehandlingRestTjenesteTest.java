@@ -57,7 +57,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.HistorikkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDtoTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KanOppretteBehandlingFpsakUuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.HenleggBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KlageTilbakekrevingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.OpprettBehandlingDto;
@@ -107,7 +107,7 @@ class BehandlingRestTjenesteTest {
         behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock, historikkTjeneste);
 
     private static SaksnummerDto saksnummerDto = new SaksnummerDto(GYLDIG_SAKSNR);
-    private static FpsakUuidDto fpsakUuidDto = new FpsakUuidDto(EKSTERN_BEHANDLING_UUID);
+    private static KanOppretteBehandlingFpsakUuidDto fpsakUuidDto = new KanOppretteBehandlingFpsakUuidDto(EKSTERN_BEHANDLING_UUID);
     private static BehandlingReferanse behandlingReferanse = new BehandlingReferanse(1L);
     private static UuidDto uuidDto = new UuidDto(UUID.randomUUID());
 
