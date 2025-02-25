@@ -18,6 +18,8 @@ import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
+import no.nav.vedtak.sikkerhet.abac.pipdata.PipBehandlingStatus;
+import no.nav.vedtak.sikkerhet.abac.pipdata.PipFagsakStatus;
 
 /**
  * Implementasjon av PDP request for fptilbake.
@@ -89,7 +91,11 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
 
     private FpPipBehandlingInfo hentFpsakBehandlingData(UUID fpsakBehandlingUuid) {
         LOG_CONTEXT.add("fpsakBehandlingUuid", fpsakBehandlingUuid);
-        return new FpPipBehandlingInfo(fpsakPipKlient.hentPipdataForFpsakBehandling(fpsakBehandlingUuid));
+        var identer = fpsakPipKlient.hentAktørIdForBehandling(fpsakBehandlingUuid);
+        if (identer.isEmpty()) {
+            return null;
+        }
+        return new FpPipBehandlingInfo(identer, null, PipFagsakStatus.UNDER_BEHANDLING, PipBehandlingStatus.UTREDES, null);
     }
 
     private FpPipBehandlingInfo lagBehandlingData(Long behandlingId) {

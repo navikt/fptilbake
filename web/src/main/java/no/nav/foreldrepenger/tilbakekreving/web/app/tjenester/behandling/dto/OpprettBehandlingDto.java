@@ -60,8 +60,8 @@ public class OpprettBehandlingDto implements AbacDto {
         return eksternUuid;
     }
 
-    public void setEksternUuid(String eksternUuid) {
-        this.eksternUuid = UUID.fromString(eksternUuid);
+    public void setEksternUuid(UUID eksternUuid) {
+        this.eksternUuid = eksternUuid;
     }
 
     public BehandlingType getBehandlingType() {
