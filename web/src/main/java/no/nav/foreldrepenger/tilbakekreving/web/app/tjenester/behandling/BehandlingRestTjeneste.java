@@ -69,7 +69,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Beh
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ByttBehandlendeEnhetDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.GjenopptaBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.HenleggBehandlingDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KanOppretteBehandlingFpsakUuidDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KlageTilbakekrevingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.OpprettBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ProsessTaskGruppeIdDto;
@@ -228,9 +228,9 @@ public class BehandlingRestTjeneste {
             description = "Sjekk om behandling kan opprettes")
     @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
     public Response kanOpprettesBehandling(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto,
-                                           @NotNull @QueryParam("uuid") @Valid KanOppretteBehandlingFpsakUuidDto fpsakUuidDto) {
+                                           @NotNull @QueryParam("uuid") @Valid FpsakUuidDto fpsakUuidDto) {
         Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
-        UUID eksternUUID = fpsakUuidDto.uuid();
+        UUID eksternUUID = fpsakUuidDto.getUuid();
 
         return Response.ok(behandlingTjeneste.kanOppretteBehandling(saksnummer, eksternUUID)).build();
     }
