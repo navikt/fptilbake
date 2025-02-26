@@ -7,10 +7,9 @@ import java.util.Map;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
 public enum MeldingType implements Kodeverdi {
 
@@ -34,11 +33,10 @@ public enum MeldingType implements Kodeverdi {
         this.kode = kode;
     }
 
-    public static MeldingType fraKode(@JsonProperty(value = "kode") Object node) {
-        if (node == null) {
+    public static MeldingType fraKode(final String kode) {
+        if (kode == null) {
             return null;
         }
-        String kode = TempAvledeKode.getVerdi(MeldingType.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent MeldingType: " + kode);
@@ -50,6 +48,7 @@ public enum MeldingType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
+    @JsonValue
     @Override
     public String getKode() {
         return kode;
