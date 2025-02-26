@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,17 +7,11 @@ import java.util.Map;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
 
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum Språkkode implements Kodeverdi {
     nb("NB"),
     nn("NN"),
@@ -45,12 +37,10 @@ public enum Språkkode implements Kodeverdi {
         this.kode = kode;
     }
 
-    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static Språkkode fraKode(@JsonProperty(value = "kode") Object node) {
-        if (node == null) {
+    public static Språkkode fraKode(final String kode) {
+        if (kode == null) {
             return null;
         }
-        String kode = TempAvledeKode.getVerdi(Språkkode.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             return Språkkode.nb;
@@ -62,13 +52,12 @@ public enum Språkkode implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonProperty
+    @JsonValue
     @Override
     public String getKode() {
         return kode;
     }
 
-    @JsonProperty
     @Override
     public String getKodeverk() {
         return KODEVERK;
