@@ -45,6 +45,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.Fei
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.dto.NyVergeDto;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 import static no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLinks.get;
@@ -212,9 +213,9 @@ public class BehandlingDtoTjeneste {
         dto.setFørsteÅrsak(førsteÅrsak(behandling).orElse(null));
         dto.setBehandlingÅrsaker(lagBehandlingÅrsakDto(behandling));
         dto.setKanHenleggeBehandling(kanHenleggeBehandling(behandling));
-        var vergeInfo = vergeRepository.finnVergeInformasjon(behandling.getId());
-        vergeInfo.ifPresent(verge -> dto.setHarVerge(true));
-        dto.setBehandlingTillatteOperasjoner(lovligeOperasjoner(behandling, vergeInfo.isPresent()));
+        var finnesVerge = vergeRepository.finnesVerge(behandling.getId());
+        dto.setHarVerge(finnesVerge);
+        dto.setBehandlingTillatteOperasjoner(lovligeOperasjoner(behandling, finnesVerge));
         if (BehandlingStatus.FATTER_VEDTAK.equals(behandling.getStatus())) {
             dto.setTotrinnskontrollReadonly(false);
             dto.setTotrinnskontrollÅrsaker(totrinnskontrollTjeneste.hentTotrinnsSkjermlenkeContext(behandling));
@@ -285,7 +286,8 @@ public class BehandlingDtoTjeneste {
                 LocalDate.now().atStartOfDay().minusDays(OPPRETTELSE_DAGER_BEGRENSNING));
     }
 
-    private void leggTilLenkerForBehandlingsoperasjoner(BehandlingDto dto) {
+    private void leggTilLenkerForBehandlingsoperasjoner(Behandling behandling, BehandlingDto dto) {
+
         dto.leggTil(post(BehandlingRestTjeneste.BASE_PATH + "/bytt-enhet", "bytt-behandlende-enhet"));
         dto.leggTil(post(BehandlingRestTjeneste.BASE_PATH + "/henlegg", "henlegg-behandling"));
         dto.leggTil(post(BehandlingRestTjeneste.BASE_PATH + "/gjenoppta", "gjenoppta-behandling"));
@@ -295,21 +297,24 @@ public class BehandlingDtoTjeneste {
         dto.leggTil(post(AksjonspunktRestTjeneste.AKSJONSPUNKT_PATH, "lagre-aksjonspunkter"));
 
         dto.leggTil(post(ForeldelseRestTjeneste.BASE_PATH + "/belop", "beregne-feilutbetalt-belop"));
-        if (!BehandlingStatus.AVSLUTTET.equals(dto.getStatus()) && !dto.isBehandlingPåVent()) {
+        var finnesVerge = vergeRepository.finnesVerge(behandling.getId());
+        var tillatteoperasjoner = lovligeOperasjoner(behandling, finnesVerge);
 
-            if (ApplicationName.hvilkenTilbake().equals(Fagsystem.FPTILBAKE)) {
-                var uuidDto = new UuidDto(dto.getUuid());
-                if (vergeRepository.finnesVerge(dto.getId())) {
-                    dto.leggTil(get(VergeRestTjeneste.BASE_PATH, "verge-hent", uuidDto));
-                    dto.leggTil(post(VergeRestTjeneste.VERGE_FJERN_PATH, "verge-fjern", null, uuidDto));
-                } else {
-                    dto.leggTil(post(VergeRestTjeneste.VERGE_OPPRETT_PATH, "verge-opprett", uuidDto));
-                }
-            } else {
-                dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/opprett", "opprett-verge"));
-                dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/fjern", "fjern-verge"));
-            }
+        var uuidDto = new UuidDto(dto.getUuid());
+        var erK9 = ApplicationName.hvilkenTilbake().equals(Fagsystem.K9TILBAKE);
+        switch (tillatteoperasjoner.getVergeBehandlingsmeny()) {
+            case OPPRETT:
+                dto.leggTil(post(VergeRestTjeneste.VERGE_OPPRETT_PATH, "verge-opprett", null, uuidDto));
+                if (erK9)
+                    dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/opprett", "opprett-verge"));
+                break;
+            case FJERN:
+                dto.leggTil(get(VergeRestTjeneste.BASE_PATH, "verge-hent", uuidDto));
+                dto.leggTil(post(VergeRestTjeneste.VERGE_FJERN_PATH, "verge-fjern", null, uuidDto));
+                if (erK9) dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/fjern", "fjern-verge"));
+                break;
         }
+
     }
 
     private void settResourceLinks(Behandling behandling, UtvidetBehandlingDto dto, boolean behandlingHenlagt) {
@@ -323,8 +328,8 @@ public class BehandlingDtoTjeneste {
         var harDataForFaktaFeilutbetaling = faktaFeilutbetalingRepository.harDataForFaktaFeilutbetaling(behandlingId);
         var harVurdertForeldelse = vurdertForeldelseTjeneste.harVurdertForeldelse(behandlingId);
         var harDataForVilkårsvurdering = vilkårsvurderingRepository.harDataForVilkårsvurdering(behandlingId);
-        var harVergeAksjonspunkt = behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.AVKLAR_VERGE).isPresent();
-        leggTilLenkerForBehandlingsoperasjoner(dto);
+
+        leggTilLenkerForBehandlingsoperasjoner(behandling, dto);
 
         dto.leggTil(get(AksjonspunktRestTjeneste.AKSJONSPUNKT_PATH, "aksjonspunkter", uuidDto));
         if (BehandlingStegType.FAKTA_FEILUTBETALING.equals(bst) || harDataForFaktaFeilutbetaling) {
@@ -349,10 +354,15 @@ public class BehandlingDtoTjeneste {
             dto.leggTil(get(TilbakekrevingResultatRestTjeneste.BASE_PATH + "/resultat", "beregningsresultat", uuidDto));
             dto.leggTil(get(DokumentRestTjeneste.BASE_PATH + "/hent-vedtaksbrev", "vedtaksbrev", uuidDto));
         }
-        if (harVergeAksjonspunkt) {
+        leggTilVergeHvisFinnes(behandling, dto, uuidDto);
+    }
+
+    private void leggTilVergeHvisFinnes(Behandling behandling, UtvidetBehandlingDto dto, UuidDto uuidDto) {
+        var finnesVerge = vergeRepository.finnesVerge(behandling.getId());
+        var harÅpentVergeAP = behandling.harÅpentAksjonspunktMedType(AksjonspunktDefinisjon.AVKLAR_VERGE);
+        if (harÅpentVergeAP || finnesVerge) {
             dto.leggTil(get(VergeRestTjeneste.BASE_PATH + "/hent", "soeker-verge", uuidDto));
         }
-
     }
 
     private Optional<String> getVenteÅrsak(Behandling behandling) {

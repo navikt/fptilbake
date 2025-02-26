@@ -94,7 +94,8 @@ public class VergeRestTjeneste {
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(description = "Oppretter verge/fullmektig på behandlingen", tags = "verge", responses = {@ApiResponse(responseCode = "200", description = "Verge/fullmektig opprettes", headers = @Header(name = HttpHeaders.LOCATION))})
     @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK)
-    public Response opprettVerge(@QueryParam(UuidDto.NAME) @Parameter(description = "Behandling uuid") @Valid UuidDto queryParam,
+    public Response opprettVerge(
+            @QueryParam(UuidDto.NAME) @Parameter(description = "Behandling uuid") @Valid UuidDto queryParam,
                                  @Valid NyVergeDto body) {
 
         var behandling = behandlingTjeneste.hentBehandling(queryParam.getBehandlingUuid());
