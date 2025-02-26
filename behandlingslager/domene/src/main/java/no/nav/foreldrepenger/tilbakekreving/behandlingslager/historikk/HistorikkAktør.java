@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,16 +7,10 @@ import java.util.Map;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum HistorikkAktør implements Kodeverdi {
 
     BESLUTTER("BESL", "Beslutter"),
@@ -47,12 +39,10 @@ public enum HistorikkAktør implements Kodeverdi {
         this.navn = navn;
     }
 
-    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static HistorikkAktør fraKode(@JsonProperty(value = "kode") Object node) {
-        if (node == null) {
+    public static HistorikkAktør fraKode(final String kode) {
+        if (kode == null) {
             return null;
         }
-        String kode = TempAvledeKode.getVerdi(HistorikkAktør.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent HistorikkAktør: " + kode);
@@ -64,19 +54,17 @@ public enum HistorikkAktør implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonProperty
+    @JsonValue
     @Override
     public java.lang.String getKode() {
         return kode;
     }
 
-    @JsonProperty
     @Override
     public java.lang.String getKodeverk() {
         return KODEVERK;
     }
 
-    @JsonProperty
     @Override
     public java.lang.String getNavn() {
         return navn;
