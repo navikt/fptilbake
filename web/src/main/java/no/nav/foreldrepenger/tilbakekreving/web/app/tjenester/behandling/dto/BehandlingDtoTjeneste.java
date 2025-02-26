@@ -44,8 +44,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.dokument.DokumentR
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.FeilutbetalingÅrsakRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.dto.NyVergeDto;
-import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.sikkerhet.kontekst.KontekstHolder;
 
 import static no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLinks.get;
