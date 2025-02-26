@@ -54,12 +54,10 @@ public enum FagsakYtelseType implements Kodeverdi {
     }
 
     // Beholdt sidan den er brukt i HendelseTaskDataWrapper. Ikkje brukt til vanleg json deserialisering lengre.
-    // Kanskje HendelseTaskDataWrapper kan bruke KODER.get istadenfor denne metoden?
-    public static FagsakYtelseType fraKode(Object node) {
-        if (node == null) {
+    public static FagsakYtelseType fraKode(String kode) {
+        if (kode == null) {
             return null;
         }
-        String kode = TempAvledeKode.getVerdi(FagsakYtelseType.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent FagsakYtelseType: " + kode);
