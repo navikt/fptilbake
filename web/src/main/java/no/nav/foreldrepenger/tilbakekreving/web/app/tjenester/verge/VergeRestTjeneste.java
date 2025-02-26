@@ -169,7 +169,7 @@ public class VergeRestTjeneste {
     }
 
     @GET
-    // Re-enable dersom non-empty. jersey gir warning @Path("/")
+    @Path("/hent")
     @Operation(description = "Returnerer informasjon om verge knyttet til søker for denne behandlingen",
             tags = "verge",
             responses = {

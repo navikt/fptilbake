@@ -296,17 +296,18 @@ public class BehandlingDtoTjeneste {
 
         dto.leggTil(post(ForeldelseRestTjeneste.BASE_PATH + "/belop", "beregne-feilutbetalt-belop"));
         if (!BehandlingStatus.AVSLUTTET.equals(dto.getStatus()) && !dto.isBehandlingPåVent()) {
-            dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/opprett", "opprett-verge"));
-            dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/fjern", "fjern-verge"));
-        }
 
-        if (ApplicationName.hvilkenTilbake().equals(Fagsystem.FPTILBAKE)){
-            var uuidDto = new UuidDto(dto.getUuid());
-            if (vergeRepository.finnesVerge(dto.getId())) {
-                dto.leggTil(get(VergeRestTjeneste.BASE_PATH, "verge-hent", uuidDto));
-                dto.leggTil(post(VergeRestTjeneste.VERGE_FJERN_PATH, "verge-fjern", null, uuidDto));
+            if (ApplicationName.hvilkenTilbake().equals(Fagsystem.FPTILBAKE)) {
+                var uuidDto = new UuidDto(dto.getUuid());
+                if (vergeRepository.finnesVerge(dto.getId())) {
+                    dto.leggTil(get(VergeRestTjeneste.BASE_PATH, "verge-hent", uuidDto));
+                    dto.leggTil(post(VergeRestTjeneste.VERGE_FJERN_PATH, "verge-fjern", null, uuidDto));
+                } else {
+                    dto.leggTil(post(VergeRestTjeneste.VERGE_OPPRETT_PATH, "verge-opprett", uuidDto));
+                }
             } else {
-                dto.leggTil(post(VergeRestTjeneste.VERGE_OPPRETT_PATH, "verge-opprett", new NyVergeDto(), uuidDto));
+                dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/opprett", "opprett-verge"));
+                dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/fjern", "fjern-verge"));
             }
         }
     }
@@ -349,7 +350,7 @@ public class BehandlingDtoTjeneste {
             dto.leggTil(get(DokumentRestTjeneste.BASE_PATH + "/hent-vedtaksbrev", "vedtaksbrev", uuidDto));
         }
         if (harVergeAksjonspunkt) {
-            dto.leggTil(get(VergeRestTjeneste.BASE_PATH, "soeker-verge", uuidDto));
+            dto.leggTil(get(VergeRestTjeneste.BASE_PATH + "/hent", "soeker-verge", uuidDto));
         }
 
     }
