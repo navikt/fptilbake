@@ -11,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
 public enum FagsakYtelseType implements Kodeverdi {
     ENGANGSTØNAD("ES", "Engangsstønad", "Eingongsstønad"),
