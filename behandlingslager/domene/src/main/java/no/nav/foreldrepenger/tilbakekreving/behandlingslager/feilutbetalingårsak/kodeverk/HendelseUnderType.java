@@ -7,16 +7,10 @@ import java.util.Map;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public enum HendelseUnderType implements Kodeverdi {
 
     //FP
@@ -128,12 +122,10 @@ public enum HendelseUnderType implements Kodeverdi {
         this.sortering = sortering;
     }
 
-    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static HendelseUnderType fraKode(@JsonProperty(value = "kode") Object node) {
-        if (node == null) {
+    public static HendelseUnderType fraKode(final String kode) {
+        if (kode == null) {
             return null;
         }
-        String kode = TempAvledeKode.getVerdi(HendelseUnderType.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent HendelseType: " + kode);
@@ -141,19 +133,17 @@ public enum HendelseUnderType implements Kodeverdi {
         return ad;
     }
 
-    @JsonProperty
+    @JsonValue
     @Override
     public String getKode() {
         return kode;
     }
 
-    @JsonProperty
     @Override
     public String getKodeverk() {
         return KODERVERK;
     }
 
-    @JsonProperty
     @Override
     public String getNavn() {
         return navn;
