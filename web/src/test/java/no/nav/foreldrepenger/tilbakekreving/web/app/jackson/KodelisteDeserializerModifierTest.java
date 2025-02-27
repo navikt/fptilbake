@@ -33,17 +33,4 @@ public class KodelisteDeserializerModifierTest {
         final TestKodeverdiEnum out1 = om.readValue(jsonStr, TestKodeverdiEnum.class);
         assertThat(out1).isEqualTo(inp1);
     }
-
-    // Test enum Kodeverdi som framleis har gammal JsonFormat annotasjon og JsonCreator for i utgangspunktet å serialisere til objekt.
-    // Kan fjernast når alle Kodeverdi implementasjoner er endra til å bruke kun @JsonValue for serialisering
-    @ParameterizedTest
-    @FieldSource("objectmappers")
-    public void testObjektbasertDeserialiseringForJsonObject(ObjectMapper om) throws JsonProcessingException {
-        // Serialiser
-        final var inp1 = FagsakYtelseType.OPPLÆRINGSPENGER;
-        final String jsonStr = om.writeValueAsString(inp1);
-        // Deserialiser
-        final FagsakYtelseType out1 = om.readValue(jsonStr, FagsakYtelseType.class);
-        assertThat(out1).isEqualTo(inp1);
-    }
 }
