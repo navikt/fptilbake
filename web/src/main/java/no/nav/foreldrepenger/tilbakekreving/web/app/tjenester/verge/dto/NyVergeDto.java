@@ -1,12 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.util.InputValideringRegex;
@@ -26,8 +26,8 @@ public class NyVergeDto implements AbacDto {
     private LocalDate gyldigFom;
     private LocalDate gyldigTom;
 
+    @Valid
     @NotNull
-    @ValidKodeverk
     private VergeType vergeType;
 
     @Pattern(regexp = "[\\d]{9}")
