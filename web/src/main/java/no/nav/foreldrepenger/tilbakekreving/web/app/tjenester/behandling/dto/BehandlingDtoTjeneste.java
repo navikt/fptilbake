@@ -295,24 +295,27 @@ public class BehandlingDtoTjeneste {
         dto.leggTil(post(AksjonspunktRestTjeneste.AKSJONSPUNKT_PATH, "lagre-aksjonspunkter"));
 
         dto.leggTil(post(ForeldelseRestTjeneste.BASE_PATH + "/belop", "beregne-feilutbetalt-belop"));
-        var finnesVerge = vergeRepository.finnesVerge(behandling.getId());
-        var tillatteoperasjoner = lovligeOperasjoner(behandling, finnesVerge);
 
-        var uuidDto = new UuidDto(dto.getUuid());
         var erK9 = ApplicationName.hvilkenTilbake().equals(Fagsystem.K9TILBAKE);
-        switch (tillatteoperasjoner.getVergeBehandlingsmeny()) {
-            case OPPRETT:
-                dto.leggTil(post(VergeRestTjeneste.VERGE_OPPRETT_PATH, "verge-opprett", null, uuidDto));
-                if (erK9)
-                    dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/opprett", "opprett-verge"));
-                break;
-            case FJERN:
-                dto.leggTil(get(VergeRestTjeneste.BASE_PATH, "verge-hent", uuidDto));
-                dto.leggTil(post(VergeRestTjeneste.VERGE_FJERN_PATH, "verge-fjern", null, uuidDto));
-                if (erK9) dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/fjern", "fjern-verge"));
-                break;
+        if (erK9) {
+            if (!BehandlingStatus.AVSLUTTET.equals(dto.getStatus()) && !dto.isBehandlingPåVent()) {
+                dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/opprett", "opprett-verge"));
+                dto.leggTil(post(VergeRestTjeneste.BASE_PATH + "/fjern", "fjern-verge"));
+            }
+        } else {
+            var uuidDto = new UuidDto(dto.getUuid());
+            var finnesVerge = vergeRepository.finnesVerge(behandling.getId());
+            var tillatteoperasjoner = lovligeOperasjoner(behandling, finnesVerge);
+            switch (tillatteoperasjoner.getVergeBehandlingsmeny()) {
+                case OPPRETT:
+                    dto.leggTil(post(VergeRestTjeneste.VERGE_OPPRETT_PATH, "verge-opprett", null, uuidDto));
+                    break;
+                case FJERN:
+                    dto.leggTil(get(VergeRestTjeneste.BASE_PATH, "verge-hent", uuidDto));
+                    dto.leggTil(post(VergeRestTjeneste.VERGE_FJERN_PATH, "verge-fjern", null, uuidDto));
+                    break;
+            }
         }
-
     }
 
     private void settResourceLinks(Behandling behandling, UtvidetBehandlingDto dto, boolean behandlingHenlagt) {

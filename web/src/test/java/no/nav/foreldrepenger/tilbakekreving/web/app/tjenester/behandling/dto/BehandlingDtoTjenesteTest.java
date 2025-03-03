@@ -15,6 +15,9 @@ import java.util.function.Consumer;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -234,6 +237,30 @@ class BehandlingDtoTjenesteTest {
                         assertThat(dto.getLinks()).extracting(ResourceLink::getRel).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
                                 "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
                                 "feilutbetalingAarsak", "verge-opprett", "soeker-verge");
+                    });
+        }
+
+        @Test
+        void skal_hentUtvidetBehandlingResultat_medEksisterendeVerge() {
+            var behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
+            var vergeEntitet = new VergeEntitet.Builder()
+                    .medVergeAktørId(new AktørId(GYLDIG_AKTØR_ID))
+                    .medVergeType(VergeType.ANNEN_F)
+                    .medGyldigPeriode(LocalDate.now(), LocalDate.now().plusYears(1))
+                    .medNavn("Navn Navnesen")
+                    .medKilde(KildeType.FPTILBAKE.name())
+                    .build();
+            repositoryProvider.getVergeRepository().lagreVergeInformasjon(behandling.getId(), vergeEntitet);
+            when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
+
+            var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
+
+            assertThat(utvidetBehandlingDto)
+                    .satisfies(harSaksbehandlerOgBehandlingIkkePåVent)
+                    .satisfies(dto -> {
+                        assertThat(dto.getLinks()).extracting(ResourceLink::getRel).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
+                                "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
+                                "feilutbetalingAarsak", "verge-fjern", "verge-hent", "soeker-verge");
                     });
         }
 
