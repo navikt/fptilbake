@@ -289,7 +289,7 @@ class BehandlingDtoTjenesteTest {
                 assertThat(dto.getLinks())
                         .extracting(ResourceLink::getRel)
                         .containsExactlyInAnyOrder("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
-                                "behandling-rettigheter", "finn-menyvalg-for-verge");
+                                "behandling-rettigheter");
             });
         }
 
@@ -309,7 +309,7 @@ class BehandlingDtoTjenesteTest {
                         assertThat(dto.getLinks())
                                 .extracting(ResourceLink::getRel)
                                 .containsExactlyInAnyOrder("totrinnskontroll-arsaker", "bekreft-totrinnsaksjonspunkt", "brev-maler", "brev-bestill", "brev-forhandvis",
-                                        "handling-rettigheter", "behandling-rettigheter", "finn-menyvalg-for-verge");
+                                        "handling-rettigheter", "behandling-rettigheter");
                     });
         }
 
@@ -330,7 +330,7 @@ class BehandlingDtoTjenesteTest {
                         assertThat(dto.getLinks())
                                 .extracting(ResourceLink::getRel)
                                 .containsExactlyInAnyOrder("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
-                                        "behandling-rettigheter", "finn-menyvalg-for-verge");
+                                        "behandling-rettigheter");
                     });
         }
 
@@ -355,7 +355,7 @@ class BehandlingDtoTjenesteTest {
                         assertThat(dto.getLinks())
                                 .extracting(ResourceLink::getRel)
                                 .containsExactlyInAnyOrder("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
-                                        "behandling-rettigheter", "finn-menyvalg-for-verge");
+                                        "behandling-rettigheter");
                     });
         }
 

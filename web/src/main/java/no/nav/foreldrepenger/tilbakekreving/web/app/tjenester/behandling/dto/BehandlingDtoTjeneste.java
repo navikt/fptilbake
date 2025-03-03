@@ -122,8 +122,6 @@ public class BehandlingDtoTjeneste {
         // Behandlingsmeny-operasjoner
         dto.leggTil(get(BehandlingRestTjeneste.BASE_PATH + "/handling-rettigheter", "handling-rettigheter", uuidDto));
         dto.leggTil(get(BehandlingRestTjeneste.BEHANDLING_RETTIGHETER_PATH, "behandling-rettigheter", uuidDto));
-        // Denne håndteres litt spesielt i frontend, så må gjøres på denne måten
-        dto.leggTil(get("/verge/behandlingsmeny?uuid=" + uuid, "finn-menyvalg-for-verge"));
 
         // Totrinnsbehandling
         if (BehandlingStatus.FATTER_VEDTAK.equals(behandling.getStatus())) {
@@ -362,7 +360,7 @@ public class BehandlingDtoTjeneste {
         var finnesVerge = vergeRepository.finnesVerge(behandling.getId());
         var harÅpentVergeAP = behandling.harÅpentAksjonspunktMedType(AksjonspunktDefinisjon.AVKLAR_VERGE);
         if (harÅpentVergeAP || finnesVerge) {
-            dto.leggTil(get(VergeRestTjeneste.BASE_PATH + "/hent", "soeker-verge", uuidDto));
+            dto.leggTil(get(VergeRestTjeneste.BASE_PATH, "soeker-verge", uuidDto));
         }
     }
 
