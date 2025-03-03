@@ -58,7 +58,7 @@ public class LosRestTjeneste {
     })
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     public Response hentBehandlingForLos(@NotNull @QueryParam(UuidDto.NAME) @Parameter(description = UuidDto.DESC) @Valid UuidDto uuidDto) {
         var behandling = behandlingRepository.hentBehandling(uuidDto.getBehandlingUuid());
         var dto = losBehandlingDtoTjeneste.lagLosBehandlingDto(behandling);

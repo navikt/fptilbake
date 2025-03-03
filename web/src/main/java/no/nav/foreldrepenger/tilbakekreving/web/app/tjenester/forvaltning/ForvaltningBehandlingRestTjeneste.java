@@ -130,7 +130,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet"),
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = true)
     public Response tvingHenleggelseBehandling(
         @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
         @QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
@@ -153,7 +153,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet eller behandlingen er ikke på vent"),
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = true)
     public Response tvingGjenopptaBehandling(
         @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
         @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
@@ -182,7 +182,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet eller behandlingen er fortsatt på vent"),
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = false)
     public Response fortsettBehandling(
         @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
         @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
@@ -206,7 +206,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Ulike problemer med request, typisk at man peker på feil XML eller behandling."),
             @ApiResponse(responseCode = "500", description = "Feilet pga ugyldig kravgrunnlag, eller ukjent feil.")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = true)
     public Response tvingkobleBehandlingTilGrunnlag(@Valid @NotNull KobleBehandlingTilGrunnlagDto behandlingTilGrunnlagDto) {
         try {
             kobleBehandling(behandlingTilGrunnlagDto);
@@ -234,7 +234,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Ulike problemer med request, typisk at man peker på feil eksternBehandlingUuid eller behandling!"),
             @ApiResponse(responseCode = "500", description = "Ukjent feil!")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = true)
     public Response korrigerHenvisning(@Valid @NotNull KorrigertHenvisningDto korrigertHenvisningDto) {
         Behandling behandling = behandlingRepository.hentBehandling(korrigertHenvisningDto.getBehandlingId());
         UUID eksternBehandlingUuid = korrigertHenvisningDto.getEksternBehandlingUuid();
@@ -253,7 +253,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Behandling er avsluttet eller behandling er på vent"),
             @ApiResponse(responseCode = "500", description = "Ukjent feil!")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = true)
     public Response tilbakeførBehandlingTilFaktaSteg(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                                      @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
@@ -275,7 +275,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "200", description = "Aksjonspunkt avbrut"),
             @ApiResponse(responseCode = "500", description = "ukjent feil.")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = true)
     public Response avbrytÅpentAksjonspunktForAvsluttetBehandling() {
         behandlingRepository.avbrytÅpentAksjonspunktForAvsluttetBehandling();
         return Response.ok().build();
@@ -290,7 +290,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "200", description = "Aksjonspunkt avbrut"),
             @ApiResponse(responseCode = "500", description = "ukjent feil.")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = false)
     public Response publiserSaksstatistikkForBehandlingPåVent() {
         behandlingRepository.finnBehandlingerPåVent().forEach(b -> {
             var tilstand = behandlingTilstandTjeneste.hentBehandlingensTilstand(b);
@@ -312,7 +312,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "ukjent feil.")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = true)
     public Response settAnsvarligSaksbehandler(@Valid @NotNull ForvaltningBehandlingRestTjeneste.SettAnsvarligSaksbehandlerDto input) {
         var behandling = behandlingRepository.hentBehandling(input.getBehandlingId());
 
@@ -351,7 +351,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "ukjent feil.")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = true)
     public Response settBehandlingsårsakFattetAnnenInstans(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                                                @QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
@@ -459,7 +459,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Behandlingen har feil status"),
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     public Response hentTilbakekrevingVedtak(
         @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
         @QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {

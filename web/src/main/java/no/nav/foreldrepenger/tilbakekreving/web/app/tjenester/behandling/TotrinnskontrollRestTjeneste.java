@@ -48,7 +48,7 @@ public class TotrinnskontrollRestTjeneste {
     @GET
     @Path("/arsaker")
     @Operation(tags = "totrinnskontroll", description = "Hent aksjonspunkter som skal til totrinnskontroll.", summary = "Returner aksjonspunkter til totrinnskontroll for behandling.")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<TotrinnskontrollSkjermlenkeContextDto> hentTotrinnskontrollSkjermlenkeContext(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                                                                               @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
@@ -59,7 +59,7 @@ public class TotrinnskontrollRestTjeneste {
     @GET
     @Path("/arsaker_read_only")
     @Operation(tags = "totrinnskontroll", description = "Hent totrinnsvurderinger for aksjonspunkter.", summary = "Returner vurderinger for aksjonspunkter etter totrinnskontroll for behandling.")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<TotrinnskontrollSkjermlenkeContextDto> hentTotrinnskontrollvurderingSkjermlenkeContext(
             @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)

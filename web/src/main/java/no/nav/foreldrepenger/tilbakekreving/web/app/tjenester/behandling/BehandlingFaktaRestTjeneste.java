@@ -53,7 +53,7 @@ public class BehandlingFaktaRestTjeneste {
             description = "Hent fakta om feilutbetaling"
     )
     @Path("/hent-fakta/feilutbetaling")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     public BehandlingFeilutbetalingFaktaDto hentFeilutbetalingFakta(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                                                     @QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         BehandlingFeilutbetalingFakta fakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(hentBehandlingId(behandlingReferanse));

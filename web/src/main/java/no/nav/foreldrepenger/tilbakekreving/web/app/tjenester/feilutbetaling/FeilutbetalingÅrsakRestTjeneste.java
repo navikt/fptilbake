@@ -48,7 +48,7 @@ public class FeilutbetalingÅrsakRestTjeneste {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Kodeverk", content = @Content(schema = @Schema(implementation = HendelseTypeMedUndertypeDto.class)))
             })
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.APPLIKASJON)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.APPLIKASJON, sporingslogg = false)
     public List<HendelseTyperPrYtelseTypeDto> hentAlleFeilutbetalingÅrsaker() {
         return feilutbetalingÅrsakTjeneste.hentFeilutbetalingårsaker();
     }

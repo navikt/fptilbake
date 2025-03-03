@@ -51,7 +51,7 @@ public class VarselresponsRestTjeneste {
                     @ApiResponse(responseCode = "200", description = "Respons registrert")
             })
     @Path(value = "/registrer")
-    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK, sporingslogg = false)
     public Response registrerBrukerrespons(@Valid @NotNull VarselresponsDto brukerRespons) {
         //Brukes av fp-autotest. Ikke bruk denne. Skal slettes
         responsTjeneste.lagreRespons(brukerRespons.getBehandlingId(), ResponsKanal.SELVBETJENING);
