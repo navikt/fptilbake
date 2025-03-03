@@ -1,23 +1,17 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Converter;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum VurderÅrsak implements Kodeverdi {
 
     FEIL_FAKTA("FEIL_FAKTA", "Fakta"),
@@ -53,12 +47,10 @@ public enum VurderÅrsak implements Kodeverdi {
         this.navn = navn;
     }
 
-    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static VurderÅrsak fraKode(@JsonProperty(value = "kode") Object node) {
-        if (node == null) {
+    public static VurderÅrsak fraKode(final String kode) {
+        if (kode == null) {
             return null;
         }
-        String kode = TempAvledeKode.getVerdi(VurderÅrsak.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent VurderÅrsak: " + kode);
@@ -83,13 +75,12 @@ public enum VurderÅrsak implements Kodeverdi {
         }
     }
 
-    @JsonProperty
+    @JsonValue
     @Override
     public String getKode() {
         return kode;
     }
 
-    @JsonProperty
     @Override
     public String getKodeverk() {
         return KODEVERK;

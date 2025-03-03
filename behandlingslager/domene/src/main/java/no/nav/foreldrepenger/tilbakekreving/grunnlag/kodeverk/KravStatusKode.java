@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,18 +7,10 @@ import java.util.Map;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
-@JsonFormat(shape = JsonFormat.Shape.STRING)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum KravStatusKode implements Kodeverdi {
 
     ANNULERT("ANNU", "Kravgrunnlag annullert"),
@@ -40,7 +30,6 @@ public enum KravStatusKode implements Kodeverdi {
     @JsonValue
     private String kode;
 
-    @JsonIgnore
     private String navn;
 
     static {
@@ -60,12 +49,10 @@ public enum KravStatusKode implements Kodeverdi {
         this.navn = navn;
     }
 
-    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static KravStatusKode fraKode(@JsonProperty(value = "kode") Object node) {
-        if (node == null) {
+    public static KravStatusKode fraKode(final String kode) {
+        if (kode == null) {
             return null;
         }
-        var kode = TempAvledeKode.getVerdi(KravStatusKode.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent KravStatusKode: " + kode);
