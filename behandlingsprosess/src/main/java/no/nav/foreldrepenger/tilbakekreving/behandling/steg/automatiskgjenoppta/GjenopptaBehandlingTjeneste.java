@@ -24,7 +24,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevSporingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
@@ -41,7 +40,6 @@ public class GjenopptaBehandlingTjeneste {
     private KravgrunnlagRepository grunnlagRepository;
     private HistorikkinnslagRepository historikkRepository;
     private BehandlingRepository behandlingRepository;
-    private BrevSporingTjeneste brevSporingTjeneste;
 
     public GjenopptaBehandlingTjeneste() {
         // CDI
@@ -51,15 +49,13 @@ public class GjenopptaBehandlingTjeneste {
     public GjenopptaBehandlingTjeneste(ProsessTaskTjeneste taskTjeneste,
                                        BehandlingKandidaterRepository behandlingKandidaterRepository,
                                        BehandlingVenterRepository behandlingVenterRepository,
-                                       BehandlingRepositoryProvider repositoryProvider,
-                                       BrevSporingTjeneste brevSporingTjeneste) {
+                                       BehandlingRepositoryProvider repositoryProvider) {
         this.taskTjeneste = taskTjeneste;
         this.behandlingKandidaterRepository = behandlingKandidaterRepository;
         this.behandlingVenterRepository = behandlingVenterRepository;
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.historikkRepository = repositoryProvider.getHistorikkinnslagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.brevSporingTjeneste = brevSporingTjeneste;
     }
 
     /**
@@ -85,13 +81,7 @@ public class GjenopptaBehandlingTjeneste {
             .filter(a -> a.getFristTid() != null && LocalDate.now().isAfter(a.getFristTid().toLocalDate()))
             .isPresent();
         if (status == KravgrunnlagTilstand.KRAVGRUNNLAG_MANGLER && venterPåKravgrunnlagFristPassert) {
-            if (!brevSporingTjeneste.erVarselBrevSendtFor(behandlingId)) {
-                opprettHenleggBehandlingTask(behandling, callId);
-            } else {
-                LOG.warn(
-                    "Kan ikke automatisk henlegge sak uten kravgrunnlag hvis varsel er sendt til bruker. Må undersøkes nærmere! Sak: {}, BehandlingId: {}",
-                    behandling.getSaksnummer(), behandlingId);
-            }
+            opprettHenleggBehandlingTask(behandling, callId);
         } else if (status == KravgrunnlagTilstand.OK || status == KravgrunnlagTilstand.KRAVGRUNNLAG_MANGLER) {
             opprettFortsettBehandlingTask(behandling, callId);
         } else if (status == KravgrunnlagTilstand.KRAVGRUNNLAG_ER_SPERRET) {

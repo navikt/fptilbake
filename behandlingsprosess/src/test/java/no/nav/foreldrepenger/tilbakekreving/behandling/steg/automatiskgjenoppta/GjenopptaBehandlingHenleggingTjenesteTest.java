@@ -42,7 +42,7 @@ class GjenopptaBehandlingHenleggingTjenesteTest {
     @BeforeEach
     void setUp() {
         when(mockRepositoryProvider.getGrunnlagRepository()).thenReturn(mockGrunnlagRepository);
-        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(mockProsessTaskTjeneste, null, null, mockRepositoryProvider, mockBrevSporingTjeneste);
+        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(mockProsessTaskTjeneste, null, null, mockRepositoryProvider);
     }
 
     @Test
