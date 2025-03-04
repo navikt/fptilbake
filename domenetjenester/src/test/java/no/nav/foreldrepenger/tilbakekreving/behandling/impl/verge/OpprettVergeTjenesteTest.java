@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVergeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVerge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -71,7 +71,7 @@ class OpprettVergeTjenesteTest extends FellesTestOppsett {
                 .withMessage("OrgansisasjonNummer er ikke gyldig");
     }
 
-    private void assertVerge(VergeEntitet vergeEntitet, OpprettVergeDto expected) {
+    private void assertVerge(VergeEntitet vergeEntitet, OpprettVerge expected) {
         assertThat(vergeEntitet).isNotNull().satisfies(ve -> {
             assertThat(ve.getKilde()).isEqualTo(KildeType.FPTILBAKE.name());
             assertThat(ve.getVergeType()).isEqualTo(expected.vergeType());
@@ -103,8 +103,8 @@ class OpprettVergeTjenesteTest extends FellesTestOppsett {
         });
     }
 
-    private OpprettVergeDto lagVergeDto(VergeType vergeType) {
-        return new OpprettVergeDto(
+    private OpprettVerge lagVergeDto(VergeType vergeType) {
+        return new OpprettVerge(
                 "John Doe",
                 VergeType.ADVOKAT.equals(vergeType) ? null : "12345678901",
                 LocalDate.now().minusYears(1),

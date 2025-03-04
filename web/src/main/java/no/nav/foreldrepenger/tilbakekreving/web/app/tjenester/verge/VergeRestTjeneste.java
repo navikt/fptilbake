@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVergeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVerge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
@@ -193,8 +193,8 @@ public class VergeRestTjeneste {
         return behandling;
     }
 
-    private OpprettVergeDto map(NyVergeDto dto) {
-        return new OpprettVergeDto(dto.getNavn(), dto.getFnr(), dto.getGyldigFom(), dto.getGyldigTom(), dto.getVergeType(),
+    private OpprettVerge map(NyVergeDto dto) {
+        return new OpprettVerge(dto.getNavn(), dto.getFnr(), dto.getGyldigFom(), dto.getGyldigTom(), dto.getVergeType(),
                 dto.getOrganisasjonsnummer(), null);
     }
 }

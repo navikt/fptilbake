@@ -4,7 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.OpprettVergeTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVergeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVerge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.DtoTilServiceAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AvklarVergeDto;
@@ -25,8 +25,8 @@ public class AvklartVergeOppdaterer implements AksjonspunktOppdaterer<AvklarVerg
         opprettVergeTjeneste.opprettVerge(behandling.getId(), behandling.getFagsakId(), map(avklarVergeDto));
     }
 
-    private OpprettVergeDto map(AvklarVergeDto dto) {
-        return new OpprettVergeDto(
+    private OpprettVerge map(AvklarVergeDto dto) {
+        return new OpprettVerge(
                 dto.getNavn(),
                 dto.getFnr(),
                 dto.getGyldigFom(),

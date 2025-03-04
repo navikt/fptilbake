@@ -8,7 +8,7 @@ import java.util.Optional;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVergeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVerge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -47,7 +47,7 @@ public class VergeTjeneste {
         this.opprettVergeTjeneste = opprettVergeTjeneste;
     }
 
-    public void opprettVerge(Behandling behandling, OpprettVergeDto param) {
+    public void opprettVerge(Behandling behandling, OpprettVerge param) {
         opprettVergeTjeneste.opprettVerge(behandling.getId(), behandling.getFagsakId(), param);
     }
 

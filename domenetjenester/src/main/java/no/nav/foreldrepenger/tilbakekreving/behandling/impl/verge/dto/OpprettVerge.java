@@ -4,7 +4,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ve
 
 import java.time.LocalDate;
 
-public record OpprettVergeDto(
+public record OpprettVerge(
         String navn,
         String fnr,
         LocalDate gyldigFom,
@@ -13,7 +13,7 @@ public record OpprettVergeDto(
         String organisasjonsnummer,
         String begrunnelse
 ) {
-    public OpprettVergeDto {
+    public OpprettVerge {
         if ((organisasjonsnummer == null && fnr == null) || (organisasjonsnummer != null && fnr != null)) {
             throw new IllegalArgumentException("Verge må ha enten fnr eller organisasjonsnummer oppgitt.");
         }

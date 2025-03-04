@@ -4,7 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVergeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVerge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
@@ -42,7 +42,7 @@ public class OpprettVergeTjeneste {
         this.historikkRepository = historikkRepository;
     }
 
-    public void opprettVerge(Long behandlingId, Long fagsakId, OpprettVergeDto dto) {
+    public void opprettVerge(Long behandlingId, Long fagsakId, OpprettVerge dto) {
         VergeEntitet.Builder vergeBuilder = VergeEntitet.builder()
                 .medKilde(KildeType.FPTILBAKE.name())
                 .medVergeType(dto.vergeType())
@@ -71,7 +71,7 @@ public class OpprettVergeTjeneste {
                 .orElseThrow(BehandlingFeil::fantIkkePersonIdentMedFnr);
     }
 
-    private void opprettHistorikkinnslag(Long behandlingId, Long fagsakId, OpprettVergeDto dto, boolean erEndring) {
+    private void opprettHistorikkinnslag(Long behandlingId, Long fagsakId, OpprettVerge dto, boolean erEndring) {
         var builder = new Historikkinnslag.Builder().medFagsakId(fagsakId)
                 .medBehandlingId(behandlingId)
                 .medAktør(HistorikkAktør.SAKSBEHANDLER)
