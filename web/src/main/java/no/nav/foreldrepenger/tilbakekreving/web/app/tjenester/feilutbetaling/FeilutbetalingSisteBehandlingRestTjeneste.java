@@ -71,7 +71,7 @@ public class FeilutbetalingSisteBehandlingRestTjeneste {
             @ApiResponse(responseCode = "200", description = "Feilutbetalte perioder og evt. avsluttet dato for siste ordinære tilbakekrevingsbehandling", content = @Content(schema = @Schema(implementation = BehandlingStatusOgFeilutbetalinger.class))),
             @ApiResponse(responseCode = "204", description = "Det finnes ingen tilbakekrevigsbehandlnig for saken")
         })
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     public Response hentInfoForSisteFørstegangsBehandling(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummer) {
         Saksnummer saksnummeret = new Saksnummer(saksnummer.getVerdi());
 
