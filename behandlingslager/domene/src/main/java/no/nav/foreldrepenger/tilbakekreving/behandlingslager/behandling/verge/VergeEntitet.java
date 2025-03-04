@@ -49,7 +49,7 @@ public class VergeEntitet extends BaseEntitet {
     @Column(name = "kilde", nullable = false)
     private String kilde;
 
-    @Column(name = "begrunnelse", nullable = false)
+    @Column(name = "begrunnelse")
     private String begrunnelse;
 
     VergeEntitet() {
@@ -158,7 +158,6 @@ public class VergeEntitet extends BaseEntitet {
             Objects.requireNonNull(this.kladd.vergeType, "vergeType");
             Objects.requireNonNull(this.kladd.kilde, "kilde");
             Objects.requireNonNull(this.kladd.navn, "navn");
-            Objects.requireNonNull(this.kladd.begrunnelse, "begrunnelse");
 
             if (this.kladd.vergeAktørId == null && (this.kladd.organisasjonsnummer == null || this.kladd.organisasjonsnummer.isEmpty())) {
                 throw new IllegalArgumentException("Organisasjonsnummer eller vergeAktørId må finnes for verge organisasjon");

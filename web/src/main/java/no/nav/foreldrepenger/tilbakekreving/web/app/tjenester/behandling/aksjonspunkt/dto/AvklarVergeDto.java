@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
@@ -18,55 +17,47 @@ import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.util.InputValideringRegex;
 
 @JsonTypeName(AksjonspunktKodeDefinisjon.AVKLAR_VERGE)
-public class AvklartVergeDto extends BekreftetAksjonspunktDto {
+public class AvklarVergeDto extends BekreftetAksjonspunktDto {
 
-    @JsonProperty("gyldigFom")
     @NotNull
-    private LocalDate fom;
+    private LocalDate gyldigFom;
 
-    @JsonProperty("gyldigTom")
     @NotNull
-    private LocalDate tom;
+    private LocalDate gyldigTom;
 
-    @JsonProperty("navn")
     @NotNull
     @Size(max = 1000)
     @Pattern(regexp = InputValideringRegex.NAVN)
     private String navn;
 
-    @JsonProperty("fnr")
     @Digits(integer = 11, fraction = 0)
     private String fnr;
 
-    @JsonProperty("organisasjonsnummer")
     @Pattern(regexp = "[\\d]{9}")
     private String organisasjonsnummer;
 
-    @JsonProperty("vergeType")
     @Valid
     @NotNull
     private VergeType vergeType;
 
-    @JsonProperty("begrunnelse")
-    @NotNull
-    @Size(max = 4000)
+    @Size(max = 100)
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String begrunnelse;
 
-    public LocalDate getFom() {
-        return fom;
+    public LocalDate getGyldigFom() {
+        return gyldigFom;
     }
 
-    public void setFom(LocalDate fom) {
-        this.fom = fom;
+    public void setGyldigFom(LocalDate gyldigFom) {
+        this.gyldigFom = gyldigFom;
     }
 
-    public LocalDate getTom() {
-        return tom;
+    public LocalDate getGyldigTom() {
+        return gyldigTom;
     }
 
-    public void setTom(LocalDate tom) {
-        this.tom = tom;
+    public void setGyldigTom(LocalDate gyldigTom) {
+        this.gyldigTom = gyldigTom;
     }
 
     public String getNavn() {

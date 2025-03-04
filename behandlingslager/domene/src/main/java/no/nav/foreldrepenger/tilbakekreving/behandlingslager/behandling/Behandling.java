@@ -365,6 +365,11 @@ public class Behandling extends BaseEntitet {
                 .findFirst();
     }
 
+    public boolean harÅpentAksjonspunktMedType(AksjonspunktDefinisjon aksjonspunktDefinisjon) {
+        return getÅpneAksjonspunkterStream().map(Aksjonspunkt::getAksjonspunktDefinisjon)
+                .anyMatch(aksjonspunktDefinisjon::equals);
+    }
+
     public Aksjonspunkt getAksjonspunktFor(AksjonspunktDefinisjon definisjon) {
         return getAksjonspunkterStream()
                 .filter(a -> a.getAksjonspunktDefinisjon().equals(definisjon))
