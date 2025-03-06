@@ -37,7 +37,7 @@ class VergeTjenesteTest extends FellesTestOppsett {
         var eventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
         var svcProvider = new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), eventPublisererMock);
         var behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(svcProvider);
-        vergeTjeneste = new VergeTjeneste(behandlingskontrollTjeneste, behandlingskontrollAsynkTjeneste, repoProvider);
+        vergeTjeneste = new VergeTjeneste(behandlingskontrollTjeneste, behandlingskontrollAsynkTjeneste, repoProvider, mock(OpprettVergeTjeneste.class));
         vergeRepository = repoProvider.getVergeRepository();
     }
 

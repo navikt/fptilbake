@@ -91,7 +91,7 @@ public class AksjonspunktRestTjeneste {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Aksjonspunkter", content = @Content(array = @ArraySchema(uniqueItems = true, arraySchema = @Schema(implementation = Set.class), schema = @Schema(implementation = AksjonspunktDto.class)), mediaType = MediaType.APPLICATION_JSON))
             })
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response getAksjonspunkter(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                       @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
@@ -119,7 +119,7 @@ public class AksjonspunktRestTjeneste {
     @Operation(
             tags = "aksjonspunkt",
             description = "Lagre endringer gitt av aksjonspunktene og rekjør behandling fra gjeldende steg")
-    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response bekreft(@Context HttpServletRequest request,
                             @Parameter(description = "Liste over aksjonspunkt som skal bekreftes, inklusiv data som trengs for å løse de.") @Valid BekreftedeAksjonspunkterDto apDto) throws URISyntaxException {
@@ -148,7 +148,7 @@ public class AksjonspunktRestTjeneste {
     @Operation(
         tags = "aksjonspunkt",
         description = "Lagre endringer gitt av aksjonspunktene og rekjør behandling fra gjeldende steg")
-    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     public Response beslutt(@Context HttpServletRequest request,
                             @Parameter(description = "Liste over aksjonspunkt som skal bekreftes, inklusiv data som trengs for å løse de.") @Valid BekreftedeAksjonspunkterDto apDto) throws URISyntaxException {
         var bekreftedeAksjonspunktDtoer = apDto.getBekreftedeAksjonspunktDtoer();

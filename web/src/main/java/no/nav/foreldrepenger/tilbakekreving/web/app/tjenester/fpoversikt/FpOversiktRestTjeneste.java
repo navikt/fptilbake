@@ -44,7 +44,7 @@ public class FpOversiktRestTjeneste {
     @Path("sak")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(description = "Hent sak for bruk i fpoversikt", tags = "fpoversikt")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
     public Sak hentSak(@NotNull @Parameter(description = "Saksnummer for fagsak") @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto) {
         var saksnummer = new Saksnummer(saksnummerDto.getVerdi());
         var sakMedÅpenTilbakekreving = dtoTjeneste.hentSak(saksnummer);

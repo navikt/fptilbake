@@ -3,37 +3,37 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjon
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.AvklartVergeTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.OpprettVergeTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVerge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.DtoTilServiceAdapter;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AvklartVergeDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AvklarVergeDto;
 
 @ApplicationScoped
-@DtoTilServiceAdapter(dto = AvklartVergeDto.class, adapter = AksjonspunktOppdaterer.class)
-public class AvklartVergeOppdaterer implements AksjonspunktOppdaterer<AvklartVergeDto> {
+@DtoTilServiceAdapter(dto = AvklarVergeDto.class, adapter = AksjonspunktOppdaterer.class)
+public class AvklartVergeOppdaterer implements AksjonspunktOppdaterer<AvklarVergeDto> {
 
-    private AvklartVergeTjeneste avklartVergeTjeneste;
+    private OpprettVergeTjeneste opprettVergeTjeneste;
 
     @Inject
-    public AvklartVergeOppdaterer(AvklartVergeTjeneste avklartVergeTjeneste) {
-        this.avklartVergeTjeneste = avklartVergeTjeneste;
+    public AvklartVergeOppdaterer(OpprettVergeTjeneste opprettVergeTjeneste) {
+        this.opprettVergeTjeneste = opprettVergeTjeneste;
     }
 
     @Override
-    public void oppdater(AvklartVergeDto avklartVergeDto, Behandling behandling) {
-        avklartVergeTjeneste.lagreVergeInformasjon(behandling, lagVergeDto(avklartVergeDto));
+    public void oppdater(AvklarVergeDto avklarVergeDto, Behandling behandling) {
+        opprettVergeTjeneste.opprettVerge(behandling.getId(), behandling.getFagsakId(), map(avklarVergeDto));
     }
 
-    private VergeDto lagVergeDto(AvklartVergeDto avklartVergeDto) {
-        VergeDto vergeDto = new VergeDto();
-        vergeDto.setFom(avklartVergeDto.getFom());
-        vergeDto.setTom(avklartVergeDto.getTom());
-        vergeDto.setFnr(avklartVergeDto.getFnr());
-        vergeDto.setOrganisasjonsnummer(avklartVergeDto.getOrganisasjonsnummer());
-        vergeDto.setNavn(avklartVergeDto.getNavn());
-        vergeDto.setBegrunnelse(avklartVergeDto.getBegrunnelse());
-        vergeDto.setVergeType(avklartVergeDto.getVergeType());
-        return vergeDto;
+    private OpprettVerge map(AvklarVergeDto dto) {
+        return new OpprettVerge(
+                dto.getNavn(),
+                dto.getFnr(),
+                dto.getGyldigFom(),
+                dto.getGyldigTom(),
+                dto.getVergeType(),
+                dto.getOrganisasjonsnummer(),
+                dto.getBegrunnelse()
+        );
     }
 }

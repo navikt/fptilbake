@@ -71,7 +71,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
             @ApiResponse(responseCode = "200", description = "Hent korrigerte grunnlag og tilkoblet det med en behandling"),
             @ApiResponse(responseCode = "400", description = "Behandling er avsluttet eller ikke gyldig")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = true)
     public Response hentKorrigertKravgrunnlag(@Valid @NotNull @TilpassetAbacAttributt(supplierClass = AbacIngen.class) HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
         Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
         if (behandling.erAvsluttet()) {
@@ -106,7 +106,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Finnes ikke kravgrunnlag."),
             @ApiResponse(responseCode = "500", description = "Ukjent feil!")
         })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = true)
     public Response annullerKravgrunnlag(@Valid @NotNull @TilpassetAbacAttributt(supplierClass = AbacIngen.class) HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
         Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
         try {
@@ -129,7 +129,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Ukjent feil!")
         })
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT, sporingslogg = false)
     public Response hentForvaltninginfo(@Valid @NotNull @QueryParam("saksnummer") SaksnummerDto saksnummer) {
         try {
             return Response.ok(forvaltningTjeneste.hentForvaltningsinfo(new Saksnummer(saksnummer.getVerdi()))).build();

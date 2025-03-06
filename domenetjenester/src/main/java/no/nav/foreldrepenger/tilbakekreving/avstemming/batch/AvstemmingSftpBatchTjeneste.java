@@ -13,7 +13,7 @@ import no.nav.foreldrepenger.tilbakekreving.avstemming.sftp.SftpKonfig;
 import no.nav.foreldrepenger.tilbakekreving.avstemming.sftp.SftpTjeneste;
 
 @ApplicationScoped
-class AvstemmingSftpBatchTjeneste extends SftpTjeneste {
+public class AvstemmingSftpBatchTjeneste extends SftpTjeneste {
 
     private SftpKonfig sftpKonfig;
 

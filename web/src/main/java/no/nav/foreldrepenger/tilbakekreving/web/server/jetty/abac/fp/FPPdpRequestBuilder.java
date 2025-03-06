@@ -18,6 +18,7 @@ import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
+import no.nav.vedtak.sikkerhet.abac.pipdata.PipAktørId;
 import no.nav.vedtak.sikkerhet.abac.pipdata.PipBehandlingStatus;
 import no.nav.vedtak.sikkerhet.abac.pipdata.PipFagsakStatus;
 
@@ -62,15 +63,19 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         }
 
         FpPipBehandlingInfo behandlingData = null;
+        String auditAktørId = null;
         if (behandlingId.isPresent()) {
             behandlingData = lagBehandlingData(behandlingId.get());
+            auditAktørId = behandlingData.getAktørIdNonNull().stream().findFirst().map(PipAktørId::toString).orElse(null);
         } else if (behandlingUuid.isPresent()) {
             behandlingData = lagBehandlingData(behandlingUuid.get());
+            auditAktørId = behandlingData.getAktørIdNonNull().stream().findFirst().map(PipAktørId::toString).orElse(null);
         } else if (fpsakBehandlingId.isPresent()) {
             behandlingData = hentFpsakBehandlingData(fpsakBehandlingId.get());
         }
 
         var ressursData = AppRessursData.builder()
+            .medAuditAktørId(auditAktørId)
             .leggTilAktørIdSet(dataAttributter.getVerdier(AppAbacAttributtType.AKTØR_ID));
         Optional.ofNullable(behandlingData).ifPresent(bi -> ressursData.leggTilAbacAktørIdSet(bi.getAktørIdNonNull()));
         var saksnumre = utledSaksnummer(dataAttributter, behandlingData);

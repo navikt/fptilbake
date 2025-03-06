@@ -2,14 +2,12 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge;
 
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -24,12 +22,11 @@ import jakarta.ws.rs.core.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVerge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
@@ -37,7 +34,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ve
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.dto.NyVergeDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.dto.VergeDto;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
@@ -52,6 +52,14 @@ import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 public class VergeRestTjeneste {
 
     public static final String BASE_PATH = "/verge";
+
+
+    private static final String VERGE_FJERN_PART_PATH = "/fjern-verge";
+    public static final String VERGE_FJERN_PATH = BASE_PATH + VERGE_FJERN_PART_PATH;
+
+    private static final String VERGE_OPPRETT_PART_PATH = "/opprett-verge";
+    public static final String VERGE_OPPRETT_PATH = BASE_PATH + VERGE_OPPRETT_PART_PATH;
+
     private BehandlingTjeneste behandlingTjeneste;
     private VergeTjeneste vergeTjeneste;
     private PersoninfoAdapter tpsTjeneste;
@@ -68,6 +76,46 @@ public class VergeRestTjeneste {
         this.tpsTjeneste = tpsTjeneste;
     }
 
+    @GET
+    @Operation(description = "Henter verge/fullmektig på behandlingen", tags = "verge", responses = {@ApiResponse(responseCode = "200", description = "Verge/fullmektig funnet"), @ApiResponse(responseCode = "204", description = "Ingen verge/fullmektig")})
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
+    public VergeDto hentVerge(@QueryParam(UuidDto.NAME) @Parameter(description = "Behandling uuid") @Valid UuidDto queryParam) {
+        var behandling = behandlingTjeneste.hentBehandling(queryParam.getBehandlingUuid());
+
+        return vergeTjeneste.hentVergeInformasjon(behandling.getId()).map(v -> map(behandling.getFagsak().getFagsakYtelseType(), v)).orElse(null);
+    }
+
+    @POST
+    @Path(VERGE_OPPRETT_PART_PATH)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Operation(description = "Oppretter verge/fullmektig på behandlingen", tags = "verge", responses = {@ApiResponse(responseCode = "200", description = "Verge/fullmektig opprettes", headers = @Header(name = HttpHeaders.LOCATION))})
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK, sporingslogg = true)
+    public Response opprettVerge(
+            @QueryParam(UuidDto.NAME) @Parameter(description = "Behandling uuid") @Valid UuidDto queryParam,
+            @Valid NyVergeDto body) {
+
+        var behandling = behandlingTjeneste.hentBehandling(queryParam.getBehandlingUuid());
+
+        vergeTjeneste.opprettVerge(behandling, map(body));
+
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path(VERGE_FJERN_PART_PATH)
+    @Operation(tags = "verge", description = "Fjerner verge/fullmektig på behandlingen", responses = {@ApiResponse(responseCode = "200", description = "Verge/fullmektig fjernet", headers = @Header(name = HttpHeaders.LOCATION))})
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK, sporingslogg = true)
+    public Response fjernVerge(@QueryParam(UuidDto.NAME) @Parameter(description = "Behandling uuid") @Valid UuidDto queryParam) {
+
+        var behandling = behandlingTjeneste.hentBehandling(queryParam.getBehandlingUuid());
+
+        vergeTjeneste.fjernVerge(behandling);
+
+        return Response.ok().build();
+    }
+
+
+    @Deprecated
     @POST
     @Path("/opprett")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -79,7 +127,7 @@ public class VergeRestTjeneste {
                             headers = @Header(name = HttpHeaders.LOCATION)
                     )
             })
-    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response opprettVerge(@Context HttpServletRequest request,
                                  @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
@@ -95,6 +143,7 @@ public class VergeRestTjeneste {
         return Redirect.tilBehandlingPollStatus(request, behandling.getUuid());
     }
 
+    @Deprecated
     @POST
     @Path("/fjern")
     @Operation(description = "Fjerner aksjonspunkt og evt. registrert informasjon om verge/fullmektig fra behandlingen",
@@ -105,7 +154,7 @@ public class VergeRestTjeneste {
                             headers = @Header(name = HttpHeaders.LOCATION)
                     )
             })
-    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response fjernVerge(@Context HttpServletRequest request,
                                @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
@@ -118,64 +167,13 @@ public class VergeRestTjeneste {
         return Redirect.tilBehandlingPollStatus(request, behandling.getUuid());
     }
 
-    @GET
-    // Re-enable dersom non-empty. jersey gir warning @Path("/")
-    @Operation(description = "Returnerer informasjon om verge knyttet til søker for denne behandlingen",
-            tags = "verge",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Returnerer Verge, null hvis ikke eksisterer (GUI støtter ikke NOT_FOUND p.t.)",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON,
-                                    schema = @Schema(implementation = VergeDto.class)
-                            )
-                    )
-            })
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
-    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public VergeDto getVerge(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                             @QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse dto) {
-        var behandling = hentBehandling(dto);
-        return vergeTjeneste.hentVergeInformasjon(behandling.getId()).map(v -> map(behandling.getFagsak().getFagsakYtelseType(), v)).orElse(null);
-    }
-
-    @GET
-    @Path("/behandlingsmeny")
-    @Operation(description = "Instruerer hvilket menyvalg som skal være mulig fra behandlingsmenyen",
-            tags = "verge",
-            responses = {
-                    @ApiResponse(responseCode = "200",
-                            description = "Returnerer OPPRETT/FJERN",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON,
-                                    schema = @Schema(implementation = VergeBehandlingsmenyDto.class)
-                            )
-                    )
-            })
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
-    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentBehandlingsmenyvalg(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                            @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
-        Behandling behandling = hentBehandling(behandlingReferanse);
-        Optional<VergeEntitet> vergeEntitet = vergeTjeneste.hentVergeInformasjon(behandling.getId());
-        boolean kanBehandlingEndres = !behandling.erSaksbehandlingAvsluttet() && !behandling.isBehandlingPåVent();
-        boolean finnesVerge = vergeEntitet.isPresent();
-        VergeBehandlingsmenyDto dto = new VergeBehandlingsmenyDto(behandling.getId(), VergeBehandlingsmenyEnum.SKJUL);
-        if (kanBehandlingEndres) {
-            dto = finnesVerge ? new VergeBehandlingsmenyDto(behandling.getId(), VergeBehandlingsmenyEnum.FJERN) :
-                    new VergeBehandlingsmenyDto(behandling.getId(), VergeBehandlingsmenyEnum.OPPRETT);
-        }
-        return Response.ok(dto).build();
-    }
-
     private VergeDto map(FagsakYtelseType ytelseType, VergeEntitet vergeEntitet) {
         VergeDto vergeDto = new VergeDto();
         if (vergeEntitet.getVergeType().equals(VergeType.ADVOKAT)) {
             vergeDto.setOrganisasjonsnummer(vergeEntitet.getOrganisasjonsnummer());
         } else {
             tpsTjeneste.hentBrukerForAktør(ytelseType, vergeEntitet.getVergeAktørId())
-                .ifPresent(value -> vergeDto.setFnr(value.getPersonIdent().getIdent()));
+                    .ifPresent(value -> vergeDto.setFnr(value.getPersonIdent().getIdent()));
         }
         vergeDto.setGyldigFom(vergeEntitet.getGyldigFom());
         vergeDto.setGyldigTom(vergeEntitet.getGyldigTom());
@@ -183,10 +181,6 @@ public class VergeRestTjeneste {
         vergeDto.setVergeType(vergeEntitet.getVergeType());
         vergeDto.setBegrunnelse(vergeEntitet.getBegrunnelse());
         return vergeDto;
-    }
-
-    private Long hentBehandlingId(BehandlingReferanse dto) {
-        return dto.erInternBehandlingId() ? dto.getBehandlingId() : hentBehandling(dto).getId();
     }
 
     private Behandling hentBehandling(BehandlingReferanse behandlingReferanse) {
@@ -197,5 +191,10 @@ public class VergeRestTjeneste {
             behandling = behandlingTjeneste.hentBehandling(behandlingReferanse.getBehandlingUuid());
         }
         return behandling;
+    }
+
+    private OpprettVerge map(NyVergeDto dto) {
+        return new OpprettVerge(dto.getNavn(), dto.getFnr(), dto.getGyldigFom(), dto.getGyldigTom(), dto.getVergeType(),
+                dto.getOrganisasjonsnummer(), null);
     }
 }

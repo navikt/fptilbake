@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.init;
 
+import static no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLinks.get;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkR
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
-
-import static no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLinks.get;
-import static no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLinks.post;
 
 @Path("/init-fetch")
 @ApplicationScoped
@@ -47,7 +46,7 @@ public class InitielleLinksRestTjeneste {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(description = "Returnerer lenker til init av frontend", tags = "init-fetch")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
     public InitLinksDto hentInitielleRessurser() {
         List<ResourceLink> lenkene = new ArrayList<>();
         lenkene.add(get(KodeverkRestTjeneste.KODERVERK_PATH, "tilbake-kodeverk"));

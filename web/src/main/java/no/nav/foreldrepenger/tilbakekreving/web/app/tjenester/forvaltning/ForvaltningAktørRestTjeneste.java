@@ -54,7 +54,7 @@ public class ForvaltningAktørRestTjeneste {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     @Operation(description = "MERGE: Oppdaterer aktørid for bruker i nødvendige tabeller", tags = "FORVALTNING", responses = {@ApiResponse(responseCode = "200", description = "Forekomster av utgått aktørid erstattet.")})
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = true)
     public Response oppdaterAktoerId(@TilpassetAbacAttributt(supplierClass = AktørRequestAbacDataSupplier.class) @NotNull @Valid ByttAktørRequest request) {
         int antall = oppdaterAktørIdFor(request.getUtgåttAktør(), request.getGyldigAktør());
         return Response.ok(antall).build();

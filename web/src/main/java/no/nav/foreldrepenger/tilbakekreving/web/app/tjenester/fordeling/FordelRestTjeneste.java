@@ -60,7 +60,7 @@ public class FordelRestTjeneste {
     @Path("/journalpost")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "fordel", description = "Ny journalpost skal behandles.", summary = "Varsel om en ny journalpost som skal behandles i systemet.")
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     public void mottaJournalpost(@Parameter(description = "Krever saksnummer, journalpostId og behandlingstemaOffisiellKode") @Valid AbacJournalpostMottakDto mottattJournalpost) {
 
         String dokumentTypeId = mottattJournalpost.getDokumentTypeIdOffisiellKode().orElse(null);

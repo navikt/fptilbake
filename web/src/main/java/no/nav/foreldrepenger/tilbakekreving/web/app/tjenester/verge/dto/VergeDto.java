@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge;
+package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.dto;
 
 import java.time.LocalDate;
 

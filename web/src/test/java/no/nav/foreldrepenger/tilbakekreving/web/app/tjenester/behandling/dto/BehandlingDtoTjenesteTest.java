@@ -1,10 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -14,13 +10,18 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Consumer;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -111,228 +112,310 @@ class BehandlingDtoTjenesteTest {
         grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         var behandlingModellRepository = new BehandlingModellRepository();
         behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, mock(TotrinnTjeneste.class),
-            mock(TotrinnskontrollAksjonspunkterTjeneste.class), mock(HenleggBehandlingTjeneste.class), foreldelseTjeneste,
-            mock(BeregningsresultatTjeneste.class), repositoryProvider, behandlingModellRepository);
+                mock(TotrinnskontrollAksjonspunkterTjeneste.class), mock(HenleggBehandlingTjeneste.class), foreldelseTjeneste,
+                mock(BeregningsresultatTjeneste.class), repositoryProvider, behandlingModellRepository);
 
         entityManager.setFlushMode(FlushModeType.AUTO);
     }
 
-    @Test
-    void skal_hentUtvidetBehandlingResultat_medFaktaSteg() {
-        var behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
-        when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
+    @Nested
+    class HentUtvidetBehandlingResultat {
 
-        var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
-        assertUtvidetBehandlingDto(utvidetBehandlingDto);
+        @Test
+        void skal_hentUtvidetBehandlingResultat_medFaktaSteg() {
+            var behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
+            when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
 
-        var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertThat(lenker).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
-            "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
-            "feilutbetalingAarsak", "opprett-verge", "fjern-verge");
+            var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
+            assertThat(utvidetBehandlingDto)
+                    .satisfies(harSaksbehandlerOgBehandlingIkkePåVent)
+                    .satisfies(dto -> {
+                        assertThat(dto.isKanHenleggeBehandling()).isFalse();
+                        assertThat(dto.getLinks()).extracting(ResourceLink::getRel).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
+                                "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
+                                "feilutbetalingAarsak", "verge-opprett");
+                    });
+        }
+
+        @Test
+        void skal_hentUtvidetBehandlingResultat_medForeldelseSteg() {
+            var behandling = lagBehandling(BehandlingStegType.FORELDELSEVURDERINGSTEG, BehandlingStatus.UTREDES);
+            when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
+            lagFaktaFeilutbetaling(behandling.getId());
+
+            var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
+
+            assertThat(utvidetBehandlingDto)
+                    .satisfies(harSaksbehandlerOgBehandlingIkkePåVent)
+                    .satisfies(dto -> {
+                        assertThat(dto.getLinks()).extracting(ResourceLink::getRel).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
+                                "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
+                                "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurderingsperioder", "verge-opprett");
+                    });
+        }
+
+        @Test
+        void skal_hentUtvidetBehandlingResultat_medVilkårSteg() {
+            var behandling = lagBehandling(BehandlingStegType.VTILBSTEG, BehandlingStatus.UTREDES);
+            when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
+            lagFaktaFeilutbetaling(behandling.getId());
+
+            var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
+            assertThat(utvidetBehandlingDto)
+                    .satisfies(harSaksbehandlerOgBehandlingIkkePåVent)
+                    .satisfies(dto -> {
+                        assertThat(dto.getLinks()).extracting(ResourceLink::getRel).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
+                                "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
+                                "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurdering", "vilkarvurderingsperioder", "verge-opprett");
+                    });
+        }
+
+        @Test
+        void skal_hentUtvidetBehandlingResultat_medVilkårSteg_når_vilkårsvurdering_finnes_allrede() {
+            var behandling = lagBehandling(BehandlingStegType.VTILBSTEG, BehandlingStatus.UTREDES);
+            when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
+            lagFaktaFeilutbetaling(behandling.getId());
+            lagVilkårsVurdering(behandling.getId());
+
+            var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
+            assertThat(utvidetBehandlingDto)
+                    .satisfies(harSaksbehandlerOgBehandlingIkkePåVent)
+                    .satisfies(dto -> {
+                        assertThat(utvidetBehandlingDto.getLinks()).extracting(ResourceLink::getRel).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
+                                "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
+                                "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurderingsperioder", "vilkarvurdering", "verge-opprett");
+                    });
+        }
+
+        @Test
+        void skal_hentUtvidetBehandlingResultat_medVedtakSteg() {
+            var behandling = lagBehandling(BehandlingStegType.FORESLÅ_VEDTAK, BehandlingStatus.UTREDES);
+            when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
+            lagFaktaFeilutbetaling(behandling.getId());
+            lagVilkårsVurdering(behandling.getId());
+
+            var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
+            assertThat(utvidetBehandlingDto)
+                    .satisfies(harSaksbehandlerOgBehandlingIkkePåVent)
+                    .satisfies(dto -> {
+                        assertThat(dto.getLinks())
+                                .extracting(ResourceLink::getRel)
+                                .containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
+                                        "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
+                                        "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurdering", "vilkarvurderingsperioder", "beregningsresultat", "vedtaksbrev",
+                                        "verge-opprett");
+                    });
+        }
+
+        @Test
+        void skal_hentUtvidetBehandlingResultat_medVedtakSteg_når_henlagt() {
+            var behandling = lagBehandling(BehandlingStegType.FORESLÅ_VEDTAK, BehandlingStatus.AVSLUTTET);
+            when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
+            when(behandlingTjeneste.erBehandlingHenlagt(any(Behandling.class))).thenReturn(true);
+
+            var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
+            assertThat(utvidetBehandlingDto)
+                    .satisfies(harSaksbehandlerOgBehandlingIkkePåVent)
+                    .satisfies(dto -> {
+                        assertThat(dto.isKanHenleggeBehandling()).isFalse();
+                        assertThat(dto.getLinks()).extracting(ResourceLink::getRel).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
+                                "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "verge-opprett");
+                    });
+        }
+
+        @Test
+        void skal_hentUtvidetBehandlingResultat_medVergeAksjonspunkt() {
+            var behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
+            when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
+            AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE);
+
+            var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
+
+            assertThat(utvidetBehandlingDto)
+                    .satisfies(harSaksbehandlerOgBehandlingIkkePåVent)
+                    .satisfies(dto -> {
+                        assertThat(dto.getLinks()).extracting(ResourceLink::getRel).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
+                                "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
+                                "feilutbetalingAarsak", "verge-opprett", "soeker-verge");
+                    });
+        }
+
+        @Test
+        void skal_hentUtvidetBehandlingResultat_medEksisterendeVerge() {
+            var behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
+            var vergeEntitet = new VergeEntitet.Builder()
+                    .medVergeAktørId(new AktørId(GYLDIG_AKTØR_ID))
+                    .medVergeType(VergeType.ANNEN_F)
+                    .medGyldigPeriode(LocalDate.now(), LocalDate.now().plusYears(1))
+                    .medNavn("Navn Navnesen")
+                    .medKilde(KildeType.FPTILBAKE.name())
+                    .build();
+            repositoryProvider.getVergeRepository().lagreVergeInformasjon(behandling.getId(), vergeEntitet);
+            when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
+
+            var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
+
+            assertThat(utvidetBehandlingDto)
+                    .satisfies(harSaksbehandlerOgBehandlingIkkePåVent)
+                    .satisfies(dto -> {
+                        assertThat(dto.getLinks()).extracting(ResourceLink::getRel).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
+                                "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
+                                "feilutbetalingAarsak", "verge-fjern", "verge-hent", "soeker-verge");
+                    });
+        }
+
+        Consumer<UtvidetBehandlingDto> harSaksbehandlerOgBehandlingIkkePåVent = (d) -> {
+            assertThat(d.isBehandlingPåVent()).isFalse();
+            assertThat(d.getAnsvarligSaksbehandler()).isEqualTo("Z991136");
+        };
     }
 
-    @Test
-    void skal_hentUtvidetBehandlingResultat_medForeldelseSteg() {
-        var behandling = lagBehandling(BehandlingStegType.FORELDELSEVURDERINGSTEG, BehandlingStatus.UTREDES);
-        when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
-        lagFaktaFeilutbetaling(behandling.getId());
+    @Nested
+    class HentAlleBehandlinger {
 
-        var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
-        assertUtvidetBehandlingDto(utvidetBehandlingDto);
+        @Test
+        void skal_hentAlleBehandlinger_medFaktaSteg() {
+            var behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
+            when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(List.of(behandling));
 
-        var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertThat(lenker).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
-            "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
-            "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurderingsperioder", "opprett-verge", "fjern-verge");
-    }
+            var behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
 
-    @Test
-    void skal_hentUtvidetBehandlingResultat_medVilkårSteg() {
-        var behandling = lagBehandling(BehandlingStegType.VTILBSTEG, BehandlingStatus.UTREDES);
-        when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
-        lagFaktaFeilutbetaling(behandling.getId());
+            assertThat(behandlingDtoListe).hasSize(1).first().satisfies(dto -> {
+                assertThat(dto.getFagsakId()).isEqualTo(behandling.getFagsakId());
+                assertThat(dto.getType()).isEqualTo(BehandlingType.TILBAKEKREVING);
+                assertThat(dto.isKanHenleggeBehandling()).isFalse();
+                assertThat(dto.getBehandlingsresultat().getType()).isEqualTo(BehandlingResultatType.IKKE_FASTSATT);
 
-        var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
-        assertUtvidetBehandlingDto(utvidetBehandlingDto);
+                assertThat(dto.getLinks())
+                        .extracting(ResourceLink::getRel)
+                        .containsExactlyInAnyOrder("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
+                                "behandling-rettigheter");
+            });
+        }
 
-        var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertThat(lenker).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
-            "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
-            "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurdering", "vilkarvurderingsperioder", "opprett-verge", "fjern-verge");
-    }
+        @Test
+        void skal_hentAlleBehandlinger_medFatteVedtakSteg() {
+            var behandling = lagBehandling(BehandlingStegType.FATTE_VEDTAK, BehandlingStatus.FATTER_VEDTAK);
+            when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(List.of(behandling));
 
-    @Test
-    void skal_hentUtvidetBehandlingResultat_medVilkårSteg_når_vilkårsvurdering_finnes_allrede() {
-        var behandling = lagBehandling(BehandlingStegType.VTILBSTEG, BehandlingStatus.UTREDES);
-        when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
-        lagFaktaFeilutbetaling(behandling.getId());
-        lagVilkårsVurdering(behandling.getId());
+            var behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
+            assertThat(behandlingDtoListe)
+                    .hasSize(1)
+                    .first()
+                    .satisfies(harFagsakIdOgTilbakekrveingType(behandling))
+                    .satisfies(dto -> {
+                        assertThat(dto.isKanHenleggeBehandling()).isFalse();
+                        assertThat(dto.getBehandlingsresultat().getType()).isEqualTo(BehandlingResultatType.IKKE_FASTSATT);
+                        assertThat(dto.getLinks())
+                                .extracting(ResourceLink::getRel)
+                                .containsExactlyInAnyOrder("totrinnskontroll-arsaker", "bekreft-totrinnsaksjonspunkt", "brev-maler", "brev-bestill", "brev-forhandvis",
+                                        "handling-rettigheter", "behandling-rettigheter");
+                    });
+        }
 
-        var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
-        assertUtvidetBehandlingDto(utvidetBehandlingDto);
+        @Test
+        void skal_hentAlleBehandlinger_medVenterPåGrunnlagSteg_men_opprettet_nå() {
+            var behandling = ScenarioSimple.simple().lagre(repositoryProvider);
+            BehandlingStegMockUtil.nyBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG, BehandlingStatus.UTREDES);
+            when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(List.of(behandling));
+            when(behandlingTjeneste.erBehandlingHenlagt(any(Behandling.class))).thenReturn(false);
 
-        var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertThat(lenker).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
-            "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
-            "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurderingsperioder", "vilkarvurdering", "opprett-verge", "fjern-verge");
-    }
+            var behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
+            assertThat(behandlingDtoListe)
+                    .hasSize(1)
+                    .first()
+                    .satisfies(harFagsakIdOgTilbakekrveingType(behandling))
+                    .satisfies(dto -> {
+                        assertThat(dto.isKanHenleggeBehandling()).isFalse();
+                        assertThat(dto.getLinks())
+                                .extracting(ResourceLink::getRel)
+                                .containsExactlyInAnyOrder("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
+                                        "behandling-rettigheter");
+                    });
+        }
 
-    @Test
-    void skal_hentUtvidetBehandlingResultat_medVedtakSteg() {
-        var behandling = lagBehandling(BehandlingStegType.FORESLÅ_VEDTAK, BehandlingStatus.UTREDES);
-        when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
-        lagFaktaFeilutbetaling(behandling.getId());
-        lagVilkårsVurdering(behandling.getId());
+        @Test
+        void skal_hentAlleBehandlinger_medVenterPåGrunnlagSteg_men_opprettet_før_bestemte_dager() {
+            var fagsak = ScenarioSimple.simple().lagreFagsak(repositoryProvider);
+            var behandling = mock(Behandling.class);
+            when(behandling.getOpprettetTidspunkt()).thenReturn(LocalDateTime.now().minusDays(8l));
+            when(behandling.getFagsak()).thenReturn(fagsak);
+            when(behandling.getType()).thenReturn(BehandlingType.TILBAKEKREVING);
+            when(behandling.getStatus()).thenReturn(BehandlingStatus.UTREDES);
+            when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(List.of(behandling));
+            when(behandlingTjeneste.erBehandlingHenlagt(any(Behandling.class))).thenReturn(false);
 
-        var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
-        assertUtvidetBehandlingDto(utvidetBehandlingDto);
+            var behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
+            assertThat(behandlingDtoListe)
+                    .hasSize(1)
+                    .first()
+                    .satisfies(harFagsakIdOgTilbakekrveingType(behandling))
+                    .satisfies(dto -> {
+                        assertThat(dto.isKanHenleggeBehandling()).isTrue();
+                        assertThat(dto.getLinks())
+                                .extracting(ResourceLink::getRel)
+                                .containsExactlyInAnyOrder("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
+                                        "behandling-rettigheter");
+                    });
+        }
 
-        var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertThat(lenker).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
-            "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
-            "feilutbetalingAarsak", "perioderForeldelse", "vilkarvurdering", "vilkarvurderingsperioder", "beregningsresultat", "vedtaksbrev",
-            "opprett-verge", "fjern-verge");
-    }
+        @Test
+        void skal_hentAlleBehandlinger_når_behandling_er_henlagt() {
+            var behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
+            var behandlingsresultat = Behandlingsresultat.builder()
+                    .medBehandling(behandling)
+                    .medBehandlingResultatType(BehandlingResultatType.HENLAGT_TEKNISK_VEDLIKEHOLD)
+                    .build();
+            repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
+            behandling.avsluttBehandling();
+            when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(List.of(behandling));
+            var behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
 
-    @Test
-    void skal_hentUtvidetBehandlingResultat_medVedtakSteg_når_henlagt() {
-        var behandling = lagBehandling(BehandlingStegType.FORESLÅ_VEDTAK, BehandlingStatus.AVSLUTTET);
-        when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
-        when(behandlingTjeneste.erBehandlingHenlagt(any(Behandling.class))).thenReturn(true);
+            assertThat(behandlingDtoListe)
+                    .hasSize(1)
+                    .first()
+                    .satisfies(harFagsakIdOgTilbakekrveingType(behandling))
+                    .satisfies(behandlingDto -> {
+                        assertThat(behandlingDto.isKanHenleggeBehandling()).isFalse();
+                        assertThat(behandlingDto.getBehandlingsresultat().getType()).isEqualTo(BehandlingResultatType.HENLAGT);
+                    });
+        }
 
-        var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
-        assertUtvidetBehandlingDto(utvidetBehandlingDto);
+        @Test
+        void skal_hentAlleBehandlinger_når_behandling_er_avsluttet() {
+            var behandling = lagBehandling(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingStatus.IVERKSETTER_VEDTAK);
+            var behandlingsresultat = Behandlingsresultat.builder()
+                    .medBehandling(behandling)
+                    .medBehandlingResultatType(BehandlingResultatType.DELVIS_TILBAKEBETALING)
+                    .build();
+            repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
+            var behandlingVedtak = BehandlingVedtak.builder()
+                    .medAnsvarligSaksbehandler("VL")
+                    .medBehandlingsresultat(behandlingsresultat)
+                    .medVedtaksdato(LocalDate.now())
+                    .medIverksettingStatus(IverksettingStatus.IVERKSATT)
+                    .build();
+            repositoryProvider.getBehandlingVedtakRepository().lagre(behandlingVedtak);
+            behandling.avsluttBehandling();
+            when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(List.of(behandling));
 
-        var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertThat(lenker).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
-            "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "opprett-verge", "fjern-verge");
-        assertFalse(utvidetBehandlingDto.isKanHenleggeBehandling());
-    }
+            var behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
+            assertThat(behandlingDtoListe)
+                    .hasSize(1)
+                    .first()
+                    .satisfies(harFagsakIdOgTilbakekrveingType(behandling))
+                    .satisfies(dto -> {
+                        assertThat(dto.isKanHenleggeBehandling()).isFalse();
+                        assertThat(dto.getBehandlingsresultat().getType()).isEqualTo(BehandlingResultatType.DELVIS_TILBAKEBETALING);
+                    });
+        }
 
-    @Test
-    void skal_hentUtvidetBehandlingResultat_medVergeAksjonspunkt() {
-        var behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
-        when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
-        AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE);
-
-        var utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
-        assertUtvidetBehandlingDto(utvidetBehandlingDto);
-
-        var lenker = utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertThat(lenker).containsExactlyInAnyOrder("bytt-behandlende-enhet", "henlegg-behandling", "gjenoppta-behandling",
-            "sett-behandling-pa-vent", "endre-pa-vent", "lagre-aksjonspunkter", "beregne-feilutbetalt-belop", "aksjonspunkter", "feilutbetalingFakta",
-            "feilutbetalingAarsak", "opprett-verge", "fjern-verge", "soeker-verge");
-    }
-
-    @Test
-    void skal_hentAlleBehandlinger_medFaktaSteg() {
-        var behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
-        when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(List.of(behandling));
-
-        var behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
-        var behandlingDto = assertBehandlingDto(behandling, behandlingDtoListe, BehandlingResultatType.IKKE_FASTSATT);
-
-        var lenker = behandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertThat(lenker).containsExactlyInAnyOrder("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
-                "behandling-rettigheter", "finn-menyvalg-for-verge");
-    }
-
-    @Test
-    void skal_hentAlleBehandlinger_medFatteVedtakSteg() {
-        var behandling = lagBehandling(BehandlingStegType.FATTE_VEDTAK, BehandlingStatus.FATTER_VEDTAK);
-        when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(List.of(behandling));
-
-        var behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
-        var behandlingDto = assertBehandlingDto(behandling, behandlingDtoListe, BehandlingResultatType.IKKE_FASTSATT);
-
-        var lenker = behandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertThat(lenker).containsExactlyInAnyOrder("totrinnskontroll-arsaker", "bekreft-totrinnsaksjonspunkt", "brev-maler", "brev-bestill", "brev-forhandvis",
-                "handling-rettigheter", "behandling-rettigheter", "finn-menyvalg-for-verge");
-    }
-
-    @Test
-    void skal_hentAlleBehandlinger_medVenterPåGrunnlagSteg_men_opprettet_nå() {
-        var behandling = ScenarioSimple.simple().lagre(repositoryProvider);
-        BehandlingStegMockUtil.nyBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG, BehandlingStatus.UTREDES);
-        when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(List.of(behandling));
-        when(behandlingTjeneste.erBehandlingHenlagt(any(Behandling.class))).thenReturn(false);
-
-        var behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
-        assertFalse(behandlingDtoListe.isEmpty());
-        assertEquals(1, behandlingDtoListe.size());
-
-        var behandlingDto = behandlingDtoListe.get(0);
-        assertEquals(behandlingDto.getFagsakId(), behandling.getFagsakId());
-        assertEquals(BehandlingType.TILBAKEKREVING, behandlingDto.getType());
-
-        var lenker = behandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertThat(lenker).containsExactlyInAnyOrder("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
-                "behandling-rettigheter", "finn-menyvalg-for-verge");
-
-        assertFalse(behandlingDto.isKanHenleggeBehandling());
-    }
-
-    @Test
-    void skal_hentAlleBehandlinger_medVenterPåGrunnlagSteg_men_opprettet_før_bestemte_dager() {
-        var fagsak = ScenarioSimple.simple().lagreFagsak(repositoryProvider);
-        var behandling = mock(Behandling.class);
-        when(behandling.getOpprettetTidspunkt()).thenReturn(LocalDateTime.now().minusDays(8l));
-        when(behandling.getFagsak()).thenReturn(fagsak);
-        when(behandling.getType()).thenReturn(BehandlingType.TILBAKEKREVING);
-        when(behandling.getStatus()).thenReturn(BehandlingStatus.UTREDES);
-        when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(List.of(behandling));
-        when(behandlingTjeneste.erBehandlingHenlagt(any(Behandling.class))).thenReturn(false);
-
-        var behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
-        assertFalse(behandlingDtoListe.isEmpty());
-        assertEquals(1, behandlingDtoListe.size());
-
-        var behandlingDto = behandlingDtoListe.get(0);
-        assertEquals(behandlingDto.getFagsakId(), behandling.getFagsakId());
-        assertEquals(BehandlingType.TILBAKEKREVING, behandlingDto.getType());
-
-        var lenker = behandlingDto.getLinks().stream().map(ResourceLink::getRel).toList();
-        assertThat(lenker).containsExactlyInAnyOrder("totrinnskontroll-arsaker-readOnly", "brev-maler", "brev-bestill", "brev-forhandvis", "handling-rettigheter",
-                "behandling-rettigheter", "finn-menyvalg-for-verge");
-
-        assertTrue(behandlingDto.isKanHenleggeBehandling());
-    }
-
-    @Test
-    void skal_hentAlleBehandlinger_når_behandling_er_henlagt() {
-        var behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
-        var behandlingsresultat = Behandlingsresultat.builder()
-            .medBehandling(behandling)
-            .medBehandlingResultatType(
-                no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType.HENLAGT_TEKNISK_VEDLIKEHOLD)
-            .build();
-        repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
-        behandling.avsluttBehandling();
-        when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(List.of(behandling));
-        var behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
-        assertBehandlingDto(behandling, behandlingDtoListe, BehandlingResultatType.HENLAGT);
-    }
-
-    @Test
-    void skal_hentAlleBehandlinger_når_behandling_er_avsluttet() {
-        var behandling = lagBehandling(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingStatus.IVERKSETTER_VEDTAK);
-        var behandlingsresultat = Behandlingsresultat.builder()
-            .medBehandling(behandling)
-            .medBehandlingResultatType(BehandlingResultatType.DELVIS_TILBAKEBETALING)
-            .build();
-        repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
-        var behandlingVedtak = BehandlingVedtak.builder()
-            .medAnsvarligSaksbehandler("VL")
-            .medBehandlingsresultat(behandlingsresultat)
-            .medVedtaksdato(LocalDate.now())
-            .medIverksettingStatus(IverksettingStatus.IVERKSATT)
-            .build();
-        repositoryProvider.getBehandlingVedtakRepository().lagre(behandlingVedtak);
-        behandling.avsluttBehandling();
-        when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(List.of(behandling));
-
-        var behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
-        assertBehandlingDto(behandling, behandlingDtoListe, BehandlingResultatType.DELVIS_TILBAKEBETALING);
+        private Consumer<BehandlingDto> harFagsakIdOgTilbakekrveingType(Behandling behandling) {
+            return (d) -> {
+                assertThat(d.getFagsakId()).isEqualTo(behandling.getFagsakId());
+                assertThat(d.getType()).isEqualTo(BehandlingType.TILBAKEKREVING);
+            };
+        }
     }
 
     private Behandling lagBehandling(BehandlingStegType behandlingStegType, BehandlingStatus behandlingStatus) {
@@ -347,26 +430,6 @@ class BehandlingDtoTjenesteTest {
         return behandling;
     }
 
-    private BehandlingDto assertBehandlingDto(Behandling behandling,
-                                              List<BehandlingDto> behandlingDtoListe,
-                                              BehandlingResultatType behandlingResultatType) {
-        assertFalse(behandlingDtoListe.isEmpty());
-        assertEquals(1, behandlingDtoListe.size());
-
-        var behandlingDto = behandlingDtoListe.get(0);
-        assertEquals(behandlingDto.getFagsakId(), behandling.getFagsakId());
-        assertEquals(BehandlingType.TILBAKEKREVING, behandlingDto.getType());
-        assertFalse(behandlingDto.isKanHenleggeBehandling());
-        assertEquals(behandlingDto.getBehandlingsresultat().getType(), behandlingResultatType);
-        return behandlingDto;
-    }
-
-    private void assertUtvidetBehandlingDto(UtvidetBehandlingDto utvidetBehandlingDto) {
-        assertNotNull(utvidetBehandlingDto);
-        assertEquals("Z991136", utvidetBehandlingDto.getAnsvarligSaksbehandler());
-        assertFalse(utvidetBehandlingDto.isBehandlingPåVent());
-    }
-
     private void lagGrunnlag(long behandlingId) {
         var mockMedFeilPostering = new KravgrunnlagMock(FOM, TOM, KlasseType.FEIL, BigDecimal.valueOf(10000), BigDecimal.ZERO);
         var mockMedYtelPostering = new KravgrunnlagMock(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(10000));
@@ -377,11 +440,11 @@ class BehandlingDtoTjenesteTest {
     private void lagFaktaFeilutbetaling(long behandlingId) {
         var faktaFeilutbetaling = new FaktaFeilutbetaling();
         var faktaFeilutbetalingPeriode = FaktaFeilutbetalingPeriode.builder()
-            .medPeriode(FOM, TOM)
-            .medHendelseType(HendelseType.FP_UTTAK_UTSETTELSE_TYPE)
-            .medHendelseUndertype(HendelseUnderType.ARBEID_HELTID)
-            .medFeilutbetalinger(faktaFeilutbetaling)
-            .build();
+                .medPeriode(FOM, TOM)
+                .medHendelseType(HendelseType.FP_UTTAK_UTSETTELSE_TYPE)
+                .medHendelseUndertype(HendelseUnderType.ARBEID_HELTID)
+                .medFeilutbetalinger(faktaFeilutbetaling)
+                .build();
         faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);
         faktaFeilutbetaling.setBegrunnelse("begrunnelse");
         faktaFeilutbetalingRepository.lagre(behandlingId, faktaFeilutbetaling);
@@ -390,11 +453,11 @@ class BehandlingDtoTjenesteTest {
     private void lagVilkårsVurdering(long behandlingId) {
         var vurdering = new VilkårVurderingEntitet();
         var p = VilkårVurderingPeriodeEntitet.builder()
-            .medPeriode(FOM, TOM)
-            .medBegrunnelse("foo")
-            .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
-            .medVurderinger(vurdering)
-            .build();
+                .medPeriode(FOM, TOM)
+                .medBegrunnelse("foo")
+                .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                .medVurderinger(vurdering)
+                .build();
         p.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder().medAktsomhet(Aktsomhet.FORSETT).medBegrunnelse("foo").medPeriode(p).build());
         vurdering.leggTilPeriode(p);
         vilkårsvurderingRepository.lagre(behandlingId, vurdering);

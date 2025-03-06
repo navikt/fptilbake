@@ -65,7 +65,7 @@ public class GrunnlagRestTestTjenesteLocalDev {
 
     @POST
     @Operation(tags = "kravgrunnlag", description = "Lagre tilbakekrevingsgrunnlag fra økonomi")
-    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.UPDATE, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     public Response lagreUtbetalinger(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                       @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse idDto,
                                       @NotNull @Valid KravgrunnlagDto kravgrunnlagDto) {

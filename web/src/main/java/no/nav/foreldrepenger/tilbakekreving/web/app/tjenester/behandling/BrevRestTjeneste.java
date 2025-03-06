@@ -70,7 +70,7 @@ public class BrevRestTjeneste {
     @Path("/bestill")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(tags = "brev", description = "bestiller brev")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     public Response bestillBrev(@NotNull @Valid BestillBrevDto bestillBrevDto) {
         var malType = DokumentMalType.fraKode(bestillBrevDto.getBrevmalkode());
         var behandlingId = hentBehandlingId(bestillBrevDto.getBehandlingReferanse());
@@ -82,7 +82,7 @@ public class BrevRestTjeneste {
     @Path("/forhandsvis")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "brev", description = "Returnerer en pdf som er en forhåndsvisning av brevet")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     public Response forhåndsvisBrev(@Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @NotNull @Valid BestillBrevDto forhåndsvisBestillBrevDto) {
         var malType = DokumentMalType.fraKode(forhåndsvisBestillBrevDto.getBrevmalkode());
         var fritekst = forhåndsvisBestillBrevDto.getFritekst();

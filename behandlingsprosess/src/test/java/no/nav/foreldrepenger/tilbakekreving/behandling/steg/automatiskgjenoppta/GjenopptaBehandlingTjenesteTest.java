@@ -58,8 +58,8 @@ class GjenopptaBehandlingTjenesteTest {
         gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(mockTaskTjeneste,
             behandlingKandidaterRepository,
             behandlingVenterRepository,
-            repositoryProvider,
-            null);
+            repositoryProvider
+        );
     }
 
     @Test
