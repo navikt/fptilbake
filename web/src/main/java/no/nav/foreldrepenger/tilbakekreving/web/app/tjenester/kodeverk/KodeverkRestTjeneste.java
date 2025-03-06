@@ -18,7 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
-import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.JacksonJsonConfig;
+import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.ObjectMapperFactory;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.app.HentKodeverkTjeneste;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
@@ -33,9 +33,7 @@ public class KodeverkRestTjeneste {
 
     private HentKodeverkTjeneste hentKodeverkTjeneste;
 
-    private static final JacksonJsonConfig jsonMapper = new JacksonJsonConfig(true); // generere fulle kodeverdi-objekt
-
-    private static final ObjectMapper objectMapper = jsonMapper.getObjectMapper();
+    private static final ObjectMapper objectMapper = ObjectMapperFactory.getDefaultObjectMapperCopy(true);
 
     private static String KODELISTER;
 
