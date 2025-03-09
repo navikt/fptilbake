@@ -70,7 +70,7 @@ public class TilbakekrevingResultatRestTjeneste {
     @GET
     @Path("/resultat")
     @Operation(tags = "beregning", description = "Henter beregningsresultat for tilbakekreving")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
     public BeregningResultatDto hentBeregningResultat(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class) @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         var behandlingId = hentBehandlingId(behandlingReferanse);
         var beregningsresultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);

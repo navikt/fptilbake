@@ -47,7 +47,7 @@ public class HistorikkRestTjeneste {
     @Path("/v2")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Operation(tags = "historikk", description = "Henter alle historikkinnslag for gitt behandling.")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentAlleInnslagV2(@Context HttpServletRequest request,
                                     @NotNull @QueryParam("saksnummer")

@@ -187,7 +187,7 @@ public class BehandlingRestTjeneste {
             tags = "behandlinger",
             description = "Opprett ny behandling")
     @Path("/opprett")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
+    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     public Response opprettBehandling(@Context HttpServletRequest request,
                                       @Valid @NotNull OpprettBehandlingDto opprettBehandlingDto) throws URISyntaxException {
         Saksnummer saksnummer = new Saksnummer(opprettBehandlingDto.getSaksnummer().getVerdi());
@@ -471,7 +471,7 @@ public class BehandlingRestTjeneste {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Returnerer vedtak info for tilbakekreving", content = @Content(schema = @Schema(implementation = Boolean.class)))
             })
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
     public Response hentTilbakekrevingsVedtakInfo(@NotNull @QueryParam(UuidDto.NAME) @Parameter(description = UuidDto.DESC) @Valid UuidDto uuidDto) {
         UUID behandlingUUId = uuidDto.getBehandlingUuid();
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingUUId);
