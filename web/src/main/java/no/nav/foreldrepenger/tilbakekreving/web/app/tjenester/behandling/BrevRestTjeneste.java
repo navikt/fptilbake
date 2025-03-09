@@ -70,7 +70,7 @@ public class BrevRestTjeneste {
     @Path("/bestill")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(tags = "brev", description = "bestiller brev")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
     public Response bestillBrev(@NotNull @Valid BestillBrevDto bestillBrevDto) {
         var malType = DokumentMalType.fraKode(bestillBrevDto.getBrevmalkode());
         var behandlingId = hentBehandlingId(bestillBrevDto.getBehandlingReferanse());

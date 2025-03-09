@@ -65,7 +65,7 @@ public class K9AbacAuditlogger {
             if (!utfall.fikkTilgang()) {
                 LOG.info("ABAC AVSLAG SYSTEMBRUKER {} tjeneste {}", beskyttetRessursAttributter.getBrukerId(), beskyttetRessursAttributter.getServicePath());
             }
-        } else if (beskyttetRessursAttributter.isSporingslogg()) {
+        } else {
             logg(beskyttetRessursAttributter, appRessursData, utfall.fikkTilgang() ? Access.GRANTED : Access.DENIED);
         }
     }
