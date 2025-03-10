@@ -90,7 +90,7 @@ public class JettyServer {
     protected void bootStrap() throws Exception {
         konfigurerLogging();
         konfigurerSikkerhet();
-        var dataSource = DatasourceUtil.createDatasource(30);
+        var dataSource = DatasourceUtil.createDatasource(30, 2);
         konfigurerDatasource(dataSource);
         migrerDatabaser(dataSource);
         start();
