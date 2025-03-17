@@ -9,6 +9,8 @@ import java.util.Set;
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 
+import no.nav.openapi.spec.utils.http.DynamicObjectMapperResolverVaryFilter;
+
 import org.glassfish.jersey.server.ServerProperties;
 
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
@@ -121,6 +123,7 @@ public class ApiConfig extends Application {
             // Applikasjonsoppsett
             DynamicJacksonJsonProvider.class,
             JacksonJsonConfig.class,
+            DynamicObjectMapperResolverVaryFilter.class,
             // ExceptionMappers pga de som finnes i Jackson+Jersey-media
             ConstraintViolationMapper.class,
             JsonMappingExceptionMapper.class,
