@@ -82,7 +82,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Uui
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SøkestrengDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRequestPath;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
@@ -544,10 +543,9 @@ public class BehandlingRestTjeneste {
         description = "Henter informasjon om rettigheter, behandlinger og historikk for sak")
     @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public SakFullDto hentSaksinformasjon(@Context HttpServletRequest request, @NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto) {
+    public SakFullDto hentSaksinformasjon(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto) {
         Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
-        var hentDokumentPath = HistorikkRequestPath.getRequestPath(request);
-        var historikkinnslag = historikkTjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()), hentDokumentPath);
+        var historikkinnslag = historikkTjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()));
         var kanOppretteTilbake = behandlingTjeneste.hentBehandlinger(saksnummer).stream().allMatch(Behandling::erSaksbehandlingAvsluttet);
         var kanOppretteRevurdering = behandlingTjeneste.hentBehandlinger(saksnummer).stream().anyMatch(revurderingTjeneste::kanRevurderingOpprettes);
         var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, kanOppretteTilbake),
