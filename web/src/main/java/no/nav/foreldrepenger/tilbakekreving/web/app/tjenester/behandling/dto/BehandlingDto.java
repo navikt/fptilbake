@@ -113,6 +113,7 @@ public class BehandlingDto {
     }
 
     @Deprecated(forRemoval = true)
+    @JsonProperty("sprakkode")
     public Språkkode getSprakkode() {
         return språkkode;
     }
@@ -122,6 +123,7 @@ public class BehandlingDto {
     }
 
     @Deprecated(forRemoval = true)
+    @JsonProperty("behandlingKoet")
     public boolean isBehandlingKoet() {
         return behandlingKøet;
     }
@@ -187,6 +189,7 @@ public class BehandlingDto {
     }
 
     @Deprecated(forRemoval = true)
+    @JsonProperty("behandlingPaaVent")
     public boolean isBehandlingPaaVent() {
         return behandlingPåVent;
     }
@@ -196,6 +199,7 @@ public class BehandlingDto {
     }
 
     @Deprecated(forRemoval = true)
+    @JsonProperty("fristBehandlingPaaVent")
     public String getFristBehandlingPaaVent() {
         return fristBehandlingPåVent;
     }
@@ -205,6 +209,7 @@ public class BehandlingDto {
     }
 
     @Deprecated(forRemoval = true)
+    @JsonProperty("venteArsakKode")
     public String getVenteArsakKode() {
         return venteÅrsakKode;
     }
