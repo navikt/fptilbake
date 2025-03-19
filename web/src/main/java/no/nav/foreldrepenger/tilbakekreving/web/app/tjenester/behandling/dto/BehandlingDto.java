@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
@@ -107,23 +108,24 @@ public class BehandlingDto {
         return toTrinnsBehandling;
     }
 
-    @Deprecated(forRemoval = true)
-    @JsonProperty("sprakkode")
-    public Språkkode getSprakkode() {
-        return språkkode;
-    }
-    
-    @JsonProperty("språkkode")
     public Språkkode getSpråkkode() {
         return språkkode;
     }
 
-    @JsonProperty("behandlingKoet")
+    @Deprecated(forRemoval = true)
+    public Språkkode getSprakkode() {
+        return språkkode;
+    }
+
+    public boolean isBehandlingKøet() {
+        return behandlingKøet;
+    }
+
+    @Deprecated(forRemoval = true)
     public boolean isBehandlingKoet() {
         return behandlingKøet;
     }
 
-    @JsonProperty("ansvarligSaksbehandler")
     public String getAnsvarligSaksbehandler() {
         return ansvarligSaksbehandler;
     }
@@ -180,18 +182,30 @@ public class BehandlingDto {
         this.toTrinnsBehandling = toTrinnsBehandling;
     }
 
-    @JsonProperty("behandlingPaaVent")
     public boolean isBehandlingPåVent() {
         return behandlingPåVent;
     }
 
-    @JsonProperty("fristBehandlingPaaVent")
+    @Deprecated(forRemoval = true)
+    public boolean isBehandlingPaaVent() {
+        return behandlingPåVent;
+    }
+
     public String getFristBehandlingPåVent() {
         return fristBehandlingPåVent;
     }
 
-    @JsonProperty("venteArsakKode")
+    @Deprecated(forRemoval = true)
+    public String getFristBehandlingPaaVent() {
+        return fristBehandlingPåVent;
+    }
+
     public String getVenteÅrsakKode() {
+        return venteÅrsakKode;
+    }
+
+    @Deprecated(forRemoval = true)
+    public String getVenteArsakKode() {
         return venteÅrsakKode;
     }
 
