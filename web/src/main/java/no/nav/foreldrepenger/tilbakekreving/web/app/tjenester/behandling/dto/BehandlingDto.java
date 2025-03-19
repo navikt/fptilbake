@@ -107,7 +107,13 @@ public class BehandlingDto {
         return toTrinnsBehandling;
     }
 
+    @Deprecated(forRemoval = true)
     @JsonProperty("sprakkode")
+    public Språkkode getSprakkode() {
+        return språkkode;
+    }
+    
+    @JsonProperty("språkkode")
     public Språkkode getSpråkkode() {
         return språkkode;
     }
