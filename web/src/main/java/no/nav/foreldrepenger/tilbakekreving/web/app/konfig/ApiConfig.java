@@ -5,25 +5,21 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRestTjeneste;
+import no.nav.openapi.spec.utils.http.DynamicObjectMapperResolverVaryFilter;
 
 import org.glassfish.jersey.server.ServerProperties;
 
-import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
-import io.swagger.v3.oas.integration.GenericOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
-import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
-import jakarta.ws.rs.ApplicationPath;
-import jakarta.ws.rs.core.Application;
 import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.ConstraintViolationMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.GeneralRestExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonMappingExceptionMapper;
@@ -45,14 +41,18 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.Forval
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningBehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningKravgrunnlagRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fpoversikt.FpOversiktRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.init.InitielleLinksRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.konfig.KonfigRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.los.LosRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.openapi.OpenApiTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjenesteLocalDev;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
+import no.nav.openapi.spec.utils.jackson.DynamicJacksonJsonProvider;
+import no.nav.openapi.spec.utils.openapi.OpenApiSetupHelper;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 
@@ -63,24 +63,31 @@ public class ApiConfig extends Application {
 
     public static final String API_URI = "/api";
 
+    private OpenAPI resolvedOpenAPI;
+
     public ApiConfig() {
-        var oas = new OpenAPI();
-        var info = new Info()
+        this.resolvedOpenAPI = resolveOpenAPI();
+    }
+
+    private OpenAPI resolveOpenAPI() {
+        final var info = new Info()
             .title("Vedtaksløsningen - Tilbakekreving")
             .version("1.0")
             .description("REST grensesnitt for tilbakekreving.");
-
-        oas.info(info).addServersItem(new Server().url(JettyServer.getContextPath()));
-
-        var oasConfig = new SwaggerConfiguration()
-            .openAPI(oas)
-            .prettyPrint(true)
-            .resourceClasses(getClasses().stream().map(Class::getName).collect(Collectors.toSet()));
-        try {
-            new GenericOpenApiContextBuilder<>().openApiConfiguration(oasConfig).buildContext(true).read();
-        } catch (OpenApiConfigurationException e) {
-            throw new TekniskException("OPEN-API", e.getMessage(), e);
+        final var server = new Server().url(JettyServer.getContextPath());
+        final var openapiSetupHelper = new OpenApiSetupHelper(this, info, server);
+        for(final var cls : getClasses()) {
+            openapiSetupHelper.addResourceClass(cls.getName());
         }
+        try {
+            return openapiSetupHelper.resolveOpenAPI();
+        } catch (OpenApiConfigurationException e) {
+            throw  new TekniskException("OPEN-API", e.getMessage(), e);
+        }
+    }
+
+    public OpenAPI getResolvedOpenAPI() {
+        return resolvedOpenAPI;
     }
 
     @Override
@@ -112,9 +119,11 @@ public class ApiConfig extends Application {
             FpOversiktRestTjeneste.class,
             HistorikkRestTjeneste.class,
             // swagger
-            OpenApiResource.class,
+            OpenApiTjeneste.class,
             // Applikasjonsoppsett
+            DynamicJacksonJsonProvider.class,
             JacksonJsonConfig.class,
+            DynamicObjectMapperResolverVaryFilter.class,
             // ExceptionMappers pga de som finnes i Jackson+Jersey-media
             ConstraintViolationMapper.class,
             JsonMappingExceptionMapper.class,
