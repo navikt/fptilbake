@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
@@ -36,6 +38,7 @@ public enum IverksettingStatus implements Kodeverdi {
         this.kode = kode;
     }
 
+    @JsonCreator
     public static IverksettingStatus fraKode(@JsonProperty(value = "kode") Object node) {
         if (node == null) {
             return null;

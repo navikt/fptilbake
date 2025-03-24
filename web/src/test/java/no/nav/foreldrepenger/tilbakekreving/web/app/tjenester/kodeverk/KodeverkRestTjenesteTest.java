@@ -8,12 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.ObjectMapperFactory;
+
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
-import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.JacksonJsonConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.app.HentKodeverkTjeneste;
 
 class KodeverkRestTjenesteTest {
@@ -25,7 +26,7 @@ class KodeverkRestTjenesteTest {
         var rawJson = (String) tjeneste.hentGruppertKodeliste().getEntity();
         assertThat(rawJson).isNotNull();
 
-        Map<String, Object> gruppertKodeliste = new JacksonJsonConfig(true).getObjectMapper().readValue(rawJson, Map.class);
+        Map<String, Object> gruppertKodeliste = ObjectMapperFactory.getDefaultObjectMapperCopy(true).readValue(rawJson, Map.class);
         assertThat(gruppertKodeliste.keySet())
             .contains(Fagsystem.class.getSimpleName(), SærligGrunn.class.getSimpleName(), VidereBehandling.class.getSimpleName());
 
@@ -43,9 +44,7 @@ class KodeverkRestTjenesteTest {
     @Test
     void serialize_kodeverdi_grunn() throws Exception {
 
-        var jsonConfig = new JacksonJsonConfig(false);
-
-        var om = jsonConfig.getObjectMapper();
+        var om = ObjectMapperFactory.getDefaultObjectMapperCopy(false);
 
         var json = om.writer().withDefaultPrettyPrinter().writeValueAsString(new X(SærligGrunn.STØRRELSE_BELØP));
 
@@ -55,9 +54,7 @@ class KodeverkRestTjenesteTest {
     @Test
     void serialize_kodeverdi_grunn_full() throws Exception {
 
-        var jsonConfig = new JacksonJsonConfig(true);
-
-        var om = jsonConfig.getObjectMapper();
+        var om = ObjectMapperFactory.getDefaultObjectMapperCopy(true);
 
         var json = om.writer().withDefaultPrettyPrinter().writeValueAsString(new X(SærligGrunn.STØRRELSE_BELØP));
 
