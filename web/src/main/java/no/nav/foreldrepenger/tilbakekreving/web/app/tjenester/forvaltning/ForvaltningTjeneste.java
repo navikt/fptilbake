@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
 import java.math.BigInteger;
+import java.util.List;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
@@ -14,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
+import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
@@ -52,6 +54,11 @@ class ForvaltningTjeneste {
         var kravgrunnlag431 = kravgrunnlagRepository.hentIsAktivFor(behandlingId);
         var annullerKravgrunnlagDto = new AnnullerKravGrunnlagDto(BigInteger.valueOf(kravgrunnlag431.getVedtakId()));
         økonomiProxyKlient.anullerKravgrunnlag(annullerKravgrunnlagDto);
+    }
+
+
+    List<ØkonomiXmlMottatt> hentAlleKravgrunnlag(Saksnummer saksnummer){
+        return økonomiMottattXmlRepository.finnAlleForSaksnummer(saksnummer);
     }
 
     Forvaltningsinfo hentForvaltningsinfo(Saksnummer saksnummer) {

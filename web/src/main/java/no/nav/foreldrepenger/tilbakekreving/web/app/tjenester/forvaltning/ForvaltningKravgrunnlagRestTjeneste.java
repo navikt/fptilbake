@@ -1,5 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -18,6 +22,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import org.jose4j.base64url.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,11 +30,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.HentKorrigertKravgrunnlagDto;
+import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
@@ -136,6 +143,36 @@ public class ForvaltningKravgrunnlagRestTjeneste {
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
+    }
+
+    @GET
+    @Path("/kravgrunnlag-med-innhold")
+    @Operation(
+        tags = "FORVALTNING-kravgrunnlag",
+        description = "Henter kravgrunnlag (og statusmeldinger) relatert til et saksnummer",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "Ukjent feil!")
+        })
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT, sporingslogg = true)
+    public List<KravgrunnlagForvaltningDto> hentKravgrunnlagMedInnhold(@Valid @NotNull @QueryParam("saksnummer") SaksnummerDto saksnummer) {
+        List<ØkonomiXmlMottatt> kravgrunnlagene = forvaltningTjeneste.hentAlleKravgrunnlag(new Saksnummer(saksnummer.getVerdi()));
+        List<KravgrunnlagForvaltningDto> resultat = kravgrunnlagene.stream()
+            .map(kg -> new KravgrunnlagForvaltningDto(
+                new SaksnummerDto(kg.getSaksnummer()),
+                kg.getHenvisning(),
+                kg.getOpprettetTidspunkt(),
+                kg.getEndretTidspunkt(),
+                kg.isTilkoblet(),
+                Base64.encode(kg.getMottattXml().getBytes(StandardCharsets.UTF_8))))
+            .sorted(Comparator.comparing(KravgrunnlagForvaltningDto::opprettetTid))
+            .toList();
+        return resultat;
+    }
+
+    public record KravgrunnlagForvaltningDto(SaksnummerDto saksnummer, Henvisning henvisning, LocalDateTime opprettetTid, LocalDateTime endretTid,
+                                             boolean tilkoblet, String innholdBase64) {
+
     }
 
     /**
