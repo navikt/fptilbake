@@ -154,7 +154,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Ukjent feil!")
         })
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT, sporingslogg = true)
     public List<KravgrunnlagForvaltningDto> hentKravgrunnlagMedInnhold(@Valid @NotNull @QueryParam("saksnummer") SaksnummerDto saksnummer) {
         List<ØkonomiXmlMottatt> kravgrunnlagene = forvaltningTjeneste.hentAlleKravgrunnlag(new Saksnummer(saksnummer.getVerdi()));
         List<KravgrunnlagForvaltningDto> resultat = kravgrunnlagene.stream()
