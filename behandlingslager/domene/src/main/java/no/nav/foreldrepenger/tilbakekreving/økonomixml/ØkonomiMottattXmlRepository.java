@@ -61,7 +61,7 @@ public class ØkonomiMottattXmlRepository {
 
     public List<ØkonomiXmlMottatt> finnAlleForSaksnummer(Saksnummer saksnummer) {
         var query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer=:saksnummer", ØkonomiXmlMottatt.class);
-        query.setParameter("saksnummer", saksnummer);
+        query.setParameter("saksnummer", saksnummer.getVerdi());
         return query.getResultList();
     }
 
