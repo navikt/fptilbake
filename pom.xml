@@ -44,7 +44,7 @@
 
         <fp-tidsserie.version>2.7.1</fp-tidsserie.version>
 
-        <openhtmltopdf.version>1.1.24</openhtmltopdf.version>
+        <openhtmltopdf.version>1.1.26</openhtmltopdf.version>
         <handlebars.version>4.3.1</handlebars.version>
         <open.batik.version>1.18</open.batik.version>
 
