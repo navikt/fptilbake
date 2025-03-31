@@ -35,8 +35,8 @@
         <sonar.projectKey>navikt_fptilbake</sonar.projectKey>
 
         <!-- Jakarta deps -->
-        <felles.version>7.4.11</felles.version>
-        <prosesstask.version>5.1.3</prosesstask.version>
+        <felles.version>7.4.12</felles.version>
+        <prosesstask.version>5.1.4</prosesstask.version>
         <fpkontrakter.version>9.2.2</fpkontrakter.version>
         <abakus-kontrakt.version>2.3.1</abakus-kontrakt.version>
         <verapdf-validation-model.version>1.26.5</verapdf-validation-model.version>
@@ -44,7 +44,7 @@
 
         <fp-tidsserie.version>2.7.1</fp-tidsserie.version>
 
-        <openhtmltopdf.version>1.1.4</openhtmltopdf.version>
+        <openhtmltopdf.version>1.1.24</openhtmltopdf.version>
         <handlebars.version>4.3.1</handlebars.version>
         <open.batik.version>1.18</open.batik.version>
 
@@ -329,7 +329,7 @@
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>swagger-ui</artifactId>
-                <version>5.20.0</version>
+                <version>5.20.1</version>
             </dependency>
 
             <!-- 3dje parts biblioteker -->
@@ -363,22 +363,22 @@
             </dependency>
 
             <dependency>
-                <groupId>at.datenwort.openhtmltopdf</groupId>
+                <groupId>io.github.openhtmltopdf</groupId>
                 <artifactId>openhtmltopdf-core</artifactId>
                 <version>${openhtmltopdf.version}</version>
             </dependency>
             <dependency>
-                <groupId>at.datenwort.openhtmltopdf</groupId>
+                <groupId>io.github.openhtmltopdf</groupId>
                 <artifactId>openhtmltopdf-pdfbox</artifactId>
                 <version>${openhtmltopdf.version}</version>
             </dependency>
             <dependency>
-                <groupId>at.datenwort.openhtmltopdf</groupId>
+                <groupId>io.github.openhtmltopdf</groupId>
                 <artifactId>openhtmltopdf-svg-support</artifactId>
                 <version>${openhtmltopdf.version}</version>
             </dependency>
             <dependency>
-                <groupId>at.datenwort.openhtmltopdf</groupId>
+                <groupId>io.github.openhtmltopdf</groupId>
                 <artifactId>openhtmltopdf-slf4j</artifactId>
                 <version>${openhtmltopdf.version}</version>
             </dependency>

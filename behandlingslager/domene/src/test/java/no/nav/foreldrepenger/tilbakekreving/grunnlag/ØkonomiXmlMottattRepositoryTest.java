@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.grunnlag;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+
 import jakarta.persistence.EntityManager;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 
@@ -69,5 +72,24 @@ class ØkonomiXmlMottattRepositoryTest {
         assertThat(lagret2.getSaksnummer()).isEqualTo(saksnummer);
     }
 
+    @Test
+    void skal_kunne_finne_alle_lagrede_for_et_saksnummer() {
 
+        var xml1 = "foo1";
+        var xml2 = "foo2";
+        var saksnummer = "1234345";
+        var henvisning = Henvisning.fraEksternBehandlingId(123L);
+        var id1 = repository.lagreMottattXml(xml1);
+        repository.oppdaterMedHenvisningOgSaksnummer(henvisning, saksnummer, id1);
+        em.flush();
+        em.clear();
+        var id2 = repository.lagreMottattXml(xml2);
+        repository.oppdaterMedHenvisningOgSaksnummer(henvisning, saksnummer, id2);
+        em.flush();
+        em.clear();
+
+        List<ØkonomiXmlMottatt> alle = repository.finnAlleForSaksnummer(new Saksnummer(saksnummer));
+        assertThat(alle.size()).isEqualTo(2);
+
+    }
 }

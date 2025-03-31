@@ -38,20 +38,20 @@ public class HistorikkTjeneste {
 
     public List<HistorikkinnslagDto> hentForSak(long behandlingId) {
         return historikkinnslagRepository.hent(behandlingId).stream()
-            .map(h -> map(null, h))
-            .toList();
+                .map(this::map)
+                .toList();
     }
 
-    public List<HistorikkinnslagDto> hentForSak(Saksnummer saksnummer, URI dokumentPath) {
+    public List<HistorikkinnslagDto> hentForSak(Saksnummer saksnummer) {
         return historikkinnslagRepository.hent(saksnummer).stream()
-            .map(h -> map(dokumentPath, h))
-            .toList();
+                .map(this::map)
+                .toList();
     }
 
-    private HistorikkinnslagDto map(URI dokumentPath, Historikkinnslag h) {
+    private HistorikkinnslagDto map(Historikkinnslag h) {
         var behandlingId = h.getBehandlingId();
         var uuid = behandlingId == null ? null : behandlingRepository.hentBehandling(behandlingId).getUuid();
-        List<HistorikkInnslagDokumentLinkDto> dokumenter = tilDokumentlenker(h.getDokumentLinker(), dokumentPath);
+        List<HistorikkInnslagDokumentLinkDto> dokumenter = tilDokumentlenker(h.getDokumentLinker());
         var linjer = h.getLinjer()
             .stream()
             .sorted(Comparator.comparing(HistorikkinnslagLinje::getSekvensNr))
@@ -61,27 +61,21 @@ public class HistorikkTjeneste {
             h.getOpprettetTidspunkt(), dokumenter, h.getTittel(), linjer);
     }
 
-    private static List<HistorikkInnslagDokumentLinkDto> tilDokumentlenker(List<HistorikkinnslagDokumentLink> dokumentLinker, URI dokumentPath) {
+    private List<HistorikkInnslagDokumentLinkDto> tilDokumentlenker(List<HistorikkinnslagDokumentLink> dokumentLinker) {
         if (dokumentLinker == null) {
             return List.of();
         }
         return dokumentLinker.stream()
-            .map(d -> tilDokumentlenker(d, dokumentPath))
+            .map(this::tilDokumentlenke)
             .toList();
     }
 
-    private static HistorikkInnslagDokumentLinkDto tilDokumentlenker(HistorikkinnslagDokumentLink lenke, URI dokumentPath) {
+    private HistorikkInnslagDokumentLinkDto tilDokumentlenke(HistorikkinnslagDokumentLink lenke) {
         var dto = new HistorikkInnslagDokumentLinkDto();
         dto.setTag(lenke.getLinkTekst());
         dto.setUtgått(false);
         dto.setDokumentId(lenke.getDokumentId());
         dto.setJournalpostId(lenke.getJournalpostId().getVerdi());
-        if (lenke.getJournalpostId().getVerdi() != null && lenke.getDokumentId() != null && dokumentPath != null) {
-            var builder = UriBuilder.fromUri(dokumentPath)
-                .queryParam("journalpostId", lenke.getJournalpostId().getVerdi())
-                .queryParam("dokumentId", lenke.getDokumentId());
-            dto.setUrl(builder.build());
-        }
         return dto;
     }
 

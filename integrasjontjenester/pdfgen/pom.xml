@@ -26,11 +26,11 @@
             <version>${verapdf-validation-model.version}</version>
         </dependency>
         <dependency>
-            <groupId>at.datenwort.openhtmltopdf</groupId>
+            <groupId>io.github.openhtmltopdf</groupId>
             <artifactId>openhtmltopdf-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>at.datenwort.openhtmltopdf</groupId>
+            <groupId>io.github.openhtmltopdf</groupId>
             <artifactId>openhtmltopdf-pdfbox</artifactId>
             <exclusions>
                 <exclusion>
@@ -42,12 +42,12 @@
         </dependency>
         <dependency>
             <!-- Optional, leave out if you do not need logging via slf4j. -->
-            <groupId>at.datenwort.openhtmltopdf</groupId>
+            <groupId>io.github.openhtmltopdf</groupId>
             <artifactId>openhtmltopdf-slf4j</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>at.datenwort.openhtmltopdf</groupId>
+            <groupId>io.github.openhtmltopdf</groupId>
             <artifactId>openhtmltopdf-svg-support</artifactId>
             <exclusions>
                 <!-- denne drar inn to ulike versjoner av org.apache.xmlgraphics.xml-graphics-commons  -->

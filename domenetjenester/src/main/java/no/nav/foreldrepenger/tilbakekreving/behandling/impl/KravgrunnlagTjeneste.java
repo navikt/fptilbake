@@ -144,7 +144,7 @@ public class KravgrunnlagTjeneste {
         // forutsatt at FPTILBAKE allerede har fått SPER melding for den behandlingen og sett behandling på vent med VenteÅrsak VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
         if (erForbiFaktaSteg) {
             LOG.info("Hopper tilbake til {} pga endret kravgrunnlag for behandlingId={}", FAKTA_FEILUTBETALING.getKode(), behandlingId);
-            if (behandling.getFagsak().getSaksnummer().getVerdi().equals("152262779")){
+            if (List.of("152381924", "152266956").contains(behandling.getFagsak().getSaksnummer().getVerdi())) {
                 //avbryter planlagte tasker for å unngå doble iverksett-tasker når prosessen kjøres på nytt
                 avbrytPlanlagteTasker(behandling.getId());
             }

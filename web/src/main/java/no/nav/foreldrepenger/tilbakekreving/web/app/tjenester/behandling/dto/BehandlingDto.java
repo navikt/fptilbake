@@ -107,17 +107,26 @@ public class BehandlingDto {
         return toTrinnsBehandling;
     }
 
-    @JsonProperty("sprakkode")
     public Språkkode getSpråkkode() {
         return språkkode;
     }
 
+    @Deprecated(forRemoval = true)
+    @JsonProperty("sprakkode")
+    public Språkkode getSprakkode() {
+        return språkkode;
+    }
+
+    public boolean isBehandlingKøet() {
+        return behandlingKøet;
+    }
+
+    @Deprecated(forRemoval = true)
     @JsonProperty("behandlingKoet")
     public boolean isBehandlingKoet() {
         return behandlingKøet;
     }
 
-    @JsonProperty("ansvarligSaksbehandler")
     public String getAnsvarligSaksbehandler() {
         return ansvarligSaksbehandler;
     }
@@ -174,18 +183,33 @@ public class BehandlingDto {
         this.toTrinnsBehandling = toTrinnsBehandling;
     }
 
-    @JsonProperty("behandlingPaaVent")
     public boolean isBehandlingPåVent() {
         return behandlingPåVent;
     }
 
-    @JsonProperty("fristBehandlingPaaVent")
+    @Deprecated(forRemoval = true)
+    @JsonProperty("behandlingPaaVent")
+    public boolean isBehandlingPaaVent() {
+        return behandlingPåVent;
+    }
+
     public String getFristBehandlingPåVent() {
         return fristBehandlingPåVent;
     }
 
-    @JsonProperty("venteArsakKode")
+    @Deprecated(forRemoval = true)
+    @JsonProperty("fristBehandlingPaaVent")
+    public String getFristBehandlingPaaVent() {
+        return fristBehandlingPåVent;
+    }
+
     public String getVenteÅrsakKode() {
+        return venteÅrsakKode;
+    }
+
+    @Deprecated(forRemoval = true)
+    @JsonProperty("venteArsakKode")
+    public String getVenteArsakKode() {
         return venteÅrsakKode;
     }
 

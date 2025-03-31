@@ -47,14 +47,12 @@ public class HistorikkRestTjeneste {
     @Path("/v2")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Operation(tags = "historikk", description = "Henter alle historikkinnslag for gitt behandling.")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentAlleInnslagV2(@Context HttpServletRequest request,
-                                    @NotNull @QueryParam("saksnummer")
+    public Response hentAlleInnslagV2(@NotNull @QueryParam("saksnummer")
                                     @Parameter(description = "Saksnummer må være et eksisterende saksnummer")
                                     @Valid SaksnummerDto saksnummerDto) {
-        var path = HistorikkRequestPath.getRequestPath(request);
-        var historikkInnslagDtoList = historikkTjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()), path);
+        var historikkInnslagDtoList = historikkTjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()));
         return Response.ok().entity(historikkInnslagDtoList).build();
     }
 
