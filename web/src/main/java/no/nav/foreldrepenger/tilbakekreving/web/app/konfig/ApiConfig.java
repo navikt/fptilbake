@@ -93,6 +93,7 @@ public class ApiConfig extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         var classes = new HashSet<>(Set.of(
+            DynamicJacksonJsonProvider.class, // Denne må registrerast før anna OpenAPI oppsett for å fungere.
             // eksponert grensesnitt
             ProsessTaskRestTjeneste.class,
             InitielleLinksRestTjeneste.class,
@@ -121,7 +122,6 @@ public class ApiConfig extends Application {
             // swagger
             OpenApiTjeneste.class,
             // Applikasjonsoppsett
-            DynamicJacksonJsonProvider.class,
             JacksonJsonConfig.class,
             DynamicObjectMapperResolverVaryFilter.class,
             // ExceptionMappers pga de som finnes i Jackson+Jersey-media
