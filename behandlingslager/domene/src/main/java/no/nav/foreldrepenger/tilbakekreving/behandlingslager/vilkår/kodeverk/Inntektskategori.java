@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
@@ -45,6 +46,7 @@ public enum Inntektskategori implements Kodeverdi {
         this.navn = navn;
     }
 
+    @JsonCreator
     public static Inntektskategori fraKode(@JsonProperty(value = "kode") Object node) {
         if (node == null) {
             return null;
