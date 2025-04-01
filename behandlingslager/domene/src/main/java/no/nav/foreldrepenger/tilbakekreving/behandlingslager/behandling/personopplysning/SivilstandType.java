@@ -1,21 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum SivilstandType implements Kodeverdi {
     ETTERLATT("ENKE"),
     GIFT("GIFT"),
@@ -47,12 +39,10 @@ public enum SivilstandType implements Kodeverdi {
         this.kode = kode;
     }
 
-    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static SivilstandType fraKode(@JsonProperty(value = "kode") Object node) {
-        if (node == null) {
+    public static SivilstandType fraKode(final String kode) {
+        if (kode == null) {
             return null;
         }
-        String kode = TempAvledeKode.getVerdi(SivilstandType.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent SivilstandType: " + kode);
@@ -76,13 +66,12 @@ public enum SivilstandType implements Kodeverdi {
         return ETTERLATT.equals(this);
     }
 
-    @JsonProperty
+    @JsonValue
     @Override
     public String getKode() {
         return kode;
     }
 
-    @JsonProperty
     @Override
     public String getKodeverk() {
         return KODEVERK;

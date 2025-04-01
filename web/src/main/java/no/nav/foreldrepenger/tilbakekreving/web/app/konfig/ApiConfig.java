@@ -82,7 +82,7 @@ public class ApiConfig extends Application {
         try {
             return openapiSetupHelper.resolveOpenAPI();
         } catch (OpenApiConfigurationException e) {
-            throw  new TekniskException("OPEN-API", e.getMessage(), e);
+            throw new TekniskException("OPEN-API", e.getMessage(), e);
         }
     }
 

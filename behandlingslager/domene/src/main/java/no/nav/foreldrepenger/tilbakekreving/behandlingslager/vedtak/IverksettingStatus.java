@@ -4,15 +4,12 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
 public enum IverksettingStatus implements Kodeverdi {
 
@@ -38,12 +35,10 @@ public enum IverksettingStatus implements Kodeverdi {
         this.kode = kode;
     }
 
-    @JsonCreator
-    public static IverksettingStatus fraKode(@JsonProperty(value = "kode") Object node) {
-        if (node == null) {
+    public static IverksettingStatus fraKode(final String kode) {
+        if (kode == null) {
             return null;
         }
-        String kode = TempAvledeKode.getVerdi(IverksettingStatus.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent IverksettingStatus: " + kode);
@@ -55,6 +50,7 @@ public enum IverksettingStatus implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
+    @JsonValue
     @Override
     public String getKode() {
         return kode;
