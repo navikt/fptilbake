@@ -6,11 +6,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
-import no.nav.vedtak.felles.testutilities.db.EntityManagerAwareTest;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
+import no.nav.vedtak.felles.testutilities.db.EntityManagerAwareTest;
 
 
 /**
@@ -146,10 +146,11 @@ class SjekkDbStrukturTest extends EntityManagerAwareTest {
                 SELECT table_name, index_name, column_name
                   FROM all_ind_columns
                  WHERE table_owner = upper(:owner)
+                   AND upper(table_name) NOT LIKE '%SCHEMA_%'
+                   AND upper(table_name) NOT LIKE 'BIN$%'
                    AND index_name NOT LIKE 'PK_%'
                    AND index_name NOT LIKE 'IDX_%'
-                   AND index_name NOT LIKE 'UIDX_%'
-                   AND upper(table_name) NOT LIKE '%SCHEMA_%'""";
+                   AND index_name NOT LIKE 'UIDX_%'""";
 
         var query = getEntityManager().createNativeQuery(sql, Object[].class);
         query.setParameter("owner", JpaExtension.DEFAULT_TEST_DB_SCHEMA_NAME);
