@@ -12,9 +12,7 @@ import static no.nav.vedtak.log.audit.CefFields.forSaksnummer;
 import static no.nav.vedtak.log.audit.EventClassId.AUDIT_ACCESS;
 import static no.nav.vedtak.log.audit.EventClassId.AUDIT_CREATE;
 import static no.nav.vedtak.log.audit.EventClassId.AUDIT_UPDATE;
-import static no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType.BEHANDLING_ID;
 import static no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType.BEHANDLING_UUID;
-import static no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType.FAGSAK_ID;
 import static no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType.SAKSNUMMER;
 
 import java.util.HashSet;
@@ -37,7 +35,6 @@ import no.nav.vedtak.log.audit.CefField;
 import no.nav.vedtak.log.audit.EventClassId;
 import no.nav.vedtak.sikkerhet.abac.AbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
-import no.nav.vedtak.sikkerhet.abac.AbacResultat;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.internal.BeskyttetRessursAttributter;
 import no.nav.vedtak.sikkerhet.kontekst.IdentType;
@@ -59,7 +56,7 @@ public class K9AbacAuditlogger {
         this.auditlogger = auditlogger;
     }
 
-    public void loggUtfall(AbacResultat utfall, BeskyttetRessursAttributter beskyttetRessursAttributter, K9AppRessursData appRessursData) {
+    public void loggUtfall(K9AbacResultat utfall, BeskyttetRessursAttributter beskyttetRessursAttributter, K9AppRessursData appRessursData) {
         if (IdentType.Systemressurs.equals(beskyttetRessursAttributter.getIdentType())) {
             // Skal ikke auditlogge systemkall
             if (!utfall.fikkTilgang()) {
@@ -113,9 +110,9 @@ public class K9AbacAuditlogger {
             fields.add(new CefField(USER_ID, beskyttetRessursAttributter.getBrukerId()));
         }
 
-        getOneOfNew(beskyttetRessursAttributter.getDataAttributter(), SAKSNUMMER, FAGSAK_ID).ifPresent(fagsak -> fields.addAll(forSaksnummer(fagsak)));
+        getOneOfNew(beskyttetRessursAttributter.getDataAttributter(), SAKSNUMMER).ifPresent(fagsak -> fields.addAll(forSaksnummer(fagsak)));
 
-        getOneOfNew(beskyttetRessursAttributter.getDataAttributter(), BEHANDLING_UUID, BEHANDLING_ID).ifPresent(behandling -> fields.addAll(forBehandling(behandling)));
+        getOneOfNew(beskyttetRessursAttributter.getDataAttributter(), BEHANDLING_UUID).ifPresent(behandling -> fields.addAll(forBehandling(behandling)));
 
         return Set.copyOf(fields);
     }

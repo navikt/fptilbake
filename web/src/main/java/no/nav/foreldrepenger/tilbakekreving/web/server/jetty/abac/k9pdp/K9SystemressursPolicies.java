@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import no.nav.foreldrepenger.konfig.Cluster;
 import no.nav.foreldrepenger.konfig.Environment;
-import no.nav.vedtak.sikkerhet.abac.AbacResultat;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.AvailabilityType;
 import no.nav.vedtak.sikkerhet.abac.internal.BeskyttetRessursAttributter;
 import no.nav.vedtak.sikkerhet.oidc.config.AzureProperty;
@@ -28,15 +27,15 @@ public class K9SystemressursPolicies {
         // Hindre instans
     }
 
-    public static AbacResultat vurderTilgang(BeskyttetRessursAttributter beskyttetRessursAttributter) {
+    public static K9AbacResultat vurderTilgang(BeskyttetRessursAttributter beskyttetRessursAttributter) {
         if (!beskyttetRessursAttributter.getIdentType().erSystem()) {
-            return AbacResultat.AVSLÅTT_ANNEN_ÅRSAK;
+            return K9AbacResultat.AVSLÅTT_ANNEN_ÅRSAK;
         }
         if (!riktigClusterNamespacePreAuth(beskyttetRessursAttributter.getBrukerId(), beskyttetRessursAttributter.getAvailabilityType())) {
-            return AbacResultat.AVSLÅTT_ANNEN_ÅRSAK;
+            return K9AbacResultat.AVSLÅTT_ANNEN_ÅRSAK;
         }
         // Skal ikke utføre videre kontroll (fagtilgang, populasjonstilgang) for System.
-        return AbacResultat.GODKJENT;
+        return K9AbacResultat.GODKJENT;
     }
 
     public static boolean riktigClusterNamespacePreAuth(String consumerId, AvailabilityType availabilityType) {

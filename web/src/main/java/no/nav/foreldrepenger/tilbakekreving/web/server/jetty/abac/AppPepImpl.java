@@ -8,6 +8,7 @@ import jakarta.interceptor.Interceptor;
 
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.AppPdpKlientImpl;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.K9AbacResultat;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.K9SystemressursPolicies;
 import no.nav.vedtak.sikkerhet.abac.AbacAuditlogger;
 import no.nav.vedtak.sikkerhet.abac.AbacResultat;
@@ -44,17 +45,32 @@ public class AppPepImpl extends PepImpl {
                 return super.vurderTilgang(beskyttetRessursAttributter);
             }
             case K9TILBAKE -> {
-                if (IdentType.Systemressurs.equals(beskyttetRessursAttributter.getIdentType())) {
-                    return K9SystemressursPolicies.vurderTilgang(beskyttetRessursAttributter);
-                } else if (ResourceType.PIP.equals(beskyttetRessursAttributter.getResourceType())) { // pip tilgang bør vurderes kun lokalt
-                    return AbacResultat.AVSLÅTT_ANNEN_ÅRSAK;
-                } else {
-                    return lokalPdpKlient.forespørTilgang(beskyttetRessursAttributter);
-                }
+                var vurdering = vurderK9Tilbake(beskyttetRessursAttributter);
+                return mapK9AbacResultat(vurdering);
             }
             default -> throw new IllegalStateException("applikasjonsnavn er satt til " + applikasjon + " som ikke er en støttet verdi");
         }
 
+    }
+
+    private K9AbacResultat vurderK9Tilbake(BeskyttetRessursAttributter beskyttetRessursAttributter) {
+        if (IdentType.Systemressurs.equals(beskyttetRessursAttributter.getIdentType())) {
+            return K9SystemressursPolicies.vurderTilgang(beskyttetRessursAttributter);
+        } else if (ResourceType.PIP.equals(beskyttetRessursAttributter.getResourceType())) { // pip tilgang bør vurderes kun lokalt
+            return K9AbacResultat.AVSLÅTT_ANNEN_ÅRSAK;
+        } else {
+            return lokalPdpKlient.forespørTilgang(beskyttetRessursAttributter);
+        }
+    }
+
+    private static AbacResultat mapK9AbacResultat(K9AbacResultat resultat) {
+        return switch (resultat) {
+            case GODKJENT -> AbacResultat.GODKJENT;
+            case AVSLÅTT_KODE_7 -> AbacResultat.AVSLÅTT_KODE_7;
+            case AVSLÅTT_KODE_6 -> AbacResultat.AVSLÅTT_KODE_6;
+            case AVSLÅTT_EGEN_ANSATT -> AbacResultat.AVSLÅTT_EGEN_ANSATT;
+            case AVSLÅTT_ANNEN_ÅRSAK -> AbacResultat.AVSLÅTT_ANNEN_ÅRSAK;
+        };
     }
 
 }

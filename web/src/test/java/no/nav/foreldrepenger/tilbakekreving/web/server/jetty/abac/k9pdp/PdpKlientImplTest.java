@@ -32,7 +32,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.Xa
 import no.nav.vedtak.exception.VLException;
 import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
-import no.nav.vedtak.sikkerhet.abac.AbacResultat;
 import no.nav.vedtak.sikkerhet.abac.TokenProvider;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
@@ -219,7 +218,7 @@ class PdpKlientImplTest {
         var felles = lagBeskyttetRessursAttributter(AbacDataAttributter.opprett(), IdentType.EksternBruker);
         var resultat = pdpKlient.forespørTilgang(felles);
 
-        assertThat(resultat).isEqualTo(AbacResultat.AVSLÅTT_EGEN_ANSATT);
+        assertThat(resultat).isEqualTo(K9AbacResultat.AVSLÅTT_EGEN_ANSATT);
     }
 
     @Test

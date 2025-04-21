@@ -14,12 +14,12 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.K9AppRessursData;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
+import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 
 /**
  * Implementasjon av PDP request for k9-tilbake.
@@ -51,8 +51,8 @@ public class K9PdpRequestBuilder {
         LOG_CONTEXT.remove("k9sakBehandlingUuid");
         LOG_CONTEXT.remove("behandlingUuid");
 
-        Optional<Long> behandlingId = utledBehandlingId(dataAttributter.getVerdier(AppAbacAttributtType.BEHANDLING_ID));
-        Optional<UUID> behandlingUuid = utledBehandlingUuId(dataAttributter.getVerdier(AppAbacAttributtType.BEHANDLING_UUID));
+        Optional<Long> behandlingId = utledBehandlingId(dataAttributter.getVerdier(TilbakekrevingAbacAttributtType.BEHANDLING_ID));
+        Optional<UUID> behandlingUuid = utledBehandlingUuId(dataAttributter.getVerdier(StandardAbacAttributtType.BEHANDLING_UUID));
         Optional<UUID> ytelesbehandlingId = utledBehandlingUuId(dataAttributter.getVerdier(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID));
         if (behandlingId.isPresent() && ytelesbehandlingId.isPresent()) {
             throw ugyldigInputFlereBehandlinger(behandlingId.get(), ytelesbehandlingId.get());
@@ -72,14 +72,10 @@ public class K9PdpRequestBuilder {
         }
 
         var ressursData = K9AppRessursData.builder()
-            .leggTilAktørIdSet(dataAttributter.getVerdier(AppAbacAttributtType.AKTØR_ID));
+            .leggTilAktørIdSet(dataAttributter.getVerdier(StandardAbacAttributtType.AKTØR_ID));
 
         Optional<String> saksnummer = utledSaksnummer(dataAttributter, behandlingData);
         saksnummer.ifPresent(s -> ressursData.leggTilRessurs(K9DataKeys.SAKSNUMMER, s));
-
-        if (saksnummer.isEmpty()) {
-            Optional.ofNullable(behandlingData).ifPresent(bi -> ressursData.leggTilAbacAktørIdSet(bi.getAktørIdNonNull()));
-        }
 
         Optional.ofNullable(behandlingData).map(K9PipBehandlingInfo::fagsakstatus)
             .ifPresent(fss -> ressursData.leggTilRessurs(K9DataKeys.FAGSAK_STATUS, fss));
@@ -112,7 +108,7 @@ public class K9PdpRequestBuilder {
     }
 
     private Optional<String> utledSaksnummer(AbacDataAttributter attributter, K9PipBehandlingInfo behandlingData) {
-        Set<String> saksnumre = new HashSet<>(attributter.getVerdier(AppAbacAttributtType.SAKSNUMMER));
+        Set<String> saksnumre = new HashSet<>(attributter.getVerdier(StandardAbacAttributtType.SAKSNUMMER));
         Optional.ofNullable(behandlingData).map(K9PipBehandlingInfo::saksnummer).ifPresent(saksnumre::add);
         if (saksnumre.isEmpty()) {
             return Optional.empty();

@@ -25,6 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -105,7 +106,7 @@ public class ForeldelseRestTjeneste {
                 attributter.leggTil(StandardAbacAttributtType.BEHANDLING_UUID, req.getBehandlingUuid());
             }
             if (req.getBehandlingId() != null) {
-                attributter.leggTil(StandardAbacAttributtType.BEHANDLING_ID, req.getBehandlingId());
+                attributter.leggTil(TilbakekrevingAbacAttributtType.BEHANDLING_ID, req.getBehandlingId());
             }
             return attributter;
         }

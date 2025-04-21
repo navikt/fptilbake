@@ -8,9 +8,10 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
+import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.util.InputValideringRegex;
 
 public class ByttBehandlendeEnhetDto implements AbacDto {
@@ -73,10 +74,10 @@ public class ByttBehandlendeEnhetDto implements AbacDto {
     public AbacDataAttributter abacAttributter() {
         var attributter = AbacDataAttributter.opprett();
         if (behandlingId != null) {
-            attributter.leggTil(AppAbacAttributtType.BEHANDLING_ID, behandlingId);
+            attributter.leggTil(TilbakekrevingAbacAttributtType.BEHANDLING_ID, behandlingId);
         }
         if (behandlingUuid != null) {
-            attributter.leggTil(AppAbacAttributtType.BEHANDLING_UUID, behandlingUuid);
+            attributter.leggTil(StandardAbacAttributtType.BEHANDLING_UUID, behandlingUuid);
         }
         return attributter;
     }

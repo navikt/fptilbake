@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.dto;
 
+import java.time.LocalDate;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
@@ -9,11 +11,8 @@ import jakarta.validation.constraints.Size;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
+import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.util.InputValideringRegex;
-
-import java.time.LocalDate;
-
-import static no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType.FNR;
 
 public class NyVergeDto implements AbacDto {
 
@@ -78,7 +77,7 @@ public class NyVergeDto implements AbacDto {
     public AbacDataAttributter abacAttributter() {
         var attributter = AbacDataAttributter.opprett();
         if (fnr != null) {
-            attributter.leggTil(FNR, fnr);
+            attributter.leggTil(StandardAbacAttributtType.FNR, fnr);
         }
         return attributter;
     }

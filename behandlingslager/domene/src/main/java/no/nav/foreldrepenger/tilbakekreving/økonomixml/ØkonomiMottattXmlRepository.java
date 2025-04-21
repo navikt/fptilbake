@@ -2,8 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.økonomixml;
 
 import static no.nav.vedtak.felles.jpa.HibernateVerktøy.hentUniktResultat;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -119,9 +119,9 @@ public class ØkonomiMottattXmlRepository {
     }
 
     private Long finnHøyesteVersjonsnummer(Henvisning henvisning) {
-        var query = entityManager.createNativeQuery("select max(sekvens) from oko_xml_mottatt where henvisning=:henvisning");
-        query.setParameter("henvisning", henvisning.getVerdi());
-        var resultat = query.getSingleResult();
-        return resultat != null ? ((BigDecimal) resultat).longValue() : null;
+        return entityManager.createQuery("select sekvens from ØkonomiXmlMottatt where henvisning=:henvisning", Long.class)
+            .setParameter("henvisning", henvisning)
+            .getResultList().stream()
+            .max(Comparator.naturalOrder()).orElse(null);
     }
 }
