@@ -59,6 +59,7 @@ import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.Tilbakekre
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KobleBehandlingTilGrunnlagDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KorrigertHenvisningDto;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
@@ -68,7 +69,6 @@ import no.nav.vedtak.log.util.LoggerUtils;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
-import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
@@ -267,21 +267,6 @@ public class ForvaltningBehandlingRestTjeneste {
     }
 
     @POST
-    @Path("/avbryt-aapent-ap-avsluttet-behandling")
-    @Operation(
-        tags = "FORVALTNING-behandling",
-        description = "Tjeneste for å avbryte åpne aksjonspunkt når behandling er avsluttet!",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Aksjonspunkt avbrut"),
-            @ApiResponse(responseCode = "500", description = "ukjent feil.")
-        })
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = true)
-    public Response avbrytÅpentAksjonspunktForAvsluttetBehandling() {
-        behandlingRepository.avbrytÅpentAksjonspunktForAvsluttetBehandling();
-        return Response.ok().build();
-    }
-
-    @POST
     @Path("/resend-saksstatistikk-aapen-vent")
     @Operation(
         tags = "FORVALTNING-behandling",
@@ -407,7 +392,7 @@ public class ForvaltningBehandlingRestTjeneste {
 
         @Override
         public AbacDataAttributter abacAttributter() {
-            return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, getBehandlingId());
+            return AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.BEHANDLING_ID, getBehandlingId());
         }
     }
 

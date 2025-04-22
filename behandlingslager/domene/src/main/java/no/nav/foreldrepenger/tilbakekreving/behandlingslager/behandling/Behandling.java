@@ -18,8 +18,6 @@ import java.util.stream.Stream;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ColumnResult;
-import jakarta.persistence.ConstructorResult;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -30,7 +28,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PreUpdate;
-import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 
@@ -46,21 +43,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.BehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
-
-// mapping for BehandlingInfo klassen
-@SqlResultSetMapping(name = "PipBehandlingInfo", classes = {
-        @ConstructorResult(targetClass = BehandlingInfo.class, columns = {
-                @ColumnResult(name = "behandlingId", type = Long.class),
-                @ColumnResult(name = "saksnummer"),
-                @ColumnResult(name = "aktørId"),
-                @ColumnResult(name = "behandlingstatus"),
-                @ColumnResult(name = "ansvarligSaksbehandler")
-        })
-})
 
 @Entity(name = "Behandling")
 @Table(name = "BEHANDLING")

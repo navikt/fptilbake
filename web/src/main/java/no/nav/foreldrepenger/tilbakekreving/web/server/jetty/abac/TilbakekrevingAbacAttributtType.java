@@ -4,6 +4,7 @@ import no.nav.vedtak.sikkerhet.abac.AbacAttributtType;
 
 public enum TilbakekrevingAbacAttributtType implements AbacAttributtType {
 
+    BEHANDLING_ID,
     YTELSEBEHANDLING_UUID;
 
     @Override

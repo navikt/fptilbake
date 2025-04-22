@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -92,7 +93,7 @@ public class HenleggBehandlingDto implements AbacDto {
     public AbacDataAttributter abacAttributter() {
         var attributter = AbacDataAttributter.opprett();
         if (behandlingId != null) {
-            attributter.leggTil(StandardAbacAttributtType.BEHANDLING_ID, behandlingId);
+            attributter.leggTil(TilbakekrevingAbacAttributtType.BEHANDLING_ID, behandlingId);
         }
         if (behandlingUuid != null) {
             attributter.leggTil(StandardAbacAttributtType.BEHANDLING_UUID, behandlingUuid);

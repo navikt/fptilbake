@@ -12,8 +12,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
+import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.util.InputValideringRegex;
 
 @JsonTypeName(AksjonspunktKodeDefinisjon.AVKLAR_VERGE)
@@ -104,7 +104,7 @@ public class AvklarVergeDto extends BekreftetAksjonspunktDto {
     public AbacDataAttributter abacAttributter() {
         AbacDataAttributter abacDataAttributter = AbacDataAttributter.opprett();
         if (this.fnr != null) {
-            abacDataAttributter.leggTil(AppAbacAttributtType.FNR, this.fnr);
+            abacDataAttributter.leggTil(StandardAbacAttributtType.FNR, this.fnr);
         }
         return abacDataAttributter;
     }

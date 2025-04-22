@@ -1,20 +1,41 @@
 package no.nav.foreldrepenger.tilbakekreving.pip;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.BehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.vedtak.util.LRUCache;
 
 @ApplicationScoped
 public class PipRepository {
+
+    private static final LRUCache<String, AktørId> SAK_EIER = new LRUCache<>(500, TimeUnit.MILLISECONDS.convert(4, TimeUnit.HOURS));
+    private static final String SAK_EIER_QUERY = """
+        SELECT br.aktørId FROM Fagsak fag JOIN Bruker br ON fag.navBruker = br
+        WHERE fag.saksnummer = :saksnummer AND br.aktørId IS NOT NULL
+        """;
+    private static final String BEHANDLING_QUERY = """
+        select b.id as behandlingId
+        , b.uuid as behandlingUuid
+        , f.saksnummer as saksnummer
+        , u.aktørId as aktørId
+        , b.status as behandlingStatus
+        , coalesce(b.ansvarligSaksbehandler, ap.endretAv) as ansvarligSaksbehandler
+        from Behandling b
+        join Fagsak f on b.fagsak = f
+        join Bruker u on f.navBruker = u
+        left outer join Aksjonspunkt ap on (ap.behandling = b and ap.aksjonspunktDefinisjon = :foreslå and ap.status = :utført)
+        """;
 
     private EntityManager entityManager;
 
@@ -28,89 +49,58 @@ public class PipRepository {
     }
 
     public Optional<PipBehandlingData> hentBehandlingData(Long behandlingId) {
-        Optional<BehandlingInfo> internBehandlingData = hentInternBehandlingData(behandlingId);
-        return getPipBehandlingData(internBehandlingData);
+        return hentInternBehandlingData(behandlingId);
     }
 
     public Optional<PipBehandlingData> hentBehandlingData(UUID behandlingUuid) {
-        Optional<BehandlingInfo> internBehandlingData = hentInternBehandlingData(behandlingUuid);
-        return getPipBehandlingData(internBehandlingData);
+        return hentInternBehandlingData(behandlingUuid);
     }
 
-    private Optional<PipBehandlingData> getPipBehandlingData(Optional<BehandlingInfo> internBehandlingData) {
-        if (internBehandlingData.isPresent()) {
-            BehandlingInfo internData = internBehandlingData.get();
+    public Optional<AktørId> hentAktørIdSomEierFagsak(String saksnummer) {
+        Objects.requireNonNull(saksnummer, "saksnummer");
+        return Optional.ofNullable(SAK_EIER.get(saksnummer))
+            .or(() -> {
+                var eier = entityManager.createQuery(SAK_EIER_QUERY, AktørId.class)
+                    .setParameter("saksnummer" , new Saksnummer(saksnummer))
+                    .getResultList().stream().findFirst();
+                eier.ifPresent(e -> SAK_EIER.put(saksnummer, e));
+                return eier;
+            });
 
-            PipBehandlingData behandlingData = new PipBehandlingData();
-            behandlingData.setBehandlingId(internData.getBehandlingId());
-            behandlingData.setAnsvarligSaksbehandler(internData.getAnsvarligSaksbehandler());
-            behandlingData.setStatusForBehandling(internData.getBehandlingStatus());
-            behandlingData.setSaksnummer(internData.getSaksnummer());
-            behandlingData.leggTilAktørId(internData.getAktørId());
-            return Optional.of(behandlingData);
-        }
-        return Optional.empty();
     }
 
-    private Optional<BehandlingInfo> hentInternBehandlingData(long behandlingId) {
-        String sql = """
-                select b.id as behandlingId
-                , f.saksnummer as saksnummer
-                , u.aktoer_id as aktørId
-                , b.behandling_status as behandlingstatus
-                , coalesce(b.ansvarlig_saksbehandler, ap.endret_av) as ansvarligSaksbehandler
-                 from behandling b
-                 left join fagsak f on f.id = b.fagsak_id
-                 left join bruker u on u.id = f.bruker_id
-                 left join aksjonspunkt ap on (ap.behandling_id = b.id and aksjonspunkt_def = :foreslå and aksjonspunkt_status = :utført)
-                 where b.id = :behandlingId
-                 """;
+    private Optional<PipBehandlingData> hentInternBehandlingData(long behandlingId) {
+        var sql = BEHANDLING_QUERY + "where b.id = :behandlingId";
 
-        // PipBehandlingInfo-mappingen er definert i Behandling entiteten
-        Query query = entityManager.createNativeQuery(sql, "PipBehandlingInfo")
+        var resultater = entityManager.createQuery(sql, PipBehandlingData.class)
             .setParameter("behandlingId", behandlingId)
-            .setParameter("foreslå", AksjonspunktKodeDefinisjon.FORESLÅ_VEDTAK)
-            .setParameter("utført", AksjonspunktStatus.UTFØRT.getKode());
+            .setParameter("foreslå", AksjonspunktDefinisjon.FORESLÅ_VEDTAK)
+            .setParameter("utført", AksjonspunktStatus.UTFØRT)
+            .getResultList();
 
-        List resultater = query.getResultList();
-        if (resultater.isEmpty()) {
-            return Optional.empty();
-        } else if (resultater.size() == 1) {
-            return Optional.of((BehandlingInfo) resultater.get(0));
-        } else {
-            throw new IllegalStateException("Utvikler feil: Forventet 0 eller 1 treff etter søk på behandlingId, fikk "
-                    + resultater.size() + " [behandlingId: " + behandlingId);
-        }
+        return sjekkResultat(resultater, String.valueOf(behandlingId));
     }
 
-    private Optional<BehandlingInfo> hentInternBehandlingData(UUID behandlingUuid) {
-        String sql = """
-                select b.id as behandlingId
-                , f.saksnummer as saksnummer
-                , u.aktoer_id as aktørId
-                , b.behandling_status as behandlingstatus
-                , coalesce(b.ansvarlig_saksbehandler, ap.endret_av) as ansvarligSaksbehandler
-                 from behandling b
-                 left join fagsak f on f.id = b.fagsak_id
-                 left join bruker u on u.id = f.bruker_id
-                 left join aksjonspunkt ap on (ap.behandling_id = b.id and aksjonspunkt_def = :foreslå and aksjonspunkt_status = :utført)
-                 where b.uuid = :behandlingUuid
-                 """;
+    private Optional<PipBehandlingData> hentInternBehandlingData(UUID behandlingUuid) {
+        var sql = BEHANDLING_QUERY + "where b.uuid = :behandlingUuid";
 
-        // PipBehandlingInfo-mappingen er definert i Behandling entiteten
-        Query query = entityManager.createNativeQuery(sql, "PipBehandlingInfo")
+        var resultater = entityManager.createQuery(sql, PipBehandlingData.class)
             .setParameter("behandlingUuid", behandlingUuid)
-            .setParameter("foreslå", AksjonspunktKodeDefinisjon.FORESLÅ_VEDTAK)
-            .setParameter("utført", AksjonspunktStatus.UTFØRT.getKode());
+            .setParameter("foreslå", AksjonspunktDefinisjon.FORESLÅ_VEDTAK)
+            .setParameter("utført", AksjonspunktStatus.UTFØRT)
+            .getResultList();
 
-        List resultater = query.getResultList();
+        return sjekkResultat(resultater, behandlingUuid.toString());
+    }
+
+    private Optional<PipBehandlingData> sjekkResultat(List<PipBehandlingData> resultater, String behandlingRef) {
         if (resultater.isEmpty()) {
             return Optional.empty();
         } else if (resultater.size() == 1) {
-            return Optional.of((BehandlingInfo) resultater.get(0));
+            return Optional.of(resultater.getFirst());
         } else {
-            throw new IllegalStateException("Utvikler feil: Forventet 0 eller 1 treff etter søk på behandlingId, fikk "
-                    + resultater.size() + " [behandlingUuid: " + behandlingUuid);
+            throw new IllegalStateException("Utvikler feil: Forventet 0 eller 1 treff etter søk på behandling, fikk "
+                + resultater.size() + " [behandling: " + behandlingRef + "]");
         }
     }
 }

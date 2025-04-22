@@ -113,7 +113,7 @@ public class OpprettBehandlingDto implements AbacDto {
         } else if (getBehandlingType().equals(BehandlingType.REVURDERING_TILBAKEKREVING)) {
             var attributter = AbacDataAttributter.opprett();
             if (behandlingId != null) {
-                attributter.leggTil(StandardAbacAttributtType.BEHANDLING_ID, behandlingId);
+                attributter.leggTil(TilbakekrevingAbacAttributtType.BEHANDLING_ID, behandlingId);
             }
             if (behandlingUuid != null) {
                 attributter.leggTil(StandardAbacAttributtType.BEHANDLING_UUID, behandlingUuid);

@@ -15,7 +15,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.Xa
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.XacmlResponseMapper;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.log.util.LoggerUtils;
-import no.nav.vedtak.sikkerhet.abac.AbacResultat;
 import no.nav.vedtak.sikkerhet.abac.TokenProvider;
 import no.nav.vedtak.sikkerhet.abac.internal.BeskyttetRessursAttributter;
 
@@ -44,7 +43,7 @@ public class AppPdpKlientImpl {
         this.pdpRequestBuilder = pdpRequestBuilder;
     }
 
-    public AbacResultat forespørTilgang(BeskyttetRessursAttributter beskyttetRessursAttributter) {
+    public K9AbacResultat forespørTilgang(BeskyttetRessursAttributter beskyttetRessursAttributter) {
         var appRessursData = pdpRequestBuilder.lagAppRessursData(beskyttetRessursAttributter.getDataAttributter());
         var token = Token.withOidcToken(tokenProvider.openIdToken());
         var request = XacmlRequestMapper.lagXacmlRequest(beskyttetRessursAttributter, DOMENE, appRessursData, token);
@@ -54,7 +53,7 @@ public class AppPdpKlientImpl {
         return hovedresultat;
     }
 
-    private static AbacResultat resultatFraResponse(XacmlResponse response) {
+    private static K9AbacResultat resultatFraResponse(XacmlResponse response) {
         var decisions = XacmlResponseMapper.getDecisions(response);
 
         for (var decision : decisions) {
@@ -68,7 +67,7 @@ public class AppPdpKlientImpl {
         handlObligation(response);
 
         if (biasedDecision == Decision.Permit) {
-            return AbacResultat.GODKJENT;
+            return K9AbacResultat.GODKJENT;
         }
 
         var denyAdvice = XacmlResponseMapper.getAdvice(response);
@@ -77,15 +76,15 @@ public class AppPdpKlientImpl {
             LOG.debug("Deny fra PDP, advice var: {}", LoggerUtils.toStringWithoutLineBreaks(denyAdvice));
         }
         if (denyAdvice.contains(Advice.DENY_KODE_6)) {
-            return AbacResultat.AVSLÅTT_KODE_6;
+            return K9AbacResultat.AVSLÅTT_KODE_6;
         }
         if (denyAdvice.contains(Advice.DENY_KODE_7)) {
-            return AbacResultat.AVSLÅTT_KODE_7;
+            return K9AbacResultat.AVSLÅTT_KODE_7;
         }
         if (denyAdvice.contains(Advice.DENY_EGEN_ANSATT)) {
-            return AbacResultat.AVSLÅTT_EGEN_ANSATT;
+            return K9AbacResultat.AVSLÅTT_EGEN_ANSATT;
         }
-        return AbacResultat.AVSLÅTT_ANNEN_ÅRSAK;
+        return K9AbacResultat.AVSLÅTT_ANNEN_ÅRSAK;
     }
 
     private static Decision createAggregatedDecision(List<Decision> decisions) {
