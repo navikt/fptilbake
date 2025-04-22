@@ -56,7 +56,7 @@ public class K9sakKlient implements FagsystemKlient {
     private static final String PARAM_NAME_SAKSNUMMER = "saksnummer";
 
 
-    private final RestClient restClient;
+    private final K9sakRestClientWrapper restClient;
     private RestConfig restConfig;
 
     private K9oppdragRestKlient k9oppdragRestKlient;
@@ -66,7 +66,7 @@ public class K9sakKlient implements FagsystemKlient {
     }
 
     K9sakKlient(RestClient restClient, K9oppdragRestKlient k9oppdragRestKlient) {
-        this.restClient = restClient;
+        this.restClient = new K9sakRestClientWrapper(restClient);
         this.k9oppdragRestKlient = k9oppdragRestKlient;
         this.restConfig = RestConfig.forClient(this.getClass());
     }

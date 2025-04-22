@@ -4,11 +4,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
 public enum Inntektskategori implements Kodeverdi {
 
@@ -46,12 +44,10 @@ public enum Inntektskategori implements Kodeverdi {
         this.navn = navn;
     }
 
-    @JsonCreator
-    public static Inntektskategori fraKode(@JsonProperty(value = "kode") Object node) {
-        if (node == null) {
+    public static Inntektskategori fraKode(final String kode) {
+        if (kode == null) {
             return null;
         }
-        String kode = TempAvledeKode.getVerdi(Inntektskategori.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent Inntektskategori: " + kode);
@@ -63,6 +59,7 @@ public enum Inntektskategori implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
+    @JsonValue
     @Override
     public String getKode() {
         return kode;

@@ -5,21 +5,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public enum BehandlingStegType implements Kodeverdi {
 
     // Tilbakekreving
@@ -55,10 +49,8 @@ public enum BehandlingStegType implements Kodeverdi {
     /**
      * Definisjon av hvilken status behandlingen skal rapporteres som når dette steget er aktivt.
      */
-    @JsonIgnore
     private BehandlingStatus definertBehandlingStatus;
 
-    @JsonIgnore
     private String navn;
 
     private String kode;
@@ -89,7 +81,7 @@ public enum BehandlingStegType implements Kodeverdi {
         return AksjonspunktDefinisjon.finnAksjonspunktDefinisjoner(this, type);
     }
 
-    @JsonProperty
+    @JsonValue
     @Override
     public String getKode() {
         return kode;
@@ -100,14 +92,12 @@ public enum BehandlingStegType implements Kodeverdi {
         return navn;
     }
 
-    @JsonProperty
     @Override
     public String getKodeverk() {
         return KODEVERK;
     }
 
-    @JsonCreator
-    public static BehandlingStegType fraKode(@JsonProperty("kode") String kode) {
+    public static BehandlingStegType fraKode(String kode) {
         if (kode == null) {
             return null;
         }

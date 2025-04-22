@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
@@ -69,36 +69,28 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
         }
     }
 
-    @JsonIgnore
     private AksjonspunktType aksjonspunktType = AksjonspunktType.UDEFINERT;
 
     /**
      * Definerer hvorvidt Aksjonspunktet default krever totrinnsbehandling. Dvs. Beslutter må godkjenne hva
      * Saksbehandler har utført.
      */
-    @JsonIgnore
     private boolean defaultTotrinnBehandling = false;
 
     /**
      * Hvorvidt aksjonspunktet har en frist før det må være løst. Brukes i forbindelse med når Behandling er lagt til
      * Vent.
      */
-    @JsonIgnore
     private String fristPeriode;
 
-    @JsonIgnore
     private boolean tilbakehoppVedGjenopptakelse;
 
-    @JsonIgnore
     private BehandlingStegType behandlingStegType;
 
-    @JsonIgnore
     private String navn;
 
-    @JsonIgnore
     private VurderingspunktType vurderingspunktType;
 
-    @JsonIgnore
     private boolean erUtgått = false;
 
     private String kode;
@@ -172,7 +164,7 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
         return navn;
     }
 
-    @JsonProperty
+    @JsonValue
     @Override
     public String getKode() {
         return kode;
@@ -186,7 +178,6 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
         return vurderingspunktType;
     }
 
-    @JsonProperty
     @Override
     public String getKodeverk() {
         return KODEVERK;
@@ -199,18 +190,11 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
         return erUtgått;
     }
 
-    /**
-     * toString is set to output the kode value of the enum instead of the default that is the enum name.
-     * This makes the generated openapi spec correct when the enum is used as a query param. Without this the generated
-     * spec incorrectly specifies that it is the enum name string that should be used as input.
-     */
-    @Override
-    public String toString() {
-        return this.getKode();
-    }
-
+    // Beholder JsonCreator annotasjon her enn så lenge for å støtte deserialisering av UNDEFINED når denne har blitt serialisert til objekt.
+    // Dette er nødvendig sidan UNDEFINED ikkje har nokon kode verdi satt, så property blir null ved serialisering til objekt.
+    // Kan fjernast når spesialserialisering til objekt er fjerna, eller viss ein legger til feks kode = "-" på UNDEFINED.
     @JsonCreator
-    public static AksjonspunktDefinisjon fraKode(@JsonProperty("kode") String kode) {
+    public static AksjonspunktDefinisjon fraKode(String kode) {
         if (kode == null) {
             return UNDEFINED;
         }
