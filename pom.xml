@@ -42,7 +42,7 @@
         <verapdf-validation-model.version>1.26.5</verapdf-validation-model.version>
         <!-- Jakarta deps end -->
 
-        <fp-tidsserie.version>2.7.1</fp-tidsserie.version>
+        <fp-tidsserie.version>2.7.3</fp-tidsserie.version>
 
         <openhtmltopdf.version>1.1.26</openhtmltopdf.version>
         <handlebars.version>4.3.1</handlebars.version>
