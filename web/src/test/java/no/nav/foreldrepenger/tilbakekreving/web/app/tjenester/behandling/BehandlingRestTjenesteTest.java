@@ -310,7 +310,7 @@ class BehandlingRestTjenesteTest {
     }
 
     private Behandling mockBehandling() {
-        var sak = Fagsak.opprettNy(new Saksnummer(GYLDIG_SAKSNR), NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.nb));
+        var sak = Fagsak.opprettNy(new Saksnummer(GYLDIG_SAKSNR), NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.NB));
         sak.setId(10L);
         var behandling = Behandling.nyBehandlingFor(sak, BehandlingType.REVURDERING_TILBAKEKREVING).build();
         behandling.setId(20L);

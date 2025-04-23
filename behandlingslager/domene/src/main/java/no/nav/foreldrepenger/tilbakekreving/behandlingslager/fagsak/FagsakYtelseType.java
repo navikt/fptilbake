@@ -102,7 +102,7 @@ public enum FagsakYtelseType implements Kodeverdi {
     }
 
     public static String finnFagsaktypenavnPåAngittSpråk(FagsakYtelseType fagsakYtelseType, Språkkode språkkode) {
-        return Språkkode.nn.equals(språkkode) ? fagsakYtelseType.getNavnPåNynorsk() : fagsakYtelseType.getNavn();
+        return Språkkode.NN.equals(språkkode) ? fagsakYtelseType.getNavnPåNynorsk() : fagsakYtelseType.getNavn();
     }
 
 }

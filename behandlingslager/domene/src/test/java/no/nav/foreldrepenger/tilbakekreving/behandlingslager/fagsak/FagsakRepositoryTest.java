@@ -75,7 +75,7 @@ class FagsakRepositoryTest {
 
 
     private Fagsak opprettFagsak(Saksnummer saksnummer, AktørId aktørId) {
-        NavBruker bruker = NavBruker.opprettNy(aktørId, Språkkode.nb);
+        NavBruker bruker = NavBruker.opprettNy(aktørId, Språkkode.NB);
 
         // Opprett fagsak
         Fagsak fagsak = TestFagsakUtil.opprettFagsak(saksnummer, bruker);
@@ -87,7 +87,7 @@ class FagsakRepositoryTest {
 
 
     private Fagsak opprettFagsak(Saksnummer saksnummer, AktørId aktørId, Long eksternSystemId, Fagsystem eksternFagsakSystem) {
-        NavBruker bruker = NavBruker.opprettNy(aktørId, Språkkode.nb);
+        NavBruker bruker = NavBruker.opprettNy(aktørId, Språkkode.NB);
 
         // Opprett fagsak
         Fagsak fagsak = TestFagsakUtil.opprettFagsak(saksnummer, bruker);

@@ -51,7 +51,7 @@ class VedtaksbrevFritekstValidatorTest {
     private final LocalDate jan3 = LocalDate.of(2019, 1, 3);
     private final LocalDate jan24 = LocalDate.of(2019, 1, 24);
 
-    private final NavBruker bruker = NavBruker.opprettNy(new AktørId(1L), Språkkode.nb);
+    private final NavBruker bruker = NavBruker.opprettNy(new AktørId(1L), Språkkode.NB);
     private final Fagsak fagsak = Fagsak.opprettNy(new Saksnummer("123"), bruker);
     private final Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
     private final Behandling revurderingBehandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.REVURDERING_TILBAKEKREVING).build();

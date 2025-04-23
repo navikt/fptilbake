@@ -44,26 +44,26 @@ class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
 
     @Test
     void skal_støtte_alle_permutasjoner_av_fakta_for_FP() {
-        lagTeksterOgValider(FagsakYtelseType.FORELDREPENGER, Språkkode.nb);
+        lagTeksterOgValider(FagsakYtelseType.FORELDREPENGER, Språkkode.NB);
     }
 
     @Test
     void skal_støtte_alle_permutasjoner_av_fakta_for_FP_nynorsk() {
-        lagTeksterOgValider(FagsakYtelseType.FORELDREPENGER, Språkkode.nn);
+        lagTeksterOgValider(FagsakYtelseType.FORELDREPENGER, Språkkode.NN);
     }
 
     @Test
     void skal_støtte_alle_permutasjoner_av_fakta_for_SVP() {
         var unntak1 = Set.of(new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, HendelseUnderType.SVP_TILRETTELEGGING_FULLT_MULIG), new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, HendelseUnderType.SVP_TILRETTELEGGING_DELVIS_MULIG));
 
-        lagTeksterOgValider(FagsakYtelseType.SVANGERSKAPSPENGER, Språkkode.nb, unntak1);
+        lagTeksterOgValider(FagsakYtelseType.SVANGERSKAPSPENGER, Språkkode.NB, unntak1);
     }
 
     @Test
     void skal_støtte_alle_permutasjoner_av_fakta_for_SVP_nynorsk() {
         var unntak1 = Set.of(new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, HendelseUnderType.SVP_TILRETTELEGGING_FULLT_MULIG), new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, HendelseUnderType.SVP_TILRETTELEGGING_DELVIS_MULIG));
 
-        lagTeksterOgValider(FagsakYtelseType.SVANGERSKAPSPENGER, Språkkode.nn, unntak1);
+        lagTeksterOgValider(FagsakYtelseType.SVANGERSKAPSPENGER, Språkkode.NN, unntak1);
     }
 
     @Test
@@ -71,7 +71,7 @@ class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
         var unntak1 = Set.of(new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_IKKE_TILDELT), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_ANDRE_FORELDRE_DODD));
         var unntak2 = Set.of(new HendelseMedUndertype(HendelseType.ES_ADOPSJONSVILKAARET_TYPE, HendelseUnderType.ES_BARN_OVER_15), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_FORELDREANSVAR_BARN_OVER_15));
 
-        lagTeksterOgValider(FagsakYtelseType.ENGANGSTØNAD, Språkkode.nb, unntak1, unntak2);
+        lagTeksterOgValider(FagsakYtelseType.ENGANGSTØNAD, Språkkode.NB, unntak1, unntak2);
     }
 
     @Test
@@ -79,7 +79,7 @@ class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
         var unntak1 = Set.of(new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_IKKE_TILDELT), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_ANDRE_FORELDRE_DODD));
         var unntak2 = Set.of(new HendelseMedUndertype(HendelseType.ES_ADOPSJONSVILKAARET_TYPE, HendelseUnderType.ES_BARN_OVER_15), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_FORELDREANSVAR_BARN_OVER_15));
 
-        lagTeksterOgValider(FagsakYtelseType.ENGANGSTØNAD, Språkkode.nn, unntak1, unntak2);
+        lagTeksterOgValider(FagsakYtelseType.ENGANGSTØNAD, Språkkode.NN, unntak1, unntak2);
     }
 
     @SafeVarargs

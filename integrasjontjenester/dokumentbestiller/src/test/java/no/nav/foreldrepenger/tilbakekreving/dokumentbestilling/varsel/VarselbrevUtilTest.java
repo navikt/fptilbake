@@ -48,7 +48,7 @@ class VarselbrevUtilTest {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setBehandlendeEnhetId(BEHANDLENDE_ENHET_ID);
         eksternBehandlingsinfoDto.setBehandlendeEnhetNavn(BEHANDLENDE_ENHET_NAVN);
-        eksternBehandlingsinfoDto.setSprakkode(Språkkode.nn);
+        eksternBehandlingsinfoDto.setSprakkode(Språkkode.NN);
 
         Adresseinfo adresseinfo = lagStandardNorskAdresse();
 
@@ -104,7 +104,7 @@ class VarselbrevUtilTest {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setBehandlendeEnhetId(BEHANDLENDE_ENHET_ID);
         eksternBehandlingsinfoDto.setBehandlendeEnhetNavn(BEHANDLENDE_ENHET_NAVN);
-        eksternBehandlingsinfoDto.setSprakkode(Språkkode.nn);
+        eksternBehandlingsinfoDto.setSprakkode(Språkkode.NN);
 
         YtelseNavn ytelseNavn = lagYtelseNavn("svangerskapspengar", "svangerskapspenger");
 
@@ -133,7 +133,7 @@ class VarselbrevUtilTest {
         assertThat(varselbrev.getFritekstFraSaksbehandler()).isEqualTo(VARSEL_TEKST);
         assertThat(varselbrev.getBrevMetadata().getSaksnummer()).isEqualTo("11111111");
         assertThat(varselbrev.getBrevMetadata().getAnsvarligSaksbehandler()).isEqualTo("VL");
-        assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(Språkkode.nn);
+        assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(Språkkode.NN);
         assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetaltePerioderDto.sumFeilutbetaling());
         assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("svangerskapspengar");
         assertThat(varselbrev.getBrevMetadata().getTittel()).isEqualTo("Varsel tilbakebetaling svangerskapspenger");
@@ -164,7 +164,7 @@ class VarselbrevUtilTest {
                 .build();
 
         Saksnummer saksnummer = new Saksnummer("11111111");
-        NavBruker navBruker = NavBruker.opprettNy(new AktørId("1232132423"), Språkkode.nb);
+        NavBruker navBruker = NavBruker.opprettNy(new AktørId("1232132423"), Språkkode.NB);
         Fagsak fagsak = Fagsak.opprettNy(saksnummer, navBruker);
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet(BEHANDLENDE_ENHET_ID, BEHANDLENDE_ENHET_NAVN);
@@ -178,7 +178,7 @@ class VarselbrevUtilTest {
                 personinfo,
                 adresseinfo,
                 FagsakYtelseType.FORELDREPENGER,
-                Språkkode.nb,
+                Språkkode.NB,
                 ytelseNavn,
                 Period.ofWeeks(3),
                 VARSEL_TEKST,
@@ -193,7 +193,7 @@ class VarselbrevUtilTest {
         assertThat(varselbrev.getFritekstFraSaksbehandler()).isEqualTo(VARSEL_TEKST);
         assertThat(varselbrev.getBrevMetadata().getSaksnummer()).isEqualTo("11111111");
         assertThat(varselbrev.getBrevMetadata().getAnsvarligSaksbehandler()).isEqualTo("VL");
-        assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(Språkkode.nb);
+        assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(Språkkode.NB);
         assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetalingFakta.getAktuellFeilUtbetaltBeløp().longValue());
         assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("foreldrepenger");
         assertThat(varselbrev.getBrevMetadata().getTittel()).isEqualTo("Varsel tilbakebetaling foreldrepenger");

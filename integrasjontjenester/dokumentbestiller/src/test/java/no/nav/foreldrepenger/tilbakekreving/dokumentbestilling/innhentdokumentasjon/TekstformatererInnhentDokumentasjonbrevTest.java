@@ -23,7 +23,7 @@ class TekstformatererInnhentDokumentasjonbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medMottakerAdresse(lagStandardNorskAdresse())
                 .medSakspartNavn("Test")
                 .build();
@@ -44,7 +44,7 @@ class TekstformatererInnhentDokumentasjonbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
                 .medFagsaktype(FagsakYtelseType.FRISINN)
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medMottakerAdresse(lagStandardNorskAdresse())
                 .medSakspartNavn("Test")
                 .build();
@@ -65,7 +65,7 @@ class TekstformatererInnhentDokumentasjonbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medMottakerAdresse(lagStandardNorskAdresse())
                 .medSakspartNavn("Test")
                 .medVergeNavn("John Doe")
@@ -91,7 +91,7 @@ class TekstformatererInnhentDokumentasjonbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medMottakerAdresse(orgAdresse)
                 .medSakspartNavn("Test")
                 .medVergeNavn("John Doe")
@@ -115,7 +115,7 @@ class TekstformatererInnhentDokumentasjonbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nn)
+                .medSprakkode(Språkkode.NN)
                 .medMottakerAdresse(lagStandardNorskAdresse())
                 .medSakspartNavn("Test")
                 .build();
@@ -136,7 +136,7 @@ class TekstformatererInnhentDokumentasjonbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .build();
 
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()
@@ -152,7 +152,7 @@ class TekstformatererInnhentDokumentasjonbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nn)
+                .medSprakkode(Språkkode.NN)
                 .build();
 
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()

@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.automatisksaksbehandling.AutomatiskSaksbehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 import no.nav.foreldrepenger.tilbakekreving.felles.Helligdager;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -42,7 +42,7 @@ public class HåndterGamleKravgrunnlagBatchTask implements ProsessTaskHandler {
         this.mottattXmlRepository = mottattXmlRepository;
         this.taskTjeneste = taskTjeneste;
         this.clock = Clock.systemDefaultZone();
-        this.alderForGammeltGrunnlag = AutomatiskSaksbehandlingRepository.getKravgrunnlagAlderNårGammel();
+        this.alderForGammeltGrunnlag = Frister.KRAVGRUNNLAG_ALDER_GAMMELT;
     }
 
     // kun for test forbruk

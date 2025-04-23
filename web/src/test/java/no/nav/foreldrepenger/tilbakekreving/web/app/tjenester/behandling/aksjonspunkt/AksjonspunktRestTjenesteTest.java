@@ -54,7 +54,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 class AksjonspunktRestTjenesteTest {
 
     private static final Saksnummer SAKSNUMMER = new Saksnummer("12345");
-    private static final NavBruker NAV_BRUKER = NavBruker.opprettNy(new AktørId(12345L), Språkkode.nb);
+    private static final NavBruker NAV_BRUKER = NavBruker.opprettNy(new AktørId(12345L), Språkkode.NB);
 
     private final AksjonspunktApplikasjonTjeneste aksjonspunktTjenesteMock = mock(AksjonspunktApplikasjonTjeneste.class);
 

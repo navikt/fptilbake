@@ -69,7 +69,7 @@ class DokumentasjonGeneratorPeriodeFaktaTest {
                         .medErFødsel(true)
                         .medAntallBarn(1)
                         .build())
-                .medSpråkkode(Språkkode.nn)
+                .medSpråkkode(Språkkode.NN)
                 .build();
         var resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
@@ -96,7 +96,7 @@ class DokumentasjonGeneratorPeriodeFaktaTest {
                         .medErFødsel(true)
                         .medAntallBarn(1)
                         .build())
-                .medSpråkkode(Språkkode.nn)
+                .medSpråkkode(Språkkode.NN)
                 .build();
         var resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
@@ -123,7 +123,7 @@ class DokumentasjonGeneratorPeriodeFaktaTest {
                         .medErFødsel(true)
                         .medAntallBarn(1)
                         .build())
-                .medSpråkkode(Språkkode.nn)
+                .medSpråkkode(Språkkode.NN)
                 .build();
         var resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
@@ -150,7 +150,7 @@ class DokumentasjonGeneratorPeriodeFaktaTest {
                         .medErFødsel(true)
                         .medAntallBarn(1)
                         .build())
-                .medSpråkkode(Språkkode.nn)
+                .medSpråkkode(Språkkode.NN)
                 .build();
         var resultat = lagFaktatekster(felles);
         prettyPrint(resultat);

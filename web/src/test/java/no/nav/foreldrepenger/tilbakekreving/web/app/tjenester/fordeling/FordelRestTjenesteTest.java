@@ -102,7 +102,7 @@ class FordelRestTjenesteTest {
     }
 
     private Behandling lagBehandling() {
-        NavBruker navBruker = NavBruker.opprettNy(AKTØR_ID, Språkkode.nb);
+        NavBruker navBruker = NavBruker.opprettNy(AKTØR_ID, Språkkode.NB);
         Fagsak fagsak = Fagsak.opprettNy(SAKSNUMMER, navBruker);
         repositoryProvider.getFagsakRepository().lagre(fagsak);
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();

@@ -6,8 +6,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.automatisksaksbehandling.AutomatiskSaksbehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
+import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 
@@ -49,7 +49,7 @@ public class AutomatiskSaksbehandlingVurderingTjeneste {
 
     public static LocalDateTime ventefristForTilfelleSomKanAutomatiskSaksbehandles(Kravgrunnlag431 kravgrunnlag) {
         return kravgrunnlag.getKontrollFeltAsLocalDate()
-            .plus(AutomatiskSaksbehandlingRepository.getKravgrunnlagAlderNårGammel())
+            .plus(Frister.KRAVGRUNNLAG_ALDER_GAMMELT)
             .plusDays(1).atStartOfDay();
     }
 

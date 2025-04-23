@@ -27,7 +27,7 @@ class TekstformatererHenleggelsesbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medMottakerAdresse(lagAdresseInfo())
                 .medSakspartNavn("Test")
                 .build();
@@ -45,7 +45,7 @@ class TekstformatererHenleggelsesbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
                 .medFagsaktype(FagsakYtelseType.FRISINN)
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medMottakerAdresse(lagAdresseInfo())
                 .medSakspartNavn("Test")
                 .build();
@@ -63,7 +63,7 @@ class TekstformatererHenleggelsesbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medMottakerAdresse(lagAdresseInfo())
                 .medSakspartNavn("Test")
                 .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
@@ -82,7 +82,7 @@ class TekstformatererHenleggelsesbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
                 .medFagsaktype(FagsakYtelseType.FRISINN)
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medMottakerAdresse(lagAdresseInfo())
                 .medSakspartNavn("Test")
                 .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
@@ -101,7 +101,7 @@ class TekstformatererHenleggelsesbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medMottakerAdresse(lagAdresseInfo())
                 .medSakspartNavn("Test")
                 .medVergeNavn("John Doe")
@@ -122,7 +122,7 @@ class TekstformatererHenleggelsesbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medMottakerAdresse(lagAdresseInfo())
                 .medSakspartNavn("Test")
                 .medVergeNavn("John Doe")
@@ -144,7 +144,7 @@ class TekstformatererHenleggelsesbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepengar")
-                .medSprakkode(Språkkode.nn)
+                .medSprakkode(Språkkode.NN)
                 .medMottakerAdresse(lagAdresseInfo())
                 .medSakspartNavn("Test")
                 .build();
@@ -162,7 +162,7 @@ class TekstformatererHenleggelsesbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepengar")
-                .medSprakkode(Språkkode.nn)
+                .medSprakkode(Språkkode.NN)
                 .medMottakerAdresse(lagAdresseInfo())
                 .medSakspartNavn("Test")
                 .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
@@ -181,7 +181,7 @@ class TekstformatererHenleggelsesbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
@@ -197,7 +197,7 @@ class TekstformatererHenleggelsesbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
                 .build();
 
@@ -214,7 +214,7 @@ class TekstformatererHenleggelsesbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nn)
+                .medSprakkode(Språkkode.NN)
                 .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();

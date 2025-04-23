@@ -61,7 +61,7 @@ class TekstformatererVedtaksbrevTest {
 
     @Test
     void skal_generere_vedtaksbrev_for_FP_og_tvillinger_og_simpel_uaktsomhet_nynorsk() throws Exception {
-        var data = getVedtaksbrevDataTvilling(FagsakYtelseType.FORELDREPENGER, HendelseType.FP_ANNET_HENDELSE_TYPE, Språkkode.nn);
+        var data = getVedtaksbrevDataTvilling(FagsakYtelseType.FORELDREPENGER, HendelseType.FP_ANNET_HENDELSE_TYPE, Språkkode.NN);
 
         var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         var fasit = les("/vedtaksbrev/FP_tvillinger_nn.txt");
@@ -98,7 +98,7 @@ class TekstformatererVedtaksbrevTest {
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(6)
                 .build())
-            .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
+            .medSpråkkode(språkkode != null ? språkkode : Språkkode.NB)
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
         var perioder = List.of(
@@ -158,7 +158,7 @@ class TekstformatererVedtaksbrevTest {
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(6)
                 .build())
-            .medSpråkkode(Språkkode.nb)
+            .medSpråkkode(Språkkode.NB)
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
         var perioder = List.of(
@@ -346,7 +346,7 @@ class TekstformatererVedtaksbrevTest {
 
     @Test
     void skal_generere_vedtaksbrev_for_revurdering_med_SVP_og_tvillinger_og_simpel_uaktsomhet_nynorsk() throws Exception {
-        var data = getVedtaksbrevDataTvilling(FagsakYtelseType.SVANGERSKAPSPENGER, HendelseType.SVP_ANNET_TYPE, Språkkode.nn);
+        var data = getVedtaksbrevDataTvilling(FagsakYtelseType.SVANGERSKAPSPENGER, HendelseType.SVP_ANNET_TYPE, Språkkode.NN);
 
         var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         var fasit = les("/vedtaksbrev/SVP_tvillinger_nn.txt");
@@ -801,9 +801,9 @@ class TekstformatererVedtaksbrevTest {
 
     @Test
     void skal_generere_vedtaksbrev_overskrift_foreldrepenger_full_tilbakebetaling_nynorsk() {
-        var data = lagBrevOverskriftTestoppsett(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, Språkkode.nn);
+        var data = lagBrevOverskriftTestoppsett(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, Språkkode.NN);
 
-        var overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data, Språkkode.nn);
+        var overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data, Språkkode.NN);
         var fasit = "Du må betale tilbake foreldrepengane";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
@@ -819,7 +819,7 @@ class TekstformatererVedtaksbrevTest {
 
     @Test
     void skal_generere_fritekst_og_uten_perioder_vedtaksbrev_for_FP_med_full_tilbakebetaling() throws IOException {
-        var fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, Språkkode.nb);
+        var fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, Språkkode.NB);
         var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(fritekstVedtaksbrevData);
         assertThat(generertBrev).isNotEmpty();
         var fasit = les("/vedtaksbrev/Fritekst_Vedtaksbrev_FP_full_tilbakebetaling.txt");
@@ -828,7 +828,7 @@ class TekstformatererVedtaksbrevTest {
 
     @Test
     void skal_generere_fritekst_og_uten_perioder_vedtaksbrev_for_ES_med_ingen_tilbakebetaling() throws IOException {
-        var fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(FagsakYtelseType.ENGANGSTØNAD, VedtakResultatType.INGEN_TILBAKEBETALING, Språkkode.nb);
+        var fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(FagsakYtelseType.ENGANGSTØNAD, VedtakResultatType.INGEN_TILBAKEBETALING, Språkkode.NB);
         var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(fritekstVedtaksbrevData);
         assertThat(generertBrev).isNotEmpty();
         var fasit = les("/vedtaksbrev/Fritekst_Vedtaksbrev_ES_ingen_tilbakebetaling.txt");
@@ -853,7 +853,7 @@ class TekstformatererVedtaksbrevTest {
                 .medAntallBarn(1)
                 .medDatoFagsakvedtak(LocalDate.now())
                 .build())
-            .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
+            .medSpråkkode(språkkode != null ? språkkode : Språkkode.NB)
             .build();
         return new HbVedtaksbrevData(vedtaksbrevFelles, Collections.emptyList());
     }
@@ -984,7 +984,7 @@ Vedlegg: Resultatet av tilbakebetalingssaken""");
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(6)
                 .build())
-            .medSpråkkode(Språkkode.nb)
+            .medSpråkkode(Språkkode.NB)
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
         var perioder = List.of(
@@ -1039,7 +1039,7 @@ Vedlegg: Resultatet av tilbakebetalingssaken""");
                 .medOriginalBehandlingDatoFagsakvedtak(LocalDate.of(2020, 3, 4))
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
-            .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
+            .medSpråkkode(språkkode != null ? språkkode : Språkkode.NB)
             .medFritekstOppsummering("sender fritekst vedtaksbrev")
             .medVedtaksbrevType(VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT)
             .build();

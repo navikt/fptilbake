@@ -33,13 +33,9 @@ public class AutomatiskSaksbehandlingRepository {
         this.entityManager = entityManager;
     }
 
-    public static Period getKravgrunnlagAlderNårGammel() {
-        return Frister.KRAVGRUNNLAG_ALDER_GAMMELT;
-    }
-
     public List<Behandling> hentAlleBehandlingerSomErKlarForAutomatiskSaksbehandling(LocalDate bestemtDato) {
 
-        var kontrollFeltFørDato = bestemtDato.minus(getKravgrunnlagAlderNårGammel());
+        var kontrollFeltFørDato = bestemtDato.minus(Frister.KRAVGRUNNLAG_ALDER_GAMMELT);
 
         TypedQuery<Behandling> query = entityManager.createQuery("""
                 from Behandling beh where beh.id in

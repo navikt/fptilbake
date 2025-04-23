@@ -79,12 +79,12 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
 
     protected AbstractTestScenario() {
         var aktørId = new AktørId(nyId());
-        var bruker = NavBruker.opprettNy(aktørId, Språkkode.nb);
+        var bruker = NavBruker.opprettNy(aktørId, Språkkode.NB);
         fagsak = lagFagsak(bruker);
     }
 
     protected AbstractTestScenario(AktørId aktørId) {
-        var bruker = NavBruker.opprettNy(aktørId, Språkkode.nb);
+        var bruker = NavBruker.opprettNy(aktørId, Språkkode.NB);
         fagsak = lagFagsak(bruker);
     }
 

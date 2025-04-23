@@ -82,7 +82,7 @@ class BehandlingKandidaterRepositoryTest {
     }
 
     private Fagsak opprettFagsak(String aktørId, String saksnummer) {
-        NavBruker b = NavBruker.opprettNy(new AktørId(aktørId), Språkkode.nb);
+        NavBruker b = NavBruker.opprettNy(new AktørId(aktørId), Språkkode.NB);
         Fagsak fagsak = TestFagsakUtil.opprettFagsak(new Saksnummer(saksnummer), b);
         Long fagsakId = fagsakRepository.lagre(fagsak);
         return fagsakRepository.finnEksaktFagsak(fagsakId);

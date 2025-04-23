@@ -52,7 +52,7 @@ class TekstformatererVedtaksbrevVedleggTest {
 
     @Test
     void skal_generere_vedlegg_med_en_periode_uten_renter_nynorsk() throws Exception {
-        var data = getVedtaksbrevData(Språkkode.nn);
+        var data = getVedtaksbrevData(Språkkode.NN);
 
         var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
         var fasit = les("/vedtaksbrev/vedlegg/vedlegg_uten_renter_nn.txt");
@@ -61,7 +61,7 @@ class TekstformatererVedtaksbrevVedleggTest {
 
     @Test
     void skal_generere_vedlegg_med_en_periode_uten_skatt() throws Exception {
-        var data = getVedtaksbrevData(Språkkode.nb, 10000, 30001, 30001, 0, 0);
+        var data = getVedtaksbrevData(Språkkode.NB, 10000, 30001, 30001, 0, 0);
 
         var generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
         var fasit = les("/vedtaksbrev/vedlegg/vedlegg_uten_skatt.txt");
@@ -91,7 +91,7 @@ class TekstformatererVedtaksbrevVedleggTest {
                         .medVarsletBeløp(BigDecimal.valueOf(varslet))
                         .medVarsletDato(LocalDate.of(2020, 4, 4))
                         .build())
-                .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
+                .medSpråkkode(språkkode != null ? språkkode : Språkkode.NB)
                 .build();
         var perioder = List.of(
                 HbVedtaksbrevPeriode.builder()

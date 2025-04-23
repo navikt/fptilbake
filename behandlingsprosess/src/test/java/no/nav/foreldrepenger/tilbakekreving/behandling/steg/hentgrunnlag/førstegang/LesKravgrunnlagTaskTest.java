@@ -95,7 +95,7 @@ class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     }
 
     private Behandling lagBehandling() {
-        NavBruker navBruker = NavBruker.opprettNy(TestFagsakUtil.genererBruker().getAktørId(), Språkkode.nb);
+        NavBruker navBruker = NavBruker.opprettNy(TestFagsakUtil.genererBruker().getAktørId(), Språkkode.NB);
         Fagsak fagsak = Fagsak.opprettNy(new Saksnummer("139015144"), navBruker);
         fagsakRepository.lagre(fagsak);
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();

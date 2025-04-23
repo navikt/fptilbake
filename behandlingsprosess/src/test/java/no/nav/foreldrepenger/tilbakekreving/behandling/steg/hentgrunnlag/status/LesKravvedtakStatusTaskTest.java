@@ -285,7 +285,7 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     }
 
     private Behandling lagBehandling() {
-        var navBruker = NavBruker.opprettNy(TestFagsakUtil.genererBruker().getAktørId(), Språkkode.nb);
+        var navBruker = NavBruker.opprettNy(TestFagsakUtil.genererBruker().getAktørId(), Språkkode.NB);
         var fagsak = Fagsak.opprettNy(new Saksnummer("139015144"), navBruker);
         fagsakRepository.lagre(fagsak);
         var behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();

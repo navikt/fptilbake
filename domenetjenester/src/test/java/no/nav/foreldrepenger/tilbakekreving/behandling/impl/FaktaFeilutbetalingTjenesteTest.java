@@ -214,7 +214,7 @@ class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
     private EksternBehandlingsinfoDto lagEksternBehandlingsInfo() {
         EksternBehandlingsinfoDto eksternBehandlingsinfo = new EksternBehandlingsinfoDto();
-        eksternBehandlingsinfo.setSprakkode(Språkkode.nb);
+        eksternBehandlingsinfo.setSprakkode(Språkkode.NB);
         eksternBehandlingsinfo.setUuid(eksternBehandlingUuid);
         eksternBehandlingsinfo.setVedtakDato(NOW);
 
