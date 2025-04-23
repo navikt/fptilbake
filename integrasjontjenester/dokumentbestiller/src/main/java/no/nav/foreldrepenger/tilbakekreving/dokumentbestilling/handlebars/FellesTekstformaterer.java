@@ -87,7 +87,7 @@ public abstract class FellesTekstformaterer {
     }
 
     private static String mapTilSpråk(Språkkode språkkode) {
-        if (Språkkode.nn.equals(språkkode)) {
+        if (Språkkode.NN.equals(språkkode)) {
             return "nn";
         } else {
             return "nb";

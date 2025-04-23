@@ -31,15 +31,15 @@ class VedtakHjemmelTest {
     void skal_gi_riktig_hjemmel_når_det_ikke_er_foreldelse_eller_renter() {
         var vurderingPerioder = aktsomhet(periode, Function.identity());
 
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true)).isEqualTo("folketrygdloven § 22-15");
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nn, true)).isEqualTo("folketrygdlova § 22-15");
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.NB, true)).isEqualTo("folketrygdloven § 22-15");
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.NN, true)).isEqualTo("folketrygdlova § 22-15");
     }
 
     @Test
     void skal_gi_riktig_hjemmel_når_det_er_forsto_burde_forstått_og_forsett() {
         var vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.FORSETT).medIleggRenter(false));
 
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true)).isEqualTo("folketrygdloven § 22-15");
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.NB, true)).isEqualTo("folketrygdloven § 22-15");
     }
 
     @Test
@@ -47,7 +47,7 @@ class VedtakHjemmelTest {
         var vurderingPerioder = aktsomhet(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
                 periode, a -> a.medAktsomhet(Aktsomhet.FORSETT));
 
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true)).isEqualTo("folketrygdloven §§ 22-15 og 22-17 a");
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.NB, true)).isEqualTo("folketrygdloven §§ 22-15 og 22-17 a");
     }
 
     @Test
@@ -55,15 +55,15 @@ class VedtakHjemmelTest {
         var vurderingPerioder = aktsomhet(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
                 periode, a -> a.medAktsomhet(Aktsomhet.FORSETT));
 
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, false)).isEqualTo("folketrygdloven § 22-15");
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.NB, false)).isEqualTo("folketrygdloven § 22-15");
     }
 
     @Test
     void skal_gi_riktig_hjemmel_når_det_ikke_kreves_tilbake_pga_lavt_beløp() {
         var vurderingPerioder = aktsomhet(periode, a -> a.medTilbakekrevSmåBeløp(false));
 
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true)).isEqualTo("folketrygdloven § 22-15 sjette ledd");
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nn, true)).isEqualTo("folketrygdlova § 22-15 sjette ledd");
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.NB, true)).isEqualTo("folketrygdloven § 22-15 sjette ledd");
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.NN, true)).isEqualTo("folketrygdlova § 22-15 sjette ledd");
     }
 
     @Test
@@ -74,7 +74,7 @@ class VedtakHjemmelTest {
             return f;
         });
 
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, Collections.emptyList(), VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true)).isEqualTo("foreldelsesloven §§ 2 og 3");
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, Collections.emptyList(), VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.NB, true)).isEqualTo("foreldelsesloven §§ 2 og 3");
     }
 
     @Test
@@ -86,7 +86,7 @@ class VedtakHjemmelTest {
         });
         var vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.GROVT_UAKTSOM).medIleggRenter(false));
 
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true)).isEqualTo("folketrygdloven § 22-15 og foreldelsesloven §§ 2 og 3");
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.NB, true)).isEqualTo("folketrygdloven § 22-15 og foreldelsesloven §§ 2 og 3");
     }
 
     @Test
@@ -94,7 +94,7 @@ class VedtakHjemmelTest {
         var vurdertForeldelse = lagForeldelseperiode(periode, f -> f.medForeldelseVurderingType(ForeldelseVurderingType.IKKE_FORELDET));
         var vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.GROVT_UAKTSOM).medIleggRenter(true));
 
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true)).isEqualTo("folketrygdloven §§ 22-15 og 22-17 a");
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.NB, true)).isEqualTo("folketrygdloven §§ 22-15 og 22-17 a");
     }
 
     @Test
@@ -107,7 +107,7 @@ class VedtakHjemmelTest {
         });
         var vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.GROVT_UAKTSOM).medIleggRenter(false));
 
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true)).isEqualTo("folketrygdloven § 22-15 og foreldelsesloven §§ 2, 3 og 10");
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.NB, true)).isEqualTo("folketrygdloven § 22-15 og foreldelsesloven §§ 2, 3 og 10");
     }
 
     @Test
@@ -120,7 +120,7 @@ class VedtakHjemmelTest {
         });
         var vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.GROVT_UAKTSOM).medIleggRenter(true));
 
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true))
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.NB, true))
                 .isEqualTo("folketrygdloven §§ 22-15 og 22-17 a og foreldelsesloven §§ 2, 3 og 10");
     }
 
@@ -128,7 +128,7 @@ class VedtakHjemmelTest {
     void skal_gi_riktig_hjemmel_når_det_ikke_er_foreldelse_eller_renter_er_klage() {
         var vurderingPerioder = aktsomhet(periode, Function.identity());
 
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.ENDRET_TIL_UGUNST_FOR_BRUKER, Språkkode.nb, true))
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.ENDRET_TIL_UGUNST_FOR_BRUKER, Språkkode.NB, true))
                 .isEqualTo("folketrygdloven § 22-15 og forvaltningsloven § 35 c)");
     }
 
@@ -142,7 +142,7 @@ class VedtakHjemmelTest {
         });
         var vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.GROVT_UAKTSOM).medIleggRenter(true));
 
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.ENDRET_TIL_GUNST_FOR_BRUKER, Språkkode.nb, true))
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.ENDRET_TIL_GUNST_FOR_BRUKER, Språkkode.NB, true))
                 .isEqualTo("folketrygdloven §§ 22-15 og 22-17 a, foreldelsesloven §§ 2, 3 og 10 og forvaltningsloven § 35 a)");
     }
 

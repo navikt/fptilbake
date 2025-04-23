@@ -29,7 +29,7 @@ public class TestFagsakUtil {
 
     public static NavBruker genererBruker() {
         AktørId aktørId = new AktørId(nyId());
-        return NavBruker.opprettNy(aktørId, Språkkode.nb);
+        return NavBruker.opprettNy(aktørId, Språkkode.NB);
     }
 
     public static Saksnummer genererSaksnummer() {

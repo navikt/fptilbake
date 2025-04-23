@@ -56,8 +56,8 @@ class DokumentasjonGeneratorVedtakSluttTest {
 
     @Test
     void list_ut_vedtak_slutt_nn() {
-        lagVedtakSluttTekster(FagsakYtelseType.FORELDREPENGER, Språkkode.nn, VedtakResultatType.FULL_TILBAKEBETALING);
-        lagVedtakSluttTekster(FagsakYtelseType.FORELDREPENGER, Språkkode.nn, VedtakResultatType.INGEN_TILBAKEBETALING);
+        lagVedtakSluttTekster(FagsakYtelseType.FORELDREPENGER, Språkkode.NN, VedtakResultatType.FULL_TILBAKEBETALING);
+        lagVedtakSluttTekster(FagsakYtelseType.FORELDREPENGER, Språkkode.NN, VedtakResultatType.INGEN_TILBAKEBETALING);
     }
 
     @Test
@@ -68,8 +68,8 @@ class DokumentasjonGeneratorVedtakSluttTest {
 
     @Test
     void list_ut_vedtak_slutt_es_nn() {
-        lagVedtakSluttTekster(FagsakYtelseType.ENGANGSTØNAD, Språkkode.nn, VedtakResultatType.FULL_TILBAKEBETALING, false);
-        lagVedtakSluttTekster(FagsakYtelseType.ENGANGSTØNAD, Språkkode.nn, VedtakResultatType.INGEN_TILBAKEBETALING, false);
+        lagVedtakSluttTekster(FagsakYtelseType.ENGANGSTØNAD, Språkkode.NN, VedtakResultatType.FULL_TILBAKEBETALING, false);
+        lagVedtakSluttTekster(FagsakYtelseType.ENGANGSTØNAD, Språkkode.NN, VedtakResultatType.INGEN_TILBAKEBETALING, false);
     }
 
     @Test
@@ -80,8 +80,8 @@ class DokumentasjonGeneratorVedtakSluttTest {
 
     @Test
     void list_ut_vedtak_slutt_frisinn_nn() {
-        lagVedtakSluttTekster(FagsakYtelseType.FRISINN, Språkkode.nn, VedtakResultatType.FULL_TILBAKEBETALING, false);
-        lagVedtakSluttTekster(FagsakYtelseType.FRISINN, Språkkode.nn, VedtakResultatType.INGEN_TILBAKEBETALING, false);
+        lagVedtakSluttTekster(FagsakYtelseType.FRISINN, Språkkode.NN, VedtakResultatType.FULL_TILBAKEBETALING, false);
+        lagVedtakSluttTekster(FagsakYtelseType.FRISINN, Språkkode.NN, VedtakResultatType.INGEN_TILBAKEBETALING, false);
     }
 
     private void lagVedtakSluttTekster(FagsakYtelseType ytelsetype, Språkkode språkkode, VedtakResultatType resultatType) {
@@ -156,7 +156,7 @@ class DokumentasjonGeneratorVedtakSluttTest {
                         .medErGift(true)
                         .build())
                 .medVedtaksbrevType(feilutbetaltBeløpBortfalt ? VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT : VedtaksbrevType.ORDINÆR)
-                .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb);
+                .medSpråkkode(språkkode != null ? språkkode : Språkkode.NB);
         if (erRevurdering) {
             builder
                     .medBehandling(HbBehandling.builder()

@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.automatisksaksbehandling.AutomatiskSaksbehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
 import no.nav.foreldrepenger.tilbakekreving.felles.Helligdager;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -60,7 +61,7 @@ public class AutomatiskSaksbehandlingBatchTask implements ProsessTaskHandler {
         if (Helligdager.erHelligdagEllerHelg(iDag)) {
             LOG.info("Kjører ikke batch {} i helgen eller helligdag. Iverksetting i saksbehandling avhenger av oppdragsystemet, som sannsynligvis har nedetid", batchRun);
         } else {
-            LocalDate loggDato = iDag.minus(AutomatiskSaksbehandlingRepository.getKravgrunnlagAlderNårGammel());
+            LocalDate loggDato = iDag.minus(Frister.KRAVGRUNNLAG_ALDER_GAMMELT);
             LOG.info("Henter behandlinger som er eldre enn {} i batch {}", loggDato, batchRun);
             List<Behandling> behandlinger = automatiskSaksbehandlingRepository.hentAlleBehandlingerSomErKlarForAutomatiskSaksbehandling(iDag);
             var opprettTaskForBehandlinger  = behandlinger.stream()

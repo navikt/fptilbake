@@ -45,7 +45,7 @@ class DokumentasjonGeneratorVedtakOppsummeringTest {
     @Test
     void list_ut_vedtak_start_for_fp() {
         var ytelseType = FagsakYtelseType.FORELDREPENGER;
-        var nb = Språkkode.nb;
+        var nb = Språkkode.NB;
         for (var resultatType : tilbakekrevingsResultat) {
             for (var medVarsel : trueFalse) {
                 listVedtakStartAllePermutasjoner(ytelseType, nb, resultatType, medVarsel);
@@ -57,7 +57,7 @@ class DokumentasjonGeneratorVedtakOppsummeringTest {
     @Test
     void list_ut_vedtak_start_for_fp_nynorsk() {
         var ytelseType = FagsakYtelseType.FORELDREPENGER;
-        var språkkode = Språkkode.nn;
+        var språkkode = Språkkode.NN;
         for (var resultatType : tilbakekrevingsResultat) {
             for (boolean medVarsel : trueFalse) {
                 listVedtakStartAllePermutasjoner(ytelseType, språkkode, resultatType, medVarsel);
@@ -69,7 +69,7 @@ class DokumentasjonGeneratorVedtakOppsummeringTest {
     @Test
     void list_ut_vedtak_start_for_es() {
         var ytelseType = FagsakYtelseType.ENGANGSTØNAD;
-        var nb = Språkkode.nb;
+        var nb = Språkkode.NB;
         for (var resultatType : tilbakekrevingsResultat) {
             for (var medVarsel : trueFalse) {
                 listVedtakStartUtenSkatt(ytelseType, nb, resultatType, medVarsel);
@@ -81,7 +81,7 @@ class DokumentasjonGeneratorVedtakOppsummeringTest {
     @Test
     void list_ut_vedtak_start_for_es_nynorsk() {
         var ytelseType = FagsakYtelseType.ENGANGSTØNAD;
-        var språkkode = Språkkode.nn;
+        var språkkode = Språkkode.NN;
         for (var resultatType : tilbakekrevingsResultat) {
             for (var medVarsel : trueFalse) {
                 listVedtakStartUtenSkatt(ytelseType, språkkode, resultatType, medVarsel);
@@ -93,7 +93,7 @@ class DokumentasjonGeneratorVedtakOppsummeringTest {
     @Test
     void list_ut_vedtak_start_for_svp() {
         var ytelseType = FagsakYtelseType.SVANGERSKAPSPENGER;
-        var nb = Språkkode.nb;
+        var nb = Språkkode.NB;
         for (var resultatType : tilbakekrevingsResultat) {
             for (var medVarsel : trueFalse) {
                 listVedtakStartAllePermutasjoner(ytelseType, nb, resultatType, medVarsel);
@@ -105,7 +105,7 @@ class DokumentasjonGeneratorVedtakOppsummeringTest {
     @Test
     void list_ut_vedtak_start_for_svp_nynorsk() {
         var ytelseType = FagsakYtelseType.SVANGERSKAPSPENGER;
-        var språkkode = Språkkode.nn;
+        var språkkode = Språkkode.NN;
         for (var resultatType : tilbakekrevingsResultat) {
             for (var medVarsel : trueFalse) {
                 listVedtakStartAllePermutasjoner(ytelseType, språkkode, resultatType, medVarsel);
@@ -117,7 +117,7 @@ class DokumentasjonGeneratorVedtakOppsummeringTest {
     @Test
     void list_ut_vedtak_start_for_frisinn() {
         var ytelseType = FagsakYtelseType.FRISINN;
-        var nb = Språkkode.nb;
+        var nb = Språkkode.NB;
         for (var resultatType : tilbakekrevingsResultat) {
             for (var medVarsel : trueFalse) {
                 listVedtakStartUtenRenter(ytelseType, nb, resultatType, medVarsel);
@@ -129,7 +129,7 @@ class DokumentasjonGeneratorVedtakOppsummeringTest {
     @Test
     void list_ut_vedtak_start_for_frisinn_nynorsk() {
         var ytelseType = FagsakYtelseType.FRISINN;
-        var språkkode = Språkkode.nn;
+        var språkkode = Språkkode.NN;
         for (var resultatType : tilbakekrevingsResultat) {
             for (var medVarsel : trueFalse) {
                 listVedtakStartUtenRenter(ytelseType, språkkode, resultatType, medVarsel);

@@ -85,7 +85,7 @@ public class EksternDataForBrevTjeneste {
         String ytelsePåBokmål = ytelsetype.getNavn().toLowerCase();
         ytelseNavn.setNavnPåBokmål(ytelsePåBokmål);
 
-        if (språkkode != null && !språkkode.equals(Språkkode.nb)) {
+        if (språkkode != null && !språkkode.equals(Språkkode.NB)) {
             ytelseNavn.setNavnPåBrukersSpråk(FagsakYtelseType.finnFagsaktypenavnPåAngittSpråk(ytelsetype, språkkode).toLowerCase());
         } else {
             ytelseNavn.setNavnPåBrukersSpråk(ytelsePåBokmål);

@@ -257,7 +257,7 @@ class BehandlingTjenesteTest extends FellesTestOppsett {
 
     private EksternBehandlingsinfoDto lagEksternBehandlingsInfo() {
         EksternBehandlingsinfoDto eksternBehandlingsinfo = new EksternBehandlingsinfoDto();
-        eksternBehandlingsinfo.setSprakkode(Språkkode.nb);
+        eksternBehandlingsinfo.setSprakkode(Språkkode.NB);
         eksternBehandlingsinfo.setUuid(eksternBehandlingUuid);
         eksternBehandlingsinfo.setHenvisning(henvisning);
         eksternBehandlingsinfo.setVedtakDato(NOW);

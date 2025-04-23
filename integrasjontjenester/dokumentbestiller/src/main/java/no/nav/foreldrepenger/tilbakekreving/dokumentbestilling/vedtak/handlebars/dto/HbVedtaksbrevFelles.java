@@ -37,7 +37,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     private boolean finnesVerge;
     @JsonProperty("annenMottakerNavn")
     private String annenMottakerNavn;
-    private Språkkode språkkode = Språkkode.nb;
+    private Språkkode språkkode = Språkkode.NB;
     @JsonProperty("feilutbetalt-beløp-er-korrigert-ned")
     private boolean erFeilutbetaltBeløpKorrigertNed;
     @JsonProperty("totalt-feilutbetalt-beløp")

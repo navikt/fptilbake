@@ -240,7 +240,7 @@ class TekstformatererVedtaksbrevIBiterTest {
     @Test
     void skal_ha_riktig_tekst_for_særlige_grunner_når_det_er_reduksjon_av_beløp() {
         var felles = lagTestBuilder()
-                .medSpråkkode(Språkkode.nn)
+                .medSpråkkode(Språkkode.NN)
                 .medSak(HbSak.build()
                         .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                         .medErFødsel(true)

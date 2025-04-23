@@ -50,7 +50,7 @@ class DokumentasjonGeneratorPeriodeSærligeGrunnerTest {
 
     @Test
     void list_ut_særlige_grunner_simpel_uaktsomhet_forstod_nynorsk() {
-        var felles = lagFellesdel(Språkkode.nn);
+        var felles = lagFellesdel(Språkkode.NN);
         lagSærligeGrunnerTekster(felles, VilkårResultat.FORSTO_BURDE_FORSTÅTT, Aktsomhet.SIMPEL_UAKTSOM);
     }
 
@@ -62,7 +62,7 @@ class DokumentasjonGeneratorPeriodeSærligeGrunnerTest {
 
     @Test
     void list_ut_særlige_grunner_grov_uaktsomhet_forstod_nynorsk() {
-        var felles = lagFellesdel(Språkkode.nn);
+        var felles = lagFellesdel(Språkkode.NN);
         lagSærligeGrunnerTekster(felles, VilkårResultat.FORSTO_BURDE_FORSTÅTT, Aktsomhet.GROVT_UAKTSOM);
     }
 
@@ -74,7 +74,7 @@ class DokumentasjonGeneratorPeriodeSærligeGrunnerTest {
 
     @Test
     void list_ut_særlige_grunner_simpel_uaktsomhet_feil_mangelfulle_opplysninger_nynorsk() {
-        var felles = lagFellesdel(Språkkode.nn);
+        var felles = lagFellesdel(Språkkode.NN);
         lagSærligeGrunnerTekster(felles, VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.SIMPEL_UAKTSOM);
     }
 
@@ -86,7 +86,7 @@ class DokumentasjonGeneratorPeriodeSærligeGrunnerTest {
 
     @Test
     void list_ut_særlige_grunner_grov_uaktsomhet_feil_mangelfulle_opplysninger_nynorsk() {
-        var felles = lagFellesdel(Språkkode.nn);
+        var felles = lagFellesdel(Språkkode.NN);
         lagSærligeGrunnerTekster(felles, VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.GROVT_UAKTSOM);
     }
 
@@ -206,7 +206,7 @@ class DokumentasjonGeneratorPeriodeSærligeGrunnerTest {
                         .medNavn("Søker Søkersen")
                         .medErGift(true)
                         .build())
-                .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
+                .medSpråkkode(språkkode != null ? språkkode : Språkkode.NB)
                 .build();
     }
 

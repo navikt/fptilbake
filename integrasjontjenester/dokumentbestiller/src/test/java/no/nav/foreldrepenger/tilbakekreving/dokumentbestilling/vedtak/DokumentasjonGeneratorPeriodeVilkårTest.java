@@ -62,42 +62,42 @@ class DokumentasjonGeneratorPeriodeVilkårTest {
 
     @Test
     void generer_vilkår_for_fp() {
-        lagVilkårstekster(FagsakYtelseType.FORELDREPENGER, Språkkode.nb);
+        lagVilkårstekster(FagsakYtelseType.FORELDREPENGER, Språkkode.NB);
     }
 
     @Test
     void generer_vilkår_for_fp_nynorsk() {
-        lagVilkårstekster(FagsakYtelseType.FORELDREPENGER, Språkkode.nn);
+        lagVilkårstekster(FagsakYtelseType.FORELDREPENGER, Språkkode.NN);
     }
 
     @Test
     void generer_vilkår_for_svp() {
-        lagVilkårstekster(FagsakYtelseType.SVANGERSKAPSPENGER, Språkkode.nb);
+        lagVilkårstekster(FagsakYtelseType.SVANGERSKAPSPENGER, Språkkode.NB);
     }
 
     @Test
     void generer_vilkår_for_svp_nynorsk() {
-        lagVilkårstekster(FagsakYtelseType.SVANGERSKAPSPENGER, Språkkode.nn);
+        lagVilkårstekster(FagsakYtelseType.SVANGERSKAPSPENGER, Språkkode.NN);
     }
 
     @Test
     void generer_vilkår_for_es() {
-        lagVilkårstekster(FagsakYtelseType.ENGANGSTØNAD, Språkkode.nb);
+        lagVilkårstekster(FagsakYtelseType.ENGANGSTØNAD, Språkkode.NB);
     }
 
     @Test
     void generer_vilkår_for_es_nynorsk() {
-        lagVilkårstekster(FagsakYtelseType.ENGANGSTØNAD, Språkkode.nn);
+        lagVilkårstekster(FagsakYtelseType.ENGANGSTØNAD, Språkkode.NN);
     }
 
     @Test
     void generer_vilkår_for_frisinn() {
-        lagVilkårstekster(FagsakYtelseType.FRISINN, Språkkode.nb);
+        lagVilkårstekster(FagsakYtelseType.FRISINN, Språkkode.NB);
     }
 
     @Test
     void generer_vilkår_for_frisinn_nynorsk() {
-        lagVilkårstekster(FagsakYtelseType.FRISINN, Språkkode.nn);
+        lagVilkårstekster(FagsakYtelseType.FRISINN, Språkkode.NN);
     }
 
     private void lagVilkårstekster(FagsakYtelseType ytelsetype, Språkkode språkkode) {

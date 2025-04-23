@@ -35,7 +35,7 @@ class TekstformatererVarselbrevTest {
     void skal_generere_varseltekst_for_flere_perioder() throws Exception {
         BrevMetadata metadata = new BrevMetadata.Builder()
                 .medFagsaktype(svangerskapspengerkode)
-                .medSprakkode(Språkkode.nn)
+                .medSprakkode(Språkkode.NN)
                 .medFagsaktypenavnPåSpråk("svangerskapspengar")
                 .medMottakerAdresse(lagAdresseInfo())
                 .medSakspartNavn("Test")
@@ -60,7 +60,7 @@ class TekstformatererVarselbrevTest {
     void skal_generere_varseltekst_for_engangsstønad() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
                 .medFagsaktype(engangsstønadkode)
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medFagsaktypenavnPåSpråk("eingongsstønad")
                 .medMottakerAdresse(lagAdresseInfo())
                 .medSakspartNavn("Test")
@@ -85,7 +85,7 @@ class TekstformatererVarselbrevTest {
     void skal_generere_varseltekst_for_foreldrepenger_med_enkelt_periode() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
                 .medFagsaktype(foreldrepengerkode)
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
                 .medMottakerAdresse(lagAdresseInfo())
                 .medSakspartNavn("Test")
@@ -110,7 +110,7 @@ class TekstformatererVarselbrevTest {
     void skal_generere_varseltekst_for_frisinn_med_enkelt_periode() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.FRISINN)
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
                 .medMottakerAdresse(lagAdresseInfo())
                 .medSakspartNavn("Test")
@@ -134,7 +134,7 @@ class TekstformatererVarselbrevTest {
     @Test
     void skal_mappe_verdier_fra_dtoer_til_komplett_tilbakekrevingsvarsel() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-                .medSprakkode(Språkkode.nn)
+                .medSprakkode(Språkkode.NN)
                 .medFagsaktype(foreldrepengerkode)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
                 .medMottakerAdresse(lagAdresseInfo())
@@ -166,7 +166,7 @@ class TekstformatererVarselbrevTest {
     void skal_ikke_sette_tidligste_og_seneste_dato_når_det_foreligger_flere_perioder() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(foreldrepengerkode)
-                .medSprakkode(Språkkode.en)
+                .medSprakkode(Språkkode.EN)
                 .medFagsaktypenavnPåSpråk("foreldrepengar")
                 .medMottakerAdresse(lagAdresseInfo())
                 .medSakspartNavn("Test")
@@ -223,7 +223,7 @@ class TekstformatererVarselbrevTest {
     void skal_generere_varselbrev_overskrift() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .build();
 
         String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(brevMetadata);
@@ -235,7 +235,7 @@ class TekstformatererVarselbrevTest {
     void skal_generere_varselbrev_overskrift_nynorsk() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktypenavnPåSpråk("foreldrepengar")
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .build();
 
         String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(brevMetadata);
@@ -247,7 +247,7 @@ class TekstformatererVarselbrevTest {
     void skal_generere_korrigert_varselbrev_overskrift() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .build();
 
         String overskrift = TekstformatererVarselbrev.lagKorrigertVarselbrevOverskrift(brevMetadata);
@@ -259,7 +259,7 @@ class TekstformatererVarselbrevTest {
     void skal_generere_korrigert_varselbrev_overskrift_nynorsk() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktypenavnPåSpråk("foreldrepengar")
-                .medSprakkode(Språkkode.nn)
+                .medSprakkode(Språkkode.NN)
                 .build();
 
         String overskrift = TekstformatererVarselbrev.lagKorrigertVarselbrevOverskrift(brevMetadata);
@@ -272,7 +272,7 @@ class TekstformatererVarselbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.ENGANGSTØNAD)
                 .medFagsaktypenavnPåSpråk("engangstønad")
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .build();
 
         String overskrift = TekstformatererVarselbrev.lagKorrigertVarselbrevOverskrift(brevMetadata);
@@ -285,7 +285,7 @@ class TekstformatererVarselbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
                 .medFagsaktype(FagsakYtelseType.ENGANGSTØNAD)
                 .medFagsaktypenavnPåSpråk("eingongstønad")
-                .medSprakkode(Språkkode.nn)
+                .medSprakkode(Språkkode.NN)
                 .build();
 
         String overskrift = TekstformatererVarselbrev.lagKorrigertVarselbrevOverskrift(brevMetadata);
@@ -297,7 +297,7 @@ class TekstformatererVarselbrevTest {
     void skal_generere_varselbrev_for_verge() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
                 .medFagsaktype(foreldrepengerkode)
-                .medSprakkode(Språkkode.nb)
+                .medSprakkode(Språkkode.NB)
                 .medFagsaktypenavnPåSpråk("foreldrepenger")
                 .medMottakerAdresse(lagAdresseInfo())
                 .medSakspartNavn("Test")

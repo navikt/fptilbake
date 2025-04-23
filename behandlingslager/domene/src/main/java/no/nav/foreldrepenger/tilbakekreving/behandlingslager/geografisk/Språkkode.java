@@ -13,12 +13,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 
 public enum Språkkode implements Kodeverdi {
-    nb("NB"),
-    nn("NN"),
-    en("en"),
+    NB("NB"),
+    NN("NN"),
+    EN("EN"),
     UDEFINERT("-");
 
-    public static final Språkkode DEFAULT = Språkkode.nb;
+    public static final Språkkode DEFAULT = Språkkode.NB;
     public static final String KODEVERK = "SPRAAK_KODE";
     private static final Map<String, Språkkode> KODER = new LinkedHashMap<>();
 
@@ -32,7 +32,6 @@ public enum Språkkode implements Kodeverdi {
         }
     }
 
-
     Språkkode(String kode) {
         this.kode = kode;
     }
@@ -43,7 +42,7 @@ public enum Språkkode implements Kodeverdi {
         }
         var ad = KODER.get(kode);
         if (ad == null) {
-            return Språkkode.nb;
+            return Språkkode.NB;
         }
         return ad;
     }

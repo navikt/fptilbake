@@ -118,12 +118,12 @@ public class VedtakHjemmel {
 
         Hjemler(String bokmål, String nynorsk) {
             hjemmelTekster = new HashMap<>();
-            hjemmelTekster.put(Språkkode.nb, bokmål);
-            hjemmelTekster.put(Språkkode.nn, nynorsk);
+            hjemmelTekster.put(Språkkode.NB, bokmål);
+            hjemmelTekster.put(Språkkode.NN, nynorsk);
         }
 
         String hjemmelTekst(Språkkode språkkode) {
-            return hjemmelTekster.getOrDefault(språkkode, hjemmelTekster.get(Språkkode.nb));
+            return hjemmelTekster.getOrDefault(språkkode, hjemmelTekster.get(Språkkode.NB));
         }
     }
 }
