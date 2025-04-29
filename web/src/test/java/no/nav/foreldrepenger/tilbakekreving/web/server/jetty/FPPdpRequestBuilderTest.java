@@ -17,7 +17,6 @@ import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.FPPdpRequestBuilder;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.FpsakPipKlient;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -37,16 +36,15 @@ class FPPdpRequestBuilderTest {
     private static final String SAKSBEHANDLER = "Z12345";
 
     private final PipRepository pipRepository = mock(PipRepository.class);
-    private final FpsakPipKlient fpsakPipKlient = mock(FpsakPipKlient.class);
 
-    private final FPPdpRequestBuilder requestBuilder = new FPPdpRequestBuilder(pipRepository, fpsakPipKlient);
+    private final FPPdpRequestBuilder requestBuilder = new FPPdpRequestBuilder(pipRepository);
 
     @Test
     void skal_hente_behandling_og_fagsak_informasjon_når_input_er_behandling_id() {
         var attributter = AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID);
 
         when(pipRepository.hentBehandlingData(BEHANDLING_ID))
-                .thenReturn(returnData(true, true));
+                .thenReturn(returnData(true));
 
         var request = requestBuilder.lagAppRessursData(attributter);
         assertThat(request.getSaksnummer()).isEqualTo(SAKSNUMMER);
@@ -60,7 +58,7 @@ class FPPdpRequestBuilderTest {
         var attributter = AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID);
 
         when(pipRepository.hentBehandlingData(BEHANDLING_UUID))
-                .thenReturn(returnData(true, true));
+                .thenReturn(returnData(true));
 
         var request = requestBuilder.lagAppRessursData(attributter);
         assertThat(request.getSaksnummer()).isEqualTo(SAKSNUMMER);
@@ -73,28 +71,13 @@ class FPPdpRequestBuilderTest {
     void skal_hente_behandlinginfo_fra_fpsak_når_input_er_fpsak_behandlingid() {
         var attributter = AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID);
 
-        when(fpsakPipKlient.saksnummerForBehandling(FPSAK_BEHANDLING_UUID)).thenReturn(SAKSNUMMER);
-
         var request = requestBuilder.lagAppRessursData(attributter);
-        assertThat(request.getSaksnummer()).isEqualTo(SAKSNUMMER);
+        assertThat(request.getSaksnummer()).isNull();
+        assertThat(request.getBehandling()).isEqualTo(FPSAK_BEHANDLING_UUID);
         assertThat(request.getResource(ForeldrepengerDataKeys.SAKSBEHANDLER)).isNull();
         assertThat(request.getResource(ForeldrepengerDataKeys.FAGSAK_STATUS).verdi()).isEqualTo(PipFagsakStatus.UNDER_BEHANDLING.getVerdi());
         assertThat(request.getResource(ForeldrepengerDataKeys.BEHANDLING_STATUS).verdi()).isEqualTo(PipBehandlingStatus.UTREDES.getVerdi());
     }
-
-    @Test
-    void skal_hente_behandlinginfo_fra_fpsak_når_input_er_fpsak_behandlingid_avsluttet_sak() {
-        var attributter = AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID);
-
-        when(fpsakPipKlient.saksnummerForBehandling(FPSAK_BEHANDLING_UUID)).thenReturn(SAKSNUMMER);
-
-        var request = requestBuilder.lagAppRessursData(attributter);
-        assertThat(request.getSaksnummer()).isEqualTo(SAKSNUMMER);
-        assertThat(request.getResource(ForeldrepengerDataKeys.SAKSBEHANDLER)).isNull();
-        assertThat(request.getResource(ForeldrepengerDataKeys.FAGSAK_STATUS).verdi()).isEqualTo(PipFagsakStatus.UNDER_BEHANDLING.getVerdi());
-        assertThat(request.getResource(ForeldrepengerDataKeys.BEHANDLING_STATUS).verdi()).isEqualTo(PipBehandlingStatus.UTREDES.getVerdi());
-    }
-
 
     @Test
     void skal_ikke_hente_aktører_fra_fpsak_når_input_er_saksnummer() {
@@ -110,7 +93,7 @@ class FPPdpRequestBuilderTest {
         var attributter = AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID);
 
         when(pipRepository.hentBehandlingData(BEHANDLING_ID))
-                .thenReturn(returnData(true, false));
+                .thenReturn(returnData(false));
 
         var request = requestBuilder.lagAppRessursData(attributter);
         assertThat(request.getSaksnummer()).isEqualTo(SAKSNUMMER);
@@ -163,14 +146,11 @@ class FPPdpRequestBuilderTest {
                 .hasMessageContainingAll("FPT-426124", BEHANDLING_UUID.toString(), FPSAK_BEHANDLING_UUID.toString());
     }
 
-    private Optional<PipBehandlingData> returnData(boolean notEmpty, boolean mAnsvarligSaksbehandler) {
-        if (notEmpty) {
-            var bruksaksbehandler = mAnsvarligSaksbehandler ? SAKSBEHANDLER : null;
-            var data = new PipBehandlingData(BEHANDLING_ID, BEHANDLING_UUID, new Saksnummer(SAKSNUMMER), new AktørId(PERSON1),
-                BEHANDLING_STATUS, bruksaksbehandler);
-            return Optional.of(data);
-        }
-        return Optional.empty();
+    private Optional<PipBehandlingData> returnData(boolean mAnsvarligSaksbehandler) {
+        var bruksaksbehandler = mAnsvarligSaksbehandler ? SAKSBEHANDLER : null;
+        var data = new PipBehandlingData(BEHANDLING_ID, BEHANDLING_UUID, new Saksnummer(SAKSNUMMER), new AktørId(PERSON1),
+            BEHANDLING_STATUS, bruksaksbehandler);
+        return Optional.of(data);
     }
 
 }

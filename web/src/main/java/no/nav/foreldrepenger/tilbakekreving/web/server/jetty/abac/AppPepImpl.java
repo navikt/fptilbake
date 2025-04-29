@@ -11,7 +11,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.AppPdpKl
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.K9AbacResultat;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.K9SystemressursPolicies;
 import no.nav.vedtak.sikkerhet.abac.AbacAuditlogger;
-import no.nav.vedtak.sikkerhet.abac.AbacResultat;
 import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 import no.nav.vedtak.sikkerhet.abac.PepImpl;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
@@ -19,6 +18,7 @@ import no.nav.vedtak.sikkerhet.abac.internal.BeskyttetRessursAttributter;
 import no.nav.vedtak.sikkerhet.kontekst.IdentType;
 import no.nav.vedtak.sikkerhet.tilgang.AnsattGruppeKlient;
 import no.nav.vedtak.sikkerhet.tilgang.PopulasjonKlient;
+import no.nav.vedtak.sikkerhet.tilgang.TilgangResultat;
 
 @Default
 @Alternative
@@ -38,7 +38,7 @@ public class AppPepImpl extends PepImpl {
     }
 
     @Override
-    public AbacResultat vurderTilgang(BeskyttetRessursAttributter beskyttetRessursAttributter) {
+    public TilgangResultat vurderTilgang(BeskyttetRessursAttributter beskyttetRessursAttributter) {
         var applikasjon = ApplicationName.hvilkenTilbake();
         switch (applikasjon) {
             case FPTILBAKE -> {
@@ -63,13 +63,13 @@ public class AppPepImpl extends PepImpl {
         }
     }
 
-    private static AbacResultat mapK9AbacResultat(K9AbacResultat resultat) {
+    private static TilgangResultat mapK9AbacResultat(K9AbacResultat resultat) {
         return switch (resultat) {
-            case GODKJENT -> AbacResultat.GODKJENT;
-            case AVSLÅTT_KODE_7 -> AbacResultat.AVSLÅTT_KODE_7;
-            case AVSLÅTT_KODE_6 -> AbacResultat.AVSLÅTT_KODE_6;
-            case AVSLÅTT_EGEN_ANSATT -> AbacResultat.AVSLÅTT_EGEN_ANSATT;
-            case AVSLÅTT_ANNEN_ÅRSAK -> AbacResultat.AVSLÅTT_ANNEN_ÅRSAK;
+            case GODKJENT -> TilgangResultat.GODKJENT;
+            case AVSLÅTT_KODE_7 -> TilgangResultat.AVSLÅTT_KODE_7;
+            case AVSLÅTT_KODE_6 -> TilgangResultat.AVSLÅTT_KODE_6;
+            case AVSLÅTT_EGEN_ANSATT -> TilgangResultat.AVSLÅTT_EGEN_ANSATT;
+            case AVSLÅTT_ANNEN_ÅRSAK -> TilgangResultat.AVSLÅTT_ANNEN_ÅRSAK;
         };
     }
 

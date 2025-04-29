@@ -11,7 +11,6 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.exception.TekniskException;
@@ -20,7 +19,6 @@ import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
-import no.nav.vedtak.sikkerhet.abac.pipdata.PipAktørId;
 import no.nav.vedtak.sikkerhet.abac.pipdata.PipBehandlingStatus;
 import no.nav.vedtak.sikkerhet.abac.pipdata.PipFagsakStatus;
 
@@ -35,33 +33,36 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private PipRepository pipRepository;
-    private FpsakPipKlient fpsakPipKlient;
 
     FPPdpRequestBuilder() {
         // For CDI proxy
     }
 
     @Inject
-    public FPPdpRequestBuilder(PipRepository pipRepository, FpsakPipKlient fpsakPipKlient) {
+    public FPPdpRequestBuilder(PipRepository pipRepository) {
         this.pipRepository = pipRepository;
-        this.fpsakPipKlient = fpsakPipKlient;
     }
 
     @Override
     public  AppRessursData lagAppRessursData(AbacDataAttributter dataAttributter) {
-        var behandlingData = utledBehandlingData(dataAttributter, true);
+        var behandlingData = utledBehandlingData(dataAttributter);
         var saksnummer = utledSaksnummer(dataAttributter, behandlingData);
         setLogContext(saksnummer, behandlingData);
 
-        var auditAktørId = utledAuditAktørId(dataAttributter, behandlingData, saksnummer);
 
+        var behandlingStatus = Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::statusForBehandling).orElse(PipBehandlingStatus.UTREDES);
         var ressursData = AppRessursData.builder()
-            .medAuditIdent(auditAktørId)
-            .leggTilAktørIdSet(dataAttributter.getVerdier(StandardAbacAttributtType.AKTØR_ID))
-            .leggTilFødselsnumre(dataAttributter.getVerdier(StandardAbacAttributtType.FNR));
+            .leggTilIdenter(dataAttributter.getVerdier(StandardAbacAttributtType.AKTØR_ID))
+            .leggTilIdenter(dataAttributter.getVerdier(StandardAbacAttributtType.FNR))
+            .medFagsakStatus(PipFagsakStatus.UNDER_BEHANDLING)
+            .medBehandlingStatus(behandlingStatus);
 
-        saksnummer.ifPresent(ressursData::medSaksnummer);
-        ressursData.medFagsakStatus(PipFagsakStatus.UNDER_BEHANDLING);
+        if (saksnummer.isPresent()) {
+            ressursData.medSaksnummer(saksnummer.get());
+        } else if (behandlingData != null && behandlingData.fpsakUuid() != null) {
+            ressursData.medBehandling(behandlingData.fpsakUuid());
+        }
+
         Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::statusForBehandling).ifPresent(ressursData::medBehandlingStatus);
         Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::ansvarligSaksbehandler).ifPresent(ressursData::medAnsvarligSaksbehandler);
 
@@ -70,14 +71,15 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
 
     @Override
     public  AppRessursData lagAppRessursDataForSystembruker(AbacDataAttributter dataAttributter) {
-        var behandlingData = utledBehandlingData(dataAttributter, false);
+        var behandlingData = utledBehandlingData(dataAttributter);
         var saksnummer = utledSaksnummer(dataAttributter, behandlingData);
 
         setLogContext(saksnummer, behandlingData);
 
+        var behandlingStatus = Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::statusForBehandling).orElse(PipBehandlingStatus.UTREDES);
         var ressursData = AppRessursData.builder()
-            .medFagsakStatus(PipFagsakStatus.UNDER_BEHANDLING);
-        Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::statusForBehandling).ifPresent(ressursData::medBehandlingStatus);
+            .medFagsakStatus(PipFagsakStatus.UNDER_BEHANDLING)
+            .medBehandlingStatus(behandlingStatus);
         return ressursData.build();
     }
 
@@ -91,7 +93,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         Optional.ofNullable(data).map(FpPipBehandlingInfo::behandlingId).ifPresent(bd -> LOG_CONTEXT.add("behandlingId", String.valueOf(bd)));
     }
 
-    private FpPipBehandlingInfo utledBehandlingData(AbacDataAttributter dataAttributter, boolean sjekkFpsak) {
+    private FpPipBehandlingInfo utledBehandlingData(AbacDataAttributter dataAttributter) {
         Set<Long> behandlingId = new HashSet<>(dataAttributter.getVerdier(TilbakekrevingAbacAttributtType.BEHANDLING_ID));
         Set<UUID> behandlingUuid = new HashSet<>(dataAttributter.getVerdier(StandardAbacAttributtType.BEHANDLING_UUID));
         Set<UUID> fpsakBehandlingId = new HashSet<>(dataAttributter.getVerdier(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID));
@@ -110,8 +112,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
             return lagBehandlingData(behandlingUuid.stream().findFirst().orElseThrow());
         } else if (!fpsakBehandlingId.isEmpty()) {
             var behandling = fpsakBehandlingId.stream().findFirst().orElseThrow();
-            var sak = sjekkFpsak ? fpsakPipKlient.saksnummerForBehandling(behandling) : null;
-            return new FpPipBehandlingInfo(null, sak, null, behandling, PipBehandlingStatus.UTREDES, null);
+            return new FpPipBehandlingInfo(null, null, null, behandling, PipBehandlingStatus.UTREDES, null, behandling);
         } else {
             return null;
         }
@@ -126,17 +127,6 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
             throw new TekniskException("FPT-426124", tekst);
         }
         return saksnumre.stream().findFirst();
-    }
-
-    private String utledAuditAktørId(AbacDataAttributter attributter, FpPipBehandlingInfo behandlingData, Optional<String> saksnummer) {
-        Set<String> aktørIdVerdier = attributter.getVerdier(StandardAbacAttributtType.AKTØR_ID);
-        Set<String> personIdentVerdier = attributter.getVerdier(StandardAbacAttributtType.FNR);
-
-        return Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::aktørId).map(PipAktørId::getVerdi)
-            .or(() -> aktørIdVerdier.stream().findFirst())
-            .or(() -> personIdentVerdier.stream().findFirst())
-            .or(() -> saksnummer.flatMap(pipRepository::hentAktørIdSomEierFagsak).map(AktørId::getId))
-            .orElse(null);
     }
 
     private FpPipBehandlingInfo lagBehandlingData(Long behandlingId) {
