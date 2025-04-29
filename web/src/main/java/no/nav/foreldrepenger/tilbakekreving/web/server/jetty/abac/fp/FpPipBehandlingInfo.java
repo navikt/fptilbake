@@ -1,21 +1,18 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
-import no.nav.vedtak.sikkerhet.abac.pipdata.PipAktørId;
 import no.nav.vedtak.sikkerhet.abac.pipdata.PipBehandlingStatus;
 
-public record FpPipBehandlingInfo(PipAktørId aktørId, String saksnummer, Long behandlingId, UUID behandlingUuid,
-                                  PipBehandlingStatus statusForBehandling, String ansvarligSaksbehandler) {
+public record FpPipBehandlingInfo(AktørId aktørId, String saksnummer, Long behandlingId, UUID behandlingUuid,
+                                  PipBehandlingStatus statusForBehandling, String ansvarligSaksbehandler, UUID fpsakUuid) {
 
     public FpPipBehandlingInfo(PipBehandlingData data) {
-        this(Optional.ofNullable(data.aktørId()).map(AktørId::getId).map(PipAktørId::new).orElse(null),
-            data.saksnummer().getVerdi(), data.behandlingId(), data.behandlingUuid(),
-            oversettBehandlingStatus(data.behandlingStatus()), data.ansvarligSaksbehandler());
+        this(data.aktørId(), data.saksnummer().getVerdi(), data.behandlingId(), data.behandlingUuid(),
+            oversettBehandlingStatus(data.behandlingStatus()), data.ansvarligSaksbehandler(), null);
     }
 
     private static PipBehandlingStatus oversettBehandlingStatus(BehandlingStatus behandlingStatus) {

@@ -106,21 +106,19 @@ public class OpprettBehandlingDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
+        var attributter = AbacDataAttributter.opprett()
+            .leggTil(saksnummer.abacAttributter());
         if (getBehandlingType().equals(BehandlingType.TILBAKEKREVING)) {
-            return AbacDataAttributter.opprett()
-                    .leggTil(saksnummer.abacAttributter())
-                    .leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, eksternUuid);
+            return attributter.leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, eksternUuid);
         } else if (getBehandlingType().equals(BehandlingType.REVURDERING_TILBAKEKREVING)) {
-            var attributter = AbacDataAttributter.opprett();
             if (behandlingId != null) {
-                attributter.leggTil(TilbakekrevingAbacAttributtType.BEHANDLING_ID, behandlingId);
+                return attributter.leggTil(TilbakekrevingAbacAttributtType.BEHANDLING_ID, behandlingId);
             }
             if (behandlingUuid != null) {
-                attributter.leggTil(StandardAbacAttributtType.BEHANDLING_UUID, behandlingUuid);
+                return attributter.leggTil(StandardAbacAttributtType.BEHANDLING_UUID, behandlingUuid);
             }
-            return attributter;
         }
-        return AbacDataAttributter.opprett();
+        return attributter;
     }
 
 }
