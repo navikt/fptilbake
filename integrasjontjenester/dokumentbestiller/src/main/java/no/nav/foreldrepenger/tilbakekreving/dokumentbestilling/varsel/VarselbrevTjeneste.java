@@ -6,6 +6,7 @@ import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+
 import no.nav.foreldrepenger.kontrakter.simulering.resultat.v1.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
@@ -140,7 +141,7 @@ public class VarselbrevTjeneste {
         // .. splitte eksternDataForBrevTjeneste i 2 (hvorav 1 del er for å hente fra fagsystemet)
         // .. lag 2 implementasjoner av fagsystemdelen
         // .. hentFeilutbetaltePerioder bør ta inn henvisning (eller intern behandlingId) og konvertere til eksernid/uuid
-        FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(henvisning);
+        FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(henvisning, behandling.getUuid(), saksnummer);
 
         VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
         String varselTekst = varselInfo.getVarselTekst();
@@ -168,12 +169,13 @@ public class VarselbrevTjeneste {
         boolean finnesVerge = vergeEntitet.isPresent();
         var brevMottaker = finnesVerge ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
         var fagsakYtelse = Optional.ofNullable(eksternBehandlingsinfo.getFagsak()).map(FagsakDto::getFagsakYtelseType).orElse(FagsakYtelseType.UDEFINERT);
+        var saksnummer = eksternBehandlingsinfo.getSaksnummer();
 
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(fagsakYtelse, eksternBehandlingsinfo.getAktørId().getId());
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(fagsakYtelse, personinfo, brevMottaker, vergeEntitet);
         String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet, adresseinfo);
 
-        FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(grunninformasjon.getHenvisning());
+        FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(grunninformasjon.getHenvisning(), behandlingUuId, saksnummer);
         Språkkode mottakersSpråkkode = grunninformasjon.getSpråkkodeEllerDefault();
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtleseType, mottakersSpråkkode);
         return VarselbrevUtil.sammenstillInfoFraFagsystemerForhåndvisningVarselbrev(

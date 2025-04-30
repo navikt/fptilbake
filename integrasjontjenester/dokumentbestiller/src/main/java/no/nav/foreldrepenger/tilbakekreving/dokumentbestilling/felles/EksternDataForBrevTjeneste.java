@@ -6,6 +6,7 @@ import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+
 import no.nav.foreldrepenger.kontrakter.simulering.resultat.v1.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
@@ -16,6 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
@@ -75,8 +77,8 @@ public class EksternDataForBrevTjeneste {
         return fra(virksomhet, vergeNavn, personinfo, brevMottaker);
     }
 
-    public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning) {
-        return fagsystemKlient.hentFeilutbetaltePerioder(henvisning);
+    public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning, UUID behandlingUuid, Saksnummer saksnummer) {
+        return fagsystemKlient.hentFeilutbetaltePerioder(henvisning, behandlingUuid, Optional.ofNullable(saksnummer).map(Saksnummer::getVerdi).orElse(null));
     }
 
     //TODO dette er ikke ekstern data, flytt til annen tjeneste
