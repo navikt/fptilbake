@@ -39,7 +39,7 @@
         <prosesstask.version>5.1.5</prosesstask.version>
         <fpkontrakter.version>9.2.7</fpkontrakter.version>
         <abakus-kontrakt.version>2.3.2</abakus-kontrakt.version>
-        <verapdf-validation-model.version>1.26.5</verapdf-validation-model.version>
+        <verapdf-validation-model.version>1.28.1</verapdf-validation-model.version>
         <!-- Jakarta deps end -->
 
         <fp-tidsserie.version>2.7.3</fp-tidsserie.version>
