@@ -154,8 +154,13 @@ public class FpsakKlient implements FagsystemKlient {
 
     @Override
     public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning) {
+        throw new IllegalStateException("Utviklerfeil: Kall metoden med flere parametre");
+    }
+
+    @Override
+    public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning, UUID behandlingUuid, String saksnummer) {
         long fpsakBehandlingId = henvisning.toLong();
-        return fpoppdragKlient.hentFeilutbetaltePerioder(fpsakBehandlingId)
+        return fpoppdragKlient.hentFeilutbetaltePerioder(fpsakBehandlingId, behandlingUuid, saksnummer)
                 .orElseThrow(() -> new IntegrasjonException("FPT-748279", String.format("Fant ikke behandling med behandlingId %s fpoppdrag", fpsakBehandlingId)));
     }
 

@@ -2,8 +2,10 @@ package no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering;
 
 import java.net.URI;
 import java.util.Optional;
+import java.util.UUID;
 
 import jakarta.ws.rs.core.UriBuilder;
+
 import no.nav.foreldrepenger.kontrakter.simulering.resultat.v1.FeilutbetaltePerioderDto;
 import no.nav.vedtak.felles.integrasjon.rest.FpApplication;
 import no.nav.vedtak.felles.integrasjon.rest.RestClient;
@@ -25,9 +27,13 @@ public class FpoppdragRestKlient {
         this.target = UriBuilder.fromUri(restConfig.fpContextPath()).path("/api/simulering/feilutbetalte-perioder").build();
     }
 
-    public Optional<FeilutbetaltePerioderDto> hentFeilutbetaltePerioder(long fpsakBehandlingId) {
-        var request = RestRequest.newPOSTJson(new BehandlingIdDto(fpsakBehandlingId), target, restConfig);
+    public Optional<FeilutbetaltePerioderDto> hentFeilutbetaltePerioder(long fpsakBehandlingId, UUID behandlingUuid, String saksnummer) {
+        var request = RestRequest.newPOSTJson(new BehandlingIdDto(fpsakBehandlingId, behandlingUuid, saksnummer), target, restConfig);
         return restClient.sendReturnOptional(request, FeilutbetaltePerioderDto.class);
     }
+
+    public record BehandlingIdDto(Long behandlingId,
+                                  UUID behandlingUuid,
+                                  String saksnummer) { }
 
 }

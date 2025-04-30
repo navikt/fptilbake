@@ -28,4 +28,8 @@ public interface FagsystemKlient {
 
     FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning);
 
+    default FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning, UUID behandlingUuid, String saksnummer) {;
+        return hentFeilutbetaltePerioder(henvisning);
+    }
+
 }
