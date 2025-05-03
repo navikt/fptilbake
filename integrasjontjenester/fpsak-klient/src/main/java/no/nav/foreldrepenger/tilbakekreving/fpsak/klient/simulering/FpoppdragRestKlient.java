@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import jakarta.ws.rs.core.UriBuilder;
 
+import no.nav.foreldrepenger.kontrakter.simulering.resultat.request.SimuleringResultatRequest;
 import no.nav.foreldrepenger.kontrakter.simulering.resultat.v1.FeilutbetaltePerioderDto;
 import no.nav.vedtak.felles.integrasjon.rest.FpApplication;
 import no.nav.vedtak.felles.integrasjon.rest.RestClient;
@@ -28,12 +29,7 @@ public class FpoppdragRestKlient {
     }
 
     public Optional<FeilutbetaltePerioderDto> hentFeilutbetaltePerioder(long fpsakBehandlingId, UUID behandlingUuid, String saksnummer) {
-        var request = RestRequest.newPOSTJson(new BehandlingIdDto(fpsakBehandlingId, behandlingUuid, saksnummer), target, restConfig);
+        var request = RestRequest.newPOSTJson(new SimuleringResultatRequest(fpsakBehandlingId, behandlingUuid, saksnummer), target, restConfig);
         return restClient.sendReturnOptional(request, FeilutbetaltePerioderDto.class);
     }
-
-    public record BehandlingIdDto(Long behandlingId,
-                                  UUID behandlingUuid,
-                                  String saksnummer) { }
-
 }
