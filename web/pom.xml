@@ -365,11 +365,5 @@
             <artifactId>domene-testutilities</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <artifactId>jcip-annotations</artifactId>
-            <groupId>net.jcip</groupId>
-            <version>RELEASE</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 </project>
