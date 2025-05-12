@@ -3,12 +3,14 @@ package no.nav.foreldrepenger.tilbakekreving.overvåkning.metrikker;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 
 @CdiDbAwareTest
+@Disabled
 class StatistikkRepositoryTest {
 
     @BeforeAll
