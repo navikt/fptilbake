@@ -12,8 +12,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -52,7 +51,6 @@ class PdpKlientImplTest {
 
     private static String APP_NAME;
 
-
     private AppPdpKlientImpl pdpKlient;
     @Mock
     private TokenProvider tokenProvider;
@@ -63,14 +61,14 @@ class PdpKlientImplTest {
     @Mock
     private K9PdpRequestBuilder pdpRequestBuilder;
 
-    @BeforeAll
-    static void beforeAll() {
+    @BeforeEach
+    void setup() {
         APP_NAME = System.getProperty("app.name");
         System.setProperty("app.name", "k9-tilbake");
     }
 
-    @AfterAll
-    static void afterAll() {
+    @AfterEach
+    void teardown() {
         if (APP_NAME != null) {
             System.setProperty("app.name", APP_NAME);
         } else {
