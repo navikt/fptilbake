@@ -2,8 +2,8 @@
   <configuration default="false" name="web/generate k9-tilbake typescript client" type="docker-deploy" factoryName="docker-image" server-name="Docker">
     <deployment type="docker-image">
       <settings>
-        <option name="imageTag" value="europe-north1-docker.pkg.dev/nais-management-233d/k9saksbehandling/navikt/openapi-ts-clientmaker-cli:v1" />
-        <option name="command" value="-- --openapi-spec-file in/k9-tilbake.openapi.json --package-json-file in/package.json --client-name K9TilbakeClient" />
+        <option name="imageTag" value="europe-north1-docker.pkg.dev/nais-management-233d/k9saksbehandling/navikt/openapi-ts-clientmaker-cli:v2" />
+        <option name="command" value="-- --openapi-spec-file in/k9-tilbake.openapi.json --package-json-file in/package.json" />
         <option name="containerName" value="openapi-ts-clientmaker-cli" />
         <option name="volumeBindings">
           <list>
