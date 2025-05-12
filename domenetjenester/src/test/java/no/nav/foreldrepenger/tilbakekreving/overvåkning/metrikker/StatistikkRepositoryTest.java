@@ -1,25 +1,24 @@
 package no.nav.foreldrepenger.tilbakekreving.overvåkning.metrikker;
 
+import jakarta.inject.Inject;
+
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 
 @CdiDbAwareTest
-@Disabled
 class StatistikkRepositoryTest {
 
-    @BeforeAll
-    static void beforeAll() {
+    @BeforeEach
+    void setup() {
         System.setProperty("app.name", "k9-tilbake");
     }
 
-    @AfterAll
-    static void afterAll() {
+    @AfterEach
+    void teardown() {
         System.clearProperty("app.name");
     }
 

@@ -5,21 +5,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Map;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@Disabled
 class SensuEventTest {
 
-    @BeforeAll
-    static void beforeAll() {
+    @BeforeEach
+    void setup() {
         System.setProperty("app.name", "k9-tilbake");
     }
 
-    @AfterAll
-    static void afterAll() {
+    @AfterEach
+    void teardown() {
         System.clearProperty("app.name");
     }
 
