@@ -84,7 +84,6 @@
     <option name="MAIN_CLASS_NAME" value="no.nav.foreldrepenger.tilbakekreving.web.app.util.OpenapiGenerate" />
     <module name="webapp" />
     <option name="PROGRAM_PARAMETERS" value="src/main/resources/openapi-ts-client/k9/k9-tilbake.openapi.json" />
-    <option name="VM_PARAMETERS" value="-Dapp.name=k9-tilbake" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/web" />
     <method v="2">
       <option name="Make" enabled="true" />
