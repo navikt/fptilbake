@@ -37,18 +37,34 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-        # TODO: Bruk main versjon når denne er testa og merged:
-      - uses: navikt/sif-gha-workflows/.github/actions/maven/generate-openapi@generate-openapi-dontCommit
-        id: generate-openapi
+      - uses: navikt/fp-gha-workflows/.github/actions/setup-java-and-maven@main
         with:
-          readerToken: ${{ secrets.READER_TOKEN }}
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          openapiFileName: k9/k9-tilbake.openapi.json
-          dontCommit: 'true'
+          github-token: ${{ secrets.READER_TOKEN }}
+      - uses: navikt/fp-gha-workflows/.github/actions/build-maven-application@main
+        with:
+          skip-tests: 'true'
+      - name: Openapi generate
+        shell: bash
+        run: mvn exec:java --projects web
+      - name: Openapi version
+        id: openapi-version
+        shell: bash
+        # extract version number from generated openapi.json
+        run: |
+          echo "openapiVersion=$(jq --exit-status --raw-output '.info.version | capture("^(?<major>\\d+)\\.(?<minor>\\d+)$") | .major + "." + .minor' ./web/src/main/resources/openapi-ts-client/${{ inputs.openapiFileName }} || echo 'FEIL')" >> $GITHUB_OUTPUT
+      - name: Feilsjekk OPENAPI_VERSION
+        if: "${{ env.OPENAPI_VERSION == 'FEIL'}}"
+        env:
+          OPENAPI_VERSION: "${{ steps.openapi-version.outputs.openapiVersion }}"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.setFailed('fant ikkje korrekt openapi version frå ${{ inputs.openapiFileName }}')
+
       - uses: ./.github/actions/generate-typescript-client
         id: generate-typescript
         with:
-          openapiVersion: ${{ steps.generate-openapi.outputs.openapiVersion }}
+          openapiVersion: ${{ steps.openapi-version.outputs.openapiVersion }}
           patchVersion: ${{ needs.build-app.outputs.build-version }}
       # XXX Her kunne vi også gjere kompileringssjekk med k9-sak-web, slik vi gjere for k9-sak, k9-klage, etc.
       # check if built typescript client has changed from last published
