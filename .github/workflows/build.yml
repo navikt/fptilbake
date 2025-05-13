@@ -29,6 +29,44 @@ jobs:
       push-image: ${{ github.ref_name == 'master' }} # default: false
     secrets: inherit
 
+  typescript-client:
+    name: Build typescript client
+    runs-on: ubuntu-latest
+    needs: build-app
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        # TODO: Bruk main versjon når denne er testa og merged:
+      - uses: navikt/sif-gha-workflows/.github/actions/maven/generate-openapi@generate-openapi-dontCommit
+        id: generate-openapi
+        with:
+          readerToken: ${{ secrets.READER_TOKEN }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          openapiFileName: k9/k9-tilbake.openapi.json
+          dontCommit: 'true'
+      - uses: ./.github/actions/generate-typescript-client
+        id: generate-typescript
+        with:
+          openapiVersion: ${{ steps.generate-openapi.outputs.openapiVersion }}
+          patchVersion: ${{ needs.build-app.outputs.build-version }}
+      # XXX Her kunne vi også gjere kompileringssjekk med k9-sak-web, slik vi gjere for k9-sak, k9-klage, etc.
+      # check if built typescript client has changed from last published
+      - uses: navikt/openapi-ts-clientmaker/extra/actions/compare-with-published@v2
+        id: compare-with-published
+        with:
+          localPath: "${{ steps.generate-typescript.outputs.resultDir }}"
+          npmPackageName: k9-tilbake-typescript-client
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+      # if changed, publish
+      - uses: navikt/openapi-ts-clientmaker/extra/actions/publish-typescript-client@v2
+        if: |
+          github.ref_name == github.event.repository.default_branch &&
+          steps.compare-with-published.outputs.changed == 'true'
+        with:
+          contentPath: "${{ steps.generate-typescript.outputs.resultDir }}"
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
   publish-image-k9:
     # målet her er at k9-verdikjede skal kunne hente imaget for k9-tilbake
     # enkleste vei ser ut til å bygge på nytt og puhse til k9sakbehandling i GAR
