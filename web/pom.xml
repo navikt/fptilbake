@@ -91,6 +91,12 @@
                 <configuration>
                     <mainClass>no.nav.foreldrepenger.tilbakekreving.web.app.util.OpenapiGenerate</mainClass>
                     <classpathScope>compile</classpathScope>
+                    <systemProperties>
+                        <systemProperty>
+                            <key>app.name</key>
+                            <value>k9-tilbake</value>
+                        </systemProperty>
+                    </systemProperties>
                     <arguments>
                         <argument>${project.build.sourceDirectory}/../resources/openapi-ts-client/k9/k9-tilbake.openapi.json</argument>
                     </arguments>
