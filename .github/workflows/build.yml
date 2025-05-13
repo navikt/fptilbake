@@ -35,6 +35,8 @@ jobs:
     needs: build-app
     permissions:
       contents: read
+      packages: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: navikt/fp-gha-workflows/.github/actions/setup-java-and-maven@main
@@ -42,7 +44,7 @@ jobs:
           github-token: ${{ secrets.READER_TOKEN }}
       - uses: navikt/fp-gha-workflows/.github/actions/build-maven-application@main
         with:
-          skip-tests: 'true'
+          skip-tests: true
       - name: Openapi generate
         shell: bash
         run: mvn exec:java --projects web
