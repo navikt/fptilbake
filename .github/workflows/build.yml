@@ -37,6 +37,8 @@ jobs:
       contents: read
       packages: write
       id-token: write
+    env:
+      OPENAPI_FILE: k9/k9-tilbake.openapi.json
     steps:
       - uses: actions/checkout@v4
       - uses: navikt/fp-gha-workflows/.github/actions/setup-java-and-maven@main
@@ -53,7 +55,7 @@ jobs:
         shell: bash
         # extract version number from generated openapi.json
         run: |
-          echo "openapiVersion=$(jq --exit-status --raw-output '.info.version | capture("^(?<major>\\d+)\\.(?<minor>\\d+)$") | .major + "." + .minor' ./web/src/main/resources/openapi-ts-client/${{ inputs.openapiFileName }} || echo 'FEIL')" >> $GITHUB_OUTPUT
+          echo "openapiVersion=$(jq --exit-status --raw-output '.info.version | capture("^(?<major>\\d+)\\.(?<minor>\\d+)$") | .major + "." + .minor' ./web/src/main/resources/openapi-ts-client/${{ env.OPENAPI_FILE }} || echo 'FEIL')" >> $GITHUB_OUTPUT
       - name: Feilsjekk OPENAPI_VERSION
         if: "${{ env.OPENAPI_VERSION == 'FEIL'}}"
         env:
@@ -61,7 +63,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            core.setFailed('fant ikkje korrekt openapi version frå ${{ inputs.openapiFileName }}')
+            core.setFailed('fant ikkje korrekt openapi version frå ${{ env.OPENAPI_FILE }}')
 
       - uses: ./.github/actions/generate-typescript-client
         id: generate-typescript
