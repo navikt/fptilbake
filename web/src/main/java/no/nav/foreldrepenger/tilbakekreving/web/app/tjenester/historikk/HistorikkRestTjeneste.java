@@ -20,13 +20,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.HistorikkTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.historikk.HistorikkinnslagDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
-
-import java.util.List;
 
 @Path(HISTORIKK_PATH)
 @ApplicationScoped
@@ -52,10 +49,11 @@ public class HistorikkRestTjeneste {
     @Operation(tags = "historikk", description = "Henter alle historikkinnslag for gitt behandling.")
     @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public List<HistorikkinnslagDto> hentAlleInnslagV2(@NotNull @QueryParam("saksnummer")
+    public Response hentAlleInnslagV2(@NotNull @QueryParam("saksnummer")
                                     @Parameter(description = "Saksnummer må være et eksisterende saksnummer")
                                     @Valid SaksnummerDto saksnummerDto) {
-        return historikkTjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()));
+        var historikkInnslagDtoList = historikkTjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()));
+        return Response.ok().entity(historikkInnslagDtoList).build();
     }
 
 }
