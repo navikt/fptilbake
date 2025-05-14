@@ -62,7 +62,7 @@ jobs:
       - uses: navikt/openapi-ts-clientmaker/extra/actions/publish-typescript-client@v2
         if: |
           github.ref_name == 'publish-k9-tilbake-typescript-client-2' &&
-          steps.compare-with-published.outputs.changed == 'true'
+          steps.compare-with-published.outputs.hasChanged == 'true'
         with:
           contentPath: "${{ steps.generate-typescript.outputs.resultDir }}"
           githubToken: ${{ secrets.GITHUB_TOKEN }}
