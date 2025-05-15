@@ -66,11 +66,11 @@ public class AppPdpKlientImpl {
         var appRessursData = pdpRequestBuilder.lagAppRessursData(beskyttetRessursAttributter.getDataAttributter());
         K9AbacResultat hovedresultat = switch (konfigurasjon) {
             case "abac-k9":
-                yield forespøTilgangAbacK9(beskyttetRessursAttributter, appRessursData);
+                yield forespørTilgangAbacK9(beskyttetRessursAttributter, appRessursData);
             case "sif-abac-pdp":
                 yield mapResultat(forespørTilgangSifAbacPdp(beskyttetRessursAttributter, appRessursData));
             case "begge": {
-                K9AbacResultat resultatGammel = forespøTilgangAbacK9(beskyttetRessursAttributter, appRessursData);
+                K9AbacResultat resultatGammel = forespørTilgangAbacK9(beskyttetRessursAttributter, appRessursData);
                 try {
                     Tilgangsbeslutning resultatNy = forespørTilgangSifAbacPdp(beskyttetRessursAttributter, appRessursData);
                     K9AbacResultat resultatNyMapped = mapResultat(resultatNy);
@@ -93,7 +93,7 @@ public class AppPdpKlientImpl {
         return hovedresultat;
     }
 
-    private K9AbacResultat forespøTilgangAbacK9(BeskyttetRessursAttributter beskyttetRessursAttributter, K9AppRessursData appRessursData) {
+    private K9AbacResultat forespørTilgangAbacK9(BeskyttetRessursAttributter beskyttetRessursAttributter, K9AppRessursData appRessursData) {
         var token = Token.withOidcToken(tokenProvider.openIdToken());
         var request = XacmlRequestMapper.lagXacmlRequest(beskyttetRessursAttributter, DOMENE, appRessursData, token);
         var response = pdp.evaluate(request);
