@@ -46,7 +46,8 @@
     "METRIKKER_KRAVGRUNNLAG_OPPDATERINGSPERIODE" : "P2W",
     "VEDTAKSBREV_JOIN_PERIODER" : "true",
     "TOGGLE_AIVEN_LOS" : "true",
-    "TOGGLE_ENABLE_SENSU" : "true"
+    "TOGGLE_ENABLE_SENSU" : "true",
+    "VALGT_PDP_K9" : "abac-k9"
   },
   "AZURE_REPLY_URL" :  "https://k9.intern.nav.no/k9/tilbake/cb",
   "AZURE_IAC_RULES": [
