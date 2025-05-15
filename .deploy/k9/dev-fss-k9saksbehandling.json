@@ -24,6 +24,7 @@
     "PDL_BASE_URL": "http://pdl-api.pdl/graphql",
     "PDL_TEMA": "OMS",
     "PDL_SCOPES": "api://dev-fss.pdl.pdl-api/.default",
+    "SIF_ABAC_PDP_SCOPE" : "api://dev-fss.k9saksbehandling.sif-abac-pdp/.default",
     "K9SAK_SCOPES": "api://dev-fss.k9saksbehandling.k9-sak/.default",
     "K9SAK_URL": "http://k9-sak.k9saksbehandling",
     "K9OPPDRAG_SCOPES": "api://dev-fss.k9saksbehandling.k9-oppdrag/.default",
@@ -52,7 +53,8 @@
     "VEDTAKSBREV_JOIN_PERIODER" : "true",
     "AKTIVER_ABAC_LOGGING" : "false",
     "TOGGLE_AIVEN_LOS" : "true",
-    "TOGGLE_ENABLE_SENSU" : "true"
+    "TOGGLE_ENABLE_SENSU" : "true",
+    "VALGT_PDP_K9" : "begge"
   },
   "AZURE_REPLY_URL" :  "https://k9.dev.intern.nav.no/k9/tilbake/cb",
   "AZURE_IAC_RULES": [

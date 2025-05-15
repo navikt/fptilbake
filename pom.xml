@@ -324,6 +324,11 @@
                 <artifactId>abakus-kontrakt</artifactId>
                 <version>${abakus-kontrakt.version}</version>
             </dependency>
+            <dependency>
+                <groupId>no.nav.sif.abac</groupId>
+                <artifactId>kontrakt</artifactId>
+                <version>1.4.0</version>
+            </dependency>
 
             <!-- Eksterne -->
             <dependency>

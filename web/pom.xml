@@ -287,6 +287,10 @@
         </dependency>
         <!-- k9tilbake -->
         <dependency>
+            <groupId>no.nav.sif.abac</groupId>
+            <artifactId>kontrakt</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-security</artifactId>
         </dependency>
