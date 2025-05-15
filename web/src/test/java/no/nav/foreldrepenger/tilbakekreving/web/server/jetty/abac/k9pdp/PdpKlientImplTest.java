@@ -78,7 +78,7 @@ class PdpKlientImplTest {
 
     @BeforeEach
     public void setUp() {
-        pdpKlient = new AppPdpKlientImpl(pdpConsumerMock, tokenProvider, abacAuditloggerMock, pdpRequestBuilder, "abac-pdp");
+        pdpKlient = new AppPdpKlientImpl(pdpConsumerMock, tokenProvider, abacAuditloggerMock, pdpRequestBuilder, "abac-k9");
     }
 
     @Test
