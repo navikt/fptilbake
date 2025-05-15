@@ -68,11 +68,11 @@ public class AppPdpKlientImpl {
             case "abac-k9":
                 yield forespøTilgangAbacK9(beskyttetRessursAttributter, appRessursData);
             case "sif-abac-pdp":
-                yield mapResultat(forespøTilgangSifAbacPdp(beskyttetRessursAttributter, appRessursData));
+                yield mapResultat(forespørTilgangSifAbacPdp(beskyttetRessursAttributter, appRessursData));
             case "begge": {
                 K9AbacResultat resultatGammel = forespøTilgangAbacK9(beskyttetRessursAttributter, appRessursData);
                 try {
-                    Tilgangsbeslutning resultatNy = forespøTilgangSifAbacPdp(beskyttetRessursAttributter, appRessursData);
+                    Tilgangsbeslutning resultatNy = forespørTilgangSifAbacPdp(beskyttetRessursAttributter, appRessursData);
                     K9AbacResultat resultatNyMapped = mapResultat(resultatNy);
                     if (resultatNyMapped != resultatGammel) {
                         LOG.warn("Ulikt resultat fra ny/gammel abac. Ny årsaker {} mapped til {} gammel {}",
@@ -101,7 +101,7 @@ public class AppPdpKlientImpl {
         return hovedresultat;
     }
 
-    private Tilgangsbeslutning forespøTilgangSifAbacPdp(BeskyttetRessursAttributter beskyttetRessursAttributter, K9AppRessursData appRessursData) {
+    private Tilgangsbeslutning forespørTilgangSifAbacPdp(BeskyttetRessursAttributter beskyttetRessursAttributter, K9AppRessursData appRessursData) {
         SaksnummerDto saksnummer = new SaksnummerDto(appRessursData.getResource(K9DataKeys.SAKSNUMMER).verdi());
         ResourceType resource = switch (beskyttetRessursAttributter.getResourceType()) {
             case APPLIKASJON -> ResourceType.APPLIKASJON;
@@ -167,10 +167,10 @@ public class AppPdpKlientImpl {
         if (verdi.equals(K9PipFagsakStatus.UNDER_BEHANDLING.getVerdi())) {
             return AbacFagsakStatus.UNDER_BEHANDLING;
         }
-        if (verdi.equals(K9PipBehandlingStatus.OPPRETTET.getVerdi())) {
+        if (verdi.equals(K9PipFagsakStatus.OPPRETTET.getVerdi())) {
             return AbacFagsakStatus.OPPRETTET;
         }
-        throw new IllegalArgumentException("Ikke-støttet behandlingstatus: " + verdi);
+        throw new IllegalArgumentException("Ikke-støttet fagsakstatus: " + verdi);
     }
 
 
