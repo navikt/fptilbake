@@ -76,6 +76,7 @@ public class K9PdpRequestBuilder {
 
         Optional<String> saksnummer = utledSaksnummer(dataAttributter, behandlingData);
         saksnummer.ifPresent(s -> ressursData.leggTilRessurs(K9DataKeys.SAKSNUMMER, s));
+        saksnummer.ifPresent(s -> ressursData.leggTilAktørId(pipRepository.hentAktørIdSomEierFagsak(s).orElseThrow().getId()));
 
         Optional.ofNullable(behandlingData).map(K9PipBehandlingInfo::fagsakstatus)
             .ifPresent(fss -> ressursData.leggTilRessurs(K9DataKeys.FAGSAK_STATUS, fss));
@@ -83,6 +84,9 @@ public class K9PdpRequestBuilder {
             .ifPresent(bs -> ressursData.leggTilRessurs(K9DataKeys.BEHANDLING_STATUS, bs));
         Optional.ofNullable(behandlingData).map(K9PipBehandlingInfo::ansvarligSaksbehandler)
             .ifPresent(sbh -> ressursData.leggTilRessurs(K9DataKeys.SAKSBEHANDLER, sbh));
+
+        Optional.ofNullable(behandlingData).map(K9PipBehandlingInfo::aktørId)
+            .ifPresent(a -> ressursData.leggTilAktørId(a.getId()));
 
         var ressursDataBuild = ressursData.build();
 
