@@ -12,7 +12,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -49,8 +50,6 @@ class PdpKlientImplTest {
     public static final OpenIDToken JWT_TOKENX_TOKEN = new OpenIDToken(OpenIDProvider.TOKENX, new TokenString(JWT_TOKENSTRING));
     private static final String DOMENE = "k9";
 
-    private static String APP_NAME;
-
     private AppPdpKlientImpl pdpKlient;
     @Mock
     private TokenProvider tokenProvider;
@@ -61,19 +60,14 @@ class PdpKlientImplTest {
     @Mock
     private K9PdpRequestBuilder pdpRequestBuilder;
 
-    @BeforeEach
-    void setup() {
-        APP_NAME = System.getProperty("app.name");
+    @BeforeAll
+    static void setup() {
         System.setProperty("app.name", "k9-tilbake");
     }
 
-    @AfterEach
-    void teardown() {
-        if (APP_NAME != null) {
-            System.setProperty("app.name", APP_NAME);
-        } else {
-            System.clearProperty("app.name");
-        }
+    @AfterAll
+    static void teardown() {
+        System.clearProperty("app.name");
     }
 
     @BeforeEach
