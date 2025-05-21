@@ -15,15 +15,13 @@ import java.util.function.Consumer;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
@@ -43,6 +41,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktTestSupport;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
@@ -73,14 +74,22 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 @ExtendWith(JpaExtension.class)
 class BehandlingDtoTjenesteTest {
 
+    private static Logger log = org.slf4j.LoggerFactory.getLogger(BehandlingDtoTjenesteTest.class);
+
     @BeforeAll
     static void setupAlle() {
+        logAppName("setupAlle");
         System.setProperty("app.name", "fptilbake");
     }
 
     @AfterAll
     static void teardown() {
+        logAppName("tearDown");
         System.clearProperty("app.name");
+    }
+
+    private static void logAppName(String fra) {
+        log.info("Fra {} -- APP NAME ----> app.name = {}", fra, System.getProperty("app.name"));
     }
 
     static final String GYLDIG_AKTØR_ID = "12345678901";
@@ -123,6 +132,7 @@ class BehandlingDtoTjenesteTest {
 
         @Test
         void skal_hentUtvidetBehandlingResultat_medFaktaSteg() {
+            logAppName("skal_hentUtvidetBehandlingResultat_medFaktaSteg");
             var behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
             when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
 
@@ -139,6 +149,7 @@ class BehandlingDtoTjenesteTest {
 
         @Test
         void skal_hentUtvidetBehandlingResultat_medForeldelseSteg() {
+            logAppName("skal_hentUtvidetBehandlingResultat_medForeldelseSteg");
             var behandling = lagBehandling(BehandlingStegType.FORELDELSEVURDERINGSTEG, BehandlingStatus.UTREDES);
             when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
             lagFaktaFeilutbetaling(behandling.getId());
