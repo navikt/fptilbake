@@ -89,7 +89,7 @@ class BehandlingDtoTjenesteTest {
     }
 
     private static void logAppName(String fra) {
-        log.info("Fra {} -- APP NAME ----> app.name = {}", fra, System.getProperty("app.name"));
+        log.error("Fra {} -- APP NAME ----> app.name = {}", fra, System.getProperty("app.name"));
     }
 
     static final String GYLDIG_AKTØR_ID = "12345678901";
