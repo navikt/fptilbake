@@ -16,6 +16,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -76,18 +77,6 @@ class BehandlingDtoTjenesteTest {
 
     private static Logger log = org.slf4j.LoggerFactory.getLogger(BehandlingDtoTjenesteTest.class);
 
-    @BeforeAll
-    static void setupAlle() {
-        logAppName("setupAlle");
-        System.setProperty("app.name", "fptilbake");
-    }
-
-    @AfterAll
-    static void teardown() {
-        logAppName("tearDown");
-        System.clearProperty("app.name");
-    }
-
     private static void logAppName(String fra) {
         log.error("Fra {} -- APP NAME ----> app.name = {}", fra, System.getProperty("app.name"));
     }
@@ -111,6 +100,8 @@ class BehandlingDtoTjenesteTest {
 
     @BeforeEach
     void init(EntityManager entityManager) {
+        logAppName("setupAlle");
+        System.setProperty("app.name", "fptilbake");
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         behandlingRepository = repositoryProvider.getBehandlingRepository();
         fagsakRepository = repositoryProvider.getFagsakRepository();
@@ -125,6 +116,12 @@ class BehandlingDtoTjenesteTest {
                 mock(BeregningsresultatTjeneste.class), repositoryProvider, behandlingModellRepository);
 
         entityManager.setFlushMode(FlushModeType.AUTO);
+    }
+
+    @AfterEach
+    void clear(){
+        logAppName("tearDown");
+        System.clearProperty("app.name");
     }
 
     @Nested
