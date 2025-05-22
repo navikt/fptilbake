@@ -21,6 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
+
 @Disabled
 class SensuKlientTest {
 
@@ -31,12 +33,15 @@ class SensuKlientTest {
 
     @BeforeAll
     static void beforeAll() {
+        ApplicationName.clearAppName();
         System.setProperty("app.name", "k9-tilbake");
     }
 
     @AfterAll
     static void afterAll() {
         System.clearProperty("app.name");
+        ApplicationName.clearAppName();
+
     }
 
     private static final String expectedJsonBeforeTimestamp = "{" +
