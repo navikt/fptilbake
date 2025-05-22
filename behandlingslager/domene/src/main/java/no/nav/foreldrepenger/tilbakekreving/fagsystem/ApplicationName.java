@@ -28,10 +28,11 @@ public final class ApplicationName {
         return CURRENT_APPLIKASJON_NAVN;
     }
 
-    /**
-     * Skal kun brukes av tester!
-     */
     public static void clearAppName() {
+        if (!ENV.isLocal()) {
+            throw new IllegalArgumentException("Skal kun brukes i tester");
+        }
+
         CURRENT_APPLIKASJON = null;
     }
 
