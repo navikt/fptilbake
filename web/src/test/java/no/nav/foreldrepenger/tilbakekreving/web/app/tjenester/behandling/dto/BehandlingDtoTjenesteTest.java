@@ -76,15 +76,15 @@ class BehandlingDtoTjenesteTest {
 
     @BeforeAll
     static void setup() {
-        System.setProperty("app.name", "k9-tilbake");
-        ApplicationName.refreshTilbakeAppName();
+        ApplicationName.clearAppName();
+        System.setProperty("app.name", "fptilbake");
 
     }
 
     @AfterAll
     static void teardown() {
-        System.setProperty("app.name", "fptilbake");
-        ApplicationName.refreshTilbakeAppName();
+        System.clearProperty("app.name");
+        ApplicationName.clearAppName();
     }
 
     static final String GYLDIG_AKTØR_ID = "12345678901";
@@ -127,6 +127,7 @@ class BehandlingDtoTjenesteTest {
 
         @Test
         void skal_hentUtvidetBehandlingResultat_medFaktaSteg() {
+            System.out.println(ApplicationName.hvilkenTilbake());
             var behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
             when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
 

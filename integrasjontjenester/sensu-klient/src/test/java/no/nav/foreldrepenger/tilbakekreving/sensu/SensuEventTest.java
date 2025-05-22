@@ -15,13 +15,14 @@ class SensuEventTest {
 
     @BeforeEach
     void setup() {
+        ApplicationName.clearAppName();
         System.setProperty("app.name", "k9-tilbake");
     }
 
     @AfterEach
     void teardown() {
-        System.setProperty("app.name", "fptilbake");
-        ApplicationName.refreshTilbakeAppName();
+        System.clearProperty("app.name");
+        ApplicationName.clearAppName();
 
     }
 

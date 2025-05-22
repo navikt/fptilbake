@@ -31,8 +31,8 @@ public final class ApplicationName {
     /**
      * Skal kun brukes av tester!
      */
-    public static void refreshTilbakeAppName() {
-        setCurrentApp();
+    public static void clearAppName() {
+        CURRENT_APPLIKASJON = null;
     }
 
     private static void setCurrentApp() {

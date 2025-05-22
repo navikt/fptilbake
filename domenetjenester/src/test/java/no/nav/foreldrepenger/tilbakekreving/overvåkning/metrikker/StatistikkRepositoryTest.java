@@ -15,15 +15,14 @@ class StatistikkRepositoryTest {
 
     @BeforeAll
     static void setup() {
+        ApplicationName.clearAppName();
         System.setProperty("app.name", "k9-tilbake");
-        ApplicationName.refreshTilbakeAppName();
     }
 
     @AfterAll
     static void teardown() {
-        System.setProperty("app.name", "fptilbake");
-        ApplicationName.refreshTilbakeAppName();
-
+        System.clearProperty("app.name");
+        ApplicationName.clearAppName();
     }
 
     @Inject

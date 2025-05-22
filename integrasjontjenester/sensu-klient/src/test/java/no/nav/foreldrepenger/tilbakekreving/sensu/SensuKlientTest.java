@@ -38,8 +38,8 @@ class SensuKlientTest {
 
     @AfterAll
     static void afterAll() {
-        System.setProperty("app.name", "fptilbake");
-        ApplicationName.refreshTilbakeAppName();
+        System.clearProperty("app.name");
+        ApplicationName.clearAppName();
 
     }
 
