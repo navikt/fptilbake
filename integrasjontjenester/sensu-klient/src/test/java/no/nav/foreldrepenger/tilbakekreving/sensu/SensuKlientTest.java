@@ -33,6 +33,7 @@ class SensuKlientTest {
 
     @BeforeAll
     static void beforeAll() {
+        ApplicationName.clearAppName();
         System.setProperty("app.name", "k9-tilbake");
     }
 
