@@ -74,9 +74,12 @@ public class K9PdpRequestBuilder {
         var ressursData = K9AppRessursData.builder()
             .leggTilAktørIdSet(dataAttributter.getVerdier(StandardAbacAttributtType.AKTØR_ID));
 
-        Optional<String> saksnummer = utledSaksnummer(dataAttributter, behandlingData);
-        saksnummer.ifPresent(s -> ressursData.leggTilRessurs(K9DataKeys.SAKSNUMMER, s));
-        saksnummer.ifPresent(s -> ressursData.leggTilAktørId(pipRepository.hentAktørIdSomEierFagsak(s).orElseThrow().getId()));
+        String saksnummer = utledSaksnummer(dataAttributter, behandlingData).orElse(null);
+        if (saksnummer != null) {
+            ressursData.leggTilRessurs(K9DataKeys.SAKSNUMMER, saksnummer);
+            pipRepository.hentAktørIdSomEierFagsak(saksnummer)
+                .ifPresent(aktørId -> ressursData.leggTilAktørId(aktørId.getId()));
+        }
 
         Optional.ofNullable(behandlingData).map(K9PipBehandlingInfo::fagsakstatus)
             .ifPresent(fss -> ressursData.leggTilRessurs(K9DataKeys.FAGSAK_STATUS, fss));
