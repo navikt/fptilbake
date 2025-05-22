@@ -9,6 +9,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
+
 class SensuEventTest {
 
     @BeforeEach
@@ -18,7 +20,9 @@ class SensuEventTest {
 
     @AfterEach
     void teardown() {
-        System.clearProperty("app.name");
+        System.setProperty("app.name", "fptilbake");
+        ApplicationName.refreshTilbakeAppName();
+
     }
 
     @Test

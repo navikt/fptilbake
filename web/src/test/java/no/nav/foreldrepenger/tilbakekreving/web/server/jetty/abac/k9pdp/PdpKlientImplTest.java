@@ -22,6 +22,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9DataKeys;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9PdpRequestBuilder;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9PipBehandlingStatus;
@@ -63,11 +64,14 @@ class PdpKlientImplTest {
     @BeforeAll
     static void setup() {
         System.setProperty("app.name", "k9-tilbake");
+        ApplicationName.refreshTilbakeAppName();
+
     }
 
     @AfterAll
     static void teardown() {
-        System.clearProperty("app.name");
+        System.setProperty("app.name", "fptilbake");
+        ApplicationName.refreshTilbakeAppName();
     }
 
     @BeforeEach

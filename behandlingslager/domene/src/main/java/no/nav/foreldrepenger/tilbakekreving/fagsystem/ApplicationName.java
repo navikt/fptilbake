@@ -28,6 +28,13 @@ public final class ApplicationName {
         return CURRENT_APPLIKASJON_NAVN;
     }
 
+    /**
+     * Skal kun brukes av tester!
+     */
+    public static void refreshTilbakeAppName() {
+        setCurrentApp();
+    }
+
     private static void setCurrentApp() {
         CURRENT_APPLIKASJON_NAVN = ENV.getRequiredProperty("app.name");
         CURRENT_APPLIKASJON = switch (CURRENT_APPLIKASJON_NAVN) {

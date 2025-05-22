@@ -16,13 +16,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
@@ -65,6 +63,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vi
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -75,10 +74,17 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 @ExtendWith(JpaExtension.class)
 class BehandlingDtoTjenesteTest {
 
-    private static Logger log = org.slf4j.LoggerFactory.getLogger(BehandlingDtoTjenesteTest.class);
+    @BeforeAll
+    static void setup() {
+        System.setProperty("app.name", "k9-tilbake");
+        ApplicationName.refreshTilbakeAppName();
 
-    private static void logAppName(String fra) {
-        log.error("Fra {} -- APP NAME ----> app.name = {}", fra, System.getProperty("app.name"));
+    }
+
+    @AfterAll
+    static void teardown() {
+        System.setProperty("app.name", "fptilbake");
+        ApplicationName.refreshTilbakeAppName();
     }
 
     static final String GYLDIG_AKTØR_ID = "12345678901";
@@ -100,8 +106,6 @@ class BehandlingDtoTjenesteTest {
 
     @BeforeEach
     void init(EntityManager entityManager) {
-        logAppName("setupAlle");
-        System.setProperty("app.name", "fptilbake");
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         behandlingRepository = repositoryProvider.getBehandlingRepository();
         fagsakRepository = repositoryProvider.getFagsakRepository();
@@ -118,18 +122,11 @@ class BehandlingDtoTjenesteTest {
         entityManager.setFlushMode(FlushModeType.AUTO);
     }
 
-    @AfterEach
-    void clear(){
-        logAppName("tearDown");
-        System.clearProperty("app.name");
-    }
-
     @Nested
     class HentUtvidetBehandlingResultat {
 
         @Test
         void skal_hentUtvidetBehandlingResultat_medFaktaSteg() {
-            logAppName("skal_hentUtvidetBehandlingResultat_medFaktaSteg");
             var behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
             when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
 
@@ -146,7 +143,6 @@ class BehandlingDtoTjenesteTest {
 
         @Test
         void skal_hentUtvidetBehandlingResultat_medForeldelseSteg() {
-            logAppName("skal_hentUtvidetBehandlingResultat_medForeldelseSteg");
             var behandling = lagBehandling(BehandlingStegType.FORELDELSEVURDERINGSTEG, BehandlingStatus.UTREDES);
             when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
             lagFaktaFeilutbetaling(behandling.getId());
