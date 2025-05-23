@@ -8,18 +8,21 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 
 @CdiDbAwareTest
 class StatistikkRepositoryTest {
 
     @BeforeAll
     static void setup() {
+        ApplicationName.clearAppName();
         System.setProperty("app.name", "k9-tilbake");
     }
 
     @AfterAll
     static void teardown() {
         System.clearProperty("app.name");
+        ApplicationName.clearAppName();
     }
 
     @Inject

@@ -28,6 +28,14 @@ public final class ApplicationName {
         return CURRENT_APPLIKASJON_NAVN;
     }
 
+    public static void clearAppName() {
+        if (!ENV.isLocal()) {
+            throw new IllegalArgumentException("Skal kun brukes i tester");
+        }
+
+        CURRENT_APPLIKASJON = null;
+    }
+
     private static void setCurrentApp() {
         CURRENT_APPLIKASJON_NAVN = ENV.getRequiredProperty("app.name");
         CURRENT_APPLIKASJON = switch (CURRENT_APPLIKASJON_NAVN) {
