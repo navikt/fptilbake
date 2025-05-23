@@ -12,8 +12,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9DataKeys;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9PdpRequestBuilder;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9PipBehandlingStatus;
@@ -51,6 +49,8 @@ class PdpKlientImplTest {
     public static final OpenIDToken JWT_TOKENX_TOKEN = new OpenIDToken(OpenIDProvider.TOKENX, new TokenString(JWT_TOKENSTRING));
     private static final String DOMENE = "k9";
 
+    private static String APP_NAME;
+
     private AppPdpKlientImpl pdpKlient;
     @Mock
     private TokenProvider tokenProvider;
@@ -61,17 +61,19 @@ class PdpKlientImplTest {
     @Mock
     private K9PdpRequestBuilder pdpRequestBuilder;
 
-    @BeforeAll
-    static void setup() {
-        ApplicationName.clearAppName();
+    @BeforeEach
+    void setup() {
+        APP_NAME = System.getProperty("app.name");
         System.setProperty("app.name", "k9-tilbake");
-
     }
 
-    @AfterAll
-    static void teardown() {
-        System.clearProperty("app.name");
-        ApplicationName.clearAppName();
+    @AfterEach
+    void teardown() {
+        if (APP_NAME != null) {
+            System.setProperty("app.name", APP_NAME);
+        } else {
+            System.clearProperty("app.name");
+        }
     }
 
     @BeforeEach

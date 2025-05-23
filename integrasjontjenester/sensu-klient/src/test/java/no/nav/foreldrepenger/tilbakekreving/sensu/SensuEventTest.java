@@ -9,21 +9,16 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
-
 class SensuEventTest {
 
     @BeforeEach
     void setup() {
-        ApplicationName.clearAppName();
         System.setProperty("app.name", "k9-tilbake");
     }
 
     @AfterEach
     void teardown() {
         System.clearProperty("app.name");
-        ApplicationName.clearAppName();
-
     }
 
     @Test
