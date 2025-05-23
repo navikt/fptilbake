@@ -103,7 +103,8 @@ public class AppPdpKlientImpl {
     }
 
     private Tilgangsbeslutning forespørTilgangSifAbacPdp(BeskyttetRessursAttributter beskyttetRessursAttributter, K9AppRessursData appRessursData) {
-        SaksnummerDto saksnummer = new SaksnummerDto(appRessursData.getResource(K9DataKeys.SAKSNUMMER).verdi());
+        K9RessursData saksnummerResource = appRessursData.getResource(K9DataKeys.SAKSNUMMER);
+        SaksnummerDto saksnummer = saksnummerResource != null ? new SaksnummerDto(saksnummerResource.verdi()) : null;
         ResourceType resource = switch (beskyttetRessursAttributter.getResourceType()) {
             case APPLIKASJON -> ResourceType.APPLIKASJON;
             case DRIFT -> ResourceType.DRIFT;
