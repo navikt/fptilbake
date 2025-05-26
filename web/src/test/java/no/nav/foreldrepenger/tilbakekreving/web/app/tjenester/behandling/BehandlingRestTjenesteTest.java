@@ -255,15 +255,6 @@ class BehandlingRestTjenesteTest {
     }
 
     @Test
-    void skal_ikke_returnere_vedtak_info_hvis_vedtak_info_ikke_finnes() {
-        Behandling behandling = ScenarioSimple.simple().lagMocked();
-        behandling.avsluttBehandling();
-        when(behandlingTjenesteMock.hentBehandling(any(UUID.class))).thenReturn(behandling);
-        var e = assertThrows(TekniskException.class, () -> behandlingRestTjeneste.hentTilbakekrevingsVedtakInfo(uuidDto));
-        assertThat(e.getMessage()).contains("FPT-763492");
-    }
-
-    @Test
     void skal_returnere_vedtak_info_hvis_tilbakekreving_er_avsluttet_og_vedtak_info_finnes() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()

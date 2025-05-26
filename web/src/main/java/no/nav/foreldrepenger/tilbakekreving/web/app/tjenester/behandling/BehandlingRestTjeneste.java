@@ -3,6 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
 import java.util.Optional;
@@ -475,11 +477,14 @@ public class BehandlingRestTjeneste {
         UUID behandlingUUId = uuidDto.getBehandlingUuid();
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingUUId);
         Long behandlingId = behandling.getId();
-        Optional<BehandlingVedtak> behandlingVedtak = behandlingTjeneste.hentBehandlingvedtakForBehandlingId(behandlingId);
-        if (!behandling.erAvsluttet() || behandlingVedtak.isEmpty()) {
+        if (!behandling.erAvsluttet()) {
             throw BehandlingFeil.fantIkkeBehandlingsVedtakInfo(behandlingId);
         }
-        KlageTilbakekrevingDto klageTilbakekrevingDto = new KlageTilbakekrevingDto(behandlingId, behandlingVedtak.get().getVedtaksdato(), behandling.getType().getKode());
+        var brukdato = behandlingTjeneste.hentBehandlingvedtakForBehandlingId(behandlingId).map(BehandlingVedtak::getVedtaksdato)
+            .or(() -> Optional.ofNullable(behandling.getAvsluttetDato()).map(LocalDateTime::toLocalDate))
+            .or(() -> Optional.ofNullable(behandling.getOpprettetDato()).map(LocalDateTime::toLocalDate))
+            .orElseGet(LocalDate::now);
+        KlageTilbakekrevingDto klageTilbakekrevingDto = new KlageTilbakekrevingDto(behandlingId, brukdato, behandling.getType().getKode());
         return Response.ok().entity(klageTilbakekrevingDto).build();
     }
 
