@@ -304,16 +304,6 @@
             <artifactId>logstash-logback-encoder</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.papertrailapp</groupId>
-            <artifactId>logback-syslog4j</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <!-- redirect java.utils.logging til slf4j (og videre til logback) -->
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
