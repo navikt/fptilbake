@@ -1,5 +1,5 @@
 {
-  "environment": "dev",
+  "kafkaPool": "nav-dev",
   "oraclefptilbakesecret":"oracle/data/dev/creds/fptilbake_q1-user",
   "oracleconfig": "oracle/data/dev/config/fptilbake_q1",
   "fptilbakeserviceuser": "serviceuser/data/dev/srvfptilbake",
@@ -16,7 +16,6 @@
   "ingresses": [
     "https://fptilbake.dev-fss-pub.nais.io"
   ],
-  "kafkaPool" : "nav-dev",
   "groups": [
     "27e77109-fef2-48ce-a174-269074490353",
     "8cddda87-0a22-4d35-9186-a2c32a6ab450",

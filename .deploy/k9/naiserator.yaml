@@ -57,8 +57,6 @@ spec:
         kvPath: {{k9tilbakeserviceuser}}
       - mountPath: /var/run/secrets/nais.io/vault
         kvPath: /kv/{{cluster}}/fss/k9-tilbake/{{namespace}}
-  secureLogs:
-    enabled: true
   kafka:
     pool: {{kafkaPool}}
   azure:
