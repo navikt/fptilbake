@@ -46,7 +46,7 @@ public class InitielleLinksRestTjeneste {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(description = "Returnerer lenker til init av frontend", tags = "init-fetch")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.APPLIKASJON, sporingslogg = false)
     public InitLinksDto hentInitielleRessurser() {
         List<ResourceLink> lenkene = new ArrayList<>();
         lenkene.add(get(KodeverkRestTjeneste.KODERVERK_PATH, "tilbake-kodeverk"));
