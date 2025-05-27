@@ -52,8 +52,6 @@ spec:
         kvPath:  {{oraclefptilbakesecret}}
       - mountPath: /var/run/secrets/nais.io/serviceuser
         kvPath: {{fptilbakeserviceuser}}
-  secureLogs:
-    enabled: true
   env:
     - name: APP_NAME
       value: "fptilbake"
