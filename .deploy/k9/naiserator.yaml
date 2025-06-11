@@ -59,6 +59,11 @@ spec:
         kvPath: /kv/{{cluster}}/fss/k9-tilbake/{{namespace}}
   kafka:
     pool: {{kafkaPool}}
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
   azure:
     application:
       allowAllUsers: true
