@@ -16,7 +16,7 @@
 
     <properties>
         <!-- versjon brukes fra webapp-modulen under resources/web.swagger/index.html og må være samme som faktisk avhengighet som brukes -->
-        <swagger-ui.version>5.22.0</swagger-ui.version>
+        <swagger-ui.version>5.24.1-1</swagger-ui.version>
         <openapi-spec-utils.version>1.5.0</openapi-spec-utils.version>
     </properties>
 
