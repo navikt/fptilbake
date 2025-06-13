@@ -62,6 +62,10 @@ public class KravgrunnlagBeregningTjeneste {
 
     public BigDecimal heltRettsgebyrFor(Long behandlingId, LocalDateTime tilbakekrevingOpprettetTid) {
         var kravgrunnlag = grunnlagRepository.finnKravgrunnlagOpt(behandlingId).orElse(null);
+        return heltRettsgebyrFor(kravgrunnlag, tilbakekrevingOpprettetTid);
+    }
+
+    public static BigDecimal heltRettsgebyrFor(Kravgrunnlag431 kravgrunnlag, LocalDateTime tilbakekrevingOpprettetTid) {
         var velgRettsgebyrDatoTid = kravgrunnlag == null || tilbakekrevingOpprettetTid.isBefore(kravgrunnlag.getKontrollFeltAsLocalDateTime()) ?
             tilbakekrevingOpprettetTid : kravgrunnlag.getKontrollFeltAsLocalDateTime();
         return Satser.rettsgebyr(Year.from(velgRettsgebyrDatoTid));

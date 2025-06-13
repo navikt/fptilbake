@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.los;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -10,9 +11,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -33,10 +36,14 @@ import no.nav.vedtak.hendelser.behandling.los.LosBehandlingDto;
 public class LosBehandlingDtoTjeneste {
 
     private KravgrunnlagRepository grunnlagRepository;
+    private VarselRepository varselRepository;
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste;
 
     @Inject
-    public LosBehandlingDtoTjeneste(KravgrunnlagRepository grunnlagRepository, FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste) {
+    public LosBehandlingDtoTjeneste(KravgrunnlagRepository grunnlagRepository,
+                                    VarselRepository varselRepository,
+                                    FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste) {
+        this.varselRepository = varselRepository;
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
         this.grunnlagRepository = grunnlagRepository;
     }
@@ -48,6 +55,7 @@ public class LosBehandlingDtoTjeneste {
     public LosBehandlingDto lagLosBehandlingDto(Behandling behandling) {
         var frist = hentFrist(behandling);
         var kravgrunnlag431 = grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId()) ? grunnlagRepository.finnKravgrunnlag(behandling.getId()) : null;
+        var tilbakeDto = mapTilbake(behandling, kravgrunnlag431, frist);
         return new LosBehandlingDto(behandling.getUuid(),
             Kildesystem.FPTILBAKE,
             behandling.getFagsak().getSaksnummer().getVerdi(),
@@ -65,8 +73,12 @@ public class LosBehandlingDtoTjeneste {
             false,
             List.of(),
             null,
-            List.of(),
-            mapTilbake(behandling, kravgrunnlag431, frist));
+            utledBehandlingEgenskaper(behandling, kravgrunnlag431, tilbakeDto).stream().map(LokalBehandlingEgenskap::name).toList(),
+            tilbakeDto);
+    }
+
+    public enum LokalBehandlingEgenskap {
+        VARSLET, OVER_FIRE_RETTSGEBYR
     }
 
     private static Ytelse mapYtelse(Behandling behandling) {
@@ -141,6 +153,19 @@ public class LosBehandlingDtoTjeneste {
 
     private BigDecimal hentFeilutbetaltBeløp(Long behandlingId) {
         return faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandlingId).getAktuellFeilUtbetaltBeløp();
+    }
+    private List<LokalBehandlingEgenskap> utledBehandlingEgenskaper(Behandling behandling, Kravgrunnlag431 kravgrunnlag, LosBehandlingDto.LosTilbakeDto tilbakeDto) {
+        List<LokalBehandlingEgenskap> egenskaper = new ArrayList<>();
+        try {
+            varselRepository.finnVarsel(behandling.getId()).ifPresent(v -> egenskaper.add(LokalBehandlingEgenskap.VARSLET));
+            var fireRettsgebyr = KravgrunnlagBeregningTjeneste.heltRettsgebyrFor(kravgrunnlag, behandling.getOpprettetTidspunkt()).multiply(BigDecimal.valueOf(4));
+            if (tilbakeDto.feilutbetaltBeløp().compareTo(fireRettsgebyr) >= 0) {
+                egenskaper.add(LokalBehandlingEgenskap.OVER_FIRE_RETTSGEBYR);
+            }
+        } catch (Exception e) {
+            // Do nothing.
+        }
+        return egenskaper;
     }
 
     private static LocalDate hentFrist(Behandling behandling) {
