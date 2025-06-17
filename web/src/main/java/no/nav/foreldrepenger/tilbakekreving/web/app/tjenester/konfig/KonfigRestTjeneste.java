@@ -37,7 +37,7 @@ public class KonfigRestTjeneste {
     @Path("/rettskilde")
     @Produces("application/json")
     @Operation(tags = "konfigurasjon", description = "Henter lenke til rettskilde.")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.APPLIKASJON, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Konfig hentRettskildeUrl() {
         return new Konfig(rettskildeUrl.toString());
@@ -47,7 +47,7 @@ public class KonfigRestTjeneste {
     @Path("/systemrutine")
     @Produces("application/json")
     @Operation(tags = "konfigurasjon", description = "Henter lenge til systemrutine")
-    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.APPLIKASJON, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Konfig hentSystemrutine() {
         return new Konfig(systemrutineUrl.toString());
