@@ -2,9 +2,12 @@ package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.BehandlingUuidOperasjonDto;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,8 +106,6 @@ public class AppPdpKlientImpl {
     }
 
     private Tilgangsbeslutning forespørTilgangSifAbacPdp(BeskyttetRessursAttributter beskyttetRessursAttributter, K9AppRessursData appRessursData) {
-        K9RessursData saksnummerResource = appRessursData.getResource(K9DataKeys.SAKSNUMMER);
-        SaksnummerDto saksnummer = saksnummerResource != null ? new SaksnummerDto(saksnummerResource.verdi()) : null;
         ResourceType resource = switch (beskyttetRessursAttributter.getResourceType()) {
             case APPLIKASJON -> ResourceType.APPLIKASJON;
             case DRIFT -> ResourceType.DRIFT;
@@ -118,10 +119,20 @@ public class AppPdpKlientImpl {
             case CREATE -> BeskyttetRessursActionAttributt.CREATE;
             default -> throw new IllegalArgumentException("Ikke-støttet action type for k9: " + beskyttetRessursAttributter.getActionType());
         };
+        OperasjonDto operasjon = new OperasjonDto(resource, action);
+
+        if (appRessursData.getResource(K9DataKeys.YTELSESBEHANDLING_UUID) != null) {
+            String k9sakBehandlingUuid = appRessursData.getResource(K9DataKeys.YTELSESBEHANDLING_UUID).verdi();
+            BehandlingUuidOperasjonDto dto = new BehandlingUuidOperasjonDto(UUID.fromString(k9sakBehandlingUuid), operasjon);
+            return sifAbacPdpRestKlient.sjekkTilgangForInnloggetBruker(dto);
+        }
+
+        K9RessursData saksnummerResource = appRessursData.getResource(K9DataKeys.SAKSNUMMER);
+        SaksnummerDto saksnummer = saksnummerResource != null ? new SaksnummerDto(saksnummerResource.verdi()) : null;
+
         K9RessursData fagsakStatusData = appRessursData.getResource(K9DataKeys.FAGSAK_STATUS);
         K9RessursData behandlingStatusData = appRessursData.getResource(K9DataKeys.BEHANDLING_STATUS);
         K9RessursData saksbehandlerData = appRessursData.getResource(K9DataKeys.SAKSBEHANDLER);
-        OperasjonDto operasjon = new OperasjonDto(resource, action);
         SaksinformasjonDto saksinformasjonDto = new SaksinformasjonDto(
             saksbehandlerData != null ? saksbehandlerData.verdi() : null,
             behandlingStatusData != null ? mapBehandlingStatus(behandlingStatusData.verdi()) : null,

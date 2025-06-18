@@ -1,5 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp;
 
+import java.net.URI;
+
+import jakarta.ws.rs.core.UriBuilder;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.BehandlingUuidOperasjonDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.SaksinformasjonTilgangskontrollInputDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.resultat.Tilgangsbeslutning;
 import no.nav.vedtak.felles.integrasjon.rest.RestClient;
@@ -16,7 +21,7 @@ import no.nav.vedtak.felles.integrasjon.rest.RestRequest;
 import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 
 @RestClientConfig(tokenConfig = TokenFlow.ADAPTIVE, scopesProperty = "sif.abac.pdp.scope", scopesDefault = "api://prod-fss.k9saksbehandling.sif-abac-pdp/.default",
-    endpointDefault = "http://sif-abac-pdp/sif/sif-abac-pdp/api/tilgangskontroll/v2/k9/saksinformasjon-uten-personer", endpointProperty = "sif.abac.pdp.url")
+    endpointDefault = "http://sif-abac-pdp/sif/sif-abac-pdp/api/tilgangskontroll/v2/k9", endpointProperty = "sif.abac.pdp.url")
 public class SifAbacPdpRestKlient {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SifAbacPdpRestKlient.class);
@@ -30,7 +35,7 @@ public class SifAbacPdpRestKlient {
     }
 
     public Tilgangsbeslutning sjekkTilgangForInnloggetBruker(SaksinformasjonTilgangskontrollInputDto input) {
-        if (Environment.current().isDev()){
+        if (Environment.current().isDev()) {
             ObjectMapper om = no.nav.vedtak.mapper.json.DefaultJsonMapper.getObjectMapper();
             try {
                 LOGGER.info("saksinformasjon: {}", om.writeValueAsString(input));
@@ -38,13 +43,28 @@ public class SifAbacPdpRestKlient {
                 throw new RuntimeException(e);
             }
         }
-        if (input.isSaksinformasjonMangler()){
+        if (input.isSaksinformasjonMangler()) {
             throw new IllegalArgumentException("saksinformasjon er påkrevet for UPDATE på FAGSAK, men saksinformasjon er null");
         }
-        if (input.isSaksnummerMangler()){
+        if (input.isSaksnummerMangler()) {
             throw new IllegalArgumentException("saksnummer er påkrevet for FAGSAK, men er null");
         }
-        var request = RestRequest.newPOSTJson(input, restConfig.endpoint(), restConfig);
+        URI uri = UriBuilder.fromUri(restConfig.endpoint()).path("saksinformasjon-uten-personer").build();
+        var request = RestRequest.newPOSTJson(input, uri, restConfig);
+        return restClient.send(request, Tilgangsbeslutning.class);
+    }
+
+    public Tilgangsbeslutning sjekkTilgangForInnloggetBruker(BehandlingUuidOperasjonDto input) {
+        if (Environment.current().isDev()) {
+            ObjectMapper om = no.nav.vedtak.mapper.json.DefaultJsonMapper.getObjectMapper();
+            try {
+                LOGGER.info("behandling: {}", om.writeValueAsString(input));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        URI uri = UriBuilder.fromUri(restConfig.endpoint()).path("behandling").build();
+        var request = RestRequest.newPOSTJson(input, uri, restConfig);
         return restClient.send(request, Tilgangsbeslutning.class);
     }
 
