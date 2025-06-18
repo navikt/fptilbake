@@ -41,6 +41,9 @@ public class SifAbacPdpRestKlient {
         if (input.isSaksinformasjonMangler()){
             throw new IllegalArgumentException("saksinformasjon er påkrevet for UPDATE på FAGSAK, men saksinformasjon er null");
         }
+        if (input.isSaksnummerMangler()){
+            throw new IllegalArgumentException("saksnummer er påkrevet for FAGSAK, men er null");
+        }
         var request = RestRequest.newPOSTJson(input, restConfig.endpoint(), restConfig);
         return restClient.send(request, Tilgangsbeslutning.class);
     }
