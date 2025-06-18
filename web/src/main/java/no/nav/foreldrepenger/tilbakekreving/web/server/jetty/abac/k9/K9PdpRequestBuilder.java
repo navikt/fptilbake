@@ -74,6 +74,8 @@ public class K9PdpRequestBuilder {
         var ressursData = K9AppRessursData.builder()
             .leggTilAktørIdSet(dataAttributter.getVerdier(StandardAbacAttributtType.AKTØR_ID));
 
+        ytelesbehandlingId.ifPresent(uuid -> ressursData.leggTilRessurs(K9DataKeys.YTELSESBEHANDLING_UUID, uuid.toString()));
+
         String saksnummer = utledSaksnummer(dataAttributter, behandlingData).orElse(null);
         if (saksnummer != null) {
             ressursData.leggTilRessurs(K9DataKeys.SAKSNUMMER, saksnummer);
