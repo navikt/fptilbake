@@ -7,12 +7,9 @@ import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.BehandlingUuidOperasjonDto;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9DataKeys;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9PdpRequestBuilder;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9PipBehandlingStatus;
@@ -20,6 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9.K9PipFagsak
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.SifAbacPdpRestKlient;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.AbacBehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.AbacFagsakStatus;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.BehandlingUuidOperasjonDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.BeskyttetRessursActionAttributt;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.OperasjonDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.ResourceType;
@@ -34,7 +32,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.Xa
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.xacml.XacmlResponseMapper;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.log.util.LoggerUtils;
-import no.nav.vedtak.sikkerhet.abac.TokenProvider;
 import no.nav.vedtak.sikkerhet.abac.internal.BeskyttetRessursAttributter;
 
 @ApplicationScoped
@@ -42,66 +39,31 @@ public class AppPdpKlientImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(AppPdpKlientImpl.class);
 
-    private static final String DOMENE = "k9";
-
-    private AppPdpConsumerImpl pdp;
-    private SifAbacPdpRestKlient sifAbacPdpRestKlient = new SifAbacPdpRestKlient();
-    private TokenProvider tokenProvider;
+    private SifAbacPdpRestKlient sifAbacPdpRestKlient;
     private K9AbacAuditlogger abacAuditlogger;
     private K9PdpRequestBuilder pdpRequestBuilder;
-    private String konfigurasjon;
 
     public AppPdpKlientImpl() {
         // CDI
     }
 
-    @Inject
-    public AppPdpKlientImpl(AppPdpConsumerImpl pdp, TokenProvider tokenProvider, K9AbacAuditlogger abacAuditlogger,
-                            K9PdpRequestBuilder pdpRequestBuilder,
-                            @KonfigVerdi(value = "VALGT_PDP_K9", defaultVerdi = "abac-k9") String konfigurasjon) {
-        this.pdp = pdp;
-        this.tokenProvider = tokenProvider;
+    AppPdpKlientImpl(K9AbacAuditlogger abacAuditlogger, K9PdpRequestBuilder pdpRequestBuilder, SifAbacPdpRestKlient sifAbacPdpRestKlient) {
         this.abacAuditlogger = abacAuditlogger;
         this.pdpRequestBuilder = pdpRequestBuilder;
-        this.konfigurasjon = konfigurasjon;
+        this.sifAbacPdpRestKlient = sifAbacPdpRestKlient;
+    }
+
+    @Inject
+    public AppPdpKlientImpl(K9AbacAuditlogger abacAuditlogger, K9PdpRequestBuilder pdpRequestBuilder) {
+        this.abacAuditlogger = abacAuditlogger;
+        this.pdpRequestBuilder = pdpRequestBuilder;
+        sifAbacPdpRestKlient = new SifAbacPdpRestKlient();
     }
 
     public K9AbacResultat forespørTilgang(BeskyttetRessursAttributter beskyttetRessursAttributter) {
         var appRessursData = pdpRequestBuilder.lagAppRessursData(beskyttetRessursAttributter.getDataAttributter());
-        K9AbacResultat hovedresultat = switch (konfigurasjon) {
-            case "abac-k9":
-                yield forespørTilgangAbacK9(beskyttetRessursAttributter, appRessursData);
-            case "sif-abac-pdp":
-                yield mapResultat(forespørTilgangSifAbacPdp(beskyttetRessursAttributter, appRessursData));
-            case "begge": {
-                K9AbacResultat resultatGammel = forespørTilgangAbacK9(beskyttetRessursAttributter, appRessursData);
-                try {
-                    Tilgangsbeslutning resultatNy = forespørTilgangSifAbacPdp(beskyttetRessursAttributter, appRessursData);
-                    K9AbacResultat resultatNyMapped = mapResultat(resultatNy);
-                    if (resultatNyMapped != resultatGammel) {
-                        LOG.warn("Ulikt resultat fra ny/gammel abac. Ny årsaker {} mapped til {} gammel {}",
-                            resultatNy.årsakerForIkkeTilgang(),
-                            resultatNyMapped,
-                            resultatGammel);
-                    }
-                } catch (Exception e) {
-                    LOG.warn("Ny tilgangskontroll feilet, bruker resultat fra gammel", e);
-                }
-                yield resultatGammel;
-            }
-            default:
-                throw new IllegalArgumentException("Ikke-støttet konfigurasjonsverdi: " + konfigurasjon);
-        };
-
+        K9AbacResultat hovedresultat = mapResultat(forespørTilgangSifAbacPdp(beskyttetRessursAttributter, appRessursData));
         abacAuditlogger.loggUtfall(hovedresultat, beskyttetRessursAttributter, appRessursData);
-        return hovedresultat;
-    }
-
-    private K9AbacResultat forespørTilgangAbacK9(BeskyttetRessursAttributter beskyttetRessursAttributter, K9AppRessursData appRessursData) {
-        var token = Token.withOidcToken(tokenProvider.openIdToken());
-        var request = XacmlRequestMapper.lagXacmlRequest(beskyttetRessursAttributter, DOMENE, appRessursData, token);
-        var response = pdp.evaluate(request);
-        var hovedresultat = resultatFraResponse(response);
         return hovedresultat;
     }
 
