@@ -4,6 +4,11 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 
+import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.simulering.dto.BehandlingReferanse;
+import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.simulering.dto.BehandlingReferanseDomene;
+
+import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.simulering.dto.Domene;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +31,7 @@ public class K9oppdragRestKlient {
 
     private static final String K9_OPPDRAG_BASE_URL = "http://k9-oppdrag/k9/oppdrag/api";
     private static final String K9_OPPDRAG_OVERRIDE_URL = "k9oppdrag.override.url";
-    private static final String K9_OPPDRAG_HENT_FEILUTBETALINGER = "/simulering/feilutbetalte-perioder";
+    private static final String K9_OPPDRAG_HENT_FEILUTBETALINGER = "/simulering/v2/feilutbetalte-perioder";
 
     public K9oppdragRestKlient() {
         this.restClient = RestClient.client();
@@ -35,7 +40,8 @@ public class K9oppdragRestKlient {
 
     public Optional<FeilutbetaltePerioderDto> hentFeilutbetaltePerioder(UUID uuid) {
         URI hentFeilutbetalingerUri = URI.create(getK9OoppdragBaseUri() + K9_OPPDRAG_HENT_FEILUTBETALINGER);
-        var request = RestRequest.newPOSTJson(uuid, hentFeilutbetalingerUri, restConfig);
+        BehandlingReferanseDomene dto = new BehandlingReferanseDomene(new BehandlingReferanse(uuid), Domene.K9);
+        var request = RestRequest.newPOSTJson(dto, hentFeilutbetalingerUri, restConfig);
         return restClient.sendReturnOptional(request, FeilutbetaltePerioderDto.class);
     }
 
