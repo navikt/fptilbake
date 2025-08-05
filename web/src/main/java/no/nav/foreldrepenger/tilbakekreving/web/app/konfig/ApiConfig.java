@@ -9,7 +9,10 @@ import java.util.Set;
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 
+import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.ObjectMapperFactory;
 import no.nav.openapi.spec.utils.http.DynamicObjectMapperResolverVaryFilter;
+
+import no.nav.openapi.spec.utils.openapi.PrefixStrippingFQNTypeNameResolver;
 
 import org.glassfish.jersey.server.ServerProperties;
 
@@ -72,13 +75,15 @@ public class ApiConfig extends Application {
     private OpenAPI resolveOpenAPI() {
         final var info = new Info()
             .title("Vedtaksløsningen - Tilbakekreving")
-            .version("1.0")
+            .version("1.1")
             .description("REST grensesnitt for tilbakekreving.");
         final var server = new Server().url(JettyServer.getContextPath());
         final var openapiSetupHelper = new OpenApiSetupHelper(this, info, server);
         for(final var cls : getClasses()) {
             openapiSetupHelper.addResourceClass(cls.getName());
         }
+        openapiSetupHelper.registerSubTypes(ObjectMapperFactory.getJsonTypeNameClasses());
+        openapiSetupHelper.setTypeNameResolver(new PrefixStrippingFQNTypeNameResolver("no.nav.foreldrepenger.", "no.nav."));
         try {
             return openapiSetupHelper.resolveOpenAPI();
         } catch (OpenApiConfigurationException e) {

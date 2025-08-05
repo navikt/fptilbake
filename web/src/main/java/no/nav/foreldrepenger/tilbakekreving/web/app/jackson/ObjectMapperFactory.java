@@ -55,7 +55,7 @@ public class ObjectMapperFactory {
     /**
      * Scan subtyper dynamisk fra WAR slik at superklasse slipper å deklarere @JsonSubtypes.
      */
-    private static List<Class<?>> getJsonTypeNameClasses() {
+    public static List<Class<?>> getJsonTypeNameClasses() {
         Class<ObjectMapperFactory> cls = ObjectMapperFactory.class;
         IndexClasses indexClasses;
         try {
