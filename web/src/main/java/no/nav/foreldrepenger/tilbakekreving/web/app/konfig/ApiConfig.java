@@ -83,7 +83,7 @@ public class ApiConfig extends Application {
             openapiSetupHelper.addResourceClass(cls.getName());
         }
         openapiSetupHelper.registerSubTypes(ObjectMapperFactory.getJsonTypeNameClasses());
-        openapiSetupHelper.setTypeNameResolver(new PrefixStrippingFQNTypeNameResolver("no.nav.foreldrepenger.", "no.nav."));
+        openapiSetupHelper.setTypeNameResolver(new PrefixStrippingFQNTypeNameResolver("no.nav."));
         try {
             return openapiSetupHelper.resolveOpenAPI();
         } catch (OpenApiConfigurationException e) {
