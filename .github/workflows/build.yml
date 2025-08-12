@@ -37,7 +37,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: navikt/sif-gha-workflows/.github/actions/maven/generate-openapi@main
         id: generate-openapi
         with:
