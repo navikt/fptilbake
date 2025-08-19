@@ -124,9 +124,7 @@ public class VergeEntitet extends BaseEntitet {
         }
 
         public Builder medGyldigPeriode(LocalDate fom, LocalDate tom) {
-            if (fom != null && tom != null) {
-                this.kladd.gyldigPeriode = Periode.of(fom, Tid.tomEllerMax(tom));
-            }
+            this.kladd.gyldigPeriode = Periode.of(fom, Tid.tomEllerMax(tom));
             return this;
         }
 
