@@ -22,7 +22,10 @@ public class NyVergeDto implements AbacDto {
 
     @Digits(integer = 11, fraction = 0)
     private String fnr;
+
+    @NotNull
     private LocalDate gyldigFom;
+
     private LocalDate gyldigTom;
 
     @Valid

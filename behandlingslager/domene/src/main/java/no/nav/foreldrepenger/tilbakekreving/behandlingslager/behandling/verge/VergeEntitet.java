@@ -17,6 +17,7 @@ import jakarta.persistence.Table;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.vedtak.konfig.Tid;
 
 @Entity(name = "VergeEntitet")
 @Table(name = "VERGE")
@@ -123,9 +124,7 @@ public class VergeEntitet extends BaseEntitet {
         }
 
         public Builder medGyldigPeriode(LocalDate fom, LocalDate tom) {
-            if (fom != null && tom != null) {
-                this.kladd.gyldigPeriode = Periode.of(fom, tom);
-            }
+            this.kladd.gyldigPeriode = Periode.of(fom, Tid.tomEllerMax(tom));
             return this;
         }
 
