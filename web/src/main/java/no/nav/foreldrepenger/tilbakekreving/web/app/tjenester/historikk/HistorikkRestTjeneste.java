@@ -2,9 +2,10 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk;
 
 import static no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRestTjeneste.HISTORIKK_PATH;
 
+import java.util.List;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -12,14 +13,13 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.HistorikkTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.historikk.HistorikkinnslagDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
@@ -49,11 +49,10 @@ public class HistorikkRestTjeneste {
     @Operation(tags = "historikk", description = "Henter alle historikkinnslag for gitt behandling.")
     @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentAlleInnslagV2(@NotNull @QueryParam("saksnummer")
+    public List<HistorikkinnslagDto> hentAlleInnslagV2(@NotNull @QueryParam("saksnummer")
                                     @Parameter(description = "Saksnummer må være et eksisterende saksnummer")
                                     @Valid SaksnummerDto saksnummerDto) {
-        var historikkInnslagDtoList = historikkTjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()));
-        return Response.ok().entity(historikkInnslagDtoList).build();
+        return historikkTjeneste.hentForSak(new Saksnummer(saksnummerDto.getVerdi()));
     }
 
 }
