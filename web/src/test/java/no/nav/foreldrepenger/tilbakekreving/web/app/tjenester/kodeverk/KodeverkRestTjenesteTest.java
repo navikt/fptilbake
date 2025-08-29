@@ -15,14 +15,13 @@ import org.junit.jupiter.api.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.app.HentKodeverkTjeneste;
 
 class KodeverkRestTjenesteTest {
 
     @Test
     void skal_hente_kodeverk_og_gruppere_på_kodeverknavn() throws IOException {
 
-        KodeverkRestTjeneste tjeneste = new KodeverkRestTjeneste(new HentKodeverkTjeneste());
+        KodeverkRestTjeneste tjeneste = new KodeverkRestTjeneste();
         var rawJson = (String) tjeneste.hentGruppertKodeliste().getEntity();
         assertThat(rawJson).isNotNull();
 
@@ -31,9 +30,9 @@ class KodeverkRestTjenesteTest {
             .contains(Fagsystem.class.getSimpleName(), SærligGrunn.class.getSimpleName(), VidereBehandling.class.getSimpleName());
 
         assertThat(gruppertKodeliste.keySet())
-            .containsAll(new HashSet<>(HentKodeverkTjeneste.KODEVERDIER_SOM_BRUKES_PÅ_KLIENT.keySet()));
+            .containsAll(new HashSet<>(KodeverkRestTjeneste.legacyGrupperteKodeverdier.keySet()));
 
-        assertThat(gruppertKodeliste.keySet()).hasSize(HentKodeverkTjeneste.KODEVERDIER_SOM_BRUKES_PÅ_KLIENT.size());
+        assertThat(gruppertKodeliste.keySet()).hasSize(KodeverkRestTjeneste.legacyGrupperteKodeverdier.size());
 
         var fagsakStatuser = (List<Map<String, String>>) gruppertKodeliste.get(Fagsystem.class.getSimpleName());
         assertThat(fagsakStatuser.stream().map(k -> k.get("kode")).collect(Collectors.toList())).contains(Fagsystem.FPSAK.getKode(),
