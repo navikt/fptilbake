@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 
-public record HistorikkinnslagDto(@NotNull UUID behandlingUuid,
+public record HistorikkinnslagDto(UUID behandlingUuid,
                                   @NotNull HistorikkAktørDto aktør,
                                   SkjermlenkeType skjermlenke,
                                   @NotNull LocalDateTime opprettetTidspunkt,
@@ -20,7 +20,6 @@ public record HistorikkinnslagDto(@NotNull UUID behandlingUuid,
                                   @NotNull List<Linje> linjer) {
 
     public HistorikkinnslagDto {
-        Objects.requireNonNull(behandlingUuid);
         Objects.requireNonNull(aktør);
         Objects.requireNonNull(opprettetTidspunkt);
         if(dokumenter == null) {
