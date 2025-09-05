@@ -2,21 +2,41 @@ package no.nav.foreldrepenger.tilbakekreving.historikk;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 
 public record HistorikkinnslagDto(UUID behandlingUuid,
-                                  HistorikkAktørDto aktør,
+                                  @NotNull HistorikkAktørDto aktør,
                                   SkjermlenkeType skjermlenke,
-                                  LocalDateTime opprettetTidspunkt,
-                                  List<HistorikkInnslagDokumentLinkDto> dokumenter,
+                                  @NotNull LocalDateTime opprettetTidspunkt,
+                                  @NotNull List<HistorikkInnslagDokumentLinkDto> dokumenter,
                                   String tittel,
-                                  List<Linje> linjer) {
+                                  @NotNull List<Linje> linjer) {
 
-    public record HistorikkAktørDto(HistorikkAktør type, String ident) {
+    public HistorikkinnslagDto {
+        Objects.requireNonNull(aktør);
+        Objects.requireNonNull(opprettetTidspunkt);
+        if(dokumenter == null) {
+            dokumenter = List.of();
+        }
+        if(linjer == null) {
+            linjer = List.of();
+        }
+    }
+
+    public record HistorikkAktørDto(@NotNull HistorikkAktør type, String ident) {
+        public HistorikkAktørDto {
+            if(type == null) {
+                type = HistorikkAktør.UDEFINERT;
+            }
+        }
+
         public static HistorikkAktørDto fra(HistorikkAktør aktør, String opprettetAv) {
             if (Set.of(HistorikkAktør.SAKSBEHANDLER, HistorikkAktør.BESLUTTER).contains(aktør)) {
                 return new HistorikkAktørDto(aktør, opprettetAv);
@@ -25,7 +45,11 @@ public record HistorikkinnslagDto(UUID behandlingUuid,
         }
     }
 
-    public record Linje(Type type, String tekst) {
+    public record Linje(@NotNull Type type, String tekst) {
+        public Linje {
+            Objects.requireNonNull(type);
+        }
+
         public static Linje tekstlinje(String tekst) {
             return new Linje(Type.TEKST, tekst);
         }

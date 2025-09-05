@@ -10,6 +10,7 @@ import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 
 import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.ObjectMapperFactory;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.caching.CacheControlFeature;
 import no.nav.openapi.spec.utils.http.DynamicObjectMapperResolverVaryFilter;
 
 import no.nav.openapi.spec.utils.openapi.PrefixStrippingFQNTypeNameResolver;
@@ -129,6 +130,7 @@ public class ApiConfig extends Application {
             // Applikasjonsoppsett
             JacksonJsonConfig.class,
             DynamicObjectMapperResolverVaryFilter.class,
+            CacheControlFeature.class,
             // ExceptionMappers pga de som finnes i Jackson+Jersey-media
             ConstraintViolationMapper.class,
             JsonMappingExceptionMapper.class,
