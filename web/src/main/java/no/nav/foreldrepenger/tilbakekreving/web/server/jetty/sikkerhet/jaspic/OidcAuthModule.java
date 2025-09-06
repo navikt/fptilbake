@@ -28,7 +28,7 @@ import jakarta.security.auth.message.module.ServerAuthModule;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.ee10.security.jaspi.JaspiMessageInfo;
+import org.eclipse.jetty.ee11.security.jaspi.JaspiMessageInfo;
 import org.eclipse.jetty.server.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

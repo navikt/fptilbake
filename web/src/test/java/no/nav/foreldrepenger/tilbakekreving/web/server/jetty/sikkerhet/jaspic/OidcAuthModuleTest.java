@@ -18,7 +18,7 @@ import jakarta.security.auth.message.MessageInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.ee10.security.jaspi.JaspiMessageInfo;
+import org.eclipse.jetty.ee11.security.jaspi.JaspiMessageInfo;
 import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.ConnectionMetaData;

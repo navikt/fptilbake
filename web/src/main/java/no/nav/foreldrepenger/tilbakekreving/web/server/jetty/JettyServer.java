@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
-import static org.eclipse.jetty.ee10.webapp.MetaInfConfiguration.CONTAINER_JAR_PATTERN;
+import static org.eclipse.jetty.ee11.webapp.MetaInfConfiguration.CONTAINER_JAR_PATTERN;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,16 +17,16 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.ContextPa
 
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.jaspic.OidcAuthModule;
 
-import org.eclipse.jetty.ee10.cdi.CdiDecoratingListener;
-import org.eclipse.jetty.ee10.cdi.CdiServletContainerInitializer;
-import org.eclipse.jetty.ee10.security.jaspi.DefaultAuthConfigFactory;
-import org.eclipse.jetty.ee10.security.jaspi.JaspiAuthenticatorFactory;
-import org.eclipse.jetty.ee10.security.jaspi.provider.JaspiAuthConfigProvider;
-import org.eclipse.jetty.ee10.servlet.ErrorPageErrorHandler;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.security.ConstraintMapping;
-import org.eclipse.jetty.ee10.servlet.security.ConstraintSecurityHandler;
-import org.eclipse.jetty.ee10.webapp.WebAppContext;
+import org.eclipse.jetty.ee11.cdi.CdiDecoratingListener;
+import org.eclipse.jetty.ee11.cdi.CdiServletContainerInitializer;
+import org.eclipse.jetty.ee11.security.jaspi.DefaultAuthConfigFactory;
+import org.eclipse.jetty.ee11.security.jaspi.JaspiAuthenticatorFactory;
+import org.eclipse.jetty.ee11.security.jaspi.provider.JaspiAuthConfigProvider;
+import org.eclipse.jetty.ee11.servlet.ErrorPageErrorHandler;
+import org.eclipse.jetty.ee11.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee11.servlet.security.ConstraintMapping;
+import org.eclipse.jetty.ee11.servlet.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.ee11.webapp.WebAppContext;
 import org.eclipse.jetty.plus.jndi.EnvEntry;
 import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.DefaultIdentityService;
