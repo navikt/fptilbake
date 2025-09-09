@@ -2,9 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.overvåkning.metrikker;
 
 import java.math.BigDecimal;
 import java.sql.Clob;
-import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -260,7 +258,7 @@ public class StatistikkRepository {
                     AksjonspunktDefinisjon.kodeMap().getOrDefault(aksjonspunktKode, AksjonspunktDefinisjon.UNDEFINED).getNavn(), UDEFINERT);
                 String aksjonspunktStatus = t.get(4, String.class);
                 String venteÅrsak = coalesce(t.get(5, String.class), UDEFINERT);
-                long tidsstempel = t.get(6, Timestamp.class).getTime();
+                long tidsstempel = t.get(6, LocalDateTime.class).toInstant(ZoneOffset.UTC).toEpochMilli();
                 return SensuEvent.createSensuEvent(metricName,
                     toMap(
                         "ytelse_type", ytelseType,
@@ -354,8 +352,8 @@ public class StatistikkRepository {
                 String taskId = t.get(2, Long.class).toString();
                 String taskType = t.get(3, String.class);
                 String status = t.get(4, String.class);
-                Timestamp sistKjørt = t.get(5, Timestamp.class);
-                long tidsstempel = sistKjørt == null ? now : sistKjørt.getTime();
+                var sistKjørt = t.get(5, LocalDateTime.class);
+                long tidsstempel = sistKjørt == null ? now : sistKjørt.toInstant(ZoneOffset.UTC).toEpochMilli();
                 Clob feilmelding = (Clob) t.get(6);
                 String sisteFeil;
                 if (feilmelding != null) {
@@ -374,7 +372,7 @@ public class StatistikkRepository {
                 Long blokkertAvId = t.get(8, Long.class);
                 String blokkertAv = blokkertAvId == null ? null : blokkertAvId.toString();
 
-                String opprettetTid = t.get(9, Timestamp.class).toInstant().toString();
+                String opprettetTid = t.get(9, LocalDateTime.class).toInstant(ZoneOffset.UTC).toString();
 
                 var gruppeSekvensnr = t.get(10, Long.class);
 
@@ -408,7 +406,6 @@ public class StatistikkRepository {
     Collection<SensuEvent> meldingerFraØkonomiStatistikk() {
 
         LocalDateTime startpunkt = LocalDateTime.now().minus(kravgrunnlagOppdateringsperiode);
-        Date startpunktDbTid = new Date(startpunkt.toEpochSecond(ZoneOffset.UTC) * 1000L);
         String sql = """
             select tidspunkt, meldingstype, status, fagomraade, count(*) as antall
             from (
@@ -428,7 +425,7 @@ public class StatistikkRepository {
         String metricName = "meldinger_fra_OS_v1";
 
         NativeQuery<Tuple> query = (NativeQuery<Tuple>) entityManager.createNativeQuery(sql, Tuple.class)
-            .setParameter("starttid", startpunktDbTid);
+            .setParameter("starttid", startpunkt);
         Stream<Tuple> stream = query.getResultStream();
         var values = stream.map(t -> SensuEvent.createSensuEvent(metricName,
                 Map.of("melding_type", t.get(1, String.class),
@@ -437,7 +434,7 @@ public class StatistikkRepository {
                     "ytelse_type", mapFagområdeTilYtelseType(t.get(3, String.class)).getKode()
                 ),
                 Map.of("totalt_antall", t.get(4, BigDecimal.class)),
-                t.get(0, Timestamp.class).getTime()))
+                t.get(0, LocalDateTime.class).toInstant(ZoneOffset.UTC).toEpochMilli()))
             .toList();
         return values;
     }
@@ -481,7 +478,7 @@ public class StatistikkRepository {
 
         NativeQuery<Tuple> query = (NativeQuery<Tuple>) entityManager.createNativeQuery(sql, Tuple.class);
         Map<BehandlignOpprettetGruppering, List<BehandlignOpprettetHendelse>> gruppertHendelse = query.getResultStream().map(row -> {
-            long tidspunkt = row.get(0, Timestamp.class).getTime();
+            long tidspunkt = row.get(0, LocalDateTime.class).toInstant(ZoneOffset.UTC).toEpochMilli();
             String behandlinType = row.get(1, String.class);
             String ytelseType = row.get(3, String.class);
             String opprettelsesgrunn = row.get(4, String.class);
@@ -546,7 +543,7 @@ public class StatistikkRepository {
                     "ytelse_type", t.get(4, String.class)
                 ),
                 Map.of("totalt_antall", t.get(5, BigDecimal.class)),
-                t.get(0, Timestamp.class).getTime()))
+                t.get(0, LocalDateTime.class).toInstant(ZoneOffset.UTC).toEpochMilli()))
             .toList();
         return values;
     }
@@ -571,7 +568,7 @@ public class StatistikkRepository {
                     "ytelse_type", t.get(2, String.class)
                 ),
                 Map.of("totalt_antall", t.get(3, BigDecimal.class)),
-                t.get(0, Timestamp.class).getTime()))
+                t.get(0, LocalDateTime.class).toInstant(ZoneOffset.UTC).toEpochMilli()))
             .toList();
         return values;
     }

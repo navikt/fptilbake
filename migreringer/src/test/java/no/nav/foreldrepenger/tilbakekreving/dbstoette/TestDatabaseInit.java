@@ -22,11 +22,15 @@ import static java.lang.Runtime.getRuntime;
  */
 public final class TestDatabaseInit {
 
+    public static final String DEFAULT_DS_SCHEMA = "defaultDS";
+    public static final String TEST_DB_CONTAINER = Environment.current()
+        .getProperty("testcontainer.test.db", String.class, "gvenzl/oracle-free:23-slim-faststart");
+
     private static final AtomicBoolean GUARD_UNIT_TEST_SKJEMAER = new AtomicBoolean();
     private static final Environment ENV = Environment.current();
     private static final String DB_SCRIPT_LOCATION = "/db/migration/defaultDS";
 
-    public static void settOppDatasourceOgMigrer(String jdbcUrl, String username, String password) {
+    public static DataSource settOppDatasourceOgMigrer(String jdbcUrl, String username, String password) {
         var ds = createDatasource(jdbcUrl, username, password);
         settJdniOppslag(ds);
         if (GUARD_UNIT_TEST_SKJEMAER.compareAndSet(false, true)) {
@@ -50,6 +54,7 @@ public final class TestDatabaseInit {
                 }
             }
         }
+        return ds;
     }
 
     private static String getScriptLocation() {
