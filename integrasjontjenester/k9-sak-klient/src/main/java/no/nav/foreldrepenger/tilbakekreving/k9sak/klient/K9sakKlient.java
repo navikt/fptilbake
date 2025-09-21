@@ -9,11 +9,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.core.UriBuilder;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.ws.rs.core.UriBuilder;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.kontrakter.simulering.resultat.v1.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -72,16 +73,6 @@ public class K9sakKlient implements FagsystemKlient {
     }
 
     @Override
-    public boolean finnesBehandlingIFagsystem(String saksnummer, Henvisning henvisning) {
-        List<EksternBehandlingsinfoDto> eksternBehandlinger = hentBehandlingForSaksnummer(saksnummer);
-        if (!eksternBehandlinger.isEmpty()) {
-            return eksternBehandlinger.stream()
-                .anyMatch(eksternBehandlingsinfoDto -> henvisning.equals(eksternBehandlingsinfoDto.getHenvisning()));
-        }
-        return false;
-    }
-
-    @Override
     public SamletEksternBehandlingInfo hentBehandlingsinfo(UUID eksternUuid, Tillegsinformasjon... tilleggsinformasjon) {
         return hentBehandlingsinfoOpt(eksternUuid, Arrays.asList(tilleggsinformasjon))
             .orElseThrow(() -> new IntegrasjonException("FPT-841933", String.format("Fant ikke behandling med behandingUuid %s i k9-sak", eksternUuid)));
@@ -117,8 +108,10 @@ public class K9sakKlient implements FagsystemKlient {
     }
 
     @Override
-    public List<EksternBehandlingsinfoDto> hentBehandlingForSaksnummer(String saksnummer) {
-        return new ArrayList<>(hentK9sakBehandlingForSaksnummer(saksnummer));
+    public Optional<EksternBehandlingsinfoDto> hentBehandlingForSaksnummerHenvisning(String saksnummer, Henvisning henvisning) {
+        return new ArrayList<EksternBehandlingsinfoDto>(hentK9sakBehandlingForSaksnummer(saksnummer)).stream()
+            .filter(b -> henvisning.equals(b.getHenvisning()))
+            .findFirst();
     }
 
     @Override

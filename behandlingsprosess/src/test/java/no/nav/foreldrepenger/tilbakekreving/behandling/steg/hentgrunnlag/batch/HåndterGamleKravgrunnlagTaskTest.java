@@ -12,8 +12,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -126,7 +124,7 @@ class HåndterGamleKravgrunnlagTaskTest {
         when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(true, ENHET, true));
         var eksternBehandlingsinfoDto = lagEksternBehandlingData();
 
-        when(fagsystemKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(List.of(eksternBehandlingsinfoDto));
+        when(fagsystemKlientMock.hentBehandlingForSaksnummerHenvisning(anyString(), any())).thenReturn(Optional.of(eksternBehandlingsinfoDto));
         when(fagsystemKlientMock.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingData(eksternBehandlingsinfoDto));
         when(fagsystemKlientMock.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingData(eksternBehandlingsinfoDto));
         when(fagsystemKlientMock.hentBehandlingOptional(any(UUID.class))).thenReturn(Optional.of(eksternBehandlingsinfoDto));
@@ -189,7 +187,7 @@ class HåndterGamleKravgrunnlagTaskTest {
 
     @Test
     void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_eksternBehandling_ikke_finnes_i_fpsak() {
-        when(fagsystemKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(new ArrayList<>());
+        when(fagsystemKlientMock.hentBehandlingForSaksnummerHenvisning(anyString(), any())).thenReturn(Optional.empty());
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNotNull();
         assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNull();

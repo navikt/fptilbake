@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang;
 
-import java.util.List;
 import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -121,9 +120,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
     }
 
     private void oppdaterHenvisningFraGrunnlag(Behandling behandling, String saksnummer, Henvisning grunnlagHenvisning) {
-        List<EksternBehandlingsinfoDto> eksternBehandlinger = hentBehandlingerFraFagsystem(saksnummer);
-        Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDto = eksternBehandlinger.stream()
-                .filter(eksternBehandling -> grunnlagHenvisning.equals(eksternBehandling.getHenvisning())).findFirst();
+        var eksternBehandlingsinfoDto = hentBehandlingerFraFagsystem(saksnummer, grunnlagHenvisning);
         if (eksternBehandlingsinfoDto.isPresent()) {
             LOG.info("Oppdaterer EksternBehandling henvisning={} for behandlingId={}", grunnlagHenvisning, behandling.getId());
             EksternBehandlingsinfoDto eksternBehandlingDto = eksternBehandlingsinfoDto.get();

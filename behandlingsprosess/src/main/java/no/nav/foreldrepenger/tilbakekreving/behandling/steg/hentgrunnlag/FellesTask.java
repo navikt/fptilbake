@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -31,8 +30,8 @@ public abstract class FellesTask {
         return fagsystemKlient.finnesBehandlingIFagsystem(saksnummer, henvisning);
     }
 
-    protected List<EksternBehandlingsinfoDto> hentBehandlingerFraFagsystem(String saksnummer) {
-        return fagsystemKlient.hentBehandlingForSaksnummer(saksnummer);
+    protected Optional<EksternBehandlingsinfoDto> hentBehandlingerFraFagsystem(String saksnummer, Henvisning henvisning) {
+        return fagsystemKlient.hentBehandlingForSaksnummerHenvisning(saksnummer, henvisning);
     }
 
     protected List<Behandling> hentBehandlingerForSaksnummer(String saksnummer) {

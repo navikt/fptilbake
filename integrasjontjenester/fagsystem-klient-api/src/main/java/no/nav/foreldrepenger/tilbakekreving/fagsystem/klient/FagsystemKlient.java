@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.fagsystem.klient;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,7 +11,9 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingV
 
 public interface FagsystemKlient {
 
-    boolean finnesBehandlingIFagsystem(String saksnummer, Henvisning henvisning);
+    default boolean finnesBehandlingIFagsystem(String saksnummer, Henvisning henvisning) {
+        return hentBehandlingForSaksnummerHenvisning(saksnummer, henvisning).isPresent();
+    }
 
     SamletEksternBehandlingInfo hentBehandlingsinfo(UUID eksternUuid, Tillegsinformasjon... tillegsinformasjon);
 
@@ -24,7 +25,7 @@ public interface FagsystemKlient {
 
     Optional<TilbakekrevingValgDto> hentTilbakekrevingValg(UUID eksternUuid);
 
-    List<EksternBehandlingsinfoDto> hentBehandlingForSaksnummer(String saksnummer);
+    Optional<EksternBehandlingsinfoDto> hentBehandlingForSaksnummerHenvisning(String saksnummer, Henvisning henvisning);
 
     FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning);
 

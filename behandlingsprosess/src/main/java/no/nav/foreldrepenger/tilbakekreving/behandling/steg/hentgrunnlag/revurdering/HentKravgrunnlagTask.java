@@ -1,8 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering;
 
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -101,9 +99,7 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
     }
 
     private void oppdaterHenvisningFraGrunnlag(Behandling behandling, String saksnummer, Henvisning grunnlagHenvisning) {
-        List<EksternBehandlingsinfoDto> eksternBehandlinger = hentBehandlingerFraFagsystem(saksnummer);
-        Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDto = eksternBehandlinger.stream()
-                .filter(eksternBehandling -> grunnlagHenvisning.equals(eksternBehandling.getHenvisning())).findFirst();
+        var eksternBehandlingsinfoDto = fagsystemKlient.hentBehandlingForSaksnummerHenvisning(saksnummer, grunnlagHenvisning);
         if (eksternBehandlingsinfoDto.isPresent()) {
             LOG.info("Oppdaterer EksternBehandling henvisning={} for behandlingId={}", grunnlagHenvisning, behandling.getId());
             EksternBehandlingsinfoDto eksternBehandlingDto = eksternBehandlingsinfoDto.get();
@@ -113,10 +109,6 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
             throw new TekniskException("FPT-587169",
                     String.format("Hentet et tilbakekrevingsgrunnlag fra Økonomi for en behandling som ikke finnes i Fagsaksystemet for saksnummer=%s, henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!", saksnummer, grunnlagHenvisning));
         }
-    }
-
-    private List<EksternBehandlingsinfoDto> hentBehandlingerFraFagsystem(String saksnummer) {
-        return fagsystemKlient.hentBehandlingForSaksnummer(saksnummer);
     }
 
     private void lagHistorikkInnslagForMotattKravgrunnlag(Behandling behandling, Kravgrunnlag431 kravgrunnlag431) {

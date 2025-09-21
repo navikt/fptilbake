@@ -5,14 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevSporingTjeneste;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevSporingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
@@ -79,7 +79,7 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         behandling = lagBehandling();
         lagEksternBehandling(behandling);
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
-        when(fagsystemKlientMock.hentBehandlingForSaksnummer("139015144")).thenReturn(lagResponsFraFagsystemKlient());
+        when(fagsystemKlientMock.hentBehandlingForSaksnummerHenvisning(eq("139015144"), any())).thenReturn(lagResponsFraFagsystemKlient());
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL_samme_referanse.xml"));
         lesKravgrunnlagTask.doTask(lagProsessTaskData(mottattXmlId, LES_KRAV_GRUNNLAG_TASK));
@@ -299,10 +299,10 @@ class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 
-    private List<EksternBehandlingsinfoDto> lagResponsFraFagsystemKlient() {
+    private Optional<EksternBehandlingsinfoDto> lagResponsFraFagsystemKlient() {
         var eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setUuid(UUID.randomUUID());
         eksternBehandlingsinfoDto.setHenvisning(Henvisning.fraEksternBehandlingId(REFERANSE));
-        return List.of(eksternBehandlingsinfoDto);
+        return Optional.of(eksternBehandlingsinfoDto);
     }
 }
