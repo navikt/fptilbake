@@ -1,8 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -104,14 +102,9 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
     //TODO k9-tilbake flytt til saksbehandlingKlient-er
     private EksternBehandlingsinfoDto hentEksternBehandlingFraFpsak(Behandling behandling, Henvisning henvisning) {
         String saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
-        List<EksternBehandlingsinfoDto> eksternBehandlinger = fagsystemKlient.hentBehandlingForSaksnummer(saksnummer);
-        Optional<EksternBehandlingsinfoDto> eksternBehandling = eksternBehandlinger.stream()
-                .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getHenvisning().equals(henvisning)).findAny();
-        if (eksternBehandling.isEmpty()) {
-            throw new TekniskException("FPT-587197",
-                    String.format("Hentet et kravgrunnlag fra Økonomi for en behandling som ikke finnes i fpsak. behandlingId=%s, henvisningId=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!", behandling.getId(), henvisning.getVerdi()));
-        }
-        return eksternBehandling.get();
+        return fagsystemKlient.hentBehandlingForSaksnummerHenvisning(saksnummer, henvisning)
+            .orElseThrow(() -> new TekniskException("FPT-587197",
+                    String.format("Hentet et kravgrunnlag fra Økonomi for en behandling som ikke finnes i fpsak. behandlingId=%s, henvisningId=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!", behandling.getId(), henvisning.getVerdi())));
     }
 
     private void oppdaterEksternBehandling(Behandling behandling, EksternBehandlingsinfoDto eksternBehandlingsinfoDto) {

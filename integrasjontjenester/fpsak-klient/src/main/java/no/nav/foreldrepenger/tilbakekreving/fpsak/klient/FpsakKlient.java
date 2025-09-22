@@ -58,16 +58,6 @@ public class FpsakKlient implements FagsystemKlient {
     }
 
     @Override
-    public boolean finnesBehandlingIFagsystem(String saksnummer, Henvisning henvisning) {
-        var eksternBehandlinger = hentBehandlingForSaksnummer(saksnummer);
-        if (!eksternBehandlinger.isEmpty()) {
-            return eksternBehandlinger.stream()
-                    .anyMatch(eksternBehandlingsinfoDto -> henvisning.equals(eksternBehandlingsinfoDto.getHenvisning()));
-        }
-        return false;
-    }
-
-    @Override
     public SamletEksternBehandlingInfo hentBehandlingsinfo(UUID eksternUuid, Tillegsinformasjon... tillegsinformasjon) {
         return hentBehandlingsinfoOpt(eksternUuid, Arrays.asList(tillegsinformasjon))
                 .orElseThrow(() -> new IntegrasjonException("FPT-841932", String.format("Fant ikke behandling med behandingUuid %s i fpsak", eksternUuid)));
@@ -148,8 +138,10 @@ public class FpsakKlient implements FagsystemKlient {
 
 
     @Override
-    public List<EksternBehandlingsinfoDto> hentBehandlingForSaksnummer(String saksnummer) {
-        return new ArrayList<>(hentFpsakBehandlingForSaksnummer(saksnummer));
+    public Optional<EksternBehandlingsinfoDto> hentBehandlingForSaksnummerHenvisning(String saksnummer, Henvisning henvisning) {
+        return new ArrayList<EksternBehandlingsinfoDto>(hentFpsakBehandlingForSaksnummer(saksnummer)).stream()
+            .filter(b -> henvisning.equals(b.getHenvisning()))
+            .findFirst();
     }
 
     @Override

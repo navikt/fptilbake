@@ -97,7 +97,7 @@ class HentKorrigertKravgrunnlagTaskTest {
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
         Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
         assertThat(eksternBehandling.getHenvisning()).isEqualTo(kravgrunnlag431.getReferanse());
-        verify(fagsystemKlient, never()).hentBehandlingForSaksnummer(anyString());
+        verify(fagsystemKlient, never()).hentBehandlingForSaksnummerHenvisning(anyString(), any());
     }
 
     @Test
@@ -112,9 +112,7 @@ class HentKorrigertKravgrunnlagTaskTest {
     void skal_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_ikke_er_samme_i_hentet_grunnlaget_men_finnes_i_fpsak() {
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(2L), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
-        when(fagsystemKlient.hentBehandlingForSaksnummer(anyString())).thenReturn(List.of(
-                lagEksternBehandlingsInfo(1L),
-                lagEksternBehandlingsInfo(2L)));
+        when(fagsystemKlient.hentBehandlingForSaksnummerHenvisning(anyString(), any())).thenReturn(Optional.of(lagEksternBehandlingsInfo(1L)));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
         assertThat(kravgrunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).isFalse();
         assertThat(eksternBehandling.getHenvisning().toLong()).isEqualTo(2L);
@@ -125,14 +123,14 @@ class HentKorrigertKravgrunnlagTaskTest {
         Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
         assertThat(eksternBehandling.getHenvisning()).isEqualTo(kravgrunnlag431.getReferanse());
         assertThat(eksternBehandling.getHenvisning().toLong()).isEqualTo(1L);
-        verify(fagsystemKlient, atLeastOnce()).hentBehandlingForSaksnummer(anyString());
+        verify(fagsystemKlient, atLeastOnce()).hentBehandlingForSaksnummerHenvisning(anyString(), any());
     }
 
     @Test
     void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_ikke_er_samme_i_hentet_grunnlaget_og_ikke_finnes_i_fpsak() {
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(2L), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
-        when(fagsystemKlient.hentBehandlingForSaksnummer(anyString())).thenReturn(List.of(lagEksternBehandlingsInfo(2L)));
+        when(fagsystemKlient.hentBehandlingForSaksnummerHenvisning(anyString(), any())).thenReturn(Optional.empty());
         ProsessTaskData prosessTaskData = lagProsessTaskData();
         var e = assertThrows(TekniskException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
         assertThat(e.getMessage()).contains("FPT-587197");

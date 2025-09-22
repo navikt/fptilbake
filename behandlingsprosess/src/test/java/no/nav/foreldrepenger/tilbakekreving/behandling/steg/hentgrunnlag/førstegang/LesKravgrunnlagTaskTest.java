@@ -6,10 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,7 +49,7 @@ class LesKravgrunnlagTaskTest extends FellesTestOppsett {
 
     @Test
     void skal_utføre_leskravgrunnlag_task_forGyldigBehandling() {
-        when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(lagResponsFraFagsystemKlient());
+        when(fagsystemKlientMock.hentBehandlingForSaksnummerHenvisning(eq(saksnummer), any())).thenReturn(lagResponsFraFagsystemKlient());
         lesKravgrunnlagTask.doTask(lagProsessTaskData());
 
         assertTrue(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId()));
@@ -61,7 +60,7 @@ class LesKravgrunnlagTaskTest extends FellesTestOppsett {
 
     @Test
     void skal_ikke_utføre_leskravgrunnlag_task_når_grunnlag_referanse_ikke_finnes_i_fagsystem() {
-        when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(Collections.emptyList());
+        when(fagsystemKlientMock.hentBehandlingForSaksnummerHenvisning(eq(saksnummer), any())).thenReturn(Optional.empty());
 
         var e = assertThrows(TekniskException.class, () -> lesKravgrunnlagTask.doTask(lagProsessTaskData()));
         assertThat(e.getMessage()).contains("FPT-587195");
@@ -87,7 +86,7 @@ class LesKravgrunnlagTaskTest extends FellesTestOppsett {
 
     @Test
     void skal_utføre_les_kravgrunnlag_task_for_ugyldig_kravgrunnlag() {
-        when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(lagResponsFraFagsystemKlient());
+        when(fagsystemKlientMock.hentBehandlingForSaksnummerHenvisning(eq(saksnummer), any())).thenReturn(lagResponsFraFagsystemKlient());
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_ugyldig_ENDR_negativ_beløp.xml"));
         lesKravgrunnlagTask.doTask(lagProsessTaskData());
         assertTilkobling();
@@ -104,11 +103,11 @@ class LesKravgrunnlagTaskTest extends FellesTestOppsett {
         return behandling;
     }
 
-    private List<EksternBehandlingsinfoDto> lagResponsFraFagsystemKlient() {
+    private Optional<EksternBehandlingsinfoDto> lagResponsFraFagsystemKlient() {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setUuid(UUID.randomUUID());
         eksternBehandlingsinfoDto.setHenvisning(Henvisning.fraEksternBehandlingId(REFERANSE));
-        return List.of(eksternBehandlingsinfoDto);
+        return Optional.of(eksternBehandlingsinfoDto);
     }
 
     private ProsessTaskData lagProsessTaskData() {

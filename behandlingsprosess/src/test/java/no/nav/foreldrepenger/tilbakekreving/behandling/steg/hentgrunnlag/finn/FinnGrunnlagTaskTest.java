@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevSporingTjeneste;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -30,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevSporingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
@@ -211,7 +210,7 @@ class FinnGrunnlagTaskTest extends FellesTestOppsett {
         EksternBehandlingsinfoDto førsteVedtak = new EksternBehandlingsinfoDto();
         førsteVedtak.setHenvisning(HENVISNING);
         førsteVedtak.setUuid(FPSAK_BEHANDLING_UUID);
-        when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(List.of(førsteVedtak));
+        when(fagsystemKlientMock.hentBehandlingForSaksnummerHenvisning(saksnummer, HENVISNING)).thenReturn(Optional.of(førsteVedtak));
 
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
         mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(ANNEN_HENVISNING, saksnummer, mottattXmlId);
@@ -313,6 +312,7 @@ class FinnGrunnlagTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR.xml"));
         mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(ANNEN_HENVISNING, saksnummer, mottattXmlId);
 
+        mockFagsystemKlientRespons();
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
 
@@ -339,15 +339,11 @@ class FinnGrunnlagTaskTest extends FellesTestOppsett {
     }
 
     private void mockFagsystemKlientRespons() {
-        EksternBehandlingsinfoDto førsteVedtak = new EksternBehandlingsinfoDto();
-        førsteVedtak.setHenvisning(HENVISNING);
-        førsteVedtak.setUuid(FPSAK_BEHANDLING_UUID);
+        EksternBehandlingsinfoDto vedtak = new EksternBehandlingsinfoDto();
+        vedtak.setHenvisning(FinnGrunnlagTaskTest.ANNEN_HENVISNING);
+        vedtak.setUuid(UUID.randomUUID());
 
-        EksternBehandlingsinfoDto andreVedtak = new EksternBehandlingsinfoDto();
-        førsteVedtak.setHenvisning(ANNEN_HENVISNING);
-        andreVedtak.setUuid(UUID.randomUUID());
-
-        when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(List.of(førsteVedtak, andreVedtak));
+        when(fagsystemKlientMock.hentBehandlingForSaksnummerHenvisning(saksnummer, FinnGrunnlagTaskTest.ANNEN_HENVISNING)).thenReturn(Optional.of(vedtak));
     }
 
 }

@@ -70,8 +70,12 @@ public class SamletEksternBehandlingInfo {
         return new AktørId(aktoerId);
     }
 
-    public SøknadType getSøknadType() {
-        return getSøknad().getSøknadType();
+    public boolean gjelderFødsel() {
+        return SøknadType.FØDSEL.equals(getSøknad().getSøknadType());
+    }
+
+    public boolean gjelderAdopsjon() {
+        return SøknadType.ADOPSJON.equals(getSøknad().getSøknadType());
     }
 
     public Saksnummer getSaksnummer() {
