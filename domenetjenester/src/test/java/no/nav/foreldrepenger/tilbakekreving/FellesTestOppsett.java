@@ -91,6 +91,8 @@ public abstract class FellesTestOppsett {
     protected static final String BEHANDLENDE_ENHET_NAVN = "Nav familie- og pensjonsytelser Oslo 1";
     protected static final BehandlingType REVURDERING_BEHANDLING_TYPE = BehandlingType.REVURDERING_TILBAKEKREVING;
     protected static final String SÆRLIG_GRUNNER_BEGRUNNELSE = "særlig grunner begrunnelse";
+    protected static final String SÆRLIG_GRUNN_ANNEN_BEGRUNNELSE = "Særlig grunn ANNET begrunnelse";
+
 
     protected BehandlingskontrollTjeneste behandlingskontrollTjeneste;;
     protected GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingMedGrunnlagTjeneste.class);
@@ -217,8 +219,9 @@ public abstract class FellesTestOppsett {
         } else {
             VilkårResultatAktsomhetDto aktsomhetDto = new VilkårResultatAktsomhetDto();
             aktsomhetDto.setSærligeGrunner(
-                List.of(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL));
+                List.of(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.ANNET, SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL));
             aktsomhetDto.setSærligGrunnerBegrunnelse(SÆRLIG_GRUNNER_BEGRUNNELSE);
+            aktsomhetDto.setAnnetBegrunnelse(SÆRLIG_GRUNN_ANNEN_BEGRUNNELSE);
             if (aktsomhet == Aktsomhet.GROVT_UAKTSOM) {
                 aktsomhetDto.setHarGrunnerTilReduksjon(false);
                 aktsomhetDto.setIleggRenter(true);
