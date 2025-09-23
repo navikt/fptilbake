@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,11 +16,9 @@ import org.junit.jupiter.api.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingInfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakTilbakeDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering.FpoppdragRestKlient;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.integrasjon.rest.RestClient;
@@ -33,23 +30,22 @@ class FpsakKlientTest {
     private static final String SAKSNUMMER = "1256436";
     private static final UUID BEHANDLING_UUID = UUID.randomUUID();
 
-    private static final String BASE_URI = "http://fpsak";
-
-    private RestClient restClientMock = mock(RestClient.class);
-    private FpoppdragRestKlient fpoppdragRestKlient = mock(FpoppdragRestKlient.class);
+    private final RestClient restClientMock = mock(RestClient.class);
+    private final FpoppdragRestKlient fpoppdragRestKlient = mock(FpoppdragRestKlient.class);
 
     private FpsakKlient klient = new FpsakKlient(restClientMock, fpoppdragRestKlient);
 
     @Test
     void skal_hente_DokumentinfoDto() {
-        FpsakBehandlingInfoDto returnDto = dokumentinfoDto();
+        var returnDto = dokumentinfoDto(null);
 
-        when(restClientMock.sendReturnOptional(any(), eq(FpsakBehandlingInfoDto.class))).thenReturn(Optional.of(returnDto));
-        when(restClientMock.sendReturnOptional(any(), eq(PersonopplysningDto.class))).thenReturn(Optional.of(personopplysningDto()));
+        when(restClientMock.sendReturnOptional(any(), eq(FpsakTilbakeDto.class))).thenReturn(Optional.of(returnDto));
 
         SamletEksternBehandlingInfo dokumentinfoDto = klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER);
 
-        assertThat(dokumentinfoDto.getGrunninformasjon()).isEqualTo(returnDto);
+        assertThat(dokumentinfoDto.getGrunninformasjon().getHenvisning().toLong()).isEqualTo(BEHANDLING_ID);
+        assertThat(dokumentinfoDto.getGrunninformasjon().getUuid()).isEqualTo(BEHANDLING_UUID);
+        assertThat(dokumentinfoDto.getGrunninformasjon().getBehandlendeEnhetId()).isEqualTo("4214");
         assertThat(dokumentinfoDto.getPersonopplysninger()).isNotNull();
     }
 
@@ -62,10 +58,8 @@ class FpsakKlientTest {
 
     @Test
     void skal_returnere_hvis_finnes_behandling_i_fpsak() {
-        FpsakBehandlingInfoDto eksternBehandlingInfo = dokumentinfoDto();
-        FpsakKlient.ListeAvFpsakBehandlingInfoDto liste = new FpsakKlient.ListeAvFpsakBehandlingInfoDto();
-        liste.add(eksternBehandlingInfo);
-        when(restClientMock.send(any(), eq(FpsakKlient.ListeAvFpsakBehandlingInfoDto.class))).thenReturn(liste);
+        var eksternBehandlingInfo = dokumentinfoDto(null);
+        when(restClientMock.sendReturnOptional(any(), eq(FpsakTilbakeDto.class))).thenReturn(Optional.of(eksternBehandlingInfo));
 
         boolean erFinnesIFpsak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
         assertThat(erFinnesIFpsak).isTrue();
@@ -73,7 +67,7 @@ class FpsakKlientTest {
 
     @Test
     void skal_returnere_tom_hvis_finnes_ikke_behandling_i_fpsak() {
-        when(restClientMock.send(any(), eq(FpsakKlient.ListeAvFpsakBehandlingInfoDto.class))).thenReturn(new FpsakKlient.ListeAvFpsakBehandlingInfoDto());
+        when(restClientMock.sendReturnOptional(any(), eq(FpsakTilbakeDto.class))).thenReturn(Optional.empty());
 
         boolean erFinnesIFpsak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
         assertThat(erFinnesIFpsak).isFalse();
@@ -81,9 +75,8 @@ class FpsakKlientTest {
 
     @Test
     void skal_returnere_tilbakekreving_valg() {
-        TilbakekrevingValgDto tilbakekrevingValgDto = new TilbakekrevingValgDto(VidereBehandling.TILBAKEKR_OPPRETT);
-        when(restClientMock.sendReturnOptional(any(), eq(FpsakBehandlingInfoDto.class))).thenReturn(Optional.of(dokumentinfoDto()));
-        when(restClientMock.sendReturnOptional(any(), eq(TilbakekrevingValgDto.class))).thenReturn(Optional.of(tilbakekrevingValgDto));
+        var dto = dokumentinfoDto(new FpsakTilbakeDto.FeilutbetalingDto(FpsakTilbakeDto.FeilutbetalingValg.OPPRETT, null));
+        when(restClientMock.sendReturnOptional(any(), eq(FpsakTilbakeDto.class))).thenReturn(Optional.of(dto));
 
         Optional<TilbakekrevingValgDto> valgDto = klient.hentTilbakekrevingValg(BEHANDLING_UUID);
         assertThat(valgDto).isPresent();
@@ -92,42 +85,20 @@ class FpsakKlientTest {
 
     @Test
     void skal_returnere_tom_tilbakekreving_valg() {
-        when(restClientMock.sendReturnOptional(any(), eq(FpsakBehandlingInfoDto.class))).thenReturn(Optional.of(dokumentinfoDto()));
-        when(restClientMock.sendReturnOptional(any(), eq(TilbakekrevingValgDto.class))).thenReturn(Optional.empty());
+        when(restClientMock.sendReturnOptional(any(), eq(FpsakTilbakeDto.class))).thenReturn(Optional.of(dokumentinfoDto(null)));
 
         Optional<TilbakekrevingValgDto> valgDto = klient.hentTilbakekrevingValg(BEHANDLING_UUID);
         assertThat(valgDto).isEmpty();
     }
 
-    private FpsakBehandlingInfoDto dokumentinfoDto() {
-        FpsakBehandlingInfoDto dto = new FpsakBehandlingInfoDto();
-        dto.setBehandlendeEnhetId("4214");
-        dto.setBehandlendeEnhetNavn("enhetnavn");
-        dto.setId(BEHANDLING_ID);
-        dto.setLinks(resourcelinks());
-        return dto;
+    private FpsakTilbakeDto dokumentinfoDto(FpsakTilbakeDto.FeilutbetalingDto feilutbetalingDto) {
+        var b = new FpsakTilbakeDto.BehandlingDto(BEHANDLING_UUID, new FpsakTilbakeDto.HenvisningDto(BEHANDLING_ID),
+            "4214", "enhetnavn",
+            FpsakTilbakeDto.Språkkode.NB, null);
+        var f = new FpsakTilbakeDto.FagsakDto("1234567890123", SAKSNUMMER, FpsakTilbakeDto.YtelseType.FORELDREPENGER);
+        var fam = new FpsakTilbakeDto.FamilieHendelseDto(FpsakTilbakeDto.FamilieHendelseType.FØDSEL, 1);
+        return new FpsakTilbakeDto(b, f, fam, feilutbetalingDto, false, null);
     }
 
-    private PersonopplysningDto personopplysningDto() {
-        PersonopplysningDto dto = new PersonopplysningDto();
-        dto.setAktoerId("aktørId");
-        dto.setAntallBarn(1);
-        return dto;
-    }
-
-    private List<BehandlingResourceLinkDto> resourcelinks() {
-        BehandlingResourceLinkDto personOpplysningerRessursLink = new BehandlingResourceLinkDto();
-        personOpplysningerRessursLink.setHref("/fpsak/api/behandling/person/personopplysninger?uuid=" + BEHANDLING_UUID.toString());
-        personOpplysningerRessursLink.setRel("personopplysninger-tilbake");
-
-        BehandlingResourceLinkDto tilbakekrevingvalgRessursLink = new BehandlingResourceLinkDto();
-        tilbakekrevingvalgRessursLink.setHref("/fpsak/api/behandling/tilbakekreving/valg?uuid=" + BEHANDLING_UUID.toString());
-        tilbakekrevingvalgRessursLink.setRel("tilbakekreving-valg");
-
-        BehandlingResourceLinkDto varselTekstRessursLink = new BehandlingResourceLinkDto();
-        varselTekstRessursLink.setHref("/fpsak/api/behandling/tilbakekreving/varseltekst?uuid=" + BEHANDLING_UUID.toString());
-        varselTekstRessursLink.setRel("tilbakekrevingsvarsel-fritekst");
-        return List.of(personOpplysningerRessursLink, tilbakekrevingvalgRessursLink, varselTekstRessursLink);
-    }
 
 }

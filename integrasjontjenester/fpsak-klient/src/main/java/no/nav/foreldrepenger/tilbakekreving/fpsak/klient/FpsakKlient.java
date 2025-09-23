@@ -1,18 +1,23 @@
 package no.nav.foreldrepenger.tilbakekreving.fpsak.klient;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.core.UriBuilder;
 
 import no.nav.foreldrepenger.kontrakter.simulering.resultat.v1.FeilutbetaltePerioderDto;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
@@ -21,13 +26,12 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandli
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.FagsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SendtoppdragDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SoknadDto;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SøknadType;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VarseltekstDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VergeDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingInfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakTilbakeDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering.FpoppdragRestKlient;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.integrasjon.rest.FpApplication;
@@ -42,8 +46,12 @@ import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 @RestClientConfig(tokenConfig = TokenFlow.ADAPTIVE, application = FpApplication.FPSAK)
 public class FpsakKlient implements FagsystemKlient {
 
+    private static final String BEHANDLING_PATH = "/api/tilbake/behandling";
+    private static final String HENVISNING_PATH = "/api/tilbake/henvisning";
+
     private final RestClient restClient;
     private final RestConfig restConfig;
+    private final URI henvisningTarget;
 
     private final FpoppdragRestKlient fpoppdragKlient;
 
@@ -55,6 +63,7 @@ public class FpsakKlient implements FagsystemKlient {
         this.restClient = restClient;
         this.restConfig = RestConfig.forClient(this.getClass());
         this.fpoppdragKlient = fpoppdragKlient;
+        this.henvisningTarget = UriBuilder.fromUri(restConfig.fpContextPath()).path(HENVISNING_PATH).build();
     }
 
     @Override
@@ -68,53 +77,9 @@ public class FpsakKlient implements FagsystemKlient {
         return hentBehandlingsinfoOpt(eksternUuid, Arrays.asList(tillegsinformasjon));
     }
 
-    private Optional<SamletEksternBehandlingInfo> hentBehandlingsinfoOpt(UUID eksternUuid, Collection<Tillegsinformasjon> tilleggsinformasjon) {
-        Optional<FpsakBehandlingInfoDto> fpsakBehandlingInfoDtoOptoinal = hentFpsakBehandlingOptional(eksternUuid);
-        return fpsakBehandlingInfoDtoOptoinal.map(fpsakBehandingInfo -> {
-            SamletEksternBehandlingInfo.Builder builder = SamletEksternBehandlingInfo.builder(tilleggsinformasjon);
-            builder.setGrunninformasjon(fpsakBehandingInfo);
-            List<BehandlingResourceLinkDto> lenker = fpsakBehandingInfo.getLinks();
-            for (BehandlingResourceLinkDto lenke : lenker) {
-                if (tilleggsinformasjon.contains(Tillegsinformasjon.PERSONOPPLYSNINGER) && lenke.getRel().equals(Tillegsinformasjon.PERSONOPPLYSNINGER.getFpsakRelasjonNavn())) {
-                    builder.setPersonopplysninger(hentPersonopplysninger(lenke));
-                }
-                if (tilleggsinformasjon.contains(Tillegsinformasjon.VARSELTEKST) && lenke.getRel().equals(Tillegsinformasjon.VARSELTEKST.getFpsakRelasjonNavn())) {
-                    hentVarseltekst(lenke).ifPresent(builder::setVarseltekst);
-                }
-                if (tilleggsinformasjon.contains(Tillegsinformasjon.SENDTOPPDRAG) && lenke.getRel().equals(Tillegsinformasjon.SENDTOPPDRAG.getFpsakRelasjonNavn())) {
-                    builder.setSendtoppdrag(hentSendtoppdrag(lenke).isPresent());
-                }
-                if (tilleggsinformasjon.contains(Tillegsinformasjon.SØKNAD) && lenke.getRel().equals(Tillegsinformasjon.SØKNAD.getFpsakRelasjonNavn())) {
-                    builder.setFamiliehendelse(hentSøknad(lenke));
-                }
-                if (tilleggsinformasjon.contains(Tillegsinformasjon.TILBAKEKREVINGSVALG) && lenke.getRel().equals(Tillegsinformasjon.TILBAKEKREVINGSVALG.getFpsakRelasjonNavn())) {
-                    hentTilbakekrevingValg(lenke).ifPresent(builder::setTilbakekrevingvalg);
-                }
-                if (tilleggsinformasjon.contains(Tillegsinformasjon.FAGSAK) && lenke.getRel().equals(Tillegsinformasjon.FAGSAK.getFpsakRelasjonNavn())) {
-                    builder.setFagsak(hentFagsak(lenke));
-                }
-                if (tilleggsinformasjon.contains(Tillegsinformasjon.VERGE) && lenke.getRel().equals(Tillegsinformasjon.VERGE.getFpsakRelasjonNavn())) {
-                    hentVergeInformasjon(lenke).ifPresent(builder::setVerge);
-                }
-            }
-            return builder.build();
-        });
-    }
-
     @Override
     public Optional<EksternBehandlingsinfoDto> hentBehandlingOptional(UUID eksternUuid) {
-        return hentFpsakBehandlingOptional(eksternUuid).map(Function.identity());
-    }
-
-    private Optional<FpsakBehandlingInfoDto> hentFpsakBehandlingOptional(UUID eksternUuid) {
-        URI endpoint = createUri("/api/behandling/backend-root", "uuid", eksternUuid.toString());
-        Optional<FpsakBehandlingInfoDto> dto = get(endpoint, FpsakBehandlingInfoDto.class);
-        if (dto.isPresent()) {
-            FpsakBehandlingInfoDto fpsakdto = dto.get();
-            fpsakdto.setHenvisning(Henvisning.fraEksternBehandlingId(fpsakdto.getId()));
-            return Optional.of(fpsakdto);
-        }
-        return Optional.empty();
+        return hentBehandlingsinfoOpt(eksternUuid).map(SamletEksternBehandlingInfo::getGrunninformasjon);
     }
 
     @Override
@@ -125,23 +90,13 @@ public class FpsakKlient implements FagsystemKlient {
 
     @Override
     public Optional<TilbakekrevingValgDto> hentTilbakekrevingValg(UUID eksternUuid) {
-        Optional<FpsakBehandlingInfoDto> eksternBehandlingsinfoDtoOptional = hentFpsakBehandlingOptional(eksternUuid);
-        if (eksternBehandlingsinfoDtoOptional.isPresent()) {
-            Optional<BehandlingResourceLinkDto> ressursLink = eksternBehandlingsinfoDtoOptional.get().getLinks().stream()
-                    .filter(resourceLink -> Tillegsinformasjon.TILBAKEKREVINGSVALG.getFpsakRelasjonNavn().equals(resourceLink.getRel())).findAny();
-            if (ressursLink.isPresent()) {
-                return hentTilbakekrevingValg(ressursLink.get());
-            }
-        }
-        return Optional.empty();
+        return hentBehandlingsinfoOpt(eksternUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG).map(SamletEksternBehandlingInfo::getTilbakekrevingsvalg);
     }
 
 
     @Override
     public Optional<EksternBehandlingsinfoDto> hentBehandlingForSaksnummerHenvisning(String saksnummer, Henvisning henvisning) {
-        return new ArrayList<EksternBehandlingsinfoDto>(hentFpsakBehandlingForSaksnummer(saksnummer)).stream()
-            .filter(b -> henvisning.equals(b.getHenvisning()))
-            .findFirst();
+        return hentFpsakBehandlingForSaksnummerHenvisning(saksnummer, henvisning).map(Function.identity());
     }
 
     @Override
@@ -156,79 +111,99 @@ public class FpsakKlient implements FagsystemKlient {
                 .orElseThrow(() -> new IntegrasjonException("FPT-748279", String.format("Fant ikke behandling med behandlingId %s fpoppdrag", fpsakBehandlingId)));
     }
 
-    static class ListeAvFpsakBehandlingInfoDto extends ArrayList<FpsakBehandlingInfoDto> {
+
+    private Optional<SamletEksternBehandlingInfo> hentBehandlingsinfoOpt(UUID eksternUuid, Collection<Tillegsinformasjon> tilleggsinformasjon) {
+        var fullbehandling = hentFpsakFullBehandlingOptional(eksternUuid);
+        return fullbehandling.map(fpsakBehandingInfo -> mapSamletEksternBehandlingInfo(tilleggsinformasjon, fpsakBehandingInfo));
     }
 
-    public List<FpsakBehandlingInfoDto> hentFpsakBehandlingForSaksnummer(String saksnummer) {
-        var endpoint = createUri("/api/behandlinger/alle", "saksnummer", saksnummer);
-        List<FpsakBehandlingInfoDto> behandlinger = restClient.send(RestRequest.newGET(endpoint, restConfig), ListeAvFpsakBehandlingInfoDto.class);
-        for (var dto : behandlinger) {
-            dto.setHenvisning(Henvisning.fraEksternBehandlingId(dto.getId()));
-        }
-        return behandlinger;
+    private Optional<FpsakTilbakeDto> hentFpsakFullBehandlingOptional(UUID eksternUuid) {
+        var target = UriBuilder.fromUri(restConfig.fpContextPath()).path(BEHANDLING_PATH)
+            .queryParam("uuid", eksternUuid.toString())
+            .build();
+        return restClient.sendReturnOptional(RestRequest.newGET(target, restConfig), FpsakTilbakeDto.class);
     }
 
-    private URI endpointFraLink(BehandlingResourceLinkDto resourceLink) {
-        var linkpath = resourceLink.getHref();
-        var path = linkpath.startsWith("/fpsak") ?  linkpath.replaceFirst("/fpsak", "") : linkpath;
-        return URI.create(restConfig.fpContextPath() + path);
-    }
-
-    private PersonopplysningDto hentPersonopplysninger(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = endpointFraLink(resourceLink);
-        return get(endpoint, PersonopplysningDto.class)
-            .orElseThrow(() -> new IllegalArgumentException("Forventet å finne personopplysninger på lenken: " + endpoint));
-    }
-
-    private Optional<VarseltekstDto> hentVarseltekst(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = endpointFraLink(resourceLink);
-        return get(endpoint, VarseltekstDto.class);
-
-    }
-
-    private Optional<SendtoppdragDto> hentSendtoppdrag(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = endpointFraLink(resourceLink);
-        return get(endpoint, SendtoppdragDto.class);
-    }
-
-    private SoknadDto hentSøknad(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = endpointFraLink(resourceLink);
-        return get(endpoint, SoknadDto.class)
-                .orElseThrow(() -> new IllegalArgumentException("Forventet å finne søknad på lenken: " + endpoint));
-    }
-
-    private Optional<TilbakekrevingValgDto> hentTilbakekrevingValg(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = endpointFraLink(resourceLink);
-        return get(endpoint, TilbakekrevingValgDto.class);
-    }
-
-    private FagsakDto hentFagsak(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = endpointFraLink(resourceLink);
-        return get(endpoint, FagsakDto.class)
-                .orElseThrow(() -> new IllegalArgumentException("Forventet å finne fagsak på lenken: " + endpoint));
-    }
-
-    private Optional<VergeDto> hentVergeInformasjon(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = endpointFraLink(resourceLink);
-        return get(endpoint, VergeDto.class);
-    }
-
-    private <T> Optional<T> get(URI endpoint, Class<T> tClass) {
-        return restClient.sendReturnOptional(RestRequest.newGET(endpoint, restConfig), tClass);
-    }
-
-    private URI createUri(String endpoint, String paramName, String paramValue) {
-        var builder = UriBuilder.fromUri(restConfig.fpContextPath())
-            .path(endpoint);
-
-        if (notNullOrEmpty(paramName) && notNullOrEmpty(paramValue)) {
-            builder.queryParam(paramName, paramValue);
-        }
+    private static SamletEksternBehandlingInfo mapSamletEksternBehandlingInfo(Collection<Tillegsinformasjon> tilleggsinformasjon,
+                                                                              FpsakTilbakeDto fpsakBehandingInfo) {
+        var builder = SamletEksternBehandlingInfo.builder(tilleggsinformasjon);
+        builder.setGrunninformasjon(FpsakBehandlingInfoDto.fraFullDto(fpsakBehandingInfo));
+        builder.setPersonopplysninger(personopplysningFraFullDto(fpsakBehandingInfo));
+        Optional.ofNullable(fpsakBehandingInfo.feilutbetaling()).map(FpsakTilbakeDto.FeilutbetalingDto::varseltekst)
+            .ifPresent(builder::setVarseltekst);
+        builder.setSendtoppdrag(fpsakBehandingInfo.sendtoppdrag());
+        videreFraFullDto(fpsakBehandingInfo).ifPresent(builder::setTilbakekrevingvalg);
+        builder.setFagsak(fagsakFraFullDto(fpsakBehandingInfo));
+        builder.setFamiliehendelse(soknadFraFullDto(fpsakBehandingInfo));
+        vergeFraFullDto(fpsakBehandingInfo).ifPresent(builder::setVerge);
         return builder.build();
     }
 
-    private boolean notNullOrEmpty(String str) {
-        return (str != null && !str.isEmpty());
+    private Optional<FpsakBehandlingInfoDto> hentFpsakBehandlingForSaksnummerHenvisning(String saksnummer, Henvisning henvisning) {
+        var request = RestRequest.newPOSTJson(new HenvisningRequestDto(saksnummer, henvisning.toLong()), henvisningTarget, restConfig);
+        var full = restClient.sendReturnOptional(request, FpsakTilbakeDto.class);
+        return full.map(FpsakBehandlingInfoDto::fraFullDto);
     }
 
+
+    private static PersonopplysningDto personopplysningFraFullDto(FpsakTilbakeDto fullDto) {
+        var personopplysninger = new PersonopplysningDto();
+        personopplysninger.setAktoerId(fullDto.fagsak().aktørId());
+        personopplysninger.setAntallBarn(fullDto.familieHendelse().antallBarn());
+        return personopplysninger;
+    }
+
+    private static FagsakDto fagsakFraFullDto(FpsakTilbakeDto fullDto) {
+        var fagsakDto = new FagsakDto();
+        fagsakDto.setSaksnummer(fullDto.fagsak().saksnummer());
+        fagsakDto.setFagsakYtelseType(switch (fullDto.fagsak().fagsakYtelseType()) {
+            case FORELDREPENGER -> FagsakYtelseType.FORELDREPENGER;
+            case SVANGERSKAPSPENGER -> FagsakYtelseType.SVANGERSKAPSPENGER;
+            case ENGANGSSTØNAD -> FagsakYtelseType.ENGANGSTØNAD;
+        });
+        return fagsakDto;
+    }
+
+    private static SoknadDto soknadFraFullDto(FpsakTilbakeDto fullDto) {
+        var soknadDto = new SoknadDto();
+        soknadDto.setSoknadType(fullDto.familieHendelse().familieHendelseType() == FpsakTilbakeDto.FamilieHendelseType.ADOPSJON ? SøknadType.ADOPSJON : SøknadType.FØDSEL);
+        return soknadDto;
+    }
+
+    private static Optional<TilbakekrevingValgDto> videreFraFullDto(FpsakTilbakeDto fullDto) {
+        var feilutbetalingValg = Optional.ofNullable(fullDto.feilutbetaling())
+            .map(FpsakTilbakeDto.FeilutbetalingDto::feilutbetalingValg)
+            .map(v -> switch (v) {
+                case OPPRETT -> VidereBehandling.TILBAKEKR_OPPRETT;
+                case OPPDATER -> VidereBehandling.TILBAKEKR_OPPDATER;
+                case IGNORER -> VidereBehandling.IGNORER_TILBAKEKREVING;
+                case INNTREKK -> VidereBehandling.INNTREKK;
+            });
+        return feilutbetalingValg.map(TilbakekrevingValgDto::new);
+    }
+
+    private static Optional<VergeDto> vergeFraFullDto(FpsakTilbakeDto fullDto) {
+        if (fullDto.verge() == null) {
+            return Optional.empty();
+        }
+        var vergeDto = new VergeDto();
+        vergeDto.setGyldigFom(fullDto.verge().gyldigFom());
+        vergeDto.setGyldigTom(fullDto.verge().gyldigTom());
+        vergeDto.setNavn(fullDto.verge().navn());
+        vergeDto.setOrganisasjonsnummer(fullDto.verge().organisasjonsnummer());
+        vergeDto.setAktoerId(fullDto.verge().aktørId());
+        vergeDto.setVergeType(switch (fullDto.verge().vergeType()) {
+                case ADVOKAT -> VergeType.ADVOKAT;
+                case BARN -> VergeType.BARN;
+                case FULLMEKTIG -> VergeType.ANNEN_F;
+                case FORELDRELØS -> VergeType.FBARN;
+                case VOKSEN -> VergeType.VOKSEN;
+            });
+        return Optional.of(vergeDto);
+    }
+
+    public record HenvisningRequestDto(@NotNull @Digits(integer = 18, fraction = 0) String saksnummer,
+                                              @NotNull @Min(0) @Max(Long.MAX_VALUE) Long henvisning) {
+
+    }
 }
