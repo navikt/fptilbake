@@ -64,7 +64,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
         List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
-        assertThat(perioder.size()).isEqualTo(3);
+        assertThat(perioder).hasSize(3);
         perioder.sort(Comparator.comparing(DetaljertFeilutbetalingPeriodeDto::getFom));
 
         DetaljertFeilutbetalingPeriodeDto førstePeriode = perioder.get(0);
@@ -76,13 +76,13 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(førstePeriode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(17000));
         assertThat(førstePeriode.isForeldet()).isTrue();
 
-        assertThat(førstePeriode.getYtelser().size()).isEqualTo(2);
+        assertThat(førstePeriode.getYtelser()).hasSize(2);
         førstePeriode.getYtelser().sort(Comparator.comparing(YtelseDto::getAktivitet));
         assertThat(førstePeriode.getYtelser().get(0).getAktivitet()).isEqualTo(AKTIVITET_ARBEIDSLEDIG);
         assertThat(førstePeriode.getYtelser().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(11000));
         assertThat(førstePeriode.getYtelser().get(1).getAktivitet()).isEqualTo(AKTIVITET_FISKER);
         assertThat(førstePeriode.getYtelser().get(1).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(6000));
-        assertThat(førstePeriode.getRedusertBeloper().size()).isEqualTo(0);
+        assertThat(førstePeriode.getRedusertBeloper()).hasSize(0);
 
         DetaljertFeilutbetalingPeriodeDto andrePeriode = perioder.get(1);
         assertThat(andrePeriode.getOppfyltValg()).isEqualByComparingTo(VilkårResultat.UDEFINERT);
@@ -93,11 +93,11 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(andrePeriode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(14000));
         assertThat(andrePeriode.isForeldet()).isFalse();
 
-        assertThat(andrePeriode.getYtelser().size()).isEqualTo(1);
+        assertThat(andrePeriode.getYtelser()).hasSize(1);
         andrePeriode.getYtelser().sort(Comparator.comparing(YtelseDto::getAktivitet));
         assertThat(andrePeriode.getYtelser().get(0).getAktivitet()).isEqualTo(AKTIVITET_FISKER);
         assertThat(andrePeriode.getYtelser().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(14000));
-        assertThat(andrePeriode.getRedusertBeloper().size()).isEqualTo(0);
+        assertThat(andrePeriode.getRedusertBeloper()).hasSize(0);
 
         DetaljertFeilutbetalingPeriodeDto tredjePeriode = perioder.get(2);
         assertThat(tredjePeriode.getOppfyltValg()).isEqualByComparingTo(VilkårResultat.UDEFINERT);
@@ -108,13 +108,13 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(tredjePeriode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(20000));
         assertThat(tredjePeriode.isForeldet()).isFalse();
 
-        assertThat(tredjePeriode.getYtelser().size()).isEqualTo(2);
+        assertThat(tredjePeriode.getYtelser()).hasSize(2);
         tredjePeriode.getYtelser().sort(Comparator.comparing(YtelseDto::getAktivitet));
         assertThat(tredjePeriode.getYtelser().get(0).getAktivitet()).isEqualTo(AKTIVITET_FISKER);
         assertThat(tredjePeriode.getYtelser().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(1000));
         assertThat(tredjePeriode.getYtelser().get(1).getAktivitet()).isEqualTo(AKTIVITET_SJØMANN);
         assertThat(tredjePeriode.getYtelser().get(1).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(19000));
-        assertThat(tredjePeriode.getRedusertBeloper().size()).isEqualTo(0);
+        assertThat(tredjePeriode.getRedusertBeloper()).hasSize(0);
     }
 
     @Test
@@ -124,7 +124,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
         List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
-        assertThat(perioder.size()).isEqualTo(1);
+        assertThat(perioder).hasSize(1);
         DetaljertFeilutbetalingPeriodeDto periode = perioder.get(0);
         assertThat(periode.getFom()).isEqualTo(FOM);
         assertThat(periode.getTom()).isEqualTo(TOM);
@@ -134,7 +134,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(periode.getHendelseUndertype()).isEqualTo(HendelseUnderType.ARBEID_HELTID);
         assertThat(periode.isForeldet()).isFalse();
 
-        assertThat(periode.getYtelser().size()).isEqualTo(3);
+        assertThat(periode.getYtelser()).hasSize(3);
         periode.getYtelser().sort(Comparator.comparing(YtelseDto::getAktivitet));
         assertThat(periode.getYtelser().get(0).getAktivitet()).isEqualTo(AKTIVITET_ARBEIDSLEDIG);
         assertThat(periode.getYtelser().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(11000));
@@ -142,7 +142,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(periode.getYtelser().get(1).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(21000));
         assertThat(periode.getYtelser().get(2).getAktivitet()).isEqualTo(AKTIVITET_SJØMANN);
         assertThat(periode.getYtelser().get(2).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(19000));
-        assertThat(periode.getRedusertBeloper().size()).isEqualTo(0);
+        assertThat(periode.getRedusertBeloper()).hasSize(0);
     }
 
     @Test
@@ -173,14 +173,14 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
         List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
-        assertThat(perioder.size()).isEqualTo(1);
+        assertThat(perioder).hasSize(1);
         DetaljertFeilutbetalingPeriodeDto periode = perioder.get(0);
         assertThat(periode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(32000));
         assertThat(periode.getHendelseType()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE);
         assertThat(periode.getHendelseUndertype()).isEqualTo(HendelseUnderType.ARBEID_HELTID);
         assertThat(periode.isForeldet()).isFalse();
 
-        assertThat(periode.getRedusertBeloper().size()).isEqualTo(1);
+        assertThat(periode.getRedusertBeloper()).hasSize(1);
         periode.getRedusertBeloper().sort(Comparator.comparing(RedusertBeløpDto::getBelop));
 
         RedusertBeløpDto førsteRedusertBeløp = periode.getRedusertBeloper().get(0);
@@ -213,9 +213,9 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
         List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
-        assertThat(perioder.size()).isEqualTo(1);
+        assertThat(perioder).hasSize(1);
         DetaljertFeilutbetalingPeriodeDto periode = perioder.get(0);
-        assertThat(periode.getYtelser().size()).isEqualTo(1);
+        assertThat(periode.getYtelser()).hasSize(1);
         YtelseDto ytelseDto = periode.getYtelser().get(0);
         assertThat(ytelseDto.getAktivitet()).isEqualTo(Inntektskategori.ARBEIDSLEDIG.getNavn());
         assertThat(ytelseDto.getBelop()).isEqualTo(BigDecimal.valueOf(32000));
@@ -233,7 +233,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(aggregateEntitet).isNotEmpty();
         VilkårVurderingEntitet vilkårEntitet = aggregateEntitet.get();
         List<VilkårVurderingPeriodeEntitet> periodene = new ArrayList<>(vilkårEntitet.getPerioder());
-        assertThat(periodene.size()).isEqualTo(2);
+        assertThat(periodene).hasSize(2);
         periodene.sort(PERIODE_FOM_COMPARATOR);
 
         VilkårVurderingPeriodeEntitet førstePeriode = periodene.get(0);
@@ -270,7 +270,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         List<VilkårVurderingPeriodeEntitet> periodene = new ArrayList<>(vilkårEntitet.getPerioder());
         periodene.sort(PERIODE_FOM_COMPARATOR);
 
-        assertThat(periodene.size()).isEqualTo(2);
+        assertThat(periodene).hasSize(2);
 
         VilkårVurderingPeriodeEntitet førstePeriode = periodene.get(0);
         assertThat(førstePeriode.getPeriode()).isEqualTo(Periode.of(FOM, LocalDate.of(2016, 3, 31)));
@@ -278,7 +278,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(førstePeriode.getAktsomhet().getAktsomhet()).isEqualByComparingTo(Aktsomhet.SIMPEL_UAKTSOM);
         assertThat(førstePeriode.getAktsomhet().getManueltTilbakekrevesBeløp()).isEqualByComparingTo(BigDecimal.valueOf(2000.00));
         assertThat(førstePeriode.getAktsomhet().getSærligGrunnerTilReduksjon()).isTrue();
-        assertThat(førstePeriode.getAktsomhet().getSærligGrunner().size()).isEqualTo(2);
+        assertThat(førstePeriode.getAktsomhet().getSærligGrunner()).hasSize(3);
         assertThat(førstePeriode.getAktsomhet().getSærligGrunnerBegrunnelse()).isEqualTo(SÆRLIG_GRUNNER_BEGRUNNELSE);
 
         VilkårVurderingPeriodeEntitet andrePeriode = periodene.get(1);
@@ -288,7 +288,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(andrePeriode.getAktsomhet().getSærligGrunnerTilReduksjon()).isTrue();
         assertThat(andrePeriode.getAktsomhet().getProsenterSomTilbakekreves()).isEqualByComparingTo(BigDecimal.TEN);
         assertThat(andrePeriode.getAktsomhet().getIleggRenter()).isTrue();
-        assertThat(andrePeriode.getAktsomhet().getSærligGrunner().size()).isEqualTo(2);
+        assertThat(andrePeriode.getAktsomhet().getSærligGrunner()).hasSize(3);
         assertThat(andrePeriode.getAktsomhet().getSærligGrunnerBegrunnelse()).isEqualTo(SÆRLIG_GRUNNER_BEGRUNNELSE);
     }
 
@@ -311,7 +311,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         Optional<VilkårVurderingEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurdering(internBehandlingId);
         assertThat(aggregateEntitet).isNotEmpty();
         VilkårVurderingEntitet vilkårEntitet = aggregateEntitet.get();
-        assertThat(vilkårEntitet.getPerioder().size()).isEqualTo(1);
+        assertThat(vilkårEntitet.getPerioder()).hasSize(1);
 
         VilkårVurderingPeriodeEntitet periode = vilkårEntitet.getPerioder().get(0);
         assertThat(periode.getPeriode()).isEqualTo(Periode.of(FØRSTE_DAG_I_IKKE_FORELDET_PERIODE, TOM));
@@ -320,7 +320,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(periode.getAktsomhet().getSærligGrunnerTilReduksjon()).isFalse();
         assertThat(periode.getAktsomhet().getProsenterSomTilbakekreves()).isNull();
         assertThat(periode.getAktsomhet().getIleggRenter()).isTrue();
-        assertThat(periode.getAktsomhet().getSærligGrunner().size()).isEqualTo(2);
+        assertThat(periode.getAktsomhet().getSærligGrunner()).hasSize(3);
         assertThat(periode.getAktsomhet().getSærligGrunnerBegrunnelse()).isEqualTo(SÆRLIG_GRUNNER_BEGRUNNELSE);
     }
 
@@ -334,7 +334,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         formGrunnlag();
 
         List<VilkårsvurderingPerioderDto> perioder = vilkårsvurderingTjeneste.hentVilkårsvurdering(internBehandlingId);
-        assertThat(perioder.size()).isEqualTo(2);
+        assertThat(perioder).hasSize(2);
         perioder.sort(Comparator.comparing(VilkårsvurderingPerioderDto::getFom));
 
         VilkårsvurderingPerioderDto førstePeriode = perioder.get(0);
@@ -359,7 +359,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(annetDto.getAktsomhetInfo().isHarGrunnerTilReduksjon()).isNull();
         assertThat(annetDto.getAktsomhetInfo().getAndelTilbakekreves()).isNull();
         assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isNull();
-        assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner().size()).isEqualTo(0);
+        assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner()).hasSize(0);
     }
 
     @Test
@@ -372,7 +372,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         formGrunnlag();
 
         List<VilkårsvurderingPerioderDto> perioder = vilkårsvurderingTjeneste.hentVilkårsvurdering(internBehandlingId);
-        assertThat(perioder.size()).isEqualTo(2);
+        assertThat(perioder).hasSize(2);
         perioder.sort(Comparator.comparing(VilkårsvurderingPerioderDto::getFom));
 
         VilkårsvurderingPerioderDto førstePeriode = perioder.get(0);
@@ -385,7 +385,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(annetDto.getAktsomhet()).isEqualByComparingTo(Aktsomhet.SIMPEL_UAKTSOM);
         assertThat(annetDto.getAktsomhetInfo().getTilbakekrevesBelop()).isEqualByComparingTo(BigDecimal.valueOf(2000.00));
         assertThat(annetDto.getAktsomhetInfo().isHarGrunnerTilReduksjon()).isTrue();
-        assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner().size()).isEqualTo(2);
+        assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner()).hasSize(3);
         assertThat(annetDto.getAktsomhetInfo().getSærligGrunnerBegrunnelse()).isEqualTo(SÆRLIG_GRUNNER_BEGRUNNELSE);
 
         VilkårsvurderingPerioderDto andrePeriode = perioder.get(1);
@@ -399,8 +399,9 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(annetDto.getAktsomhetInfo().isHarGrunnerTilReduksjon()).isFalse();
         assertThat(annetDto.getAktsomhetInfo().getAndelTilbakekreves()).isNull();
         assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isTrue();
-        assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner().size()).isEqualTo(2);
         assertThat(annetDto.getAktsomhetInfo().getSærligGrunnerBegrunnelse()).isEqualTo(SÆRLIG_GRUNNER_BEGRUNNELSE);
+        assertThat(annetDto.getAktsomhetInfo().getAnnetBegrunnelse()).isEqualTo(SÆRLIG_GRUNN_ANNEN_BEGRUNNELSE);
+        assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner()).hasSize(3);
     }
 
     @Test
@@ -416,7 +417,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         formGrunnlag();
 
         List<VilkårsvurderingPerioderDto> perioder = vilkårsvurderingTjeneste.hentVilkårsvurdering(internBehandlingId);
-        assertThat(perioder.size()).isEqualTo(1);
+        assertThat(perioder).hasSize(1);
         perioder.sort(Comparator.comparing(VilkårsvurderingPerioderDto::getFom));
 
         VilkårsvurderingPerioderDto andrePeriode = perioder.get(0);
@@ -442,7 +443,7 @@ class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         formGrunnlag();
 
         List<VilkårsvurderingPerioderDto> perioder = vilkårsvurderingTjeneste.hentVilkårsvurdering(internBehandlingId);
-        assertThat(perioder.size()).isEqualTo(1);
+        assertThat(perioder).hasSize(1);
         perioder.sort(Comparator.comparing(VilkårsvurderingPerioderDto::getFom));
 
         VilkårsvurderingPerioderDto andrePeriode = perioder.get(0);

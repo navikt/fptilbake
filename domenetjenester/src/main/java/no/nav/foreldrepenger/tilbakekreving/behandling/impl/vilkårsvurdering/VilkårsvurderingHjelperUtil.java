@@ -104,7 +104,9 @@ public class VilkårsvurderingHjelperUtil {
             List<SærligGrunn> særligGrunner = new ArrayList<>();
             for (VilkårVurderingSærligGrunnEntitet grunnEntitet : aktsomhetEntitet.getSærligGrunner()) {
                 særligGrunner.add(grunnEntitet.getGrunn());
-                aktsomhetDto.setAnnetBegrunnelse(grunnEntitet.getBegrunnelse());
+                if (grunnEntitet.getGrunn() == SærligGrunn.ANNET) {
+                    aktsomhetDto.setAnnetBegrunnelse(grunnEntitet.getBegrunnelse());
+                }
             }
             aktsomhetDto.setSærligeGrunner(særligGrunner);
         }
