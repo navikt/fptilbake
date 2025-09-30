@@ -54,6 +54,11 @@
       "app": "fpoversikt",
       "namespace": "teamforeldrepenger",
       "cluster": "dev-gcp"
+    },
+    {
+      "app": "fpsoknad",
+      "namespace": "teamforeldrepenger",
+      "cluster": "dev-gcp"
     }
   ]
 }
