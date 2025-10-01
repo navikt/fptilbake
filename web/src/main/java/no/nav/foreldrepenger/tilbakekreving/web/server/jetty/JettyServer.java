@@ -104,9 +104,6 @@ public class JettyServer {
     }
 
     private void konfigurerSikkerhet() {
-        if (ENV.isLocal()) {
-            initTrustStore();
-        }
         if (Fagsystem.K9TILBAKE.equals(ApplicationName.hvilkenTilbake())) {
             var factory = new DefaultAuthConfigFactory();
             factory.registerConfigProvider(new JaspiAuthConfigProvider(new OidcAuthModule()),
@@ -116,23 +113,6 @@ public class JettyServer {
 
             AuthConfigFactory.setFactory(factory);
         }
-    }
-
-    private static void initTrustStore() {
-        final var trustStorePathProp = "javax.net.ssl.trustStore";
-        final var trustStorePasswordProp = "javax.net.ssl.trustStorePassword";
-
-        var defaultLocation = ENV.getProperty("user.home", ".") + "/.modig/truststore.jks";
-        var storePath = ENV.getProperty(trustStorePathProp, defaultLocation);
-        var storeFile = new File(storePath);
-        if (!storeFile.exists()) {
-            throw new IllegalStateException("Finner ikke truststore i " + storePath
-                    + "\n\tKonfrigurer enten som System property '" + trustStorePathProp + "' eller environment variabel '"
-                    + trustStorePathProp.toUpperCase().replace('.', '_') + "'");
-        }
-        var password = ENV.getProperty(trustStorePasswordProp, "changeit");
-        System.setProperty(trustStorePathProp, storeFile.getAbsolutePath());
-        System.setProperty(trustStorePasswordProp, password);
     }
 
     private void konfigurerDatasource(DataSource dataSource) throws NamingException {
