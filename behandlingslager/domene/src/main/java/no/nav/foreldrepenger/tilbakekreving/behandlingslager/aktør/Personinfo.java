@@ -13,7 +13,6 @@ public class Personinfo {
     private AktørId aktørId;
     private String navn;
     private PersonIdent personIdent;
-    private LocalDate fødselsdato;
     private LocalDate dødsdato;
     private SivilstandType sivilstand;
 
@@ -30,10 +29,6 @@ public class Personinfo {
 
     public String getNavn() {
         return navn;
-    }
-
-    public LocalDate getFødselsdato() {
-        return fødselsdato;
     }
 
     public LocalDate getDødsdato() {
@@ -72,11 +67,6 @@ public class Personinfo {
 
         public Builder medPersonIdent(PersonIdent fnr) {
             personinfoMal.personIdent = fnr;
-            return this;
-        }
-
-        public Builder medFødselsdato(LocalDate fødselsdato) {
-            personinfoMal.fødselsdato = fødselsdato;
             return this;
         }
 

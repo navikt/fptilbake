@@ -55,7 +55,7 @@ class VarselbrevUtilTest {
         PersonopplysningDto personopplysningDto = new PersonopplysningDto();
 
         Personinfo personinfo = Personinfo.builder().medAktørId(new AktørId("1234567890011")).medPersonIdent(new PersonIdent(PERSONNUMMER))
-                .medNavn("Fiona").medFødselsdato(LocalDate.now().minusDays(1)).build();
+                .medNavn("Fiona").build();
 
         YtelseNavn ytelseNavn = lagYtelseNavn("eingongsstønad", "engangsstønad");
 
@@ -213,7 +213,6 @@ class VarselbrevUtilTest {
                 .medPersonIdent(PersonIdent.fra(personnummer))
                 .medNavn(navn)
                 .medAktørId(new AktørId(1000000000000L))
-                .medFødselsdato(LocalDate.of(1990, 2, 2))
                 .build();
     }
 
