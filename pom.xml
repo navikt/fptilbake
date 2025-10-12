@@ -35,7 +35,7 @@
         <sonar.projectKey>navikt_fptilbake</sonar.projectKey>
 
         <!-- Jakarta deps -->
-        <felles.version>7.6.6</felles.version>
+        <felles.version>7.6.7</felles.version>
         <prosesstask.version>5.2.1</prosesstask.version>
         <fpkontrakter.version>9.4.3</fpkontrakter.version>
         <abakus-kontrakt.version>2.3.4</abakus-kontrakt.version>
@@ -330,7 +330,7 @@
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>swagger-ui</artifactId>
-                <version>5.29.2</version>
+                <version>5.29.3</version>
             </dependency>
 
             <!-- 3dje parts biblioteker -->

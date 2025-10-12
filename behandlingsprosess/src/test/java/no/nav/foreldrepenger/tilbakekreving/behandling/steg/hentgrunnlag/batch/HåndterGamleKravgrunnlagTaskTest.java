@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -297,7 +296,6 @@ class HåndterGamleKravgrunnlagTaskTest {
     private Optional<Personinfo> lagPersonInfo(AktørId aktørId) {
         var personinfo = Personinfo.builder()
                 .medAktørId(aktørId)
-                .medFødselsdato(LocalDate.now().minusYears(20))
                 .medPersonIdent(new PersonIdent(aktørId.getId()))
                 .medNavn("testnavn")
                 .build();

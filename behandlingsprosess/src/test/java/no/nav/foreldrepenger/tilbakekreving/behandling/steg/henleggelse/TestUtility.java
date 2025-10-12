@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse;
 
-import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -59,7 +58,6 @@ public class TestUtility {
     public Optional<Personinfo> lagPersonInfo(AktørId aktørId) {
         Personinfo personinfo = Personinfo.builder()
                 .medAktørId(aktørId)
-                .medFødselsdato(LocalDate.now().minusYears(20))
                 .medPersonIdent(new PersonIdent(aktørId.getId()))
                 .medNavn("testnavn")
                 .build();
