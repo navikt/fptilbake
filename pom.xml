@@ -35,7 +35,7 @@
         <sonar.projectKey>navikt_fptilbake</sonar.projectKey>
 
         <!-- Jakarta deps -->
-        <felles.version>7.6.7</felles.version>
+        <felles.version>7.6.8</felles.version>
         <prosesstask.version>5.2.1</prosesstask.version>
         <fpkontrakter.version>9.4.3</fpkontrakter.version>
         <abakus-kontrakt.version>2.3.4</abakus-kontrakt.version>
@@ -393,7 +393,7 @@
             <dependency>
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>pdfbox</artifactId>
-                <version>3.0.5</version>
+                <version>3.0.6</version>
             </dependency>
             <dependency>
                 <groupId>xml-apis</groupId>

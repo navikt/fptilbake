@@ -38,7 +38,7 @@ class KravgrunnlagValidatorTest {
         kravgrunnlag = lagKravgrunnlag(null);
 
         var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
-        assertThat(e.getMessage()).isEqualTo("FPT-879716:Ugyldig kravgrunnlag for kravgrunnlagId 12341. Mangler referanse.");
+        assertThat(e.getMessage()).isEqualTo("FPT-879716: Ugyldig kravgrunnlag for kravgrunnlagId 12341. Mangler referanse.");
     }
 
     @Test
@@ -51,7 +51,7 @@ class KravgrunnlagValidatorTest {
         leggTilFeilutbetaling(kgPeriode2, 1000);
 
         var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
-        assertThat(e.getMessage()).isEqualTo("FPT-936521:Ugyldig kravgrunnlag for kravgrunnlagId 12341. Overlappende perioder 01.01.2020-10.01.2020 og 06.01.2020-31.01.2020.");
+        assertThat(e.getMessage()).isEqualTo("FPT-936521: Ugyldig kravgrunnlag for kravgrunnlagId 12341. Overlappende perioder 01.01.2020-10.01.2020 og 06.01.2020-31.01.2020.");
     }
 
     @Test
@@ -66,7 +66,7 @@ class KravgrunnlagValidatorTest {
         leggTilFeilutbetaling(kgPeriode2, 500, skatteprosent);
 
         var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
-        assertThat(e.getMessage()).isEqualTo("FPT-930235:Ugyldig kravgrunnlag. For måned 2020-01 er maks skatt 299, men maks tilbakekreving ganget med skattesats blir 300");
+        assertThat(e.getMessage()).isEqualTo("FPT-930235: Ugyldig kravgrunnlag. For måned 2020-01 er maks skatt 299, men maks tilbakekreving ganget med skattesats blir 300");
     }
 
     @Test
@@ -81,7 +81,7 @@ class KravgrunnlagValidatorTest {
         leggTilFeil(kgPeriode, 100 + 100 + 1, BigDecimal.ZERO);
 
         var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
-        assertThat(e.getMessage()).isEqualTo("FPT-361605:Ugyldig kravgrunnlag for kravgrunnlagId 12341. For periode 01.01.2020-15.01.2020 er sum tilkakekreving fra YTEL 200, mens belopNytt i FEIL er 201. Det er forventet at disse er like.");
+        assertThat(e.getMessage()).isEqualTo("FPT-361605: Ugyldig kravgrunnlag for kravgrunnlagId 12341. For periode 01.01.2020-15.01.2020 er sum tilkakekreving fra YTEL 200, mens belopNytt i FEIL er 201. Det er forventet at disse er like.");
     }
 
     @Test
@@ -95,7 +95,7 @@ class KravgrunnlagValidatorTest {
         leggTilYtel(kgPeriode, KlasseKode.FPADSND_OP, 0, skattNæringsdrivende);
 
         var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
-        assertThat(e.getMessage()).isEqualTo("FPT-727260:Ugyldig kravgrunnlag for kravgrunnlagId 12341. Perioden 01.01.2020-15.01.2020 mangler postering med klasseType=FEIL.");
+        assertThat(e.getMessage()).isEqualTo("FPT-727260: Ugyldig kravgrunnlag for kravgrunnlagId 12341. Perioden 01.01.2020-15.01.2020 mangler postering med klasseType=FEIL.");
     }
 
     @Test
@@ -107,7 +107,7 @@ class KravgrunnlagValidatorTest {
         leggTilFeil(kgPeriode, 1000, skattOrd);
 
         var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
-        assertThat(e.getMessage()).isEqualTo("FPT-727261:Ugyldig kravgrunnlag for kravgrunnlagId 12341. Perioden 01.01.2020-15.01.2020 mangler postering med klasseType=YTEL.");
+        assertThat(e.getMessage()).isEqualTo("FPT-727261: Ugyldig kravgrunnlag for kravgrunnlagId 12341. Perioden 01.01.2020-15.01.2020 mangler postering med klasseType=YTEL.");
     }
 
     @Test
@@ -120,7 +120,7 @@ class KravgrunnlagValidatorTest {
         leggTilYtel(kgPeriode, KlasseKode.FPATORD, -1000, skattOrd);
 
         var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
-        assertThat(e.getMessage()).isEqualTo("FPT-930247:Ugyldig kravgrunnlag for kravgrunnlagId 12341. Perioden 01.01.2020-15.01.2020 har FEIL postering med negativ beløp");
+        assertThat(e.getMessage()).isEqualTo("FPT-930247: Ugyldig kravgrunnlag for kravgrunnlagId 12341. Perioden 01.01.2020-15.01.2020 har FEIL postering med negativ beløp");
     }
 
     @Test
@@ -139,7 +139,7 @@ class KravgrunnlagValidatorTest {
                 .build());
 
         var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag));
-        assertThat(e.getMessage()).isEqualTo("FPT-615761:Ugyldig kravgrunnlag for kravgrunnlagId 12341. For perioden 01.01.2020-10.01.2020 finnes YTEL-postering med tilbakekrevesBeløp 1000 som er større enn differanse mellom nyttBeløp 200 og opprinneligBeløp 1000");
+        assertThat(e.getMessage()).isEqualTo("FPT-615761: Ugyldig kravgrunnlag for kravgrunnlagId 12341. For perioden 01.01.2020-10.01.2020 finnes YTEL-postering med tilbakekrevesBeløp 1000 som er større enn differanse mellom nyttBeløp 200 og opprinneligBeløp 1000");
     }
 
     private void leggTilFeilutbetaling(KravgrunnlagPeriode432 kgPeriode, int feilutbetaltBeløp) {
