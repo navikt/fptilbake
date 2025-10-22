@@ -104,5 +104,7 @@ spec:
      value: "k9"
    - name: AUDITLOGGER_PRODUCT
      value: "k9-tilbake"
+  - name: VAULT_MOUNT_PATH
+    value: "/var/run/secrets/nais.io"
   envFrom:
     - secret: k9-tilbake-avstemming

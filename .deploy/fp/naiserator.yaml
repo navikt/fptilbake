@@ -46,15 +46,17 @@ spec:
   vault:
     enabled: true
     paths:
-      - mountPath: /var/run/secrets/nais.io/defaultDSconfig
-        kvPath: {{oracleconfig}}
-      - mountPath: /var/run/secrets/nais.io/defaultDS
-        kvPath:  {{oraclefptilbakesecret}}
-      - mountPath: /var/run/secrets/nais.io/serviceuser
-        kvPath: {{fptilbakeserviceuser}}
+      - mountPath: {{vault.mountPath}}/defaultDSconfig
+        kvPath: {{vault.db.configPath}}
+      - mountPath: {{vault.mountPath}}/defaultDS
+        kvPath: {{vault.db.secretsPath}}
+      - mountPath: {{vault.mountPath}}/serviceuser
+        kvPath: {{vault.serviceuser.secretsPath}}
   env:
     - name: APP_NAME
       value: "fptilbake"
+    - name: VAULT_MOUNT_PATH
+      value: "{{vault.mountPath}}"
   envFrom:
     - secret: fptilbake-avstemming
   kafka:
@@ -79,7 +81,7 @@ spec:
           - "azp_name"
         groups:
         {{#each groups as |group|}}
-          - id: "{{group}}"
+          - id: "{{group.uuid}}"
         {{/each}}
   {{#if AZURE_IAC_RULES}}
   accessPolicy:

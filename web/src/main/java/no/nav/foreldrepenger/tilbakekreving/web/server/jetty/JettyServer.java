@@ -68,14 +68,11 @@ public class JettyServer {
 
     private final Integer serverPort;
 
-    public static void main(String[] args) throws Exception {
-        jettyServer(args).bootStrap();
+    static void main() throws Exception {
+        jettyServer().bootStrap();
     }
 
-    private static JettyServer jettyServer(String[] args) {
-        if (args.length > 0) {
-            return new JettyServer(Integer.parseUnsignedInt(args[0]));
-        }
+    private static JettyServer jettyServer() {
         return new JettyServer(ENV.getProperty("server.port", Integer.class, 8080));
     }
 
@@ -89,6 +86,7 @@ public class JettyServer {
 
     protected void bootStrap() throws Exception {
         konfigurerLogging();
+        konfigurerSystembruker();
         konfigurerSikkerhet();
         var dataSource = DatasourceUtil.createDatasource(30, 2);
         konfigurerDatasource(dataSource);
@@ -101,6 +99,18 @@ public class JettyServer {
         System.setProperty("xr.util-logging.handlers", "org.slf4j.bridge.SLF4JBridgeHandler");
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
+    }
+
+    /* Brukes kun for å kunne samhandle med Økonomi via JMS */
+    private static void konfigurerSystembruker() {
+        settSystembrukerVerdiHvisMangler("systembruker.username", "username");
+        settSystembrukerVerdiHvisMangler("systembruker.password", "password");
+    }
+
+    private static void settSystembrukerVerdiHvisMangler(String key, String filNavn) {
+        if (ENV.getProperty(key) == null) {
+            System.getProperties().computeIfAbsent(key, _ -> VaultUtil.lesFilVerdi("serviceuser", filNavn));
+        }
     }
 
     private void konfigurerSikkerhet() {
