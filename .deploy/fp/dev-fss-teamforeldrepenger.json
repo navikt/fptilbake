@@ -1,8 +1,15 @@
 {
   "kafkaPool": "nav-dev",
-  "oraclefptilbakesecret":"oracle/data/dev/creds/fptilbake_q1-user",
-  "oracleconfig": "oracle/data/dev/config/fptilbake_q1",
-  "fptilbakeserviceuser": "serviceuser/data/dev/srvfptilbake",
+  "vault": {
+    "mountPath": "/var/run/secrets/nais.io",
+    "db": {
+      "secretsPath": "oracle/data/dev/creds/fptilbake_q1-user",
+      "configPath": "oracle/data/dev/config/fptilbake_q1"
+    },
+    "serviceuser": {
+      "secretsPath": "serviceuser/data/dev/srvfptilbake"
+    }
+  },
   "minReplicas": "1",
   "maxReplicas": "2",
   "limits": {
@@ -17,9 +24,18 @@
     "https://fptilbake.dev-fss-pub.nais.io"
   ],
   "groups": [
-    "27e77109-fef2-48ce-a174-269074490353",
-    "8cddda87-0a22-4d35-9186-a2c32a6ab450",
-    "f1b82579-c5b5-4617-9673-8ace5ff67f63"
+    {
+      "uuid": "27e77109-fef2-48ce-a174-269074490353",
+      "kommentar": "saksbehandler"
+    },
+    {
+      "uuid": "8cddda87-0a22-4d35-9186-a2c32a6ab450",
+      "kommentar": "veileder"
+    },
+    {
+      "uuid": "f1b82579-c5b5-4617-9673-8ace5ff67f63",
+      "kommentar": "drift"
+    }
   ],
   "AZURE_IAC_RULES": [
     {
