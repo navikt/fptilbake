@@ -9,7 +9,7 @@ import no.nav.vedtak.util.InputValideringRegex;
 public class VarseltekstDto {
 
     @NotNull
-    @Size(max = 12000)
+    @Size(max = 20000)
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String varseltekst;
 

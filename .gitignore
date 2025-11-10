@@ -19,3 +19,4 @@ conf
 .flattened*
 web/src/main/resources/openapi-ts-client/k9/k9-tilbake.openapi.json
 .tool-versions
+.java-version
