@@ -16,7 +16,7 @@ public class HentForhåndsvisningVarselbrevDto {
     @Valid
     private UUID behandlingUuid;
 
-    @Size(max = 12000, message = "Varseltekst er for lang")
+    @Size(max = 20000, message = "Varseltekst er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String varseltekst;
 
