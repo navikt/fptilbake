@@ -189,7 +189,7 @@ class VedtakOppsummeringTjenesteTest {
         VedtakPeriode vedtakPeriode = vedtakPerioder.get(0);
         assertThat(vedtakPeriode.getFom()).isEqualTo(periode.getFom());
         assertThat(vedtakPeriode.getTom()).isEqualTo(periode.getTom());
-        assertThat(vedtakPeriode.getHendelseTypeTekst()).isEqualTo("§14-2 Medlemskap");
+        assertThat(vedtakPeriode.getHendelseTypeTekst()).isEqualTo("§ 14-2 Medlemskap");
         assertThat(vedtakPeriode.getHendelseUndertypeTekst()).isEqualTo("Ikke bosatt");
         return vedtakPeriode;
     }

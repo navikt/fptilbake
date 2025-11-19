@@ -55,7 +55,7 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
             tekstlinjerPeriode.add(fraTilEquals("I hvilken grad har mottaker handlet uaktsomt?", gammelperiode.map(VilkårVurderingPeriodeEntitet::getAktsomhetResultat).orElse(null), nyPeriode.getAktsomhetResultat()));
             tekstlinjerPeriode.add(fraTilEquals("Andel som tilbakekreves", gammelperiode.map(VilkårVurderingPeriodeEntitet::finnAndelTilbakekreves).orElse(null), nyPeriode.finnAndelTilbakekreves()));
             tekstlinjerPeriode.add(fraTilEquals("Skal det tilegges renter?", gammelperiode.map(VilkårVurderingPeriodeEntitet::manueltSattIleggRenter).orElse(null), nyPeriode.manueltSattIleggRenter()));
-            tekstlinjerPeriode.add(fraTilEquals("Skal beløp under 4 rettsgebyr (6.ledd) tilbakekreves?", gammelperiode.map(VilkårVurderingPeriodeEntitet::tilbakekrevesSmåbeløp).orElse(null), nyPeriode.tilbakekrevesSmåbeløp()));
+            tekstlinjerPeriode.add(fraTilEquals("Skal beløp under 4 rettsgebyr (sjette ledd) tilbakekreves?", gammelperiode.map(VilkårVurderingPeriodeEntitet::tilbakekrevesSmåbeløp).orElse(null), nyPeriode.tilbakekrevesSmåbeløp()));
             tekstlinjerPeriode.add(fraTilEquals("Er det særlige grunner til reduksjon?", gammelperiode.map(VilkårsvurderingHistorikkInnslagTjeneste::lagSærligeGrunnerTekst).orElse(null), lagSærligeGrunnerTekst(nyPeriode)));
             if (!Objects.equals(gammelperiode.map(VilkårVurderingPeriodeEntitet::getBegrunnelse).orElse(null), nyPeriode.getBegrunnelse())) {
                 tekstlinjerPeriode.add(plainTekstLinje(String.format("Begrunnelse for vilkår: %s", nyPeriode.getBegrunnelse())));
