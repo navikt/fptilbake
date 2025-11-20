@@ -12,9 +12,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 @JsonTypeName(AksjonspunktKodeDefinisjon.FATTE_VEDTAK)
 public class FatteVedtakDto extends BekreftetAksjonspunktDto {
 
-    @Valid
     @Size(max = 10)
-    private Collection<AksjonspunktGodkjenningDto> aksjonspunktGodkjenningDtos;
+    private Collection<@Valid AksjonspunktGodkjenningDto> aksjonspunktGodkjenningDtos;
 
     FatteVedtakDto() {
         // For Jackson

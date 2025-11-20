@@ -14,9 +14,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 @JsonTypeName(AksjonspunktKodeDefinisjon.VURDER_FORELDELSE)
 public class VurderForeldelseDto extends BekreftetAksjonspunktDto {
 
-    @Valid
     @Size(min = 1)
-    private List<ForeldelsePeriodeDto> foreldelsePerioder = new ArrayList<>();
+    private List<@Valid ForeldelsePeriodeDto> foreldelsePerioder = new ArrayList<>();
 
     public VurderForeldelseDto() {
         super();

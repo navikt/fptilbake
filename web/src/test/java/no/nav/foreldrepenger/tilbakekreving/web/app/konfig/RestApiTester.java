@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Application;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 
 public class RestApiTester {
@@ -31,6 +33,17 @@ public class RestApiTester {
 
     static Collection<Class<?>> finnAlleRestTjenester() {
         return new ArrayList<>(finnAlleRestTjenester(new ApiConfig()));
+    }
+
+    static Collection<Class<?>> finnAlleJsonSubTypeClasses(Class<?> klasse) {
+        var resultat = new ArrayList<Class<?>>();
+        if (klasse.isAnnotationPresent(JsonSubTypes.class)) {
+            var jsonSubTypes = klasse.getAnnotation(JsonSubTypes.class);
+            for (var subtype : jsonSubTypes.value()) {
+                resultat.add(subtype.value());
+            }
+        }
+        return resultat;
     }
 
     static Collection<Class<?>> finnAlleRestTjenester(Application config) {

@@ -26,8 +26,7 @@ public class HentForhåndvisningVedtaksbrevPdfDto {
 
     @Size(max = 50, message = "For mange perioder")
     @NotNull
-    @Valid
-    private List<PeriodeMedTekstDto> perioderMedTekst;
+    private List<@Valid PeriodeMedTekstDto> perioderMedTekst;
 
     public BehandlingReferanse getBehandlingReferanse() {
         return behandlingReferanse;

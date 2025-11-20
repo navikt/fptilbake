@@ -20,8 +20,7 @@ public class FeilutbetalingPerioderDto {
 
     @NotNull
     @Size(min = 1, max = 100)
-    @Valid
-    private List<ForeldelsePeriodeMedBeløpDto> perioder;
+    private List<@Valid ForeldelsePeriodeMedBeløpDto> perioder;
 
     public Long getBehandlingId() {
         return behandlingId;

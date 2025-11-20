@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -12,6 +11,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.util.InputValideringRegex;
 
@@ -28,7 +28,7 @@ public class ForeldelsePeriodeMedBeløpDto {
     @Digits(integer = 9, fraction = 2)
     private BigDecimal belop;
 
-    @Valid
+    @ValidKodeverk
     private ForeldelseVurderingType foreldelseVurderingType;
 
     private LocalDate foreldelsesfrist;

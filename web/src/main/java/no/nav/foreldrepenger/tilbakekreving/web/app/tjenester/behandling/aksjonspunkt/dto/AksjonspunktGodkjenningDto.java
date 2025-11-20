@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjon
 
 import java.util.Set;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -24,7 +23,6 @@ public class AksjonspunktGodkjenningDto {
     @Pattern(regexp = InputValideringRegex.KODEVERK)
     private String aksjonspunktKode;
 
-    @Valid
     @NotNull
     @Size(max = 10)
     private Set<@ValidKodeverk VurderÅrsak> arsaker;

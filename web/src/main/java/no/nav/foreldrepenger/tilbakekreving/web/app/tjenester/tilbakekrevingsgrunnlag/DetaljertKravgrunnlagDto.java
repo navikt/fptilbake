@@ -107,8 +107,7 @@ public class DetaljertKravgrunnlagDto implements AbacDto {
     private String referanse;
 
     @Size(min = 1)
-    @Valid
-    private List<DetaljertKravgrunnlagPeriodeDto> perioder = new ArrayList<>();
+    private List<@Valid DetaljertKravgrunnlagPeriodeDto> perioder = new ArrayList<>();
 
     public Long getVedtakId() {
         return vedtakId;

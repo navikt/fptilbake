@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -23,7 +22,6 @@ public class VilkårResultatAktsomhetDto {
 
     @Size(max = 5)
     @JsonProperty("sarligGrunner")
-    @Valid
     private List<@ValidKodeverk SærligGrunn> særligeGrunner = new ArrayList<>();
 
     private Boolean harGrunnerTilReduksjon;

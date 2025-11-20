@@ -26,23 +26,23 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.S�
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 
 public record AlleKodeverdierSomObjektResponse(
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<Fagsystem>> fagsystemer,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<Venteårsak>> venteårsaker,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<Aktsomhet>> aktsomheter,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<AnnenVurdering>> annenVurderinger,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<SærligGrunn>> særligGrunner,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<VilkårResultat>> vilkårResultater,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<VedtakResultatType>> vedtakResultatTyper,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<ForeldelseVurderingType>> foreldelseVurderingTyper,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<HistorikkAktør>> historikkAktører,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<HendelseType>> hendelseTyper,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<SkjermlenkeType>> skjermlenkeTyper,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<HendelseUnderType>> hendelseUnderTyper,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<BehandlingResultatType>> behandlingResultatTyper,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<VidereBehandling>> videreBehandlinger,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<VergeType>> vergeTyper,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<VurderÅrsak>> vurderÅrsaker,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<BehandlingÅrsakType>> behandlingÅrsakTyper,
-    @NotNull @Valid @Size(min= 1, max=1000) SortedSet<KodeverdiSomObjekt<BehandlingType>> behandlingTyper
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<Fagsystem>> fagsystemer,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<Venteårsak>> venteårsaker,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<Aktsomhet>> aktsomheter,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<AnnenVurdering>> annenVurderinger,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<SærligGrunn>> særligGrunner,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<VilkårResultat>> vilkårResultater,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<VedtakResultatType>> vedtakResultatTyper,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<ForeldelseVurderingType>> foreldelseVurderingTyper,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<HistorikkAktør>> historikkAktører,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<HendelseType>> hendelseTyper,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<SkjermlenkeType>> skjermlenkeTyper,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<HendelseUnderType>> hendelseUnderTyper,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<BehandlingResultatType>> behandlingResultatTyper,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<VidereBehandling>> videreBehandlinger,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<VergeType>> vergeTyper,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<VurderÅrsak>> vurderÅrsaker,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<BehandlingÅrsakType>> behandlingÅrsakTyper,
+    @NotNull @Size(min= 1, max=1000) SortedSet<@Valid KodeverdiSomObjekt<BehandlingType>> behandlingTyper
     ) {
 }

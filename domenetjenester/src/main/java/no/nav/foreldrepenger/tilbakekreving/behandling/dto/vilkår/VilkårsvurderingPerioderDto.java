@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.util.InputValideringRegex;
@@ -27,7 +28,7 @@ public class VilkårsvurderingPerioderDto {
 
     @NotNull
     @JsonProperty("vilkarResultat")
-    @Valid
+    @ValidKodeverk
     private VilkårResultat vilkårResultat;
 
     @NotNull

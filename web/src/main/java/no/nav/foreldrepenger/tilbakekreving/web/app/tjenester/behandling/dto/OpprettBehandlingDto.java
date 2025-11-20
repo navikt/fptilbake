@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
@@ -26,13 +27,13 @@ public class OpprettBehandlingDto implements AbacDto {
     @Valid
     private UUID eksternUuid;
 
-    @Valid
+    @ValidKodeverk
     private BehandlingType behandlingType;
 
-    @Valid
+    @ValidKodeverk
     private BehandlingÅrsakType behandlingArsakType;
 
-    @Valid
+    @ValidKodeverk
     private FagsakYtelseType fagsakYtelseType;
 
     //Gjelder kun for Tilbakekrevingsrevurdering
