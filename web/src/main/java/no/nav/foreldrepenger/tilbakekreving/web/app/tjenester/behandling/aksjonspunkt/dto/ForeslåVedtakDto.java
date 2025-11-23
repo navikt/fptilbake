@@ -15,9 +15,8 @@ import no.nav.vedtak.util.InputValideringRegex;
 @JsonTypeName(AksjonspunktKodeDefinisjon.FORESLÅ_VEDTAK)
 public class ForeslåVedtakDto extends BekreftetAksjonspunktDto {
 
-    @Valid
     @Size(max = 100)
-    private List<PeriodeMedTekstDto> perioderMedTekst;
+    private List<@Valid PeriodeMedTekstDto> perioderMedTekst;
 
     @Size(max = 10000, message = "Oppsummeringstekst er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)

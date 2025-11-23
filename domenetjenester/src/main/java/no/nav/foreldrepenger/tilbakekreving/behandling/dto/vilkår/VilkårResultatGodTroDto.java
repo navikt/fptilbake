@@ -8,12 +8,7 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-
-@JsonTypeName(VilkårResultatGodTroDto.TYPE)
 public class VilkårResultatGodTroDto extends VilkårResultatInfoDto {
-
-    static final String TYPE = "godTro";
 
     private boolean erBelopetIBehold;
 

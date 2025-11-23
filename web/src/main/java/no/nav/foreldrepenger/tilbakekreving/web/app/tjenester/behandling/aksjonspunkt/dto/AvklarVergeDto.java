@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjon
 
 import java.time.LocalDate;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -12,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.util.InputValideringRegex;
@@ -36,7 +36,7 @@ public class AvklarVergeDto extends BekreftetAksjonspunktDto {
     @Pattern(regexp = "[\\d]{9}")
     private String organisasjonsnummer;
 
-    @Valid
+    @ValidKodeverk
     @NotNull
     private VergeType vergeType;
 

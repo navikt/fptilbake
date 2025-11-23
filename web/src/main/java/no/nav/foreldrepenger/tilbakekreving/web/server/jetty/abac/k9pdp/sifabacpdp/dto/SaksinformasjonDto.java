@@ -1,11 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.Set;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record SaksinformasjonDto(
@@ -16,7 +17,6 @@ public record SaksinformasjonDto(
     AbacBehandlingStatus behandlingStatus,
     AbacFagsakStatus fagsakStatus,
 
-    @Valid
     @Size(min = 0, max = 4)
-    Set<AksjonspunktType> aksjonspunktTyper) {
+    Set<@Valid AksjonspunktType> aksjonspunktTyper) {
 }

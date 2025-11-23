@@ -14,8 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 public class VilkårsVurderingDto extends BekreftetAksjonspunktDto {
 
     @Size(min = 1)
-    @Valid
-    private List<VilkårsvurderingPerioderDto> vilkarsVurdertePerioder;
+    private List<@Valid VilkårsvurderingPerioderDto> vilkarsVurdertePerioder;
 
     public List<VilkårsvurderingPerioderDto> getVilkarsVurdertePerioder() {
         return vilkarsVurdertePerioder;

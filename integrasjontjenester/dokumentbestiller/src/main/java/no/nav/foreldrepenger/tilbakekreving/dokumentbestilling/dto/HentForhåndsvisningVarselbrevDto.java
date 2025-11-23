@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.vedtak.util.InputValideringRegex;
 
 public class HentForhåndsvisningVarselbrevDto {
@@ -21,7 +22,7 @@ public class HentForhåndsvisningVarselbrevDto {
     private String varseltekst;
 
     @NotNull
-    @Valid
+    @ValidKodeverk
     private FagsakYtelseType fagsakYtelseType;
 
     public UUID getBehandlingUuid() {

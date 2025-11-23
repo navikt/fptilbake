@@ -4,17 +4,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 
-@JsonTypeName(VilkårResultatAnnetDto.TYPE)
 public class VilkårResultatAnnetDto extends VilkårResultatInfoDto {
 
-    static final String TYPE = "annet";
-
     @NotNull
-    @Valid
+    @ValidKodeverk
     private Aktsomhet aktsomhet;
 
     @Valid

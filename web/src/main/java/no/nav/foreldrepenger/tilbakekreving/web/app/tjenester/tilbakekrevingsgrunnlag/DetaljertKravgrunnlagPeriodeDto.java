@@ -25,8 +25,7 @@ public class DetaljertKravgrunnlagPeriodeDto implements AbacDto {
     private BigDecimal beløpSkattMnd;
 
     @Size(min = 1)
-    @Valid
-    private List<DetaljertKravgrunnlagBelopDto> posteringer = new ArrayList<>();
+    private List<@Valid DetaljertKravgrunnlagBelopDto> posteringer = new ArrayList<>();
 
     public LocalDate getFom() {
         return fom;

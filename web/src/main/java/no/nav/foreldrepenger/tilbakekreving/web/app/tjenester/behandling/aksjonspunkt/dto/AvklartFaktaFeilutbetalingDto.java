@@ -21,10 +21,9 @@ public class AvklartFaktaFeilutbetalingDto extends BekreftetAksjonspunktDto {
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String begrunnelse;
 
-    @Valid
     @Size(min = 1)
     @JsonProperty("feilutbetalingFakta")
-    private List<FaktaFeilutbetalingDto> feilutbetalingFakta;
+    private List<@Valid FaktaFeilutbetalingDto> feilutbetalingFakta;
 
     public AvklartFaktaFeilutbetalingDto() {
         super();
