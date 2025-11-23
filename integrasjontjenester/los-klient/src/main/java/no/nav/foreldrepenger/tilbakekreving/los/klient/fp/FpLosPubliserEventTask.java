@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.los.klient.task;
+package no.nav.foreldrepenger.tilbakekreving.los.klient.fp;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -16,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProses
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
-import no.nav.foreldrepenger.tilbakekreving.los.klient.producer.LosKafkaProducerAiven;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -40,7 +39,7 @@ public class FpLosPubliserEventTask implements ProsessTaskHandler {
     private static final Logger LOG = LoggerFactory.getLogger(FpLosPubliserEventTask.class);
 
     private BehandlingRepository behandlingRepository;
-    private LosKafkaProducerAiven losKafkaProducerAiven;
+    private FpLosKafkaProducerAiven fpLosKafkaProducerAiven;
 
     boolean brukAiven;
 
@@ -50,15 +49,15 @@ public class FpLosPubliserEventTask implements ProsessTaskHandler {
 
     @Inject
     public FpLosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
-                                  LosKafkaProducerAiven losKafkaProducerAiven) {
-        this(repositoryProvider, losKafkaProducerAiven, ApplicationName.hvilkenTilbake());
+                                  FpLosKafkaProducerAiven fpLosKafkaProducerAiven) {
+        this(repositoryProvider, fpLosKafkaProducerAiven, ApplicationName.hvilkenTilbake());
     }
 
     public FpLosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
-                                  LosKafkaProducerAiven losKafkaProducerAiven,
+                                  FpLosKafkaProducerAiven fpLosKafkaProducerAiven,
                                   Fagsystem applikasjonNavn) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.losKafkaProducerAiven = losKafkaProducerAiven;
+        this.fpLosKafkaProducerAiven = fpLosKafkaProducerAiven;
 
         this.fagsystem = switch (applikasjonNavn) {
             case FPTILBAKE -> Fagsystem.FPTILBAKE;
@@ -86,7 +85,7 @@ public class FpLosPubliserEventTask implements ProsessTaskHandler {
             .medBehandlingstype(mapBehandlingstype(behandling))
             .medTidspunkt(LocalDateTime.now())
             .build();
-        losKafkaProducerAiven.sendHendelseFplos(behandling.getFagsak().getSaksnummer(), losHendelseDto);
+        fpLosKafkaProducerAiven.sendHendelseFplos(behandling.getFagsak().getSaksnummer(), losHendelseDto);
     }
 
     private static Ytelse mapYtelse(Behandling behandling) {
