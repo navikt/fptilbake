@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.los.klient.task;
+package no.nav.foreldrepenger.tilbakekreving.los.klient.k9;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -6,11 +6,14 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import no.nav.foreldrepenger.tilbakekreving.los.klient.k9.kontrakt.EventHendelse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
@@ -25,10 +28,8 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.los.klient.producer.LosKafkaProducerAiven;
+import no.nav.foreldrepenger.tilbakekreving.los.klient.k9.kontrakt.TilbakebetalingBehandlingProsessEventDto;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
-import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEventDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -50,7 +51,7 @@ public class K9LosPubliserEventTask implements ProsessTaskHandler {
     private KravgrunnlagRepository grunnlagRepository;
     private BehandlingRepository behandlingRepository;
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste;
-    private LosKafkaProducerAiven losKafkaProducerAiven;
+    private K9LosKafkaProducerAiven k9LosKafkaProducerAiven;
 
     boolean brukAiven;
 
@@ -61,18 +62,18 @@ public class K9LosPubliserEventTask implements ProsessTaskHandler {
     @Inject
     public K9LosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
                                   FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
-                                  LosKafkaProducerAiven losKafkaProducerAiven) {
-        this(repositoryProvider, faktaFeilutbetalingTjeneste, losKafkaProducerAiven, ApplicationName.hvilkenTilbake());
+                                  K9LosKafkaProducerAiven k9LosKafkaProducerAiven) {
+        this(repositoryProvider, faktaFeilutbetalingTjeneste, k9LosKafkaProducerAiven, ApplicationName.hvilkenTilbake());
     }
 
     public K9LosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
                                   FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
-                                  LosKafkaProducerAiven losKafkaProducerAiven,
+                                  K9LosKafkaProducerAiven k9LosKafkaProducerAiven,
                                   Fagsystem applikasjonNavn) {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
-        this.losKafkaProducerAiven = losKafkaProducerAiven;
+        this.k9LosKafkaProducerAiven = k9LosKafkaProducerAiven;
 
         switch (applikasjonNavn) {
             case FPTILBAKE -> {
@@ -97,7 +98,7 @@ public class K9LosPubliserEventTask implements ProsessTaskHandler {
         try {
             if (Fagsystem.K9TILBAKE.equals(fagsystem)) {
                 TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto = getTilbakebetalingBehandlingProsessEventDto(behandling, eventName, kravgrunnlag431);
-                losKafkaProducerAiven.sendHendelse(behandling.getUuid(), behandlingProsessEventDto);
+                k9LosKafkaProducerAiven.sendHendelse(behandling.getUuid(), behandlingProsessEventDto);
             } else if (Fagsystem.FPTILBAKE.equals(fagsystem)) {
                 LOG.info("Publiser ikke behandlingshendelse for behandling {}", behandling.getId());
             } else {

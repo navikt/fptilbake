@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.los.klient.task;
+package no.nav.foreldrepenger.tilbakekreving.los.klient.k9;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import jakarta.persistence.EntityManager;
+
+import no.nav.foreldrepenger.tilbakekreving.los.klient.k9.kontrakt.EventHendelse;
+import no.nav.foreldrepenger.tilbakekreving.los.klient.k9.kontrakt.TilbakebetalingBehandlingProsessEventDto;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,9 +54,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
-import no.nav.foreldrepenger.tilbakekreving.los.klient.producer.LosKafkaProducerAiven;
-import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
-import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEventDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 @ExtendWith(JpaExtension.class)
@@ -67,7 +67,7 @@ class K9LosPubliserEventTaskAivenTest {
 
     private BehandlingRepositoryProvider repositoryProvider;
 
-    private LosKafkaProducerAiven mockKafkaProducerAiven = mock(LosKafkaProducerAiven.class);
+    private K9LosKafkaProducerAiven mockKafkaProducerAiven = mock(K9LosKafkaProducerAiven.class);
 
     private K9LosPubliserEventTask losPubliserEventTask;
 

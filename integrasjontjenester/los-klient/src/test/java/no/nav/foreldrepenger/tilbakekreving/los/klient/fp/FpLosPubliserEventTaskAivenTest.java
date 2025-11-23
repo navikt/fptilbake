@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.los.klient.task;
+package no.nav.foreldrepenger.tilbakekreving.los.klient.fp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,7 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
-import no.nav.foreldrepenger.tilbakekreving.los.klient.producer.LosKafkaProducerAiven;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.hendelser.behandling.Behandlingstype;
 import no.nav.vedtak.hendelser.behandling.Hendelse;
@@ -38,7 +37,7 @@ class FpLosPubliserEventTaskAivenTest {
 
     private BehandlingRepositoryProvider repositoryProvider;
 
-    private LosKafkaProducerAiven mockKafkaProducerAiven = mock(LosKafkaProducerAiven.class);
+    private FpLosKafkaProducerAiven mockKafkaProducerAiven = mock(FpLosKafkaProducerAiven.class);
 
     private FpLosPubliserEventTask losPubliserEventTask;
 
