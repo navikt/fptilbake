@@ -22,7 +22,7 @@ public class KafkaProducerAiven extends AivenMeldingProducer {
     }
 
     @Inject
-    public KafkaProducerAiven(@KonfigVerdi(value = "kafka.fplos.aiven.topic") String topic) {
+    public KafkaProducerAiven(@KonfigVerdi(value = "kafka.los.aiven.topic") String topic) {
         super(topic);
     }
 
