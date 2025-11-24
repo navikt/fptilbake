@@ -21,7 +21,7 @@ public enum NavOppfulgt implements Kodeverdi {
     HAR_UTFØRT_FEIL("HAR_UTFOERT_FEIL"),
     HAR_SENDT_TIL_FEIL_MOTTAKER("HAR_SENDT_TIL_FEIL_MOTTAKER"),
 
-    UDEFINERT("-");
+    UDEFINERT(STANDARDKODE_UDEFINERT);
 
     public static final String KODEVERK = "NAV_OPPFULGT";
     private static final Map<String, NavOppfulgt> KODER = new LinkedHashMap<>();

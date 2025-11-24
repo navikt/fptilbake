@@ -15,7 +15,7 @@ public enum VidereBehandling implements Kodeverdi {
     INNTREKK("TILBAKEKR_INNTREKK", "Feilutbetaling hvor inntrekk dekker hele beløpet"),
     TILBAKEKR_OPPDATER("TILBAKEKR_OPPDATER", "Endringer vil oppdatere eksisterende feilutbetalte perioder og beløp."),
 
-    UDEFINERT("-", "UDefinert");
+    UDEFINERT(STANDARDKODE_UDEFINERT, "UDefinert");
 
     private String kode;
     private String navn;

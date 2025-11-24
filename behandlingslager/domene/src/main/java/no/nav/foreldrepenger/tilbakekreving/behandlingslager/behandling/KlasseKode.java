@@ -116,7 +116,7 @@ public enum KlasseKode implements Kodeverdi {
     OPALFERTILL("OPALFERTILL"),
     OPALFERTILL_IOP("OPALFERTILL-IOP"),
 
-    UDEFINERT("-");
+    UDEFINERT(STANDARDKODE_UDEFINERT);
 
     public static final String KODEVERK = "KLASSE_KODE";
 

@@ -17,7 +17,7 @@ public enum ForeldelseVurderingType implements Kodeverdi {
     FORELDET("FORELDET", "Perioden er foreldet"),
     IKKE_FORELDET("IKKE_FORELDET", "Perioden er ikke foreldet"),
     TILLEGGSFRIST("TILLEGGSFRIST", "Perioden er ikke foreldet, regel om tilleggsfrist (10 år) benyttes"),
-    UDEFINERT("-", "Ikke Definert");
+    UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke Definert");
 
     private String kode;
     private String navn;

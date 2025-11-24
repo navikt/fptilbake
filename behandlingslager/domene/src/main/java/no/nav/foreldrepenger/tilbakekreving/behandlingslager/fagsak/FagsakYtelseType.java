@@ -29,7 +29,7 @@ public enum FagsakYtelseType implements Kodeverdi {
     OMSORGSPENGER_MA("OMP_MA", "Ekstra omsorgsdager midlertidig alene", ""),
 
 
-    UDEFINERT("-", "Ikke definert", "Ikke Definert");
+    UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke definert", "Ikke Definert");
 
     private String kode;
     private String navn; //på bøkmål som standard

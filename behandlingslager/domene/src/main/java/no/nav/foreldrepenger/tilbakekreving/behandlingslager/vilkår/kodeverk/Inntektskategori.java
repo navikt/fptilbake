@@ -23,7 +23,7 @@ public enum Inntektskategori implements Kodeverdi {
     FERIEPENGER_ARBEIDSTAKER("FERIEPENGER_ARBEIDSTAKER", "Feriepenger arbeidstaker"),
     FERIETILLEGG("FERIETILLEGG", "Ferietillegg dagpenger"),
 
-    UDEFINERT("-", "Ikke Definert");
+    UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke Definert");
 
     public static final String KODEVERK = "INNTEKTS_KATEGORI";
     private static final Map<String, Inntektskategori> KODER = new LinkedHashMap<>();

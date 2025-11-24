@@ -21,7 +21,7 @@ public enum BehandlingÅrsakType implements Kodeverdi {
     RE_FEILUTBETALT_BELØP_HELT_ELLER_DELVIS_BORTFALT("RE_FEILUTBETALT_BELØP_REDUSERT", "Feilutbetalt beløp helt eller delvis bortfalt"),
     VEDTAK_FATTET_AV_ANNEN_INSTANS("FATTET_AV_ANNEN_INSTANS", "Vedtak fattet av annen instans"),
 
-    UDEFINERT("-", "Ikke Definert");
+    UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke Definert");
 
     private String kode;
     private String navn;

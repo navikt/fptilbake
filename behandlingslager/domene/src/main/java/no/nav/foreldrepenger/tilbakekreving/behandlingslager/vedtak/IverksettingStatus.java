@@ -16,7 +16,7 @@ public enum IverksettingStatus implements Kodeverdi {
     IKKE_IVERKSATT("IKKE_IVERKSATT"),
     UNDER_IVERKSETTING("UNDER_IVERKSETTING"),
     IVERKSATT("IVERKSATT"),
-    UDEFINERT("-");
+    UDEFINERT(STANDARDKODE_UDEFINERT);
 
     public static final String KODEVERK = "IVERKSETTING_STATUS";
     private static final Map<String, IverksettingStatus> KODER = new LinkedHashMap<>();

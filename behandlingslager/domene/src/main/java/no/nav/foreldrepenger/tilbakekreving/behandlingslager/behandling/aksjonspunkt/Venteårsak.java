@@ -21,7 +21,7 @@ public enum Venteårsak implements Kodeverdi {
     UTVIDET_TILSVAR_FRIST("UTV_TIL_FRIST", "Utvidet tilsvarsfrist"),
     ENDRE_TILKJENT_YTELSE("ENDRE_TILKJENT_YTELSE", "Mulig endring i tilkjent ytelse"),
     VENT_PÅ_MULIG_MOTREGNING("VENT_PÅ_MULIG_MOTREGNING", "Mulig motregning med annen ytelse"),
-    UDEFINERT("-", "");
+    UDEFINERT(STANDARDKODE_UDEFINERT, "");
 
     public static final String KODEVERK = "VENT_AARSAK";
 

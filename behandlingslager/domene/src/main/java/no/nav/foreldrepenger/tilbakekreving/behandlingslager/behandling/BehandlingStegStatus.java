@@ -37,7 +37,7 @@ public enum BehandlingStegStatus implements Kodeverdi {
     /**
      * Kun for intern bruk.
      */
-    UDEFINERT("-");
+    UDEFINERT(STANDARDKODE_UDEFINERT);
 
     public static final String KODEVERK = "BEHANDLING_STEG_STATUS";
     private static final Map<String, BehandlingStegStatus> KODER = new LinkedHashMap<>();

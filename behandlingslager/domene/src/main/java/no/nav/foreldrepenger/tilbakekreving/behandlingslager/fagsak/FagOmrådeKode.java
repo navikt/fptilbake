@@ -34,7 +34,7 @@ public enum FagOmrådeKode implements Kodeverdi {
     OPPLÆRINGSPENGER_ARBEIDSGIVER("OPPREF", "Opplæringspenger"),
     FRISINN("FRISINN", "FRIlansere og Selstendig næringsdrivendes INNtektskompensasjon"),
 
-    UDEFINERT("-", "udefinert");
+    UDEFINERT(STANDARDKODE_UDEFINERT, "udefinert");
 
     private String kode;
     private String navn;

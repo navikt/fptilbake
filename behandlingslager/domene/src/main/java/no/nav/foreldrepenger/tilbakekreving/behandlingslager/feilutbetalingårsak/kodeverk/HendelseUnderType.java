@@ -94,7 +94,7 @@ public enum HendelseUnderType implements Kodeverdi {
     REFUSJON_ARBEIDSGIVER("REFUSJON_ARBGIVER", "Refusjon til arbeidsgiver", 1),
     ANNET_FRITEKST("ANNET_FRITEKST", "Annet - fritekst", 2),
     FEIL_FERIEPENGER_4G("FEIL_FERIEPENGER_4G", "Feil i feriepenger - under 4 G", 3),
-    IKKE_SATT("-", null, 0),
+    IKKE_SATT(STANDARDKODE_UDEFINERT, null, 0),
     ;
 
     public static final String KODERVERK = "HENDELSE_UNDERTYPE";

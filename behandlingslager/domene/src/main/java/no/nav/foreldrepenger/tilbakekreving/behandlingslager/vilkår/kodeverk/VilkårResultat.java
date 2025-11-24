@@ -17,7 +17,7 @@ public enum VilkårResultat implements Kodeverdi {
     MANGELFULLE_OPPLYSNINGER_FRA_BRUKER("MANGELFULL_OPPLYSNING", "Ja, mottaker har forårsaket feilutbetalingen ved forsett eller uaktsomt gitt mangelfulle opplysninger (første ledd, andre punkt)"),
     FEIL_OPPLYSNINGER_FRA_BRUKER("FEIL_OPPLYSNINGER", "Ja, mottaker har forårsaket feilutbetalingen ved forsett eller uaktsomt gitt feilaktige opplysninger (første ledd, andre punkt)"),
     GOD_TRO("GOD_TRO", "Nei, mottaker har mottatt beløpet i god tro (første ledd)"),
-    UDEFINERT("-", "Ikke Definert");
+    UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke Definert");
 
     private String kode;
     private String navn;
