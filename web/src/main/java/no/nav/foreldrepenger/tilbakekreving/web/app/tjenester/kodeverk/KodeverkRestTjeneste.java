@@ -1,8 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -41,6 +44,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.S�
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.ObjectMapperFactory;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.dto.AlleKodeverdierSomObjektResponse;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.dto.KodeverdiMedNavnDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.dto.KodeverdiSomObjekt;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.caching.CacheControl;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -53,6 +57,8 @@ import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 public class KodeverkRestTjeneste {
 
     public static final String KODERVERK_PATH = "/kodeverk";
+
+    public static final String KODEVERK_FPTILBAKE_PATH = KODERVERK_PATH + "/fptilbake";
 
     private static final ObjectMapper objectMapper = ObjectMapperFactory.getDefaultObjectMapperCopy(true);
 
@@ -150,5 +156,50 @@ public class KodeverkRestTjeneste {
 
     private static String tilJson(Map<String, SortedSet<Kodeverdi>> kodeverk) throws JsonProcessingException {
         return objectMapper.writeValueAsString(kodeverk);
+    }
+
+    /*
+     * KODE FOR FPTILBAKE.
+     */
+    private static final Map<String, List<KodeverdiMedNavnDto>> KODEVERDIER_MED_NAVN = Map.ofEntries(
+        lagEnumEntry(Aktsomhet.class),
+        lagEnumEntry(AnnenVurdering.class),
+        lagEnumEntry(BehandlingResultatType.class),
+        lagEnumEntry(BehandlingType.class),
+        lagEnumEntry(BehandlingÅrsakType.class),
+        lagEnumEntry(ForeldelseVurderingType.class),
+        lagEnumEntry(HendelseType.class),
+        lagEnumEntry(HendelseUnderType.class),
+        lagEnumEntry(HistorikkAktør.class),
+        lagEnumEntry(SkjermlenkeType.class),
+        lagEnumEntry(SærligGrunn.class),
+        lagEnumEntry(VedtakResultatType.class),
+        lagEnumEntry(Venteårsak.class),
+        lagEnumEntry(VergeType.class),
+        lagEnumEntry(VidereBehandling.class),
+        lagEnumEntry(VilkårResultat.class),
+        lagEnumEntry(VurderÅrsak.class)
+    );
+
+    @GET
+    @Path("/fptilbake")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(description = "Alle statiske kodeverdier for fptilbake", tags = "kodeverk")
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.APPLIKASJON, sporingslogg = false)
+    @CacheControl(maxAge = 60 * 60)
+    public Response kodeverkFptilbake() {
+        return Response.ok().entity(KODEVERDIER_MED_NAVN).build();
+    }
+
+    private static Map.Entry<String, List<KodeverdiMedNavnDto>> lagEnumEntry(Class<? extends Kodeverdi> kodeverkClass) {
+        if (!Enum.class.isAssignableFrom(kodeverkClass)) {
+            throw new IllegalArgumentException("Ikke enum: " + kodeverkClass.getSimpleName());
+        }
+        var dtos = Arrays.stream(kodeverkClass.getEnumConstants())
+            .filter(kodeverdi -> !Kodeverdi.STANDARDKODE_UDEFINERT.equals(kodeverdi.getKode()))
+            .map(k -> new KodeverdiMedNavnDto(k.getKode(), k.getNavn()))
+            .sorted(Comparator.comparing(KodeverdiMedNavnDto::navn))
+            .toList();
+        return Map.entry(kodeverkClass.getSimpleName(), dtos);
     }
 }
