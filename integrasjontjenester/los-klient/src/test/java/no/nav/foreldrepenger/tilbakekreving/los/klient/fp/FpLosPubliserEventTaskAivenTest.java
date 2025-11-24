@@ -10,6 +10,10 @@ import java.util.List;
 
 import jakarta.persistence.EntityManager;
 
+import no.nav.foreldrepenger.tilbakekreving.los.klient.KafkaProducerAiven;
+
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,7 +41,7 @@ class FpLosPubliserEventTaskAivenTest {
 
     private BehandlingRepositoryProvider repositoryProvider;
 
-    private FpLosKafkaProducerAiven mockKafkaProducerAiven = mock(FpLosKafkaProducerAiven.class);
+    private KafkaProducerAiven mockKafkaProducerAiven = mock(KafkaProducerAiven.class);
 
     private FpLosPubliserEventTask losPubliserEventTask;
 
@@ -61,9 +65,9 @@ class FpLosPubliserEventTaskAivenTest {
         var prosessTaskData = lagProsessTaskData(Hendelse.VENTETILSTAND);
         losPubliserEventTask.doTask(prosessTaskData);
 
-        var eventCaptor = ArgumentCaptor.forClass(BehandlingHendelseV1.class);
-        verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelseFplos(any(), eventCaptor.capture());
-        var event = eventCaptor.getValue();
+        var eventCaptor = ArgumentCaptor.forClass(String.class);
+        verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelse(any(), eventCaptor.capture());
+        var event = DefaultJsonMapper.fromJson(eventCaptor.getValue(), BehandlingHendelseV1.class);
 
 
         assertThat(event.getHendelse()).isEqualTo(Hendelse.VENTETILSTAND);
@@ -83,9 +87,9 @@ class FpLosPubliserEventTaskAivenTest {
         var prosessTaskData = lagProsessTaskData(Hendelse.AKSJONSPUNKT);
         losPubliserEventTask.doTask(prosessTaskData);
 
-        var eventCaptor = ArgumentCaptor.forClass(BehandlingHendelseV1.class);
-        verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelseFplos(any(), eventCaptor.capture());
-        var event = eventCaptor.getValue();
+        var eventCaptor = ArgumentCaptor.forClass(String.class);
+        verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelse(any(), eventCaptor.capture());
+        var event = DefaultJsonMapper.fromJson(eventCaptor.getValue(), BehandlingHendelseV1.class);
 
 
         assertThat(event.getHendelse()).isEqualTo(Hendelse.AKSJONSPUNKT);
@@ -102,9 +106,9 @@ class FpLosPubliserEventTaskAivenTest {
         var prosessTaskData = lagProsessTaskData(Hendelse.OPPRETTET);
         losPubliserEventTask.doTask(prosessTaskData);
 
-        var eventCaptor = ArgumentCaptor.forClass(BehandlingHendelseV1.class);
-        verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelseFplos(any(), eventCaptor.capture());
-        var event = eventCaptor.getValue();
+        var eventCaptor = ArgumentCaptor.forClass(String.class);
+        verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelse(any(), eventCaptor.capture());
+        var event = DefaultJsonMapper.fromJson(eventCaptor.getValue(), BehandlingHendelseV1.class);
 
         assertThat(event.getHendelse()).isEqualTo(Hendelse.OPPRETTET);
         assertThat(event.getKildesystem()).isEqualTo(Kildesystem.FPTILBAKE);
