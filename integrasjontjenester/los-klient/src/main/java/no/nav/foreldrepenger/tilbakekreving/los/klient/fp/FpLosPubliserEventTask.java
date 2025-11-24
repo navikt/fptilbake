@@ -4,11 +4,12 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
@@ -16,6 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProses
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
+import no.nav.foreldrepenger.tilbakekreving.los.klient.KafkaProducerAiven;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -24,6 +26,7 @@ import no.nav.vedtak.hendelser.behandling.Hendelse;
 import no.nav.vedtak.hendelser.behandling.Kildesystem;
 import no.nav.vedtak.hendelser.behandling.Ytelse;
 import no.nav.vedtak.hendelser.behandling.v1.BehandlingHendelseV1;
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 @ApplicationScoped
 @ProsessTask(value = "fplos.oppgavebehandling.behandlingshendelse", prioritet = 2)
@@ -39,7 +42,7 @@ public class FpLosPubliserEventTask implements ProsessTaskHandler {
     private static final Logger LOG = LoggerFactory.getLogger(FpLosPubliserEventTask.class);
 
     private BehandlingRepository behandlingRepository;
-    private FpLosKafkaProducerAiven fpLosKafkaProducerAiven;
+    private KafkaProducerAiven kafkaProducerAiven;
 
     boolean brukAiven;
 
@@ -49,15 +52,15 @@ public class FpLosPubliserEventTask implements ProsessTaskHandler {
 
     @Inject
     public FpLosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
-                                  FpLosKafkaProducerAiven fpLosKafkaProducerAiven) {
-        this(repositoryProvider, fpLosKafkaProducerAiven, ApplicationName.hvilkenTilbake());
+                                  KafkaProducerAiven kafkaProducerAiven) {
+        this(repositoryProvider, kafkaProducerAiven, ApplicationName.hvilkenTilbake());
     }
 
     public FpLosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
-                                  FpLosKafkaProducerAiven fpLosKafkaProducerAiven,
+                                  KafkaProducerAiven kafkaProducerAiven,
                                   Fagsystem applikasjonNavn) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.fpLosKafkaProducerAiven = fpLosKafkaProducerAiven;
+        this.kafkaProducerAiven = kafkaProducerAiven;
 
         this.fagsystem = switch (applikasjonNavn) {
             case FPTILBAKE -> Fagsystem.FPTILBAKE;
@@ -85,7 +88,7 @@ public class FpLosPubliserEventTask implements ProsessTaskHandler {
             .medBehandlingstype(mapBehandlingstype(behandling))
             .medTidspunkt(LocalDateTime.now())
             .build();
-        fpLosKafkaProducerAiven.sendHendelseFplos(behandling.getFagsak().getSaksnummer(), losHendelseDto);
+        kafkaProducerAiven.sendHendelse(behandling.getFagsak().getSaksnummer().getVerdi(), DefaultJsonMapper.toJson(losHendelseDto));
     }
 
     private static Ytelse mapYtelse(Behandling behandling) {
