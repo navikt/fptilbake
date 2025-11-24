@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.domene.typer;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
+
 import java.util.Objects;
 
 public class FagsystemId implements Comparable<FagsystemId> {
@@ -9,7 +11,7 @@ public class FagsystemId implements Comparable<FagsystemId> {
     private boolean gammeltFormat;
 
     public static FagsystemId parse(String kode) {
-        return kode.contains("-")
+        return kode.contains(Kodeverdi.STANDARDKODE_UDEFINERT)
                 ? parseNyttFormat(kode)
                 : parseGammeltFormat(kode);
     }

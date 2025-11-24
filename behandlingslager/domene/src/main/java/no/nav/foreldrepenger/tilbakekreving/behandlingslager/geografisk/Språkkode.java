@@ -16,7 +16,7 @@ public enum Språkkode implements Kodeverdi {
     NB("NB"),
     NN("NN"),
     EN("EN"),
-    UDEFINERT("-");
+    UDEFINERT(STANDARDKODE_UDEFINERT);
 
     public static final Språkkode DEFAULT = Språkkode.NB;
     public static final String KODEVERK = "SPRAAK_KODE";

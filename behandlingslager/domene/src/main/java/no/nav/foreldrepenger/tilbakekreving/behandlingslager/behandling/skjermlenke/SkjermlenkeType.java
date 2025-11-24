@@ -19,7 +19,7 @@ public enum SkjermlenkeType implements Kodeverdi {
     FORELDELSE("FORELDELSE", "Foreldelse"),
     VEDTAK("VEDTAK", "Vedtak"),
     FAKTA_OM_VERGE("FAKTA_OM_VERGE", "Fakta om verge/fullmektig"),
-    UDEFINERT("-", "Ikke Definert");
+    UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke Definert");
 
     private String kode;
     private String navn;

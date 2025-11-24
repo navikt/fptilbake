@@ -69,7 +69,7 @@ public class KodeverkRestTjeneste {
     private static <K extends Kodeverdi> void addLegacyGruppertKodeverdier(final SortedSet<KodeverdiSomObjekt<K>> verdier) {
         final String gruppenavn = verdier.getFirst().getKilde().getClass().getSimpleName();
         final var verdierSomGenerelleKodeverdiObjekter = verdier.stream()
-            .filter(o -> !o.getKode().equals("-")) // Utelat kode "-", for å stemme med tidligere kode
+            .filter(o -> !o.getKode().equals(Kodeverdi.STANDARDKODE_UDEFINERT)) // Utelat kode "-", for å stemme med tidligere kode
             .map(o -> (Kodeverdi) o.getKilde())
             .collect(Collectors.toCollection(() -> new TreeSet<>((a, b) -> a.getKode().compareTo(b.getKode()))));
         legacyGrupperteKodeverdier.put(gruppenavn, verdierSomGenerelleKodeverdiObjekter);

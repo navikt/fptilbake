@@ -267,7 +267,7 @@ public enum Landkoder implements Kodeverdi {
     ZMB("ZMB", "ZAMBIA"),
     ZWE("ZWE", "ZIMBABWE"),
 
-    UDEFINERT("-", "Ikke definert");
+    UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke definert");
 
     public static final String KODEVERK = "LANDKODER";
     private static final Map<String, Landkoder> KODER = new LinkedHashMap<>();

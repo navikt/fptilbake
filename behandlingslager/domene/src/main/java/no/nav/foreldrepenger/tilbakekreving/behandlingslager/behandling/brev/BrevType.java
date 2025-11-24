@@ -18,7 +18,7 @@ public enum BrevType implements Kodeverdi {
     HENLEGGELSE_BREV("HENLEGGELSE"),
     INNHENT_DOKUMENTASJONBREV("INNHENT_DOKUMENTASJON"),
     FRITEKST("FRITEKSTBREV"),
-    UDEFINERT("-");
+    UDEFINERT(STANDARDKODE_UDEFINERT);
 
     public static final String KODEVERK = "BREV_TYPE";
     private static final Map<String, BrevType> KODER = new LinkedHashMap<>();

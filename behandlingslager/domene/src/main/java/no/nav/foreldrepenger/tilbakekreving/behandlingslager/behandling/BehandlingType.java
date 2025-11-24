@@ -15,7 +15,7 @@ public enum BehandlingType implements Kodeverdi {
 
     TILBAKEKREVING("BT-007", "Tilbakekreving"),
     REVURDERING_TILBAKEKREVING("BT-009", "Tilbakekreving revurdering"),
-    UDEFINERT("-", "Ikke definert");
+    UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke definert");
 
     public static final String KODEVERK = "BEHANDLING_TYPE";
     private static final Map<String, BehandlingType> TILGJENGELIGE = Map.of(

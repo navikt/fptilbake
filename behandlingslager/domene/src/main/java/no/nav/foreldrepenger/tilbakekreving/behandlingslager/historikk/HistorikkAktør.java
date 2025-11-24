@@ -18,7 +18,7 @@ public enum HistorikkAktør implements Kodeverdi {
     SØKER("SOKER", "Søker"),
     ARBEIDSGIVER("ARBEIDSGIVER", "Arbeidsgiver"),
     VEDTAKSLØSNINGEN("VL", "Vedtaksløsningen"),
-    UDEFINERT("-", "Ikke definert");
+    UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke definert");
 
     private String kode;
     private String navn;
