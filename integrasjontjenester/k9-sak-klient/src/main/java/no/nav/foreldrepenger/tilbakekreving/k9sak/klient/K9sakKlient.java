@@ -23,9 +23,9 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.FagsakDto;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.FamilieHendelseType;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SoknadDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VarseltekstDto;
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.BehandlingResourceLinkDto;
@@ -145,7 +145,7 @@ public class K9sakKlient implements FagsystemKlient {
                     hentVarseltekst(lenke).ifPresent(builder::setVarseltekst);
                 }
                 if (tilleggsinformasjon.contains(Tillegsinformasjon.SØKNAD) && lenke.getRel().equals(Tillegsinformasjon.SØKNAD.getK9sakRelasjonNavn())) {
-                    builder.setFamiliehendelse(hentSøknad(lenke));
+                    builder.setFamiliehendelse(hentSøknad());
                 }
                 if (tilleggsinformasjon.contains(Tillegsinformasjon.TILBAKEKREVINGSVALG) && lenke.getRel().equals(Tillegsinformasjon.TILBAKEKREVINGSVALG.getK9sakRelasjonNavn())) {
                     hentTilbakekrevingValg(lenke).ifPresent(builder::setTilbakekrevingvalg);
@@ -184,10 +184,8 @@ public class K9sakKlient implements FagsystemKlient {
 
     }
 
-    private SoknadDto hentSøknad(BehandlingResourceLinkDto resourceLink) {
-        URI endpoint = URI.create(baseUri() + resourceLink.getHref());
-        return get(endpoint, SoknadDto.class)
-            .orElseThrow(() -> new IllegalArgumentException("Forventet å finne søknad på lenken: " + endpoint));
+    private FamilieHendelseType hentSøknad() {
+        return FamilieHendelseType.FØDSEL;
     }
 
     private Optional<TilbakekrevingValgDto> hentTilbakekrevingValg(BehandlingResourceLinkDto resourceLink) {

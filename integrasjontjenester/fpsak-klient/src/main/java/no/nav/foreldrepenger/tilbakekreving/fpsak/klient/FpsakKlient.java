@@ -24,10 +24,9 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.FagsakDto;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.FamilieHendelseType;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SoknadDto;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SøknadType;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VergeDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingInfoDto;
@@ -164,10 +163,8 @@ public class FpsakKlient implements FagsystemKlient {
         return fagsakDto;
     }
 
-    private static SoknadDto soknadFraFullDto(FpsakTilbakeDto fullDto) {
-        var soknadDto = new SoknadDto();
-        soknadDto.setSoknadType(fullDto.familieHendelse().familieHendelseType() == FpsakTilbakeDto.FamilieHendelseType.ADOPSJON ? SøknadType.ADOPSJON : SøknadType.FØDSEL);
-        return soknadDto;
+    private static FamilieHendelseType soknadFraFullDto(FpsakTilbakeDto fullDto) {
+        return fullDto.familieHendelse().familieHendelseType() == FpsakTilbakeDto.FamilieHendelseType.ADOPSJON ? FamilieHendelseType.ADOPSJON : FamilieHendelseType.FØDSEL;
     }
 
     private static Optional<TilbakekrevingValgDto> videreFraFullDto(FpsakTilbakeDto fullDto) {

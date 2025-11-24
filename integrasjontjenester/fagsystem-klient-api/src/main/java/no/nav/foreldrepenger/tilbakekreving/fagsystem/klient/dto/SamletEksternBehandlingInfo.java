@@ -21,7 +21,7 @@ public class SamletEksternBehandlingInfo {
     private PersonopplysningDto personopplysninger;
     private String varseltekst;
     private TilbakekrevingValgDto tilbakekrevingsvalg;
-    private SoknadDto søknad;
+    private FamilieHendelseType familieHendelseType;
     private FagsakDto fagsak;
     private VergeDto verge;
     private Boolean sendtoppdrag;
@@ -50,9 +50,9 @@ public class SamletEksternBehandlingInfo {
         return tilbakekrevingsvalg;
     }
 
-    public SoknadDto getSøknad() {
+    public FamilieHendelseType getSøknad() {
         check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.SØKNAD), "Utvikler-feil: har ikke hentet søknad");
-        return søknad;
+        return familieHendelseType;
     }
 
     public FagsakDto getFagsak() {
@@ -71,11 +71,11 @@ public class SamletEksternBehandlingInfo {
     }
 
     public boolean gjelderFødsel() {
-        return SøknadType.FØDSEL.equals(getSøknad().getSøknadType());
+        return FamilieHendelseType.FØDSEL.equals(getSøknad());
     }
 
     public boolean gjelderAdopsjon() {
-        return SøknadType.ADOPSJON.equals(getSøknad().getSøknadType());
+        return FamilieHendelseType.ADOPSJON.equals(getSøknad());
     }
 
     public Saksnummer getSaksnummer() {
@@ -141,8 +141,8 @@ public class SamletEksternBehandlingInfo {
             return this;
         }
 
-        public Builder setFamiliehendelse(SoknadDto søknad) {
-            kladd.søknad = søknad;
+        public Builder setFamiliehendelse(FamilieHendelseType familieHendelseType) {
+            kladd.familieHendelseType = familieHendelseType;
             return this;
         }
 
