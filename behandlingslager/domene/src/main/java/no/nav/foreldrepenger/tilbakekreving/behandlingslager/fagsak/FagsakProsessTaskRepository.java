@@ -18,6 +18,8 @@ import jakarta.persistence.LockModeType;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
+
 import org.hibernate.jpa.HibernateHints;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.type.StandardBasicTypes;
@@ -77,6 +79,14 @@ public class FagsakProsessTaskRepository {
         Query query = em.createQuery("Delete from FagsakProsessTask Where prosessTaskId = :prosessTaskId and fagsakId=:fagsakId");
         query.setParameter("prosessTaskId", prosessTaskId);
         query.setParameter("fagsakId", fagsakId);
+        query.executeUpdate();
+        em.flush();
+    }
+
+    public void fjernForAvsluttedeBehandlinger() {
+        var em = getEntityManager();
+        var query = em.createNativeQuery("delete from FAGSAK_PROSESS_TASK fp where fp.id in ( select fpt.id from FAGSAK_PROSESS_TASK fpt join BEHANDLING b on fpt.behandling_id=b.id where behandling_status = :avsluttet )");
+        query.setParameter("avsluttet", BehandlingStatus.AVSLUTTET.getKode());
         query.executeUpdate();
         em.flush();
     }
