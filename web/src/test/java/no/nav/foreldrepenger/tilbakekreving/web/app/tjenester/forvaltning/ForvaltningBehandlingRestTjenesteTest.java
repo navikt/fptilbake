@@ -95,11 +95,11 @@ class ForvaltningBehandlingRestTjenesteTest {
 
     @BeforeEach
     void setup() {
-        BehandlingskontrollEventPubliserer eventPubliserer = mock(BehandlingskontrollEventPubliserer.class);
+        var eventPubliserer = BehandlingskontrollEventPubliserer.NULL_EVENT_PUB;
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, behandlingModellRepository, eventPubliserer));
 
         forvaltningBehandlingRestTjeneste = new ForvaltningBehandlingRestTjeneste(repositoryProvider, taskTjeneste, behandlingresultatRepository,
-            mottattXmlRepository, kravgrunnlagMapper, kravgrunnlagTjeneste, eksternBehandlingRepository, null, null);
+            mottattXmlRepository, kravgrunnlagMapper, kravgrunnlagTjeneste, eksternBehandlingRepository, null, null, null);
         behandling = scenario.lagre(repositoryProvider);
     }
 
