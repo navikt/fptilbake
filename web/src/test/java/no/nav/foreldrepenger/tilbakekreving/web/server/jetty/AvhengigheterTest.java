@@ -1,14 +1,15 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
+import jakarta.enterprise.inject.spi.CDI;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import jakarta.enterprise.inject.spi.CDI;
 import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemFraResultatOgIverksettingStatusTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SakshendelserEventObserver;
 import no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer.KravgrunnlagAsyncJmsConsumer;
-import no.nav.foreldrepenger.tilbakekreving.los.klient.observer.FpLosEventObserver;
-import no.nav.foreldrepenger.tilbakekreving.los.klient.observer.K9LosEventObserver;
+import no.nav.foreldrepenger.tilbakekreving.los.klient.fp.FpLosEventObserver;
+import no.nav.foreldrepenger.tilbakekreving.los.klient.k9.K9LosEventObserver;
 import no.nav.vedtak.felles.testutilities.cdi.WeldContext;
 
 class AvhengigheterTest {

@@ -297,11 +297,6 @@
                 <version>${fpkontrakter.version}</version>
             </dependency>
             <dependency>
-                <groupId>no.nav.foreldrepenger.kontrakter.topics</groupId>
-                <artifactId>fp-topics-behandlingsprosess</artifactId>
-                <version>${fpkontrakter.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>no.nav.foreldrepenger.kontrakter</groupId>
                 <artifactId>fp-ws-proxy-v1</artifactId>
                 <version>${fpkontrakter.version}</version>

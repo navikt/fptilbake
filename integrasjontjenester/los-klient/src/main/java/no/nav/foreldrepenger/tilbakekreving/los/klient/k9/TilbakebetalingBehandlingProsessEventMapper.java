@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.los.klient;
+package no.nav.foreldrepenger.tilbakekreving.los.klient.k9;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEventDto;
+import no.nav.foreldrepenger.tilbakekreving.los.klient.k9.kontrakt.TilbakebetalingBehandlingProsessEventDto;
 
 public class TilbakebetalingBehandlingProsessEventMapper {
 

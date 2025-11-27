@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.los.klient.task;
+package no.nav.foreldrepenger.tilbakekreving.los.klient.k9;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,9 +51,9 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
-import no.nav.foreldrepenger.tilbakekreving.los.klient.producer.LosKafkaProducerAiven;
-import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
-import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEventDto;
+import no.nav.foreldrepenger.tilbakekreving.los.klient.KafkaProducerAiven;
+import no.nav.foreldrepenger.tilbakekreving.los.klient.k9.kontrakt.EventHendelse;
+import no.nav.foreldrepenger.tilbakekreving.los.klient.k9.kontrakt.TilbakebetalingBehandlingProsessEventDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 @ExtendWith(JpaExtension.class)
@@ -67,7 +67,7 @@ class K9LosPubliserEventTaskAivenTest {
 
     private BehandlingRepositoryProvider repositoryProvider;
 
-    private LosKafkaProducerAiven mockKafkaProducerAiven = mock(LosKafkaProducerAiven.class);
+    private KafkaProducerAiven mockKafkaProducerAiven = mock(KafkaProducerAiven.class);
 
     private K9LosPubliserEventTask losPubliserEventTask;
 
@@ -112,7 +112,7 @@ class K9LosPubliserEventTaskAivenTest {
 
         losPubliserEventTask.doTask(prosessTaskData);
 
-        verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelse(any(), any());
+        verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelseMedCallId(any(), any(), any());
         TilbakebetalingBehandlingProsessEventDto event = losPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(behandling, EventHendelse.AKSJONSPUNKT_OPPRETTET.name(),
                 kravgrunnlag431);
 
@@ -142,7 +142,7 @@ class K9LosPubliserEventTaskAivenTest {
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
 
         losPubliserEventTask.doTask(prosessTaskData);
-        verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelse(any(), any());
+        verify(mockKafkaProducerAiven, atLeastOnce()).sendHendelseMedCallId(any(), any(), any());
 
         TilbakebetalingBehandlingProsessEventDto event = losPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(behandling, EventHendelse.AKSJONSPUNKT_AVBRUTT.name(), null);
 
