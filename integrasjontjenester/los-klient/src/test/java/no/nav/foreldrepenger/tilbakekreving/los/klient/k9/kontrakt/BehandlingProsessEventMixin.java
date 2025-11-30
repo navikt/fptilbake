@@ -10,8 +10,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(use = NAME, include = PROPERTY, property = "fagsystem", visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = TilbakebetalingBehandlingProsessEventDto.class, name = "FPTILBAKE"),
-        @JsonSubTypes.Type(value = BehandlingProsessEventDto.class, name = "FPSAK")
+        @JsonSubTypes.Type(value = TilbakebetalingBehandlingProsessEventDto.class, name = "K9TILBAKE"),
+        @JsonSubTypes.Type(value = BehandlingProsessEventDto.class, name = "K9")
 })
 public abstract class BehandlingProsessEventMixin {
     public BehandlingProsessEventMixin() {

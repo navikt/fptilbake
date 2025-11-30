@@ -63,7 +63,7 @@ class K9LosPubliserEventTaskAivenTest {
     private static final LocalDate TOM_1 = LocalDate.of(2019, 12, 31);
     private static final LocalDate FOM_2 = LocalDate.of(2020, 1, 1);
     private static final LocalDate TOM_2 = LocalDate.of(2020, 1, 31);
-    private static final UUID FPSAK_BEHANDLING_UUID = UUID.randomUUID();
+    private static final UUID K9SAK_BEHANDLING_UUID = UUID.randomUUID();
 
     private BehandlingRepositoryProvider repositoryProvider;
 
@@ -91,7 +91,7 @@ class K9LosPubliserEventTaskAivenTest {
 
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
         behandling.setAnsvarligSaksbehandler("1234");
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), FPSAK_BEHANDLING_UUID);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), K9SAK_BEHANDLING_UUID);
         repositoryProvider.getEksternBehandlingRepository().lagre(eksternBehandling);
 
         lagProsessTaskData();
@@ -100,11 +100,11 @@ class K9LosPubliserEventTaskAivenTest {
                 .setGrunninformasjon(new EksternBehandlingsinfoDto())
                 .setTilbakekrevingvalg(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKR_OPPRETT))
                 .build();
-        when(mockFagsystemKlient.hentBehandlingsinfo(FPSAK_BEHANDLING_UUID, Tillegsinformasjon.TILBAKEKREVINGSVALG)).thenReturn(samletEksternBehandlingInfo);
+        when(mockFagsystemKlient.hentBehandlingsinfo(K9SAK_BEHANDLING_UUID, Tillegsinformasjon.TILBAKEKREVINGSVALG)).thenReturn(samletEksternBehandlingInfo);
     }
 
     @Test
-    void skal_publisere_fplos_data_til_kafka() throws IOException {
+    void skal_publisere_k9los_data_til_kafka() throws IOException {
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, List.of(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING);
@@ -136,7 +136,7 @@ class K9LosPubliserEventTaskAivenTest {
     }
 
     @Test
-    void skal_publisere_fplos_data_til_kafka_for_henleggelse_når_kravgrunnlag_ikke_finnes() throws IOException {
+    void skal_publisere_k9los_data_til_kafka_for_henleggelse_når_kravgrunnlag_ikke_finnes() throws IOException {
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.VARSEL, List.of(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING));
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);

@@ -26,10 +26,10 @@ class BehandlingProsessEventDtoTest {
         aksjonspunkter.put("5080", "OPPR");
 
         BehandlingProsessEventDto baseDto = BehandlingProsessEventDto.builder()
-                .medFagsystem("FPSAK")
+                .medFagsystem("K9")
                 .medAktørId("123457890123")
                 .medSaksnummer("9876543210")
-                .medYtelseTypeKode("FP")
+                .medYtelseTypeKode("PSB")
                 .medBehandlingTypeKode("BT-004")
                 .medEventTid(LocalDateTime.now())
                 .medOpprettetBehandling(LocalDateTime.now().minusHours(10))
@@ -39,14 +39,14 @@ class BehandlingProsessEventDtoTest {
                 .build();
 
         TilbakebetalingBehandlingProsessEventDto tilbakebetalingDto = TilbakebetalingBehandlingProsessEventDto.builder()
-                .medFagsystem("FPTILBAKE")
+                .medFagsystem("K9TILBAKE")
                 .medFeilutbetaltBeløp(BigDecimal.valueOf(20000L))
                 .medFørsteFeilutbetaling(LocalDate.now().minusMonths(4))
                 .medAnsvarligSaksbehandlerIdent("T12345")
                 .medHref("http://tilbakekreving/")
                 .medAktørId("123457890123")
                 .medSaksnummer("9876543210")
-                .medYtelseTypeKode("FP")
+                .medYtelseTypeKode("PSB")
                 .medBehandlingTypeKode("BT-004")
                 .medEventTid(LocalDateTime.now())
                 .medOpprettetBehandling(LocalDateTime.now().minusHours(10))

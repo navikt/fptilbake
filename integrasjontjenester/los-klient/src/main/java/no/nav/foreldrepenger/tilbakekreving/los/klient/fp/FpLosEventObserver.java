@@ -21,8 +21,6 @@ import no.nav.vedtak.hendelser.behandling.Hendelse;
 @ApplicationScoped
 public class FpLosEventObserver {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FpLosEventObserver.class);
-
     private Fagsystem fagsystem;
 
     private ProsessTaskTjeneste taskTjeneste;
