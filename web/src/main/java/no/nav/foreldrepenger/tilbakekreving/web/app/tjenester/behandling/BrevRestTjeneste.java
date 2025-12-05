@@ -4,6 +4,8 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -81,6 +83,8 @@ public class BrevRestTjeneste {
     @POST
     @Path("/forhandsvis")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces("application/pdf")
+    @Schema(format = "binary")
     @Operation(tags = "brev", description = "Returnerer en pdf som er en forhåndsvisning av brevet")
     @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = true)
     public Response forhåndsvisBrev(@Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @NotNull @Valid BestillBrevDto forhåndsvisBestillBrevDto) {
