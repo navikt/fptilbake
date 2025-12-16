@@ -597,10 +597,11 @@ public class BehandlingRestTjeneste {
             return BehandlingOperasjonerDto.builder(b.getUuid()).medTilGodkjenning(tilgokjenning).build();
         } else {
             boolean totrinnRetur = totrinnTjeneste.hentTotrinnsvurderinger(b).stream().anyMatch(tt -> !tt.isGodkjent());
+
             return BehandlingOperasjonerDto.builder(b.getUuid())
                 .medTilGodkjenning(false)
                 .medFraBeslutter(!b.isBehandlingPåVent() && totrinnRetur)
-                .medKanBytteEnhet(true)
+                .medKanBytteEnhet(KontekstUtil.kanSaksbehandle())
                 .medKanHenlegges(henleggBehandlingTjeneste.kanHenleggeBehandlingManuelt(b))
                 .medKanSettesPaVent(!b.isBehandlingPåVent())
                 .medKanGjenopptas(b.isBehandlingPåVent())
