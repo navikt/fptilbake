@@ -233,7 +233,7 @@ public class BehandlingDtoTjeneste {
             return BehandlingOperasjonerDto.builder(b.getUuid())
                     .medTilGodkjenning(false)
                     .medFraBeslutter(!b.isBehandlingPåVent() && totrinnRetur)
-                    .medKanBytteEnhet(true)
+                    .medKanBytteEnhet(KontekstUtil.kanSaksbehandle())
                     .medKanHenlegges(henleggBehandlingTjeneste.kanHenleggeBehandlingManuelt(b))
                     .medKanSettesPaVent(!b.isBehandlingPåVent())
                     .medKanGjenopptas(b.isBehandlingPåVent())
