@@ -15,6 +15,7 @@ public class Satser {
 
     //se https://www.skatteetaten.no/satser/rettsgebyr/
     private static final Map<Year, BigDecimal> RETTSGEBYR_HISTORISK = Map.ofEntries(
+        Map.entry(Year.of(2026), BigDecimal.valueOf(1345)),
         Map.entry(Year.of(2025), BigDecimal.valueOf(1314)),
         Map.entry(Year.of(2024), BigDecimal.valueOf(1277)),
         Map.entry(Year.of(2023), BigDecimal.valueOf(1243)),
@@ -25,6 +26,7 @@ public class Satser {
     );
 
     private static final Map<Year, BigDecimal> HALVT_RETTSGEBYR_HISTORISK = Map.ofEntries(
+        Map.entry(Year.of(2026), BigDecimal.valueOf(672)),
         Map.entry(Year.of(2025), BigDecimal.valueOf(657)),
         Map.entry(Year.of(2024), BigDecimal.valueOf(638)),
         Map.entry(Year.of(2023), BigDecimal.valueOf(622)),
