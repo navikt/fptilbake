@@ -18,7 +18,7 @@
             <artifactId>domenetjenester</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.foreldrepenger.kontrakter.topics</groupId>
+            <groupId>no.nav.foreldrepenger.kontrakter</groupId>
             <artifactId>hendelser-behandling</artifactId>
         </dependency>
         <dependency>

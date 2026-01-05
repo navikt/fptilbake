@@ -20,6 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.vedtak.hendelser.behandling.Aksjonspunktstatus;
+import no.nav.vedtak.hendelser.behandling.Aksjonspunkttype;
 import no.nav.vedtak.hendelser.behandling.AktørId;
 import no.nav.vedtak.hendelser.behandling.Behandlingsstatus;
 import no.nav.vedtak.hendelser.behandling.Behandlingstype;
@@ -116,8 +117,17 @@ public class LosBehandlingDtoTjeneste {
 
     private static LosBehandlingDto.LosAksjonspunktDto mapTilLosAksjonspunkt(Aksjonspunkt aksjonspunkt) {
         return new LosBehandlingDto.LosAksjonspunktDto(aksjonspunkt.getAksjonspunktDefinisjon().getKode(),
+            mapAksjonspunkttype(aksjonspunkt),
             mapAksjonspunktstatus(aksjonspunkt),
             aksjonspunkt.getFristTid());
+    }
+
+    private static Aksjonspunkttype mapAksjonspunkttype(Aksjonspunkt aksjonspunkt) {
+        return switch (aksjonspunkt.getAksjonspunktDefinisjon()) {
+            case VENT_PÅ_BRUKERTILBAKEMELDING, VENT_PÅ_TILBAKEKREVINGSGRUNNLAG -> Aksjonspunkttype.VENT;
+            case FATTE_VEDTAK -> Aksjonspunkttype.BESLUTTER;
+            default -> Aksjonspunkttype.AKSJONSPUNKT;
+        };
     }
 
     private static Aksjonspunktstatus mapAksjonspunktstatus(Aksjonspunkt aksjonspunkt) {
