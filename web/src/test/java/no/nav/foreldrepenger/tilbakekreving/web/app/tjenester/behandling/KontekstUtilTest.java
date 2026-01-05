@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import no.nav.vedtak.sikkerhet.kontekst.AnsattGruppe;
@@ -16,8 +17,14 @@ import no.nav.vedtak.sikkerhet.kontekst.RequestKontekst;
 
 class KontekstUtilTest {
 
+    @BeforeEach
+    void setUp() {
+        System.setProperty("app.name", "fptilbake");
+    }
+
     @AfterEach
     void tearDown() {
+        System.clearProperty("app.name");
         KontekstHolder.fjernKontekst();
     }
 
