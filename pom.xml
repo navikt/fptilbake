@@ -178,6 +178,11 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>no.nav.k9.felles.integrasjon</groupId>
+                <artifactId>k9-bigquery-klient</artifactId>
+                <version>10.0.4</version>
+            </dependency>
+            <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>kravgrunnlag-queue</artifactId>
                 <version>${project.version}</version>
@@ -419,4 +424,3 @@
         </repository>
     </distributionManagement>
 </project>
-
