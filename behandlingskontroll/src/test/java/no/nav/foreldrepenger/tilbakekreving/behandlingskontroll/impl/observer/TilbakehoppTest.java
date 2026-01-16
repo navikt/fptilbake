@@ -47,6 +47,7 @@ class TilbakehoppTest {
     private BehandlingStegType steg5;
     private BehandlingStegType steg6;
     private BehandlingStegType steg7;
+    private BehandlingStegType steg8;
 
     private final List<StegTransisjon> transisjoner = new ArrayList<>();
 
@@ -84,6 +85,7 @@ class TilbakehoppTest {
         steg5 = modell.finnNesteSteg(steg4).getBehandlingStegType();
         steg6 = modell.finnNesteSteg(steg5).getBehandlingStegType();
         steg7 = modell.finnNesteSteg(steg6).getBehandlingStegType();
+        steg8 = modell.finnNesteSteg(steg7).getBehandlingStegType();
     }
 
     @Test
@@ -92,6 +94,12 @@ class TilbakehoppTest {
         assertAPGjenåpnesVedTilbakehopp(fra(steg3, INN), til(steg1), medUtførtAP(identifisertI(steg1), løsesI(steg2, UT)));
         // Bevisst diff fra fpsak
         assertAPGjenåpnesVedTilbakehopp(fra(steg3, INN), til(steg1), medUtførtAP(identifisertI(steg1), løsesI(steg3, UT)));
+    }
+
+    @Test
+    void tilfelle_fatte_tilbake_til_foreslå_vedtak() {
+        // Tilfelle Fatte til Foreslå vedtak
+        assertAPAvbrytesVedTilbakehopp(fra(steg8, INN), til(steg7, UT), medUtførtAP(identifisertI(steg7), løsesI(steg8, INN)));
     }
 
     @Test
@@ -138,35 +146,12 @@ class TilbakehoppTest {
     }
 
     @Test
-    void skal_gjenopprette_et_overstyrings_aksjonspunkt_når_det_hoppes() {
-    /*  Ikke definert noen overstyringsaksjonspunkter
-        assertAPGjenåpnesVedTilbakehopp(fra(steg3, INN), til(steg1), medUtførtOverstyringAP(identifisertI(steg1), løsesI(steg2, UT)));
-        assertAPGjenåpnesVedTilbakehopp(fra(steg3, INN), til(steg1), medUtførtOverstyringAP(identifisertI(steg1), løsesI(steg2, UT)));
-        assertAPGjenåpnesVedTilbakehopp(fra(steg3, INN), til(steg1), medUtførtOverstyringAP(identifisertI(steg2), løsesI(steg2, UT)));
-        assertAPGjenåpnesVedTilbakehopp(fra(steg3, INN), til(steg2), medUtførtOverstyringAP(identifisertI(steg1), løsesI(steg2, UT)));
-        assertAPGjenåpnesVedTilbakehopp(fra(steg3, INN), til(steg2), medUtførtOverstyringAP(identifisertI(steg2), løsesI(steg2, UT)));
-
-     */
-    }
-
-    @Test
     void skal_kalle_transisjoner_på_steg_det_hoppes_over() {
         assertThat(transisjonerVedTilbakehopp(fra(steg3, INN), til(steg1))).containsOnly(StegTransisjon.hoppTilbakeOver(steg1),
                 StegTransisjon.hoppTilbakeOver(steg2), StegTransisjon.hoppTilbakeOver(steg3));
         assertThat(transisjonerVedTilbakehopp(fra(steg3, INN), til(steg2))).containsOnly(StegTransisjon.hoppTilbakeOver(steg2),
                 StegTransisjon.hoppTilbakeOver(steg3));
         assertThat(transisjonerVedTilbakehopp(fra(steg2, UT), til(steg2))).containsOnly(StegTransisjon.hoppTilbakeOver(steg2));
-    }
-
-    @Test
-    void skal_ta_med_transisjon_på_steg_det_hoppes_fra_for_overstyring() {
-        /*  Ikke definert noen overstyringsaksjonspunkter
-        assertThat(transisjonerVedOverstyrTilbakehopp(fra(steg3, INN), til(steg1))).containsOnly(StegTransisjon.hoppTilbakeOver(steg1),
-            StegTransisjon.hoppTilbakeOver(steg2), StegTransisjon.hoppTilbakeOver(steg3));
-        assertThat(transisjonerVedOverstyrTilbakehopp(fra(steg3, INN), til(steg2))).containsOnly(StegTransisjon.hoppTilbakeOver(steg2),
-            StegTransisjon.hoppTilbakeOver(steg3));
-        assertThat(transisjonerVedOverstyrTilbakehopp(fra(steg2, UT), til(steg2))).containsOnly(StegTransisjon.hoppTilbakeOver(steg2));
-         */
     }
 
     private void assertAPGjenåpnesVedTilbakehopp(StegPort fra, StegPort til, Aksjonspunkt ap) {
