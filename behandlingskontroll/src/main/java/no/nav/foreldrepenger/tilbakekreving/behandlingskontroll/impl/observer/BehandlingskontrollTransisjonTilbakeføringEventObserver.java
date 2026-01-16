@@ -139,8 +139,7 @@ public class BehandlingskontrollTransisjonTilbakeføringEventObserver {
         boolean måLøsesIEllerEtterFørsteSteg = !modell.erStegAFørStegB(måTidligstLøsesISteg, førsteSteg);
         boolean erFunnetFørMåLøsesEtterFørsteSteg = måLøsesIEllerEtterFørsteSteg && modell.erStegAFørStegB(a.getBehandlingStegFunnet(), førsteSteg);
         boolean erOpprettetIFørsteSteg = erOpprettetIFørsteSteg(a, førsteSteg);
-        boolean reåpne = (a.erManueltOpprettet() && måLøsesIEllerEtterFørsteSteg) ||
-                erFunnetFørMåLøsesEtterFørsteSteg || erOpprettetIFørsteSteg;
+        boolean reåpne = erFunnetFørMåLøsesEtterFørsteSteg || erOpprettetIFørsteSteg;
         return reåpne;
     }
 
@@ -151,10 +150,12 @@ public class BehandlingskontrollTransisjonTilbakeføringEventObserver {
      */
     private boolean skalAvbryte(Aksjonspunkt a, BehandlingStegType førsteSteg, BehandlingModell modell, boolean tilInngangFørsteSteg) {
         var erFunnetIFørsteStegEllerSenere = !modell.erStegAFørStegB(a.getBehandlingStegFunnet(), førsteSteg);
-        var erManueltOpprettet = a.erManueltOpprettet();
         var erOpprettetIFørsteSteg = erOpprettetIFørsteSteg(a, førsteSteg);
         var hensyntaÅpneOpprettetIFørste = erOpprettetIFørsteSteg && tilInngangFørsteSteg && a.erÅpentAksjonspunkt();
-        var avbryt = !erManueltOpprettet && erFunnetIFørsteStegEllerSenere && (hensyntaÅpneOpprettetIFørste || !erOpprettetIFørsteSteg);
+        // Tilpasning for å avbryte FatteVedtak (VP FatteVedtak.INN) ved tilbakeføring av ForeslåVedtakAP (VP ForeslåVedtak.UT).
+        var hensyntaFatteTilForeslåVedtak = erOpprettetIFørsteSteg && a.getAksjonspunktDefinisjon().avbrytVedTilbakeføring();
+        var ulikeHensynOppfylt = hensyntaÅpneOpprettetIFørste || !erOpprettetIFørsteSteg || hensyntaFatteTilForeslåVedtak;
+        var avbryt = erFunnetIFørsteStegEllerSenere && ulikeHensynOppfylt;
         return avbryt;
     }
 

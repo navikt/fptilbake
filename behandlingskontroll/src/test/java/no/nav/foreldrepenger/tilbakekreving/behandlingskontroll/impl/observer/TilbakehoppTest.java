@@ -96,9 +96,9 @@ class TilbakehoppTest {
 
     @Test
     void skal_avbryte_åpent_aksjonspunkt_som_oppsto_i_steget_det_hoppes_tilbake_til_inngang() {
-        assertAPAvbrytesVedTilbakehopp(fra(steg2, UT), til(steg2, INN), medAP(identifisertI(steg2), løsesI(steg2, UT), OPPRETTET, false));
-        assertAPAvbrytesVedTilbakehopp(fra(steg3, INN), til(steg2, INN), medAP(identifisertI(steg2), løsesI(steg3, UT), OPPRETTET, false));
-        assertAPUendretVedTilbakehopp(fra(steg3, INN), til(steg2, UT), medAP(identifisertI(steg2), løsesI(steg3, UT), OPPRETTET, false));
+        assertAPAvbrytesVedTilbakehopp(fra(steg2, UT), til(steg2, INN), medAP(identifisertI(steg2), løsesI(steg2, UT), OPPRETTET));
+        assertAPAvbrytesVedTilbakehopp(fra(steg3, INN), til(steg2, INN), medAP(identifisertI(steg2), løsesI(steg3, UT), OPPRETTET));
+        assertAPUendretVedTilbakehopp(fra(steg3, INN), til(steg2, UT), medAP(identifisertI(steg2), løsesI(steg3, UT), OPPRETTET));
     }
 
     @Test
@@ -196,35 +196,10 @@ class TilbakehoppTest {
         return transisjoner;
     }
 
-    private List<StegTransisjon> transisjonerVedOverstyrTilbakehopp(StegPort fra, StegPort til) {
-        // skal ikke spille noen rolle for transisjoner hvilke aksjonspunkter som finnes
-        var ap = medUtførtOverstyringAP(identifisertI(steg1), løsesI(steg2, UT));
-
-        transisjoner.clear();
-        utførOverstyringTilbakehoppReturnerAksjonspunkt(fra, til, ap);
-        return transisjoner;
-    }
-
     private Aksjonspunkt utførTilbakehoppReturnerAksjonspunkt(StegPort fra, StegPort til, Aksjonspunkt ap) {
 
         var fraTilstand = new BehandlingStegTilstandSnapshot(1L, fra.steg(), getBehandlingStegStatus(fra));
         var tilTilstand = new BehandlingStegTilstandSnapshot(2L, til.steg(), getBehandlingStegStatus(til));
-        var fagsak = behandling.getFagsak();
-        var kontekst = new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), behandlingLås);
-        var event = new BehandlingStegOvergangEvent.BehandlingStegTilbakeføringEvent(
-                kontekst,
-                fraTilstand, tilTilstand);
-
-        // act
-        observer.observerBehandlingSteg(event);
-
-        return ap;
-    }
-
-    private Aksjonspunkt utførOverstyringTilbakehoppReturnerAksjonspunkt(StegPort fra, StegPort til, Aksjonspunkt ap) {
-        var fraTilstand = new BehandlingStegTilstandSnapshot(1L, fra.steg(), getBehandlingStegStatus(fra));
-        var tilTilstand = new BehandlingStegTilstandSnapshot(2L, til.steg(), getBehandlingStegStatus(til));
-
         var fagsak = behandling.getFagsak();
         var kontekst = new BehandlingskontrollKontekst(fagsak.getSaksnummer(), fagsak.getId(), behandlingLås);
         var event = new BehandlingStegOvergangEvent.BehandlingStegTilbakeføringEvent(
@@ -250,21 +225,13 @@ class TilbakehoppTest {
         return fraStatus;
     }
 
-    private Aksjonspunkt medUtførtOverstyringAP(BehandlingStegType identifisertI, StegPort port) {
-        return medAP(identifisertI, port, AksjonspunktStatus.UTFØRT, true);
-    }
-
     private Aksjonspunkt medUtførtAP(BehandlingStegType identifisertI, StegPort port) {
-        return medAP(identifisertI, port, AksjonspunktStatus.UTFØRT, false);
+        return medAP(identifisertI, port, AksjonspunktStatus.UTFØRT);
     }
 
-    private Aksjonspunkt medAP(BehandlingStegType identifisertI, StegPort port, AksjonspunktStatus status) {
-        return medAP(identifisertI, port, status, false);
-    }
-
-    private Aksjonspunkt medAP(BehandlingStegType identifisertISteg, StegPort port, AksjonspunktStatus status, boolean manueltOpprettet) {
+    private Aksjonspunkt medAP(BehandlingStegType identifisertISteg, StegPort port, AksjonspunktStatus status) {
         clearTransisjoner();
-        var ad = finnAksjonspunkt(port, manueltOpprettet);
+        var ad = finnAksjonspunkt(port);
 
         var ytelseBehandling = ScenarioSimple.simple().lagre(repositoryProvider);
         behandling = Behandling.nyBehandlingFor(ytelseBehandling.getFagsak(), BehandlingType.TILBAKEKREVING).build();
@@ -285,11 +252,9 @@ class TilbakehoppTest {
         return ap;
     }
 
-    private AksjonspunktDefinisjon finnAksjonspunkt(StegPort port, boolean manueltOpprettet) {
+    private AksjonspunktDefinisjon finnAksjonspunkt(StegPort port) {
         var defs = AksjonspunktDefinisjon.finnAksjonspunktDefinisjoner(port.steg(), port.port());
-        var filtered = defs.stream()
-                .filter(ad -> !manueltOpprettet || ad.getAksjonspunktType().erOverstyringpunkt())
-                .findFirst();
+        var filtered = defs.stream().findFirst();
         return filtered.orElse(null);
     }
 
