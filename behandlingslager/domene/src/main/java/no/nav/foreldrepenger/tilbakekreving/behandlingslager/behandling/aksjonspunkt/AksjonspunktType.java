@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjons
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
@@ -16,8 +15,6 @@ public enum AksjonspunktType implements Kodeverdi {
 
     MANUELL("MANU", "Manuell"),
     AUTOPUNKT("AUTO", "Autopunkt"),
-    OVERSTYRING("OVST", "Overstyring"),
-    SAKSBEHANDLEROVERSTYRING("SAOV", "Saksbehandleroverstyring"),
     UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke Definert");
 
     public static final String KODEVERK = "AKSJONSPUNKT_TYPE";
@@ -52,14 +49,6 @@ public enum AksjonspunktType implements Kodeverdi {
 
     public static Map<String, AksjonspunktType> kodeMap() {
         return Collections.unmodifiableMap(KODER);
-    }
-
-    public boolean erAutopunkt() {
-        return Objects.equals(this, AUTOPUNKT);
-    }
-
-    public boolean erOverstyringpunkt() {
-        return Objects.equals(this, OVERSTYRING) || Objects.equals(this, SAKSBEHANDLEROVERSTYRING);
     }
 
     @JsonValue

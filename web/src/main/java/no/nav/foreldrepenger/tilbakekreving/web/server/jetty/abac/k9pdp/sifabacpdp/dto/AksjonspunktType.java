@@ -2,7 +2,5 @@ package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabac
 
 public enum AksjonspunktType {
     AUTOPUNKT,
-    MANUELL,
-    OVERSTYRING,
-    SAKSBEHANDLEROVERSTYRING
+    MANUELL
 }
