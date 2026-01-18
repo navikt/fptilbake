@@ -5,9 +5,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.Context;
 
-import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.ApiConfig;
-
 import org.glassfish.jersey.server.ResourceConfig;
+
+import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.ApiConfig;
 
 /**
  * OpenApiResource frå openapi-spec-utils er laga mtp eksplisitt initialisering med resolved OpenAPI instans.
@@ -41,6 +41,9 @@ public class OpenApiTjeneste extends no.nav.openapi.spec.utils.openapi.OpenApiRe
 
     @PostConstruct
     public void init() {
-        super.setResolvedOpenAPI((this.getApiConfig().getResolvedOpenAPI()));
+        var api = this.getApiConfig().getResolvedOpenAPI();
+        if (api != null) {
+            super.setResolvedOpenAPI(api);
+        }
     }
 }

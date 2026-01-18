@@ -9,12 +9,6 @@ import java.util.Set;
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 
-import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.ObjectMapperFactory;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.caching.CacheControlFeature;
-import no.nav.openapi.spec.utils.http.DynamicObjectMapperResolverVaryFilter;
-
-import no.nav.openapi.spec.utils.openapi.PrefixStrippingFQNTypeNameResolver;
-
 import org.glassfish.jersey.server.ServerProperties;
 
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
@@ -29,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.GeneralRestExcept
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonMappingExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonParseExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.JacksonJsonConfig;
+import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.ObjectMapperFactory;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingFaktaRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BrevRestTjeneste;
@@ -55,8 +50,11 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgru
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.caching.CacheControlFeature;
+import no.nav.openapi.spec.utils.http.DynamicObjectMapperResolverVaryFilter;
 import no.nav.openapi.spec.utils.jackson.DynamicJacksonJsonProvider;
 import no.nav.openapi.spec.utils.openapi.OpenApiSetupHelper;
+import no.nav.openapi.spec.utils.openapi.PrefixStrippingFQNTypeNameResolver;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 
@@ -64,13 +62,20 @@ import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 public class ApiConfig extends Application {
 
     private static final Environment ENV = Environment.current();
+    private static final Fagsystem HVILKEN_TILBAKE = ApplicationName.hvilkenTilbake();
 
     public static final String API_URI = "/api";
 
     private OpenAPI resolvedOpenAPI;
 
     public ApiConfig() {
-        this.resolvedOpenAPI = resolveOpenAPI();
+        if (skalSetteOppOpenApi()) {
+            this.resolvedOpenAPI = resolveOpenAPI();
+        }
+    }
+
+    public static boolean skalSetteOppOpenApi() {
+        return !ENV.isProd() || !Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE);
     }
 
     private OpenAPI resolveOpenAPI() {
@@ -80,7 +85,8 @@ public class ApiConfig extends Application {
             .description("REST grensesnitt for tilbakekreving.");
         final var server = new Server().url(JettyServer.getContextPath());
         final var openapiSetupHelper = new OpenApiSetupHelper(this, info, server);
-        for(final var cls : getClasses()) {
+        var openApiKlasser = Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE) ? getProduksjonsKlasser() : getClasses();
+        for(final var cls : openApiKlasser) {
             openapiSetupHelper.addResourceClass(cls.getName());
         }
         openapiSetupHelper.registerSubTypes(ObjectMapperFactory.getJsonTypeNameClasses());
@@ -98,11 +104,46 @@ public class ApiConfig extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        var classes = new HashSet<>(Set.of(
-            DynamicJacksonJsonProvider.class, // Denne må registrerast før anna OpenAPI oppsett for å fungere.
-            // eksponert grensesnitt
-            ProsessTaskRestTjeneste.class,
-            InitielleLinksRestTjeneste.class,
+        Set<Class<?>> classes = skalSetteOppOpenApi() ? new HashSet<>(getOpenApiKlasser()) : new HashSet<>();
+        classes.addAll(getProduksjonsKlasser());
+
+        classes.addAll(Set.of(
+            // Applikasjonsoppsett
+            JacksonJsonConfig.class,
+            CacheControlFeature.class,
+            // ExceptionMappers pga de som finnes i Jackson+Jersey-media
+            ConstraintViolationMapper.class,
+            JsonMappingExceptionMapper.class,
+            JsonParseExceptionMapper.class,
+            // Generell exceptionmapper m/logging for øvrige tilfelle
+            GeneralRestExceptionMapper.class));
+
+        if (ENV.isLocal()) {
+            classes.add(GrunnlagRestTestTjenesteLocalDev.class);
+        }
+
+        // Standard etter fork av fp-tilbake
+        if (Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
+            classes.add(AuthenticationFilter.class); // autentisering etter ny standard
+        } else {
+            // Forvaltning - fortsatt i K9-løsning
+            classes.add(ProsessTaskRestTjeneste.class);
+            classes.add(ForvaltningAktørRestTjeneste.class);
+            classes.add(ForvaltningBehandlingRestTjeneste.class);
+            classes.add(ForvaltningKravgrunnlagRestTjeneste.class);
+        }
+
+        return Collections.unmodifiableSet(classes);
+    }
+
+    private static Set<Class<?>> getOpenApiKlasser() {
+        return Set.of(DynamicJacksonJsonProvider.class,  // Denne må registrerast før anna OpenAPI oppsett for å fungere.
+            OpenApiTjeneste.class,
+            DynamicObjectMapperResolverVaryFilter.class);
+    }
+
+    private static Set<Class<?>> getProduksjonsKlasser() {
+        return Set.of(InitielleLinksRestTjeneste.class,
             KodeverkRestTjeneste.class,
             BehandlingRestTjeneste.class,
             AksjonspunktRestTjeneste.class,
@@ -117,37 +158,11 @@ public class ApiConfig extends Application {
             TilbakekrevingResultatRestTjeneste.class,
             TotrinnskontrollRestTjeneste.class,
             BrevRestTjeneste.class,
-            ForvaltningAktørRestTjeneste.class,
             FordelRestTjeneste.class,
-            ForvaltningBehandlingRestTjeneste.class,
-            ForvaltningKravgrunnlagRestTjeneste.class,
             VergeRestTjeneste.class,
             LosRestTjeneste.class,
             FpOversiktRestTjeneste.class,
-            HistorikkRestTjeneste.class,
-            // swagger
-            OpenApiTjeneste.class,
-            // Applikasjonsoppsett
-            JacksonJsonConfig.class,
-            DynamicObjectMapperResolverVaryFilter.class,
-            CacheControlFeature.class,
-            // ExceptionMappers pga de som finnes i Jackson+Jersey-media
-            ConstraintViolationMapper.class,
-            JsonMappingExceptionMapper.class,
-            JsonParseExceptionMapper.class,
-            // Generell exceptionmapper m/logging for øvrige tilfelle
-            GeneralRestExceptionMapper.class));
-
-        if (ENV.isLocal()) {
-            classes.add(GrunnlagRestTestTjenesteLocalDev.class);
-        }
-
-        // Standard etter fork av fp-tilbake
-        if (Fagsystem.FPTILBAKE.equals(ApplicationName.hvilkenTilbake())) {
-            classes.add(AuthenticationFilter.class); // autentisering etter ny standard
-        }
-
-        return Collections.unmodifiableSet(classes);
+            HistorikkRestTjeneste.class);
     }
 
     @Override
