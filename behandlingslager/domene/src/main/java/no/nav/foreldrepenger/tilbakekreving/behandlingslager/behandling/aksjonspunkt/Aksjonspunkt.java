@@ -97,10 +97,6 @@ public class Aksjonspunkt extends BaseEntitet {
         return getAksjonspunktDefinisjon() != null && AksjonspunktType.MANUELL.equals(getAksjonspunktDefinisjon().getAksjonspunktType());
     }
 
-    public boolean erOverstyrt() {
-        return getAksjonspunktDefinisjon() != null && AksjonspunktType.OVERSTYRING.equals(getAksjonspunktDefinisjon().getAksjonspunktType());
-    }
-
     /**
      * Hvorvidt et Aksjonspunkt er av typen Autopunkt.
      * <p>
@@ -109,10 +105,6 @@ public class Aksjonspunkt extends BaseEntitet {
      */
     public boolean erAutopunkt() {
         return getAksjonspunktDefinisjon() != null && AksjonspunktType.AUTOPUNKT.equals(getAksjonspunktDefinisjon().getAksjonspunktType());
-    }
-
-    public boolean erManueltOpprettet() {
-        return this.aksjonspunktDefinisjon.getAksjonspunktType() != null && this.aksjonspunktDefinisjon.getAksjonspunktType().erOverstyringpunkt();
     }
 
     void setBehandlingsresultat(Behandling behandling) {

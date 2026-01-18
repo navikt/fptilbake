@@ -91,8 +91,6 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
 
     private VurderingspunktType vurderingspunktType;
 
-    private boolean erUtgått = false;
-
     private String kode;
 
     AksjonspunktDefinisjon() {
@@ -139,16 +137,8 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
         return Objects.equals(AksjonspunktType.UDEFINERT, aksjonspunktType) ? null : aksjonspunktType;
     }
 
-    public boolean erAutopunkt() {
-        return AksjonspunktType.AUTOPUNKT.equals(getAksjonspunktType());
-    }
-
     public boolean getDefaultTotrinnBehandling() {
         return defaultTotrinnBehandling;
-    }
-
-    public String getFristPeriode() {
-        return fristPeriode;
     }
 
     public Period getFristPeriod() {
@@ -157,6 +147,10 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
 
     public boolean tilbakehoppVedGjenopptakelse() {
         return tilbakehoppVedGjenopptakelse;
+    }
+
+    public boolean avbrytVedTilbakeføring() {
+        return FATTE_VEDTAK.equals(this);
     }
 
     @Override
@@ -181,13 +175,6 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
     @Override
     public String getKodeverk() {
         return KODEVERK;
-    }
-
-    /**
-     * Aksjonspunkt tidligere brukt, nå utgått (kan ikke gjenoppstå).
-     */
-    public boolean erUtgått() {
-        return erUtgått;
     }
 
     // Beholder JsonCreator annotasjon her enn så lenge for å støtte deserialisering av UNDEFINED når denne har blitt serialisert til objekt.
