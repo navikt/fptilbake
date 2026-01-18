@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
 import static org.eclipse.jetty.ee11.webapp.MetaInfConfiguration.CONTAINER_JAR_PATTERN;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +11,6 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import jakarta.security.auth.message.config.AuthConfigFactory;
-
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.ContextPathHolder;
-
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.jaspic.OidcAuthModule;
 
 import org.eclipse.jetty.ee11.cdi.CdiDecoratingListener;
 import org.eclipse.jetty.ee11.cdi.CdiServletContainerInitializer;
@@ -55,7 +50,10 @@ import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.ApiConfig;
+import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.ForvaltningApiConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.InternalApiConfig;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.ContextPathHolder;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.jaspic.OidcAuthModule;
 
 public class JettyServer {
 
@@ -248,6 +246,8 @@ public class JettyServer {
         handler.addConstraintMapping(pathConstraint(Constraint.ALLOWED, InternalApiConfig.API_URI + "/*"));
         // Slipp gjennom til autentisering i JaxRs / auth-filter
         handler.addConstraintMapping(pathConstraint(Constraint.ALLOWED, ApiConfig.API_URI + "/*"));
+        // Slipp gjennom til autentisering i JaxRs / auth-filter
+        handler.addConstraintMapping(pathConstraint(Constraint.ALLOWED, ForvaltningApiConfig.API_URI + "/*"));
         // K9-tilbake bruker deprekert swagger-oppsett
         if (Fagsystem.K9TILBAKE.equals(ApplicationName.hvilkenTilbake())) {
             handler.addConstraintMapping(pathConstraint(Constraint.ALLOWED, "/swagger-ui/*"));
