@@ -65,6 +65,7 @@ public class LosBehandlingDtoTjeneste {
             mapBehandlingstype(behandling),
             mapBehandlingsstatus(behandling),
             behandling.getOpprettetTidspunkt(),
+            behandling.getAvsluttetDato(),
             behandling.getBehandlendeEnhetId(),
             null,
             behandling.getAnsvarligSaksbehandler(),
