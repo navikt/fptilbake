@@ -20,8 +20,9 @@ public enum AksjonspunktType implements Kodeverdi {
     public static final String KODEVERK = "AKSJONSPUNKT_TYPE";
     private static final Map<String, AksjonspunktType> KODER = new LinkedHashMap<>();
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     static {
         for (var v : values()) {
@@ -51,7 +52,6 @@ public enum AksjonspunktType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

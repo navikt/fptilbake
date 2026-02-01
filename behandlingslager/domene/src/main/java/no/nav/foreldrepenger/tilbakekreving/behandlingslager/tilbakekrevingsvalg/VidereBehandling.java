@@ -17,8 +17,9 @@ public enum VidereBehandling implements Kodeverdi {
 
     UDEFINERT(STANDARDKODE_UDEFINERT, "UDefinert");
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     public static final String KODEVERK = "TILBAKEKR_VIDERE_BEH";
     private static final Map<String, VidereBehandling> KODER = new LinkedHashMap<>();
@@ -51,7 +52,6 @@ public enum VidereBehandling implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

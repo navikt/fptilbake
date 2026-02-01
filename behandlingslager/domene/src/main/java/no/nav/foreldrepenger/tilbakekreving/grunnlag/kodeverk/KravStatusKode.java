@@ -28,7 +28,7 @@ public enum KravStatusKode implements Kodeverdi {
     private static Map<String, KravStatusKode> KODER = new LinkedHashMap<>();
 
     @JsonValue
-    private String kode;
+    private final String kode;
 
     private String navn;
 

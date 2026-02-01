@@ -19,8 +19,9 @@ public enum VilkårResultat implements Kodeverdi {
     GOD_TRO("GOD_TRO", "Nei, mottaker har mottatt beløpet i god tro (første ledd)"),
     UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke Definert");
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     public static final String KODEVERK = "VILKAAR_RESULTAT";
     private static Map<String, VilkårResultat> KODER = new LinkedHashMap<>();
@@ -53,7 +54,6 @@ public enum VilkårResultat implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

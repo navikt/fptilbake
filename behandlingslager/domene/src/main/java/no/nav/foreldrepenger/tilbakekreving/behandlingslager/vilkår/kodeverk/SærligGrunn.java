@@ -22,9 +22,10 @@ public enum SærligGrunn implements Kodeverdi {
     ANNET("ANNET", "Annet");
 
     @Pattern(regexp = InputValideringRegex.KODEVERK)
-    private String kode;
+    @JsonValue
+    private final String kode;
     @Pattern(regexp = InputValideringRegex.FRITEKST)
-    private String navn;
+    private final String navn;
 
     public static final String KODEVERK = "SAERLIG_GRUNN";
     private static final Map<String, SærligGrunn> KODER = new LinkedHashMap<>();
@@ -57,7 +58,6 @@ public enum SærligGrunn implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

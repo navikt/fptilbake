@@ -64,9 +64,10 @@ public enum HendelseType implements Kodeverdi {
         }
     }
 
-    private String kode;
-    private String navn;
-    private int sortering;
+    @JsonValue
+    private final String kode;
+    private final String navn;
+    private final int sortering;
 
     HendelseType(String kode, String navn, int sortering) {
         this.kode = kode;
@@ -89,7 +90,6 @@ public enum HendelseType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

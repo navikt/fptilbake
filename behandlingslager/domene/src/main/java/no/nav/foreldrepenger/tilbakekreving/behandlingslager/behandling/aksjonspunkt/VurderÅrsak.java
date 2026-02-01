@@ -31,8 +31,9 @@ public enum VurderÅrsak implements Kodeverdi {
     public static final String KODEVERK = "VURDER_AARSAK";
     private static final Map<String, VurderÅrsak> KODER = new LinkedHashMap<>();
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     static {
         for (var v : values()) {
@@ -75,7 +76,6 @@ public enum VurderÅrsak implements Kodeverdi {
         }
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

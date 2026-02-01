@@ -26,7 +26,8 @@ public enum NavOppfulgt implements Kodeverdi {
     public static final String KODEVERK = "NAV_OPPFULGT";
     private static final Map<String, NavOppfulgt> KODER = new LinkedHashMap<>();
 
-    private String kode;
+    @JsonValue
+    private final String kode;
 
     static {
         for (var v : values()) {
@@ -55,7 +56,6 @@ public enum NavOppfulgt implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

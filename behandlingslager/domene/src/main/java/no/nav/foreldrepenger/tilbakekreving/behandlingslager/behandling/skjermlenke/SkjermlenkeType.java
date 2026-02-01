@@ -21,8 +21,9 @@ public enum SkjermlenkeType implements Kodeverdi {
     FAKTA_OM_VERGE("FAKTA_OM_VERGE", "Fakta om verge/fullmektig"),
     UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke Definert");
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     public static final String KODEVERK = "SKJERMLENKE_TYPE";
     private static Map<String, SkjermlenkeType> KODER = new LinkedHashMap<>();
@@ -56,7 +57,6 @@ public enum SkjermlenkeType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

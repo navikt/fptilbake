@@ -20,8 +20,9 @@ public enum HistorikkAktør implements Kodeverdi {
     VEDTAKSLØSNINGEN("VL", "Vedtaksløsningen"),
     UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke definert");
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     public static final String KODEVERK = "HISTORIKK_AKTOER";
     private static Map<String, HistorikkAktør> KODER = new LinkedHashMap<>();
@@ -54,7 +55,6 @@ public enum HistorikkAktør implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public java.lang.String getKode() {
         return kode;

@@ -123,7 +123,7 @@ public enum KlasseKode implements Kodeverdi {
     private static final Map<String, KlasseKode> KODER = new LinkedHashMap<>();
 
     @JsonValue
-    private String kode;
+    private final String kode;
 
     static {
         for (var v : values()) {

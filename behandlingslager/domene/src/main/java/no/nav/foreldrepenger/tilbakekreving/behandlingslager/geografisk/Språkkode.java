@@ -22,7 +22,8 @@ public enum Språkkode implements Kodeverdi {
     public static final String KODEVERK = "SPRAAK_KODE";
     private static final Map<String, Språkkode> KODER = new LinkedHashMap<>();
 
-    private String kode;
+    @JsonValue
+    private final String kode;
 
     static {
         for (var v : values()) {
@@ -51,7 +52,6 @@ public enum Språkkode implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

@@ -91,6 +91,7 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
 
     private VurderingspunktType vurderingspunktType;
 
+    @JsonValue
     private String kode;
 
     AksjonspunktDefinisjon() {
@@ -158,7 +159,6 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
         return navn;
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

@@ -17,8 +17,9 @@ public enum VedtakResultatType implements Kodeverdi { //Kun brukes for å sende 
     DELVIS_TILBAKEBETALING("DELVIS_TILBAKEBETALING", "Delvis tilbakebetaling"),
     INGEN_TILBAKEBETALING("INGEN_TILBAKEBETALING", "Ingen tilbakebetaling");
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     public static final String KODEVERK = "VEDTAK_RESULTAT_TYPE";
     private static final Map<String, VedtakResultatType> KODER = new LinkedHashMap<>();
@@ -51,7 +52,6 @@ public enum VedtakResultatType implements Kodeverdi { //Kun brukes for å sende 
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

@@ -18,8 +18,9 @@ public enum DokumentMalType implements Kodeverdi {
     public static final String KODEVERK = "DOKUMENT_MAL_TYPE";
     private static final Map<String, DokumentMalType> KODER = new LinkedHashMap<>();
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     static {
         for (var v : values()) {
@@ -49,7 +50,6 @@ public enum DokumentMalType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

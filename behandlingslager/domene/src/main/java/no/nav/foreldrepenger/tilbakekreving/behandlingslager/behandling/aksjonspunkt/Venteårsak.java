@@ -27,9 +27,10 @@ public enum Venteårsak implements Kodeverdi {
 
     private static final Map<String, Venteårsak> KODER = new LinkedHashMap<>();
 
-    private String kode;
+    @JsonValue
+    private final String kode;
 
-    private String navn;
+    private final String navn;
 
     static {
         for (var v : values()) {
@@ -68,7 +69,6 @@ public enum Venteårsak implements Kodeverdi {
         return VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(venteårsak) || VENT_PÅ_MULIG_MOTREGNING.equals(venteårsak) || ENDRE_TILKJENT_YTELSE.equals(venteårsak);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

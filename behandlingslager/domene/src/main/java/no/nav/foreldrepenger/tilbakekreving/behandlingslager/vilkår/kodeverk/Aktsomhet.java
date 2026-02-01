@@ -21,8 +21,9 @@ public enum Aktsomhet implements Vurdering {
      enum-verdi BURDE_HA_FORSTÅTT
      */
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     public static final String KODEVERK = "AKTSOMHET";
     private static final Map<String, Aktsomhet> KODER = new LinkedHashMap<>();
@@ -55,7 +56,6 @@ public enum Aktsomhet implements Vurdering {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

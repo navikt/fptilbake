@@ -25,8 +25,9 @@ public enum AksjonspunktStatus implements Kodeverdi {
     private static final List<AksjonspunktStatus> BEHANDLEDE_AKSJONSPUNKT_KODER = List.of(UTFØRT);
     private static final Map<String, AksjonspunktStatus> KODER = new LinkedHashMap<>();
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     static {
         for (var v : values()) {
@@ -68,7 +69,6 @@ public enum AksjonspunktStatus implements Kodeverdi {
         return new ArrayList<>(ÅPNE_AKSJONSPUNKT_STATUSER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

@@ -24,9 +24,9 @@ public enum GjelderType implements Kodeverdi {
     private static final Map<String, GjelderType> KODER = new LinkedHashMap<>();
 
     @JsonValue
-    private String kode;
+    private final String kode;
 
-    private String navn;
+    private final String navn;
 
     static {
         for (var v : values()) {
