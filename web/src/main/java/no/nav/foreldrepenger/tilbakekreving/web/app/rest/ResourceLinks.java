@@ -1,9 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.rest;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.ApiConfig;
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 public final class ResourceLinks {
 
@@ -49,8 +50,7 @@ public final class ResourceLinks {
 
     public static String toQuery(Object queryParams) {
         if (queryParams != null) {
-            var mapper = new ObjectMapper();
-            var mappedQueryParams = mapper.convertValue(queryParams, UriFormat.class).toString();
+            var mappedQueryParams = DefaultJsonMapper.getJsonMapper().convertValue(queryParams, UriFormat.class).toString();
             if (!mappedQueryParams.isEmpty()) {
                 return "?" + mappedQueryParams;
             }

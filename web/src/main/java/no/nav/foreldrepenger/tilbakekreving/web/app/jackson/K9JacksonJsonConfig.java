@@ -5,9 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.openapi.spec.utils.jackson.DynamicObjectMapperResolver;
-import no.nav.openapi.spec.utils.jackson.OpenapiCompatObjectMapperModifier;
 
-public class JacksonJsonConfig extends DynamicObjectMapperResolver {
+public class K9JacksonJsonConfig extends DynamicObjectMapperResolver {
     private final String JSON_SERIALIZER_KODEVERDI_SOM_OBJEKT = "kodeverdi-objekt";
     private final String JSON_SERIALIZER_KODEVERDI_SOM_STRING = "kodeverdi-string";
 
@@ -16,7 +15,7 @@ public class JacksonJsonConfig extends DynamicObjectMapperResolver {
         return ObjectMapperFactory.getDefaultObjectMapperCopy(serialiserKodeverdiSomObjekt);
     }
 
-    public JacksonJsonConfig() {
+    public K9JacksonJsonConfig() {
         super(defaultObjectMapper());
         final ObjectMapper openapiObjectMapper = ObjectMapperFactory.getOpenapiObjectMapper();
         super.addObjectMapper(DynamicObjectMapperResolver.JSON_SERIALIZER_OPENAPI, openapiObjectMapper);
