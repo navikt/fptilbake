@@ -8,12 +8,12 @@ import jakarta.validation.Validator;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.aiven.AivenVedtakKafkaProducer;
+import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.VedtakOppsummeringMapper;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.VedtakOppsummering;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
-import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 @ApplicationScoped
 @ProsessTask(value = "dvh.send.vedtak", prioritet = 2)
@@ -45,7 +45,7 @@ public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
         VedtakOppsummering vedtakOppsummering = vedtakOppsummeringTjeneste.hentVedtakOppsummering(behandlingId);
         validate(vedtakOppsummering);
         aivenVedtakKafkaProducer.sendMelding(vedtakOppsummering);
-        prosessTaskData.setPayload(DefaultJsonMapper.toJson(vedtakOppsummering));
+        prosessTaskData.setPayload(VedtakOppsummeringMapper.tilJsonString(vedtakOppsummering));
         taskTjeneste.lagre(prosessTaskData);
     }
 
