@@ -11,7 +11,6 @@ import jakarta.ws.rs.core.Application;
 
 import org.glassfish.jersey.server.ServerProperties;
 
-import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -71,28 +70,17 @@ public class ApiConfig extends Application {
     private OpenAPI resolvedOpenAPI;
 
     public ApiConfig() {
-        if (skalSetteOppOpenApi()) {
-            final var info = new Info()
-                .title("Vedtaksløsningen - Tilbakekreving")
-                .version("1.1")
-                .description("REST grensesnitt for tilbakekreving.");
-            final var contextPath = JettyServer.getContextPath();
-            if (Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
-                FpOpenApiUtils.settOppForTypegenereringFrontend();
-                FpOpenApiUtils.openApiConfigFor(info, contextPath, this)
-                    .registerClasses(getProduksjonsKlasser())
-                    .buildOpenApiContext();
-            } else {
-                this.resolvedOpenAPI = resolveOpenAPIK9(info, contextPath);
-            }
+        if (!Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
+            this.resolvedOpenAPI = resolveOpenAPIK9();
         }
     }
 
-    public static boolean skalSetteOppOpenApi() {
-        return !ENV.isProd() || !Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE);
-    }
-
-    private OpenAPI resolveOpenAPIK9(Info info, String contextPath) {
+    private OpenAPI resolveOpenAPIK9() {
+        final var info = new Info()
+            .title("Vedtaksløsningen - Tilbakekreving")
+            .version("1.1")
+            .description("REST grensesnitt for tilbakekreving.");
+        final var contextPath = JettyServer.getContextPath();
         final var server = new Server().url(contextPath);
         final var openapiSetupHelper = new OpenApiSetupHelper(this, info, server);
         var openApiKlasser = getClasses();
@@ -148,11 +136,8 @@ public class ApiConfig extends Application {
     }
 
     private static Set<Class<?>> getOpenApiKlasser() {
-        if (!skalSetteOppOpenApi()) {
-            return Set.of();
-        }
         if (Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
-            return Set.of(OpenApiResource.class);
+            return Set.of();
         } else {
             return Set.of(DynamicJacksonJsonProvider.class,  // Denne må registrerast før anna OpenAPI oppsett for å fungere.
                 OpenApiTjeneste.class,
