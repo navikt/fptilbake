@@ -24,7 +24,7 @@ public enum KlasseType implements Kodeverdi {
     private static final Map<String, KlasseType> KODER = new LinkedHashMap<>();
 
     @JsonValue
-    private String kode;
+    private final String kode;
 
     private String navn;
 

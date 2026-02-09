@@ -46,7 +46,8 @@ public enum BehandlingStegStatus implements Kodeverdi {
     private static final Set<BehandlingStegStatus> KAN_FORTSETTE_NESTE = new HashSet<>(Set.of(UTFØRT, FREMOVERFØRT));
     private static final Set<BehandlingStegStatus> SLUTT_STATUSER = new HashSet<>(Set.of(AVBRUTT, UTFØRT, TILBAKEFØRT));
 
-    private String kode;
+    @JsonValue
+    private final String kode;
 
     static {
         for (var v : values()) {
@@ -95,7 +96,6 @@ public enum BehandlingStegStatus implements Kodeverdi {
         return Objects.equals(UTGANG, stegStatus);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

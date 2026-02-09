@@ -19,8 +19,9 @@ public enum ForeldelseVurderingType implements Kodeverdi {
     TILLEGGSFRIST("TILLEGGSFRIST", "Perioden er ikke foreldet, regel om tilleggsfrist (10 år) benyttes"),
     UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke Definert");
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     public static final String KODEVERK = "FORELDELSE_VURDERING";
     private static final Map<String, ForeldelseVurderingType> KODER = new LinkedHashMap<>();
@@ -53,7 +54,6 @@ public enum ForeldelseVurderingType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public java.lang.String getKode() {
         return kode;

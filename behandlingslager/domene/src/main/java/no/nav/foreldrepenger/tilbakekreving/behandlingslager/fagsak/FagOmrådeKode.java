@@ -36,8 +36,9 @@ public enum FagOmrådeKode implements Kodeverdi {
 
     UDEFINERT(STANDARDKODE_UDEFINERT, "udefinert");
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     public static final String KODEVERK = "FAG_OMRAADE_KODE";
     private static final Map<String, FagOmrådeKode> KODER = new LinkedHashMap<>();
@@ -70,7 +71,6 @@ public enum FagOmrådeKode implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

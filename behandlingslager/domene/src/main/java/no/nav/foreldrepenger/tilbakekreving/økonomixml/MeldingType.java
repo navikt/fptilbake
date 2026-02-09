@@ -19,7 +19,8 @@ public enum MeldingType implements Kodeverdi {
     public static final String KODEVERK = "MELDING_TYPE";
     private static final Map<String, MeldingType> KODER = new LinkedHashMap<>();
 
-    private String kode;
+    @JsonValue
+    private final String kode;
 
     static {
         for (var v : values()) {
@@ -48,7 +49,6 @@ public enum MeldingType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

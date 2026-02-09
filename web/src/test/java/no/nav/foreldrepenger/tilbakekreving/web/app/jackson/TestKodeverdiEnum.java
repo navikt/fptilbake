@@ -15,14 +15,14 @@ public enum TestKodeverdiEnum implements Kodeverdi {
     VALUE_ONE("ONE"),
     VALUE_TWO("TWO");
 
-    private String kode;
+    @JsonValue
+    private final String kode;
 
     private TestKodeverdiEnum(final String kode) {
         this.kode = kode;
     }
 
     @Override
-    @JsonValue
     public String getKode() {
         return this.kode;
     }

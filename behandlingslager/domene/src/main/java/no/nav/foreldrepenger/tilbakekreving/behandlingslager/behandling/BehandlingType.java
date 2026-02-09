@@ -24,8 +24,9 @@ public enum BehandlingType implements Kodeverdi {
     );
     private static final Map<String, BehandlingType> KODER = new LinkedHashMap<>();
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     static {
         for (var v : values()) {
@@ -56,7 +57,6 @@ public enum BehandlingType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

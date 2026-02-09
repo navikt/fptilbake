@@ -51,13 +51,10 @@ public enum BehandlingStegType implements Kodeverdi {
      */
     private BehandlingStatus definertBehandlingStatus;
 
-    private String navn;
+    private final String navn;
 
-    private String kode;
-
-    private BehandlingStegType(String kode) {
-        this.kode = kode;
-    }
+    @JsonValue
+    private final String kode;
 
     private BehandlingStegType(String kode, String navn, BehandlingStatus definertBehandlingStatus) {
         this.kode = kode;
@@ -81,7 +78,6 @@ public enum BehandlingStegType implements Kodeverdi {
         return AksjonspunktDefinisjon.finnAksjonspunktDefinisjoner(this, type);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

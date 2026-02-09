@@ -112,9 +112,10 @@ public enum HendelseUnderType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    private String kode;
-    private String navn;
-    private int sortering;
+    @JsonValue
+    private final String kode;
+    private final String navn;
+    private final int sortering;
 
     HendelseUnderType(String kode, String navn, int sortering) {
         this.kode = kode;
@@ -133,7 +134,6 @@ public enum HendelseUnderType implements Kodeverdi {
         return ad;
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

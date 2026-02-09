@@ -30,8 +30,9 @@ public enum BehandlingResultatType implements Kodeverdi {
     DELVIS_TILBAKEBETALING("DELVIS_TILBAKEBETALING", "Delvis tilbakebetaling"),
     FULL_TILBAKEBETALING("FULL_TILBAKEBETALING", "Tilbakebetaling");
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     public static final String KODEVERK = "BEHANDLING_RESULTAT_TYPE";
     private static final Map<String, BehandlingResultatType> KODER = new LinkedHashMap<>();
@@ -69,7 +70,6 @@ public enum BehandlingResultatType implements Kodeverdi {
         };
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

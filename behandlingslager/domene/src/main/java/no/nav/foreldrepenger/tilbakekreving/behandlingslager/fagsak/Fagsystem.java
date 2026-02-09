@@ -30,9 +30,10 @@ public enum Fagsystem implements Kodeverdi {
 
     private static final Map<String, Fagsystem> KODER = new LinkedHashMap<>();
 
-    private String kode;
+    @JsonValue
+    private final String kode;
 
-    private String offisiellKode;
+    private final String offisiellKode;
 
     static {
         for (var v : values()) {
@@ -62,7 +63,6 @@ public enum Fagsystem implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

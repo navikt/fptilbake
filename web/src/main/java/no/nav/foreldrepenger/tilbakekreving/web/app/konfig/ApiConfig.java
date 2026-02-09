@@ -22,7 +22,8 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.ConstraintViolati
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.GeneralRestExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonMappingExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonParseExceptionMapper;
-import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.JacksonJsonConfig;
+import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.FPJacksonJsonConfig;
+import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.K9JacksonJsonConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.ObjectMapperFactory;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingFaktaRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
@@ -69,23 +70,20 @@ public class ApiConfig extends Application {
     private OpenAPI resolvedOpenAPI;
 
     public ApiConfig() {
-        if (skalSetteOppOpenApi()) {
-            this.resolvedOpenAPI = resolveOpenAPI();
+        if (!Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
+            this.resolvedOpenAPI = resolveOpenAPIK9();
         }
     }
 
-    public static boolean skalSetteOppOpenApi() {
-        return !ENV.isProd() || !Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE);
-    }
-
-    private OpenAPI resolveOpenAPI() {
+    private OpenAPI resolveOpenAPIK9() {
         final var info = new Info()
             .title("Vedtaksløsningen - Tilbakekreving")
             .version("1.1")
             .description("REST grensesnitt for tilbakekreving.");
-        final var server = new Server().url(JettyServer.getContextPath());
+        final var contextPath = JettyServer.getContextPath();
+        final var server = new Server().url(contextPath);
         final var openapiSetupHelper = new OpenApiSetupHelper(this, info, server);
-        var openApiKlasser = Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE) ? getProduksjonsKlasser() : getClasses();
+        var openApiKlasser = getClasses();
         for(final var cls : openApiKlasser) {
             openapiSetupHelper.addResourceClass(cls.getName());
         }
@@ -104,12 +102,11 @@ public class ApiConfig extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        Set<Class<?>> classes = skalSetteOppOpenApi() ? new HashSet<>(getOpenApiKlasser()) : new HashSet<>();
+        Set<Class<?>> classes = new HashSet<>(getOpenApiKlasser());
         classes.addAll(getProduksjonsKlasser());
 
         classes.addAll(Set.of(
             // Applikasjonsoppsett
-            JacksonJsonConfig.class,
             CacheControlFeature.class,
             // ExceptionMappers pga de som finnes i Jackson+Jersey-media
             ConstraintViolationMapper.class,
@@ -124,9 +121,11 @@ public class ApiConfig extends Application {
 
         // Standard etter fork av fp-tilbake
         if (Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
+            classes.add(FPJacksonJsonConfig.class);
             classes.add(AuthenticationFilter.class); // autentisering etter ny standard
         } else {
             // Forvaltning - fortsatt i K9-løsning
+            classes.add(K9JacksonJsonConfig.class);
             classes.add(ProsessTaskRestTjeneste.class);
             classes.add(ForvaltningAktørRestTjeneste.class);
             classes.add(ForvaltningBehandlingRestTjeneste.class);
@@ -137,9 +136,13 @@ public class ApiConfig extends Application {
     }
 
     private static Set<Class<?>> getOpenApiKlasser() {
-        return Set.of(DynamicJacksonJsonProvider.class,  // Denne må registrerast før anna OpenAPI oppsett for å fungere.
-            OpenApiTjeneste.class,
-            DynamicObjectMapperResolverVaryFilter.class);
+        if (Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
+            return Set.of();
+        } else {
+            return Set.of(DynamicJacksonJsonProvider.class,  // Denne må registrerast før anna OpenAPI oppsett for å fungere.
+                OpenApiTjeneste.class,
+                DynamicObjectMapperResolverVaryFilter.class);
+        }
     }
 
     private static Set<Class<?>> getProduksjonsKlasser() {

@@ -11,8 +11,9 @@ public enum AnnenVurdering implements Vurdering {
     GOD_TRO("GOD_TRO", "Handlet i god tro"),
     FORELDET("FORELDET", "Foreldet");
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     public static final String KODEVERK = "VURDERING";
     private static final Map<String, AnnenVurdering> KODER = new LinkedHashMap<>();
@@ -45,7 +46,6 @@ public enum AnnenVurdering implements Vurdering {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

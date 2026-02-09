@@ -23,8 +23,9 @@ public enum BehandlingÅrsakType implements Kodeverdi {
 
     UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke Definert");
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     public static final String KODEVERK = "BEHANDLING_AARSAK";
     private static final Map<String, BehandlingÅrsakType> KODER = new LinkedHashMap<>();
@@ -62,7 +63,6 @@ public enum BehandlingÅrsakType implements Kodeverdi {
         return this != VEDTAK_FATTET_AV_ANNEN_INSTANS;
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

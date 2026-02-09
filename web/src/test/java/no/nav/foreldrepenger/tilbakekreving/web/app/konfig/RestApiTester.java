@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,9 @@ public class RestApiTester {
     }
 
     static Collection<Class<?>> finnAlleRestTjenester() {
-        return new ArrayList<>(finnAlleRestTjenester(new ApiConfig()));
+        var alle = new HashSet<>(finnAlleRestTjenester(new ApiConfig()));
+        alle.addAll(finnAlleRestTjenester(new ForvaltningApiConfig()));
+        return alle;
     }
 
     static Collection<Class<?>> finnAlleJsonSubTypeClasses(Class<?> klasse) {

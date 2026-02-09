@@ -25,7 +25,8 @@ public enum SivilstandType implements Kodeverdi {
     public static final String KODEVERK = "SIVILSTAND_TYPE";
     private static final Map<String, SivilstandType> KODER = new LinkedHashMap<>();
 
-    private String kode;
+    @JsonValue
+    private final String kode;
 
     static {
         for (var v : values()) {
@@ -66,7 +67,6 @@ public enum SivilstandType implements Kodeverdi {
         return ETTERLATT.equals(this);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

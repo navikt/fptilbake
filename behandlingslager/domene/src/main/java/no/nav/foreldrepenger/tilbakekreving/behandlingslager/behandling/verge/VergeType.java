@@ -20,8 +20,9 @@ public enum VergeType implements Kodeverdi {
     ANNEN_F("ANNEN_F", "Annen fullmektig"),
     UDEFINERT(STANDARDKODE_UDEFINERT, "UDefinert");
 
-    private String kode;
-    private String navn;
+    @JsonValue
+    private final String kode;
+    private final String navn;
 
     public static final String KODEVERK = "VERGE_TYPE";
     private static final Map<String, VergeType> KODER = new LinkedHashMap<>();
@@ -54,7 +55,6 @@ public enum VergeType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

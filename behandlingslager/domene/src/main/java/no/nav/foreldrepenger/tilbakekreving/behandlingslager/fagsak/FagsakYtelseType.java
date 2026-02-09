@@ -31,9 +31,10 @@ public enum FagsakYtelseType implements Kodeverdi {
 
     UDEFINERT(STANDARDKODE_UDEFINERT, "Ikke definert", "Ikke Definert");
 
-    private String kode;
-    private String navn; //på bøkmål som standard
-    private String navnPåNynorsk;
+    @JsonValue
+    private final String kode;
+    private final String navn; //på bøkmål som standard
+    private final String navnPåNynorsk;
 
     public static final String KODEVERK = "FAGSAK_YTELSE";
     private static final Map<String, FagsakYtelseType> KODER = new LinkedHashMap<>();
@@ -68,7 +69,6 @@ public enum FagsakYtelseType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;

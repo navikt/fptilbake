@@ -23,7 +23,8 @@ public enum BrevType implements Kodeverdi {
     public static final String KODEVERK = "BREV_TYPE";
     private static final Map<String, BrevType> KODER = new LinkedHashMap<>();
 
-    private String kode;
+    @JsonValue
+    private final String kode;
 
     static {
         for (var v : values()) {
@@ -52,7 +53,6 @@ public enum BrevType implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
-    @JsonValue
     @Override
     public String getKode() {
         return kode;
