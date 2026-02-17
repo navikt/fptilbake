@@ -53,7 +53,10 @@
     "VEDTAKSBREV_JOIN_PERIODER" : "true",
     "AKTIVER_ABAC_LOGGING" : "false",
     "TOGGLE_AIVEN_LOS" : "true",
-    "TOGGLE_ENABLE_SENSU" : "true"
+    "TOGGLE_ENABLE_SENSU" : "true",
+    "BIGQUERY_ENABLED": "true",
+    "BIGQUERY_GCP_PROJECT": "k9saksbehandling-dev-1d8d",
+    "GOOGLE_APPLICATION_CREDENTIALS": "/var/run/secrets/nais.io/google/bigquery_json_key"
   },
   "AZURE_REPLY_URL" :  "https://k9.dev.intern.nav.no/k9/tilbake/cb",
   "AZURE_IAC_RULES": [

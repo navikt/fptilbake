@@ -55,6 +55,9 @@ spec:
         kvPath: {{k9tilbakeserviceuser}}
       - mountPath: /var/run/secrets/nais.io/vault
         kvPath: /kv/{{cluster}}/fss/k9-tilbake/{{namespace}}
+  filesFrom:
+    - secret: k9saksbehandling-bigquery-sa-key
+      mountPath: /var/run/secrets/nais.io/google
   kafka:
     pool: {{kafkaPool}}
   observability:
