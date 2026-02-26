@@ -3,11 +3,12 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 import java.util.Objects;
 import java.util.UUID;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -92,7 +93,6 @@ public class JournalføringTjeneste {
                 .medTittel(brevMetadata.getTittel())
                 .medSak(lagSaksreferanse(behandling.getFagsak()))
                 .leggTilDokument(DokumentInfoOpprett.builder()
-                        .medDokumentkategori(dokumentkategori)
                         .medTittel(brevMetadata.getTittel())
                         .medBrevkode(brevMetadata.getFagsaktype().getKode() + "-TILB")
                         .leggTilDokumentvariant(new Dokumentvariant(Dokumentvariant.Variantformat.ARKIV, Dokumentvariant.Filtype.PDFA, vedleggPdf)))
