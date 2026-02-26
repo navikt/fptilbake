@@ -2,7 +2,7 @@ version: 2
 registries:
   maven-github:
     type: maven-repository
-    url: https://maven.pkg.github.com/navikt/fp-felles
+    url: https://maven.pkg.github.com/navikt/fp-bom
     username: x-access-token
     password: ${{ secrets.READER_TOKEN }}
 
