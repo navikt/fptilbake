@@ -82,7 +82,6 @@ jobs:
       build-image: ${{ github.ref_name == 'master' }} # default: true
       push-image: ${{ github.ref_name == 'master' }} # default: false
       namespace: k9saksbehandling
-      sonar-scan: false
     secrets: inherit
 
   fptilbake-tester:
