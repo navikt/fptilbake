@@ -39,8 +39,8 @@ public enum HendelseType implements Kodeverdi {
 
     SVP_FAKTA_TYPE("SVP_FAKTA_TYPE", "§ 14-4 Fakta om svangerskap", 20),
     SVP_ARBEIDSGIVERS_FORHOLD_TYPE("SVP_ARBEIDSGIVERS_FORHOLD_TYPE", "§ 14-4 første ledd Arbeidsgivers forhold", 30),
-    SVP_OPPTJENING_TYPE("SVP_OPPTJENING_TYPE", "§ 14-4 3. ledd Opptjening/ inntekt", 50),
-    SVP_BEREGNING_TYPE("SVP_BEREGNING_TYPE", "§ 14-4 5. ledd Beregning ", 60),
+    SVP_OPPTJENING_TYPE("SVP_OPPTJENING_TYPE", "§ 14-4 tredje ledd Opptjening/ inntekt", 50),
+    SVP_BEREGNING_TYPE("SVP_BEREGNING_TYPE", "§ 14-4 femte ledd Beregning ", 60),
     SVP_UTTAK_TYPE("SVP_UTTAK_TYPE", "§ 14-4 Uttak", 70),
     SVP_OPPHØR("OPPHØR", "Opphør", 80),
     SVP_ANNET_TYPE("SVP_ANNET_TYPE", "Annet", 999),//NOSONAR
