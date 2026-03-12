@@ -15,7 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Ukedager;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
-import no.nav.vedtak.exception.VLException;
+import no.nav.vedtak.exception.TekniskException;
 
 public class KravgrunnlagValidator {
 
@@ -198,7 +198,7 @@ public class KravgrunnlagValidator {
         return YearMonth.of(fom.getYear(), fom.getMonth());
     }
 
-    public static class UgyldigKravgrunnlagException extends VLException {
+    public static class UgyldigKravgrunnlagException extends TekniskException {
         public UgyldigKravgrunnlagException(String kode, String message) {
             super(kode, message, null);
         }
