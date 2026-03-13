@@ -4,7 +4,6 @@ import java.net.URI;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -17,7 +16,6 @@ import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
 @Path("/konfig")
 @RequestScoped
-@Transactional
 public class KonfigRestTjeneste {
 
     private URI rettskildeUrl;
@@ -28,7 +26,8 @@ public class KonfigRestTjeneste {
     }
 
     @Inject
-    public KonfigRestTjeneste(@KonfigVerdi(value = "rettskilde.url") URI rettskildeUrl, @KonfigVerdi(value = "systemrutine.url") URI systemrutineUrl) {
+    public KonfigRestTjeneste(@KonfigVerdi(value = "rettskilde.url") URI rettskildeUrl,
+                              @KonfigVerdi(value = "systemrutine.url") URI systemrutineUrl) {
         this.rettskildeUrl = rettskildeUrl;
         this.systemrutineUrl = systemrutineUrl;
     }
