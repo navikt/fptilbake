@@ -39,7 +39,7 @@ public class BrevSporing extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    private BrevSporing() {
+    protected BrevSporing() {
     }
 
     public String getDokumentId() {

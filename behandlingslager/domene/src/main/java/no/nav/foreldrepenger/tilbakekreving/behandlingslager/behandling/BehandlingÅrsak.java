@@ -44,7 +44,7 @@ public class BehandlingÅrsak extends BaseEntitet {
     @JoinColumn(name = "original_behandling_id", updatable = false)
     private Behandling originalBehandling;
 
-    BehandlingÅrsak() {
+    protected BehandlingÅrsak() {
         // for hibernate
     }
 

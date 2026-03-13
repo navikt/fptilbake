@@ -39,7 +39,7 @@ class KravVedtakStatusAggregate extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    KravVedtakStatusAggregate() {
+    protected KravVedtakStatusAggregate() {
         // Hibernate
     }
 

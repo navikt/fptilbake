@@ -40,7 +40,7 @@ class FaktaFeilutbetalingAggregate extends BaseEntitet {
     private long versjon;
 
 
-    FaktaFeilutbetalingAggregate() {
+    protected FaktaFeilutbetalingAggregate() {
         // for hibernate
     }
 

@@ -39,7 +39,7 @@ public class VergeAggregateEntitet extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    VergeAggregateEntitet() {
+    protected VergeAggregateEntitet() {
         //for hibernate
     }
 

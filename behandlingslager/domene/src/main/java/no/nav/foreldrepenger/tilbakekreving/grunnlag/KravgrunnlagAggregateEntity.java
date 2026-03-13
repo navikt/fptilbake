@@ -43,7 +43,7 @@ class KravgrunnlagAggregateEntity extends BaseEntitet implements KravgrunnlagAgg
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    KravgrunnlagAggregateEntity() {
+    protected KravgrunnlagAggregateEntity() {
         // Hibernate
     }
 

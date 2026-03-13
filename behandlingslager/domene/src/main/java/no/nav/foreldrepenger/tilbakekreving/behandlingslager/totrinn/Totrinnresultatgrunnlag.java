@@ -44,7 +44,7 @@ public class Totrinnresultatgrunnlag extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    Totrinnresultatgrunnlag() {
+    protected Totrinnresultatgrunnlag() {
         // for hibernate
     }
 

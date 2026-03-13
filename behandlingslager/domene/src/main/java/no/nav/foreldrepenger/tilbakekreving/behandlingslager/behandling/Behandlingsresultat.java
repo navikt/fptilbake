@@ -35,7 +35,7 @@ public class Behandlingsresultat extends BaseEntitet {
     @Column(name = "behandling_resultat_type", nullable = false)
     private BehandlingResultatType behandlingResultatType = BehandlingResultatType.IKKE_FASTSATT;
 
-    Behandlingsresultat() {
+    protected Behandlingsresultat() {
         // Hibernate
     }
 

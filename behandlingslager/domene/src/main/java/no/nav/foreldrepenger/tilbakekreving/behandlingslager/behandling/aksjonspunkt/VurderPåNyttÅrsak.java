@@ -35,7 +35,7 @@ public class VurderPåNyttÅrsak extends BaseEntitet implements IndexKey {
     @JoinColumn(name = "aksjonspunkt_id", nullable = false, updatable = false)
     private Aksjonspunkt aksjonspunkt;
 
-    VurderPåNyttÅrsak() {
+    protected VurderPåNyttÅrsak() {
         // for Hibernate
     }
 

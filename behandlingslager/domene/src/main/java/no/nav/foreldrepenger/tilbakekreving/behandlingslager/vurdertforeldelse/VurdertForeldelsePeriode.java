@@ -53,7 +53,7 @@ public class VurdertForeldelsePeriode extends BaseEntitet {
     private String begrunnelse;
 
 
-    VurdertForeldelsePeriode() {
+    protected VurdertForeldelsePeriode() {
         // For hibernate
     }
 

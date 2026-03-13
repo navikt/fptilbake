@@ -66,7 +66,7 @@ public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "vurdertAktsomhet")
     private List<VilkårVurderingSærligGrunnEntitet> særligGrunner = new ArrayList<>();
 
-    VilkårVurderingAktsomhetEntitet() {
+    protected VilkårVurderingAktsomhetEntitet() {
         // for hibernate
     }
 

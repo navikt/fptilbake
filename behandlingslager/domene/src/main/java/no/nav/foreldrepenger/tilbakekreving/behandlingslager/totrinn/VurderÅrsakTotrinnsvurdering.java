@@ -36,7 +36,7 @@ public class VurderÅrsakTotrinnsvurdering extends BaseEntitet implements IndexK
     @JoinColumn(name = "totrinnsvurdering_id", nullable = false, updatable = false)
     private Totrinnsvurdering totrinnsvurdering;
 
-    VurderÅrsakTotrinnsvurdering() {
+    protected VurderÅrsakTotrinnsvurdering() {
         // for Hibernate
     }
 

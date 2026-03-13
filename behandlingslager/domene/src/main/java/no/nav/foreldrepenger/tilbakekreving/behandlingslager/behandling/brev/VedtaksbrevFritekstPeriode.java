@@ -46,7 +46,7 @@ public class VedtaksbrevFritekstPeriode extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    private VedtaksbrevFritekstPeriode() {
+    protected VedtaksbrevFritekstPeriode() {
     }
 
     public Long getId() {

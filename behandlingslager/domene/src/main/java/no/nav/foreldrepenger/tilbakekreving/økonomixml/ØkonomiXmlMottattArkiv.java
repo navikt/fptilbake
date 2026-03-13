@@ -19,7 +19,7 @@ public class ØkonomiXmlMottattArkiv extends BaseEntitet {
     @Column(name = "melding", nullable = false)
     private String mottattXml;
 
-    ØkonomiXmlMottattArkiv() {
+    protected ØkonomiXmlMottattArkiv() {
         // for hibernate
     }
 

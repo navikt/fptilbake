@@ -34,7 +34,7 @@ public class VilkårVurderingSærligGrunnEntitet extends BaseEntitet {
     @Column(name = "begrunnelse")
     private String begrunnelse;
 
-    VilkårVurderingSærligGrunnEntitet() {
+    protected VilkårVurderingSærligGrunnEntitet() {
         // for hibernate
     }
 

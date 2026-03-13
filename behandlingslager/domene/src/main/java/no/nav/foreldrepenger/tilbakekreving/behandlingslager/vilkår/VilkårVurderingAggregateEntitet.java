@@ -39,7 +39,7 @@ class VilkårVurderingAggregateEntitet extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    VilkårVurderingAggregateEntitet() {
+    protected VilkårVurderingAggregateEntitet() {
         // for hibernate
     }
 

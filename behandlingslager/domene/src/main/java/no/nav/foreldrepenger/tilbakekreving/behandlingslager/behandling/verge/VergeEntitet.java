@@ -53,7 +53,7 @@ public class VergeEntitet extends BaseEntitet {
     @Column(name = "begrunnelse")
     private String begrunnelse;
 
-    VergeEntitet() {
+    protected VergeEntitet() {
         // Hibernate
     }
 
