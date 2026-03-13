@@ -12,7 +12,6 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -53,7 +52,6 @@ import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
 @Path("/kodeverk")
 @RequestScoped
-@Transactional
 public class KodeverkRestTjeneste {
 
     public static final String KODERVERK_PATH = "/kodeverk";
