@@ -38,7 +38,7 @@ public class VilkårVurderingGodTroEntitet extends BaseEntitet {
     @Column(name = "begrunnelse", nullable = false, updatable = false)
     private String begrunnelse;
 
-    VilkårVurderingGodTroEntitet() {
+    protected VilkårVurderingGodTroEntitet() {
         // for hibernate
     }
 

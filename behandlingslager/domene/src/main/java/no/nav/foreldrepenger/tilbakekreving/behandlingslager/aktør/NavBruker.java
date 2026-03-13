@@ -29,7 +29,7 @@ public class NavBruker extends Person {
     @Column(name = "sprak_kode", nullable = false)
     private Språkkode språkkode = Språkkode.UDEFINERT;
 
-    private NavBruker() {
+    protected NavBruker() {
         super(null);
         // For Hibernate
     }

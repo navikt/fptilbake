@@ -136,7 +136,7 @@ public class Behandling extends BaseEntitet {
     @Column(name = "SAKSBEHANDLING_TYPE", nullable = false)
     private SaksbehandlingType saksbehandlingType = SaksbehandlingType.ORDINÆR;
 
-    Behandling() {
+    protected Behandling() {
         // Hibernate
     }
 

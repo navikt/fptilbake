@@ -51,7 +51,7 @@ public class Fagsak extends BaseEntitet {
     @Column(name = "ytelse_type", nullable = false)
     private FagsakYtelseType fagsakYtelseType = FagsakYtelseType.FORELDREPENGER;
 
-    Fagsak() {
+    protected Fagsak() {
         // Hibernate
     }
 

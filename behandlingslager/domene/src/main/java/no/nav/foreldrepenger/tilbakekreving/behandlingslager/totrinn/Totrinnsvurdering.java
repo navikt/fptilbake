@@ -58,7 +58,7 @@ public class Totrinnsvurdering extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    Totrinnsvurdering() {
+    protected Totrinnsvurdering() {
         // for hibernate
     }
 

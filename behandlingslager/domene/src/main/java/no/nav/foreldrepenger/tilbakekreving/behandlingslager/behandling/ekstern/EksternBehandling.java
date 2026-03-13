@@ -44,7 +44,7 @@ public class EksternBehandling extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    EksternBehandling() {
+    protected EksternBehandling() {
         // Hibernate
     }
 

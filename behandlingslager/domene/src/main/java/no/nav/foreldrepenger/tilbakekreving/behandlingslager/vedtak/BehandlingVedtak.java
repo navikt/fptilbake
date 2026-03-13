@@ -44,7 +44,7 @@ public class BehandlingVedtak extends BaseEntitet {
     @Column(name = "iverksetting_status", nullable = false)
     private IverksettingStatus iverksettingStatus = IverksettingStatus.UDEFINERT;
 
-    private BehandlingVedtak() {
+    protected BehandlingVedtak() {
         // for hibernate
     }
 

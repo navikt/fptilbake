@@ -44,7 +44,7 @@ public class VarselInfo extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    private VarselInfo() {
+    protected VarselInfo() {
         // for hibernate
     }
 

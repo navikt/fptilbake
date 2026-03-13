@@ -60,7 +60,7 @@ public class VilkårVurderingPeriodeEntitet extends BaseEntitet {
     @OneToOne(mappedBy = "periode")
     private VilkårVurderingGodTroEntitet godTro;
 
-    VilkårVurderingPeriodeEntitet() {
+    protected VilkårVurderingPeriodeEntitet() {
         // for hibernate
     }
 

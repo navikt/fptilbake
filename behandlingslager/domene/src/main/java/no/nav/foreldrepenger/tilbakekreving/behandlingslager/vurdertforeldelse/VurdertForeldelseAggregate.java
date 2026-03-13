@@ -39,7 +39,7 @@ class VurdertForeldelseAggregate extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    private VurdertForeldelseAggregate() {
+    protected VurdertForeldelseAggregate() {
         // For hibernate
     }
 

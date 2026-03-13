@@ -48,7 +48,7 @@ public class FaktaFeilutbetalingPeriode extends BaseEntitet {
     @Column(name = "hendelse_undertype")
     private HendelseUnderType hendelseUndertype;
 
-    FaktaFeilutbetalingPeriode() {
+    protected FaktaFeilutbetalingPeriode() {
         // FOR CDI
     }
 

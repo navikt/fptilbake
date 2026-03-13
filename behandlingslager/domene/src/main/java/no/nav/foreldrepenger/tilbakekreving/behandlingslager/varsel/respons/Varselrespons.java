@@ -36,7 +36,7 @@ public class Varselrespons extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    private Varselrespons() {
+    protected Varselrespons() {
         // Hibernate
     }
 
