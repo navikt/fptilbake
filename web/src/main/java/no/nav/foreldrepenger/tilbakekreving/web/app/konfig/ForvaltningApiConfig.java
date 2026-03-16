@@ -12,19 +12,16 @@ import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.server.ServerProperties;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
-import io.swagger.v3.oas.models.info.Info;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
-import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.ConstraintViolationMapper;
-import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.GeneralRestExceptionMapper;
-import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonMappingExceptionMapper;
-import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonParseExceptionMapper;
-import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.FPJacksonJsonConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningAktørRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningBehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningKravgrunnlagRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
+import no.nav.vedtak.openapi.OpenApiUtils;
+import no.nav.vedtak.server.rest.ForvaltningAuthorizationFilter;
+import no.nav.vedtak.server.rest.FpRestJackson2Feature;
 
 @ApplicationPath(ForvaltningApiConfig.API_URI)
 public class ForvaltningApiConfig extends Application {
@@ -35,18 +32,9 @@ public class ForvaltningApiConfig extends Application {
 
     public ForvaltningApiConfig() {
         if (Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
-            setupOpenAPI();
+            OpenApiUtils.setupOpenApi("Forvaltning - Tilbakekreving", JettyServer.getContextPath(),
+                getForvaltningClasses(), this);
         }
-    }
-
-    private void setupOpenAPI() {
-        final var info = new Info()
-            .title("Vedtaksløsningen - Tilbakekreving")
-            .version("1.1")
-            .description("REST grensesnitt for tilbakekreving.");
-        FpOpenApiUtils.openApiConfigFor(info, JettyServer.getContextPath(), this)
-            .registerClasses(getForvaltningClasses())
-            .buildOpenApiContext();
     }
 
     @Override
@@ -55,19 +43,8 @@ public class ForvaltningApiConfig extends Application {
             return Collections.emptySet();
         }
         var classes = new HashSet<>(getForvaltningClasses());
-        classes.addAll(Set.of(
-            // autentisering etter ny standard
-            AuthenticationFilter.class,
-            ForvaltningAuthorizationFilter.class,
-            // Applikasjonsoppsett
-            FPJacksonJsonConfig.class,
-            // ExceptionMappers pga de som finnes i Jackson+Jersey-media
-            ConstraintViolationMapper.class,
-            JsonMappingExceptionMapper.class,
-            JsonParseExceptionMapper.class,
-            // Generell exceptionmapper m/logging for øvrige tilfelle
-            GeneralRestExceptionMapper.class));
-
+        classes.add(FpRestJackson2Feature.class);
+        classes.add(ForvaltningAuthorizationFilter.class);
         // swagger
         classes.add(OpenApiResource.class);
 

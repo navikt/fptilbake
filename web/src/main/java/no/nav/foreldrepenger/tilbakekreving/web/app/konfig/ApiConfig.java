@@ -18,10 +18,6 @@ import io.swagger.v3.oas.models.servers.Server;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
-import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.ConstraintViolationMapper;
-import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.GeneralRestExceptionMapper;
-import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonMappingExceptionMapper;
-import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonParseExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.FPJacksonJsonConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.K9JacksonJsonConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.ObjectMapperFactory;
@@ -58,6 +54,10 @@ import no.nav.openapi.spec.utils.openapi.OpenApiSetupHelper;
 import no.nav.openapi.spec.utils.openapi.PrefixStrippingFQNTypeNameResolver;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
+import no.nav.vedtak.server.rest.AuthenticationFilter;
+import no.nav.vedtak.server.rest.GeneralRestExceptionMapper;
+import no.nav.vedtak.server.rest.ValidationExceptionMapper;
+import no.nav.vedtak.server.rest.jackson.Jackson2BasicFeature;
 
 @ApplicationPath(ApiConfig.API_URI)
 public class ApiConfig extends Application {
@@ -104,16 +104,12 @@ public class ApiConfig extends Application {
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<>(getOpenApiKlasser());
         classes.addAll(getProduksjonsKlasser());
+        classes.add(CacheControlFeature.class);
 
-        classes.addAll(Set.of(
-            // Applikasjonsoppsett
-            CacheControlFeature.class,
-            // ExceptionMappers pga de som finnes i Jackson+Jersey-media
-            ConstraintViolationMapper.class,
-            JsonMappingExceptionMapper.class,
-            JsonParseExceptionMapper.class,
-            // Generell exceptionmapper m/logging for øvrige tilfelle
-            GeneralRestExceptionMapper.class));
+        // Fra felles-server. Kan ikke bruke standard pga JsonSubTypes-oppsett i ContextResolver
+        classes.add(Jackson2BasicFeature.class);
+        classes.add(ValidationExceptionMapper.class);
+        classes.add(GeneralRestExceptionMapper.class);
 
         if (ENV.isLocal()) {
             classes.add(GrunnlagRestTestTjenesteLocalDev.class);
@@ -124,6 +120,8 @@ public class ApiConfig extends Application {
             classes.add(FPJacksonJsonConfig.class);
             classes.add(AuthenticationFilter.class); // autentisering etter ny standard
         } else {
+            // Bruker lokal variant pga cookies i k9
+            classes.add(K9AuthenticationFilter.class);
             // Forvaltning - fortsatt i K9-løsning
             classes.add(K9JacksonJsonConfig.class);
             classes.add(ProsessTaskRestTjeneste.class);

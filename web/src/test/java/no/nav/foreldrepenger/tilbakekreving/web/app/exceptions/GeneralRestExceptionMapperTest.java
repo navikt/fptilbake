@@ -14,6 +14,8 @@ import ch.qos.logback.classic.Level;
 import no.nav.vedtak.exception.FunksjonellException;
 import no.nav.vedtak.exception.ManglerTilgangException;
 import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.feil.FeilDto;
+import no.nav.vedtak.feil.FeilType;
 import no.nav.vedtak.log.util.MemoryAppender;
 
 @Execution(ExecutionMode.SAME_THREAD)
@@ -21,11 +23,11 @@ class GeneralRestExceptionMapperTest {
 
     private static MemoryAppender logSniffer;
 
-    private final GeneralRestExceptionMapper exceptionMapper = new GeneralRestExceptionMapper();
+    private final no.nav.vedtak.server.rest.GeneralRestExceptionMapper exceptionMapper = new no.nav.vedtak.server.rest.GeneralRestExceptionMapper();
 
     @BeforeEach
     void setUp() {
-        logSniffer = MemoryAppender.sniff(GeneralRestExceptionMapper.class);
+        logSniffer = MemoryAppender.sniff(no.nav.vedtak.server.rest.GeneralRestExceptionMapper.class);
     }
 
     @AfterEach
@@ -41,7 +43,7 @@ class GeneralRestExceptionMapperTest {
         assertThat(response.getEntity()).isInstanceOf(FeilDto.class);
         var feilDto = (FeilDto) response.getEntity();
 
-        assertThat(feilDto.type()).isEqualTo(FeilType.MANGLER_TILGANG_FEIL);
+        assertThat(feilDto.feiltype()).isEqualTo(FeilType.MANGLER_TILGANG_FEIL.name());
         assertThat(feilDto.feilmelding()).contains("ManglerTilgangFeilmeldingKode");
         assertThat(logSniffer.search("ManglerTilgangFeilmeldingKode", Level.WARN)).isEmpty();
     }
