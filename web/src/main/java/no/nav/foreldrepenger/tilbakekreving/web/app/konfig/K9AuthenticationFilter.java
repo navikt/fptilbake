@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.konfig;
 
+import java.util.Optional;
+
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -10,22 +12,21 @@ import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.ext.Provider;
+
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
 import no.nav.vedtak.sikkerhet.jaxrs.AuthenticationFilterDelegate;
 import no.nav.vedtak.sikkerhet.oidc.token.TokenString;
 
-import java.util.Optional;
-
 @Provider
 @Priority(Priorities.AUTHENTICATION)
-public class AuthenticationFilter implements ContainerRequestFilter, ContainerResponseFilter {
+public class K9AuthenticationFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     private static final String K9_ID_TOKEN_COOKIE_NAME = "ID_token";
 
     @Context
     private ResourceInfo resourceinfo;
 
-    public AuthenticationFilter() {
+    public K9AuthenticationFilter() {
         // Ingenting
     }
 
