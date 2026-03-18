@@ -473,6 +473,7 @@ public class ForvaltningBehandlingRestTjeneste {
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response fjernFagsakProsesstaskAvsluttetBehandling() {
         fagsakProsessTaskRepository.fjernForAvsluttedeBehandlinger();
+        fagsakProsessTaskRepository.fjernForAvsluttedeTasks();
         return Response.ok().build();
     }
 

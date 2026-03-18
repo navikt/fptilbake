@@ -91,6 +91,14 @@ public class FagsakProsessTaskRepository {
         em.flush();
     }
 
+    public void fjernForAvsluttedeTasks() {
+        var em = getEntityManager();
+        var query = em.createNativeQuery("delete from FAGSAK_PROSESS_TASK fp where fp.prosess_task_id in ( select pt.id from FAGSAK_PROSESS_TASK fpt join PROSESS_TASK pt on fpt.prosess_task_id=pt.id where pt.status = :ferdig )");
+        query.setParameter("ferdig", ProsessTaskStatus.FERDIG.getDbKode());
+        query.executeUpdate();
+        em.flush();
+    }
+
     public List<ProsessTaskData> finnAlleForAngittSøk(Long fagsakId, Long behandlingId, String gruppeId, Collection<ProsessTaskStatus> statuser,
                                                       LocalDateTime nesteKjoeringFraOgMed,
                                                       LocalDateTime nesteKjoeringTilOgMed) {
