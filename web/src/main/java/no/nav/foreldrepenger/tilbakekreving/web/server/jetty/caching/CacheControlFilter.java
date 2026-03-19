@@ -41,7 +41,7 @@ public class CacheControlFilter implements ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext req, ContainerResponseContext res) throws IOException {
-        if(req.getMethod().equals("GET")) {
+        if(req.getMethod().equals("GET") && res.getStatus() >= 200 && res.getStatus() < 300) {
             final ExtendedCacheControl cc = new ExtendedCacheControl();
             cc.setMaxAge(this.maxAge);
             cc.setNoStore(this.noStore);
