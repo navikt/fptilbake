@@ -14,7 +14,6 @@ import org.glassfish.jersey.message.internal.HeaderUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.List;
 
 public class CacheControlFilterTest {
     @Test
@@ -32,6 +31,7 @@ public class CacheControlFilterTest {
         final ContainerRequestContext req = mock(ContainerRequestContext.class);
         when(req.getMethod()).thenReturn("GET");
         final ContainerResponseContext res = mock(ContainerResponseContext.class);
+        when(res.getStatus()).thenReturn(200);
         final MultivaluedMap<String, Object> headers = HeaderUtils.createOutbound();
         when(res.getHeaders()).thenReturn(headers);
 
@@ -48,5 +48,29 @@ public class CacheControlFilterTest {
         assertThat(ecc.isImmutable()).isTrue();
         assertThat(ecc.getStaleWhileRevalidate()).isEqualTo(5);
         assertThat(ecc.getStaleIfError()).isEqualTo(3);
+    }
+
+    @Test
+    void skal_ikke_cache_error_response() throws IOException {
+        final var ccf = new CacheControlFilter(
+            10,
+            false,
+            true,
+            true,
+            true,
+            true,
+            5,
+            3
+        );
+        final ContainerRequestContext req = mock(ContainerRequestContext.class);
+        when(req.getMethod()).thenReturn("GET");
+        final ContainerResponseContext res = mock(ContainerResponseContext.class);
+        when(res.getStatus()).thenReturn(500);
+        final MultivaluedMap<String, Object> headers = HeaderUtils.createOutbound();
+        when(res.getHeaders()).thenReturn(headers);
+
+        ccf.filter(req, res);
+        final var cclist = res.getHeaders().get("Cache-Control");
+        assertThat(cclist).isNull();
     }
 }
