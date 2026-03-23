@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -31,10 +30,8 @@ public class VergeEntitet extends BaseEntitet {
     private AktørId vergeAktørId;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "fom", column = @Column(name = "gyldig_fom", nullable = false)),
-            @AttributeOverride(name = "tom", column = @Column(name = "gyldig_tom", nullable = false))
-    })
+    @AttributeOverride(name = "fom", column = @Column(name = "gyldig_fom", nullable = false))
+    @AttributeOverride(name = "tom", column = @Column(name = "gyldig_tom", nullable = false))
     private Periode gyldigPeriode; //NOSONAR
 
     @Convert(converter = VergeType.KodeverdiConverter.class)

@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak;
 import java.util.Objects;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -39,7 +38,7 @@ public class Fagsak extends BaseEntitet {
      * Offisielt tildelt saksnummer fra GSAK.
      */
     @Embedded
-    @AttributeOverrides(@AttributeOverride(name = "saksnummer", column = @Column(name = "saksnummer", unique = true)))
+    @AttributeOverride(name = "saksnummer", column = @Column(name = "saksnummer", unique = true))
     private Saksnummer saksnummer;
 
 

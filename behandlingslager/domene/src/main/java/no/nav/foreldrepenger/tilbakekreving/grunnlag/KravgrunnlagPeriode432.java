@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -33,10 +32,8 @@ public class KravgrunnlagPeriode432 extends BaseEntitet {
     private Long id;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false)),
-            @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
-    })
+    @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false))
+    @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
     private Periode periode;
 
     @Column(name = "belop_skatt_mnd")

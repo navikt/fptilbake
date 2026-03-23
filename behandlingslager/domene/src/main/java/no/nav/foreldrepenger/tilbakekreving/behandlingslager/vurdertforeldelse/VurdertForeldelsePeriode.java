@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -33,10 +32,8 @@ public class VurdertForeldelsePeriode extends BaseEntitet {
     private VurdertForeldelse vurdertForeldelse;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false)),
-            @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
-    })
+    @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false))
+    @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
     private Periode periode;
 
     @Convert(converter = ForeldelseVurderingType.KodeverdiConverter.class)

@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev;
 import java.util.Objects;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -29,10 +28,8 @@ public class VedtaksbrevFritekstPeriode extends BaseEntitet {
     private Long behandlingId;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false)),
-            @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
-    })
+    @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false))
+    @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
     private Periode periode;
 
     @Convert(converter = VedtaksbrevFritekstType.KodeverdiConverter.class)

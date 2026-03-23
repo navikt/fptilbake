@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør;
 import java.util.Objects;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.MappedSuperclass;
@@ -15,7 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 public abstract class Aktør extends BaseEntitet {
 
     @Embedded
-    @AttributeOverrides(@AttributeOverride(name = "aktørId", column = @Column(name = "aktoer_id", unique = true, nullable = false, updatable = false)))
+    @AttributeOverride(name = "aktørId", column = @Column(name = "aktoer_id", unique = true, nullable = false, updatable = false))
     private AktørId aktørId;
 
     @SuppressWarnings("unused")
