@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import java.time.LocalDate;
 import java.util.function.Function;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,6 +20,8 @@ import jakarta.ws.rs.core.Response;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemFraResultatOgIverksettingStatusTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemmingCsvFormatter;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.aktørbytte.ByttAktørRequest;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -37,6 +40,8 @@ public class ForvaltningAktørRestTjeneste {
     private static final String GAMMEL = "gammel";
     private static final String GJELDENDE = "gjeldende";
 
+    private AvstemFraResultatOgIverksettingStatusTjeneste avstemFraResultatOgIverksettingStatusTjeneste;
+
     private EntityManager entityManager;
 
     public ForvaltningAktørRestTjeneste() {
@@ -44,7 +49,8 @@ public class ForvaltningAktørRestTjeneste {
     }
 
     @Inject
-    public ForvaltningAktørRestTjeneste(EntityManager entityManager) {
+    public ForvaltningAktørRestTjeneste(AvstemFraResultatOgIverksettingStatusTjeneste avstemFraResultatOgIverksettingStatusTjeneste, EntityManager entityManager) {
+        this.avstemFraResultatOgIverksettingStatusTjeneste = avstemFraResultatOgIverksettingStatusTjeneste;
         this.entityManager = entityManager;
     }
 
@@ -59,6 +65,29 @@ public class ForvaltningAktørRestTjeneste {
         int antall = oppdaterAktørIdFor(request.getUtgåttAktør(), request.getGyldigAktør());
         return Response.ok(antall).build();
     }
+
+    @POST
+    @Path("/hentAvstemmingForDato")
+    @Consumes(APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    @Operation(description = "AVSTEM: Hent avstemming for gitt dato", tags = "FORVALTNING",
+        responses = {@ApiResponse(responseCode = "200", description = "Rader i avstemming.")}
+    )
+    @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.DRIFT, sporingslogg = true)
+    public Response hentAvstemmingForDato(@Valid @NotNull @TilpassetAbacAttributt(supplierClass = ForvaltningKravgrunnlagRestTjeneste.AbacIngen.class)
+                                          AvstemDatoRequest request) {
+        var avstemmingCsvFormatter = new AvstemmingCsvFormatter();
+
+        avstemFraResultatOgIverksettingStatusTjeneste.leggTilOppsummering(request.avstemDato(), avstemmingCsvFormatter);
+
+        if (avstemmingCsvFormatter.getAntallRader() == 0) {
+            return Response.ok().build();
+        } else {
+            return Response.ok(avstemmingCsvFormatter.getData()).build();
+        }
+    }
+
+    public record AvstemDatoRequest(@Valid @NotNull LocalDate avstemDato) {}
 
     private int oppdaterAktørIdFor(String gammel, String gjeldende) {
         int antall = 0;
