@@ -149,7 +149,7 @@ class RapporterUnmappedKolonnerIDatabaseTest {
     }
 
     private String getSchemaName(Namespace namespace) {
-        var schema = namespace.getName().getSchema();
+        var schema = namespace.getName().schema();
         return schema == null ? null : schema.getCanonicalName().toUpperCase();
     }
 
