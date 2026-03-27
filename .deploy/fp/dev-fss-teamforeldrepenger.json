@@ -61,6 +61,11 @@
       "cluster": "dev-fss"
     },
     {
+      "app": "fplos",
+      "namespace": "teamforeldrepenger",
+      "cluster": "dev-gcp"
+    },
+    {
       "app": "fpmottak",
       "namespace": "teamforeldrepenger",
       "cluster": "dev-gcp"
