@@ -56,6 +56,10 @@
             <artifactId>sensu-klient</artifactId>
         </dependency>
         <dependency>
+            <groupId>no.nav.k9.felles.integrasjon</groupId>
+            <artifactId>k9-bigquery-klient</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-core</artifactId>
         </dependency>
