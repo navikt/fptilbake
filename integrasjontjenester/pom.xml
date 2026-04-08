@@ -27,7 +27,6 @@
         <module>kafka-producer</module>
         <module>ytelsesvedtak-kafka-poller</module>
         <module>journalpost-api-klient</module>
-        <module>sensu-klient</module>
     </modules>
 
 </project>
