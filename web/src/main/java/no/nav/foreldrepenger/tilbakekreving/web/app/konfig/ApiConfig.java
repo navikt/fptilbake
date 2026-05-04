@@ -40,7 +40,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fpoversikt.FpOvers
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.init.InitielleLinksRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkRestTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.konfig.KonfigRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.los.LosRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.openapi.OpenApiTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjenesteLocalDev;
@@ -149,7 +148,6 @@ public class ApiConfig extends Application {
             KodeverkRestTjeneste.class,
             BehandlingRestTjeneste.class,
             AksjonspunktRestTjeneste.class,
-            KonfigRestTjeneste.class,
             DokumentRestTjeneste.class,
             ForeldelseRestTjeneste.class,
             VarselresponsRestTjeneste.class,

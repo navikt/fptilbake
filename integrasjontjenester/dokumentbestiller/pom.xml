@@ -43,7 +43,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.jknack</groupId>
-            <artifactId>handlebars-jackson2</artifactId>
+            <artifactId>handlebars-jackson</artifactId>
         </dependency>
 
         <!-- Test avhengigheter -->

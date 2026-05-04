@@ -13,7 +13,7 @@
             <td class="periode">01.01.2019 – 31.01.2019</td>
             <td class="tall">30 001 kroner</td>
             <td>Hele beløpet</td>
-            <td class="tall sum">30 001 kroner</td>
+                        <td class="tall sum">30 001 kroner</td>
         </tr>
         <tr>
             <td class="periode sumrad">Sum</td>
