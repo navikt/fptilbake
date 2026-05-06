@@ -16,10 +16,10 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6.0.2
 
       - name: Deploy topics to dev
-        uses: nais/deploy/actions/deploy@v2
+        uses: nais/deploy/actions/deploy@823ec9b7e305ce7cf911d0f9a25f7da9d7486cf2 # ratchet:nais/deploy/actions/deploy@v2
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_K9 }}
           CLUSTER: dev-gcp
@@ -27,7 +27,7 @@ jobs:
 
       - name: Deploy topics to prod
         if: github.ref == 'refs/heads/master'
-        uses: nais/deploy/actions/deploy@v2
+        uses: nais/deploy/actions/deploy@823ec9b7e305ce7cf911d0f9a25f7da9d7486cf2 # ratchet:nais/deploy/actions/deploy@v2
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_K9 }}
           CLUSTER: prod-gcp
