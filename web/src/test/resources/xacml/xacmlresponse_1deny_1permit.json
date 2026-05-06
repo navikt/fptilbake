@@ -61,7 +61,7 @@
           },
           {
             "AttributeId": "no.nav.abac.attributter.resource.felles.person.fnr",
-            "Value": "07078515206",
+            "Value": "15490357286",
             "Category": "urn:oasis:names:tc:xacml:3.0:attribute-category:resource",
             "DataType": "http://www.w3.org/2001/XMLSchema#string"
           }
