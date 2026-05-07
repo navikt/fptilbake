@@ -13,6 +13,7 @@
         <tr>
             <td class="periode">01.01.2019 – 31.01.2019</td>
             <td class="tall">30 001 kroner</td>
+
             <td>Deler av beløpet</td>
             <td class="tall">20 002 kroner</td>
             <td class="tall sum">16 015 kroner</td>
