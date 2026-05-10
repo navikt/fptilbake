@@ -36,7 +36,7 @@ public class SifAbacPdpRestKlient {
 
     public Tilgangsbeslutning sjekkTilgangForInnloggetBruker(SaksinformasjonTilgangskontrollInputDto input) {
         if (Environment.current().isDev()) {
-            ObjectMapper om = no.nav.vedtak.mapper.json.DefaultJsonMapper.getObjectMapper();
+            ObjectMapper om = no.nav.vedtak.mapper.json.DefaultJsonMapper.getJsonMapper();
             try {
                 LOGGER.info("saksinformasjon: {}", om.writeValueAsString(input));
             } catch (JsonProcessingException e) {
@@ -56,7 +56,7 @@ public class SifAbacPdpRestKlient {
 
     public Tilgangsbeslutning sjekkTilgangForInnloggetBruker(BehandlingUuidOperasjonDto input) {
         if (Environment.current().isDev()) {
-            ObjectMapper om = no.nav.vedtak.mapper.json.DefaultJsonMapper.getObjectMapper();
+            ObjectMapper om = no.nav.vedtak.mapper.json.DefaultJsonMapper.getJsonMapper();
             try {
                 LOGGER.info("behandling: {}", om.writeValueAsString(input));
             } catch (JsonProcessingException e) {

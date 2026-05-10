@@ -8,14 +8,13 @@ import jakarta.ws.rs.ext.ContextResolver;
 import jakarta.ws.rs.ext.Provider;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import no.nav.foreldrepenger.tilbakekreving.web.app.IndexClasses;
 import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 @Provider
-public class FPJacksonJsonConfig implements ContextResolver<ObjectMapper> {
+public class FPJacksonJsonConfig implements ContextResolver<JsonMapper> {
 
     private static final JsonMapper JSON_MAPPER = createObjectMapper();
 
@@ -25,7 +24,7 @@ public class FPJacksonJsonConfig implements ContextResolver<ObjectMapper> {
     }
 
     @Override
-    public ObjectMapper getContext(Class<?> type) {
+    public JsonMapper getContext(Class<?> type) {
         return JSON_MAPPER;
     }
 
