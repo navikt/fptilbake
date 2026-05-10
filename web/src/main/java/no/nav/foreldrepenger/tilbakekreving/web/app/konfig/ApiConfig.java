@@ -56,7 +56,8 @@ import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 import no.nav.vedtak.server.rest.AuthenticationFilter;
 import no.nav.vedtak.server.rest.GeneralRestExceptionMapper;
 import no.nav.vedtak.server.rest.ValidationExceptionMapper;
-import no.nav.vedtak.server.rest.jackson.Jackson2BasicFeature;
+import no.nav.vedtak.server.rest.jackson.Jackson2ExceptionMapper;
+import no.nav.vedtak.server.rest.jackson.Jackson2ProviderFeature;
 
 @ApplicationPath(ApiConfig.API_URI)
 public class ApiConfig extends Application {
@@ -106,8 +107,10 @@ public class ApiConfig extends Application {
         classes.addAll(getProduksjonsKlasser());
         classes.add(CacheControlFeature.class);
 
-        // Fra felles-server. Kan ikke bruke standard pga JsonSubTypes-oppsett i ContextResolver
-        classes.add(Jackson2BasicFeature.class);
+        // Applikasjonsoppsett - her er FpRestJackson brutt opp pga JsonTypeName i ContextResolver
+
+        classes.add(Jackson2ProviderFeature.class);
+        classes.add(Jackson2ExceptionMapper.class);
         classes.add(ValidationExceptionMapper.class);
         classes.add(GeneralRestExceptionMapper.class);
 
@@ -117,7 +120,7 @@ public class ApiConfig extends Application {
 
         // Standard etter fork av fp-tilbake
         if (Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
-            classes.add(FPJacksonJsonConfig.class);
+            classes.add(FPJacksonJsonConfig.class);  // Lokal ContextResolver pga AP-oppdaterere/JsonTypeName/JsonTypeinfo
             classes.add(AuthenticationFilter.class); // autentisering etter ny standard
         } else {
             // Bruker lokal variant pga cookies i k9
