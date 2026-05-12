@@ -70,7 +70,6 @@ public class ApiConfig extends Application {
     private OpenAPI resolvedOpenAPI;
 
     public ApiConfig() {
-        GeneralRestExceptionMapper.setLegacyFrontendInternFeil(true);
         if (!Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
             this.resolvedOpenAPI = resolveOpenAPIK9();
         }
