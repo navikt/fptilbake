@@ -67,8 +67,9 @@ public class OppdragIverksettingStatusRepository {
     public List<OppdragIverksettingStatusEntitet> finnForDato(LocalDate dato){
         var query = entityManager.createQuery("""
         from OppdragIverksettingStatus
-        where opprettetTidspunkt >= :t0
-        and opprettetTidspunkt < :t1
+        where kvittertTidspunkt is not null
+        and kvittertTidspunkt >= :t0
+        and kvittertTidspunkt < :t1
         order by opprettetTidspunkt desc""", OppdragIverksettingStatusEntitet.class);
         query.setParameter("t0", dato.atStartOfDay());
         query.setParameter("t1", dato.plusDays(1).atStartOfDay());

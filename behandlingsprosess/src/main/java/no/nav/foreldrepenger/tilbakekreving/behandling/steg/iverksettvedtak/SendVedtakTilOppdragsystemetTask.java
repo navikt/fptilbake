@@ -11,7 +11,6 @@ import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.Tilba
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.UkjentKvitteringFraOSException;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusRepository;
@@ -60,7 +59,6 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         beregningsresultatTjeneste.beregnOgLagre(behandlingId); //midlertidig her for å raskere kunne fase ut håndtering av lagret XML
         var tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
         oppdragIverksettingStatusRepository.registrerStarterIverksetting(behandlingId, tilbakekrevingsvedtak.vedtakId().toString());
@@ -76,6 +74,7 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
                 LOG.info("Tilbakekrevingsvedtak sendt OK til oppdragsystemet via fpwsproxy. BehandlingId={}", behandlingId);
                 oppdragIverksettingStatusRepository.registrerKvittering(behandlingId, true);
             } catch (UkjentKvitteringFraOSException e) {
+                // Er oversendt men mottatt negativ kvittering - kode 08 eller 16
                 oppdragIverksettingStatusRepository.registrerKvittering(behandlingId, false);
                 var rwsp = new RunWithSavepoint(entityManager);
                 rwsp.doWork(() -> {
@@ -84,6 +83,7 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
                     throw new IntegrasjonException("FPT-609912", String.format("Fikk feil fra OS ved iverksetting av behandlingId=%s. Sjekk loggen til fpwsproxy for mer info.", behandlingId));
                 });
             }
+            // Feilet oversendelse - setter ikke kvitteringstidspunkt
             return null;
         });
     }
