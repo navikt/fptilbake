@@ -2,21 +2,20 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.healthchecks.checks;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
-import no.nav.vedtak.server.ReadinessAware;
+import jakarta.jms.JMSException;
+import jakarta.jms.JMSRuntimeException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.jms.JMSException;
-import jakarta.jms.JMSRuntimeException;
 import no.nav.foreldrepenger.felles.jms.QueueSelftest;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer.KravgrunnlagAsyncJmsConsumer;
+import no.nav.vedtak.server.LivenessAware;
 
 @ApplicationScoped
-public class KravgrunnlagQueueHealthCheck implements ReadinessAware {
+public class KravgrunnlagQueueHealthCheck implements LivenessAware {
     private static final Logger LOG = LoggerFactory.getLogger(KravgrunnlagQueueHealthCheck.class);
     private QueueSelftest client;
 
@@ -36,17 +35,17 @@ public class KravgrunnlagQueueHealthCheck implements ReadinessAware {
         }
         try {
             client.testConnection();
-        } catch (JMSRuntimeException | JMSException e) { //NOSONAR
+        } catch (JMSRuntimeException | JMSException _) {
             if (LOG.isWarnEnabled()) {
                 LOG.warn("Feil ved Kravgrunnlag meldingskø helsesjekk: {}", client.getConnectionEndpoint());
-                return false;
+                return true;
             }
         }
         return true;
     }
 
     @Override
-    public boolean isReady() {
+    public boolean isAlive() {
         return isOK();
     }
 }
