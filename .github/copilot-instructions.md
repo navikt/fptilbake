@@ -29,8 +29,11 @@ The final decision (vedtak) is sent back to OS for balance adjustment and client
 
 ```
 OS → kravgrunnlag over MQ → fptilbake/k9-tilbake → vedtak → iverksetting (Vedtak til OS via fp-ws-proxy, vedtaksbrev) 
-fpsak/k9-sak → simulerings -> varsel → fptilbake/k9-tilbake (opprett tilbakekreving, evt sender varsel)
+fpsak/k9-sak → simulering -> varsel → fptilbake/k9-tilbake (opprett tilbakekreving, evt sender varsel)
 ```
+
+fpoppdrag is **not** the source of kravgrunnlag — that comes directly from OS.
+fptilbake calls fpoppdrag only during the notice flow, to fetch repayment periods from the simulation as part of the notice letter.
 
 ## Tech stack
 
