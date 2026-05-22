@@ -9,15 +9,10 @@ import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.vedtak.felles.jpa.HibernateVerktøy;
 
 @Dependent
 public class OppdragIverksettingStatusRepository {
-
-    private static final Logger LOG = LoggerFactory.getLogger(OppdragIverksettingStatusRepository.class);
 
     private EntityManager entityManager;
 
@@ -26,31 +21,11 @@ public class OppdragIverksettingStatusRepository {
         this.entityManager = entityManager;
     }
 
-    public void registrerStarterIverksetting(Long behandlingId, String vedtakId) {
-        var eksisterende = hentOppdragIverksettingStatus(behandlingId);
-        if (eksisterende.isPresent()) {
-            //skjer hvis prosesstask for iverksetting rekjøres
-            LOG.info("Har allerede registrert at iverksetting er startet");
-        } else {
-            entityManager.persist(new OppdragIverksettingStatusEntitet(behandlingId, vedtakId));
-        }
-    }
-
-    public void registrerKvittering(Long behandlingId, boolean kvitteringOk) {
-        registrerKvittering(behandlingId, LocalDateTime.now(), kvitteringOk);
-    }
-
-    private void registrerKvittering(Long behandlingId, LocalDateTime tidspunkt, boolean kvitteringOk) {
-        var eksisterende = hentOppdragIverksettingStatus(behandlingId);
-        if (eksisterende.isEmpty()) {
-            throw new IllegalStateException("Kan ikke oppdatere " + OppdragIverksettingStatusEntitet.class + " for behandling " + behandlingId + " siden det ikke finnes noen slik fra før");
-        }
-        if (Boolean.TRUE.equals(eksisterende.get().getKvitteringOk())) {
-            throw new IllegalStateException("Har allerede mottatt positiv kvittering for behandlingId=" + behandlingId);
-        }
-        var status = eksisterende.get();
-        status.registrerKvittering(tidspunkt, kvitteringOk);
-        entityManager.persist(status);
+    public void registrerKvittertVedtak(Long behandlingId, String vedtakId) {
+        var kvittering = hentOppdragIverksettingStatus(behandlingId).orElseGet(() -> new OppdragIverksettingStatusEntitet(behandlingId, vedtakId));
+        kvittering.registrerKvittering(LocalDateTime.now(), true);
+        entityManager.persist(kvittering);
+        entityManager.flush();
     }
 
     public Optional<OppdragIverksettingStatusEntitet> hentOppdragIverksettingStatus(Long behandlingId) {

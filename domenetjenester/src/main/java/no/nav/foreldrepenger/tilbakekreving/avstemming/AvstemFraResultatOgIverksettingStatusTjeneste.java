@@ -72,14 +72,9 @@ public class AvstemFraResultatOgIverksettingStatusTjeneste {
     }
 
     public void leggTilOppsummering(LocalDate dato, AvstemmingCsvFormatter avstemmingCsvFormatter) {
-        var antallFeilet = 0;
         var antallFørstegangsvedtakUtenTilbakekreving = 0;
         var iverksettingStatuser = oppdragIverksettingStatusRepository.finnForDato(dato);
         for (var iverksettingStatus : iverksettingStatuser) {
-            if (!iverksettingStatus.getKvitteringOk()) {
-                antallFeilet++;
-                continue;
-            }
             var behandlingId = iverksettingStatus.getBehandlingId();
             var behandling = behandlingRepository.hentBehandling(behandlingId);
             var beregningsresultat = beregningsresultatRepository.hentHvisEksisterer(behandlingId).orElseThrow();
@@ -90,9 +85,6 @@ public class AvstemFraResultatOgIverksettingStatusTjeneste {
             }
             leggTilAvstemmingsdataForVedtaket(avstemmingCsvFormatter, behandling, oppsummering);
 
-        }
-        if (antallFeilet != 0) {
-            LOG.warn("{} vedtak har feilet i overføring til OS for {}", antallFeilet, dato);
         }
         if (antallFørstegangsvedtakUtenTilbakekreving != 0) {
             LOG.info("{} førstegangsvedtak uten tilbakekreving sendes ikke til avstemming for {}", antallFørstegangsvedtakUtenTilbakekreving, dato);

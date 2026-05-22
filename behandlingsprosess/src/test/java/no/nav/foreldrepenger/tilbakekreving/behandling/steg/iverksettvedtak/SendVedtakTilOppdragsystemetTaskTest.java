@@ -8,7 +8,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.Beregningsresul
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.UkjentKvitteringFraOSException;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
@@ -31,10 +29,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 @CdiDbAwareTest
 class SendVedtakTilOppdragsystemetTaskTest {
 
-    @Inject
-    private EntityManager entityManager;
-    @Inject
-    private BehandlingRepository behandlingRepository;
     @Inject
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
     @Inject
@@ -50,7 +44,7 @@ class SendVedtakTilOppdragsystemetTaskTest {
 
     @BeforeEach
     void setup() {
-        task = new SendVedtakTilOppdragsystemetTask(entityManager, behandlingRepository, oppdragIverksettingStatusRepository, beregningsresultatTjeneste, tilbakekrevingsvedtakTjeneste, økonomiProxyKlient);
+        task = new SendVedtakTilOppdragsystemetTask(oppdragIverksettingStatusRepository, beregningsresultatTjeneste, tilbakekrevingsvedtakTjeneste, økonomiProxyKlient);
     }
 
     @Test
@@ -76,7 +70,7 @@ class SendVedtakTilOppdragsystemetTaskTest {
 
     @Test
     void skal_få_exception_når_kvittering_ikke_er_OK() {
-        doThrow(new UkjentKvitteringFraOSException("FPT-539080", "Fikk feil fra OS ved iverksetting av tilbakekrevginsvedtak. Sjekk loggen til fpwsproxy for mer info."))
+        doThrow(new UkjentKvitteringFraOSException("FPT-539080", "Fikk feil fra OS ved iverksetting av tilbakekrevingsvedtak. Sjekk loggen til fpwsproxy for mer info."))
             .when(økonomiProxyKlient).iverksettTilbakekrevingsvedtak(any());
 
         var scenario = ScenarioSimple
@@ -86,11 +80,10 @@ class SendVedtakTilOppdragsystemetTaskTest {
         var behandling = scenario.lagre(behandlingRepositoryProvider);
         var data = lagProsessTaskKonfigurasjon(behandling);
 
-        assertThatThrownBy(() -> task.doTask(data)).hasMessageContaining("Fikk feil fra OS ved iverksetting av behandling");
-        //har lagret status riktig
+        assertThatThrownBy(() -> task.doTask(data)).hasMessageContaining("Fikk feil fra OS ved iverksetting av tilbakekrevingsvedtak");
+        //har ikke lagret status
         var status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
-        assertThat(status).isPresent();
-        assertThat(status.get().getKvitteringOk()).isFalse();
+        assertThat(status).isEmpty();
     }
 
     private ProsessTaskData lagProsessTaskKonfigurasjon(Behandling behandling) {
