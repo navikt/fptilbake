@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.vedtak.felles.integrasjon.kafka.KafkaConsumerManager;
 import no.nav.vedtak.server.Controllable;
-import no.nav.vedtak.server.LiveAndReadinessAware;
+import no.nav.vedtak.server.LivenessAware;
 
 @ApplicationScoped
-public class VedtakConsumer implements LiveAndReadinessAware, Controllable {
+public class VedtakConsumer implements LivenessAware, Controllable {
 
     private static final Logger LOG = LoggerFactory.getLogger(VedtakConsumer.class);
     private KafkaConsumerManager<String, String> kcm;
@@ -27,11 +27,6 @@ public class VedtakConsumer implements LiveAndReadinessAware, Controllable {
     @Override
     public boolean isAlive() {
         return kcm.allRunning();
-    }
-
-    @Override
-    public boolean isReady() {
-        return isAlive();
     }
 
     @Override
