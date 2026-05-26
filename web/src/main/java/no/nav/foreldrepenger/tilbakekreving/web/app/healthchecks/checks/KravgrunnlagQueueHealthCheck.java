@@ -38,7 +38,7 @@ public class KravgrunnlagQueueHealthCheck implements LivenessAware {
         } catch (JMSRuntimeException | JMSException _) {
             if (LOG.isWarnEnabled()) {
                 LOG.warn("Feil ved Kravgrunnlag meldingskø helsesjekk: {}", client.getConnectionEndpoint());
-                return true;
+                return false;
             }
         }
         return true;
