@@ -1,92 +1,79 @@
 # fptilbake
 
-Tilbakekrevingsapplikasjon — handles cases where Nav has paid benefits to a
-client and the client must repay an amount (tilbakekreving + tilbakebetaling).
+Case processing application for repayments after benefits have been paid and then changed.
 
-Repository builds **two deployments** from the same codebase:
-- **fptilbake** — for Foreldrepenger, Svangerskapspenger, Engangsstønad (Team Foreldrepenger)
-- **k9-tilbake** — for k9-ytelser: pleiepenger, omsorgspenger, opplæringspenger, frisinn (Team Sykdom-i-familien)
+## Shared context
 
-When changing code, consider impact on **both** deployments.
+- Source of truth for shared domain, architecture, and conventions: `navikt/fp-context`
+- Copilot Space: `navikt/TeamForeldrepenger`
 
-## Domain
+Repository builds two deployments from the same codebase:
+- `fptilbake` for foreldrepenger, svangerskapspenger, engangsstønad (Team Foreldrepenger) 
+- `k9-tilbake` for pleiepenger, omsorgspenger, opplæringspenger (Team Sykdom i familien)
 
-| Concept | Description |
-|---------|-------------|
-| Kravgrunnlag | Trigger from payment system (oppdragssystem) with claim basis — the main entry point |
-| Varsel | Early notice letter sent when simulation indicates potential tilbakekreving |
-| Tilbakekrevingsbehandling | Case processing of the repayment claim |
-| Vurder vilkår | Evaluate cause and degree of client fault (forsett, grov uaktsomhet, simpel uaktsomhet) |
-| Vurder foreldelse | Evaluate statute of limitations |
-| Beregning | Calculate amount, tax (skattetrekk), and interest (rente) |
-| Vedtak | Decision letter (vedtaksbrev) to client + structured data to payment system |
+Consider impact on both deployments when changing shared code.
 
-## Value chain position
+## Repo-specific context
 
-OS (Oppdragssystemet, payment system) is external to the team and handles the payment balance for the clients.
-The process is primarily triggered by a claim basis (kravgrunnlag) from OS over JMS/MQ, with a secondary entry point through varsel.
-The final decision (vedtak) is sent back to OS for balance adjustment and client communication, via fp-ws-proxy.
+| Topic             | Details                                                            |
+|-------------------|--------------------------------------------------------------------|
+| Role              | Case processing from identified repayment to vedtak/dismissal      |
+| Consumers         | `fp-frontend`, `fp-los`, `fp-oversikt`, K9                         |
+| Tech stack        | Standard fp Java backend using `fp-prosesstask`                    |
+| Data              | Oracle; FSS deployment; long-term storage of behandling and vedtak |
 
-```
-OS → kravgrunnlag over MQ → fptilbake/k9-tilbake → vedtak → iverksetting (Vedtak til OS via fp-ws-proxy, vedtaksbrev) 
-fpsak/k9-sak → simulering -> varsel → fptilbake/k9-tilbake (opprett tilbakekreving, evt sender varsel)
-```
+Oppdragssystemet (OS) handles the payment balance for clients and is external to the team. 
+- the main trigger is kravgrunnlag from OS over JMS/MQ
+- the seconadry trigger is that simulation in `fp-sak` indicates feilutbetaling (possible repayment) and a saksbehandler selects to create tilbakekreving with a notice (varsel)
 
-fpoppdrag is **not** the source of kravgrunnlag — that comes directly from OS.
-fptilbake calls fpoppdrag only during the notice flow, to fetch repayment periods from the simulation as part of the notice letter.
+Direct relations/integrations:
+- Upstream: `fp-sak` (create tilbakekreving), OS (kravgrunnlag)
+- Frontend: `fp-frontend` (saksbehandler), `fp-swagger` (admin)
+- Satellites: `fpoppdrag` (data for notice letter), `fp-sak` (text for notice letter)
+- Downstream: `fp-oversikt`, `fp-ws-proxy` to OS, Joark
+- Parallel: `fp-los`
+- Main data sources: PDL, EREG, Joark
+- Data warehouse: Producer for Kafka topics on behandling and vedtak
 
-## Tech stack
+## Domain model
 
-Standard Team Foreldrepenger backend stack. See
-[fp-context/architecture/backend-stack.md](https://github.com/navikt/fp-context/blob/main/architecture/backend-stack.md).
-Java 25, Jetty, Jersey, Weld, Hibernate, Jackson, fp-prosesstask, fp-felles.
+- `KravgrunnlagAggregate` = Java representation of a kravgrunnlag which can be active or suspended (pending update from OS)  
+- `VarselInfo` = Text for early notice letter when simulation indicates possible tilbakekreving                              
+- `Behandling` = a unit of case processing of repayment claim from identification to vedtak/dismissal
+- `BehandlingModell` = pre-defined pipeline (behandlingsprosess) for a benefit and behandling type. See `ForeldrepengerModellProducer`and similar for ES/SVP
+- `BehandlingSteg` = pipeline stage with implementation
+- `Aksjonspunkt` = saksbehandler decision point
+- `BehandlingVedtak` =  vedtak overall outcome, related to decision letter and structured vedtak sent to OS via `fp-ws-proxy` 
 
-## Module structure
+Steps included in a behandling:
+- Feilutbetaling: Evaluate periods of incorrect payment and identify causes and legal references
+- Vurder foreldelse: Evaluate statute of limitations for each periode
+- Vurder vilkar: Evaluate fault and degree of client responsibility
+- Beregning: Calculate amount, tax, and interest
+- Vedtak: Finalize letter and approval (totrinnskontroll)
+- The whole process may run automatically for small amounts
 
-| Module | Purpose |
-|--------|---------|
-| `behandlingslager` | JPA entities, repositories |
-| `behandlingskontroll` | Behandlingssteg framework, aksjonspunkt orchestration |
-| `behandlingsprosess` | Concrete steg implementations (vilkår, foreldelse, beregning) |
-| `domenetjenester` | Domain services |
-| `integrasjontjenester` | External integrations (fpsak, fpoppdrag, k9-sak, k9-oppdrag) |
-| `kafka` | Kafka consumers/producers (kravgrunnlag, hendelser) |
-| `kontrakter` | API contracts |
-| `migreringer` | Flyway DB migrations |
-| `web` | REST endpoints, app entry point |
-| `testutilities` | Shared test fixtures |
+## Entry points
 
-## Build and test
+- `KravgrunnlagAsyncJmsConsumer`: receives kravgrunnlag from OS via MQ and creates or updates behandling
+- `VedtakConsumer` receives vedtak from `fp-sak` and `k9-sak` creates `HåndterVedtakFattetTask`to handle event - create new behandling or suspend active behandling pending update from OS
+- Most REST enpoints from `ApiConfig` method `getProduksjonsKlasser` support `fp-frontend`, except callbacks in `LosRestTjeneste` and `FpOversiktRestTjeneste` that serve `fp-los` and `fp-oversikt` respectively. 
 
-```bash
-mvn clean install                                  # full build + unit tests
-mvn test -pl behandlingsprosess                    # tests for one module
-```
+## Repo structure
 
-## Integration tests
+| Module                 | Purpose                                                                        |
+|------------------------|--------------------------------------------------------------------------------|
+| `behandlingslager`     | JPA entities and repositories                                                  |
+| `behandlingskontroll`  | Behandlingssteg framework and aksjonspunkt orchestration                       |
+| `behandlingsprosess`   | Concrete steg implementations for vilkar, foreldelse, and beregning            |
+| `domenetjenester`      | Domain services                                                                |
+| `integrasjontjenester` | External integrations such as `fpsak`, `fpoppdrag`, `k9-sak`, and `k9-oppdrag` |
+| `kontrakter`           | Date warehouse Dtos                                                            |
+| `migreringer`          | Flyway migrations                                                              |
+| `web`                  | REST endpoints and app entry point                                             |
+| `testutilities`        | Shared test fixtures                                                           |
 
-Run from [fp-autotest](https://github.com/navikt/fp-autotest) (Foreldrepenger side):
-- Suite: `fptilbake` (also runs in `verdikjede`)
-- See `fp-autotest/AGENTS.md` for catalog and run commands
+## Verification
 
-k9-tilbake has its own integration test setup outside fp-autotest.
-
-## Team context
-
-| Hub                                                            | Purpose                                               |
-|----------------------------------------------------------------|-------------------------------------------------------|
-| [fp-context](https://github.com/navikt/fp-context)             | Team Foreldrepenger domain, architecture, conventions |
-| TeamForeldrepenger Copilot Space (`navikt`)                    | Same content, attached for AI grounding               |
-| [fp-gha-workflows](https://github.com/navikt/fp-gha-workflows) | Reusable CI/CD workflows                              |
-| [fp-bom](https://github.com/navikt/fp-bom)                     | Parent POM, dependency versions                       |
-| [fp-felles](https://github.com/navikt/fp-felles)               | Common components                                     |
-| [fp-prosesstask](https://github.com/navikt/fp-prosesstask)     | Asynch execution framework                            |
-
-Use these as authoritative for shared conventions. This file only covers
-fptilbake-specific information.
-
-## Cross-team note
-
-Changes here affect both Team Foreldrepenger and Team Sykdom-i-familien
-(`#sykdom-i-familien`, `#po-familie-tilbake`). Coordinate larger changes
-across teams.
+- Foreldrepenger-side integration tests run from `navikt/fp-autotest`.
+- Relevant suites: `fptilbake`, `verdikjede`.
