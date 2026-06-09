@@ -21,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyServer;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 import no.nav.vedtak.openapi.OpenApiUtils;
 import no.nav.vedtak.server.rest.ForvaltningAuthorizationFilter;
+import no.nav.vedtak.server.rest.AuthenticationFilter;
 import no.nav.vedtak.server.rest.FpRestJackson2Feature;
 
 @ApplicationPath(ForvaltningApiConfig.API_URI)
@@ -43,6 +44,7 @@ public class ForvaltningApiConfig extends Application {
             return Collections.emptySet();
         }
         var classes = new HashSet<>(getForvaltningClasses());
+        classes.add(AuthenticationFilter.class);
         classes.add(FpRestJackson2Feature.class);
         classes.add(ForvaltningAuthorizationFilter.class);
         // swagger

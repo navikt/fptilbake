@@ -107,7 +107,6 @@ public class ApiConfig extends Application {
         classes.add(CacheControlFeature.class);
 
         // Applikasjonsoppsett - her er FpRestJackson brutt opp pga JsonTypeName i ContextResolver
-
         classes.add(Jackson2ProviderFeature.class);
         classes.add(Jackson2ExceptionMapper.class);
         classes.add(ValidationExceptionMapper.class);
