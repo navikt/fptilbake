@@ -37,7 +37,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6.0.2
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # ratchet:actions/checkout@v6.0.3
       - uses: navikt/sif-gha-workflows/.github/actions/maven/generate-openapi@main
         id: generate-openapi
         with:
@@ -193,6 +193,6 @@ jobs:
   sif-code-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6.0.2
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # ratchet:actions/checkout@v6.0.3
       - uses: navikt/sif-gha-workflows/.github/actions/sif-code-scan@v1
 
