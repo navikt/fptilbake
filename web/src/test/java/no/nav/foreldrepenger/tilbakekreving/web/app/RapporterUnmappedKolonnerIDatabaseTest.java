@@ -15,6 +15,9 @@ import jakarta.persistence.Persistence;
 
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.JpaExtension;
 
+import no.nav.vedtak.felles.jpa.NamingStandard;
+import no.nav.vedtak.felles.jpa.jdbc.DataSourceHolder;
+
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.model.relational.Database;
 import org.hibernate.boot.model.relational.Namespace;
@@ -56,10 +59,10 @@ class RapporterUnmappedKolonnerIDatabaseTest {
         Map<String, Object> configuration = new HashMap<>();
 
         configuration.put("hibernate.integrator_provider",
-                (IntegratorProvider) () -> Collections.singletonList(
-                        MetadataExtractorIntegrator.INSTANCE));
+            (IntegratorProvider) () -> Collections.singletonList(MetadataExtractorIntegrator.INSTANCE));
+        configuration.put("jakarta.persistence.nonJtaDataSource", DataSourceHolder.getDataSource());
 
-        entityManagerFactory = Persistence.createEntityManagerFactory("pu-default", configuration);
+        entityManagerFactory = Persistence.createEntityManagerFactory(NamingStandard.DEFAULT_PERSISTENCE_UNIT, configuration);
     }
 
     @AfterAll

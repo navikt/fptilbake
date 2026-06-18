@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-
 import jakarta.security.auth.message.config.AuthConfigFactory;
 
 import org.eclipse.jetty.ee11.cdi.CdiDecoratingListener;
@@ -22,7 +19,6 @@ import org.eclipse.jetty.ee11.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee11.servlet.security.ConstraintMapping;
 import org.eclipse.jetty.ee11.servlet.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.ee11.webapp.WebAppContext;
-import org.eclipse.jetty.plus.jndi.EnvEntry;
 import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.DefaultIdentityService;
 import org.eclipse.jetty.security.SecurityHandler;
@@ -39,8 +35,6 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceFactory;
-import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.FlywayException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -54,6 +48,11 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.ForvaltningApiConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.InternalApiConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.ContextPathHolder;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.jaspic.OidcAuthModule;
+import no.nav.vedtak.felles.jpa.NamingStandard;
+import no.nav.vedtak.felles.jpa.flyway.FlywayUtil;
+import no.nav.vedtak.felles.jpa.jdbc.DataSourceHolder;
+import no.nav.vedtak.felles.jpa.jdbc.DatasourceUtil;
+import no.nav.vedtak.log.metrics.MetricsUtil;
 
 public class JettyServer {
 
@@ -86,9 +85,8 @@ public class JettyServer {
         konfigurerLogging();
         konfigurerSystembruker();
         konfigurerSikkerhet();
-        var dataSource = DatasourceUtil.createDatasource(30, 2);
-        konfigurerDatasource(dataSource);
-        migrerDatabaser(dataSource);
+        createDatasourceMigrer();
+
         start();
     }
 
@@ -97,6 +95,7 @@ public class JettyServer {
         System.setProperty("xr.util-logging.handlers", "org.slf4j.bridge.SLF4JBridgeHandler");
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
+        MetricsUtil.scrape(); // TODO: Erstatt med kommende init
     }
 
     /* Brukes kun for å kunne samhandle med Økonomi via JMS */
@@ -111,6 +110,23 @@ public class JettyServer {
         }
     }
 
+    private static void createDatasourceMigrer() {
+        var jdbc = hentEllerBeregnVerdiHvisMangler("defaultDS.url", "defaultDSconfig", "jdbc_url");
+        var username = hentEllerBeregnVerdiHvisMangler("defaultDS.username", "defaultDS", "username");
+        var password = hentEllerBeregnVerdiHvisMangler("defaultDS.password", "defaultDS", "password");
+        var dataSource = DatasourceUtil.oracleDataSource(jdbc, username, password, 30);
+        DataSourceHolder.initialize(dataSource);
+        FlywayUtil.migrateLegacyOracle(dataSource, NamingStandard.DEFAULT_DS_MIGRATION_CLASSPATH);
+    }
+
+    /* Denne gir lazy loading og feiler ikke ved lokalt kjøring uten vault mount */
+    private static String hentEllerBeregnVerdiHvisMangler(String key, String mappeNavn, String filNavn) {
+        if (ENV.getProperty(key) == null) {
+            System.getProperties().computeIfAbsent(key, _ -> VaultUtil.lesFilVerdi(mappeNavn, filNavn));
+        }
+        return ENV.getRequiredProperty(key);
+    }
+
     private void konfigurerSikkerhet() {
         if (Fagsystem.K9TILBAKE.equals(ApplicationName.hvilkenTilbake())) {
             var factory = new DefaultAuthConfigFactory();
@@ -120,25 +136,6 @@ public class JettyServer {
                 "OIDC Authentication");
 
             AuthConfigFactory.setFactory(factory);
-        }
-    }
-
-    private void konfigurerDatasource(DataSource dataSource) throws NamingException {
-        new EnvEntry("jdbc/defaultDS", dataSource);
-    }
-
-    private void migrerDatabaser(DataSource dataSource) {
-        try {
-            Flyway.configure()
-                    .dataSource(dataSource)
-                    .locations("classpath:/db/migration/defaultDS")
-                    .table("schema_version")
-                    .baselineOnMigrate(true)
-                    .load()
-                    .migrate();
-        } catch (FlywayException e) {
-            LOG.error("Feil under migrering av databasen.");
-            throw e;
         }
     }
 

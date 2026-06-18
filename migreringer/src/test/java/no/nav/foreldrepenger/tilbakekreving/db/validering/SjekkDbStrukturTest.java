@@ -9,10 +9,9 @@ import javax.sql.DataSource;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.oracle.OracleContainer;
-import org.testcontainers.utility.DockerImageName;
 
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.TestDatabaseInit;
+import no.nav.vedtak.felles.jpa.NamingStandard;
 
 
 /**
@@ -32,10 +31,8 @@ class SjekkDbStrukturTest {
 
     @BeforeAll
     static void setup() {
-        schema = TestDatabaseInit.DEFAULT_DS_SCHEMA;
-        var testDatabase = new OracleContainer(DockerImageName.parse(TestDatabaseInit.TEST_DB_CONTAINER)).withReuse(true);
-        testDatabase.start();
-        ds = TestDatabaseInit.settOppDatasourceOgMigrer(testDatabase.getJdbcUrl(), testDatabase.getUsername(), testDatabase.getPassword());
+        schema = NamingStandard.DEFAULT_DATA_SOURCE;
+        ds = TestDatabaseInit.getDataSource();
     }
 
     @Test

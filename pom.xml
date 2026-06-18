@@ -7,7 +7,7 @@
     <parent>
         <groupId>no.nav.foreldrepenger.felles</groupId>
         <artifactId>fp-parent-app</artifactId>
-        <version>5.3.4</version>
+        <version>5.3.5</version>
     </parent>
 
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -35,11 +35,11 @@
         <sonar.projectKey>navikt_fptilbake</sonar.projectKey>
 
         <!-- Jakarta deps -->
-        <felles.version>7.8.3</felles.version>
+        <felles.version>7.8.4</felles.version>
         <prosesstask.version>5.2.7</prosesstask.version>
-        <fpkontrakter.version>9.4.36</fpkontrakter.version>
+        <fpkontrakter.version>9.4.37</fpkontrakter.version>
         <abakus-kontrakt.version>2.4.1</abakus-kontrakt.version>
-        <verapdf-validation-model.version>1.30.1</verapdf-validation-model.version>
+        <verapdf-validation-model.version>1.30.2</verapdf-validation-model.version>
         <!-- Jakarta deps end -->
 
         <fp-tidsserie.version>2.7.4</fp-tidsserie.version>
@@ -67,11 +67,6 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty.ee11</groupId>
-            <artifactId>jetty-ee11-plus</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
