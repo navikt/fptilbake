@@ -14,12 +14,8 @@ import org.eclipse.jetty.ee11.cdi.CdiServletContainerInitializer;
 import org.eclipse.jetty.ee11.security.jaspi.DefaultAuthConfigFactory;
 import org.eclipse.jetty.ee11.security.jaspi.JaspiAuthenticatorFactory;
 import org.eclipse.jetty.ee11.security.jaspi.provider.JaspiAuthConfigProvider;
-import org.eclipse.jetty.ee11.servlet.ErrorPageErrorHandler;
-import org.eclipse.jetty.ee11.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee11.servlet.security.ConstraintMapping;
 import org.eclipse.jetty.ee11.servlet.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.ee11.webapp.WebAppContext;
-import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.DefaultIdentityService;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.jaas.JAASLoginService;
@@ -35,8 +31,6 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -46,6 +40,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.ApiConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.ForvaltningApiConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.InternalApiConfig;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.FpServiceStarterListener;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.ContextPathHolder;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.jaspic.OidcAuthModule;
 import no.nav.vedtak.felles.jpa.NamingStandard;
@@ -53,11 +48,12 @@ import no.nav.vedtak.felles.jpa.flyway.FlywayUtil;
 import no.nav.vedtak.felles.jpa.jdbc.DataSourceHolder;
 import no.nav.vedtak.felles.jpa.jdbc.DatasourceUtil;
 import no.nav.vedtak.log.metrics.MetricsUtil;
+import no.nav.vedtak.server.jetty.DataSourceShutdownListener;
+import no.nav.vedtak.server.jetty.JettyServerBuilder;
 
 public class JettyServer {
 
     private static final Environment ENV = Environment.current();
-    private static final Logger LOG = LoggerFactory.getLogger(JettyServer.class);
     private static final String CONTEXT_PATH = getContextPath();
     private static final String JETTY_SCAN_LOCATIONS = "^.*jersey-.*\\.jar$|^.*felles-.*\\.jar$|^.*/app\\.jar$";
     private static final String JETTY_LOCAL_CLASSES = "^.*/target/classes/|";
@@ -82,12 +78,17 @@ public class JettyServer {
     }
 
     protected void bootStrap() throws Exception {
+        MetricsUtil.init();
         konfigurerLogging();
         konfigurerSystembruker();
         konfigurerSikkerhet();
         createDatasourceMigrer();
 
-        start();
+        if (Fagsystem.K9TILBAKE.equals(ApplicationName.hvilkenTilbake())) {
+            startK9tilbake();
+        } else {
+            startFptilbake();
+        }
     }
 
     private void konfigurerLogging() {
@@ -95,7 +96,6 @@ public class JettyServer {
         System.setProperty("xr.util-logging.handlers", "org.slf4j.bridge.SLF4JBridgeHandler");
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
-        MetricsUtil.scrape(); // TODO: Erstatt med kommende init
     }
 
     /* Brukes kun for å kunne samhandle med Økonomi via JMS */
@@ -127,6 +127,21 @@ public class JettyServer {
         return ENV.getRequiredProperty(key);
     }
 
+    private void startFptilbake() throws Exception {
+        var server = JettyServerBuilder.builder()
+            .port(getServerPort())
+            .contextPath(CONTEXT_PATH)
+            .withForwardedRequestCustomizer()
+            .addEventListener(new FpServiceStarterListener())
+            .addEventListener(new DataSourceShutdownListener(DataSourceHolder::close))
+            .registerRestApp(InternalApiConfig.API_URI, InternalApiConfig.class)
+            .registerRestApp(ApiConfig.API_URI, ApiConfig.class)
+            .registerRestApp(ForvaltningApiConfig.API_URI, ForvaltningApiConfig.class)
+            .build();
+        server.start();
+        server.join();
+    }
+
     private void konfigurerSikkerhet() {
         if (Fagsystem.K9TILBAKE.equals(ApplicationName.hvilkenTilbake())) {
             var factory = new DefaultAuthConfigFactory();
@@ -139,7 +154,7 @@ public class JettyServer {
         }
     }
 
-    private void start() throws Exception {
+    private void startK9tilbake() throws Exception {
         var server = new Server(getServerPort());
         server.setConnectors(createConnectors(server).toArray(new Connector[]{}));
         if (Fagsystem.K9TILBAKE.equals(ApplicationName.hvilkenTilbake())) {
@@ -168,47 +183,19 @@ public class JettyServer {
     }
 
     private static ContextHandler createContext() throws IOException {
-        if (Fagsystem.K9TILBAKE.equals(ApplicationName.hvilkenTilbake())) {
-            var ctx = new WebAppContext();
-            ctx.setParentLoaderPriority(true);
-            // må hoppe litt bukk for å hente web.xml fra classpath i stedet for fra filsystem.
-            String descriptor;
-            String baseResource;
-            try (var factory = ResourceFactory.closeable()) {
-                var resource = factory.newClassLoaderResource("/WEB-INF/web.xml", false);
-                descriptor = resource.getURI().toURL().toExternalForm();
-                baseResource = factory.newResource(".").getRealURI().toURL().toExternalForm();
-            }
-            ctx.setDescriptor(descriptor);
-
-            ctx.setContextPath(CONTEXT_PATH);
-
-            var appname = ApplicationName.hvilkenTilbake();
-            if (Fagsystem.K9TILBAKE.equals(appname)) {
-                ctx.setBaseResource(createResourceCollection(ctx));
-            } else {
-                ctx.setBaseResourceAsString(baseResource);
-            }
-            ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
-            ctx.setAttribute(CONTAINER_JAR_PATTERN, String.format("%s%s", ENV.isLocal() ? JETTY_LOCAL_CLASSES : "", JETTY_SCAN_LOCATIONS));
-            // Enable Weld + CDI
-            ctx.setInitParameter(CdiServletContainerInitializer.CDI_INTEGRATION_ATTRIBUTE, CdiDecoratingListener.MODE);
-            ctx.addServletContainerInitializer(new CdiServletContainerInitializer());
-            ctx.addServletContainerInitializer(new org.jboss.weld.environment.servlet.EnhancedListener());
-
-            ctx.setSecurityHandler(createSecurityHandler());
-            ctx.setThrowUnavailableOnStartupException(true);
-
-            return ctx;
-        }
-        var ctx = new WebAppContext(CONTEXT_PATH, null, simpleConstraints(), null,
-            new ErrorPageErrorHandler(), ServletContextHandler.NO_SESSIONS);
+        var ctx = new WebAppContext();
         ctx.setParentLoaderPriority(true);
         // må hoppe litt bukk for å hente web.xml fra classpath i stedet for fra filsystem.
+        String descriptor;
         String baseResource;
         try (var factory = ResourceFactory.closeable()) {
+            var resource = factory.newClassLoaderResource("/WEB-INF/web.xml", false);
+            descriptor = resource.getURI().toURL().toExternalForm();
             baseResource = factory.newResource(".").getRealURI().toURL().toExternalForm();
         }
+        ctx.setDescriptor(descriptor);
+
+        ctx.setContextPath(CONTEXT_PATH);
 
         var appname = ApplicationName.hvilkenTilbake();
         if (Fagsystem.K9TILBAKE.equals(appname)) {
@@ -216,16 +203,14 @@ public class JettyServer {
         } else {
             ctx.setBaseResourceAsString(baseResource);
         }
-
         ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
-
         ctx.setAttribute(CONTAINER_JAR_PATTERN, String.format("%s%s", ENV.isLocal() ? JETTY_LOCAL_CLASSES : "", JETTY_SCAN_LOCATIONS));
-
         // Enable Weld + CDI
         ctx.setInitParameter(CdiServletContainerInitializer.CDI_INTEGRATION_ATTRIBUTE, CdiDecoratingListener.MODE);
         ctx.addServletContainerInitializer(new CdiServletContainerInitializer());
         ctx.addServletContainerInitializer(new org.jboss.weld.environment.servlet.EnhancedListener());
 
+        ctx.setSecurityHandler(createSecurityHandler());
         ctx.setThrowUnavailableOnStartupException(true);
 
         return ctx;
@@ -236,32 +221,6 @@ public class JettyServer {
         return ResourceFactory.combine(factory.newClassLoaderResource("/META-INF/resources/webjars/", false),
             factory.newClassLoaderResource("/web", false));
     }
-
-    private static ConstraintSecurityHandler simpleConstraints() {
-        var handler = new ConstraintSecurityHandler();
-        // Slipp gjennom kall fra plattform til JaxRs. Foreløpig kun behov for GET
-        handler.addConstraintMapping(pathConstraint(Constraint.ALLOWED, InternalApiConfig.API_URI + "/*"));
-        // Slipp gjennom til autentisering i JaxRs / auth-filter
-        handler.addConstraintMapping(pathConstraint(Constraint.ALLOWED, ApiConfig.API_URI + "/*"));
-        // Slipp gjennom til autentisering i JaxRs / auth-filter
-        handler.addConstraintMapping(pathConstraint(Constraint.ALLOWED, ForvaltningApiConfig.API_URI + "/*"));
-        // K9-tilbake bruker deprekert swagger-oppsett
-        if (Fagsystem.K9TILBAKE.equals(ApplicationName.hvilkenTilbake())) {
-            handler.addConstraintMapping(pathConstraint(Constraint.ALLOWED, "/swagger-ui/*"));
-            handler.addConstraintMapping(pathConstraint(Constraint.ALLOWED, "/swagger/*"));
-        }
-        // Alt annet av paths og metoder forbudt - 403
-        handler.addConstraintMapping(pathConstraint(Constraint.FORBIDDEN, "/*"));
-        return handler;
-    }
-
-    private static ConstraintMapping pathConstraint(Constraint constraint, String path) {
-        var mapping = new ConstraintMapping();
-        mapping.setConstraint(constraint);
-        mapping.setPathSpec(path);
-        return mapping;
-    }
-
 
     private Integer getServerPort() {
         return this.serverPort;
