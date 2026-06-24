@@ -6,7 +6,7 @@ import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
 @WebListener
-public class ServiceStarterListener implements ServletContextListener {
+public class K9ServiceStarterListener implements ServletContextListener {
 
     @Inject
     private ApplicationServiceStarter applicationServiceStarter; // NOSONAR - vil ikke fungere med constructor innjection

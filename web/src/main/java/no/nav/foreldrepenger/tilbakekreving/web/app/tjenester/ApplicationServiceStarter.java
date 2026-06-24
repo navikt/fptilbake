@@ -21,6 +21,8 @@ import no.nav.vedtak.server.Controllable;
 public class ApplicationServiceStarter {
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationServiceStarter.class);
 
+    private static boolean started = false;
+
     private Set<Controllable> services;
 
     ApplicationServiceStarter() {
@@ -41,6 +43,10 @@ public class ApplicationServiceStarter {
     }
 
     public void startServices() {
+        if (isStarted()) {
+            return;
+        }
+        setStarted(true);
         // Services
         LOG.info("Starter {} services", services.size());
         CompletableFuture.allOf(services.stream().map(service -> runAsync(service::start)).toArray(CompletableFuture[]::new)).join();
@@ -53,6 +59,15 @@ public class ApplicationServiceStarter {
             .orTimeout(31, TimeUnit.SECONDS)
             .join();
         LOG.info("Stoppet {} services", services.size());
+        setStarted(false);
+    }
+
+    private static synchronized boolean isStarted() {
+        return started;
+    }
+
+    private static synchronized void setStarted(boolean started) {
+        ApplicationServiceStarter.started = started;
     }
 
     @Override
