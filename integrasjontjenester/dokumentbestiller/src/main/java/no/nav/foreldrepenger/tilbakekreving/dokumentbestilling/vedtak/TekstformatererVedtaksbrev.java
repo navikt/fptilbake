@@ -6,13 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.github.jknack.handlebars.Context;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.context.JavaBeanValueResolver;
 import com.github.jknack.handlebars.context.MapValueResolver;
-import com.github.jknack.handlebars.jackson.JsonNodeValueResolver;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -21,11 +19,13 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.TekstformatererBrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.FellesTekstformaterer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.HandlebarsData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.JsonNodeValueResolver;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriodeOgFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVedtaksbrevPeriode;
 import no.nav.vedtak.exception.TekniskException;
+import tools.jackson.databind.JsonNode;
 
 class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     private static Map<String, Template> TEMPLATE_CACHE = new HashMap<>();
@@ -305,7 +305,7 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
             //3. unngår at template feiler når variable endrer navn
             JsonNode jsonNode = OM.valueToTree(data);
             Context context = Context.newBuilder(jsonNode)
-                    .resolver(JsonNodeValueResolver.INSTANCE, JavaBeanValueResolver.INSTANCE, MapValueResolver.INSTANCE)
+                    .resolver(new JsonNodeValueResolver(), JavaBeanValueResolver.INSTANCE, MapValueResolver.INSTANCE)
                     .build();
             return template.apply(context).stripLeading().stripTrailing();
         } catch (IOException e) {

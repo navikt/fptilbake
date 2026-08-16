@@ -1,10 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodeverdiSomKodeSerialiserer;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 public class BaseDokument {
 

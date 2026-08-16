@@ -3,11 +3,11 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebar
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodeverdiSomKodeSerialiserer;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 public class HbFakta {
     @JsonProperty("hendelsetype")

@@ -1,22 +1,25 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars;
 
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
-public class LocalDateTilKortNorskFormatSerialiserer extends JsonSerializer<LocalDate> {
+public class LocalDateTilKortNorskFormatSerialiserer extends StdSerializer<LocalDate> {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
+    public LocalDateTilKortNorskFormatSerialiserer() {
+        super(LocalDate.class);
+    }
+
     @Override
-    public void serialize(LocalDate o, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    public void serialize(LocalDate o, JsonGenerator jsonGenerator, SerializationContext serializationContext) {
         if (o != null) {
-            jsonGenerator.writeObject(FORMATTER.format(o));
+            jsonGenerator.writePOJO(FORMATTER.format(o));
         }
     }
 }

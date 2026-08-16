@@ -3,11 +3,11 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.p
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilKortNorskFormatSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 public class HbPeriode {
 
