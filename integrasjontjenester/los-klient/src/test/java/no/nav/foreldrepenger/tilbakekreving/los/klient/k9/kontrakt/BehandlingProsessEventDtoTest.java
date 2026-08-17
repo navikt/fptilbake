@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.los.klient.k9.kontrakt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,16 +11,15 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 
 class BehandlingProsessEventDtoTest {
 
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder().build();
+
     @Test
-    void testAksjonspunktEventRoundtrip() throws Exception {
+    void testAksjonspunktEventRoundtrip() {
         Map<String, String> aksjonspunkter = new HashMap<>();
         aksjonspunkter.put("5080", "OPPR");
 
@@ -59,24 +57,19 @@ class BehandlingProsessEventDtoTest {
         testRoundtrip(baseDto, BehandlingProsessEventDto.class);
     }
 
-    private static <T> T testRoundtrip(BehandlingProsessEventDto dto, Class<T> cls) throws Exception {
+    private static <T> T testRoundtrip(BehandlingProsessEventDto dto, Class<T> cls) {
         String json = serialiserToJson(dto);
         var roundtrippedDto = deserialiser(json, BehandlingProsessEventDto.class);
         assertThat(roundtrippedDto).isInstanceOf(cls);
         return null;
     }
 
-    private static String serialiserToJson(Object objekt) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        return mapper.writeValueAsString(objekt);
+    private static String serialiserToJson(Object objekt)  {
+        return JSON_MAPPER.writeValueAsString(objekt);
     }
 
-    private static <T> T deserialiser(String melding, Class<T> klassetype) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-        mapper.addMixIn(BehandlingProsessEventDto.class, BehandlingProsessEventMixin.class);
+    private static <T> T deserialiser(String melding, Class<T> klassetype) {
+        var mapper = JSON_MAPPER.rebuild().addMixIn(BehandlingProsessEventDto.class, BehandlingProsessEventMixin.class).build();
         return mapper.readValue(melding, klassetype);
     }
 

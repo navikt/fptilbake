@@ -4,12 +4,6 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-
-
 
 public class BehandlingProsessEventDto {
     /**
@@ -26,8 +20,6 @@ public class BehandlingProsessEventDto {
     /**
      * Tidspunkt for hendelse lokalt for fagsystem.
      */
-    @JsonSerialize(using = ToStringSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime eventTid;
     private EventHendelse eventHendelse;
     private String behandlinStatus; // fjernes etter overgang til behandlingStatus
@@ -48,8 +40,6 @@ public class BehandlingProsessEventDto {
     /**
      * Tidspunkt behandling ble opprettet
      */
-    @JsonSerialize(using = ToStringSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime opprettetBehandling;
 
     /**

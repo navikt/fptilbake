@@ -4,15 +4,12 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import no.nav.foreldrepenger.tilbakekreving.los.klient.k9.kontrakt.TilbakebetalingBehandlingProsessEventDto;
+import tools.jackson.databind.json.JsonMapper;
 
 public class TilbakebetalingBehandlingProsessEventMapper {
 
-    private static final ObjectMapper OBJECT_MAPPER = lagObjectMapper();
+    private static final JsonMapper OBJECT_MAPPER = lagObjectMapper();
 
     private TilbakebetalingBehandlingProsessEventMapper() {
     }
@@ -24,10 +21,7 @@ public class TilbakebetalingBehandlingProsessEventMapper {
         return jsonWriter.toString();
     }
 
-    private static ObjectMapper lagObjectMapper() {
-        ObjectMapper om = new ObjectMapper();
-        om.registerModule(new JavaTimeModule());
-        om.registerModule(new Jdk8Module());
-        return om;
+    private static JsonMapper lagObjectMapper() {
+        return JsonMapper.builder().build();
     }
 }
