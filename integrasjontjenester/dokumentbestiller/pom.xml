@@ -42,8 +42,8 @@
             <artifactId>handlebars</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.jknack</groupId>
-            <artifactId>handlebars-jackson</artifactId>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
 
         <!-- Test avhengigheter -->

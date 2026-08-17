@@ -1,20 +1,21 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars;
 
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
-public class KodeverdiSomKodeSerialiserer extends JsonSerializer<Kodeverdi> {
+public class KodeverdiSomKodeSerialiserer extends StdSerializer<Kodeverdi> {
+
+    public KodeverdiSomKodeSerialiserer() {
+        super(Kodeverdi.class);
+    }
 
     @Override
-    public void serialize(Kodeverdi o, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    public void serialize(Kodeverdi o, JsonGenerator jsonGenerator, SerializationContext serializationContext) {
         if (o != null) {
-            jsonGenerator.writeObject(o.getKode());
+            jsonGenerator.writePOJO(o.getKode());
         }
     }
 }

@@ -3,10 +3,9 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumenta
 import java.time.LocalDate;
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.BaseDokument;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 public class InnhentDokumentasjonbrevDokument extends BaseDokument {
 

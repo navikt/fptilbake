@@ -2,9 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.header;
 
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 public class Brev {
 
