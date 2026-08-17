@@ -4,16 +4,9 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-
 
 public class TilbakebetalingBehandlingProsessEventDto extends BehandlingProsessEventDto {
 
-    @JsonSerialize(using = ToStringSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate førsteFeilutbetaling;
     private BigDecimal feilutbetaltBeløp;
     private String ansvarligSaksbehandlerIdent;

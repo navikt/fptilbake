@@ -25,6 +25,10 @@
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>kafka-producer</artifactId>
         </dependency>
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
         <!--test avhengigheter-->
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
