@@ -3,9 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.datavarehus.felles;
 import java.time.ZoneId;
 import java.util.TimeZone;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
-
 import no.nav.vedtak.mapper.json.DefaultJsonMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class JsonObjectMapper {
     private JsonObjectMapper() {
