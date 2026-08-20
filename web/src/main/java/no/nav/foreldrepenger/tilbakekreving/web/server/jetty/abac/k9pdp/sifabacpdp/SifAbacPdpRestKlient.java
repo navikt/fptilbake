@@ -7,9 +7,6 @@ import jakarta.ws.rs.core.UriBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.BehandlingUuidOperasjonDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.SaksinformasjonTilgangskontrollInputDto;
@@ -19,6 +16,7 @@ import no.nav.vedtak.felles.integrasjon.rest.RestClientConfig;
 import no.nav.vedtak.felles.integrasjon.rest.RestConfig;
 import no.nav.vedtak.felles.integrasjon.rest.RestRequest;
 import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 @RestClientConfig(tokenConfig = TokenFlow.ADAPTIVE, scopesProperty = "sif.abac.pdp.scope", scopesDefault = "api://prod-fss.k9saksbehandling.sif-abac-pdp/.default",
     endpointDefault = "http://sif-abac-pdp/sif/sif-abac-pdp/api/tilgangskontroll/v2/k9", endpointProperty = "sif.abac.pdp.url")
@@ -36,12 +34,7 @@ public class SifAbacPdpRestKlient {
 
     public Tilgangsbeslutning sjekkTilgangForInnloggetBruker(SaksinformasjonTilgangskontrollInputDto input) {
         if (Environment.current().isDev()) {
-            ObjectMapper om = no.nav.vedtak.mapper.json.DefaultJsonMapper.getJsonMapper();
-            try {
-                LOGGER.info("saksinformasjon: {}", om.writeValueAsString(input));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            LOGGER.info("saksinformasjon: {}", DefaultJsonMapper.toJson(input));
         }
         if (input.isSaksinformasjonMangler()) {
             throw new IllegalArgumentException("saksinformasjon er påkrevet for UPDATE på FAGSAK, men saksinformasjon er null");
@@ -56,12 +49,7 @@ public class SifAbacPdpRestKlient {
 
     public Tilgangsbeslutning sjekkTilgangForInnloggetBruker(BehandlingUuidOperasjonDto input) {
         if (Environment.current().isDev()) {
-            ObjectMapper om = no.nav.vedtak.mapper.json.DefaultJsonMapper.getJsonMapper();
-            try {
-                LOGGER.info("behandling: {}", om.writeValueAsString(input));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            LOGGER.info("behandling: {}", DefaultJsonMapper.toJson(input));
         }
         URI uri = UriBuilder.fromUri(restConfig.endpoint()).path("behandling").build();
         var request = RestRequest.newPOSTJson(input, uri, restConfig);

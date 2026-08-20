@@ -19,7 +19,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
@@ -58,16 +57,18 @@ public class KodeverkRestTjeneste {
 
     public static final String KODEVERK_FPTILBAKE_PATH = KODERVERK_PATH + "/fptilbake";
 
-    private static final ObjectMapper objectMapper = ObjectMapperFactory.getDefaultObjectMapperCopy(true);
-
     private static String KODELISTER;
 
     public KodeverkRestTjeneste() {
         // for CDI
     }
 
-    private final static AlleKodeverdierSomObjektResponse oppslagAlleResponse;
-    public final static Map<String, SortedSet<Kodeverdi>> legacyGrupperteKodeverdier;
+    /*
+     * K9-tilbake sine kodeverdistrukturer
+     */
+
+    private static final AlleKodeverdierSomObjektResponse oppslagAlleResponse;
+    public static final Map<String, SortedSet<Kodeverdi>> legacyGrupperteKodeverdier;
 
     // Hjelpefunksjon for å konvertere nytt dataformat til gammalt, så vi kan beholde gammalt endepunkt ei stund.
     private static <K extends Kodeverdi> void addLegacyGruppertKodeverdier(final SortedSet<KodeverdiSomObjekt<K>> verdier) {
@@ -149,11 +150,7 @@ public class KodeverkRestTjeneste {
     }
 
     private synchronized void hentGruppertKodelisteTilCache() throws JsonProcessingException {
-        KODELISTER = tilJson(legacyGrupperteKodeverdier);
-    }
-
-    private static String tilJson(Map<String, SortedSet<Kodeverdi>> kodeverk) throws JsonProcessingException {
-        return objectMapper.writeValueAsString(kodeverk);
+        KODELISTER = ObjectMapperFactory.getDefaultObjectMapperCopy(true).writeValueAsString(legacyGrupperteKodeverdier);
     }
 
     /*

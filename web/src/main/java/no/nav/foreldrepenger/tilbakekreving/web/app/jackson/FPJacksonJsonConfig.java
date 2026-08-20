@@ -8,10 +8,10 @@ import jakarta.ws.rs.ext.ContextResolver;
 import jakarta.ws.rs.ext.Provider;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import no.nav.foreldrepenger.tilbakekreving.web.app.IndexClasses;
 import no.nav.vedtak.mapper.json.DefaultJsonMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @Provider
 public class FPJacksonJsonConfig implements ContextResolver<JsonMapper> {

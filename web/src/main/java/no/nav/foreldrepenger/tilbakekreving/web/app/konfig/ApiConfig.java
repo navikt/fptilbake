@@ -58,6 +58,8 @@ import no.nav.vedtak.server.rest.GeneralRestExceptionMapper;
 import no.nav.vedtak.server.rest.ValidationExceptionMapper;
 import no.nav.vedtak.server.rest.jackson.Jackson2ExceptionMapper;
 import no.nav.vedtak.server.rest.jackson.Jackson2ProviderFeature;
+import no.nav.vedtak.server.rest.jackson.JacksonExceptionMapper;
+import no.nav.vedtak.server.rest.jackson.JacksonProviderFeature;
 
 @ApplicationPath(ApiConfig.API_URI)
 public class ApiConfig extends Application {
@@ -107,8 +109,6 @@ public class ApiConfig extends Application {
         classes.add(CacheControlFeature.class);
 
         // Applikasjonsoppsett - her er FpRestJackson brutt opp pga JsonTypeName i ContextResolver
-        classes.add(Jackson2ProviderFeature.class);
-        classes.add(Jackson2ExceptionMapper.class);
         classes.add(ValidationExceptionMapper.class);
         classes.add(GeneralRestExceptionMapper.class);
 
@@ -118,12 +118,16 @@ public class ApiConfig extends Application {
 
         // Standard etter fork av fp-tilbake
         if (Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
+            classes.add(JacksonProviderFeature.class);
+            classes.add(JacksonExceptionMapper.class);
             classes.add(FPJacksonJsonConfig.class);  // Lokal ContextResolver pga AP-oppdaterere/JsonTypeName/JsonTypeinfo
             classes.add(AuthenticationFilter.class); // autentisering etter ny standard
         } else {
             // Bruker lokal variant pga cookies i k9
             classes.add(K9AuthenticationFilter.class);
             // Forvaltning - fortsatt i K9-løsning
+            classes.add(Jackson2ProviderFeature.class);
+            classes.add(Jackson2ExceptionMapper.class);
             classes.add(K9JacksonJsonConfig.class);
             classes.add(ProsessTaskRestTjeneste.class);
             classes.add(ForvaltningAktørRestTjeneste.class);

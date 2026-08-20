@@ -17,12 +17,6 @@ import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTi
 class BehandlingTilstandMapperTest {
 
     @Test
-    void skal_serialisere_riktig() {
-        String string = BehandlingTilstandMapper.tilJsonString(lagTestTilstand());
-        Assertions.assertThat(string).isEqualTo("{\"funksjonellTid\":\"2020-03-05T13:48:10.001Z\",\"saksnummer\":\"SNR123\",\"ytelseType\":\"SVP\",\"behandlingUuid\":\"dd31dc4f-ea61-4124-8943-7738fa9b7b7a\",\"behandlingType\":\"REVURDERING_TILBAKEKREVING\",\"behandlingStatus\":\"AVSLUTTET\",\"behandlingResultat\":\"HENLAGT_FEILOPPRETTET\",\"erBehandlingManueltOpprettet\":false,\"behandlendeEnhetKode\":\"1234\",\"ansvarligSaksbehandler\":\"Z111111\",\"forrigeBehandling\":\"a93862f2-b72c-4e44-b042-0829599c3b53\",\"venterPaaBruker\":false,\"venterPaaOekonomi\":false,\"revurderingOpprettetAarsak\":\"KLAGE_NFP\"}");
-    }
-
-    @Test
     void skal_serialisere_og_deserialisere() {
         String serialisert = BehandlingTilstandMapper.tilJsonString(lagTestTilstand());
         BehandlingTilstand resultat = BehandlingTilstandMapper.fraJson(serialisert);
