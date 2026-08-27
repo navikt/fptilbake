@@ -21,13 +21,12 @@ jobs:
     name: Build
     permissions:
       contents: read
-      packages: write
+      packages: read
       id-token: write
     uses: navikt/fp-gha-workflows/.github/workflows/build-app-no-db.yml@main
     with:
       build-image: ${{ github.ref_name == 'master' }} # default: true
       push-image: ${{ github.ref_name == 'master' }} # default: false
-    secrets: inherit
 
   typescript-client:
     name: Build typescript client
@@ -95,7 +94,6 @@ jobs:
     with:
       build-version: ${{ needs.build-app.outputs.build-version }}
       test-suite: fptilbake
-    secrets: inherit
 
   verdikjede-tester:
     name: Verdikjedetester
@@ -108,7 +106,6 @@ jobs:
     with:
       build-version: ${{ needs.build-app.outputs.build-version }}
       test-suite: verdikjede
-    secrets: inherit
 
   k9-verdikjede-tester:
     name: K9 Verdikjedetester
@@ -135,7 +132,8 @@ jobs:
       fptilbake: ${{ needs.fptilbake-tester.outputs.resultat }}
       verdikjede: ${{ needs.verdikjede-tester.outputs.resultat }}
       build-version: ${{ needs.build-app.outputs.build-version }}
-    secrets: inherit
+    secrets:
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
   deploy-dev-teamforeldrepenger:
     name: Deploy dev fp
@@ -148,7 +146,6 @@ jobs:
       image: ${{ needs.build-app.outputs.build-version }}
       cluster: dev-fss
       namespace: teamforeldrepenger
-    secrets: inherit
 
   deploy-prod-teamforeldrepenger:
     name: Deploy prod fp
@@ -161,7 +158,6 @@ jobs:
       image: ${{ needs.build-app.outputs.build-version }}
       cluster: prod-fss
       namespace: teamforeldrepenger
-    secrets: inherit
 
   deploy-dev-k9saksbehandling:
     name: Deploy dev k9
