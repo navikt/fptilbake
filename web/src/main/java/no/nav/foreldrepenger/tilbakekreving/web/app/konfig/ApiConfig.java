@@ -19,7 +19,9 @@ import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.FPJacksonJsonConfig;
+import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.K9JacksonExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.K9JacksonJsonConfig;
+import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.K9JacksonProviderFeature;
 import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.ObjectMapperFactory;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingFaktaRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
@@ -56,8 +58,6 @@ import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 import no.nav.vedtak.server.rest.AuthenticationFilter;
 import no.nav.vedtak.server.rest.GeneralRestExceptionMapper;
 import no.nav.vedtak.server.rest.ValidationExceptionMapper;
-import no.nav.vedtak.server.rest.jackson.Jackson2ExceptionMapper;
-import no.nav.vedtak.server.rest.jackson.Jackson2ProviderFeature;
 import no.nav.vedtak.server.rest.jackson.JacksonExceptionMapper;
 import no.nav.vedtak.server.rest.jackson.JacksonProviderFeature;
 
@@ -126,8 +126,8 @@ public class ApiConfig extends Application {
             // Bruker lokal variant pga cookies i k9
             classes.add(K9AuthenticationFilter.class);
             // Forvaltning - fortsatt i K9-løsning
-            classes.add(Jackson2ProviderFeature.class);
-            classes.add(Jackson2ExceptionMapper.class);
+            classes.add(K9JacksonProviderFeature.class);
+            classes.add(K9JacksonExceptionMapper.class);
             classes.add(K9JacksonJsonConfig.class);
             classes.add(ProsessTaskRestTjeneste.class);
             classes.add(ForvaltningAktørRestTjeneste.class);
