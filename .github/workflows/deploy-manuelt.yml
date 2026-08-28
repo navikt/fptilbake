@@ -31,4 +31,3 @@ jobs:
       image: ${{ inputs.image }}
       cluster: ${{ inputs.environment }}-fss
       namespace: ${{ inputs.namespace }}
-    secrets: inherit
