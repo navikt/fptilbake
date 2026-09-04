@@ -138,6 +138,7 @@ jobs:
   deploy-dev-teamforeldrepenger:
     name: Deploy dev fp
     permissions:
+      contents: read
       id-token: write
     if: github.ref_name == 'master'
     needs: [build-app, fptilbake-tester, verdikjede-tester]
@@ -150,6 +151,7 @@ jobs:
   deploy-prod-teamforeldrepenger:
     name: Deploy prod fp
     permissions:
+      contents: read
       id-token: write
     if: github.ref_name == 'master'
     needs: [build-app, fptilbake-tester, verdikjede-tester, deploy-dev-teamforeldrepenger]
@@ -162,6 +164,7 @@ jobs:
   deploy-dev-k9saksbehandling:
     name: Deploy dev k9
     permissions:
+      contents: read
       id-token: write
     if: github.ref_name == 'master'
     needs: [publish-image-k9, fptilbake-tester, verdikjede-tester, k9-verdikjede-tester]
@@ -175,6 +178,7 @@ jobs:
   deploy-prod-k9saksbehandling:
     name: Deploy prod k9
     permissions:
+      contents: read
       id-token: write
     if: github.ref_name == 'master'
     needs: [publish-image-k9, fptilbake-tester, verdikjede-tester, k9-verdikjede-tester, deploy-dev-k9saksbehandling]
