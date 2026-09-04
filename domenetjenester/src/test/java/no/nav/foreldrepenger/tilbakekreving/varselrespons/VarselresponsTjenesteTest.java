@@ -16,6 +16,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepository;
@@ -29,14 +31,16 @@ class VarselresponsTjenesteTest {
 
     private BehandlingRepository behandlingRepository;
     private FagsakRepository fagsakRepository;
+    private HistorikkinnslagRepository historikkinnslagRepository;
     private VarselresponsTjeneste varselresponsTjeneste;
 
     @BeforeEach
     void setup(EntityManager entityManager) {
         behandlingRepository = new BehandlingRepository(entityManager);
         fagsakRepository = new FagsakRepository(entityManager);
+        historikkinnslagRepository = new HistorikkinnslagRepository(entityManager);
         VarselresponsRepository repository = new VarselresponsRepository(entityManager);
-        varselresponsTjeneste = new VarselresponsTjeneste(repository);
+        varselresponsTjeneste = new VarselresponsTjeneste(repository, historikkinnslagRepository, behandlingRepository);
 
         BEHANDLING_ID = opprettBehandling();
     }
@@ -82,5 +86,24 @@ class VarselresponsTjenesteTest {
         Optional<Varselrespons> result = varselresponsTjeneste.hentRespons(99999L);
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void skal_opprette_historikkinnslag_når_bruker_har_uttalt_seg() {
+        varselresponsTjeneste.lagreRespons(BEHANDLING_ID, ResponsKanal.SELVBETJENING, true);
+
+        var historikkinnslag = historikkinnslagRepository.hent(BEHANDLING_ID);
+
+        assertThat(historikkinnslag).hasSize(1);
+        assertThat(historikkinnslag.get(0).getTittel()).isEqualTo(VarselresponsTjeneste.HISTORIKK_TITTEL_UTTALELSE);
+        assertThat(historikkinnslag.get(0).getAktør()).isEqualTo(HistorikkAktør.SØKER);
+    }
+
+    @Test
+    void skal_ikke_opprette_nytt_historikkinnslag_ved_gjentatt_respons() {
+        varselresponsTjeneste.lagreRespons(BEHANDLING_ID, ResponsKanal.SELVBETJENING, true);
+        varselresponsTjeneste.lagreRespons(BEHANDLING_ID, ResponsKanal.SELVBETJENING, false);
+
+        assertThat(historikkinnslagRepository.hent(BEHANDLING_ID)).hasSize(1);
     }
 }

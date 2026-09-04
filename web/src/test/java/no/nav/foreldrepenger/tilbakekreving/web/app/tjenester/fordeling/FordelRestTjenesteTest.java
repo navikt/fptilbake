@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordeling;
 
 import static no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordeling.FordelRestTjeneste.UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -55,7 +55,8 @@ class FordelRestTjenesteTest {
     void setUp(EntityManager entityManager) {
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         behandlingRepository = repositoryProvider.getBehandlingRepository();
-        varselresponsTjeneste = new VarselresponsTjeneste(new VarselresponsRepository(entityManager));
+        varselresponsTjeneste = new VarselresponsTjeneste(new VarselresponsRepository(entityManager),
+            repositoryProvider.getHistorikkinnslagRepository(), behandlingRepository);
         fordelRestTjeneste = new FordelRestTjeneste(repositoryProvider.getBehandlingRepository(), mockGjenopptaBehandlingTjeneste,
             varselresponsTjeneste);
     }
@@ -101,6 +102,11 @@ class FordelRestTjenesteTest {
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
         verify(mockGjenopptaBehandlingTjeneste, atLeastOnce()).fortsettBehandlingManuelt(behandlingId, behandling.getFagsakId(), HistorikkAktør.SØKER);
         assertThat(varselresponsTjeneste.hentRespons(behandlingId)).isPresent();
+
+        var historikkinnslag = repositoryProvider.getHistorikkinnslagRepository().hent(behandlingId);
+        assertThat(historikkinnslag).hasSize(1);
+        assertThat(historikkinnslag.get(0).getTittel()).isEqualTo(VarselresponsTjeneste.HISTORIKK_TITTEL_UTTALELSE);
+        assertThat(historikkinnslag.get(0).getAktør()).isEqualTo(HistorikkAktør.SØKER);
     }
 
     private Behandling lagBehandling() {
