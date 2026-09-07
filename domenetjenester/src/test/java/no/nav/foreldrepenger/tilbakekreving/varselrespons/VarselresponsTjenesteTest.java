@@ -100,10 +100,11 @@ class VarselresponsTjenesteTest {
     }
 
     @Test
-    void skal_ikke_opprette_nytt_historikkinnslag_ved_gjentatt_respons() {
+    void skal_opprette_historikkinnslag_for_hver_uttalelse_selv_om_kun_første_respons_lagres() {
         varselresponsTjeneste.lagreRespons(BEHANDLING_ID, ResponsKanal.SELVBETJENING, true);
         varselresponsTjeneste.lagreRespons(BEHANDLING_ID, ResponsKanal.SELVBETJENING, false);
 
-        assertThat(historikkinnslagRepository.hent(BEHANDLING_ID)).hasSize(1);
+        assertThat(historikkinnslagRepository.hent(BEHANDLING_ID)).hasSize(2);
+        assertThat(varselresponsTjeneste.hentRespons(BEHANDLING_ID).orElseThrow().getAkseptertFaktagrunnlag()).isTrue();
     }
 }

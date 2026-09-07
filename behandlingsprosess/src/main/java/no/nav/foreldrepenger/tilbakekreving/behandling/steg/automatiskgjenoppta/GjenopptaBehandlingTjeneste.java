@@ -102,14 +102,29 @@ public class GjenopptaBehandlingTjeneste {
             throw new IllegalArgumentException("Kan ikke fortsette avsluttet behandling");
         }
 
-        var kanGjenopptaBehandling = behandling.isBehandlingPåVent() && BehandlingStegType.VARSEL.equals(behandling.getAktivtBehandlingSteg())
-            || (!Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(behandling.getVenteårsak()) && kanGjenopptaSteg(behandlingId));
-        if (kanGjenopptaBehandling) {
+        if (kanGjenopptaBehandling(behandling)) {
             var gruppe = opprettFortsettBehandlingTask(behandling, hentCallId());
             opprettHistorikkInnslagForManueltGjenopptaBehandling(behandlingId, fagsakId, historikkAktør);
             return Optional.ofNullable(gruppe);
         }
         return Optional.empty();
+    }
+
+    /**
+     * Fortsetter behandling uten å opprette historikkinnslag om gjenopptak. Brukes når hendelsen som
+     * utløser gjenopptaket allerede dokumenteres i historikken, slik at saken ikke får dobbelt innslag.
+     */
+    public Optional<String> fortsettBehandlingUtenHistorikkinnslag(long behandlingId) {
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
+        if (behandling.erAvsluttet() || !kanGjenopptaBehandling(behandling)) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(opprettFortsettBehandlingTask(behandling, hentCallId()));
+    }
+
+    private boolean kanGjenopptaBehandling(Behandling behandling) {
+        return behandling.isBehandlingPåVent() && BehandlingStegType.VARSEL.equals(behandling.getAktivtBehandlingSteg())
+            || (!Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(behandling.getVenteårsak()) && kanGjenopptaSteg(behandling.getId()));
     }
 
     /**

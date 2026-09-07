@@ -45,10 +45,11 @@ public class VarselresponsTjeneste {
                     .setKilde(responsKanal.getDbKode())
                     .build();
             varselresponsRepository.lagre(varselrespons);
-            // Innslaget lages her og ikke ved gjenopptak, slik at uttalelsen blir dokumentert
-            // også når behandlingen ikke kan gjenopptas med det samme.
-            opprettHistorikkinnslagForBrukerUttalelse(behandlingId);
         }
+        // Varselresponsen lagres kun for første uttalelse siden den er en markør for at bruker har svart,
+        // men hver enkelt uttalelse skal dokumenteres i historikken. Innslaget lages her og ikke ved
+        // gjenopptak, slik at uttalelsen blir dokumentert også når behandlingen ikke kan gjenopptas.
+        opprettHistorikkinnslagForBrukerUttalelse(behandlingId);
     }
 
     public void lagreRespons(long behandlingId, ResponsKanal kanal) {
