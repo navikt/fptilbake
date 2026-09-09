@@ -49,7 +49,16 @@ public class VarselresponsTjeneste {
         // Varselresponsen lagres kun for første uttalelse siden den er en markør for at bruker har svart,
         // men hver enkelt uttalelse skal dokumenteres i historikken. Innslaget lages her og ikke ved
         // gjenopptak, slik at uttalelsen blir dokumentert også når behandlingen ikke kan gjenopptas.
-        opprettHistorikkinnslagForBrukerUttalelse(behandlingId);
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
+        opprettHistorikkinnslagForBrukerUttalelse(behandling.getFagsakId(), behandlingId);
+    }
+
+    /**
+     * Dokumenterer uttalelsen på fagsaken når det ikke finnes en behandling å knytte den til, typisk
+     * fordi uttalelsen kommer inn etter at behandlingen er avsluttet.
+     */
+    public void opprettHistorikkinnslagForUttalelseUtenBehandling(long fagsakId) {
+        opprettHistorikkinnslagForBrukerUttalelse(fagsakId, null);
     }
 
     public void lagreRespons(long behandlingId, ResponsKanal kanal) {
@@ -60,11 +69,10 @@ public class VarselresponsTjeneste {
         return varselresponsRepository.hentRespons(behandlingId);
     }
 
-    private void opprettHistorikkinnslagForBrukerUttalelse(long behandlingId) {
-        var behandling = behandlingRepository.hentBehandling(behandlingId);
+    private void opprettHistorikkinnslagForBrukerUttalelse(long fagsakId, Long behandlingId) {
         var historikkinnslag = new Historikkinnslag.Builder()
             .medAktør(HistorikkAktør.SØKER)
-            .medFagsakId(behandling.getFagsakId())
+            .medFagsakId(fagsakId)
             .medBehandlingId(behandlingId)
             .medTittel(HISTORIKK_TITTEL_UTTALELSE)
             .build();

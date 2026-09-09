@@ -23,6 +23,8 @@ import no.nav.foreldrepenger.kontrakter.fordel.JournalpostMottakDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatiskgjenoppta.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
@@ -44,6 +46,7 @@ public class FordelRestTjeneste {
     public static final String UTTALELSE_TILBAKEBETALING_DOKUMENT_TYPE_ID = "I000119";
 
     private BehandlingRepository behandlingRepository;
+    private FagsakRepository fagsakRepository;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
     private VarselresponsTjeneste varselresponsTjeneste;
 
@@ -53,9 +56,11 @@ public class FordelRestTjeneste {
 
     @Inject
     public FordelRestTjeneste(BehandlingRepository behandlingRepository,
+                              FagsakRepository fagsakRepository,
                               GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
                               VarselresponsTjeneste varselresponsTjeneste) {
         this.behandlingRepository = behandlingRepository;
+        this.fagsakRepository = fagsakRepository;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
         this.varselresponsTjeneste = varselresponsTjeneste;
     }
@@ -74,18 +79,28 @@ public class FordelRestTjeneste {
         String saksnummer = mottattJournalpost.getSaksnummer();
         UUID forsendelseId = mottattJournalpost.getForsendelseId().orElse(null);
 
+        if (!erTilbakemeldingFraBruker(dokumentTypeId)) {
+            LOG.info("Mottok og ignorerte dokument pga dokumentTypeId. Saksnummer={} dokumentTypeId={} forsendelseId={}", saksnummer, dokumentTypeId, forsendelseId);
+            return;
+        }
+
         var åpenBehandling = hentÅpenBehandling(saksnummer);
         if (åpenBehandling.isPresent()) {
             var behandling = åpenBehandling.get();
-            if (erTilbakemeldingFraBruker(dokumentTypeId)) {
-                LOG.info("Mottok dokument og tok behandlingId={} av vent. Saksnummer={} dokumentTypeId={} forsendelseId={}", behandling.getId(), saksnummer, dokumentTypeId, forsendelseId);
-                varselresponsTjeneste.lagreRespons(behandling.getId(), ResponsKanal.SELVBETJENING);
-                gjenopptaBehandlingTjeneste.fortsettBehandlingUtenHistorikkinnslag(behandling.getId());
-            } else {
-                LOG.info("Mottok og ignorerte dokument pga dokumentTypeId. Saksnummer={} dokumentTypeId={} forsendelseId={}", saksnummer, dokumentTypeId, forsendelseId);
-            }
+            LOG.info("Mottok dokument og tok behandlingId={} av vent. Saksnummer={} dokumentTypeId={} forsendelseId={}", behandling.getId(), saksnummer, dokumentTypeId, forsendelseId);
+            varselresponsTjeneste.lagreRespons(behandling.getId(), ResponsKanal.SELVBETJENING);
+            gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), behandling.getFagsakId(), HistorikkAktør.VEDTAKSLØSNINGEN);
+            return;
+        }
+
+        // Uttalelsen kan komme inn etter at behandlingen er avsluttet. Den skal fortsatt være synlig i
+        // fagsakhistorikken, og lagres derfor uten behandling.
+        var fagsak = fagsakRepository.hentSakGittSaksnummer(new Saksnummer(saksnummer));
+        if (fagsak.isPresent()) {
+            LOG.info("Mottok dokument uten åpen behandling for saken. Saksnummer={} dokumentTypeId={} forsendelseId={}", saksnummer, dokumentTypeId, forsendelseId);
+            varselresponsTjeneste.opprettHistorikkinnslagForUttalelseUtenBehandling(fagsak.get().getId());
         } else {
-            LOG.info("Mottok og ignorerte dokument siden ingen behandling er på vent for saken. Saksnummer={} dokumentTypeId={} forsendelseId={}", saksnummer, dokumentTypeId, forsendelseId);
+            LOG.info("Mottok og ignorerte dokument siden fagsaken ikke finnes. Saksnummer={} dokumentTypeId={} forsendelseId={}", saksnummer, dokumentTypeId, forsendelseId);
         }
     }
 

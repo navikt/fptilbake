@@ -59,26 +59,28 @@ class FordelRestTjenesteTest {
         behandlingRepository = repositoryProvider.getBehandlingRepository();
         varselresponsTjeneste = new VarselresponsTjeneste(new VarselresponsRepository(entityManager),
             repositoryProvider.getHistorikkinnslagRepository(), behandlingRepository);
-        fordelRestTjeneste = new FordelRestTjeneste(repositoryProvider.getBehandlingRepository(), mockGjenopptaBehandlingTjeneste,
-            varselresponsTjeneste);
+        fordelRestTjeneste = new FordelRestTjeneste(repositoryProvider.getBehandlingRepository(), repositoryProvider.getFagsakRepository(),
+            mockGjenopptaBehandlingTjeneste, varselresponsTjeneste);
     }
 
     @Test
     void mottaJournalpost_når_saksnummer_ikke_finnes() {
-        var behandling = lagBehandling();
+        lagBehandling();
         var abacJournalpostMottakDto = new JournalpostMottakDto("10000", JOURNAL_POST_ID, FORSENDELSE_ID,
                 UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
-        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingUtenHistorikkinnslag(behandling.getId());
+        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(anyLong(), anyLong(), any());
+        assertThat(repositoryProvider.getHistorikkinnslagRepository().hent(SAKSNUMMER)).isEmpty();
     }
 
     @Test
     void mottaJournalpost_når_dokument_type_id_ikke_gyldig() {
-        var behandling = lagBehandling();
+        lagBehandling();
         var abacJournalpostMottakDto = new JournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
                 "XYZS", LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
-        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingUtenHistorikkinnslag(behandling.getId());
+        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(anyLong(), anyLong(), any());
+        assertThat(repositoryProvider.getHistorikkinnslagRepository().hent(SAKSNUMMER)).isEmpty();
     }
 
     @Test
@@ -86,11 +88,18 @@ class FordelRestTjenesteTest {
         Long behandlingId = lagBehandling().getId();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         behandling.avsluttBehandling();
+        behandlingRepository.lagre(behandling, behandlingRepository.taSkriveLås(behandling));
 
         var abacJournalpostMottakDto = new JournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
                 UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
-        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingUtenHistorikkinnslag(behandlingId);
+        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(anyLong(), anyLong(), any());
+
+        var historikkinnslag = repositoryProvider.getHistorikkinnslagRepository().hent(SAKSNUMMER);
+        assertThat(historikkinnslag).hasSize(1);
+        assertThat(historikkinnslag.get(0).getTittel()).isEqualTo(VarselresponsTjeneste.HISTORIKK_TITTEL_UTTALELSE);
+        assertThat(historikkinnslag.get(0).getAktør()).isEqualTo(HistorikkAktør.SØKER);
+        assertThat(historikkinnslag.get(0).getBehandlingId()).isNull();
     }
 
     @Test
@@ -102,8 +111,8 @@ class FordelRestTjenesteTest {
         var abacJournalpostMottakDto = new JournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
                 UTTALELSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
-        verify(mockGjenopptaBehandlingTjeneste, atLeastOnce()).fortsettBehandlingUtenHistorikkinnslag(behandlingId);
-        verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(anyLong(), anyLong(), any());
+        verify(mockGjenopptaBehandlingTjeneste, atLeastOnce()).fortsettBehandlingManuelt(behandlingId, behandling.getFagsakId(),
+            HistorikkAktør.VEDTAKSLØSNINGEN);
         assertThat(varselresponsTjeneste.hentRespons(behandlingId)).isPresent();
 
         var historikkinnslag = repositoryProvider.getHistorikkinnslagRepository().hent(behandlingId);

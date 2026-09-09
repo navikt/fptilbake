@@ -104,36 +104,6 @@ class GjenopptaBehandlingTjenesteTest {
     }
 
     @Test
-    void skal_gjenoppta_uten_historikkinnslag_når_bruker_har_uttalt_seg() {
-        Behandling behandling = lagBehandling();
-        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER,
-            BehandlingStegStatus.VENTER);
-        final Long behandlingId = behandling.getId();
-
-        List<ProsessTaskData> faktiskeProsessTaskDataListe = new ArrayList<>();
-        prosessTaskCapture("67", faktiskeProsessTaskDataListe);
-
-        gjenopptaBehandlingTjeneste.fortsettBehandlingUtenHistorikkinnslag(behandlingId);
-
-        assertThat(faktiskeProsessTaskDataListe).hasSize(1);
-        assertThat(repositoryProvider.getHistorikkinnslagRepository().hent(behandlingId)).isEmpty();
-    }
-
-    @Test
-    void skal_ikke_gjenoppta_avsluttet_behandling_når_bruker_har_uttalt_seg() {
-        Behandling behandling = lagBehandling();
-        behandling.avsluttBehandling();
-        var behandlingRepository = repositoryProvider.getBehandlingRepository();
-        behandlingRepository.lagre(behandling, behandlingRepository.taSkriveLås(behandling));
-
-        List<ProsessTaskData> faktiskeProsessTaskDataListe = new ArrayList<>();
-        prosessTaskCapture("68", faktiskeProsessTaskDataListe);
-
-        assertThat(gjenopptaBehandlingTjeneste.fortsettBehandlingUtenHistorikkinnslag(behandling.getId())).isEmpty();
-        assertThat(faktiskeProsessTaskDataListe).isEmpty();
-    }
-
-    @Test
     void skal_lage_prosess_tasks_for_behandlinger_som_skal_gjenopptas() {
         final String gruppe = "55";
 

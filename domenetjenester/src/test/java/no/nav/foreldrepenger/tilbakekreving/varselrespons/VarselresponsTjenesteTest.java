@@ -107,4 +107,17 @@ class VarselresponsTjenesteTest {
         assertThat(historikkinnslagRepository.hent(BEHANDLING_ID)).hasSize(2);
         assertThat(varselresponsTjeneste.hentRespons(BEHANDLING_ID).orElseThrow().getAkseptertFaktagrunnlag()).isTrue();
     }
+
+    @Test
+    void skal_opprette_historikkinnslag_på_fagsak_når_det_ikke_finnes_behandling() {
+        var behandling = behandlingRepository.hentBehandling(BEHANDLING_ID);
+
+        varselresponsTjeneste.opprettHistorikkinnslagForUttalelseUtenBehandling(behandling.getFagsakId());
+
+        var historikkinnslag = historikkinnslagRepository.hent(behandling.getFagsak().getSaksnummer());
+        assertThat(historikkinnslag).hasSize(1);
+        assertThat(historikkinnslag.get(0).getTittel()).isEqualTo(VarselresponsTjeneste.HISTORIKK_TITTEL_UTTALELSE);
+        assertThat(historikkinnslag.get(0).getAktør()).isEqualTo(HistorikkAktør.SØKER);
+        assertThat(historikkinnslag.get(0).getBehandlingId()).isNull();
+    }
 }
