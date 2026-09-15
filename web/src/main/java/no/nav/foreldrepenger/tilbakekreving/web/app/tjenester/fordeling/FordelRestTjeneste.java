@@ -87,9 +87,12 @@ public class FordelRestTjeneste {
         var åpenBehandling = hentÅpenBehandling(saksnummer);
         if (åpenBehandling.isPresent()) {
             var behandling = åpenBehandling.get();
-            LOG.info("Mottok dokument og tok behandlingId={} av vent. Saksnummer={} dokumentTypeId={} forsendelseId={}", behandling.getId(), saksnummer, dokumentTypeId, forsendelseId);
+            LOG.info("Mottok dokument for behandlingId={}, forsøker å ta av vent. Saksnummer={} dokumentTypeId={} forsendelseId={}", behandling.getId(), saksnummer, dokumentTypeId, forsendelseId);
             varselresponsTjeneste.lagreRespons(behandling.getId(), ResponsKanal.SELVBETJENING);
-            gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), behandling.getFagsakId(), HistorikkAktør.VEDTAKSLØSNINGEN);
+            var gjenopptattGruppe = gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), behandling.getFagsakId(), HistorikkAktør.VEDTAKSLØSNINGEN);
+            if (gjenopptattGruppe.isEmpty()) {
+                LOG.info("Kunne ikke ta behandlingId={} av vent ennå, sannsynligvis venter den fortsatt på kravgrunnlag. Saksnummer={}", behandling.getId(), saksnummer);
+            }
             return;
         }
 
