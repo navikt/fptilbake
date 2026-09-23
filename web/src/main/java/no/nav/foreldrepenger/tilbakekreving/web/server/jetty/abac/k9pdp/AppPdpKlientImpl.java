@@ -23,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacp
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.resultat.IkkeTilgangÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.sifabacpdp.dto.resultat.Tilgangsbeslutning;
 import no.nav.vedtak.sikkerhet.abac.internal.BeskyttetRessursAttributter;
+import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
 
 @ApplicationScoped
 public class AppPdpKlientImpl {
@@ -48,10 +49,14 @@ public class AppPdpKlientImpl {
         sifAbacPdpRestKlient = new SifAbacPdpRestKlient();
     }
 
+    public AppRessursData hentRessurser(BeskyttetRessursAttributter beskyttetRessursAttributter) {
+        return pdpRequestBuilder.lagAppRessursDataForLogging(beskyttetRessursAttributter.getDataAttributter());
+    }
+
     public K9AbacResultat forespørTilgang(BeskyttetRessursAttributter beskyttetRessursAttributter) {
-        var appRessursData = pdpRequestBuilder.lagAppRessursData(beskyttetRessursAttributter.getDataAttributter());
-        K9AbacResultat hovedresultat = mapResultat(forespørTilgangSifAbacPdp(beskyttetRessursAttributter, appRessursData));
-        abacAuditlogger.loggUtfall(hovedresultat, beskyttetRessursAttributter, appRessursData);
+        var k9AppRessursData = pdpRequestBuilder.lagAppRessursData(beskyttetRessursAttributter.getDataAttributter());
+        K9AbacResultat hovedresultat = mapResultat(forespørTilgangSifAbacPdp(beskyttetRessursAttributter, k9AppRessursData));
+        abacAuditlogger.loggUtfall(hovedresultat, beskyttetRessursAttributter, k9AppRessursData);
         return hovedresultat;
     }
 
