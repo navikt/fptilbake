@@ -17,9 +17,10 @@ import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9pdp.K9AppRessursData;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
+import no.nav.vedtak.log.mdc.LoggFelter;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
+import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
 
 /**
  * Implementasjon av PDP request for k9-tilbake.
@@ -28,8 +29,6 @@ import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 public class K9PdpRequestBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(K9PdpRequestBuilder.class);
-
-    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private PipRepository pipRepository;
     private boolean aktiverAbacLogging;
@@ -45,11 +44,32 @@ public class K9PdpRequestBuilder {
         this.aktiverAbacLogging = aktiverAbacLogging;
     }
 
+    public AppRessursData lagAppRessursDataForLogging(AbacDataAttributter dataAttributter) {
+        Optional<Long> behandlingId = utledBehandlingId(dataAttributter.getVerdier(TilbakekrevingAbacAttributtType.BEHANDLING_ID));
+        Optional<UUID> behandlingUuid = utledBehandlingUuId(dataAttributter.getVerdier(StandardAbacAttributtType.BEHANDLING_UUID));
+        if (behandlingId.isPresent() && behandlingUuid.isPresent()) {
+            throw ugyldigInputFlereBehandlinger(behandlingId.get(), behandlingUuid.get());
+        }
+
+        K9PipBehandlingInfo behandlingData = null;
+        if (behandlingId.isPresent()) {
+            behandlingData = lagBehandlingData(behandlingId.get());
+        } else if (behandlingUuid.isPresent()) {
+            behandlingData = lagBehandlingData(behandlingUuid.get());
+        }
+
+        var ressursData = AppRessursData.builder();
+
+        utledSaksnummer(dataAttributter, behandlingData).ifPresent(ressursData::medLoggSaksnummer);
+        Optional.ofNullable(behandlingData).map(K9PipBehandlingInfo::behandlingId)
+            .ifPresent(fss -> ressursData.medLoggFelt(LoggFelter.BEHANDLING, fss.toString()));
+        Optional.ofNullable(behandlingData).map(K9PipBehandlingInfo::behandlingUuid)
+            .ifPresent(bs -> ressursData.medLoggFelt("behandlingUuid", bs.toString()));
+
+        return ressursData.build();
+    }
+
     public K9AppRessursData lagAppRessursData(AbacDataAttributter dataAttributter) {
-        LOG_CONTEXT.remove("saksnummer");
-        LOG_CONTEXT.remove("behandling");
-        LOG_CONTEXT.remove("k9sakBehandlingUuid");
-        LOG_CONTEXT.remove("behandlingUuid");
 
         Optional<Long> behandlingId = utledBehandlingId(dataAttributter.getVerdier(TilbakekrevingAbacAttributtType.BEHANDLING_ID));
         Optional<UUID> behandlingUuid = utledBehandlingUuId(dataAttributter.getVerdier(StandardAbacAttributtType.BEHANDLING_UUID));
@@ -124,21 +144,18 @@ public class K9PdpRequestBuilder {
         }
         if (saksnumre.size() == 1) {
             var saksnummer = saksnumre.iterator().next();
-            LOG_CONTEXT.add("saksnummer", saksnummer);
             return Optional.of(saksnummer);
         }
         throw new IllegalArgumentException("Ikke støttet å ha to saksnumre samtidig");
     }
 
     private K9PipBehandlingInfo lagBehandlingData(Long behandlingId) {
-        LOG_CONTEXT.add("behandling", behandlingId);
         return pipRepository.hentBehandlingData(behandlingId)
             .map(K9PipBehandlingInfo::new)
             .orElseThrow(() -> fantIkkeBehandling(behandlingId));
     }
 
     private K9PipBehandlingInfo lagBehandlingData(UUID behandlingUuid) {
-        LOG_CONTEXT.add("behandlingUuid", behandlingUuid);
         return pipRepository.hentBehandlingData(behandlingUuid)
             .map(K9PipBehandlingInfo::new)
             .orElseThrow(() -> fantIkkeBehandling(behandlingUuid));
