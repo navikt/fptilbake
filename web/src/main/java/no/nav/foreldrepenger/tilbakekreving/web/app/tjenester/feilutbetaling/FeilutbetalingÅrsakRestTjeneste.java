@@ -12,10 +12,10 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyperPrYtelseTypeDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste.FeilutbetalingÅrsakTjeneste;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -46,7 +46,7 @@ public class FeilutbetalingÅrsakRestTjeneste {
             tags = "kodeverk",
             description = "Henter kodeverk for årsak med underårsaker for feilutbetaling",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Kodeverk", content = @Content(schema = @Schema(implementation = HendelseTypeMedUndertypeDto.class)))
+                    @ApiResponse(responseCode = "200", description = "Kodeverk", content = @Content(array = @ArraySchema(schema = @Schema(implementation = HendelseTyperPrYtelseTypeDto.class))))
             })
     @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.APPLIKASJON, sporingslogg = false)
     public List<HendelseTyperPrYtelseTypeDto> hentAlleFeilutbetalingÅrsaker() {
