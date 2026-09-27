@@ -15,6 +15,7 @@ import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 import no.nav.vedtak.sikkerhet.abac.PepImpl;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 import no.nav.vedtak.sikkerhet.abac.internal.BeskyttetRessursAttributter;
+import no.nav.vedtak.sikkerhet.abac.pdp.AppRessursData;
 import no.nav.vedtak.sikkerhet.kontekst.IdentType;
 import no.nav.vedtak.sikkerhet.tilgang.AnsattGruppeKlient;
 import no.nav.vedtak.sikkerhet.tilgang.PopulasjonKlient;
@@ -38,11 +39,26 @@ public class AppPepImpl extends PepImpl {
     }
 
     @Override
-    public TilgangResultat vurderTilgang(BeskyttetRessursAttributter beskyttetRessursAttributter) {
+    public AppRessursData hentRessurser(BeskyttetRessursAttributter beskyttetRessursAttributter) {
         var applikasjon = ApplicationName.hvilkenTilbake();
         switch (applikasjon) {
             case FPTILBAKE -> {
-                return super.vurderTilgang(beskyttetRessursAttributter);
+                return super.hentRessurser(beskyttetRessursAttributter);
+            }
+            case K9TILBAKE -> {
+                return lokalPdpKlient.hentRessurser(beskyttetRessursAttributter);
+            }
+            default -> throw new IllegalStateException("applikasjonsnavn er satt til " + applikasjon + " som ikke er en støttet verdi");
+        }
+
+    }
+
+    @Override
+    public TilgangResultat vurderTilgang(BeskyttetRessursAttributter beskyttetRessursAttributter, AppRessursData appRessurser) {
+        var applikasjon = ApplicationName.hvilkenTilbake();
+        switch (applikasjon) {
+            case FPTILBAKE -> {
+                return super.vurderTilgang(beskyttetRessursAttributter, appRessurser);
             }
             case K9TILBAKE -> {
                 var vurdering = vurderK9Tilbake(beskyttetRessursAttributter);

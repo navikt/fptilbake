@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
+import no.nav.vedtak.log.mdc.LoggFelter;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -29,8 +29,6 @@ import no.nav.vedtak.sikkerhet.abac.pipdata.PipFagsakStatus;
 public class FPPdpRequestBuilder implements PdpRequestBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(FPPdpRequestBuilder.class);
-
-    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess");
 
     private PipRepository pipRepository;
 
@@ -47,7 +45,6 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
     public  AppRessursData lagAppRessursData(AbacDataAttributter dataAttributter) {
         var behandlingData = utledBehandlingData(dataAttributter);
         var saksnummer = utledSaksnummer(dataAttributter, behandlingData);
-        setLogContext(saksnummer, behandlingData);
 
 
         var behandlingStatus = Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::statusForBehandling).orElse(PipBehandlingStatus.UTREDES);
@@ -59,12 +56,16 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
 
         if (saksnummer.isPresent()) {
             ressursData.medSaksnummer(saksnummer.get());
+            ressursData.medLoggSaksnummer(saksnummer.get());
         } else if (behandlingData != null && behandlingData.fpsakUuid() != null) {
             ressursData.medBehandling(behandlingData.fpsakUuid());
+            ressursData.medLoggBehandling(behandlingData.fpsakUuid());
         }
 
         Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::statusForBehandling).ifPresent(ressursData::medBehandlingStatus);
         Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::ansvarligSaksbehandler).ifPresent(ressursData::medAnsvarligSaksbehandler);
+
+        setLogContext(ressursData, saksnummer, behandlingData);
 
         return ressursData.build();
     }
@@ -74,23 +75,19 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         var behandlingData = utledBehandlingData(dataAttributter);
         var saksnummer = utledSaksnummer(dataAttributter, behandlingData);
 
-        setLogContext(saksnummer, behandlingData);
-
         var behandlingStatus = Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::statusForBehandling).orElse(PipBehandlingStatus.UTREDES);
         var ressursData = AppRessursData.builder()
             .medFagsakStatus(PipFagsakStatus.UNDER_BEHANDLING)
             .medBehandlingStatus(behandlingStatus);
+        setLogContext(ressursData, saksnummer, behandlingData);
         return ressursData.build();
     }
 
-    private static void setLogContext(Optional<String> saksnummer, FpPipBehandlingInfo data) {
-        LOG_CONTEXT.remove("behandlingId");
-        LOG_CONTEXT.remove("behandling");
-        LOG_CONTEXT.remove("fagsak");
-
-        saksnummer.ifPresent(s -> LOG_CONTEXT.add("fagsak", s));
-        Optional.ofNullable(data).map(FpPipBehandlingInfo::behandlingUuid).ifPresent(bd -> LOG_CONTEXT.add("behandling", bd.toString()));
-        Optional.ofNullable(data).map(FpPipBehandlingInfo::behandlingId).ifPresent(bd -> LOG_CONTEXT.add("behandlingId", String.valueOf(bd)));
+    private static void setLogContext(AppRessursData.Builder builder, Optional<String> saksnummer, FpPipBehandlingInfo data) {
+        saksnummer.ifPresent(builder::medLoggSaksnummer);
+        Optional.ofNullable(data).map(FpPipBehandlingInfo::behandlingUuid).ifPresent(builder::medLoggBehandling);
+        Optional.ofNullable(data).map(FpPipBehandlingInfo::behandlingId).map(String::valueOf)
+            .ifPresent(bd -> builder.medLoggFelt(LoggFelter.BEHANDLING_ID, bd));
     }
 
     private FpPipBehandlingInfo utledBehandlingData(AbacDataAttributter dataAttributter) {

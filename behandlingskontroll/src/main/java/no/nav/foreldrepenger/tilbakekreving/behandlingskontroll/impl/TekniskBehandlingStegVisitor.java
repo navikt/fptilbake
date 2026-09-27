@@ -10,6 +10,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.Behandlingsk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.jpa.savepoint.Work;
+import no.nav.vedtak.log.mdc.LoggFelter;
 import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 /**
@@ -37,9 +38,9 @@ public class TekniskBehandlingStegVisitor implements BehandlingModellVisitor {
     public StegProsesseringResultat prosesser(BehandlingStegModell steg) {
         var saksreferanse = Optional.ofNullable(kontekst.getSaksnummer()).map(Saksnummer::getVerdi)
             .orElseGet(() -> kontekst.getFagsakId().toString());
-        LOG_CONTEXT.add("fagsak", saksreferanse);
-        LOG_CONTEXT.add("behandling", kontekst.getBehandlingId());
-        LOG_CONTEXT.add("steg", steg.getBehandlingStegType().getKode());
+        LOG_CONTEXT.add(LoggFelter.SAK, saksreferanse);
+        LOG_CONTEXT.add(LoggFelter.BEHANDLING_ID, kontekst.getBehandlingId());
+        LOG_CONTEXT.add(LoggFelter.STEG, steg.getBehandlingStegType().getKode());
 
         var behandling = serviceProvider.hentBehandling(kontekst.getBehandlingId());
         var forrigeTilstand = BehandlingModellImpl.tilBehandlingsStegSnapshot(behandling.getSisteBehandlingStegTilstand());
@@ -60,7 +61,7 @@ public class TekniskBehandlingStegVisitor implements BehandlingModellVisitor {
          * behandling og fagsak kan være satt utenfor, så nullstiller ikke de i log
          * context her
          */
-        LOG_CONTEXT.remove("steg");
+        LOG_CONTEXT.remove(LoggFelter.STEG);
 
         return resultat;
     }
