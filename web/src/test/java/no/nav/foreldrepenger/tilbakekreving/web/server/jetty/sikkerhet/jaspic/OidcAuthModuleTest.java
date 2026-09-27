@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.jaspic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -10,11 +11,13 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.Configuration;
 
 import jakarta.security.auth.message.AuthStatus;
 import jakarta.security.auth.message.MessageInfo;
+import jakarta.security.auth.message.callback.GroupPrincipalCallback;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -25,11 +28,14 @@ import org.eclipse.jetty.server.ConnectionMetaData;
 import org.eclipse.jetty.server.Context;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.security.DefaultIdentityService;
+import org.eclipse.jetty.security.UserPrincipal;
 import org.jose4j.jwt.NumericDate;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.mockito.ArgumentCaptor;
 
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.loginmodule.LoginContextConfiguration;
 import no.nav.vedtak.sikkerhet.kontekst.IdentType;
@@ -144,6 +150,13 @@ class OidcAuthModuleTest {
 
         AuthStatus result = authModule.validateRequest(request, subject, serviceSubject);
         assertThat(result).isEqualTo(AuthStatus.SUCCESS);
+
+        var callbacks = ArgumentCaptor.forClass(Callback[].class);
+        verify(callbackHandler, atLeastOnce()).handle(callbacks.capture());
+        var groupCallback = (GroupPrincipalCallback) callbacks.getValue()[1];
+        assertThat(groupCallback.getGroups()).isEmpty();
+        var identity = new DefaultIdentityService().newUserIdentity(subject, new UserPrincipal("demo", null), groupCallback.getGroups());
+        assertThat(identity.getRoles()).isEmpty();
     }
 
     @Test
