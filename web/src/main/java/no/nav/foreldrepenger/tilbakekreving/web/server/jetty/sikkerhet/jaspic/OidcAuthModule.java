@@ -23,6 +23,7 @@ import jakarta.security.auth.message.AuthStatus;
 import jakarta.security.auth.message.MessageInfo;
 import jakarta.security.auth.message.MessagePolicy;
 import jakarta.security.auth.message.callback.CallerPrincipalCallback;
+import jakarta.security.auth.message.callback.GroupPrincipalCallback;
 import jakarta.security.auth.message.config.ServerAuthContext;
 import jakarta.security.auth.message.module.ServerAuthModule;
 import jakarta.servlet.http.HttpServletRequest;
@@ -230,7 +231,8 @@ public class OidcAuthModule implements ServerAuthModule {
      */
     private AuthStatus notifyContainerAboutLogin(Subject clientSubject, String username) {
         try {
-            containerCallbackHandler.handle(new Callback[]{new CallerPrincipalCallback(clientSubject, username)});
+            containerCallbackHandler.handle(new Callback[]{new CallerPrincipalCallback(clientSubject, username),
+                new GroupPrincipalCallback(clientSubject, new String[0])});
         } catch (IOException | UnsupportedCallbackException e) {
             // Should not happen
             throw new IllegalStateException(e);
