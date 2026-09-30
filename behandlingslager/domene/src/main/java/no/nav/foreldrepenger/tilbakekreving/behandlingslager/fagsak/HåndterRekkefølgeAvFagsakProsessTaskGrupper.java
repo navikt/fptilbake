@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe.Entry;
@@ -48,6 +49,9 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
         if (fagsakId == null) {
             return new ProsessTaskVeto(false, ptData.getId()); // do nothing, er ikke relatert til fagsak/behandling
         }
+        if (ptData.getSaksnummer() == null) {
+           LOG.warn("Prosesstask[{}] av {} for fagsak [{}] har null saksnummer.", ptData.getId(), ptData.taskType(), fagsakId);
+        }
 
         Optional<FagsakProsessTask> blokkerendeTask = repository.sjekkTillattKjøreFagsakProsessTask(ptData);
         // dersom blokkerende task er tom, vetoes ikke tasken
@@ -79,12 +83,16 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
                 // ikke interessant her, move along
                 continue;
             }
+            if (task.getSaksnummer() == null) {
+                LOG.warn("Prosesstask[{}] av {} for fagsak [{}] har null saksnummer.", task.getId(), task.taskType(), task.getFagsakId());
+            }
 
             try (LocalProsessTaskHandlerRef handler = LocalProsessTaskHandlerRef.lookup(task.taskType())) {
                 var rekkefølge = handler.getFagsakProsesstaskRekkefølge();
                 Long sekvensNr = rekkefølge.gruppeSekvens() ? gruppeSekvensNr : null;
                 Long behandlingId = ProsessTaskDataWrapper.wrap(task).getBehandlingId();
-                repository.lagre(new FagsakProsessTask(task.getFagsakId(), task.getId(), behandlingId, sekvensNr));
+                Saksnummer saksnummer = task.getSaksnummer() != null ? new Saksnummer(task.getSaksnummer()) : null;
+                repository.lagre(new FagsakProsessTask(saksnummer, task.getFagsakId(), task.getId(), behandlingId, sekvensNr));
             }
         }
     }
