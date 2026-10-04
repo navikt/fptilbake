@@ -8,10 +8,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
+import no.nav.foreldrepenger.tilbakekreving.sokos.TilbakekrevingsvedtakRequest;
 
 @ApplicationScoped
 public class TilbakekrevingsvedtakTjeneste {
@@ -37,13 +38,26 @@ public class TilbakekrevingsvedtakTjeneste {
     }
 
     public TilbakekrevingVedtakDTO lagTilbakekrevingsvedtak(Long behandlingId) {
+        var data = lagVedtakData(behandlingId);
+        return TilbakekrevingsvedtakMapper.tilDto(data.kravgrunnlag(), data.perioder());
+    }
+
+    public TilbakekrevingsvedtakRequest lagSokosTilbakekrevingsvedtak(Long behandlingId) {
+        var data = lagVedtakData(behandlingId);
+        return TilbakekrevingsvedtakSokosMapper.tilRequest(data.kravgrunnlag(), data.perioder());
+    }
+
+    private VedtakData lagVedtakData(Long behandlingId) {
         var kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
         var vurdertForeldelse = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
         var beregningResultat = beregningsresultatTjeneste.finnEllerBeregn(behandlingId);
         var tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, vurdertForeldelse,
             beregningResultat);
         validerSkattBeløp(tilbakekrevingPerioder);
-        return TilbakekrevingsvedtakMapper.tilDto(kravgrunnlag, tilbakekrevingPerioder);
+        return new VedtakData(kravgrunnlag, tilbakekrevingPerioder);
+    }
+
+    private record VedtakData(Kravgrunnlag431 kravgrunnlag, List<TilbakekrevingPeriode> perioder) {
     }
 
     private void validerSkattBeløp(final List<TilbakekrevingPeriode> tilbakekrevingPerioder) {

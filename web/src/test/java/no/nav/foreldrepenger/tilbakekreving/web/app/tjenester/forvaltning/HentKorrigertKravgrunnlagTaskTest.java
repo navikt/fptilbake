@@ -37,6 +37,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonO
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.HentKravgrunnlagMapperProxy;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.sokos.HentKravgrunnlagMapperSokos;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
@@ -51,6 +52,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandli
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
+import no.nav.foreldrepenger.tilbakekreving.sokos.SokosTilbakekrevingKlient;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
@@ -75,7 +77,8 @@ class HentKorrigertKravgrunnlagTaskTest {
         kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         hentKravgrunnlagMapperProxy = new HentKravgrunnlagMapperProxy(tpsAdapterWrapper);
-        var kravgrunnlagHenter = new KravgrunnlagHenter(økonomiProxyKlient, hentKravgrunnlagMapperProxy);
+        var kravgrunnlagHenter = new KravgrunnlagHenter(økonomiProxyKlient, hentKravgrunnlagMapperProxy,
+            mock(SokosTilbakekrevingKlient.class), mock(HentKravgrunnlagMapperSokos.class));
         hentKorrigertGrunnlagTask = new HentKorrigertKravgrunnlagTask(repositoryProvider, fagsystemKlient, kravgrunnlagHenter);
         entityManager.setFlushMode(FlushModeType.AUTO);
         ScenarioSimple scenarioSimple = ScenarioSimple.simple();
@@ -157,7 +160,7 @@ class HentKorrigertKravgrunnlagTaskTest {
             .vedtakId(207406L)
             .eksternKravgrunnlagId("123456789")
             .vedtakFagSystemDato(LocalDate.now().minusYears(2))
-            .ansvarligEnhet(HentKorrigertKravgrunnlagTask.ANSVARLIG_ENHET_NØS)
+            .ansvarligEnhet(KravgrunnlagHenter.ANSVARLIG_ENHET_NØS)
             .fagSystemId("10000000000000000")
             .fagOmrådeKode(FagOmrådeKode.FP)
             .hjemmelKode("1234239042304")
@@ -168,8 +171,8 @@ class HentKorrigertKravgrunnlagTaskTest {
             .utbetalesTilId("12345678901")
             .utbetGjelderType(GjelderType.PERSON)
             .gjelderType(GjelderType.PERSON)
-            .behandlendeEnhet(HentKorrigertKravgrunnlagTask.ANSVARLIG_ENHET_NØS)
-            .bostedEnhet(HentKorrigertKravgrunnlagTask.ANSVARLIG_ENHET_NØS)
+            .behandlendeEnhet(KravgrunnlagHenter.ANSVARLIG_ENHET_NØS)
+            .bostedEnhet(KravgrunnlagHenter.ANSVARLIG_ENHET_NØS)
             .kravStatusKode(KravStatusKode.NY)
             .gjelderVedtakId("12345678901")
             .omgjortVedtakId(207407L)

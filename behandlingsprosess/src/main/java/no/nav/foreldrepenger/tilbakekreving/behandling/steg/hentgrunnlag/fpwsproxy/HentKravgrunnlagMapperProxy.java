@@ -46,6 +46,8 @@ public class HentKravgrunnlagMapperProxy {
                 KravgrunnlagBelop433 kravgrunnlagBelop433 = formKravgrunnlagBelop433(kravgrunnlagPeriode432, postering);
                 if (!erPosteringenPostitivYtel(kravgrunnlagBelop433)) {
                     kravgrunnlagPeriode432.leggTilBeløp(kravgrunnlagBelop433);
+                }  else {
+                    LOG.warn("Kravbeløp for klasseType YTEL er større enn opprinnelig utbetalt i kravgrunnlag: {}", dto.eksternKravgrunnlagId());
                 }
             }
             kravgrunnlag431.leggTilPeriode(kravgrunnlagPeriode432);

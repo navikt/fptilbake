@@ -33,7 +33,7 @@ public class TilbakekrevingsvedtakMapper {
             .tilbakekrevingsperiode(tilTilbakekrevingsperiodeDTOer(tilbakekrevingPerioder))
             .build();
     }
-    private static LocalDate vedatkFagsystemDato(Kravgrunnlag431 kravgrunnlag) {
+    static LocalDate vedatkFagsystemDato(Kravgrunnlag431 kravgrunnlag) {
         var vedtakFagsystemDato = kravgrunnlag.getVedtakFagSystemDato();
         if (vedtakFagsystemDato == null) {
             vedtakFagsystemDato = LocalDate.now();
