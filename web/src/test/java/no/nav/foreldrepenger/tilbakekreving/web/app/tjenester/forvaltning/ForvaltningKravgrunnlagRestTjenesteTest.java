@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -32,7 +33,6 @@ class ForvaltningKravgrunnlagRestTjenesteTest {
     @Mock
     KravgrunnlagRepository kravgrunnlagRepository;
 
-    @Mock
     KravgrunnlagHenter kravgrunnlagHenter;
 
     @Inject
@@ -46,11 +46,18 @@ class ForvaltningKravgrunnlagRestTjenesteTest {
 
     @BeforeEach
     void setup() {
+        System.setProperty("app.name", "fptilbake");
+        kravgrunnlagHenter = mock(KravgrunnlagHenter.class);
         var forvaltningTjeneste = new ForvaltningTjeneste(mock(ProsessTaskTjeneste.class), mottattXmlRepository,
             repositoryProvider.getBehandlingRepository(), kravgrunnlagRepository, kravgrunnlagHenter);
 
         forvaltningKravgrunnlagRestTjeneste = new ForvaltningKravgrunnlagRestTjeneste(repositoryProvider.getBehandlingRepository(), forvaltningTjeneste, kravgrunnlagRepository);
         behandling = scenario.lagre(repositoryProvider);
+    }
+
+    @AfterEach
+    void cleanup() {
+        System.clearProperty("app.name");
     }
 
     @Test
