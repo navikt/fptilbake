@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,14 +19,16 @@ final class TilbakekrevingsvedtakSokosMapper {
     private TilbakekrevingsvedtakSokosMapper() {
     }
 
-    static TilbakekrevingsvedtakRequest tilRequest(Kravgrunnlag431 kravgrunnlag, List<TilbakekrevingPeriode> perioder) {
+    static TilbakekrevingsvedtakRequest tilRequest(Kravgrunnlag431 kravgrunnlag,
+                                                   List<TilbakekrevingPeriode> perioder,
+                                                   LocalDate tilleggsfristUtgangspunkt) {
         var vedtakId = Math.toIntExact(Objects.requireNonNull(kravgrunnlag.getVedtakId(), "vedtakId"));
         if (vedtakId > 999_999_999) {
             throw new IllegalArgumentException("vedtakId er større enn tillatt i Sokos-kontrakten: " + vedtakId);
         }
         return new TilbakekrevingsvedtakRequest(KodeAksjon.FATTE_VEDTAK, vedtakId, TilbakekrevingsvedtakMapper.vedatkFagsystemDato(kravgrunnlag),
             Optional.ofNullable(kravgrunnlag.getHjemmelKode()).orElse(KODE_HJEMMEL),
-            kravgrunnlag.getAnsvarligEnhet(), kravgrunnlag.getKontrollFelt(), KontekstHolder.getKontekst().getUid(), null,
+            kravgrunnlag.getAnsvarligEnhet(), kravgrunnlag.getKontrollFelt(), KontekstHolder.getKontekst().getUid(), tilleggsfristUtgangspunkt,
             perioder.stream().map(TilbakekrevingsvedtakSokosMapper::tilPeriode).toList());
     }
 

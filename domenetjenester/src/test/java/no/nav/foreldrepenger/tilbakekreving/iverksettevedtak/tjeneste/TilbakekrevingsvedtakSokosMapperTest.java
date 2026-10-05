@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -50,28 +49,29 @@ class TilbakekrevingsvedtakSokosMapperTest {
         var periode = TilbakekrevingPeriode.med(Periode.of(dato.minusDays(14), dato))
             .medRenter(BigDecimal.TEN).medBeløp(List.of(ytelse, trekk));
 
-        try (var kontekst = mockStatic(KontekstHolder.class)) {
-            kontekst.when(KontekstHolder::getKontekst).thenReturn(BasisKontekst.forProsesstaskUtenSystembruker());
-            var request = TilbakekrevingsvedtakSokosMapper.tilRequest(grunnlag, List.of(periode));
+        KontekstHolder.setKontekst(BasisKontekst.forProsesstaskUtenSystembruker());
 
-            assertThat(request.kodeAksjon()).isEqualTo(KodeAksjon.FATTE_VEDTAK);
-            assertThat(request.vedtakId()).isEqualTo(123);
-            assertThat(request.vedtaksDato()).isEqualTo(dato);
-            assertThat(request.kodeHjemmel()).isEqualTo("FVL-22");
-            assertThat(request.enhetAnsvarlig()).isEqualTo("8020");
-            assertThat(request.kontrollfelt()).isEqualTo("kontrollfelt");
-            assertThat(request.saksbehandlerId()).isNotBlank();
-            assertThat(request.perioder()).containsExactly(
-                new TilbakekrevingsvedtakRequest.Periode(dato.minusDays(14), dato, BigDecimal.TEN, List.of(
-                    new TilbakekrevingsvedtakRequest.Postering("FPATORD", BigDecimal.valueOf(1000), BigDecimal.valueOf(800),
-                        BigDecimal.valueOf(200), BigDecimal.ZERO, BigDecimal.valueOf(50),
-                        "FULL_TILBAKEKREV", "ANNET", "IKKE_FORDELT"),
-                    new TilbakekrevingsvedtakRequest.Postering("TREKK", BigDecimal.ZERO, BigDecimal.ZERO,
-                        BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", "", ""))));
-            assertThat(DefaultJsonMapper.toJson(request))
-                .contains("\"kodeResultat\":\"\"", "\"kodeAarsak\":\"\"", "\"kodeSkyld\":\"\"")
-                .doesNotContain("\"renterBeregnes\"", "\"renterPeriodeBeregnes\"");
-        }
+        var request = TilbakekrevingsvedtakSokosMapper.tilRequest(grunnlag, List.of(periode), null);
+
+        assertThat(request.kodeAksjon()).isEqualTo(KodeAksjon.FATTE_VEDTAK);
+        assertThat(request.vedtakId()).isEqualTo(123);
+        assertThat(request.vedtaksDato()).isEqualTo(dato);
+        assertThat(request.kodeHjemmel()).isEqualTo("FVL-22");
+        assertThat(request.enhetAnsvarlig()).isEqualTo("8020");
+        assertThat(request.kontrollfelt()).isEqualTo("kontrollfelt");
+        assertThat(request.saksbehandlerId()).isNotBlank();
+        assertThat(request.perioder()).containsExactly(
+            new TilbakekrevingsvedtakRequest.Periode(dato.minusDays(14), dato, BigDecimal.TEN, List.of(
+                new TilbakekrevingsvedtakRequest.Postering("FPATORD", BigDecimal.valueOf(1000), BigDecimal.valueOf(800),
+                    BigDecimal.valueOf(200), BigDecimal.ZERO, BigDecimal.valueOf(50),
+                    "FULL_TILBAKEKREV", "ANNET", "IKKE_FORDELT"),
+                new TilbakekrevingsvedtakRequest.Postering("TREKK", BigDecimal.ZERO, BigDecimal.ZERO,
+                    BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", "", ""))));
+        assertThat(DefaultJsonMapper.toJson(request))
+            .contains("\"kodeResultat\":\"\"", "\"kodeAarsak\":\"\"", "\"kodeSkyld\":\"\"")
+            .doesNotContain("\"renterBeregnes\"", "\"renterPeriodeBeregnes\"");
+
+        KontekstHolder.fjernKontekst();
     }
 
     @ParameterizedTest
@@ -86,15 +86,18 @@ class TilbakekrevingsvedtakSokosMapperTest {
         var periode = TilbakekrevingPeriode.med(Periode.of(LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31)))
             .medBeløp(beløp);
 
-        try (var kontekst = mockStatic(KontekstHolder.class)) {
-            kontekst.when(KontekstHolder::getKontekst).thenReturn(BasisKontekst.forProsesstaskUtenSystembruker());
-            var request = TilbakekrevingsvedtakSokosMapper.tilRequest(grunnlag, List.of(periode));
-            var postering = request.perioder().getFirst().posteringer().getFirst();
+        KontekstHolder.setKontekst(BasisKontekst.forProsesstaskUtenSystembruker());
 
-            assertThat(postering.kodeResultat()).isEmpty();
-            assertThat(postering.kodeAarsak()).isEmpty();
-            assertThat(postering.kodeSkyld()).isEmpty();
-        }
+        var request = TilbakekrevingsvedtakSokosMapper.tilRequest(grunnlag, List.of(periode), LocalDate.now());
+        var postering = request.perioder().getFirst().posteringer().getFirst();
+
+        assertThat(postering.kodeResultat()).isEmpty();
+        assertThat(postering.kodeAarsak()).isEmpty();
+        assertThat(postering.kodeSkyld()).isEmpty();
+
+        assertThat(request.datoTilleggsfrist()).isEqualTo(LocalDate.now());
+
+        KontekstHolder.fjernKontekst();
     }
 
     @Test
@@ -113,14 +116,15 @@ class TilbakekrevingsvedtakSokosMapperTest {
         var tjeneste = new TilbakekrevingsvedtakTjeneste(grunnlagRepository, mock(BeregningsresultatTjeneste.class),
             periodeBeregner, foreldelseRepository);
 
-        try (var kontekst = mockStatic(KontekstHolder.class)) {
-            kontekst.when(KontekstHolder::getKontekst).thenReturn(BasisKontekst.forProsesstaskUtenSystembruker());
-            var request = tjeneste.lagSokosTilbakekrevingsvedtak(42L);
+        KontekstHolder.setKontekst(BasisKontekst.forProsesstaskUtenSystembruker());
 
-            assertThat(request.vedtakId()).isEqualTo(123);
-            assertThat(request.kodeHjemmel()).isEqualTo("22-15");
-            assertThat(request.perioder()).isEmpty();
-        }
+        var request = tjeneste.lagSokosTilbakekrevingsvedtak(42L);
+
+        assertThat(request.vedtakId()).isEqualTo(123);
+        assertThat(request.kodeHjemmel()).isEqualTo("22-15");
+        assertThat(request.perioder()).isEmpty();
+
+        KontekstHolder.fjernKontekst();
     }
 
     @Test
@@ -128,7 +132,7 @@ class TilbakekrevingsvedtakSokosMapperTest {
         var grunnlag = mock(Kravgrunnlag431.class);
         when(grunnlag.getVedtakId()).thenReturn(1_000_000_000L);
 
-        assertThatThrownBy(() -> TilbakekrevingsvedtakSokosMapper.tilRequest(grunnlag, List.of()))
+        assertThatThrownBy(() -> TilbakekrevingsvedtakSokosMapper.tilRequest(grunnlag, List.of(), null))
             .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("vedtakId");
     }
 

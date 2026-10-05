@@ -1,7 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -9,6 +12,9 @@ import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -44,7 +50,7 @@ public class TilbakekrevingsvedtakTjeneste {
 
     public TilbakekrevingsvedtakRequest lagSokosTilbakekrevingsvedtak(Long behandlingId) {
         var data = lagVedtakData(behandlingId);
-        return TilbakekrevingsvedtakSokosMapper.tilRequest(data.kravgrunnlag(), data.perioder());
+        return TilbakekrevingsvedtakSokosMapper.tilRequest(data.kravgrunnlag(), data.perioder(), data.tillegsfristUtgangspunkt());
     }
 
     private VedtakData lagVedtakData(Long behandlingId) {
@@ -54,10 +60,20 @@ public class TilbakekrevingsvedtakTjeneste {
         var tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, vurdertForeldelse,
             beregningResultat);
         validerSkattBeløp(tilbakekrevingPerioder);
-        return new VedtakData(kravgrunnlag, tilbakekrevingPerioder);
+        var tilleggsfrist = utledTillegsfristUtgangspunkt(vurdertForeldelse);
+        return new VedtakData(kravgrunnlag, tilbakekrevingPerioder, tilleggsfrist);
     }
 
-    private record VedtakData(Kravgrunnlag431 kravgrunnlag, List<TilbakekrevingPeriode> perioder) {
+    private record VedtakData(Kravgrunnlag431 kravgrunnlag, List<TilbakekrevingPeriode> perioder, LocalDate tillegsfristUtgangspunkt) {
+    }
+
+    private static LocalDate utledTillegsfristUtgangspunkt(VurdertForeldelse vurdertForeldelse) {
+        return Optional.ofNullable(vurdertForeldelse).map(VurdertForeldelse::getVurdertForeldelsePerioder).orElse(List.of()).stream()
+            .filter(p -> ForeldelseVurderingType.TILLEGGSFRIST.equals(p.getForeldelseVurderingType()))
+            .map(VurdertForeldelsePeriode::getOppdagelsesDato)
+            .max(Comparator.naturalOrder())
+            .orElse(null);
+
     }
 
     private void validerSkattBeløp(final List<TilbakekrevingPeriode> tilbakekrevingPerioder) {
