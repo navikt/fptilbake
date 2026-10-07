@@ -34,7 +34,7 @@ jobs:
 
       - name: Deploy ${{ inputs.cluster }} fra GAR
         if: inputs.namespace == 'teamforeldrepenger'
-        uses: nais/deploy/actions/deploy@027a91857992525139798892f2804b0ca21f4af6 # ratchet:nais/deploy/actions/deploy@v2
+        uses: nais/deploy/actions/deploy@7ad7c2b833e1db74a80954e3ee6bb6ac060a8ae7 # ratchet:nais/deploy/actions/deploy@v2
         env:
           PRINT_PAYLOAD: true
           CLUSTER: ${{ inputs.cluster }}
@@ -44,7 +44,7 @@ jobs:
 
       - name: Deploy ${{ inputs.cluster }}
         if: inputs.namespace == 'k9saksbehandling'
-        uses: nais/deploy/actions/deploy@027a91857992525139798892f2804b0ca21f4af6 # ratchet:nais/deploy/actions/deploy@v2
+        uses: nais/deploy/actions/deploy@7ad7c2b833e1db74a80954e3ee6bb6ac060a8ae7 # ratchet:nais/deploy/actions/deploy@v2
         env:
           PRINT_PAYLOAD: true
           CLUSTER: ${{ inputs.cluster }}
