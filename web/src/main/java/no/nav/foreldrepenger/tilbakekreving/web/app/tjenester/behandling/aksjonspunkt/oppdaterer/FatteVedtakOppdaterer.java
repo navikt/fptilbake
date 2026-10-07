@@ -10,12 +10,14 @@ import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.VedtakAksjonspunktData;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.FatteVedtakTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.fattevedtak.NedstengingOktober2026;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.DtoTilServiceAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AksjonspunktGodkjenningDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.FatteVedtakDto;
+import no.nav.vedtak.exception.FunksjonellException;
 
 @ApplicationScoped
 @DtoTilServiceAdapter(dto = FatteVedtakDto.class, adapter = AksjonspunktOppdaterer.class)
@@ -43,6 +45,11 @@ public class FatteVedtakOppdaterer implements AksjonspunktOppdaterer<FatteVedtak
                     return new VedtakAksjonspunktData(aksDef, a.isGodkjent(), a.getBegrunnelse(), fraDto(a.getArsaker()));
                 })
                 .collect(Collectors.toSet());
+
+        var godkjent = aksjonspunkter.stream().allMatch(VedtakAksjonspunktData::isGodkjent);
+        if (godkjent && !NedstengingOktober2026.kanFatteVedtak()) {
+            throw new FunksjonellException("FPT-091926", "Kan ikke fatte vedtak 9-19 oktober 2026", "Kan ikke fatte vedtak 9-19 oktober 2026");
+        }
 
         fatteVedtakTjeneste.opprettTotrinnsVurdering(behandling, aksjonspunkter);
     }

@@ -78,6 +78,9 @@ public class FatteVedtakSteg implements BehandlingSteg {
             return BehandleStegResultat.tilbakeførtMedAksjonspunkter(aksjonspunktDefinisjoner);
         } else {
             //TODO Velge mer fingranulert ved revurdering
+            if (!NedstengingOktober2026.kanFatteVedtak()) {
+                throw new IllegalStateException("Fatte vedtak er stengt 9-19 oktober 2026");
+            }
             opprettBehandlingVedtak(behandling);
             if (behandling.isAutomatiskSaksbehandlet()) {
                 behandling.setAnsvarligBeslutter("VL");
