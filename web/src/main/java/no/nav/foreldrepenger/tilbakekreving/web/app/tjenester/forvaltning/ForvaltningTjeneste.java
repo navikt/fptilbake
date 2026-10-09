@@ -1,13 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.AnnullerKravGrunnlagDto;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagXmlUnmarshaller;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -23,11 +21,11 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 @Dependent
 class ForvaltningTjeneste {
 
-    private ProsessTaskTjeneste prosessTaskTjeneste;
-    private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
-    private BehandlingRepository behandlingRepository;
-    private KravgrunnlagRepository kravgrunnlagRepository;
-    private ØkonomiProxyKlient økonomiProxyKlient;
+    private final ProsessTaskTjeneste prosessTaskTjeneste;
+    private final ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
+    private final BehandlingRepository behandlingRepository;
+    private final KravgrunnlagRepository kravgrunnlagRepository;
+    private final KravgrunnlagHenter kravgrunnlagHenter;
 
 
     @Inject
@@ -35,12 +33,12 @@ class ForvaltningTjeneste {
                                ØkonomiMottattXmlRepository økonomiMottattXmlRepository,
                                BehandlingRepository behandlingRepository,
                                KravgrunnlagRepository kravgrunnlagRepository,
-                               ØkonomiProxyKlient økonomiProxyKlient) {
+                               KravgrunnlagHenter kravgrunnlagHenter) {
         this.prosessTaskTjeneste = prosessTaskTjeneste;
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
         this.behandlingRepository = behandlingRepository;
         this.kravgrunnlagRepository = kravgrunnlagRepository;
-        this.økonomiProxyKlient = økonomiProxyKlient;
+        this.kravgrunnlagHenter = kravgrunnlagHenter;
     }
 
     void hentKorrigertKravgrunnlag(Behandling behandling, String kravgrunnlagId) {
@@ -51,9 +49,7 @@ class ForvaltningTjeneste {
     }
 
     void annullerKravgrunnlag(Long behandlingId) {
-        var kravgrunnlag431 = kravgrunnlagRepository.hentIsAktivFor(behandlingId);
-        var annullerKravgrunnlagDto = new AnnullerKravGrunnlagDto(BigInteger.valueOf(kravgrunnlag431.getVedtakId()));
-        økonomiProxyKlient.anullerKravgrunnlag(annullerKravgrunnlagDto);
+        kravgrunnlagHenter.annullerKravgrunnlag(behandlingId, kravgrunnlagRepository.hentIsAktivFor(behandlingId));
     }
 
 
@@ -74,7 +70,7 @@ class ForvaltningTjeneste {
         if (økonomiXmlMottatt.isEmpty()) {
             throw new TekniskException("ERROR", String.format("Finnes ikke data i systemet for saksnummer=%s", saksnummer));
         }
-        var xmlMottatt = økonomiXmlMottatt.get(0);
+        var xmlMottatt = økonomiXmlMottatt.getFirst();
         var kravgrunnlagDto = KravgrunnlagXmlUnmarshaller.unmarshall(xmlMottatt.getId(), xmlMottatt.getMottattXml(), true);
         return new Forvaltningsinfo(kravgrunnlagDto.getKravgrunnlagId().toString(), xmlMottatt.getId(), new Henvisning(kravgrunnlagDto.getReferanse()), null);
     }

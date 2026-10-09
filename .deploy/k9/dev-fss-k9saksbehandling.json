@@ -46,6 +46,8 @@
     "DOKARKIV_SCOPES": "api://dev-fss.teamdokumenthandtering.dokarkiv/.default",
     "DOKDIST_REST_DISTRIBUER_JOURNALPOST" : "http://dokdistfordeling.teamdokumenthandtering/rest/v1/distribuerjournalpost",
     "DOKDIST_SCOPES" : "api://dev-fss.teamdokumenthandtering.dokdistfordeling/.default",
+    "SOKOS_BASE_URL": "https://sokos-os-ekstern-api.intern.dev.nav.no/api/v1/tilbakekreving",
+    "SOKOS_SCOPES": "api://dev-gcp.okonomi.sokos-os-ekstern-api/.default",
     "SENSU_HOST": "sensu.nais",
     "SENSU_PORT": "3030",
     "METRIKKER_KRAVGRUNNLAG_OPPDATERINGSPERIODE" : "P2W",

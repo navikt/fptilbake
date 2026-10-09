@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import jakarta.persistence.EntityManager;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwspro
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.UkjentKvitteringFraOSException;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.sokos.HentKravgrunnlagMapperSokos;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
@@ -65,6 +67,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.Personopplysnin
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.HistorikkTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.sokos.SokosTilbakekrevingKlient;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
@@ -111,7 +114,8 @@ class HåndterGamleKravgrunnlagTaskTest {
         var fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repositoryProvider,
                 behandlingskontrollProvider, fagsakTjeneste, behandlingHistorikkTjeneste, fagsystemKlientMock);
-        var kravgrunnlagHenter = new KravgrunnlagHenter(økonomiProxyKlient, hentKravgrunnlagMapperProxy);
+        var kravgrunnlagHenter = new KravgrunnlagHenter(økonomiProxyKlient, hentKravgrunnlagMapperProxy,
+            mock(SokosTilbakekrevingKlient.class), mock(HentKravgrunnlagMapperSokos.class));
         var håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(
                 mottattXmlRepository, grunnlagRepository, lesKravgrunnlagMapper, behandlingTjeneste,
                 fagsystemKlientMock, kravgrunnlagHenter);
@@ -130,6 +134,13 @@ class HåndterGamleKravgrunnlagTaskTest {
         when(fagsystemKlientMock.hentBehandling(any(UUID.class))).thenReturn(eksternBehandlingsinfoDto);
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML());
+
+        System.setProperty("app.name", "fptilbake");
+    }
+
+    @AfterEach
+    void cleanup() {
+        System.clearProperty("app.name");
     }
 
     @Test
