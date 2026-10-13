@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.log.mdc.LoggFelter;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -65,9 +64,11 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::statusForBehandling).ifPresent(ressursData::medBehandlingStatus);
         Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::ansvarligSaksbehandler).ifPresent(ressursData::medAnsvarligSaksbehandler);
 
-        setLogContext(ressursData, saksnummer, behandlingData);
-
-        return ressursData.build();
+        return ressursData
+            .medLoggSaksnummer(saksnummer.orElse(null))
+            .medLoggBehandling(Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::behandlingUuid).orElse(null))
+            .medLoggBehandlingId(Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::behandlingId).orElse(null))
+            .build();
     }
 
     @Override
@@ -79,15 +80,11 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         var ressursData = AppRessursData.builder()
             .medFagsakStatus(PipFagsakStatus.UNDER_BEHANDLING)
             .medBehandlingStatus(behandlingStatus);
-        setLogContext(ressursData, saksnummer, behandlingData);
-        return ressursData.build();
-    }
-
-    private static void setLogContext(AppRessursData.Builder builder, Optional<String> saksnummer, FpPipBehandlingInfo data) {
-        saksnummer.ifPresent(builder::medLoggSaksnummer);
-        Optional.ofNullable(data).map(FpPipBehandlingInfo::behandlingUuid).ifPresent(builder::medLoggBehandling);
-        Optional.ofNullable(data).map(FpPipBehandlingInfo::behandlingId).map(String::valueOf)
-            .ifPresent(bd -> builder.medLoggFelt(LoggFelter.BEHANDLING_ID, bd));
+        return ressursData
+            .medLoggSaksnummer(saksnummer.orElse(null))
+            .medLoggBehandling(Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::behandlingUuid).orElse(null))
+            .medLoggBehandlingId(Optional.ofNullable(behandlingData).map(FpPipBehandlingInfo::behandlingId).orElse(null))
+            .build();
     }
 
     private FpPipBehandlingInfo utledBehandlingData(AbacDataAttributter dataAttributter) {
