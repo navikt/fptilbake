@@ -217,6 +217,11 @@
                 <artifactId>journalpost-api-klient</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>sokos-klient</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- skal være del av Jakarta EE BOM, tas med for synk med versjon i JMS-integrasjon -->
             <dependency>

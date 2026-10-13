@@ -9,6 +9,7 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -80,10 +81,17 @@ class AutomatiskSaksbehandlingProsessTaskTest {
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING,
                 BehandlingStegStatus.UTGANG, BehandlingStegStatus.UTGANG);
 
+        System.setProperty("app.name", "fptilbake");
+    }
+
+    @AfterEach
+    void cleanup() {
+        System.clearProperty("app.name");
     }
 
     @Test
     void skal_saksbehandle_automatisk() {
+        System.setProperty("app.name", "fptilbake");
         var antallKlareFør = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).size();
         automatiskSaksbehandlingProsessTask.doTask(lagProsesTaskData());
         behandling = behandlingRepository.hentBehandling(behandlingId);
@@ -158,6 +166,7 @@ class AutomatiskSaksbehandlingProsessTaskTest {
         assertThat(historikkinnslager.stream().allMatch(historikkinnslag -> HistorikkAktør.VEDTAKSLØSNINGEN.equals(historikkinnslag.getAktør()))).isTrue();
 
         assertThat(totrinnRepository.hentTotrinngrunnlag(behandling)).isEmpty();
+        System.clearProperty("app.name");
     }
 
     @Test

@@ -15,6 +15,8 @@ public enum FagOmrådeKode implements Kodeverdi {
 
     FORELDREPENGER("FP", "Foreldrepenger"),
     FORELDREPENGER_ARBEIDSGIVER("FPREF", "Foreldrepenger refusjon"),
+    FORELDREPENGER_MANUELL("MFP", "Foreldrepenger manuell"),
+    FORELDREPENGER_MAN_ARBEIDSGIVER("MFPREF", "Foreldrepenger manuell refusjon"),
     SYKEPENGER("SP", "Sykepenger"),
     SYKEPENGER_ARBEIDSGIVER("SPREF", "Sykepenger refusjon"),
     PLEIEPENGER_V1("OOP", "Pleiepenger sykt barn"),
@@ -22,6 +24,8 @@ public enum FagOmrådeKode implements Kodeverdi {
     ENGANGSSTØNAD("REFUTG", "Engangsstønad"),
     SVANGERSKAPSPENGER("SVP", "Svangerskapspenger"),
     SVANGERSKAPSPENGER_ARBEIDSGIVER("SVPREF", "Svangerskapspenger refusjon til arbeidsgiver"),
+    SVANGERSKAPSPENGER_MANUELL("MSVP", "Svangerskapspenger manuell"),
+    SVANGERSKAPSPENGER_MAN_ARBEIDSGIVER("MSVPREF", "Svangerskapspenger manuell refusjon"),
 
     //K9
     PLEIEPENGER_SYKT_BARN("PB", PLEIEPENGER_V1.navn),

@@ -24,6 +24,10 @@
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>sokos-klient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>behandlingskontroll</artifactId>
         </dependency>
 

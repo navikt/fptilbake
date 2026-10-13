@@ -5,8 +5,7 @@ import java.math.BigInteger;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.HentKravgrunnlagRequest;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
@@ -21,6 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandli
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.web.app.util.StringUtils;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -33,9 +33,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
 
     public static final String KRAVGRUNNLAG_ID = "KRAVGRUNNLAG_ID";
-    public static final String ANSVARLIG_ENHET_NØS = "8020";  // fast verdi
-    public static final String OKO_SAKSBEH_ID = "K231B433";  //fast verdi
-
     private EksternBehandlingRepository eksternBehandlingRepository;
     private KravgrunnlagRepository kravgrunnlagRepository;
     private BehandlingRepository behandlingRepository;
@@ -76,16 +73,16 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
 
     private Kravgrunnlag431 hentKorrigertKravgrunnlagFraØkonomi(Long behandlingId, String kravgrunnlagId) {
         if (StringUtils.erIkkeTom(kravgrunnlagId)) {
-            var hentKravgrunnlagDetaljDto = new HentKravgrunnlagDetaljDto.Builder()
+            var hentKravgrunnlagDetaljDto = new HentKravgrunnlagRequest.Builder()
                 .kodeAksjon(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG)
                 .kravgrunnlagId(new BigInteger(kravgrunnlagId))
-                .enhetAnsvarlig(ANSVARLIG_ENHET_NØS)
-                .saksbehId(OKO_SAKSBEH_ID)
+                .enhetAnsvarlig(KravgrunnlagHenter.ANSVARLIG_ENHET_NØS)
+                .saksbehId(KravgrunnlagHenter.OKO_SAKSBEH_ID)
                 .build();
             return kravgrunnlagHenter.hentKravgrunnlagFraOS(behandlingId, hentKravgrunnlagDetaljDto);
         } else {
             var kravgrunnlag431 = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
-            var hentKravgrunnlagDetaljDto = new HentKravgrunnlagDetaljDto.Builder()
+            var hentKravgrunnlagDetaljDto = new HentKravgrunnlagRequest.Builder()
                 .kodeAksjon(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG)
                 .kravgrunnlagId(new BigInteger(kravgrunnlag431.getEksternKravgrunnlagId()))
                 .enhetAnsvarlig(kravgrunnlag431.getAnsvarligEnhet())

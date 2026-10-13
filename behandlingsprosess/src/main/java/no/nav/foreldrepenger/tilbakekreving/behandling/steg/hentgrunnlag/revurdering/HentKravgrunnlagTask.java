@@ -8,9 +8,8 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.HentKravgrunnlagRequest;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -29,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandli
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KodeAksjon;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -89,7 +89,7 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
 
     private Kravgrunnlag431 hentNyttKravgrunnlag(Long origBehandlingId) {
         var kravgrunnlag = grunnlagRepository.finnKravgrunnlag(origBehandlingId);
-        var hentKravgrunnlagRequest = new HentKravgrunnlagDetaljDto.Builder()
+        var hentKravgrunnlagRequest = new HentKravgrunnlagRequest.Builder()
             .kodeAksjon(KodeAksjon.HENT_GRUNNLAG_OMGJØRING)
             .kravgrunnlagId(new BigInteger(kravgrunnlag.getEksternKravgrunnlagId()))
             .enhetAnsvarlig(kravgrunnlag.getAnsvarligEnhet())

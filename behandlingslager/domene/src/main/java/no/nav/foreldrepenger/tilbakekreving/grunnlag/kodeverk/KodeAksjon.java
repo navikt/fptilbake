@@ -1,4 +1,6 @@
-package no.nav.foreldrepenger.tilbakekreving.grunnlag;
+package no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk;
+
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum KodeAksjon {
 
@@ -8,7 +10,8 @@ public enum KodeAksjon {
     FATTE_VEDTAK("8"),
     ANNULERE_GRUNNLAG("A");
 
-    private String kode;
+    @JsonValue
+    private final String kode;
 
     KodeAksjon(String kode) {
         this.kode = kode;
