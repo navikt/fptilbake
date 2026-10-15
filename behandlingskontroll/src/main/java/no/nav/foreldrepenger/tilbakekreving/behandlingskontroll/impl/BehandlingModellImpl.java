@@ -12,8 +12,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jakarta.enterprise.inject.spi.CDI;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 /**
  * Modell av behandlingssteg, vurderingspunkter og aksjonspunkter som brukes i evaluering av en prosess for behandling.
  */
-public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
+public class BehandlingModellImpl implements BehandlingModell {
 
     private static final Logger LOG = LoggerFactory.getLogger(BehandlingModellImpl.class);
     private static final String ER_IKKE_DEFINERT_BLANT = " er ikke definert blant: ";
@@ -50,19 +48,15 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
      * Enkel sekvens av behandlingsteg. Støtter ikke branching p.t.
      */
     private List<BehandlingStegModellImpl> steg = new ArrayList<>();
-    private BiFunction<BehandlingStegType, BehandlingType, BehandlingStegModellImpl> lookup;
-    private boolean destroyOnClose;
+    private final BiFunction<BehandlingStegType, BehandlingType, BehandlingStegModellImpl> lookup;
 
     /**
-     * Default modell bruker steg implementert vha. CDI.
-     *
-     * @param destroyOnClose - hvorvidt #close skal gjøre noe.
+     * Default modell bruker steg implementert vha. CDI. Oppslag av steg skjer lazy ved første bruk.
      */
-    protected BehandlingModellImpl(BehandlingType behandlingType, boolean destroyOnClose) {
+    protected BehandlingModellImpl(BehandlingType behandlingType) {
         Objects.requireNonNull(behandlingType, "behandlingType");
-        this.destroyOnClose = destroyOnClose;
         this.behandlingType = behandlingType;
-        this.lookup = new CdiLookup(this);
+        this.lookup = (stegType, behType) -> new BehandlingStegModellImpl(this, () -> finnCdiSteg(stegType, behType), stegType);
     }
 
     /* for testing først og fremst. */
@@ -187,20 +181,6 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
     @Override
     public List<BehandlingStegType> getAlleBehandlingStegTyper() {
         return steg.stream().map(s -> s.getBehandlingStegType()).collect(Collectors.toList());
-    }
-
-    /**
-     * Siden CDI kan ha blitt benyttet programmatisk i oppslag må modellen også
-     * avsluttes når den ikke lenger er i bruk.
-     */
-    @Override
-    public void close() {
-        if (destroyOnClose) {
-            for (var stegModellImpl : steg) {
-                stegModellImpl.destroy();
-            }
-        }
-
     }
 
     @Override
@@ -443,26 +423,13 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
 
     }
 
-    private static class CdiLookup implements BiFunction<BehandlingStegType, BehandlingType, BehandlingStegModellImpl> {
-        private BehandlingModellImpl behandlingModell;
-
-        CdiLookup(BehandlingModellImpl behandlingModell) {
-            this.behandlingModell = behandlingModell;
-        }
-
-        @Override
-        public BehandlingStegModellImpl apply(BehandlingStegType stegType, BehandlingType behandlingType) {
-            var annotationLiteral = new BehandlingStegRef.BehandlingStegRefLiteral(stegType);
-
-            var instance = CDI.current().select(BehandlingSteg.class, annotationLiteral);
-            return new BehandlingStegModellImpl(behandlingModell, instance, stegType);
-        }
-
+    private static BehandlingSteg finnCdiSteg(BehandlingStegType stegType, BehandlingType behandlingType) {
+        return BehandlingStegRef.Lookup.find(BehandlingSteg.class, behandlingType, stegType)
+            .orElseThrow(() -> new IllegalStateException("Mangler steg definert for stegKode=" + stegType + " [behandlingType=" + behandlingType + "]"));
     }
 
-    @SuppressWarnings("resource")
     public static BehandlingModellBuilder builder(BehandlingType behandlingType) {
-        return new BehandlingModellBuilder(new BehandlingModellImpl(behandlingType, false));
+        return new BehandlingModellBuilder(new BehandlingModellImpl(behandlingType));
     }
 
     public static class BehandlingModellBuilder {

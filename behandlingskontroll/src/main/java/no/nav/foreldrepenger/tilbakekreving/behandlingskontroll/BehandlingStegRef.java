@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Instance;
+import jakarta.enterprise.inject.spi.CDI;
 import jakarta.enterprise.inject.Stereotype;
 import jakarta.enterprise.inject.spi.CDI;
 import jakarta.enterprise.util.AnnotationLiteral;
@@ -72,6 +73,10 @@ public @interface BehandlingStegRef {
     public static final  class Lookup {
 
         private Lookup() {
+        }
+
+        public static <I> Optional<I> find(Class<I> cls, BehandlingType behandlingType, BehandlingStegType behandlingStegRef) {
+            return find(cls, CDI.current().select(cls), behandlingType, behandlingStegRef);
         }
 
         public static <I> Optional<I> find(Class<I> cls, Instance<I> instances, BehandlingType behandlingType, BehandlingStegType behandlingStegRef) {

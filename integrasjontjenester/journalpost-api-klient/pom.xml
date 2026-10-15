@@ -22,10 +22,6 @@
             <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
             <artifactId>dokarkiv-klient</artifactId>
         </dependency>
-        <dependency>
-            <groupId>jakarta.enterprise</groupId>
-            <artifactId>jakarta.enterprise.cdi-api</artifactId>
-        </dependency>
     </dependencies>
 
 </project>
