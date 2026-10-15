@@ -1,4 +1,4 @@
-FROM ghcr.io/navikt/fp-baseimages/chainguard:jre-27
+FROM ghcr.io/navikt/fp-baseimages/chainguard:jre-25
 LABEL org.opencontainers.image.source=https://github.com/navikt/fptilbake
 
 # Config
