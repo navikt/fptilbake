@@ -11,11 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -200,6 +199,12 @@ public enum AksjonspunktDefinisjon implements Kodeverdi {
         return KODER.values().stream()
                 .filter(ad -> Objects.equals(ad.getBehandlingSteg(), behandlingStegType) && Objects.equals(ad.getVurderingspunktType(), vurderingspunktType))
                 .toList();
+    }
+
+    public static List<AksjonspunktDefinisjon> finnAutopunkt() {
+        return KODER.values().stream()
+            .filter(ad -> AksjonspunktType.AUTOPUNKT.equals(ad.getAksjonspunktType()))
+            .toList();
     }
 
     @Converter(autoApply = true)

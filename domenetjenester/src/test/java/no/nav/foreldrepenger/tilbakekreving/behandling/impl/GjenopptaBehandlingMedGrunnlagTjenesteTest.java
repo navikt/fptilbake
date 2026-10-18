@@ -22,7 +22,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.InternalAksjonspunktManipulator;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -36,9 +35,6 @@ class GjenopptaBehandlingMedGrunnlagTjenesteTest {
     @Inject
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
 
-    @Inject
-    private BehandlingVenterRepository behandlingVenterRepository;
-
     @Mock
     private ProsessTaskTjeneste mockTaskTjeneste;
 
@@ -47,7 +43,7 @@ class GjenopptaBehandlingMedGrunnlagTjenesteTest {
 
     @BeforeEach
     void setup() {
-        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingMedGrunnlagTjeneste(mockTaskTjeneste, behandlingVenterRepository);
+        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingMedGrunnlagTjeneste(mockTaskTjeneste);
     }
 
     @Test
@@ -55,7 +51,7 @@ class GjenopptaBehandlingMedGrunnlagTjenesteTest {
         Behandling behandling = lagBehandling();
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
         internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().plusDays(20));
-        gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling.getId());
+        gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling);
         verifyNoInteractions(mockTaskTjeneste);
     }
 
@@ -65,7 +61,7 @@ class GjenopptaBehandlingMedGrunnlagTjenesteTest {
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
         internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(20));
         when(mockTaskTjeneste.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
-        gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling.getId());
+        gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling);
         verify(mockTaskTjeneste).lagre(any(ProsessTaskData.class));
     }
 
@@ -75,7 +71,7 @@ class GjenopptaBehandlingMedGrunnlagTjenesteTest {
         InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStegStatus.VENTER, BehandlingStegStatus.VENTER);
         internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(20));
         when(mockTaskTjeneste.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
-        gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling.getId());
+        gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling);
         verify(mockTaskTjeneste).lagre(any(ProsessTaskData.class));
     }
 

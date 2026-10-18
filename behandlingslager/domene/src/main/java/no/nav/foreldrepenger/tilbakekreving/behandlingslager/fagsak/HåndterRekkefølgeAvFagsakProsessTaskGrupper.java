@@ -46,12 +46,8 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
 
     @Override
     public ProsessTaskVeto vetoKjøring(ProsessTaskData ptData) {
-        Long fagsakId = ptData.getFagsakId();
-        if (fagsakId == null) {
-            return new ProsessTaskVeto(false, ptData.getId()); // do nothing, er ikke relatert til fagsak/behandling
-        }
         if (ptData.getSaksnummer() == null) {
-           LOG.warn("Prosesstask[{}] av {} for fagsak [{}] har null saksnummer.", ptData.getId(), ptData.taskType(), fagsakId);
+            return new ProsessTaskVeto(false, ptData.getId()); // do nothing, er ikke relatert til fagsak/behandling
         }
 
         Optional<FagsakProsessTask> blokkerendeTask = repository.sjekkTillattKjøreFagsakProsessTask(ptData);
@@ -60,7 +56,7 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
         if (vetoed) {
             ProsessTaskData blokker = taskTjeneste.finn(blokkerendeTask.get().getProsessTaskId());
             LOG.info("Vetoer kjøring av prosesstask[{}] av {} for fagsak [{}] , er blokkert av prosesstask[{}] av {} for samme fagsak.",
-                    ptData.getId(), ptData.taskType(), ptData.getFagsakId(), blokker.getId(), blokker.taskType());
+                    ptData.getId(), ptData.taskType(), ptData.getSaksnummer(), blokker.getId(), blokker.taskType());
 
             return new ProsessTaskVeto(false, ptData.getId(), blokker.getId(), getClass().getSimpleName()
                     + " vetoer pga definert rekkefølge i FAGSAK_PROSESS_TASK.GRUPPE_SEKVENSNR. Blir pukket når blokkerende task kjøres FERDIG.");
@@ -80,12 +76,9 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
         for (Entry entry : gruppe.getTasks()) {
 
             ProsessTaskData task = entry.task();
-            if (task.getFagsakId() == null) {
+            if (task.getSaksnummer() == null) {
                 // ikke interessant her, move along
                 continue;
-            }
-            if (task.getSaksnummer() == null) {
-                LOG.warn("Prosesstask[{}] av {} for fagsak [{}] har null saksnummer.", task.getId(), task.taskType(), task.getFagsakId());
             }
 
             try (LocalProsessTaskHandlerRef handler = LocalProsessTaskHandlerRef.lookup(task.taskType())) {

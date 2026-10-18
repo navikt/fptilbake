@@ -23,10 +23,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.InternalAksjonspunktManipulator;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingKandidaterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
@@ -42,24 +40,14 @@ class GjenopptaBehandlingTjenesteTest {
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
 
     @Inject
-    private BehandlingVenterRepository behandlingVenterRepository;
-
-    @Inject
-    private BehandlingKandidaterRepository behandlingKandidaterRepository;
-
-    @Inject
     private BehandlingRepositoryProvider repositoryProvider;
 
-    private ProsessTaskTjeneste mockTaskTjeneste = mock(ProsessTaskTjeneste.class);
-    private InternalAksjonspunktManipulator internalAksjonspunktManipulator = new InternalAksjonspunktManipulator();
+    private final ProsessTaskTjeneste mockTaskTjeneste = mock(ProsessTaskTjeneste.class);
+    private final InternalAksjonspunktManipulator internalAksjonspunktManipulator = new InternalAksjonspunktManipulator();
 
     @BeforeEach
     void setup() {
-        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(mockTaskTjeneste,
-            behandlingKandidaterRepository,
-            behandlingVenterRepository,
-            repositoryProvider
-        );
+        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(mockTaskTjeneste, repositoryProvider);
     }
 
     @Test

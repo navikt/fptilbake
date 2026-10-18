@@ -89,8 +89,7 @@ class MottattGrunnlagStegTest extends FellesTestOppsett {
     }
 
     private MottattGrunnlagSteg steg() {
-        var gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskTjeneste, behandlingKandidaterRepository, behandlingVenterRepository,
-            repositoryProvider);
+        var gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskTjeneste, repositoryProvider);
         return new MottattGrunnlagSteg(behandlingRepository, behandlingskontrollTjeneste, gjenopptaBehandlingTjeneste,
             new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository()));
     }

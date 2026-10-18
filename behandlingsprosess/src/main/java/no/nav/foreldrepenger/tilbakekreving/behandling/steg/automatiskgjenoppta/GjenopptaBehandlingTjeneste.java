@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatiskgjenoppta
 
 import java.time.LocalDate;
 import java.util.Optional;
-import java.util.Set;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -17,10 +16,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingKandidaterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
@@ -35,8 +32,6 @@ public class GjenopptaBehandlingTjeneste {
     private static final Logger LOG = LoggerFactory.getLogger(GjenopptaBehandlingTjeneste.class);
 
     private ProsessTaskTjeneste taskTjeneste;
-    private BehandlingKandidaterRepository behandlingKandidaterRepository;
-    private BehandlingVenterRepository behandlingVenterRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private HistorikkinnslagRepository historikkRepository;
     private BehandlingRepository behandlingRepository;
@@ -47,12 +42,8 @@ public class GjenopptaBehandlingTjeneste {
 
     @Inject
     public GjenopptaBehandlingTjeneste(ProsessTaskTjeneste taskTjeneste,
-                                       BehandlingKandidaterRepository behandlingKandidaterRepository,
-                                       BehandlingVenterRepository behandlingVenterRepository,
                                        BehandlingRepositoryProvider repositoryProvider) {
         this.taskTjeneste = taskTjeneste;
-        this.behandlingKandidaterRepository = behandlingKandidaterRepository;
-        this.behandlingVenterRepository = behandlingVenterRepository;
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.historikkRepository = repositoryProvider.getHistorikkinnslagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
@@ -65,11 +56,10 @@ public class GjenopptaBehandlingTjeneste {
      */
     public String automatiskGjenopptaBehandlinger() {
         final String callId = hentCallId();
-        Set<Behandling> behandlinger = behandlingKandidaterRepository.finnBehandlingerForAutomatiskGjenopptagelse();
-
-        for (Behandling behandling : behandlinger) {
-            gjenopptaBehandlingOmMulig(callId, behandling);
-        }
+        LocalDate iDag = LocalDate.now();
+        behandlingRepository.finnBehandlingerPåVent().stream()
+            .filter(o -> iDag.isAfter(o.getFristDatoBehandlingPåVent()))
+            .forEach(b -> gjenopptaBehandlingOmMulig(callId, b));
         return "-";
     }
 
@@ -119,8 +109,10 @@ public class GjenopptaBehandlingTjeneste {
      * @return prosesstask gruppe ID
      */
     public void fortsettBehandling(long behandlingId) {
-        behandlingVenterRepository.hentBehandlingPåVent(behandlingId)
-            .ifPresent(behandling -> opprettFortsettBehandlingTask(behandling, hentCallId() + behandling.getId()));
+        var behandling = behandlingRepository.hentBehandling(behandlingId);
+        if (behandling.isBehandlingPåVent()) {
+            opprettFortsettBehandlingTask(behandling, hentCallId() + behandling.getId());
+        }
     }
 
     /**

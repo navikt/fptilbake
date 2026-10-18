@@ -13,6 +13,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBeh
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskStatusUtil;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
@@ -34,14 +35,14 @@ public class BehandlingskontrollAsynkTjeneste {
         this.fagsakProsessTaskRepository = fagsakProsessTaskRepository;
     }
 
-    public Map<String, ProsessTaskData> sjekkProsessTaskPågår(Long fagsakId, Long behandlingId, String gruppe) {
+    public Map<String, ProsessTaskData> sjekkProsessTaskPågår(Saksnummer saksnummer, Long behandlingId, String gruppe) {
 
-        Map<String, List<ProsessTaskData>> statusProsessTasks = sjekkStatusProsessTasksGrouped(fagsakId, behandlingId, gruppe);
+        Map<String, List<ProsessTaskData>> statusProsessTasks = sjekkStatusProsessTasksGrouped(saksnummer, behandlingId, gruppe);
 
         Map<String, ProsessTaskData> nestePerGruppe = nesteProsessTaskPerGruppe(statusProsessTasks);
 
         if (angittGruppeErFerdig(gruppe, nestePerGruppe)) {
-            nestePerGruppe = nesteProsessTaskPerGruppe(sjekkStatusProsessTasksGrouped(fagsakId, behandlingId, null));
+            nestePerGruppe = nesteProsessTaskPerGruppe(sjekkStatusProsessTasksGrouped(saksnummer, behandlingId, null));
         }
 
         return nestePerGruppe;
@@ -55,15 +56,15 @@ public class BehandlingskontrollAsynkTjeneste {
      * behandling. Tasks som er {@link ProsessTaskStatus#FERDIG eller ProsessTaskStatus#KJOERT} ignoreres i resultatet når gruppe ikke er angitt.
      */
     public Map<String, ProsessTaskData> sjekkProsessTaskPågårForBehandling(Behandling behandling, String gruppe) {
-        return sjekkProsessTaskPågår(behandling.getFagsakId(), behandling.getId(), gruppe);
+        return sjekkProsessTaskPågår(behandling.getSaksnummer(), behandling.getId(), gruppe);
     }
 
     /**
      * Merge ny gruppe med eksisterende, hvis tidligere gruppe er i gang ignoreres input gruppe her. Hvis tidligere gruppe har feil, overskrives
      * denne (ny skrives, gamle fjernes). For å merge sees det på individuelle tasks inne i gruppen (da gruppe id kan være forskjellig uansett).
      */
-    public String lagreNyGruppeKunHvisIkkeAlleredeFinnesOgIngenHarFeilet(Long fagsakId, Long behandlingId, ProsessTaskGruppe gruppe) {
-        return fagsakProsessTaskRepository.lagreNyGruppeKunHvisIkkeAlleredeFinnesOgIngenHarFeilet(fagsakId, behandlingId, gruppe);
+    public String lagreNyGruppeKunHvisIkkeAlleredeFinnesOgIngenHarFeilet(Saksnummer saksnummer, Long behandlingId, ProsessTaskGruppe gruppe) {
+        return fagsakProsessTaskRepository.lagreNyGruppeKunHvisIkkeAlleredeFinnesOgIngenHarFeilet(saksnummer, behandlingId, gruppe);
     }
 
     private Map<String, ProsessTaskData> nesteProsessTaskPerGruppe(Map<String, List<ProsessTaskData>> tasks) {
@@ -89,8 +90,8 @@ public class BehandlingskontrollAsynkTjeneste {
                 && ProsessTaskStatusUtil.FERDIG_STATUSER.contains(nestePerGruppe.get(gruppe).getStatus())));
     }
 
-    private Map<String, List<ProsessTaskData>> sjekkStatusProsessTasksGrouped(Long fagsakId, Long behandlingId, String gruppe) {
-        List<ProsessTaskData> tasks = fagsakProsessTaskRepository.sjekkStatusProsessTasks(fagsakId, behandlingId, gruppe);
+    private Map<String, List<ProsessTaskData>> sjekkStatusProsessTasksGrouped(Saksnummer saksnummer, Long behandlingId, String gruppe) {
+        List<ProsessTaskData> tasks = fagsakProsessTaskRepository.sjekkStatusProsessTasks(saksnummer, behandlingId, gruppe);
         return tasks.stream().collect(Collectors.groupingBy(ProsessTaskData::getGruppe));
     }
 
