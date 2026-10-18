@@ -9,7 +9,7 @@ public class NedstengingOktober2026 {
 
     private static final Environment ENV = Environment.current();
     private static final LocalDateTime FOM = LocalDateTime.of(2026, Month.OCTOBER, 9, 15, 50);
-    private static final LocalDateTime TOM = LocalDateTime.of(2026, Month.OCTOBER, 19, 9, 0);
+    private static final LocalDateTime TOM = LocalDateTime.of(2026, Month.OCTOBER, 19, 8, 1);
 
     private NedstengingOktober2026() {
         // for CDI proxy
