@@ -2,8 +2,10 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposit
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 
@@ -18,7 +20,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKontrollRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.felles.FellesQueriesForBehandlingRepositories;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -30,17 +31,12 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 @ExtendWith(JpaExtension.class)
 class BehandlingKandidaterRepositoryTest {
 
-    private BehandlingKandidaterRepository behandlingKandidaterRepository;
-
     private AksjonspunktKontrollRepository aksjonspunktRepository;
     private BehandlingRepository behandlingRepository;
     private FagsakRepository fagsakRepository;
 
     @BeforeEach
     void setUp(EntityManager entityManager) {
-        FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
-                entityManager);
-        behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
         BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         fagsakRepository = repositoryProvider.getFagsakRepository();
         aksjonspunktRepository = new AksjonspunktKontrollRepository();
@@ -57,7 +53,9 @@ class BehandlingKandidaterRepositoryTest {
         settVenterPåBrukerRespons(behandling2, LocalDateTime.now().plusWeeks(3));
         settVenterPåTilbakekrevinggrunnlag(behandling3);
 
-        Set<Behandling> resultat = behandlingKandidaterRepository.finnBehandlingerForAutomatiskGjenopptagelse();
+        Set<Behandling> resultat = behandlingRepository.finnBehandlingerPåVent().stream()
+            .filter(b -> LocalDate.now().isAfter(b.getFristDatoBehandlingPåVent()))
+            .collect(Collectors.toSet());
 
         assertThat(resultat).hasSize(1);
         assertThat(resultat).contains(behandling1);

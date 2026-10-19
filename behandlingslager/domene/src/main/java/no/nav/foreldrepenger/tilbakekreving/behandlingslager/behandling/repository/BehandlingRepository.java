@@ -20,6 +20,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 @ApplicationScoped
@@ -228,12 +230,19 @@ public class BehandlingRepository {
     }
 
     public List<Behandling> finnBehandlingerPåVent() {
+        TypedQuery<Behandling> query = entityManager.createQuery("""
+                        select distinct b
+                          from Aksjonspunkt ap
+                          inner join ap.behandling b on ap.behandling.id = b.id
+                          where ap.status in (:åpneAksjonspunktKoder)
+                          and ap.aksjonspunktDefinisjon in (:autopunkt)
+                        """,
+                Behandling.class)
+            .setHint(HibernateHints.HINT_READ_ONLY, "true")
+            .setParameter("åpneAksjonspunktKoder", AksjonspunktStatus.getÅpneAksjonspunktStatuser())
+            .setParameter("autopunkt", AksjonspunktDefinisjon.finnAutopunkt());
 
-        var query = entityManager.createQuery("FROM Behandling behandling WHERE behandling.status <> :status ", Behandling.class);
-
-        query.setParameter("status", BehandlingStatus.AVSLUTTET)
-            .setHint(HibernateHints.HINT_READ_ONLY, "true");
-        return query.getResultList().stream().filter(Behandling::isBehandlingPåVent).toList();
+        return query.getResultList();
     }
 
 }

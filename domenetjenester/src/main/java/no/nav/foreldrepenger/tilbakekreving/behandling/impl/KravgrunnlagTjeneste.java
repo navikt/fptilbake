@@ -12,13 +12,8 @@ import java.util.TreeMap;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
-
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +26,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
@@ -120,7 +117,7 @@ public class KravgrunnlagTjeneste {
             håndterEndretKravgrunnlagFraØkonomi(behandling, kravgrunnlag431, kravgrunnlagetErGyldig);
         } else {
             kravgrunnlagRepository.lagre(behandlingId, kravgrunnlag431);
-            gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
+            gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling);
         }
     }
 
@@ -144,10 +141,6 @@ public class KravgrunnlagTjeneste {
         // forutsatt at FPTILBAKE allerede har fått SPER melding for den behandlingen og sett behandling på vent med VenteÅrsak VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
         if (erForbiFaktaSteg) {
             LOG.info("Hopper tilbake til {} pga endret kravgrunnlag for behandlingId={}", FAKTA_FEILUTBETALING.getKode(), behandlingId);
-            if (List.of("152381924", "152266956").contains(behandling.getFagsak().getSaksnummer().getVerdi())) {
-                //avbryter planlagte tasker for å unngå doble iverksett-tasker når prosessen kjøres på nytt
-                avbrytPlanlagteTasker(behandling.getId());
-            }
             var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
             behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
             behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, FAKTA_FEILUTBETALING);
@@ -157,25 +150,11 @@ public class KravgrunnlagTjeneste {
         slettVLAnsvarlingSaksbehandler(behandling); // Hvis AS er ikke null vil den aldri bli plukket opp av automatisk saksbehandling igjen.
         fyrKravgrunnlagEndretEvent(behandlingId);
         if (skalVenteTil == null || skalVenteTil.isBefore(LocalDateTime.now())) {
-            gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
+            gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling, erForbiFaktaSteg);
         } else {
             behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
                 BehandlingStegType.TBKGSTEG, skalVenteTil, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         }
-    }
-
-    private void avbrytPlanlagteTasker(Long behandlingId) {
-        Query query = entityManager.createNativeQuery("""
-                        update prosess_task pt set status = 'FERDIG'
-                            where pt.id in (select prosess_task_id from FAGSAK_PROSESS_TASK fpt where behandling_id = :behandlingId)
-                            and status in ('FEILET', 'KLAR')
-            """);
-        query.setParameter("behandlingId", behandlingId);
-        int antallStoppet = query.executeUpdate();
-        if (antallStoppet > 4){
-            throw new IllegalStateException("Var forventet å stoppe 4 tasker, men forsøker å stoppe " + antallStoppet);
-        }
-        LOG.info("Stoppet {} planlagte tasker for behandling {}", antallStoppet, behandlingId);
     }
 
     private void slettVLAnsvarlingSaksbehandler(Behandling behandling) {

@@ -89,7 +89,7 @@ class KravgrunnlagTjenesteTest extends FellesTestOppsett {
         kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, false);
 
         assertKravgrunnlag();
-        verify(gjenopptaBehandlingTjeneste, never()).fortsettBehandlingMedGrunnlag(behandling.getId());
+        verify(gjenopptaBehandlingTjeneste, never()).fortsettBehandlingMedGrunnlag(behandling);
     }
 
     @Test

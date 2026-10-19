@@ -13,12 +13,13 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.FlushModeType;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.AutomatiskSaksbehandlingVurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.GjenopptaBehandlingMedGrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
@@ -34,13 +35,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingKandidaterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.felles.FellesQueriesForBehandlingRepositories;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
@@ -78,8 +76,6 @@ public abstract class FellesTestOppsett {
     protected ProsessTaskTjeneste taskTjeneste;
     protected ØkonomiMottattXmlRepository mottattXmlRepository;
     protected EksternBehandlingRepository eksternBehandlingRepository;
-    protected BehandlingVenterRepository behandlingVenterRepository;
-    protected BehandlingKandidaterRepository behandlingKandidaterRepository;
 
     protected GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste;
     protected BehandlingskontrollTjeneste behandlingskontrollTjeneste;
@@ -105,11 +101,7 @@ public abstract class FellesTestOppsett {
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
         eksternBehandlingRepository = new EksternBehandlingRepository(entityManager);
-        var fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
-                entityManager);
-        behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
-        behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
-        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingMedGrunnlagTjeneste(taskTjeneste, behandlingVenterRepository);
+        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingMedGrunnlagTjeneste(taskTjeneste);
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager,
                 new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
         var haltGebyrTjeneste = new AutomatiskSaksbehandlingVurderingTjeneste(grunnlagRepository, repositoryProvider.getVarselRepository());
