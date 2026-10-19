@@ -78,7 +78,7 @@ public class FagsakProsessTaskRepository {
         EntityManager em = getEntityManager();
         Query query = em.createQuery("Delete from FagsakProsessTask Where prosessTaskId = :prosessTaskId and saksnummer=:saksnummer");
         query.setParameter("prosessTaskId", prosessTaskId);
-        query.setParameter("saksnummer", saksnummer.getVerdi());
+        query.setParameter("saksnummer", saksnummer);
         query.executeUpdate();
         em.flush();
     }
