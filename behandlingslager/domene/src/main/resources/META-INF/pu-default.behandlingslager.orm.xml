@@ -44,7 +44,6 @@
 
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnresultatgrunnlag"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.VurderÅrsakTotrinnsvurdering"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak"/>

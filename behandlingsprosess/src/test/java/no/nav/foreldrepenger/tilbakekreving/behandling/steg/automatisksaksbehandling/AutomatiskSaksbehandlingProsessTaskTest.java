@@ -165,7 +165,6 @@ class AutomatiskSaksbehandlingProsessTaskTest {
         var historikkinnslager = repositoryProvider.getHistorikkinnslagRepository().hent(behandlingId);
         assertThat(historikkinnslager.stream().allMatch(historikkinnslag -> HistorikkAktør.VEDTAKSLØSNINGEN.equals(historikkinnslag.getAktør()))).isTrue();
 
-        assertThat(totrinnRepository.hentTotrinngrunnlag(behandling)).isEmpty();
         System.clearProperty("app.name");
     }
 
