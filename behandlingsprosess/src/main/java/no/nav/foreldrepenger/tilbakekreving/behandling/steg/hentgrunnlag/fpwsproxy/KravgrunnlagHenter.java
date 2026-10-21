@@ -82,6 +82,9 @@ public class KravgrunnlagHenter {
             hentKravgrunnlagRequest.kravgrunnlagId());
         var kravgrunnlag431 = erDev.getAsBoolean() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE) ?
             hentFraSokos(hentKravgrunnlagRequest) : hentFraProxy(hentKravgrunnlagRequest);
+        if (!erDev.getAsBoolean() && ENV.isProd() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
+            sammenlignMedSokos(hentKravgrunnlagRequest, kravgrunnlag431);
+        }
         LOG.info("Kravgrunnlag hentet OK");
         return kravgrunnlag431;
     }
@@ -119,6 +122,19 @@ public class KravgrunnlagHenter {
         } catch (SokosKravgrunnlagException e) {
             validerFeilkoder(e.melding());
             throw e;
+        }
+    }
+
+    private void sammenlignMedSokos(HentKravgrunnlagRequest request, Kravgrunnlag431 original) {
+        try {
+            var sokos = hentFraSokos(request);
+            if (Objects.equals(original, sokos)) {
+                LOG.info("Kravgrunnlag fra proxy og Sokos er identiske for kravgrunnlagId {}", request.kravgrunnlagId());
+            } else {
+                LOG.info("Kravgrunnlag fra proxy og Sokos er IKKE identiske for kravgrunnlagId {}.", request.kravgrunnlagId());
+            }
+        } catch (Exception e) {
+            LOG.info("Kravgrunnlag fra proxy og Sokos kunne ikke hente fra Sokos for kravgrunnlagId {}.", request.kravgrunnlagId(), e);
         }
     }
 
