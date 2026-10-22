@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch;
 
-import static no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.KravgrunnlagTestUtils.lagKravgrunnlag;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -22,15 +21,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.KravgrunnlagSokosTestUtils;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.HentKravgrunnlagMapperProxy;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ManglendeKravgrunnlagException;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.SperringKravgrunnlagException;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.UkjentKvitteringFraOSException;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.sokos.HentKravgrunnlagMapperSokos;
@@ -67,6 +63,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.Personopplysnin
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.HistorikkTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.sokos.SokosKravgrunnlagException;
 import no.nav.foreldrepenger.tilbakekreving.sokos.SokosTilbakekrevingKlient;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -80,14 +77,14 @@ class HåndterGamleKravgrunnlagTaskTest {
     private final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(tpsTjenesteMock);
     private final BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
     private final FagsystemKlient fagsystemKlientMock = mock(FagsystemKlient.class);
-    private final ØkonomiProxyKlient økonomiProxyKlient = mock(ØkonomiProxyKlient.class);
+    private final SokosTilbakekrevingKlient sokosTilbakekrevingKlient = mock(SokosTilbakekrevingKlient.class);
 
     private FagsakRepository fagsakRepository;
     private BehandlingRepository behandlingRepository;
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private KravgrunnlagRepository grunnlagRepository;
 
-    private HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy;
+    private HentKravgrunnlagMapperSokos hentKravgrunnlagMapperSokos;
 
     private BehandlingTjeneste behandlingTjeneste;
     private HåndterGamleKravgrunnlagTask håndterGamleKravgrunnlagTask;
@@ -97,6 +94,7 @@ class HåndterGamleKravgrunnlagTaskTest {
 
     @BeforeEach
     void setup(EntityManager entityManager) {
+        System.setProperty("app.name", "fptilbake");
         var repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         fagsakRepository = repositoryProvider.getFagsakRepository();
         behandlingRepository = repositoryProvider.getBehandlingRepository();
@@ -105,7 +103,7 @@ class HåndterGamleKravgrunnlagTaskTest {
         var navBrukerRepository = new NavBrukerRepository(entityManager);
         var behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(
                 entityManager, new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
-        hentKravgrunnlagMapperProxy = new HentKravgrunnlagMapperProxy(tpsAdapterWrapper);
+        hentKravgrunnlagMapperSokos = new HentKravgrunnlagMapperSokos(tpsAdapterWrapper);
         var lesKravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
         var behandlingskontrollProvider = new BehandlingskontrollProvider(
                 behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
@@ -114,8 +112,8 @@ class HåndterGamleKravgrunnlagTaskTest {
         var fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repositoryProvider,
                 behandlingskontrollProvider, fagsakTjeneste, behandlingHistorikkTjeneste, fagsystemKlientMock);
-        var kravgrunnlagHenter = new KravgrunnlagHenter(økonomiProxyKlient, hentKravgrunnlagMapperProxy,
-            mock(SokosTilbakekrevingKlient.class), mock(HentKravgrunnlagMapperSokos.class), () -> false);
+        var kravgrunnlagHenter = new KravgrunnlagHenter(mock(ØkonomiProxyKlient.class), mock(HentKravgrunnlagMapperProxy.class),
+            sokosTilbakekrevingKlient, hentKravgrunnlagMapperSokos, () -> true);
         var håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(
                 mottattXmlRepository, grunnlagRepository, lesKravgrunnlagMapper, behandlingTjeneste,
                 fagsystemKlientMock, kravgrunnlagHenter);
@@ -124,7 +122,7 @@ class HåndterGamleKravgrunnlagTaskTest {
         behandling = ScenarioSimple.simple().lagMocked();
         when(tpsTjenesteMock.hentBrukerForAktør(any(), any(AktørId.class))).thenReturn(lagPersonInfo(behandling.getFagsak().getAktørId()));
         when(tpsTjenesteMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));
-        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(true, ENHET, true));
+        when(sokosTilbakekrevingKlient.hentKravgrunnlag(any())).thenReturn(KravgrunnlagSokosTestUtils.lagKravgrunnlag(true, ENHET, true));
         var eksternBehandlingsinfoDto = lagEksternBehandlingData();
 
         when(fagsystemKlientMock.hentBehandlingForSaksnummerHenvisning(anyString(), any())).thenReturn(Optional.of(eksternBehandlingsinfoDto));
@@ -134,8 +132,6 @@ class HåndterGamleKravgrunnlagTaskTest {
         when(fagsystemKlientMock.hentBehandling(any(UUID.class))).thenReturn(eksternBehandlingsinfoDto);
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML());
-
-        System.setProperty("app.name", "fptilbake");
     }
 
     @AfterEach
@@ -160,8 +156,8 @@ class HåndterGamleKravgrunnlagTaskTest {
 
     @Test
     void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_grunnlaget_ikke_finnes_i_økonomi() {
-        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class)))
-                .thenThrow(new ManglendeKravgrunnlagException("FPT-539080", "kravgrunnlag ikke finnes"));
+        when(sokosTilbakekrevingKlient.hentKravgrunnlag(any()))
+                .thenThrow(new SokosKravgrunnlagException("B420010I"));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNotNull();
         assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNull();
@@ -170,8 +166,8 @@ class HåndterGamleKravgrunnlagTaskTest {
 
     @Test
     void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_økonomi_svarer_ukjent_feil() {
-        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class)))
-                .thenThrow(new UkjentKvitteringFraOSException("FPT-539085", "ukjent feil"));
+        when(sokosTilbakekrevingKlient.hentKravgrunnlag(any()))
+                .thenThrow(new SokosKravgrunnlagException("ukjent feil"));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
         assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNotNull();
@@ -180,8 +176,8 @@ class HåndterGamleKravgrunnlagTaskTest {
 
     @Test
     void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_grunnlaget_er_sperret() {
-        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class)))
-                .thenThrow(new SperringKravgrunnlagException("FPT-539081", "sperret"));
+        when(sokosTilbakekrevingKlient.hentKravgrunnlag(any()))
+                .thenThrow(new SokosKravgrunnlagException("B420012I"));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
         var økonomiXmlMottatt = mottattXmlRepository.finnMottattXml(mottattXmlId);
@@ -206,7 +202,7 @@ class HåndterGamleKravgrunnlagTaskTest {
 
     @Test
     void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_kravgrunnlaget_ikke_er_gyldig() {
-        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(true, ENHET, false));
+        when(sokosTilbakekrevingKlient.hentKravgrunnlag(any())).thenReturn(KravgrunnlagSokosTestUtils.lagKravgrunnlag(true, ENHET, false));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
         assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNotNull();
@@ -221,7 +217,7 @@ class HåndterGamleKravgrunnlagTaskTest {
         var behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         var behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
-        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(true, ENHET,true));
+        when(sokosTilbakekrevingKlient.hentKravgrunnlag(any())).thenReturn(KravgrunnlagSokosTestUtils.lagKravgrunnlag(true, ENHET,true));
 
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
@@ -237,9 +233,9 @@ class HåndterGamleKravgrunnlagTaskTest {
         var behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         var behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
-        var kravgrunnlag431Dto = lagKravgrunnlag(true, ENHET, true);
-        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class))).thenReturn(kravgrunnlag431Dto);
-        var kravgrunnlag431 = hentKravgrunnlagMapperProxy.mapTilDomene(kravgrunnlag431Dto);
+        var kravgrunnlag431Dto = KravgrunnlagSokosTestUtils.lagKravgrunnlag(true, ENHET, true);
+        when(sokosTilbakekrevingKlient.hentKravgrunnlag(any())).thenReturn(kravgrunnlag431Dto);
+        var kravgrunnlag431 = hentKravgrunnlagMapperSokos.mapTilDomene(kravgrunnlag431Dto.kravgrunnlag());
         grunnlagRepository.lagre(behandling.getId(), kravgrunnlag431);
 
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
@@ -257,8 +253,8 @@ class HåndterGamleKravgrunnlagTaskTest {
         var behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         var behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
-        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class)))
-                .thenThrow(new SperringKravgrunnlagException("FPT-539081", "sperret"));
+        when(sokosTilbakekrevingKlient.hentKravgrunnlag(any()))
+                .thenThrow(new SokosKravgrunnlagException("B420012I"));
 
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();

@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,19 +19,11 @@ import java.util.UUID;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.FagOmrådeKode;
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.GjelderType;
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.KlasseType;
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.KravStatusKode;
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.Kravgrunnlag431Dto;
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.KravgrunnlagBelop433Dto;
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.KravgrunnlagPeriode432Dto;
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.Periode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.HentKravgrunnlagMapperProxy;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.KravgrunnlagHenter;
@@ -52,6 +43,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandli
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
+import no.nav.foreldrepenger.tilbakekreving.sokos.HentKravgrunnlagDetaljerResponse;
 import no.nav.foreldrepenger.tilbakekreving.sokos.SokosTilbakekrevingKlient;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -61,10 +53,10 @@ class HentKorrigertKravgrunnlagTaskTest {
 
     private final PersoninfoAdapter tpsAdapterMock = mock(PersoninfoAdapter.class);
     private final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(tpsAdapterMock);
-    private final ØkonomiProxyKlient økonomiProxyKlient = mock(ØkonomiProxyKlient.class);
+    private final SokosTilbakekrevingKlient sokosTilbakekrevingKlient = mock(SokosTilbakekrevingKlient.class);
     private final FagsystemKlient fagsystemKlient = mock(FagsystemKlient.class);
     private KravgrunnlagRepository kravgrunnlagRepository;
-    private HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy ;
+    private HentKravgrunnlagMapperSokos hentKravgrunnlagMapperSokos;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private HentKorrigertKravgrunnlagTask hentKorrigertGrunnlagTask;
 
@@ -73,21 +65,27 @@ class HentKorrigertKravgrunnlagTaskTest {
 
     @BeforeEach
     void setup(EntityManager entityManager) {
+        System.setProperty("app.name", "fptilbake");
         BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
-        hentKravgrunnlagMapperProxy = new HentKravgrunnlagMapperProxy(tpsAdapterWrapper);
-        var kravgrunnlagHenter = new KravgrunnlagHenter(økonomiProxyKlient, hentKravgrunnlagMapperProxy,
-            mock(SokosTilbakekrevingKlient.class), mock(HentKravgrunnlagMapperSokos.class), () -> false);
+        hentKravgrunnlagMapperSokos = new HentKravgrunnlagMapperSokos(tpsAdapterWrapper);
+        var kravgrunnlagHenter = new KravgrunnlagHenter(mock(ØkonomiProxyKlient.class), mock(HentKravgrunnlagMapperProxy.class),
+            sokosTilbakekrevingKlient, hentKravgrunnlagMapperSokos, () -> true);
         hentKorrigertGrunnlagTask = new HentKorrigertKravgrunnlagTask(repositoryProvider, fagsystemKlient, kravgrunnlagHenter);
         entityManager.setFlushMode(FlushModeType.AUTO);
         ScenarioSimple scenarioSimple = ScenarioSimple.simple();
         behandling = scenarioSimple.lagre(repositoryProvider);
         behandlingId = behandling.getId();
         when(tpsAdapterMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));
-        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlagNY(true));
+        when(sokosTilbakekrevingKlient.hentKravgrunnlag(any())).thenReturn(lagKravgrunnlagNY(true));
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1L), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
+    }
+
+    @AfterEach
+    void cleanup() {
+        System.clearProperty("app.name");
     }
 
     @Test
@@ -105,7 +103,7 @@ class HentKorrigertKravgrunnlagTaskTest {
 
     @Test
     void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_hentet_grunnlaget_er_ugyldig() {
-        when(økonomiProxyKlient.hentKravgrunnlag(any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlagNY(false));
+        when(sokosTilbakekrevingKlient.hentKravgrunnlag(any())).thenReturn(lagKravgrunnlagNY(false));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
         var e = assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
         assertThat(e.getMessage()).contains("FPT-930235");
@@ -155,60 +153,60 @@ class HentKorrigertKravgrunnlagTaskTest {
     }
 
 
-    static Kravgrunnlag431Dto lagKravgrunnlagNY(boolean erGyldig) {
-        return new Kravgrunnlag431Dto.Builder()
-            .vedtakId(207406L)
-            .eksternKravgrunnlagId("123456789")
-            .vedtakFagSystemDato(LocalDate.now().minusYears(2))
-            .ansvarligEnhet(KravgrunnlagHenter.ANSVARLIG_ENHET_NØS)
-            .fagSystemId("10000000000000000")
-            .fagOmrådeKode(FagOmrådeKode.FP)
-            .hjemmelKode("1234239042304")
-            .kontrollFelt("kontrolll-123")
-            .referanse("1")
-            .beregnesRenter("N")
-            .saksBehId("Z111111")
-            .utbetalesTilId("12345678901")
-            .utbetGjelderType(GjelderType.PERSON)
-            .gjelderType(GjelderType.PERSON)
-            .behandlendeEnhet(KravgrunnlagHenter.ANSVARLIG_ENHET_NØS)
-            .bostedEnhet(KravgrunnlagHenter.ANSVARLIG_ENHET_NØS)
-            .kravStatusKode(KravStatusKode.NY)
-            .gjelderVedtakId("12345678901")
-            .omgjortVedtakId(207407L)
-            .perioder(lagPeriode(erGyldig))
-            .build();
+    public static HentKravgrunnlagDetaljerResponse lagKravgrunnlagNY(boolean erGyldig) {
+        return new HentKravgrunnlagDetaljerResponse(0, "", lagKravgrunnlagDetaljer(erGyldig));
     }
 
-    private static List<KravgrunnlagPeriode432Dto> lagPeriode(boolean erGyldig) {
-        var KravgrunnlagPeriode432DtoListe = new ArrayList<KravgrunnlagPeriode432Dto>();
+    private static HentKravgrunnlagDetaljerResponse.KravgrunnlagDetaljer lagKravgrunnlagDetaljer(boolean erGyldig) {
+        return new HentKravgrunnlagDetaljerResponse.KravgrunnlagDetaljer(123456789L,
+            207406L,
+            no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode.NYTT,
+            no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode.FORELDREPENGER,
+            "139015144100",
+            LocalDate.now().minusYears(2),
+            207407L,
+            "12345678901",
+            no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType.PERSON,
+            "12345678901",
+            no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType.PERSON,
+            "1234239042304",
+            false,
+            KravgrunnlagHenter.ANSVARLIG_ENHET_NØS,
+            KravgrunnlagHenter.ANSVARLIG_ENHET_NØS,
+            KravgrunnlagHenter.ANSVARLIG_ENHET_NØS,
+            "kontrolll-123",
+            "Z111111",
+            "1",
+            null,
+            lagPerioder(erGyldig));
+    }
 
 
-        var kravgrunnlagBuilder = new KravgrunnlagPeriode432Dto.Builder()
-            .periode(new Periode(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 1, 22)))
-            .kravgrunnlagBeloper433(
-                List.of(
-                    hentBeløp(BigDecimal.valueOf(6000.00), BigDecimal.ZERO, BigDecimal.ZERO, KlasseType.FEIL),
-                    hentBeløp(BigDecimal.ZERO, BigDecimal.valueOf(6000.00), BigDecimal.valueOf(6000.00), KlasseType.YTEL)
-                )
+    private static List<HentKravgrunnlagDetaljerResponse.DetaljerPeriode> lagPerioder(boolean erGyldig) {
+        var kravgrunnlagPeriode1 = new HentKravgrunnlagDetaljerResponse.DetaljerPeriode(
+            LocalDate.of(2022, 1, 1), LocalDate.of(2022, 1, 22),
+            erGyldig ? BigDecimal.valueOf(600) : BigDecimal.ZERO, List.of(
+                lagPostering(BigDecimal.valueOf(6000.00), BigDecimal.ZERO, BigDecimal.ZERO, no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType.FEIL),
+                lagPostering(BigDecimal.ZERO, BigDecimal.valueOf(6000.00), BigDecimal.valueOf(6000.00), no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType.YTEL)
+            )
         );
-        if (erGyldig) {
-            kravgrunnlagBuilder.beløpSkattMnd(BigDecimal.valueOf(600.00));
-        }
-        KravgrunnlagPeriode432DtoListe.add(kravgrunnlagBuilder.build());
-        return KravgrunnlagPeriode432DtoListe;
+        return List.of(kravgrunnlagPeriode1);
     }
 
-    private static KravgrunnlagBelop433Dto hentBeløp(BigDecimal nyBeløp, BigDecimal tilbakekrevesBeløp,
-                                                     BigDecimal opprUtbetBeløp, KlasseType klasseType) {
-        return new KravgrunnlagBelop433Dto.Builder()
-            .klasseType(klasseType)
-            .nyBelop(nyBeløp)
-            .opprUtbetBelop(opprUtbetBeløp)
-            .tilbakekrevesBelop(tilbakekrevesBeløp)
-            .uinnkrevdBelop(BigDecimal.ZERO)
-            .klasseKode("FPATAL")
-            .skattProsent(BigDecimal.valueOf(10.0000))
-            .build();
+    private static HentKravgrunnlagDetaljerResponse.DetaljerPostering lagPostering(BigDecimal nyBeløp, BigDecimal tilbakekrevesBeløp, BigDecimal opprUtbetBeløp, no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType klasseType) {
+        return new HentKravgrunnlagDetaljerResponse.DetaljerPostering(
+            "FPATAL",
+            klasseType,
+            opprUtbetBeløp,
+            nyBeløp,
+            tilbakekrevesBeløp,
+            BigDecimal.ZERO,
+            BigDecimal.valueOf(10.0000),
+            null,
+            null,
+            null
+        );
     }
+
+
 }

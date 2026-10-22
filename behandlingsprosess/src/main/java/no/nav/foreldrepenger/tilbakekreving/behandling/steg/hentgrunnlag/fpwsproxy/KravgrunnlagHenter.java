@@ -80,8 +80,7 @@ public class KravgrunnlagHenter {
         LOG.info("Henter kravgrunnlag for behandling{} med kravgrunnlagId {}",
             behandlingId != null ? " " + behandlingId : "",
             hentKravgrunnlagRequest.kravgrunnlagId());
-        var kravgrunnlag431 = erDev.getAsBoolean() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE) ?
-            hentFraSokos(hentKravgrunnlagRequest) : hentFraProxy(hentKravgrunnlagRequest);
+        var kravgrunnlag431 = erDev.getAsBoolean() ? hentFraSokos(hentKravgrunnlagRequest) : hentFraProxy(hentKravgrunnlagRequest);
         if (!erDev.getAsBoolean() && ENV.isProd() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
             sammenlignMedSokos(hentKravgrunnlagRequest, kravgrunnlag431);
         }
@@ -118,7 +117,9 @@ public class KravgrunnlagHenter {
         var sokosRequest = new HentKravgrunnlagDetaljerRequest(request.kodeAksjon(), kravgrunnlagId,
             request.enhetAnsvarlig(), request.saksbehId());
         try {
-            return hentKravgrunnlagMapperSokos.mapTilDomene(validerDetaljer(sokosTilbakekrevingKlient.hentKravgrunnlag(sokosRequest)));
+            var respons = sokosTilbakekrevingKlient.hentKravgrunnlag(sokosRequest);
+            var validerteDetaljer = validerDetaljer(respons);
+            return hentKravgrunnlagMapperSokos.mapTilDomene(validerteDetaljer);
         } catch (SokosKravgrunnlagException e) {
             validerFeilkoder(e.melding());
             throw e;

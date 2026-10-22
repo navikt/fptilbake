@@ -32,6 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KodeAksjon;
+import no.nav.foreldrepenger.tilbakekreving.sokos.SokosKravgrunnlagException;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
@@ -84,7 +85,11 @@ public class HåndterGamleKravgrunnlagTjeneste {
         } catch (UkjentKvitteringFraOSException e) {
             // ikke arkiver xml i tilfelle ukjent feil kommer fra økonomi
             LOG.warn(e.getMessage());
+        } catch (SokosKravgrunnlagException e) {
+            // ikke arkiver xml i tilfelle ukjent feil kommer fra økonomi
+            LOG.warn(e.melding());
         }
+
         LOG.info("Finner ikke grunnlag.");
         return KravgrunnlagMedStatus.utenGrunnlag();
     }
