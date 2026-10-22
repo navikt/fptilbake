@@ -115,7 +115,7 @@ class HåndterGamleKravgrunnlagTaskTest {
         behandlingTjeneste = new BehandlingTjeneste(repositoryProvider,
                 behandlingskontrollProvider, fagsakTjeneste, behandlingHistorikkTjeneste, fagsystemKlientMock);
         var kravgrunnlagHenter = new KravgrunnlagHenter(økonomiProxyKlient, hentKravgrunnlagMapperProxy,
-            mock(SokosTilbakekrevingKlient.class), mock(HentKravgrunnlagMapperSokos.class));
+            mock(SokosTilbakekrevingKlient.class), mock(HentKravgrunnlagMapperSokos.class), () -> false);
         var håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(
                 mottattXmlRepository, grunnlagRepository, lesKravgrunnlagMapper, behandlingTjeneste,
                 fagsystemKlientMock, kravgrunnlagHenter);

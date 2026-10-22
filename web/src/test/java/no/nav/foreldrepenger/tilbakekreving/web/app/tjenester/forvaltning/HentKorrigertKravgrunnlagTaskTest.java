@@ -78,7 +78,7 @@ class HentKorrigertKravgrunnlagTaskTest {
         eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         hentKravgrunnlagMapperProxy = new HentKravgrunnlagMapperProxy(tpsAdapterWrapper);
         var kravgrunnlagHenter = new KravgrunnlagHenter(økonomiProxyKlient, hentKravgrunnlagMapperProxy,
-            mock(SokosTilbakekrevingKlient.class), mock(HentKravgrunnlagMapperSokos.class));
+            mock(SokosTilbakekrevingKlient.class), mock(HentKravgrunnlagMapperSokos.class), () -> false);
         hentKorrigertGrunnlagTask = new HentKorrigertKravgrunnlagTask(repositoryProvider, fagsystemKlient, kravgrunnlagHenter);
         entityManager.setFlushMode(FlushModeType.AUTO);
         ScenarioSimple scenarioSimple = ScenarioSimple.simple();

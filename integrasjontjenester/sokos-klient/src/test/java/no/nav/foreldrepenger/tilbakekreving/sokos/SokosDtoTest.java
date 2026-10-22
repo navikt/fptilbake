@@ -68,13 +68,13 @@ class SokosDtoTest {
     }
 
     @Test
-    void annulerOgFeil() {
+    void annullerOgFeil() {
         assertJsonRoundtrip("""
             {"kodeAksjon": "A", "vedtakId": 892793, "enhetAnsvarlig": "8020", "saksbehandlerId": "Z999999"}
-            """, KravgrunnlagAnnulerRequest.class);
+            """, KravgrunnlagAnnullerRequest.class);
         assertJsonRoundtrip("""
             {"status": 0, "melding": "OK", "vedtakId": 892793, "saksbehandlerId": "Z999999"}
-            """, KravgrunnlagAnnulerResponse.class);
+            """, KravgrunnlagAnnullerResponse.class);
         var errorJson = """
             {
               "timestamp": "2026-01-15T12:34:56Z", "status": 500,

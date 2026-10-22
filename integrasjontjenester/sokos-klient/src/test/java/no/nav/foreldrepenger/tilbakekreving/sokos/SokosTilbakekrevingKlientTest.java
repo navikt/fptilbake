@@ -65,8 +65,8 @@ class SokosTilbakekrevingKlientTest {
             .hasMessageContaining("status null");
     }
 
-    private static KravgrunnlagAnnulerResponse annullerKvittering(Integer status) {
-        return new KravgrunnlagAnnulerResponse(status, "Melding", 123, "K231B433");
+    private static KravgrunnlagAnnullerResponse annullerKvittering(Integer status) {
+        return new KravgrunnlagAnnullerResponse(status, "Melding", 123, "K231B433");
     }
 
     @Test
