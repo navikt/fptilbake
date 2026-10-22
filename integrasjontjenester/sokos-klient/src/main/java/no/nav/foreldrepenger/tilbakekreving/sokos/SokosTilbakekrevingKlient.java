@@ -25,9 +25,9 @@ import no.nav.vedtak.felles.integrasjon.rest.RestRequest;
 import no.nav.vedtak.felles.integrasjon.rest.TokenFlow;
 
 @ApplicationScoped
-@RestClientConfig(tokenConfig = TokenFlow.AZUREAD_CC, endpointProperty = "sokos.base.url",
+@RestClientConfig(tokenConfig = TokenFlow.AZUREAD_CC, endpointProperty = "sokos.tilbakekreving.base.url",
     endpointDefault = "https://sokos-os-ekstern-api.intern.nav.no/api/v1/tilbakekreving",
-    scopesProperty = "sokos.scopes", scopesDefault = "api://prod-gcp.okonomi.sokos-os-ekstern-api/.default")
+    scopesProperty = "sokos.tilbakekreving.scope", scopesDefault = "api://prod-gcp.okonomi.sokos-os-ekstern-api/.default")
 public class SokosTilbakekrevingKlient {
     private static final String KODE_403_FRA_SERVER = "Mangler tilgang. Fikk http-kode 403 fra server";
 
@@ -43,7 +43,7 @@ public class SokosTilbakekrevingKlient {
         this.restClient = RestClient.client();
         this.restConfig = RestConfig.forClient(this.getClass());
         this.endpointKravgrunnlag = UriBuilder.fromUri(restConfig.endpoint()).path("/kravgrunnlag/detaljer").build();
-        this.endpointKravgrunnlagAnnuller = UriBuilder.fromUri(restConfig.endpoint()).path("/kravgrunnlag/annuller").build();
+        this.endpointKravgrunnlagAnnuller = UriBuilder.fromUri(restConfig.endpoint()).path("/kravgrunnlag/annuler").build();
         this.endpointIverksett = UriBuilder.fromUri(restConfig.endpoint()).path("/vedtak").build();
         LOG.info("proxy klient konfigurasjon: endepunkt {}, scopes {}, token config {}", restConfig.endpoint(), restConfig.scopes(), restConfig.tokenConfig());
     }
@@ -64,12 +64,12 @@ public class SokosTilbakekrevingKlient {
         return fromJson(response.body(), HentKravgrunnlagDetaljerResponse.class);
     }
 
-    public void anullerKravgrunnlag(KravgrunnlagAnnulerRequest annullerKravgrunnlagDto) {
+    public void annullerKravgrunnlag(KravgrunnlagAnnullerRequest annullerKravgrunnlagDto) {
         var target = UriBuilder.fromUri(endpointKravgrunnlagAnnuller).build();
         var request = RestRequest.newPOSTJson(annullerKravgrunnlagDto, target, restConfig);
         var response = restClient.sendReturnUnhandled(request);
         handleAnnullertKravgrunnlagResponse(response);
-        validerAnnullering(fromJson(response.body(), KravgrunnlagAnnulerResponse.class));
+        validerAnnullering(fromJson(response.body(), KravgrunnlagAnnullerResponse.class));
     }
 
     private static void handleIverksettVedtakRespons(HttpResponse<String> response) {
@@ -90,7 +90,7 @@ public class SokosTilbakekrevingKlient {
         }
     }
 
-    static void validerAnnullering(KravgrunnlagAnnulerResponse kvittering) {
+    static void validerAnnullering(KravgrunnlagAnnullerResponse kvittering) {
         var status = kvittering != null ? kvittering.status() : null;
         if (status == null || status != 0 && status != 4) {
             throw new IntegrasjonException("F-468817", "Sokos avviste annullering av kravgrunnlag med status " + status + ". Sjekk loggen til Sokos.");

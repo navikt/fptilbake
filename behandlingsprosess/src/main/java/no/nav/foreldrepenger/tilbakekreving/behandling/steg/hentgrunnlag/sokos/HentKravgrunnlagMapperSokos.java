@@ -46,7 +46,7 @@ public class HentKravgrunnlagMapperSokos {
             .medGjelderType(gjelderType)
             .medUtbetalesTilId(personOrganisasjonWrapper.hentAktørIdEllerOrganisajonNummer(dto.utbetalesTilId(), utbetalingGjelderType))
             .medUtbetIdType(utbetalingGjelderType)
-            .medHjemmelKode(dto.kodeHjemmel().isEmpty() ? null : dto.kodeHjemmel())
+            .medHjemmelKode(nonEmpty(dto.kodeHjemmel()))
             .medBeregnesRenter(Boolean.TRUE.equals(dto.renterBeregnes()) ? "J" : "N")
             .medAnsvarligEnhet(dto.enhetAnsvarlig())
             .medBostedEnhet(dto.enhetBosted())
@@ -73,9 +73,9 @@ public class HentKravgrunnlagMapperSokos {
                     .medTilbakekrevesBelop(postering.belopTilbakekreves())
                     .medUinnkrevdBelop(postering.belopUinnkrevd())
                     .medSkattProsent(postering.skattProsent())
-                    .medResultatKode(postering.kodeResultat())
-                    .medÅrsakKode(postering.kodeAarsak())
-                    .medSkyldKode(postering.kodeSkyld())
+                    .medResultatKode(nonEmpty(postering.kodeResultat()))
+                    .medÅrsakKode(nonEmpty(postering.kodeAarsak()))
+                    .medSkyldKode(nonEmpty(postering.kodeSkyld()))
                     .medKravgrunnlagPeriode432(periode)
                     .build();
                 if (klasseType != KlasseType.YTEL || beløp.getNyBelop().compareTo(beløp.getOpprUtbetBelop()) <= 0) {
@@ -87,5 +87,9 @@ public class HentKravgrunnlagMapperSokos {
             kravgrunnlag.leggTilPeriode(periode);
         }
         return kravgrunnlag;
+    }
+
+    private static String nonEmpty(String value) {
+        return value == null || value.isEmpty() ? null : value;
     }
 }

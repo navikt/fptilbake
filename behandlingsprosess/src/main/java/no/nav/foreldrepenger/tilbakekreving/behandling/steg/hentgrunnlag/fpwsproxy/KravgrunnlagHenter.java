@@ -20,7 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.sokos.HentKravgrunnlagDetaljerRequest;
 import no.nav.foreldrepenger.tilbakekreving.sokos.HentKravgrunnlagDetaljerResponse;
-import no.nav.foreldrepenger.tilbakekreving.sokos.KravgrunnlagAnnulerRequest;
+import no.nav.foreldrepenger.tilbakekreving.sokos.KravgrunnlagAnnullerRequest;
 import no.nav.foreldrepenger.tilbakekreving.sokos.SokosKravgrunnlagException;
 import no.nav.foreldrepenger.tilbakekreving.sokos.SokosTilbakekrevingKlient;
 import no.nav.vedtak.exception.IntegrasjonException;
@@ -48,10 +48,10 @@ public class KravgrunnlagHenter {
     @Inject
     public KravgrunnlagHenter(ØkonomiProxyKlient økonomiProxyKlient, HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy,
                              SokosTilbakekrevingKlient sokosTilbakekrevingKlient, HentKravgrunnlagMapperSokos hentKravgrunnlagMapperSokos) {
-        this(økonomiProxyKlient, hentKravgrunnlagMapperProxy, sokosTilbakekrevingKlient, hentKravgrunnlagMapperSokos, ENV::isDev);
+        this(økonomiProxyKlient, hentKravgrunnlagMapperProxy, sokosTilbakekrevingKlient, hentKravgrunnlagMapperSokos, () -> (ENV.isDev() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) || ENV.isLocal());
     }
 
-    KravgrunnlagHenter(ØkonomiProxyKlient økonomiProxyKlient, HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy,
+    public KravgrunnlagHenter(ØkonomiProxyKlient økonomiProxyKlient, HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy,
                        SokosTilbakekrevingKlient sokosTilbakekrevingKlient, HentKravgrunnlagMapperSokos hentKravgrunnlagMapperSokos,
                        BooleanSupplier erDev) {
         this.økonomiProxyKlient = økonomiProxyKlient;
@@ -64,12 +64,12 @@ public class KravgrunnlagHenter {
     public void annullerKravgrunnlag(Long behandlingId, Kravgrunnlag431 kravgrunnlag) {
         Objects.requireNonNull(kravgrunnlag,
             "Finnes ikke aktivt kravgrunnlag for behandling " + behandlingId);
-        if (erDev.getAsBoolean() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
+        if (erDev.getAsBoolean()) {
             var vedtakId = Math.toIntExact(Objects.requireNonNull(kravgrunnlag.getVedtakId(), "vedtakId"));
             if (vedtakId > 999_999_999) {
                 throw new IllegalArgumentException("vedtakId er større enn tillatt i Sokos-kontrakten: " + vedtakId);
             }
-            sokosTilbakekrevingKlient.anullerKravgrunnlag(new KravgrunnlagAnnulerRequest(
+            sokosTilbakekrevingKlient.annullerKravgrunnlag(new KravgrunnlagAnnullerRequest(
                 KodeAksjon.ANNULERE_GRUNNLAG, vedtakId, ANSVARLIG_ENHET_NØS, OKO_SAKSBEH_ID));
         } else {
             økonomiProxyKlient.anullerKravgrunnlag(new AnnullerKravGrunnlagDto(BigInteger.valueOf(kravgrunnlag.getVedtakId())));
@@ -131,7 +131,7 @@ public class KravgrunnlagHenter {
             if (Objects.equals(original, sokos)) {
                 LOG.info("Kravgrunnlag fra proxy og Sokos er identiske for kravgrunnlagId {}", request.kravgrunnlagId());
             } else {
-                LOG.info("Kravgrunnlag fra proxy og Sokos er IKKE identiske for kravgrunnlagId {}.", request.kravgrunnlagId());
+                LOG.info("Kravgrunnlag fra proxy og Sokos er IKKE identiske for kravgrunnlagId proxy {} sokos {}.", original, sokos);
             }
         } catch (Exception e) {
             LOG.info("Kravgrunnlag fra proxy og Sokos kunne ikke hente fra Sokos for kravgrunnlagId {}.", request.kravgrunnlagId(), e);

@@ -104,7 +104,7 @@ public class ForvaltningKravgrunnlagRestTjeneste {
     }
 
     @PUT
-    @Path("/annuler")
+    @Path("/annuller")
     @Operation(
         tags = "FORVALTNING-kravgrunnlag",
         description = "Tjeneste for å annullere en mottatt kravgrunnlag hos økonomi, f.eks pga brukerens død",
@@ -118,9 +118,9 @@ public class ForvaltningKravgrunnlagRestTjeneste {
         Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
         try {
             var behandlingId = behandling.getId();
-            LOG.info("Starter Anullerekravgrunnlag for behandlingId={}", behandlingId);
+            LOG.info("Starter Annullerekravgrunnlag for behandlingId={}", behandlingId);
             forvaltningTjeneste.annullerKravgrunnlag(behandlingId);
-            LOG.info("AnnulereKravgrunnlag sendt til oppdragssystemet.");
+            LOG.info("AnnullereKravgrunnlag sendt til oppdragssystemet.");
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }

@@ -23,7 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.sokos.HentKravgrunnlagDetaljerRequest;
 import no.nav.foreldrepenger.tilbakekreving.sokos.HentKravgrunnlagDetaljerResponse;
-import no.nav.foreldrepenger.tilbakekreving.sokos.KravgrunnlagAnnulerRequest;
+import no.nav.foreldrepenger.tilbakekreving.sokos.KravgrunnlagAnnullerRequest;
 import no.nav.foreldrepenger.tilbakekreving.sokos.SokosKravgrunnlagException;
 import no.nav.foreldrepenger.tilbakekreving.sokos.SokosTilbakekrevingKlient;
 import no.nav.vedtak.exception.IntegrasjonException;
@@ -54,7 +54,7 @@ class KravgrunnlagHenterTest {
 
         henter(true).annullerKravgrunnlag(behandlingId, grunnlag);
 
-        verify(sokos).anullerKravgrunnlag(new KravgrunnlagAnnulerRequest(
+        verify(sokos).annullerKravgrunnlag(new KravgrunnlagAnnullerRequest(
             KodeAksjon.ANNULERE_GRUNNLAG, 13434,
             KravgrunnlagHenter.ANSVARLIG_ENHET_NØS, KravgrunnlagHenter.OKO_SAKSBEH_ID));
         verify(proxy, never()).anullerKravgrunnlag(any());
@@ -68,7 +68,7 @@ class KravgrunnlagHenterTest {
         henter(false).annullerKravgrunnlag(123L, grunnlag);
 
         verify(proxy).anullerKravgrunnlag(new AnnullerKravGrunnlagDto(BigInteger.valueOf(13434L)));
-        verify(sokos, never()).anullerKravgrunnlag(any());
+        verify(sokos, never()).annullerKravgrunnlag(any());
     }
 
     @Test
@@ -79,7 +79,7 @@ class KravgrunnlagHenterTest {
         assertThatThrownBy(() -> henter(true).annullerKravgrunnlag(123L, grunnlag))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("vedtakId");
-        verify(sokos, never()).anullerKravgrunnlag(any());
+        verify(sokos, never()).annullerKravgrunnlag(any());
     }
 
     @Test
@@ -87,7 +87,7 @@ class KravgrunnlagHenterTest {
         assertThatThrownBy(() -> henter(true).annullerKravgrunnlag(123L, null))
             .isInstanceOf(NullPointerException.class)
             .hasMessageContaining("Finnes ikke aktivt kravgrunnlag");
-        verify(sokos, never()).anullerKravgrunnlag(any());
+        verify(sokos, never()).annullerKravgrunnlag(any());
         verify(proxy, never()).anullerKravgrunnlag(any());
     }
 

@@ -50,7 +50,7 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
                                             ØkonomiProxyKlient økonomiProxyKlient,
                                             SokosTilbakekrevingKlient sokosTilbakekrevingKlient) {
         this(oppdragIverksettingStatusRepository, beregningsresultatTjeneste, tilbakekrevingsvedtakTjeneste,
-            økonomiProxyKlient, sokosTilbakekrevingKlient, ENV::isDev);
+            økonomiProxyKlient, sokosTilbakekrevingKlient, () -> (ENV.isDev() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) || ENV.isLocal());
     }
 
     SendVedtakTilOppdragsystemetTask(OppdragIverksettingStatusRepository oppdragIverksettingStatusRepository,
@@ -71,7 +71,7 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         beregningsresultatTjeneste.beregnOgLagre(behandlingId); //midlertidig her for å raskere kunne fase ut håndtering av lagret XML
-        if (erDev.getAsBoolean() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
+        if (erDev.getAsBoolean()) {
             var request = tilbakekrevingsvedtakTjeneste.lagSokosTilbakekrevingsvedtak(behandlingId);
             sokosTilbakekrevingKlient.iverksettTilbakekrevingsvedtak(request);
             oppdragIverksettingStatusRepository.registrerKvittertVedtak(behandlingId, request.vedtakId().toString());

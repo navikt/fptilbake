@@ -78,7 +78,7 @@ class ForvaltningKravgrunnlagRestTjenesteTest {
     }
 
     @Test
-    void annuler_krav_grunnlag_ok() {
+    void annuller_krav_grunnlag_ok() {
         var grunnlag = mock(Kravgrunnlag431.class);
         when(kravgrunnlagRepository.hentIsAktivFor(behandling.getId())).thenReturn(grunnlag);
         HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto = new HentKorrigertKravgrunnlagDto(behandling.getId(),
@@ -89,7 +89,7 @@ class ForvaltningKravgrunnlagRestTjenesteTest {
     }
 
     @Test
-    void annuler_krav_grunnlag_500_kravgrunnlag_finnes_ikke() {
+    void annuller_krav_grunnlag_500_kravgrunnlag_finnes_ikke() {
         doThrow(new IllegalStateException("Finnes ikke kravgrunnlag")).when(kravgrunnlagRepository).hentIsAktivFor(behandling.getId());
 
         HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto = new HentKorrigertKravgrunnlagDto(behandling.getId(),
