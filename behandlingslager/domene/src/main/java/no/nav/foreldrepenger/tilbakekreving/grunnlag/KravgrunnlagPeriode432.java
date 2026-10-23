@@ -119,7 +119,7 @@ public class KravgrunnlagPeriode432 extends BaseEntitet {
             erListeLik(kravgrunnlagBeloper433, that.kravgrunnlagBeloper433);
     }
 
-    private boolean erBigDecimalLik(BigDecimal bd1, BigDecimal bd2) {
+    private static boolean erBigDecimalLik(BigDecimal bd1, BigDecimal bd2) {
         if (bd1 == null && bd2 == null)
             return true;
         if (bd1 == null || bd2 == null)
@@ -127,7 +127,7 @@ public class KravgrunnlagPeriode432 extends BaseEntitet {
         return bd1.compareTo(bd2) == 0;
     }
 
-    private boolean erListeLik(List<KravgrunnlagBelop433> l1, List<KravgrunnlagBelop433> l2) {
+    private static boolean erListeLik(List<KravgrunnlagBelop433> l1, List<KravgrunnlagBelop433> l2) {
         if (l1 == null && l2 == null)
             return true;
         if (l1 == null || l2 == null)

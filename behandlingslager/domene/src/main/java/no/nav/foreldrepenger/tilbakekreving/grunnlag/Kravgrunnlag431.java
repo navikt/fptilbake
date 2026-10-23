@@ -235,7 +235,31 @@ public class Kravgrunnlag431 extends BaseEntitet {
             erListeLik(perioder, that.perioder);
     }
 
-    private boolean erListeLik(List<KravgrunnlagPeriode432> l1, List<KravgrunnlagPeriode432> l2) {
+    public static boolean likUtenomRenterBeregnet(Kravgrunnlag431 ene, Kravgrunnlag431 andre) {
+        if (ene == andre) return true;
+        if (ene == null || andre == null) return false;
+        return Objects.equals(ene.eksternKravgrunnlagId, andre.eksternKravgrunnlagId) &&
+            Objects.equals(ene.vedtakId, andre.vedtakId) &&
+            ene.kravStatusKode == andre.kravStatusKode &&
+            ene.fagOmrådeKode == andre.fagOmrådeKode &&
+            Objects.equals(ene.fagSystemId, andre.fagSystemId) &&
+            Objects.equals(ene.vedtakFagSystemDato, andre.vedtakFagSystemDato) &&
+            Objects.equals(ene.omgjortVedtakId, andre.omgjortVedtakId) &&
+            Objects.equals(ene.gjelderVedtakId, andre.gjelderVedtakId) &&
+            ene.gjelderType == andre.gjelderType &&
+            Objects.equals(ene.utbetalesTilId, andre.utbetalesTilId) &&
+            ene.utbetGjelderType == andre.utbetGjelderType &&
+            Objects.equals(ene.hjemmelKode, andre.hjemmelKode) &&
+            Objects.equals(ene.ansvarligEnhet, andre.ansvarligEnhet) &&
+            Objects.equals(ene.bostedEnhet, andre.bostedEnhet) &&
+            Objects.equals(ene.behandlendeEnhet, andre.behandlendeEnhet) &&
+            Objects.equals(ene.kontrollFelt, andre.kontrollFelt) &&
+            Objects.equals(ene.saksBehId, andre.saksBehId) &&
+            Objects.equals(ene.referanse, andre.referanse) &&
+            erListeLik(ene.perioder, andre.perioder);
+    }
+
+    private static boolean erListeLik(List<KravgrunnlagPeriode432> l1, List<KravgrunnlagPeriode432> l2) {
         if (l1 == null && l2 == null)
             return true;
         if (l1 == null || l2 == null)

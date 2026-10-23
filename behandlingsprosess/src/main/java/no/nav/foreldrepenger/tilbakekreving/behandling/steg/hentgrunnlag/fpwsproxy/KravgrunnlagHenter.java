@@ -129,7 +129,7 @@ public class KravgrunnlagHenter {
     private void sammenlignMedSokos(HentKravgrunnlagRequest request, Kravgrunnlag431 original) {
         try {
             var sokos = hentFraSokos(request);
-            if (Objects.equals(original, sokos)) {
+            if (Kravgrunnlag431.likUtenomRenterBeregnet(original, sokos)) {
                 LOG.info("Kravgrunnlag fra proxy og Sokos er identiske for kravgrunnlagId {}", request.kravgrunnlagId());
             } else {
                 LOG.info("Kravgrunnlag fra proxy og Sokos er IKKE identiske for kravgrunnlagId proxy {} sokos {}.", original, sokos);
