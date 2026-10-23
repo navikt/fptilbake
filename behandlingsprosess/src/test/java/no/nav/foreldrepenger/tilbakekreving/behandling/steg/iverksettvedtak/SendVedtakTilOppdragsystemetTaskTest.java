@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,9 +20,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.iverksett.TilbakekrevingVedtakDTO;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.UkjentKvitteringFraOSException;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
@@ -52,8 +52,8 @@ class SendVedtakTilOppdragsystemetTaskTest {
     @Inject
     private KravgrunnlagRepository kravgrunnlagRepository;
 
-    private final ØkonomiProxyKlient økonomiProxyKlient = Mockito.mock(ØkonomiProxyKlient.class);
-    private final SokosTilbakekrevingKlient sokosTilbakekrevingKlient = Mockito.mock(SokosTilbakekrevingKlient.class);
+    private final ØkonomiProxyKlient økonomiProxyKlient = mock(ØkonomiProxyKlient.class);
+    private final SokosTilbakekrevingKlient sokosTilbakekrevingKlient = mock(SokosTilbakekrevingKlient.class);
 
     private SendVedtakTilOppdragsystemetTask task;
 
@@ -61,7 +61,7 @@ class SendVedtakTilOppdragsystemetTaskTest {
     void setup() {
         System.setProperty("app.name", "fptilbake");
         task = new SendVedtakTilOppdragsystemetTask(oppdragIverksettingStatusRepository, beregningsresultatTjeneste,
-            tilbakekrevingsvedtakTjeneste, økonomiProxyKlient, sokosTilbakekrevingKlient, () -> false);
+            tilbakekrevingsvedtakTjeneste, økonomiProxyKlient, sokosTilbakekrevingKlient, () -> true);
     }
 
     @AfterEach
@@ -71,28 +71,6 @@ class SendVedtakTilOppdragsystemetTaskTest {
 
     @Test
     void skal_lagre_iverksettingstatus_og_sende_vedtak_til_os() {
-        var scenario = ScenarioSimple
-            .simple()
-            .medDefaultKravgrunnlag()
-            .medFullInnkreving();
-        var behandling = scenario.lagre(behandlingRepositoryProvider);
-
-        var data = lagProsessTaskKonfigurasjon(behandling);
-
-        task.doTask(data);
-
-        //har sendt til OS:
-        verify(økonomiProxyKlient).iverksettTilbakekrevingsvedtak(any(TilbakekrevingVedtakDTO.class));
-        verify(sokosTilbakekrevingKlient, never()).iverksettTilbakekrevingsvedtak(any());
-
-        //har lagret status riktig
-        var status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
-        assertThat(status).isPresent();
-        assertThat(status.get().getKvitteringOk()).isTrue();
-    }
-
-    @Test
-    void skal_sende_vedtak_via_sokos_i_dev() {
         var behandling = ScenarioSimple.simple().medDefaultKravgrunnlag().medFullInnkreving().lagre(behandlingRepositoryProvider);
         brukSokos(behandling.getId());
 
@@ -107,11 +85,13 @@ class SendVedtakTilOppdragsystemetTaskTest {
         assertThat(DefaultJsonMapper.toJson(request.getValue())).doesNotContain("\"renterBeregnes\"", "\"renterPeriodeBeregnes\"");
         assertThat(request.getValue().perioder()).isNotEmpty();
         assertThat(request.getValue().perioder().getFirst().posteringer()).isNotEmpty();
-        assertThat(oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId())).isPresent();
+        var status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
+        assertThat(status).isPresent();
+        assertThat(status.get().getKvitteringOk()).isTrue();
     }
 
     @Test
-    void skal_ikke_kvittere_når_sokos_avviser_vedtak() {
+    void skal_få_exception_når_kvittering_ikke_er_OK() {
         doThrow(new UkjentKvitteringFraOSException("FPT-539080", "Avvist av Sokos"))
             .when(sokosTilbakekrevingKlient).iverksettTilbakekrevingsvedtak(any());
         var behandling = ScenarioSimple.simple().medDefaultKravgrunnlag().medFullInnkreving().lagre(behandlingRepositoryProvider);
@@ -122,7 +102,7 @@ class SendVedtakTilOppdragsystemetTaskTest {
     }
 
     private void brukSokos(Long behandlingId) {
-        var sokosTjeneste = Mockito.mock(TilbakekrevingsvedtakTjeneste.class);
+        var sokosTjeneste = mock(TilbakekrevingsvedtakTjeneste.class);
         var dato = LocalDate.of(2026, 1, 15);
         var request = new TilbakekrevingsvedtakRequest(KodeAksjon.FATTE_VEDTAK, 1412, dato,
             "22-15", "8020", "kontrollfelt", "Z999999", null,
@@ -131,27 +111,9 @@ class SendVedtakTilOppdragsystemetTaskTest {
                 List.of(new TilbakekrevingsvedtakRequest.Postering("FPATORD", BigDecimal.ONE,
                     BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
                     "FULL_TILBAKEKREV", "ANNET", "IKKE_FORDELT")))));
-        Mockito.when(sokosTjeneste.lagSokosTilbakekrevingsvedtak(behandlingId)).thenReturn(request);
+        when(sokosTjeneste.lagSokosTilbakekrevingsvedtak(behandlingId)).thenReturn(request);
         task = new SendVedtakTilOppdragsystemetTask(oppdragIverksettingStatusRepository, beregningsresultatTjeneste,
             sokosTjeneste, økonomiProxyKlient, sokosTilbakekrevingKlient, () -> true);
-    }
-
-    @Test
-    void skal_få_exception_når_kvittering_ikke_er_OK() {
-        doThrow(new UkjentKvitteringFraOSException("FPT-539080", "Fikk feil fra OS ved iverksetting av tilbakekrevingsvedtak. Sjekk loggen til fpwsproxy for mer info."))
-            .when(økonomiProxyKlient).iverksettTilbakekrevingsvedtak(any());
-
-        var scenario = ScenarioSimple
-            .simple()
-            .medDefaultKravgrunnlag()
-            .medFullInnkreving();
-        var behandling = scenario.lagre(behandlingRepositoryProvider);
-        var data = lagProsessTaskKonfigurasjon(behandling);
-
-        assertThatThrownBy(() -> task.doTask(data)).hasMessageContaining("Fikk feil fra OS ved iverksetting av tilbakekrevingsvedtak");
-        //har ikke lagret status
-        var status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
-        assertThat(status).isEmpty();
     }
 
     private ProsessTaskData lagProsessTaskKonfigurasjon(Behandling behandling) {

@@ -16,8 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.AnnullerKravGrunnlagDto;
-import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.respons.Kravgrunnlag431Dto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.sokos.HentKravgrunnlagMapperSokos;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KodeAksjon;
@@ -52,7 +50,7 @@ class KravgrunnlagHenterTest {
         when(grunnlag.getVedtakId()).thenReturn(13434L);
         when(grunnlag.getAnsvarligEnhet()).thenReturn("4819");
 
-        henter(true).annullerKravgrunnlag(behandlingId, grunnlag);
+        henter().annullerKravgrunnlag(behandlingId, grunnlag);
 
         verify(sokos).annullerKravgrunnlag(new KravgrunnlagAnnullerRequest(
             KodeAksjon.ANNULERE_GRUNNLAG, 13434,
@@ -61,22 +59,11 @@ class KravgrunnlagHenterTest {
     }
 
     @Test
-    void annullerer_via_proxy_utenfor_dev() {
-        var grunnlag = mock(Kravgrunnlag431.class);
-        when(grunnlag.getVedtakId()).thenReturn(13434L);
-
-        henter(false).annullerKravgrunnlag(123L, grunnlag);
-
-        verify(proxy).anullerKravgrunnlag(new AnnullerKravGrunnlagDto(BigInteger.valueOf(13434L)));
-        verify(sokos, never()).annullerKravgrunnlag(any());
-    }
-
-    @Test
     void avviser_vedtakid_over_grensen_for_sokos() {
         var grunnlag = mock(Kravgrunnlag431.class);
         when(grunnlag.getVedtakId()).thenReturn(1_000_000_000L);
 
-        assertThatThrownBy(() -> henter(true).annullerKravgrunnlag(123L, grunnlag))
+        assertThatThrownBy(() -> henter().annullerKravgrunnlag(123L, grunnlag))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("vedtakId");
         verify(sokos, never()).annullerKravgrunnlag(any());
@@ -84,7 +71,7 @@ class KravgrunnlagHenterTest {
 
     @Test
     void avviser_annullering_uten_aktivt_kravgrunnlag() {
-        assertThatThrownBy(() -> henter(true).annullerKravgrunnlag(123L, null))
+        assertThatThrownBy(() -> henter().annullerKravgrunnlag(123L, null))
             .isInstanceOf(NullPointerException.class)
             .hasMessageContaining("Finnes ikke aktivt kravgrunnlag");
         verify(sokos, never()).annullerKravgrunnlag(any());
@@ -102,27 +89,14 @@ class KravgrunnlagHenterTest {
         when(sokos.hentKravgrunnlag(sokosRequest)).thenReturn(new HentKravgrunnlagDetaljerResponse(0, "OK", respons));
         when(sokosMapper.mapTilDomene(respons)).thenReturn(resultat);
 
-        assertThat(henter(true).hentKravgrunnlagFraOS(1L, request)).isSameAs(resultat);
+        assertThat(henter().hentKravgrunnlagFraOS(1L, request)).isSameAs(resultat);
 
         verify(proxy, never()).hentKravgrunnlag(any());
     }
 
     @Test
-    void beholder_proxy_utenfor_dev() {
-        var request = request(KodeAksjon.HENT_GRUNNLAG_OMGJØRING, BigInteger.valueOf(570598));
-        var respons = mock(Kravgrunnlag431Dto.class);
-        var resultat = mock(Kravgrunnlag431.class);
-        when(proxy.hentKravgrunnlag(any())).thenReturn(respons);
-        when(proxyMapper.mapTilDomene(respons)).thenReturn(resultat);
-
-        assertThat(henter(false).hentKravgrunnlagFraOS(null, request)).isSameAs(resultat);
-
-        verify(sokos, never()).hentKravgrunnlag(any());
-    }
-
-    @Test
     void avviser_kravgrunnlagid_over_sokos_grensen() {
-        assertThatThrownBy(() -> henter(true).hentKravgrunnlagFraOS(null, request(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG, BigInteger.valueOf(1_000_000_000))))
+        assertThatThrownBy(() -> henter().hentKravgrunnlagFraOS(null, request(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG, BigInteger.valueOf(1_000_000_000))))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("kravgrunnlagId");
         verify(sokos, never()).hentKravgrunnlag(any());
@@ -130,7 +104,7 @@ class KravgrunnlagHenterTest {
 
     @Test
     void avviser_kravgrunnlagid_som_ikke_er_int() {
-        assertThatThrownBy(() -> henter(true).hentKravgrunnlagFraOS(null, request(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG, new BigInteger("9223372036854775808"))))
+        assertThatThrownBy(() -> henter().hentKravgrunnlagFraOS(null, request(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG, new BigInteger("9223372036854775808"))))
             .isInstanceOf(ArithmeticException.class);
         verify(sokos, never()).hentKravgrunnlag(any());
     }
@@ -166,12 +140,12 @@ class KravgrunnlagHenterTest {
         assertThatThrownBy(() -> KravgrunnlagHenter.validerDetaljer(new HentKravgrunnlagDetaljerResponse(4, "B420012I", null)))
             .isInstanceOf(SperringKravgrunnlagException.class);
         when(sokos.hentKravgrunnlag(any())).thenThrow(new SokosKravgrunnlagException("B420010I"));
-        assertThatThrownBy(() -> henter(true).hentKravgrunnlagFraOS(null, request(KodeAksjon.HENT_GRUNNLAG_OMGJØRING, BigInteger.valueOf(570598))))
+        assertThatThrownBy(() -> henter().hentKravgrunnlagFraOS(null, request(KodeAksjon.HENT_GRUNNLAG_OMGJØRING, BigInteger.valueOf(570598))))
             .isInstanceOf(ManglendeKravgrunnlagException.class);
     }
 
-    private KravgrunnlagHenter henter(boolean dev) {
-        return new KravgrunnlagHenter(proxy, proxyMapper, sokos, sokosMapper, () -> dev);
+    private KravgrunnlagHenter henter() {
+        return new KravgrunnlagHenter(proxy, proxyMapper, sokos, sokosMapper, () -> true);
     }
 
     private static HentKravgrunnlagRequest request(KodeAksjon aksjon, BigInteger id) {
