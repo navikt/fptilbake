@@ -86,7 +86,7 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
                 Long sekvensNr = rekkefølge.gruppeSekvens() ? gruppeSekvensNr : null;
                 Long behandlingId = ProsessTaskDataWrapper.wrap(task).getBehandlingId();
                 Saksnummer saksnummer = task.getSaksnummer() != null ? new Saksnummer(task.getSaksnummer()) : null;
-                repository.lagre(new FagsakProsessTask(saksnummer, task.getFagsakId(), task.getId(), behandlingId, sekvensNr));
+                repository.lagre(new FagsakProsessTask(saksnummer, task.getId(), behandlingId, sekvensNr));
             }
         }
     }

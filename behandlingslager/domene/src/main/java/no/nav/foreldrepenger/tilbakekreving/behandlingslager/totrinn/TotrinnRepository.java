@@ -4,7 +4,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -12,7 +11,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.vedtak.felles.jpa.HibernateVerktøy;
 
 @ApplicationScoped
 public class TotrinnRepository {
@@ -48,25 +46,8 @@ public class TotrinnRepository {
         entityManager.flush();
     }
 
-    public void lagreOgFlush(Behandling behandling, Totrinnresultatgrunnlag totrinnresultatgrunnlag) {
-        Objects.requireNonNull(behandling, "behandling");
-
-        Optional<Totrinnresultatgrunnlag> aktivtTotrinnresultatgrunnlag = getAktivtTotrinnresultatgrunnlag(behandling);
-        if (aktivtTotrinnresultatgrunnlag.isPresent()) {
-            Totrinnresultatgrunnlag grunnlag = aktivtTotrinnresultatgrunnlag.get();
-            grunnlag.disable();
-            entityManager.persist(grunnlag);
-        }
-        lagreTotrinnsresultatgrunnlag(totrinnresultatgrunnlag);
-        entityManager.flush();
-    }
-
     public Collection<Totrinnsvurdering> hentTotrinnsvurderinger(Behandling behandling) {
         return getAktiveTotrinnaksjonspunktvurderinger(behandling);
-    }
-
-    public Optional<Totrinnresultatgrunnlag> hentTotrinngrunnlag(Behandling behandling) {
-        return getAktivtTotrinnresultatgrunnlag(behandling);
     }
 
     public void slettGammelTotrinnData(Long behandlingId) {
@@ -77,30 +58,11 @@ public class TotrinnRepository {
                 entityManager.persist(totrinnsvurdering);
             });
         }
-        Optional<Totrinnresultatgrunnlag> totrinnresultatgrunnlag = getAktivtTotrinnresultatgrunnlag(behandlingId);
-        if (totrinnresultatgrunnlag.isPresent()) {
-            Totrinnresultatgrunnlag aktivTotrinnresultatgrunnlag = totrinnresultatgrunnlag.get();
-            aktivTotrinnresultatgrunnlag.disable();
-            entityManager.persist(aktivTotrinnresultatgrunnlag);
-        }
         entityManager.flush();
     }
 
     protected Collection<Totrinnsvurdering> getAktiveTotrinnaksjonspunktvurderinger(Behandling behandling) {
         return getAktiveTotrinnaksjonspunktvurderinger(behandling.getId());
-    }
-
-    protected Optional<Totrinnresultatgrunnlag> getAktivtTotrinnresultatgrunnlag(Behandling behandling) {
-        return getAktivtTotrinnresultatgrunnlag(behandling.getId());
-    }
-
-    protected Optional<Totrinnresultatgrunnlag> getAktivtTotrinnresultatgrunnlag(Long behandlingId) {
-        TypedQuery<Totrinnresultatgrunnlag> query = entityManager.createQuery(
-                "SELECT trg FROM Totrinnresultatgrunnlag trg WHERE trg.behandling.id = :behandling_id AND trg.aktiv = true",
-                Totrinnresultatgrunnlag.class);
-
-        query.setParameter("behandling_id", behandlingId);
-        return HibernateVerktøy.hentUniktResultat(query);
     }
 
     protected Collection<Totrinnsvurdering> getAktiveTotrinnaksjonspunktvurderinger(Long behandlingId) {
@@ -112,7 +74,4 @@ public class TotrinnRepository {
         return query.getResultList();
     }
 
-    private void lagreTotrinnsresultatgrunnlag(Totrinnresultatgrunnlag totrinnresultatgrunnlag) {
-        entityManager.persist(totrinnresultatgrunnlag);
-    }
 }
