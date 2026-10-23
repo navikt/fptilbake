@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.sokos;
 
+import java.util.Optional;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -47,7 +49,7 @@ public class HentKravgrunnlagMapperSokos {
             .medUtbetalesTilId(personOrganisasjonWrapper.hentAktørIdEllerOrganisajonNummer(dto.utbetalesTilId(), utbetalingGjelderType))
             .medUtbetIdType(utbetalingGjelderType)
             .medHjemmelKode(nonEmpty(dto.kodeHjemmel()))
-            .medBeregnesRenter(Boolean.TRUE.equals(dto.renterBeregnes()) ? "J" : "N")
+            .medBeregnesRenter(Optional.ofNullable(dto.renterBeregnes()).map(b -> b ? "J" : "N").orElse(null))
             .medAnsvarligEnhet(dto.enhetAnsvarlig())
             .medBostedEnhet(dto.enhetBosted())
             .medBehandlendeEnhet(dto.enhetBehandl())
