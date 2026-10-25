@@ -7,8 +7,10 @@
 
     <sequence-generator name="SEQ_MOTTAKER_VARSEL_RESPONS" allocation-size="50"
                         sequence-name="SEQ_MOTTAKER_VARSEL_RESPONS"/>
-    <sequence-generator name="SEQ_VARSELBREV_DATA" allocation-size="50" sequence-name="SEQ_VARSELBREV_DATA"/>
     <sequence-generator name="SEQ_VARSEL" allocation-size="50" sequence-name="SEQ_VARSEL"/>
+    <sequence-generator name="SEQ_BREV_SPORING" allocation-size="50" sequence-name="SEQ_BREV_SPORING"/>
+    <sequence-generator name="SEQ_VEDTAKSBREV_OPPSUMMERING" allocation-size="50" sequence-name="SEQ_VEDTAKSBREV_OPPSUMMERING"/>
+    <sequence-generator name="SEQ_VEDTAKSBREV_PERIODE" allocation-size="50" sequence-name="SEQ_VEDTAKSBREV_PERIODE"/>
 
     <!-- fritekst vedtaksbrev -->
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode"/>
