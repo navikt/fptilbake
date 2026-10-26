@@ -16,6 +16,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 
+import jakarta.validation.constraints.NotNull;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -35,8 +37,9 @@ public class Fagsak extends BaseEntitet {
     private NavBruker navBruker;
 
     /**
-     * Offisielt tildelt saksnummer fra GSAK.
+     * Offisielt tildelt saksnummer fra FPSAK.
      */
+    @NotNull
     @Embedded
     @AttributeOverride(name = "saksnummer", column = @Column(name = "saksnummer", unique = true))
     private Saksnummer saksnummer;
@@ -55,6 +58,8 @@ public class Fagsak extends BaseEntitet {
     }
 
     private Fagsak(Saksnummer saksnummer, NavBruker bruker) {
+        Objects.requireNonNull(saksnummer, "saksnummer");
+        Objects.requireNonNull(bruker, "bruker");
         this.saksnummer = saksnummer;
         this.navBruker = bruker;
     }
