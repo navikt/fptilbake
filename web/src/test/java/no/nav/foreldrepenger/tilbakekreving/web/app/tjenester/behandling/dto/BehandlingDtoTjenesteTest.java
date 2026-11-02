@@ -424,8 +424,8 @@ class BehandlingDtoTjenesteTest {
     }
 
     private Behandling lagBehandling(BehandlingStegType behandlingStegType, BehandlingStatus behandlingStatus) {
-        var fagsakId = fagsakRepository.lagre(Fagsak.opprettNy(saksnummer, NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.NB)));
-        var fagsak = fagsakRepository.finnEksaktFagsak(fagsakId);
+        fagsakRepository.lagre(Fagsak.opprettNy(saksnummer, NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.NB)));
+        var fagsak = fagsakRepository.hentEksaktFagsakForGittSaksnummer(saksnummer);
         var behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         behandling.setAnsvarligSaksbehandler("Z991136");
         BehandlingStegMockUtil.nyBehandlingSteg(behandling, behandlingStegType, behandlingStatus);

@@ -41,15 +41,14 @@ public class FagsakTjeneste {
     }
 
     public Fagsak opprettFagsak(Saksnummer saksnummer, AktørId aktørId, FagsakYtelseType fagsakYtelseType, Språkkode språkkode) {
-        NavBruker bruker = hentNavBruker(aktørId, språkkode);
-        Fagsak fagsak = Fagsak.opprettNy(saksnummer, bruker);
-        fagsak.setFagsakYtelseType(fagsakYtelseType);
-
         //Hent forrige fagsak hvis finnes
         Optional<Fagsak> forrigeFagsak = finnFagsak(saksnummer);
         if (forrigeFagsak.isPresent()) {
-            fagsak = forrigeFagsak.get();
+            return forrigeFagsak.get();
         }
+        NavBruker bruker = hentNavBruker(aktørId, språkkode);
+        Fagsak fagsak = Fagsak.opprettNy(saksnummer, bruker, fagsakYtelseType);
+
         lagreFagsak(fagsak, saksnummer);
         return fagsak;
     }

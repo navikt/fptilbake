@@ -38,6 +38,8 @@ public class EksternBehandling extends BaseEntitet {
     @Column(name = "ekstern_uuid")
     private UUID eksternUuid;
 
+    @Convert(converter = Henvisning.HenvisningConverter.class)
+    @Column(name = "henvisning", nullable = false, updatable = false)
     private Henvisning henvisning;
 
     @Version

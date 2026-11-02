@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 @ApplicationScoped
 @ProsessTask(value = "start.ettersend.sakshendelser", prioritet = 4)
@@ -36,13 +37,15 @@ public class TriggEttersendAvsluttetSakshendelseTask implements ProsessTaskHandl
         }
         Query query = entityManager.createNativeQuery(
             """
-                insert into prosess_task (id, task_type, task_parametere)
-                 select seq_prosess_task.nextval, 'dvh.ettersend.sakshendelser', 'behandlingId=' || b.id
+                insert into prosess_task (id, task_type, task_gruppe, task_sekvens, task_parametere)
+                 select seq_prosess_task.nextval, :tasknavn, :tasknavn, :sekvens, 'behandlingId=' || b.id
                  from behandling b
                  where b.behandling_status = 'AVSLU'
                 """
-        );
+            )
+            .setParameter("tasknavn", TaskType.forProsessTask(EttersendSakshendelserTilDvhTask.class).value())
+            .setParameter("sekvens", "1");
         int rader = query.executeUpdate();
-        LOG.info("Opprettet {} tasker av migrer.beregnignsresultat", rader);
+        LOG.info("Opprettet {} tasker av dvh.ettersend.sakshendelser", rader);
     }
 }

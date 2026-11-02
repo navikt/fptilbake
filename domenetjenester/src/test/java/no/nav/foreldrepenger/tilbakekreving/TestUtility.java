@@ -5,29 +5,36 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
+import jakarta.persistence.EntityManager;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
 
 public class TestUtility {
 
-    private static final AtomicLong GEN_SAK_ID = new AtomicLong(1000000L);
     private static final AtomicLong GEN_UID = new AtomicLong(300000L);
     private static final AtomicLong GEN_SAK_NR = new AtomicLong(500000L);
     private static final AtomicLong GEN_EBEH_ID = new AtomicLong(999950L);
 
     private static final BehandlingType BEHANDLING_TYPE = BehandlingType.TILBAKEKREVING;
 
-    private BehandlingTjeneste behandlingTjeneste;
+    private final BehandlingTjeneste behandlingTjeneste;
+    private final FagsakTjeneste fagsakTjeneste;
+    private final EntityManager entityManager;
 
-    public TestUtility(BehandlingTjeneste behandlingTjeneste) {
+    public TestUtility(BehandlingTjeneste behandlingTjeneste, FagsakTjeneste fagsakTjeneste, EntityManager entityManager) {
         this.behandlingTjeneste = behandlingTjeneste;
+        this.fagsakTjeneste = fagsakTjeneste;
+        this.entityManager = entityManager;
     }
 
     public AktørId genererAktørId() {
@@ -41,18 +48,19 @@ public class TestUtility {
      */
     public SakDetaljer opprettFørstegangsBehandling(AktørId aktørId) {
         // generer data
-        long fagsakId = genererFagsakId();
         long eksBehId = genererEksternBehandlingId();
         Henvisning henvisning = Henvisning.fraEksternBehandlingId(eksBehId);
         Saksnummer saksnummer = genererSaksnummer();
         UUID eksternUuid = genererEksternUuid();
 
+        fagsakTjeneste.opprettFagsak(saksnummer, aktørId, FagsakYtelseType.FORELDREPENGER, Språkkode.NB);
+        entityManager.flush();
         long intBehId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternUuid, henvisning, aktørId, FagsakYtelseType.FORELDREPENGER, BEHANDLING_TYPE);
 
         Behandling behandling = behandlingTjeneste.hentBehandling(intBehId);
 
         // opprett SakDetaljer
-        return new SakDetaljer(fagsakId, saksnummer, intBehId, henvisning, eksternUuid, aktørId, BEHANDLING_TYPE, behandling);
+        return new SakDetaljer(saksnummer, intBehId, henvisning, eksternUuid, aktørId, BEHANDLING_TYPE, behandling);
     }
 
     public Optional<Personinfo> lagPersonInfo(AktørId aktørId) {
@@ -71,10 +79,6 @@ public class TestUtility {
         return UUID.nameUUIDFromBytes(data);
     }
 
-    private Long genererFagsakId() {
-        return GEN_SAK_ID.getAndIncrement();
-    }
-
     private Saksnummer genererSaksnummer() {
         Long nr = GEN_SAK_NR.getAndIncrement();
         return new Saksnummer(String.valueOf(nr));
@@ -85,7 +89,6 @@ public class TestUtility {
     }
 
     public static class SakDetaljer {
-        private Long fagsakId;
         private Saksnummer saksnummer;
         private Long internBehandlingId;
         private Henvisning henvisning;
@@ -94,9 +97,8 @@ public class TestUtility {
         private BehandlingType behandlingType;
         private Behandling behandling;
 
-        public SakDetaljer(Long fagsakId, Saksnummer saksnummer, Long internBehandlingId, Henvisning henvisning,
+        public SakDetaljer(Saksnummer saksnummer, Long internBehandlingId, Henvisning henvisning,
                            UUID eksternUuid, AktørId aktørId, BehandlingType behandlingType, Behandling behandling) {
-            this.fagsakId = fagsakId;
             this.saksnummer = saksnummer;
             this.internBehandlingId = internBehandlingId;
             this.henvisning = henvisning;
@@ -104,10 +106,6 @@ public class TestUtility {
             this.aktørId = aktørId;
             this.behandlingType = behandlingType;
             this.behandling = behandling;
-        }
-
-        public Long getFagsakId() {
-            return fagsakId;
         }
 
         public Saksnummer getSaksnummer() {

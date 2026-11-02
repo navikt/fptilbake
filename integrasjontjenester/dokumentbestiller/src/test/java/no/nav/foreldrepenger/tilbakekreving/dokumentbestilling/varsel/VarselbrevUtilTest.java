@@ -119,7 +119,7 @@ class VarselbrevUtilTest {
 
         VarselbrevSamletInfo varselbrev = VarselbrevUtil.sammenstillInfoFraFagsystemerForSending(
                 behandingsinfo,
-                Saksnummer.infotrygd("11111111"),
+                Saksnummer.fra("11111111"),
                 adresseinfo,
                 personinfo,
                 feilutbetaltePerioderDto,

@@ -2,15 +2,15 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak;
 
 import java.util.Objects;
 
-import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -24,8 +24,9 @@ public class FagsakProsessTask extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_FAGSAK_PROSESS_TASK")
     private Long id;
 
-    @Embedded
-    @AttributeOverride(name = "saksnummer", column = @Column(name = "saksnummer", nullable = false, updatable = false))
+    @NotNull
+    @Convert(converter = Saksnummer.SaksnummerConverter.class)
+    @Column(name = "saksnummer", nullable = false, updatable = false)
     private Saksnummer saksnummer;
 
     @Column(name = "prosess_task_id", nullable = false, updatable = false)

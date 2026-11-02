@@ -4,10 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 
-import org.junit.jupiter.api.Test;
-
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+
+import org.junit.jupiter.api.Test;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -98,7 +99,7 @@ class FpOversiktDtoTjenesteTest {
     private void lagVarsel(Behandling behandling) {
         var brev = new BrevSporing.Builder()
             .medBehandlingId(behandling.getId())
-            .medJournalpostId(new JournalpostId(1L))
+            .medJournalpostId(new JournalpostId("1"))
             .medBrevType(BrevType.VARSEL_BREV)
             .medDokumentId("1")
             .build();

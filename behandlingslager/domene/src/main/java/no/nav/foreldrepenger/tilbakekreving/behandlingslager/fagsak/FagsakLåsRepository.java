@@ -1,11 +1,16 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryFeil;
+import org.hibernate.KeyType;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryFeil;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+
+@ApplicationScoped
 public class FagsakLåsRepository {
 
     private EntityManager entityManager;
@@ -21,72 +26,30 @@ public class FagsakLåsRepository {
     /**
      * Tar lås på underliggende rader
      *
-     * @param fagsakId fagsaken
+     * @param saksnummer fagsaken
      * @return låsen
      */
-    public FagsakLås taLås(final Long fagsakIdIn) {
-        final LockModeType lockModeType = LockModeType.PESSIMISTIC_WRITE;
-
-        FagsakLås lås = new FagsakLås(fagsakIdIn);
-
-        // sjekker om fagsakId != null slik at det fungerer som no-op for ferske, unpersisted entiteter
-        if (fagsakIdIn != null) {
-            // bruker enkle queries slik at unngår laste eager associations og entiteter her
-            låsFagsak(fagsakIdIn, lockModeType);
+    public FagsakLås taLås(final Saksnummer saksnummer) {
+        Fagsak fagsak = entityManager.find(Fagsak.class, saksnummer, KeyType.NATURAL, LockModeType.PESSIMISTIC_WRITE);
+        if (fagsak == null) {
+            throw BehandlingRepositoryFeil.fantIkkeEntitetForLåsing(Fagsak.class.getSimpleName(), saksnummer);
         }
-
-        return lås;
-    }
-
-    /**
-     * Tar lås på underliggende rader
-     * Kaller bare på {@link #taLås(Long)}
-     *
-     * @param fagsak fagsaken
-     * @return låsen
-     */
-    public FagsakLås taLås(Fagsak fagsak) {
-        return taLås(fagsak.getId());
-    }
-
-    private Long låsFagsak(final Long fagsakId, LockModeType lockModeType) {
-        Object[] resultFs = (Object[]) entityManager
-                .createQuery("select fs.id, fs.versjon from Fagsak fs where fs.id=:id")
-                .setParameter("id", fagsakId)
-                .setLockMode(lockModeType)
-                .getSingleResult();
-        return (Long) resultFs[0];
+        return new FagsakLås(saksnummer);
     }
 
     /**
      * Verifisering av lås
      *
-     * @param fagsakLås låsen
+     * @param lås låsen
      */
     public void oppdaterLåsVersjon(FagsakLås lås) {
-        if (lås.getFagsakId() != null) {
-            verifisertLås(lås);
-        }
+        verifisertLås(lås.saksnummer());
     }
 
-    private void verifisertLås(FagsakLås lås) {
-        Long id = lås.getFagsakId();
-        // NB - Oracle syntax
-        Object versjon = entityManager.createNativeQuery("select versjon from FAGSAK where id =:fagsakId for update nowait")
-                .setParameter("fagsakId", id)
-                .getSingleResult();
-
-        if (versjon == null) {
-            throw BehandlingRepositoryFeil.fantIkkeEntitetForLåsing(Fagsak.class.getSimpleName(), id);
-        } else {
-            int updated = entityManager.createNativeQuery("update FAGSAK set versjon=versjon+1 where id=:fagsakId and versjon=:versjon")
-                    .setParameter("fagsakId", id)
-                    .setParameter("versjon", versjon)
-                    .executeUpdate();
-            if (updated != 1) {
-                throw new IllegalStateException("Kunne ikke verifisere lås på Fagsak: " + id + ", fikk ikke oppdatert versjon " + versjon);
-            }
+    private void verifisertLås(Saksnummer saksnummer) {
+        var fagsak = entityManager.find(Fagsak.class, saksnummer, KeyType.NATURAL, LockModeType.PESSIMISTIC_FORCE_INCREMENT);
+        if (fagsak == null) {
+            throw BehandlingRepositoryFeil.fantIkkeEntitetForLåsing(Fagsak.class.getSimpleName(), saksnummer);
         }
     }
-
 }

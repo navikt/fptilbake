@@ -66,7 +66,7 @@ public class BehandlingRepository {
         Objects.requireNonNull(saksnummer, KEY_SAKSNUMMER);
 
         var query = getEntityManager().createQuery(
-            "SELECT beh from Behandling beh, Fagsak fagsak WHERE beh.fagsak.id=fagsak.id AND fagsak.saksnummer=:saksnummer",
+            "SELECT beh from Behandling beh WHERE beh.fagsak.saksnummer=:saksnummer",
             Behandling.class);
         query.setParameter(KEY_SAKSNUMMER, saksnummer);
         return query.getResultList();
@@ -75,10 +75,10 @@ public class BehandlingRepository {
     public Optional<Behandling> finnÅpenTilbakekrevingsbehandling(Saksnummer saksnummer) {
         Objects.requireNonNull(saksnummer, KEY_SAKSNUMMER);
         var query = getEntityManager().createQuery("""
-            SELECT beh FROM Behandling beh, Fagsak fagsak WHERE beh.fagsak.id=fagsak.id AND fagsak.saksnummer = :saksnummer
+            SELECT beh FROM Behandling beh WHERE beh.fagsak.saksnummer = :saksnummer
                 AND beh.status <> :behandlingStatus
                 AND beh.behandlingType = :behandlingType
-                """, Behandling.class)
+            """, Behandling.class)
             .setParameter(KEY_SAKSNUMMER, saksnummer)
             .setParameter(KEY_BEHANDLING_STATUS, BehandlingStatus.AVSLUTTET)
             .setParameter(KEY_BEHANDLING_TYPE, BehandlingType.TILBAKEKREVING);

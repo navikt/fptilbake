@@ -106,7 +106,7 @@ class KravVedtakStatusTjenesteTest {
         var kravVedtakStatus437 = lagKravVedtakStatus(KravStatusKode.SPERRET);
 
         var behandling = Behandling.nyBehandlingFor(
-            Fagsak.opprettNy(Saksnummer.infotrygd("32423432"),
+            Fagsak.opprettNy(Saksnummer.fra("32423432"),
                 NavBruker.opprettNy(new AktørId(233L), Språkkode.NN)), BehandlingType.TILBAKEKREVING).build();
 
         when(grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).thenReturn(true);
@@ -127,7 +127,7 @@ class KravVedtakStatusTjenesteTest {
         var kravVedtakStatus437 = lagKravVedtakStatus(KravStatusKode.MANUELL);
 
         var behandling = Behandling.nyBehandlingFor(
-            Fagsak.opprettNy(Saksnummer.infotrygd("32423432"),
+            Fagsak.opprettNy(Saksnummer.fra("32423432"),
                 NavBruker.opprettNy(new AktørId(233L), Språkkode.NN)), BehandlingType.TILBAKEKREVING).build();
 
         when(grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).thenReturn(true);

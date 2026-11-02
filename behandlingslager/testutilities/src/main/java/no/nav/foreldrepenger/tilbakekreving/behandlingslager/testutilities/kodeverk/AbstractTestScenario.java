@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kode
 
 import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -231,8 +230,6 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
 
     public FagsakRepository mockFagsakRepository() {
         var fagsakRepository = mock(FagsakRepository.class);
-        when(fagsakRepository.finnEksaktFagsak(anyLong())).thenAnswer(a -> fagsak);
-        when(fagsakRepository.finnUnikFagsak(anyLong())).thenAnswer(a -> Optional.of(fagsak));
         when(fagsakRepository.hentSakGittSaksnummer(any(Saksnummer.class))).thenAnswer(a -> Optional.of(fagsak));
         when(fagsakRepository.hentForBruker(any(AktørId.class))).thenAnswer(a -> singletonList(fagsak));
         when(fagsakRepository.lagre(fagsakCaptor.capture())).thenAnswer(invocation -> {

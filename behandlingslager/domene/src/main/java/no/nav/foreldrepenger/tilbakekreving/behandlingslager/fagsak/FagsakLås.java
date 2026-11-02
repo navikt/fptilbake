@@ -2,9 +2,11 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak;
 
 import java.util.Objects;
 
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+
 /**
  * Lås, fungerer som token som indikerer at write-lock er tatt ut. Kreves av lagre metoder.
- * Er knyttet til underliggende lock på database rad ({@link LockModeType#PESSIMISTIC_WRITE}).
+ * Er knyttet til underliggende lock på database rad (LockModeType#PESSIMISTIC_WRITE).
  * Går out-of-scope og vil ikke være gyldig transaksjonen er ferdig.
  * <p>
  * Låsen initialiseres utelukkende via {@link FagsakRepository}. Og verfisers også her senere ved lagring som
@@ -14,60 +16,12 @@ import java.util.Objects;
  * <p>
  * Når lagring skjer vil relevante entiteter også få sin versjon inkrementert
  */
-public class FagsakLås {
-
-    private Long fagsakId;
-
-    /**
-     * protected ctor, kun for test-mock.
-     */
-    protected FagsakLås() {
-    }
+public record FagsakLås(Saksnummer saksnummer) {
 
     /**
      * protected, unngå å opprette utenfor denne pakken. Kan overstyres kun til test
      */
-    protected FagsakLås(Long fagsakId) {
-        if (fagsakId == null) {
-            throw new IllegalArgumentException("Minst en av fagsakId og behandlingId må være forskjellig fra null.");
-        }
-        this.fagsakId = fagsakId;
-    }
-
-    public Long getFagsakId() {
-        return this.fagsakId;
-    }
-
-    void setFagsakId(Long fagsakId) {
-        if (this.fagsakId != null && !Objects.equals(fagsakId, this.fagsakId)) {
-            throw new IllegalStateException(
-                    "Kan ikke endre fagsakId til annen verdi, var [" +
-                            this.fagsakId + "], forsøkte å sette til [" +
-                            fagsakId + "]");
-        }
-        this.fagsakId = fagsakId;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        } else if (obj == null || !(obj instanceof FagsakLås)) {
-            return false;
-        }
-        FagsakLås other = (FagsakLås) obj;
-        return Objects.equals(getFagsakId(), other.getFagsakId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getFagsakId());
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() +
-                "<fagsak=" + getFagsakId() +
-                ">";
+    public FagsakLås {
+        Objects.requireNonNull(saksnummer, "saksnummer");
     }
 }

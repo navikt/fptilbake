@@ -2,11 +2,9 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak;
 
 import java.util.Objects;
 
-import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,8 +13,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
-
 import jakarta.validation.constraints.NotNull;
+
+import org.hibernate.annotations.NaturalId;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
@@ -37,11 +36,12 @@ public class Fagsak extends BaseEntitet {
     private NavBruker navBruker;
 
     /**
-     * Offisielt tildelt saksnummer fra FPSAK.
+     * Offisielt tildelt saksnummer fra FPSAK/K9SAK.
      */
+    @NaturalId
     @NotNull
-    @Embedded
-    @AttributeOverride(name = "saksnummer", column = @Column(name = "saksnummer", unique = true))
+    @Convert(converter = Saksnummer.SaksnummerConverter.class)
+    @Column(name = "saksnummer", nullable = false, updatable = false, unique = true)
     private Saksnummer saksnummer;
 
 
@@ -57,15 +57,21 @@ public class Fagsak extends BaseEntitet {
         // Hibernate
     }
 
-    private Fagsak(Saksnummer saksnummer, NavBruker bruker) {
+    private Fagsak(Saksnummer saksnummer, NavBruker bruker, FagsakYtelseType ytelseType) {
         Objects.requireNonNull(saksnummer, "saksnummer");
         Objects.requireNonNull(bruker, "bruker");
         this.saksnummer = saksnummer;
         this.navBruker = bruker;
+        this.fagsakYtelseType = ytelseType;
     }
 
+    // Kun test
     public static Fagsak opprettNy(Saksnummer saksnummer, NavBruker bruker) {
-        return new Fagsak(saksnummer, bruker);
+        return new Fagsak(saksnummer, bruker, FagsakYtelseType.FORELDREPENGER);
+    }
+
+    public static Fagsak opprettNy(Saksnummer saksnummer, NavBruker bruker, FagsakYtelseType ytelseType) {
+        return new Fagsak(saksnummer, bruker, ytelseType);
     }
 
     public Long getId() {
@@ -74,10 +80,6 @@ public class Fagsak extends BaseEntitet {
 
     public Saksnummer getSaksnummer() {
         return saksnummer;
-    }
-
-    public void setSaksnummer(Saksnummer saksnummer) {
-        this.saksnummer = saksnummer;
     }
 
     public NavBruker getNavBruker() {
@@ -90,10 +92,6 @@ public class Fagsak extends BaseEntitet {
 
     public FagsakYtelseType getFagsakYtelseType() {
         return fagsakYtelseType;
-    }
-
-    public void setFagsakYtelseType(FagsakYtelseType fagsakYtelseType) {
-        this.fagsakYtelseType = fagsakYtelseType;
     }
 
     @Override

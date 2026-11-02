@@ -18,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakLåsRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 /**
  * Provider for å enklere å kunne hente ut ulike repository uten for mange
@@ -126,8 +127,8 @@ public class BehandlingskontrollServiceProvider {
         return behandlingLåsRepository.taLås(behandlingId);
     }
 
-    public FagsakLås taFagsakLås(Long fagsakId) {
-        return fagsakLåsRepository.taLås(fagsakId);
+    public FagsakLås taFagsakLås(Saksnummer saksnummer) {
+        return fagsakLåsRepository.taLås(saksnummer);
     }
 
     public void oppdaterLåsVersjon(FagsakLås lås) {

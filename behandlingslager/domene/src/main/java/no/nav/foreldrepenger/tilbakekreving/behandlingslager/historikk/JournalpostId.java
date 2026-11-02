@@ -2,10 +2,11 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -14,66 +15,41 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
 /**
  * Journalpostid refererer til journalpost registret i Joark.
  */
-@Embeddable
-public class JournalpostId implements Serializable, IndexKey {
+public record JournalpostId(@JsonValue String verdi) implements Serializable, IndexKey {
     private static final String CHARS = "a-z0-9_:-";
 
     private static final Pattern VALID = Pattern.compile("^(-?[1-9]|[a-z0])[" + CHARS + "]*$", Pattern.CASE_INSENSITIVE);
     private static final Pattern INVALID = Pattern.compile("[^" + CHARS + "]+", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
-    @JsonValue
-    @Column(name = "journalpost_id", updatable = false)
-    private String journalpostId;
 
-    JournalpostId() {
-        // for hibernate
-    }
-
-    public JournalpostId(Long journalpostId) {
-        Objects.requireNonNull(journalpostId, "journalpostId");
-        this.journalpostId = Long.toString(journalpostId);
-    }
-
-    public JournalpostId(String journalpostId) {
-        Objects.requireNonNull(journalpostId, "journalpostId");
-        if (!VALID.matcher(journalpostId).matches()) {
+    public JournalpostId {
+        Objects.requireNonNull(verdi, "verdi");
+        if (!VALID.matcher(verdi).matches()) {
             // skal ikke skje, funksjonelle feilmeldinger håndteres ikke her.
-            throw new IllegalArgumentException("Ugyldig aktørId, støtter kun A-Z/0-9/:/-/_ tegn. Var: " + journalpostId.replaceAll(INVALID.pattern(), "?") + " (vasket)");
+            throw new IllegalArgumentException("Ugyldig journalpostId, støtter kun A-Z/0-9/:/-/_ tegn. Var: " + verdi.replaceAll(INVALID.pattern(), "?") + " (vasket)");
         }
-        this.journalpostId = journalpostId;
     }
 
     @Override
     public String getIndexKey() {
-        return journalpostId;
+        return verdi;
     }
 
     public String getVerdi() {
-        return journalpostId;
+        return verdi;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        } else if (obj == null || !getClass().equals(obj.getClass())) {
-            return false;
+    @Converter
+    public static class JournalpostIdConverter implements AttributeConverter<JournalpostId, String> {
+
+        @Override
+        public String convertToDatabaseColumn(JournalpostId attribute) {
+            return Optional.ofNullable(attribute).map(JournalpostId::getVerdi).orElse(null);
         }
-        JournalpostId other = (JournalpostId) obj;
-        return Objects.equals(journalpostId, other.journalpostId);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(journalpostId);
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "<" + journalpostId + ">";
-    }
-
-    public static boolean erGyldig(String input) {
-        return input != null && !(input = input.trim()).isEmpty() && VALID.matcher(input).matches();
+        @Override
+        public JournalpostId convertToEntityAttribute(String dbData) {
+            return Optional.ofNullable(dbData).map(JournalpostId::new).orElse(null);
+        }
     }
 }
