@@ -296,7 +296,6 @@ class HåndterGamleKravgrunnlagTaskTest {
     private ProsessTaskData lagProsessTaskData() {
         var prosessTaskData = ProsessTaskData.forProsessTask(HåndterGamleKravgrunnlagTask.class);
         prosessTaskData.setProperty(TaskProperties.PROPERTY_MOTTATT_XML_ID, String.valueOf(mottattXmlId));
-        prosessTaskData.setCallIdFraEksisterende();
         return prosessTaskData;
     }
 

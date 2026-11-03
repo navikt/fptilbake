@@ -133,7 +133,6 @@ public abstract class FellesTestOppsett {
     protected AktørId aktørId;
 
     protected Saksnummer saksnummer;
-    protected Long fagsakId;
     protected Long internBehandlingId;
     protected Henvisning henvisning;
     protected UUID eksternBehandlingUuid;
@@ -176,7 +175,7 @@ public abstract class FellesTestOppsett {
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollProvider,
                 fagsakTjeneste, new BehandlingHistorikkTjeneste(historikkinnslagRepository, historikkTjeneste), mockFagsystemKlient);
-        testUtility = new TestUtility(behandlingTjeneste);
+        testUtility = new TestUtility(behandlingTjeneste, fagsakTjeneste, entityManager);
         aktørId = testUtility.genererAktørId();
         when(mockTpsTjeneste.hentBrukerForAktør(any(), eq(aktørId))).thenReturn(testUtility.lagPersonInfo(aktørId));
         EksternBehandlingsinfoDto behandlingsinfoDto = lagEksternBehandlingInfoDto();
@@ -239,7 +238,6 @@ public abstract class FellesTestOppsett {
     private void mapSakDetaljer(TestUtility.SakDetaljer sakDetaljer) {
         aktørId = sakDetaljer.getAktørId();
         saksnummer = sakDetaljer.getSaksnummer();
-        fagsakId = sakDetaljer.getFagsakId();
         internBehandlingId = sakDetaljer.getInternBehandlingId();
         henvisning = sakDetaljer.getHenvisning();
         eksternBehandlingUuid = sakDetaljer.getEksternUuid();

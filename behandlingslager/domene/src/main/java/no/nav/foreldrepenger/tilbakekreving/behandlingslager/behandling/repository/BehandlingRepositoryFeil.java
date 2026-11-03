@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository;
 
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.exception.TekniskException;
 
 public class BehandlingRepositoryFeil {
@@ -7,6 +8,10 @@ public class BehandlingRepositoryFeil {
 
     public static TekniskException fantIkkeEntitetForLåsing(String entityClassName, long id) {
         return new TekniskException("FPT-131239", String.format("Fant ikke entitet for låsing [%s], id=%s.", entityClassName, id));
+    }
+
+    public static TekniskException fantIkkeEntitetForLåsing(String entityClassName, Saksnummer saksnummer) {
+        return new TekniskException("FPT-131238", String.format("Fant ikke sak for låsing [%s], saksnummer=%s.", entityClassName, saksnummer.getVerdi()));
     }
 
     public static TekniskException fantIkkeBehandlingVedtak(long behandlingId) {

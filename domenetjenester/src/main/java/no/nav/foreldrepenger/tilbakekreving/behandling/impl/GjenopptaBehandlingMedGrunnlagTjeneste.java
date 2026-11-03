@@ -54,7 +54,6 @@ public class GjenopptaBehandlingMedGrunnlagTjeneste {
     private void opprettFortsettBehandlingTask(Behandling behandling) {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
         prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
-        prosessTaskData.setSekvens("1");
         prosessTaskData.setPrioritet(3);
         prosessTaskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
 

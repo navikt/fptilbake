@@ -2,9 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk;
 
 import java.util.Objects;
 
-import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,8 +31,8 @@ public class HistorikkinnslagDokumentLink extends BaseCreateableEntitet implemen
     @JoinColumn(name = "historikkinnslag_id", nullable = false)
     private Historikkinnslag historikkinnslag;
 
-    @Embedded
-    @AttributeOverride(name = "journalpostId", column = @Column(name = "journalpost_id"))
+    @Convert(converter = JournalpostId.JournalpostIdConverter.class)
+    @Column(name = "journalpost_id", updatable = false)
     private JournalpostId journalpostId;
 
     @Column(name = "dokument_id")

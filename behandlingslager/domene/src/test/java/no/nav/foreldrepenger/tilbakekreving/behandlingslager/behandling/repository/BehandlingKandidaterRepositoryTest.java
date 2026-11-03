@@ -45,9 +45,9 @@ class BehandlingKandidaterRepositoryTest {
 
     @Test
     void test_skalHenteBehandlingerSomVenterPåBrukerResponsHvorTidsfristUtgåttEllerTilbakekrevinggrunnlag() {
-        Behandling behandling1 = opprettBehandling("2124325", "35423523", BehandlingType.TILBAKEKREVING);
-        Behandling behandling2 = opprettBehandling("5345345", "32532523", BehandlingType.TILBAKEKREVING);
-        Behandling behandling3 = opprettBehandling("6322436", "64352676", BehandlingType.TILBAKEKREVING);
+        Behandling behandling1 = opprettBehandling("2124325", Saksnummer.fra("35423523"), BehandlingType.TILBAKEKREVING);
+        Behandling behandling2 = opprettBehandling("5345345", Saksnummer.fra("32532523"), BehandlingType.TILBAKEKREVING);
+        Behandling behandling3 = opprettBehandling("6322436", Saksnummer.fra("64352676"), BehandlingType.TILBAKEKREVING);
 
         settVenterPåBrukerRespons(behandling1, LocalDateTime.now().minusDays(2));
         settVenterPåBrukerRespons(behandling2, LocalDateTime.now().plusWeeks(3));
@@ -66,7 +66,7 @@ class BehandlingKandidaterRepositoryTest {
         return behandlingRepository.lagre(behandling, lås);
     }
 
-    private Behandling opprettBehandling(String aktørId, String saksnummer, BehandlingType behandlingType) {
+    private Behandling opprettBehandling(String aktørId, Saksnummer saksnummer, BehandlingType behandlingType) {
         // opprett fagsak
         Fagsak fagsak = opprettFagsak(aktørId, saksnummer);
 
@@ -79,11 +79,11 @@ class BehandlingKandidaterRepositoryTest {
         return behandlingRepository.hentBehandling(id);
     }
 
-    private Fagsak opprettFagsak(String aktørId, String saksnummer) {
+    private Fagsak opprettFagsak(String aktørId, Saksnummer saksnummer) {
         NavBruker b = NavBruker.opprettNy(new AktørId(aktørId), Språkkode.NB);
-        Fagsak fagsak = TestFagsakUtil.opprettFagsak(new Saksnummer(saksnummer), b);
-        Long fagsakId = fagsakRepository.lagre(fagsak);
-        return fagsakRepository.finnEksaktFagsak(fagsakId);
+        Fagsak fagsak = TestFagsakUtil.opprettFagsak(saksnummer, b);
+        fagsakRepository.lagre(fagsak);
+        return fagsakRepository.hentEksaktFagsakForGittSaksnummer(saksnummer);
     }
 
     private void settVenterPåBrukerRespons(Behandling behandling, LocalDateTime frist) {

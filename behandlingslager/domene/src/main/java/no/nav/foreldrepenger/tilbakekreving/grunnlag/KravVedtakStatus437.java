@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.grunnlag;
 
 import java.util.Objects;
 
-import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -46,7 +45,8 @@ public class KravVedtakStatus437 extends BaseEntitet {
     @Column(name = "gjelder_type", nullable = false, updatable = false)
     private GjelderType gjelderType;
 
-    @AttributeOverride(name = "henvisning", column = @Column(name = "referanse"))
+    @Convert(converter = Henvisning.HenvisningConverter.class)
+    @Column(name = "referanse")
     private Henvisning referanse;
 
     public Long getId() {

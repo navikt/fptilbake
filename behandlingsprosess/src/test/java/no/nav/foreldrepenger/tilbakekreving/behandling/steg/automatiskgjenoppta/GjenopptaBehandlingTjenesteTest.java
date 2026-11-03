@@ -70,7 +70,6 @@ class GjenopptaBehandlingTjenesteTest {
 
         ProsessTaskData prosessTaskData = faktiskProsesstaskDataliste.get(0);
         assertThat(prosessTaskData.getSaksnummer()).isEqualTo(behandling.getSaksnummer().getVerdi());
-        assertThat(prosessTaskData.getFagsakId()).isEqualTo(fagsakId);
         assertThat(prosessTaskData.getBehandlingIdAsLong()).isEqualTo(behandlingId);
     }
 
