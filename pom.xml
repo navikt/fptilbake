@@ -35,7 +35,7 @@
         <sonar.projectKey>navikt_fptilbake</sonar.projectKey>
 
         <!-- Jakarta deps -->
-        <felles.version>7.9.5</felles.version>
+        <felles.version>7.9.6</felles.version>
         <prosesstask.version>5.3.0</prosesstask.version>
         <fpkontrakter.version>9.4.41</fpkontrakter.version>
         <abakus-kontrakt.version>2.4.1</abakus-kontrakt.version>
@@ -232,7 +232,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>jms-integrasjon</artifactId>
-                <version>3.2.22</version>
+                <version>3.2.23</version>
             </dependency>
 
             <dependency>
