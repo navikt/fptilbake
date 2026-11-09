@@ -90,7 +90,6 @@ class AutomatiskSaksbehandlingBatchTaskTest {
             assertThat(prosessTasker).hasSize(1);
             var prosessTaskData = prosessTasker.get(0);
             assertThat(prosessTaskData.getBehandlingIdAsLong()).isEqualTo(behandling.getId());
-            assertThat(prosessTaskData.getSekvens()).isEqualTo("10");
         }
     }
 

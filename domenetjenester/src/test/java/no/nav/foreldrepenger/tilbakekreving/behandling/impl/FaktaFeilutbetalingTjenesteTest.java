@@ -93,11 +93,11 @@ class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(10000));
         //TODO
         Kravgrunnlag431 kravgrunnlag431 = Kravgrunnlag431.builder()
-                .medVedtakId(100000l)
+                .medVedtakId(100000L)
                 .medEksternKravgrunnlagId("12123")
                 .medKravStatusKode(KravStatusKode.NYTT)
                 .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
-                .medFagSystemId(saksnummer + "100")
+                .medFagSystemId(saksnummer.getVerdi() + "100")
                 .medGjelderVedtakId("100000000")
                 .medGjelderType(GjelderType.ORGANISASJON)
                 .medUtbetalesTilId("100000000")

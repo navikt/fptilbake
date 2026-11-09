@@ -381,7 +381,7 @@ public class BehandlingskontrollTjeneste {
      * Lagrer en ny behandling i behandlingRepository og fyrer av event om at en Behandling er opprettet
      */
     public void opprettBehandling(BehandlingskontrollKontekst kontekst, Behandling behandling, Consumer<Behandling> etterLagring) {
-        final var fagsakLås = serviceProvider.taFagsakLås(behandling.getFagsakId());
+        final var fagsakLås = serviceProvider.taFagsakLås(kontekst.getSaksnummer());
         behandlingRepository.lagre(behandling, kontekst.getSkriveLås());
         serviceProvider.oppdaterLåsVersjon(fagsakLås);
         etterLagring.accept(behandling);

@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.task;
 
 
 import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.BEHANDLING_TYPE;
-import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.EKSTERN_BEHANDLING_ID;
 import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.EKSTERN_BEHANDLING_UUID;
 import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.FAGSAK_YTELSE_TYPE;
 import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.HENVISNING;
@@ -20,7 +19,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 public class HendelseTaskDataWrapper {
 
-    private ProsessTaskData prosessTaskData;
+    private final ProsessTaskData prosessTaskData;
 
     public HendelseTaskDataWrapper(ProsessTaskData eksisterendeData) {
         this.prosessTaskData = eksisterendeData;
@@ -31,13 +30,7 @@ public class HendelseTaskDataWrapper {
     }
 
     public Henvisning getHenvisning() {
-        String henvisningValue = prosessTaskData.getPropertyValue(HENVISNING);
-        if (henvisningValue != null) {
-            return new Henvisning(henvisningValue);
-        }
-        //TODO k9-tilbake, denne koden er for å tåle prosesstasker som er opprettet før endring til henvisning
-        long eksternBehandlingId = Long.parseLong(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_ID));
-        return Henvisning.fraEksternBehandlingId(eksternBehandlingId);
+        return Optional.ofNullable(prosessTaskData.getPropertyValue(HENVISNING)).map(Henvisning::new).orElse(null);
     }
 
     public AktørId getAktørId() {
@@ -66,23 +59,16 @@ public class HendelseTaskDataWrapper {
         prosessTaskData.setProperty(FAGSAK_YTELSE_TYPE, fagsakYtelseType.getKode());
     }
 
-    public void setSaksnummer(Saksnummer saksnummer) {
-        Optional.ofNullable(saksnummer).map(Saksnummer::getVerdi).ifPresent(prosessTaskData::setSaksnummer);
-    }
-
-
     public void setBehandlingType(BehandlingType behandlingType) {
         prosessTaskData.setProperty(BEHANDLING_TYPE, behandlingType.getKode());
     }
 
     public void validerTaskDataHåndterHendelse() {
-        if (prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_ID) == null && prosessTaskData.getPropertyValue(HENVISNING) == null) {
-            throw new IllegalArgumentException("Trenger minst en av henvisning og ekstern behandling id, manglet begge.");
-        }
         Objects.requireNonNull(prosessTaskData.getAktørId());
         Objects.requireNonNull(prosessTaskData.getSaksnummer());
         Objects.requireNonNull(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_UUID));
         Objects.requireNonNull(prosessTaskData.getPropertyValue(FAGSAK_YTELSE_TYPE));
+        Objects.requireNonNull(prosessTaskData.getPropertyValue(HENVISNING));
     }
 
     public void validerTaskDataHåndterVedtakFattet() {
@@ -103,7 +89,6 @@ public class HendelseTaskDataWrapper {
         td.setAktørId(aktørId.getId());
         td.setSaksnummer(saksnummer.getVerdi());
         td.setProperty(EKSTERN_BEHANDLING_UUID, behandlingUuid.toString());
-        td.setProperty(EKSTERN_BEHANDLING_ID, henvisning.getVerdi()); //TODO k9-tilbake fjern når transisjon til henvisning er ferdig
         td.setProperty(HENVISNING, henvisning.getVerdi());
         return new HendelseTaskDataWrapper(td);
     }

@@ -9,14 +9,12 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
+import jakarta.persistence.EntityManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
-import jakarta.persistence.EntityManager;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
@@ -28,6 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRep
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -73,7 +72,6 @@ public abstract class FellesTestOppsett {
     protected AktørId aktørId;
 
     protected Saksnummer saksnummer;
-    protected Long fagsakId;
     protected Long internBehandlingId;
     protected Henvisning henvisning;
     protected UUID eksternBehandlingUuid;
@@ -117,7 +115,6 @@ public abstract class FellesTestOppsett {
     private void mapSakDetaljer(TestUtility.SakDetaljer sakDetaljer) {
         aktørId = sakDetaljer.getAktørId();
         saksnummer = sakDetaljer.getSaksnummer();
-        fagsakId = sakDetaljer.getFagsakId();
         internBehandlingId = sakDetaljer.getInternBehandlingId();
         henvisning = sakDetaljer.getHenvisning();
         eksternBehandlingUuid = sakDetaljer.getEksternUuid();

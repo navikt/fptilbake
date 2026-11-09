@@ -69,7 +69,7 @@ class GjenopptaBehandlingHenleggingTjenesteTest {
         when(ventPåGrunnlagAksjonspunktMock.getFristTid()).thenReturn(LocalDateTime.now().minusDays(1));
         when(ventPåGrunnlagAksjonspunktMock.erOpprettet()).thenReturn(true);
 
-        when(behandlingMock.getSaksnummer()).thenReturn(Saksnummer.infotrygd("123456"));
+        when(behandlingMock.getSaksnummer()).thenReturn(Saksnummer.fra("123456"));
         when(behandlingMock.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).thenReturn(
             Optional.of(ventPåGrunnlagAksjonspunktMock));
 

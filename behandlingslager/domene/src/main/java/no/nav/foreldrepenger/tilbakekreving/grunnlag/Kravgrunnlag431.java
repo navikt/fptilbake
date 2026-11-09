@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -97,7 +96,8 @@ public class Kravgrunnlag431 extends BaseEntitet {
     @Column(name = "saksbeh_id", nullable = false)
     private String saksBehId;
 
-    @AttributeOverride(name = "henvisning", column = @Column(name = "referanse"))
+    @Convert(converter = Henvisning.HenvisningConverter.class)
+    @Column(name = "referanse")
     private Henvisning referanse;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "kravgrunnlag431")
