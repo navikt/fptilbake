@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,11 +13,10 @@ import jakarta.ws.rs.core.Application;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 
-import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
-
 public class RestApiTester {
 
-    static final List<Class<?>> UNNTATT = Collections.singletonList(OpenApiResource.class);
+    static final List<Class<?>> UNNTATT = List.of(io.swagger.v3.jaxrs2.integration.resources.OpenApiResource.class,
+        io.swagger.v3.rest.integration.resources.OpenApiResource.class);
 
     protected static Collection<Method> finnAlleRestMetoder() {
         List<Method> liste = new ArrayList<>();
