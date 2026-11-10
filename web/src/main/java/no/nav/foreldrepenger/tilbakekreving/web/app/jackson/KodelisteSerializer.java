@@ -1,12 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.jackson;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 /**
  * Enkel serialisering av KodeverkTabell klasser, uten at disse trenger @JsonIgnore eller lignende. Deserialisering går
@@ -22,7 +19,7 @@ public class KodelisteSerializer extends StdSerializer<Kodeverdi> {
     }
 
     @Override
-    public void serialize(Kodeverdi value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(Kodeverdi value, JsonGenerator jgen, SerializationContext ctxt) {
 
         if (!serialiserKodeverdiSomObjekt) {
             jgen.writeString(value.getKode());
@@ -31,9 +28,9 @@ public class KodelisteSerializer extends StdSerializer<Kodeverdi> {
 
         jgen.writeStartObject();
 
-        jgen.writeStringField("kode", value.getKode());
-        jgen.writeStringField("navn", value.getNavn());
-        jgen.writeStringField("kodeverk", value.getKodeverk());
+        jgen.writeStringProperty("kode", value.getKode());
+        jgen.writeStringProperty("navn", value.getNavn());
+        jgen.writeStringProperty("kodeverk", value.getKodeverk());
 
         jgen.writeEndObject();
     }

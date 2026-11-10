@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.jackson;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 
-import com.fasterxml.jackson.core.JacksonException;
+import tools.jackson.core.JacksonException;
 
 import no.nav.vedtak.feil.Feilkode;
 import no.nav.vedtak.log.util.LoggerUtils;
