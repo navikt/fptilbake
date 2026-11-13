@@ -39,32 +39,34 @@ public class KravgrunnlagHenter {
     private ØkonomiProxyKlient økonomiProxyKlient;
     private HentKravgrunnlagMapperSokos hentKravgrunnlagMapperSokos;
     private SokosTilbakekrevingKlient sokosTilbakekrevingKlient;
-    private BooleanSupplier erDev;
+    private BooleanSupplier brukSokos;
 
     public KravgrunnlagHenter() {
         // for CDI
     }
 
+
+    // (ENV.isDev() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE))
     @Inject
     public KravgrunnlagHenter(ØkonomiProxyKlient økonomiProxyKlient, HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy,
                              SokosTilbakekrevingKlient sokosTilbakekrevingKlient, HentKravgrunnlagMapperSokos hentKravgrunnlagMapperSokos) {
-        this(økonomiProxyKlient, hentKravgrunnlagMapperProxy, sokosTilbakekrevingKlient, hentKravgrunnlagMapperSokos, () -> (ENV.isDev() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) || ENV.isLocal());
+        this(økonomiProxyKlient, hentKravgrunnlagMapperProxy, sokosTilbakekrevingKlient, hentKravgrunnlagMapperSokos, () -> ENV.isLocal());
     }
 
     public KravgrunnlagHenter(ØkonomiProxyKlient økonomiProxyKlient, HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy,
                        SokosTilbakekrevingKlient sokosTilbakekrevingKlient, HentKravgrunnlagMapperSokos hentKravgrunnlagMapperSokos,
-                       BooleanSupplier erDev) {
+                       BooleanSupplier brukSokos) {
         this.økonomiProxyKlient = økonomiProxyKlient;
         this.hentKravgrunnlagMapperProxy = hentKravgrunnlagMapperProxy;
         this.sokosTilbakekrevingKlient = sokosTilbakekrevingKlient;
         this.hentKravgrunnlagMapperSokos = hentKravgrunnlagMapperSokos;
-        this.erDev = erDev;
+        this.brukSokos = brukSokos;
     }
 
     public void annullerKravgrunnlag(Long behandlingId, Kravgrunnlag431 kravgrunnlag) {
         Objects.requireNonNull(kravgrunnlag,
             "Finnes ikke aktivt kravgrunnlag for behandling " + behandlingId);
-        if (erDev.getAsBoolean()) {
+        if (brukSokos.getAsBoolean()) {
             var vedtakId = Math.toIntExact(Objects.requireNonNull(kravgrunnlag.getVedtakId(), "vedtakId"));
             if (vedtakId > 999_999_999) {
                 throw new IllegalArgumentException("vedtakId er større enn tillatt i Sokos-kontrakten: " + vedtakId);
@@ -80,8 +82,8 @@ public class KravgrunnlagHenter {
         LOG.info("Henter kravgrunnlag for behandling{} med kravgrunnlagId {}",
             behandlingId != null ? " " + behandlingId : "",
             hentKravgrunnlagRequest.kravgrunnlagId());
-        var kravgrunnlag431 = erDev.getAsBoolean() ? hentFraSokos(hentKravgrunnlagRequest) : hentFraProxy(hentKravgrunnlagRequest);
-        if (!erDev.getAsBoolean() && ENV.isProd() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
+        var kravgrunnlag431 = brukSokos.getAsBoolean() ? hentFraSokos(hentKravgrunnlagRequest) : hentFraProxy(hentKravgrunnlagRequest);
+        if (!brukSokos.getAsBoolean() && ENV.isProd() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
             sammenlignMedSokos(hentKravgrunnlagRequest, kravgrunnlag431);
         }
         LOG.info("Kravgrunnlag hentet OK");
