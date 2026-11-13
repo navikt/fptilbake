@@ -25,7 +25,7 @@ class KodeverkRestTjenesteTest {
         var rawJson = (String) tjeneste.hentGruppertKodeliste().getEntity();
         assertThat(rawJson).isNotNull();
 
-        Map<String, Object> gruppertKodeliste = ObjectMapperFactory.getDefaultObjectMapperCopy(true).readValue(rawJson, Map.class);
+        Map<String, Object> gruppertKodeliste = ObjectMapperFactory.getDefaultObjectMapper(true).readValue(rawJson, Map.class);
         assertThat(gruppertKodeliste.keySet())
             .contains(Fagsystem.class.getSimpleName(), SærligGrunn.class.getSimpleName(), VidereBehandling.class.getSimpleName());
 
@@ -43,7 +43,7 @@ class KodeverkRestTjenesteTest {
     @Test
     void serialize_kodeverdi_grunn() throws Exception {
 
-        var om = ObjectMapperFactory.getDefaultObjectMapperCopy(false);
+        var om = ObjectMapperFactory.getDefaultObjectMapper(false);
 
         var json = om.writer().withDefaultPrettyPrinter().writeValueAsString(new X(SærligGrunn.STØRRELSE_BELØP));
 
@@ -53,7 +53,7 @@ class KodeverkRestTjenesteTest {
     @Test
     void serialize_kodeverdi_grunn_full() throws Exception {
 
-        var om = ObjectMapperFactory.getDefaultObjectMapperCopy(true);
+        var om = ObjectMapperFactory.getDefaultObjectMapper(true);
 
         var json = om.writer().withDefaultPrettyPrinter().writeValueAsString(new X(SærligGrunn.STØRRELSE_BELØP));
 

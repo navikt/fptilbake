@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -17,8 +16,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
@@ -139,7 +136,7 @@ public class KodeverkRestTjeneste {
     @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.APPLIKASJON, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     @CacheControl(maxAge = 600 * 60)
-    public Response hentGruppertKodeliste() throws IOException {
+    public Response hentGruppertKodeliste() {
         if (KODELISTER == null) {
             hentGruppertKodelisteTilCache();
         }
@@ -149,8 +146,8 @@ public class KodeverkRestTjeneste {
             .build();
     }
 
-    private synchronized void hentGruppertKodelisteTilCache() throws JsonProcessingException {
-        KODELISTER = ObjectMapperFactory.getDefaultObjectMapperCopy(true).writeValueAsString(legacyGrupperteKodeverdier);
+    private synchronized void hentGruppertKodelisteTilCache() {
+        KODELISTER = ObjectMapperFactory.getDefaultObjectMapper(true).writeValueAsString(legacyGrupperteKodeverdier);
     }
 
     /*

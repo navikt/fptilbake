@@ -1,55 +1,61 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.jackson;
 
+import java.net.URISyntaxException;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.web.app.IndexClasses;
 import no.nav.openapi.spec.utils.jackson.JsonParserPreProcessingDeserializerModifier;
 import no.nav.openapi.spec.utils.jackson.ObjectToPropertyPreProcessor;
 import no.nav.openapi.spec.utils.jackson.OpenapiCompatObjectMapperModifier;
+import tools.jackson.core.Version;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
-import java.net.URISyntaxException;
-import java.util.List;
-
+/**
+ * JsonMapper oppsett for K9-tilbake. Basert på Jackson 2 standardoppsett (builderWithJackson2Defaults) for å få
+ * samme serialisering/deserialisering som før overgang til Jackson 3.
+ */
 public class ObjectMapperFactory {
 
-    public static ObjectMapper createBaseObjectMapper() {
-        final var objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new Jdk8Module());
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE);
-
-        objectMapper.registerSubtypes(getJsonTypeNameClasses());
-        return objectMapper;
+    private ObjectMapperFactory() {
     }
 
-    private static ObjectMapper baseObjectMapper = null;
-
-    public static ObjectMapper getBaseObjectMapperCopy() {
-        if(baseObjectMapper == null) {
-            baseObjectMapper = createBaseObjectMapper();
-        }
-        return baseObjectMapper.copy();
+    public static JsonMapper createBaseObjectMapper() {
+        return JsonMapper.builderWithJackson2Defaults()
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .enable(EnumFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
+            .registerSubtypes(getJsonTypeNameClasses())
+            .build();
     }
 
-    public static ObjectMapper getDefaultObjectMapperCopy(final boolean serialiserKodeverdiSomObjekt) {
-        return getBaseObjectMapperCopy()
-            .registerModule(createOverstyrendeKodelisteSerializerModule(serialiserKodeverdiSomObjekt));
+    private static final class BaseObjectMapperHolder {
+        private static final JsonMapper BASE_OBJECT_MAPPER = createBaseObjectMapper();
     }
 
-    public static ObjectMapper getOpenapiObjectMapper() {
+    /**
+     * JsonMapper er immutable, så samme instans kan delast. Bruk rebuild() for å lage modifisert variant.
+     */
+    public static JsonMapper getBaseObjectMapper() {
+        return BaseObjectMapperHolder.BASE_OBJECT_MAPPER;
+    }
+
+    public static JsonMapper getDefaultObjectMapper(final boolean serialiserKodeverdiSomObjekt) {
+        return getBaseObjectMapper().rebuild()
+            .addModule(createOverstyrendeKodelisteSerializerModule(serialiserKodeverdiSomObjekt))
+            .build();
+    }
+
+    public static JsonMapper getOpenapiObjectMapper() {
         return OpenapiCompatObjectMapperModifier
             .withDefaultModifications()
-            .modify(getBaseObjectMapperCopy());
+            .modify(getBaseObjectMapper());
     }
 
     /**

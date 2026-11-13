@@ -15,8 +15,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 
 public class RestApiTester {
 
-    static final List<Class<?>> UNNTATT = List.of(io.swagger.v3.jaxrs2.integration.resources.OpenApiResource.class,
-        io.swagger.v3.rest.integration.resources.OpenApiResource.class);
+    static final List<Class<?>> UNNTATT = List.of(io.swagger.v3.rest.integration.resources.OpenApiResource.class);
 
     protected static Collection<Method> finnAlleRestMetoder() {
         List<Method> liste = new ArrayList<>();

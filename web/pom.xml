@@ -17,7 +17,7 @@
     <properties>
         <!-- versjon brukes fra webapp-modulen under resources/web.swagger/index.html og må være samme som faktisk avhengighet som brukes -->
         <swagger-ui.version>5.34.1</swagger-ui.version>
-        <openapi-spec-utils.version>2.1.0</openapi-spec-utils.version>
+        <openapi-spec-utils.version>3.0.0</openapi-spec-utils.version>
     </properties>
 
     <build>
@@ -314,27 +314,14 @@
             <artifactId>expressly</artifactId>
         </dependency>
 
-        <!-- K9-tilbake trenger swagger-ui (html), swagger-core 2 og jackson2-->
+        <!-- K9-tilbake trenger swagger-ui (html) -->
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>swagger-ui</artifactId>
         </dependency>
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-jaxrs2-jakarta</artifactId>
-            <version>2.2.55</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jdk8</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
+            <artifactId>swagger-rest</artifactId>
         </dependency>
 
         <dependency>

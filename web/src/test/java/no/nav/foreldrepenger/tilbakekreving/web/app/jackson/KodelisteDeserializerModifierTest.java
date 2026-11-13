@@ -10,14 +10,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 public class KodelisteDeserializerModifierTest {
 
     static List<ObjectMapper> objectmappers = Arrays.asList(
-        ObjectMapperFactory.getDefaultObjectMapperCopy(true),
-        ObjectMapperFactory.getDefaultObjectMapperCopy(false)
+        ObjectMapperFactory.getDefaultObjectMapper(true),
+        ObjectMapperFactory.getDefaultObjectMapper(false)
     );
 
     // Test enum Kodeverdi endra til å ikkje ha objekt serialisering/deserialisering annotasjoner, kun JsonValue på kode.
@@ -25,7 +25,7 @@ public class KodelisteDeserializerModifierTest {
     // Viss denne test feiler etter refaktorering av Kodeverdi, sjekk at propertyName gitt til ObjectToPropertyPreProcessor er korrekt.
     @ParameterizedTest
     @FieldSource("objectmappers")
-    public void testObjektbasertDeserialiseringForJsonValue(ObjectMapper om) throws JsonProcessingException {
+    public void testObjektbasertDeserialiseringForJsonValue(ObjectMapper om) throws JacksonException {
         // Serialiser
         final var inp1 = TestKodeverdiEnum.VALUE_TWO;
         final String jsonStr = om.writeValueAsString(inp1);

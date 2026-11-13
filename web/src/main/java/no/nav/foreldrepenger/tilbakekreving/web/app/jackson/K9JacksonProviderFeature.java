@@ -6,7 +6,7 @@ import jakarta.ws.rs.core.FeatureContext;
 import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.ws.rs.ext.MessageBodyWriter;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 
 public class K9JacksonProviderFeature implements Feature {

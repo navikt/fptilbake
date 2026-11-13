@@ -9,8 +9,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;
 import org.opentest4j.AssertionFailedError;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
@@ -55,15 +55,15 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
 public class KodeverdiDeSerialiseringTest {
 
-    private final ObjectMapper overstyrSomObjektMapper = ObjectMapperFactory.getDefaultObjectMapperCopy(true);
-    private final ObjectMapper overstyrSomStringMapper = ObjectMapperFactory.getDefaultObjectMapperCopy(false);
+    private final ObjectMapper overstyrSomObjektMapper = ObjectMapperFactory.getDefaultObjectMapper(true);
+    private final ObjectMapper overstyrSomStringMapper = ObjectMapperFactory.getDefaultObjectMapper(false);
     private final ObjectMapper openapiMapper = ObjectMapperFactory.getOpenapiObjectMapper();
 
     private boolean isDefaultObjectSerialized(final Kodeverdi kv) {
         return true;
     }
 
-    private <KV extends Kodeverdi> void checkObjektObjectMapperKodeverdi(KV kv) throws JsonProcessingException {
+    private <KV extends Kodeverdi> void checkObjektObjectMapperKodeverdi(KV kv) throws JacksonException {
         final String serialisert = overstyrSomObjektMapper.writeValueAsString(kv);
         final Class<?> cls = kv.getClass().isAnonymousClass() ? kv.getClass().getSuperclass() : kv.getClass();
         if(isDefaultObjectSerialized(kv)) {
@@ -90,7 +90,11 @@ public class KodeverdiDeSerialiseringTest {
         assertThat(deserialisert.getClass().getSimpleName()).isEqualTo(kv.getClass().getSimpleName());
     }
 
-    private <KV extends Kodeverdi> void checkStringObjectMapperKodeverdi(KV kv) throws JsonProcessingException {
+    private static String jsonString(final String wrap) {
+        return wrap == null ? "null" : "\"" + wrap + "\"";
+    }
+
+    private <KV extends Kodeverdi> void checkStringObjectMapperKodeverdi(KV kv) throws JacksonException {
         final String serialisert = overstyrSomStringMapper.writeValueAsString(kv);
         final String kodeStr = kv.getKode() != null ? "\"" + kv.getKode() + "\"" : "null";
         assertThat(serialisert).isEqualToIgnoringWhitespace(kodeStr);
@@ -106,7 +110,7 @@ public class KodeverdiDeSerialiseringTest {
         }
     }
 
-    private <KV extends Kodeverdi> void checkOpenapiObjectMapperKodeverdi(KV kv) throws JsonProcessingException {
+    private <KV extends Kodeverdi> void checkOpenapiObjectMapperKodeverdi(KV kv) throws JacksonException {
         final String serialisert = openapiMapper.writeValueAsString(kv);
         // Nokon enum instanser er anonyme subklasser av enum klassen, må bruke getEnclosingClass for å finne info om
         // enum klassen då.
@@ -115,23 +119,25 @@ public class KodeverdiDeSerialiseringTest {
         final boolean isEnum = cls.isEnum();
         if(isEnum) {
             try {
-                final String expected = kv.toString() != null ? kv.toString() : "";
+                final String expected = jsonString(kv.toString());
                 assertThat(serialisert)
                     .as("kodeverk: %s, klasse: %s toString ikkje lik", kv.getKodeverk(), cls.getSimpleName())
-                    .isEqualToIgnoringWhitespace("\"" + expected + "\"");
+                    .isEqualToIgnoringWhitespace(expected);
             } catch (AssertionFailedError e) {
-                final String expected = kv.getKode() != null ? kv.getKode() : "";
+                final String expected = jsonString(kv.getKode());
                 assertThat(serialisert)
                     .as("kodeverk: %s, klasse: %s toString ikkje lik, getKode ikkje lik", kv.getKodeverk(), cls.getSimpleName())
-                    .isEqualToIgnoringWhitespace("\"" + expected + "\"");
+                    .isEqualToIgnoringWhitespace(expected);
             }
         } // Else is default serialization, no need, and hard to check generally here
 
         assertThat(Kodeverdi.class.isAssignableFrom(cls)).isTrue();
         final Kodeverdi deserialisert = openapiMapper.readValue(serialisert, (Class<? extends Kodeverdi>) cls);
-        assertThat(deserialisert).isInstanceOf(kv.getClass());
-        assertThat(deserialisert).isEqualTo(kv);
-        assertThat(deserialisert.getClass().getSimpleName()).isEqualTo(kv.getClass().getSimpleName());
+        if(deserialisert != null) { // Nokon Kodeverdi typer har UNDEFINED som serialisert til string blir null
+            assertThat(deserialisert).isInstanceOf(kv.getClass());
+            assertThat(deserialisert).isEqualTo(kv);
+            assertThat(deserialisert.getClass().getSimpleName()).isEqualTo(kv.getClass().getSimpleName());
+        }
     }
 
     static Set<EnumSet<? extends Kodeverdi>> alleKodeverdier = Set.of(
@@ -178,11 +184,11 @@ public class KodeverdiDeSerialiseringTest {
 
     @ParameterizedTest
     @FieldSource("alleKodeverdier")
-    public void testAlleKodeverdier(final EnumSet<? extends Kodeverdi> kodeverdier) throws JsonProcessingException {
+    public void testAlleKodeverdier(final EnumSet<? extends Kodeverdi> kodeverdier) throws JacksonException {
         for(final var v: kodeverdier) {
             checkObjektObjectMapperKodeverdi(v);
             checkStringObjectMapperKodeverdi(v);
-            checkObjektObjectMapperKodeverdi(v);
+            checkOpenapiObjectMapperKodeverdi(v);
         }
     }
 }
