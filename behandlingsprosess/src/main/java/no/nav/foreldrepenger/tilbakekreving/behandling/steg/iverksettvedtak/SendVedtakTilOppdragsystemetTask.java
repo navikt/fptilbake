@@ -36,12 +36,14 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
     private BeregningsresultatTjeneste beregningsresultatTjeneste;
     private ØkonomiProxyKlient økonomiProxyKlient;
     private SokosTilbakekrevingKlient sokosTilbakekrevingKlient;
-    private BooleanSupplier erDev;
+    private BooleanSupplier brukSokos;
 
 
     SendVedtakTilOppdragsystemetTask() {
         // CDI krav
     }
+
+    // (ENV.isDev() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) ||
 
     @Inject
     public SendVedtakTilOppdragsystemetTask(OppdragIverksettingStatusRepository oppdragIverksettingStatusRepository,
@@ -50,7 +52,7 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
                                             ØkonomiProxyKlient økonomiProxyKlient,
                                             SokosTilbakekrevingKlient sokosTilbakekrevingKlient) {
         this(oppdragIverksettingStatusRepository, beregningsresultatTjeneste, tilbakekrevingsvedtakTjeneste,
-            økonomiProxyKlient, sokosTilbakekrevingKlient, () -> (ENV.isDev() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) || ENV.isLocal());
+            økonomiProxyKlient, sokosTilbakekrevingKlient, () -> ENV.isLocal());
     }
 
     SendVedtakTilOppdragsystemetTask(OppdragIverksettingStatusRepository oppdragIverksettingStatusRepository,
@@ -58,20 +60,20 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
                                      TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste,
                                      ØkonomiProxyKlient økonomiProxyKlient,
                                      SokosTilbakekrevingKlient sokosTilbakekrevingKlient,
-                                     BooleanSupplier erDev) {
+                                     BooleanSupplier brukSokos) {
         this.oppdragIverksettingStatusRepository = oppdragIverksettingStatusRepository;
         this.beregningsresultatTjeneste = beregningsresultatTjeneste;
         this.tilbakekrevingsvedtakTjeneste = tilbakekrevingsvedtakTjeneste;
         this.økonomiProxyKlient = økonomiProxyKlient;
         this.sokosTilbakekrevingKlient = sokosTilbakekrevingKlient;
-        this.erDev = erDev;
+        this.brukSokos = brukSokos;
     }
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         beregningsresultatTjeneste.beregnOgLagre(behandlingId); //midlertidig her for å raskere kunne fase ut håndtering av lagret XML
-        if (erDev.getAsBoolean()) {
+        if (brukSokos.getAsBoolean()) {
             var request = tilbakekrevingsvedtakTjeneste.lagSokosTilbakekrevingsvedtak(behandlingId);
             sokosTilbakekrevingKlient.iverksettTilbakekrevingsvedtak(request);
             oppdragIverksettingStatusRepository.registrerKvittertVedtak(behandlingId, request.vedtakId().toString());
