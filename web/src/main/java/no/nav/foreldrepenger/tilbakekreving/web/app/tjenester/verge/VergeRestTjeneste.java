@@ -22,8 +22,6 @@ import jakarta.ws.rs.core.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
@@ -80,7 +78,7 @@ public class VergeRestTjeneste {
 
     @GET
     @Operation(description = "Henter verge/fullmektig på behandlingen", tags = "verge", responses = {
-            @ApiResponse(responseCode = "200", description = "Verge/fullmektig funnet", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = VergeDto.class))),
+            @ApiResponse(responseCode = "200", description = "Verge/fullmektig funnet", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "204", description = "Ingen verge/fullmektig")
     })
     @BeskyttetRessurs(actionType = ActionType.READ, resourceType = ResourceType.FAGSAK, sporingslogg = false)
