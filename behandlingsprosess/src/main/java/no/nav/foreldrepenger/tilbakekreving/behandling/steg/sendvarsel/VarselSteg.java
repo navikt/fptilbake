@@ -107,7 +107,7 @@ public class VarselSteg implements BehandlingSteg {
 
     private void sendVarsel(Behandling behandling, ProsessTaskGruppe taskGruppe) {
         ProsessTaskData sendVarselbrev = ProsessTaskData.forProsessTask(SendVarselbrevTask.class);
-        sendVarselbrev.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
+        sendVarselbrev.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
         sendVarselbrev.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
         taskGruppe.addNesteSekvensiell(sendVarselbrev);
     }

@@ -78,7 +78,7 @@ public class PdfBrevTjeneste {
 
     private ProsessTaskData lagPubliserJournalpostTask(Behandling behandling, BrevData brevdata, JournalpostIdOgDokumentId dokumentreferanse, BrevType brevType) {
         ProsessTaskData data = ProsessTaskData.forProsessTask(PubliserJournalpostTask.class);
-        data.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsak().getId(), behandling.getId());
+        data.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
         data.setProperty(PubliserJournalpostTask.JOURNALPOST_ID, dokumentreferanse.getJournalpostId().getVerdi());
         data.setProperty(PubliserJournalpostTask.MOTTAKER, brevdata.getMottaker().name());
         data.setProperty(PubliserJournalpostTask.DISTRIBUSJONSTYPE, DistribusjonstypeUtleder.utledFor(brevType).name());
@@ -87,7 +87,7 @@ public class PdfBrevTjeneste {
 
     private ProsessTaskData lagSporingBrevTask(Behandling behandling, DetaljertBrevType detaljertBrevType, BrevData brevdata, JournalpostIdOgDokumentId dokumentreferanse) {
         var data = ProsessTaskData.forProsessTask(LagreBrevSporingTask.class);
-        data.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsak().getId(), behandling.getId());
+        data.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
         data.setProperty(LagreBrevSporingTask.JOURNALPOST_ID, dokumentreferanse.getJournalpostId().getVerdi());
         data.setProperty(LagreBrevSporingTask.DOKUMENT_ID, dokumentreferanse.getDokumentId());
         data.setProperty(LagreBrevSporingTask.MOTTAKER, brevdata.getMottaker().name());
@@ -100,7 +100,7 @@ public class PdfBrevTjeneste {
 
     private ProsessTaskData lagSporingVarselBrevTask(Behandling behandling, Long varsletBeløp, String fritekst) {
         var data = ProsessTaskData.forProsessTask(LagreVarselBrevSporingTask.class);
-        data.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsak().getId(), behandling.getId());
+        data.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
         data.setProperty(LagreVarselBrevSporingTask.VARSLET_BELOEP, Long.toString(varsletBeløp));
         data.setPayload(fritekst);
         return data;

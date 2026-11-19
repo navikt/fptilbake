@@ -64,7 +64,7 @@ public class SakshendelserEventObserver {
     private void opprettProsessTask(BehandlingEvent event, BehandlingTilstand behandlingTilstand) {
         ProsessTaskData taskData = ProsessTaskData.forProsessTask(SendSakshendelserTilDvhTask.class);
         taskData.setPayload(BehandlingTilstandMapper.tilJsonString(behandlingTilstand));
-        taskData.setBehandling(event.getSaksnummer().getVerdi(), event.getFagsakId(), event.getBehandlingId());
+        taskData.setBehandling(event.getSaksnummer().getVerdi(), event.getBehandlingId());
         taskTjeneste.lagre(taskData);
     }
 

@@ -1,14 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl;
 
-import java.util.Optional;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModellVisitor;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.StegProsesseringResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.jpa.savepoint.Work;
 import no.nav.vedtak.log.mdc.LoggFelter;
 import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
@@ -36,9 +33,7 @@ public class TekniskBehandlingStegVisitor implements BehandlingModellVisitor {
 
     @Override
     public StegProsesseringResultat prosesser(BehandlingStegModell steg) {
-        var saksreferanse = Optional.ofNullable(kontekst.getSaksnummer()).map(Saksnummer::getVerdi)
-            .orElseGet(() -> kontekst.getFagsakId().toString());
-        LOG_CONTEXT.add(LoggFelter.SAK, saksreferanse);
+        LOG_CONTEXT.add(LoggFelter.SAK, kontekst.getSaksnummer().getVerdi());
         LOG_CONTEXT.add(LoggFelter.BEHANDLING_ID, kontekst.getBehandlingId());
         LOG_CONTEXT.add(LoggFelter.STEG, steg.getBehandlingStegType().getKode());
 

@@ -35,11 +35,6 @@ public abstract class BehandlingskontrollEvent implements BehandlingEvent {
     }
 
     @Override
-    public Long getFagsakId() {
-        return kontekst.getFagsakId();
-    }
-
-    @Override
     public Long getBehandlingId() {
         return kontekst.getBehandlingId();
     }

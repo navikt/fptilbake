@@ -19,10 +19,10 @@ public class BehandlingStatusEventLogger {
 
     public void loggBehandlingStatusEndring(@Observes BehandlingStatusEvent event) {
         Long behandlingId = event.getBehandlingId();
-        Long fagsakId = event.getKontekst().getFagsakId();
+        var saksnummer = event.getSaksnummer();
 
         BehandlingStatus nyStatus = event.getNyStatus();
         String kode = nyStatus == null ? null : nyStatus.getKode();
-        LOG.info("Behandling status oppdatert; behandlingId [{}]; fagsakId [{}]; status [{}]]", behandlingId, fagsakId, kode);
+        LOG.info("Behandling status oppdatert; behandlingId [{}]; saksnummer [{}]; status [{}]]", behandlingId, saksnummer.getVerdi(), kode);
     }
 }

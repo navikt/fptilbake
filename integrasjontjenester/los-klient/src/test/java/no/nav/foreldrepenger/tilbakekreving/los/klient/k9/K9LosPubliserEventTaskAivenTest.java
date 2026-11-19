@@ -178,7 +178,7 @@ class K9LosPubliserEventTaskAivenTest {
 
     private ProsessTaskData lagProsessTaskData() {
         prosessTaskData = ProsessTaskData.forProsessTask(K9LosPubliserEventTask.class);
-        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
         prosessTaskData.setProperty(K9LosPubliserEventTask.PROPERTY_EVENT_NAME, EventHendelse.AKSJONSPUNKT_OPPRETTET.name());
         return prosessTaskData;
     }

@@ -118,7 +118,7 @@ class SendVedtakTilOppdragsystemetTaskTest {
 
     private ProsessTaskData lagProsessTaskKonfigurasjon(Behandling behandling) {
         var data = ProsessTaskData.forProsessTask(SendVedtakTilOppdragsystemetTask.class);
-        data.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
+        data.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
         return data;
     }
 

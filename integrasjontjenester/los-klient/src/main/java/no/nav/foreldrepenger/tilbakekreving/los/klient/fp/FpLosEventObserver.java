@@ -63,7 +63,7 @@ public class FpLosEventObserver {
     private void opprettProsessTask(BehandlingEvent behandlingEvent, Hendelse hendelse) {
         if (Fagsystem.FPTILBAKE.equals(fagsystem)) {
             var prosessTaskData = ProsessTaskData.forProsessTask(FpLosPubliserEventTask.class);
-            prosessTaskData.setBehandling(behandlingEvent.getSaksnummer().getVerdi(), behandlingEvent.getFagsakId(), behandlingEvent.getBehandlingId());
+            prosessTaskData.setBehandling(behandlingEvent.getSaksnummer().getVerdi(), behandlingEvent.getBehandlingId());
             prosessTaskData.setProperty(FpLosPubliserEventTask.PROPERTY_EVENT_NAME, hendelse.name());
             taskTjeneste.lagre(prosessTaskData);
         }

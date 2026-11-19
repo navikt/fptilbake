@@ -75,7 +75,7 @@ public class AutomatiskSaksbehandlingBatchTask implements ProsessTaskHandler {
 
     private void opprettAutomatiskSaksbehandlingProsessTask(String batchRun, Behandling behandling) {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(AutomatiskSaksbehandlingProsessTask.class);
-        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
         prosessTaskData.setGruppe(getGruppeNavn(batchRun));
         taskTjeneste.lagre(prosessTaskData);
     }

@@ -121,7 +121,7 @@ public class DokumentBehandlingTjeneste {
         sendVarselbrev.setProperty(SendManueltVarselbrevTask.MAL_TYPE, malType.getKode());
         sendVarselbrev.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
         sendVarselbrev.setPayload(fritekst);
-        sendVarselbrev.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandlingId);
+        sendVarselbrev.setBehandling(behandling.getSaksnummer().getVerdi(), behandlingId);
         taskTjeneste.lagre(sendVarselbrev);
     }
 
@@ -134,7 +134,7 @@ public class DokumentBehandlingTjeneste {
         var sendInnhentDokumentasjonBrev = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
         sendInnhentDokumentasjonBrev.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
         sendInnhentDokumentasjonBrev.setPayload(fritekst);
-        sendInnhentDokumentasjonBrev.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandlingId);
+        sendInnhentDokumentasjonBrev.setBehandling(behandling.getSaksnummer().getVerdi(), behandlingId);
         taskTjeneste.lagre(sendInnhentDokumentasjonBrev);
     }
 }

@@ -140,7 +140,7 @@ class HentKorrigertKravgrunnlagTaskTest {
 
     private ProsessTaskData lagProsessTaskData() {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(HentKorrigertKravgrunnlagTask.class);
-        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandlingId);
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandlingId);
         prosessTaskData.setProperty(HentKorrigertKravgrunnlagTask.KRAVGRUNNLAG_ID, "152806");
         return prosessTaskData;
     }

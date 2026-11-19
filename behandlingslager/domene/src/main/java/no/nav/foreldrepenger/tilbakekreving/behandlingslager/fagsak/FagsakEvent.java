@@ -9,8 +9,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
  */
 public interface FagsakEvent {
 
-    Long getFagsakId();
-
     Saksnummer getSaksnummer();
 
 }

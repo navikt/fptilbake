@@ -110,7 +110,7 @@ public class HenleggBehandlingTjeneste {
 
     private void sendHenleggelsesbrev(Behandling behandling, String fritekst) {
         var henleggelseBrevTask = ProsessTaskData.forTaskType(TaskType.forProsessTask(SendHenleggelsesbrevTask.class));
-        henleggelseBrevTask.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
+        henleggelseBrevTask.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
         henleggelseBrevTask.setPayload(fritekst);
         henleggelseBrevTask.setProperty(TaskProperties.BESTILLING_UUID, UUID.randomUUID().toString()); // Brukes som eksternReferanseId ved journalføring av brev
         taskTjeneste.lagre(henleggelseBrevTask);
