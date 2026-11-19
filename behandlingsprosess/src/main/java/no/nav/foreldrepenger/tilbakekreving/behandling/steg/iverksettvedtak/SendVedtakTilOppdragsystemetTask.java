@@ -74,6 +74,7 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
         beregningsresultatTjeneste.beregnOgLagre(behandlingId); //midlertidig her for å raskere kunne fase ut håndtering av lagret XML
         if (brukSokos.getAsBoolean()) {
             var request = tilbakekrevingsvedtakTjeneste.lagSokosTilbakekrevingsvedtak(behandlingId);
+            LOG.info("Tilbakekrevingsvedtak sokos {}", request);
             sokosTilbakekrevingKlient.iverksettTilbakekrevingsvedtak(request);
             oppdragIverksettingStatusRepository.registrerKvittertVedtak(behandlingId, request.vedtakId().toString());
             LOG.info("Tilbakekrevingsvedtak sendt OK til oppdragsystemet via Sokos. BehandlingId={}", behandlingId);
