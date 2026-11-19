@@ -43,8 +43,6 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
         // CDI krav
     }
 
-    // (ENV.isDev() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) ||
-
     @Inject
     public SendVedtakTilOppdragsystemetTask(OppdragIverksettingStatusRepository oppdragIverksettingStatusRepository,
                                             BeregningsresultatTjeneste beregningsresultatTjeneste,
@@ -52,7 +50,8 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
                                             ØkonomiProxyKlient økonomiProxyKlient,
                                             SokosTilbakekrevingKlient sokosTilbakekrevingKlient) {
         this(oppdragIverksettingStatusRepository, beregningsresultatTjeneste, tilbakekrevingsvedtakTjeneste,
-            økonomiProxyKlient, sokosTilbakekrevingKlient, () -> ENV.isLocal());
+            økonomiProxyKlient, sokosTilbakekrevingKlient,
+            () -> (ENV.isProd() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) || ENV.isLocal());
     }
 
     SendVedtakTilOppdragsystemetTask(OppdragIverksettingStatusRepository oppdragIverksettingStatusRepository,
