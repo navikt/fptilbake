@@ -5,6 +5,8 @@ import java.util.function.BooleanSupplier;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import no.nav.vedtak.mapper.json.DefaultJsonMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +77,7 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
         if (brukSokos.getAsBoolean()) {
             var request = tilbakekrevingsvedtakTjeneste.lagSokosTilbakekrevingsvedtak(behandlingId);
             LOG.info("Tilbakekrevingsvedtak sokos {}", request);
+            LOG.info("Tilbakekrevingsvedtak sokos json {}", DefaultJsonMapper.toJson(request));
             sokosTilbakekrevingKlient.iverksettTilbakekrevingsvedtak(request);
             oppdragIverksettingStatusRepository.registrerKvittertVedtak(behandlingId, request.vedtakId().toString());
             LOG.info("Tilbakekrevingsvedtak sendt OK til oppdragsystemet via Sokos. BehandlingId={}", behandlingId);
