@@ -53,8 +53,6 @@ spec:
         kvPath:  {{oraclek9tilbakesecret}}
       - mountPath: /var/run/secrets/nais.io/serviceuser
         kvPath: {{k9tilbakeserviceuser}}
-      - mountPath: /var/run/secrets/nais.io/vault
-        kvPath: /kv/{{cluster}}/fss/k9-tilbake/{{namespace}}
   kafka:
     pool: {{kafkaPool}}
   observability:

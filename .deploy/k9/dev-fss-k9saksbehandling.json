@@ -14,8 +14,6 @@
   ],
   "kafkaPool" : "nav-dev",
   "env": {
-    "APPDYNAMICS_AGENT_ACCOUNT_NAME": "NON-PROD",
-    "APPD_ENABLED": "true",
     "MQGATEWAY02_NAME": "MQLS02",
     "MQGATEWAY02_HOSTNAME": "b27apvl220.preprod.local",
     "MQGATEWAY02_PORT": "1413",
