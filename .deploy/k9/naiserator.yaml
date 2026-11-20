@@ -43,7 +43,6 @@ spec:
     requests: # App is guaranteed the requested resources and  will be scheduled on nodes with at least this amount of resources available
       cpu: "200m"
       memory: "1400Mi"
-  webproxy: true # Optional. Expose web proxy configuration to the application using the HTTP_PROXY, HTTPS_PROXY and NO_PROXY environment variables.
   vault:
     enabled: true
     paths:
