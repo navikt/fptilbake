@@ -54,7 +54,8 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
                                             ØkonomiProxyKlient økonomiProxyKlient,
                                             SokosTilbakekrevingKlient sokosTilbakekrevingKlient) {
         this(oppdragIverksettingStatusRepository, beregningsresultatTjeneste, tilbakekrevingsvedtakTjeneste,
-            økonomiProxyKlient, sokosTilbakekrevingKlient, () -> ENV.isLocal());
+            økonomiProxyKlient, sokosTilbakekrevingKlient,
+            () -> (ENV.isProd() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) || ENV.isLocal());
     }
 
     SendVedtakTilOppdragsystemetTask(OppdragIverksettingStatusRepository oppdragIverksettingStatusRepository,
@@ -77,8 +78,8 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
         beregningsresultatTjeneste.beregnOgLagre(behandlingId); //midlertidig her for å raskere kunne fase ut håndtering av lagret XML
         if (brukSokos.getAsBoolean()) {
             var request = tilbakekrevingsvedtakTjeneste.lagSokosTilbakekrevingsvedtak(behandlingId);
-            LOG.info("Tilbakekrevingsvedtak sokos {}", request);
-            LOG.info("Tilbakekrevingsvedtak sokos json {}", DefaultJsonMapper.toJson(request));
+            //LOG.info("Tilbakekrevingsvedtak sokos {}", request);
+            //LOG.info("Tilbakekrevingsvedtak sokos json {}", DefaultJsonMapper.toJson(request));
             sokosTilbakekrevingKlient.iverksettTilbakekrevingsvedtak(request);
             oppdragIverksettingStatusRepository.registrerKvittertVedtak(behandlingId, request.vedtakId().toString());
             LOG.info("Tilbakekrevingsvedtak sendt OK til oppdragsystemet via Sokos. BehandlingId={}", behandlingId);
