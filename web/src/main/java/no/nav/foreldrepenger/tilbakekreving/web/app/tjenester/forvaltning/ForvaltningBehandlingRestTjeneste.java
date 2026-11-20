@@ -288,7 +288,7 @@ public class ForvaltningBehandlingRestTjeneste {
             var tilstand = behandlingTilstandTjeneste.hentBehandlingensTilstand(b);
             var taskData = ProsessTaskData.forProsessTask(SendSakshendelserTilDvhTask.class);
             taskData.setPayload(BehandlingTilstandMapper.tilJsonString(tilstand));
-            taskData.setBehandling(b.getSaksnummer().getVerdi(), b.getFagsakId(), b.getId());
+            taskData.setBehandling(b.getSaksnummer().getVerdi(), b.getId());
             taskTjeneste.lagre(taskData);
 
         });
@@ -521,19 +521,19 @@ public class ForvaltningBehandlingRestTjeneste {
 
     private ProsessTaskData opprettFortsettBehandlingTask(Behandling behandling) {
         var fortsettTaskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
-        fortsettTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
+        fortsettTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
         return fortsettTaskData;
     }
 
     private void opprettHenleggBehandlingTask(Behandling behandling) {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(TvingHenlegglBehandlingTask.class);
-        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
         taskTjeneste.lagre(prosessTaskData);
     }
 
     private void opprettKorrigertHenvisningTask(Behandling behandling, UUID eksternBehandlingUuid) {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(KorrigertHenvisningTask.class);
-        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
         prosessTaskData.setProperty(KorrigertHenvisningTask.PROPERTY_EKSTERN_UUID, eksternBehandlingUuid.toString());
         taskTjeneste.lagre(prosessTaskData);
     }

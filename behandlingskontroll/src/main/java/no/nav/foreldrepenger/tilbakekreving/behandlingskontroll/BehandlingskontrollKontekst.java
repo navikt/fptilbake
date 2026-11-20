@@ -11,9 +11,9 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
  */
 public class BehandlingskontrollKontekst {
 
-    private BehandlingLås behandlingLås;
-    private Saksnummer saksnummer;
-    private Long fagsakId;
+    private final BehandlingLås behandlingLås;
+    private final Saksnummer saksnummer;
+    private final Long fagsakId;
 
     /**
      * NB: Foretrekk {@link BehandlingskontrollTjeneste#initBehandlingskontroll} i stedet for å opprette her direkte.

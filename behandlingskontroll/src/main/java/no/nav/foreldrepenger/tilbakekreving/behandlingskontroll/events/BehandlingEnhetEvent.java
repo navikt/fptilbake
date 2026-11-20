@@ -11,11 +11,6 @@ public record BehandlingEnhetEvent(Saksnummer saksnummer, Long fagsakId, Long be
     }
 
     @Override
-    public Long getFagsakId() {
-        return fagsakId;
-    }
-
-    @Override
     public Saksnummer getSaksnummer() {
         return saksnummer;
     }

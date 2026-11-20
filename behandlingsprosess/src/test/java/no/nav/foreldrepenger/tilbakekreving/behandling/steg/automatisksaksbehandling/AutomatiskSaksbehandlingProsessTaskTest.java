@@ -201,7 +201,7 @@ class AutomatiskSaksbehandlingProsessTaskTest {
 
     private ProsessTaskData lagProsesTaskData() {
         var prosessTaskData = ProsessTaskData.forProsessTask(AutomatiskSaksbehandlingProsessTask.class);
-        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
         return prosessTaskData;
     }
 

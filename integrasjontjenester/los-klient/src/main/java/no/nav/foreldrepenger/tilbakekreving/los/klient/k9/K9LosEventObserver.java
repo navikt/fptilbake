@@ -69,36 +69,36 @@ public class K9LosEventObserver {
                     behandlingId))) {
                     LOG.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_OPPRETTET,
                         aksjonspunkt.getAksjonspunktDefinisjon().getKode());
-                    opprettProsessTask(event.getSaksnummer(), event.getFagsakId(), behandlingId, EventHendelse.AKSJONSPUNKT_OPPRETTET);
+                    opprettProsessTask(event.getSaksnummer(), behandlingId, EventHendelse.AKSJONSPUNKT_OPPRETTET);
                 }
                 if (!AksjonspunktStatus.OPPRETTET.equals(aksjonspunkt.getStatus()) && aksjonspunkt.erAutopunkt() && erBehandlingIFaktaEllerSenereSteg(
                     behandlingId)) {
                     LOG.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_UTFØRT, aksjonspunkt.getAksjonspunktDefinisjon().getKode());
-                    opprettProsessTask(event.getSaksnummer(), event.getFagsakId(), behandlingId, EventHendelse.AKSJONSPUNKT_UTFØRT);
+                    opprettProsessTask(event.getSaksnummer(), behandlingId, EventHendelse.AKSJONSPUNKT_UTFØRT);
                 }
             }
         }
     }
 
     public void observerBehandlingAvsluttetEvent(@Observes BehandlingStatusEvent.BehandlingAvsluttetEvent event) {
-        opprettProsessTask(event.getSaksnummer(), event.getFagsakId(), event.getBehandlingId(), EventHendelse.AKSJONSPUNKT_AVBRUTT);
+        opprettProsessTask(event.getSaksnummer(), event.getBehandlingId(), EventHendelse.AKSJONSPUNKT_AVBRUTT);
     }
 
     public void observerAksjonspunktHarEndretBehandlendeEnhetEvent(@Observes BehandlingEnhetEvent event) {
-        opprettProsessTask(event.getSaksnummer(), event.getFagsakId(), event.getBehandlingId(), EventHendelse.AKSJONSPUNKT_HAR_ENDRET_BEHANDLENDE_ENHET);
+        opprettProsessTask(event.getSaksnummer(), event.getBehandlingId(), EventHendelse.AKSJONSPUNKT_HAR_ENDRET_BEHANDLENDE_ENHET);
     }
 
     public void observerStoppetEvent(@Observes BehandlingskontrollEvent.StoppetEvent event) {
         if (!Fagsystem.FPTILBAKE.equals(fagsystem) && event.getStegStatus().equals(BehandlingStegStatus.INNGANG)) {
-            opprettProsessTask(event.getSaksnummer(), event.getFagsakId(), event.getBehandlingId(), EventHendelse.BEHANDLINGSKONTROLL_EVENT);
+            opprettProsessTask(event.getSaksnummer(), event.getBehandlingId(), EventHendelse.BEHANDLINGSKONTROLL_EVENT);
         }
     }
 
-    private void opprettProsessTask(Saksnummer saksnummer, long fagsakId, long behandlingId, EventHendelse eventHendelse) {
+    private void opprettProsessTask(Saksnummer saksnummer, long behandlingId, EventHendelse eventHendelse) {
         if (!Fagsystem.FPTILBAKE.equals(fagsystem)) {
             ProsessTaskData taskData = ProsessTaskData.forProsessTask(K9LosPubliserEventTask.class);
             taskData.setProperty(K9LosPubliserEventTask.PROPERTY_EVENT_NAME, eventHendelse.name());
-            taskData.setBehandling(saksnummer.getVerdi(), fagsakId, behandlingId);
+            taskData.setBehandling(saksnummer.getVerdi(), behandlingId);
             taskTjeneste.lagre(taskData);
         }
     }

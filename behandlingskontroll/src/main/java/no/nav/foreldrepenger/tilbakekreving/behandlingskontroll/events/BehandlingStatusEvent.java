@@ -33,11 +33,6 @@ public class BehandlingStatusEvent implements BehandlingEvent {
         return kontekst.getBehandlingId();
     }
 
-    @Override
-    public Long getFagsakId() {
-        return kontekst.getFagsakId();
-    }
-
     public BehandlingskontrollKontekst getKontekst() {
         return kontekst;
     }

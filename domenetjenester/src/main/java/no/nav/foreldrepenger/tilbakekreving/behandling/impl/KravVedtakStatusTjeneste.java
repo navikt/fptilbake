@@ -125,7 +125,7 @@ public class KravVedtakStatusTjeneste {
 
     private void taBehandlingAvventOgFortsettBehandling(Behandling behandling) {
         var taskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
-        taskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
+        taskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
         taskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
         taskTjeneste.lagre(taskData);
     }

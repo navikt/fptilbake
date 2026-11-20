@@ -35,7 +35,7 @@ public class ProsessTaskIverksett {
         taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(AvsluttBehandlingTask.class));
         taskGruppe.addNesteSekvensiell(ProsessTaskData.forProsessTask(SendVedtakHendelserTilDvhTask.class));
 
-        taskGruppe.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
+        taskGruppe.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
 
         taskTjeneste.lagre(taskGruppe);
     }

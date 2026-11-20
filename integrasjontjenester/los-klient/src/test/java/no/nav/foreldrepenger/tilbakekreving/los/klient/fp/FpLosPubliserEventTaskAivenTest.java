@@ -122,7 +122,7 @@ class FpLosPubliserEventTaskAivenTest {
 
     private ProsessTaskData lagProsessTaskData(Hendelse hendelse) {
         var prosessTaskData = ProsessTaskData.forProsessTask(FpLosPubliserEventTask.class);
-        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getFagsakId(), behandling.getId());
+        prosessTaskData.setBehandling(behandling.getSaksnummer().getVerdi(), behandling.getId());
         prosessTaskData.setProperty(FpLosPubliserEventTask.PROPERTY_EVENT_NAME, hendelse.name());
         return prosessTaskData;
     }
