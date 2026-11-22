@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -16,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
@@ -31,23 +31,26 @@ public class VilkårVurderingPeriodeEntitet extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VILKAAR_PERIODE")
     private Long id;
 
+    @NotNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "vilkaar_id", nullable = false, updatable = false)
     private VilkårVurderingEntitet vurderinger;
 
+    @NotNull
     @Embedded
-    @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false))
-    @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
     private Periode periode;
 
+    @NotNull
     @Convert(converter = NavOppfulgt.KodeverdiConverter.class)
-    @Column(name = "nav_oppfulgt")
+    @Column(name = "nav_oppfulgt", nullable = false)
     private NavOppfulgt navOppfulgt = NavOppfulgt.UDEFINERT;
 
+    @NotNull
     @Convert(converter = VilkårResultat.KodeverdiConverter.class)
-    @Column(name = "vilkaar_resultat")
+    @Column(name = "vilkaar_resultat", nullable = false)
     private VilkårResultat vilkårResultat = VilkårResultat.UDEFINERT;
 
+    @NotNull
     @Column(name = "begrunnelse", nullable = false, updatable = false)
     private String begrunnelse;
 

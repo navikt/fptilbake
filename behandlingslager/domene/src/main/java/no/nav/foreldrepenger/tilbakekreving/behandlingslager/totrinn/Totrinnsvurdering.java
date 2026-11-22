@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -31,10 +32,12 @@ public class Totrinnsvurdering extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_TOTRINNSVURDERING")
     private Long id;
 
+    @NotNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "behandling_id", nullable = false, updatable = false)
     private Behandling behandling;
 
+    @NotNull
     @Convert(converter = AksjonspunktDefinisjon.KodeverdiConverter.class)
     @Column(name = "aksjonspunkt_def", nullable = false, updatable = false)
     private AksjonspunktDefinisjon aksjonspunktDefinisjon;
@@ -42,6 +45,7 @@ public class Totrinnsvurdering extends BaseEntitet {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "totrinnsvurdering")
     private Set<VurderÅrsakTotrinnsvurdering> vurderÅrsaker = new HashSet<>();
 
+    @NotNull
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "godkjent", nullable = false)
     private Boolean godkjent;

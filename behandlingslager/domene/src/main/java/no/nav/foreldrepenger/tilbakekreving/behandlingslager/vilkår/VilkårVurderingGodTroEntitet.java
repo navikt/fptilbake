@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
@@ -24,6 +25,7 @@ public class VilkårVurderingGodTroEntitet extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VILKAAR_GOD_TRO")
     private Long id;
 
+    @NotNull
     @OneToOne(optional = false)
     @JoinColumn(name = "vilkaar_periode_id", nullable = false, updatable = false)
     private VilkårVurderingPeriodeEntitet periode;
@@ -35,6 +37,7 @@ public class VilkårVurderingGodTroEntitet extends BaseEntitet {
     @Column(name = "beloep_tilbakekreves")
     private BigDecimal beløpTilbakekreves;
 
+    @NotNull
     @Column(name = "begrunnelse", nullable = false, updatable = false)
     private String begrunnelse;
 

@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
@@ -23,6 +24,7 @@ public class VarselInfo extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VARSEL")
     private Long id;
 
+    @NotNull
     @Column(name = "behandling_id", nullable = false)
     private Long behandlingId;
 
@@ -30,9 +32,11 @@ public class VarselInfo extends BaseEntitet {
     @Column(name = "aktiv", nullable = false)
     private boolean aktiv = true;
 
+    @NotNull
     @Column(name = "varsel_fritekst", nullable = false, updatable = false)
     private String varselTekst;
 
+    @NotNull
     @Lob
     @Column(name = "varsel_fritekst_utvidet", nullable = false, updatable = false)
     private String varselTekstUtvidet;

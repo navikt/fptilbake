@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.annotations.NaturalId;
 
@@ -27,9 +28,11 @@ public class EksternBehandling extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_EKSTERN_BEHANDLING")
     private Long id;
 
+    @NotNull
     @Column(name = "intern_id", nullable = false)
     private Long internId;
 
+    @NotNull
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "aktiv", nullable = false)
     private Boolean aktiv = true;
@@ -38,6 +41,7 @@ public class EksternBehandling extends BaseEntitet {
     @Column(name = "ekstern_uuid")
     private UUID eksternUuid;
 
+    @NotNull
     @Convert(converter = Henvisning.HenvisningConverter.class)
     @Column(name = "henvisning", nullable = false, updatable = false)
     private Henvisning henvisning;

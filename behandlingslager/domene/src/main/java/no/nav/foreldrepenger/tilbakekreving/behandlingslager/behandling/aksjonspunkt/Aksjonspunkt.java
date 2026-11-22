@@ -19,6 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -37,6 +38,7 @@ public class Aksjonspunkt extends BaseEntitet {
     @Column(name = "frist_tid")
     private LocalDateTime fristTid;
 
+    @NotNull
     @Convert(converter = AksjonspunktDefinisjon.KodeverdiConverter.class)
     @Column(name = "aksjonspunkt_def", nullable = false, updatable = false)
     private AksjonspunktDefinisjon aksjonspunktDefinisjon;
@@ -45,21 +47,24 @@ public class Aksjonspunkt extends BaseEntitet {
     @Column(name = "behandling_steg_funnet")
     private BehandlingStegType behandlingSteg;
 
+    @NotNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "behandling_id", nullable = false, updatable = false)
     private Behandling behandling;
 
+    @NotNull
     @Convert(converter = AksjonspunktStatus.KodeverdiConverter.class)
     @Column(name = "aksjonspunkt_status", nullable = false)
     private AksjonspunktStatus status;
 
+    @NotNull
     @Convert(converter = Venteårsak.KodeverdiConverter.class)
     @Column(name = "vent_aarsak", nullable = false)
     private Venteårsak venteårsak = Venteårsak.UDEFINERT;
 
     @Version
     @Column(name = "versjon", nullable = false)
-    private Long versjon;
+    private long versjon;
 
     // OK med orphanRemoval=true siden årsakene er eid av et aksjonspunkt
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "aksjonspunkt")

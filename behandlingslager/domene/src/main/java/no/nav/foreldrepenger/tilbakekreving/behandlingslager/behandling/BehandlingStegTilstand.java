@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
@@ -25,14 +26,17 @@ public class BehandlingStegTilstand extends BaseEntitet implements IndexKey {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BEHANDLING_STEG_TILSTAND")
     private Long id;
 
+    @NotNull
     @Convert(converter = BehandlingStegType.KodeverdiConverter.class)
     @Column(name = "behandling_steg", nullable = false, updatable = false)
     private BehandlingStegType behandlingSteg;
 
+    @NotNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "behandling_id", nullable = false, updatable = false)
     private Behandling behandling;
 
+    @NotNull
     @Convert(converter = BehandlingStegStatus.KodeverdiConverter.class)
     @Column(name = "behandling_steg_status", nullable = false)
     private BehandlingStegStatus behandlingStegStatus = BehandlingStegStatus.UDEFINERT;

@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.annotations.BatchSize;
 
@@ -28,6 +29,7 @@ public class BeregningsresultatEntitet extends BaseCreateableEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BEREGNINGSRESULTAT")
     private Long id;
 
+    @NotNull
     @Convert(converter = VedtakResultatType.KodeverdiConverter.class)
     @Column(name = "vedtak_resultat_type", nullable = false)
     private VedtakResultatType vedtakResultatType;

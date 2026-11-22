@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
@@ -24,11 +25,13 @@ public class BeregningsresultatAggregate extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GR_BEREGNINGSRESULTAT")
     private Long id;
 
+    @NotNull
     @Column(name = "behandling_id", updatable = false, nullable = false)
     private Long behandlingId;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "beregningsresultat_id", updatable = false)
+    @JoinColumn(name = "beregningsresultat_id", nullable = false, updatable = false)
     private BeregningsresultatEntitet beregningsresultat;
 
     @Convert(converter = BooleanToStringConverter.class)

@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
@@ -22,13 +23,15 @@ public class Varselrespons extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_MOTTAKER_VARSEL_RESPONS")
     private Long id;
 
-    @Column(name = "behandling_id", nullable = false)
+    @NotNull
+    @Column(name = "behandling_id", nullable = false, unique = true)
     private Long behandlingId;
 
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "akseptert_faktagrunnlag")
     private Boolean akseptertFaktagrunnlag;
 
+    @NotNull
     @Column(name = "kilde", nullable = false)
     private String kilde;
 
