@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 
@@ -15,6 +16,7 @@ public class ØkonomiXmlMottattArkiv extends BaseEntitet {
     @Id
     private Long id;
 
+    @NotNull
     @Lob
     @Column(name = "melding", nullable = false)
     private String mottattXml;

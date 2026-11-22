@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 
@@ -30,10 +31,12 @@ public class BehandlingÅrsak extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
+    @NotNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "behandling_id", nullable = false, updatable = false)
     private Behandling behandling;
 
+    @NotNull
     @Convert(converter = BehandlingÅrsakType.KodeverdiConverter.class)
     @Column(name = "behandling_arsak_type", nullable = false)
     private BehandlingÅrsakType behandlingÅrsakType = BehandlingÅrsakType.UDEFINERT;

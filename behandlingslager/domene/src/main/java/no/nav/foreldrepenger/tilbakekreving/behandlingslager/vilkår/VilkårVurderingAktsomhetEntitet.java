@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
@@ -31,12 +32,14 @@ public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VILKAAR_AKTSOMHET")
     private Long id;
 
+    @NotNull
     @OneToOne(optional = false)
     @JoinColumn(name = "vilkaar_periode_id", nullable = false, updatable = false)
     private VilkårVurderingPeriodeEntitet periode;
 
+    @NotNull
     @Convert(converter = Aktsomhet.KodeverdiConverter.class)
-    @Column(name = "aktsomhet")
+    @Column(name = "aktsomhet", nullable = false)
     private Aktsomhet aktsomhet;
 
     @Convert(converter = BooleanToStringConverter.class)
@@ -53,6 +56,7 @@ public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
     @Column(name = "manuelt_satt_beloep")
     private BigDecimal manueltTilbakekrevesBeløp;
 
+    @NotNull
     @Column(name = "begrunnelse", nullable = false, updatable = false)
     private String begrunnelse;
 

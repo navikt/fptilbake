@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -14,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
@@ -27,15 +27,16 @@ public class VurdertForeldelsePeriode extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_FORELDELSE_PERIODE")
     private Long id;
 
+    @NotNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "vurdert_foreldelse_id", nullable = false, updatable = false)
     private VurdertForeldelse vurdertForeldelse;
 
+    @NotNull
     @Embedded
-    @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false))
-    @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
     private Periode periode;
 
+    @NotNull
     @Convert(converter = ForeldelseVurderingType.KodeverdiConverter.class)
     @Column(name = "foreldelse_vurdering_type", nullable = false)
     private ForeldelseVurderingType foreldelseVurderingType;
@@ -46,6 +47,7 @@ public class VurdertForeldelsePeriode extends BaseEntitet {
     @Column(name = "oppdagelses_dato")
     private LocalDate oppdagelsesDato;
 
+    @NotNull
     @Column(name = "begrunnelse", nullable = false)
     private String begrunnelse;
 

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,6 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseCreateableEntitet;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
@@ -22,28 +25,38 @@ public class BeregningsresultatPeriodeEntitet  extends BaseCreateableEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BEREGNINGSRESULTAT_PERIODE")
     private Long id;
 
+    @NotNull
+    @Embedded
     private Periode periode;
-    @Column(name = "tilbakekreving_beloep")
+    @NotNull
+    @Column(name = "tilbakekreving_beloep", nullable = false)
     private BigDecimal tilbakekrevingBeløp;
-    @Column(name = "tilbakekreving_beloep_u_skatt")
+    @NotNull
+    @Column(name = "tilbakekreving_beloep_u_skatt", nullable = false)
     private BigDecimal tilbakekrevingBeløpEtterSkatt;
-    @Column(name = "tilbakekreving_beloep_u_rente")
+    @NotNull
+    @Column(name = "tilbakekreving_beloep_u_rente", nullable = false)
     private BigDecimal tilbakekrevingBeløpUtenRenter;
     @Column(name = "renter_prosent")
     private BigDecimal renterProsent;
-    @Column(name = "renter_beloep")
+    @NotNull
+    @Column(name = "renter_beloep", nullable = false)
     private BigDecimal renteBeløp;
-    @Column(name = "skatt_beloep")
+    @NotNull
+    @Column(name = "skatt_beloep", nullable = false)
     private BigDecimal skattBeløp;
-    @Column(name = "feilutbetalt_beloep")
+    @NotNull
+    @Column(name = "feilutbetalt_beloep", nullable = false)
     private BigDecimal feilutbetaltBeløp;
-    @Column(name = "utbetalt_ytelse_beloep")
+    @NotNull
+    @Column(name = "utbetalt_ytelse_beloep", nullable = false)
     private BigDecimal utbetaltYtelseBeløp; //rått beløp, ikke justert for evt. trekk
-    @Column(name = "riktig_ytelse_beloep")
+    @NotNull
+    @Column(name = "riktig_ytelse_beloep", nullable = false)
     private BigDecimal riktigYtelseBeløp; //rått beløp, ikke justert for evt. trekk
 
     @ManyToOne
-    @JoinColumn(name = "beregningsresultat_id", insertable = false, updatable = false)
+    @JoinColumn(name = "beregningsresultat_id", nullable = false, insertable = false, updatable = false)
     private BeregningsresultatEntitet beregningsresultat;
 
     protected BeregningsresultatPeriodeEntitet() {

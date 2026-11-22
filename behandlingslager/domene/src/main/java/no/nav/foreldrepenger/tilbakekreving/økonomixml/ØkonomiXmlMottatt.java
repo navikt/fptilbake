@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -29,6 +30,7 @@ public class ØkonomiXmlMottatt extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_OKO_XML_MOTTATT")
     private Long id;
 
+    @NotNull
     @Lob
     @Column(name = "melding", nullable = false)
     private String mottattXml;
@@ -44,7 +46,7 @@ public class ØkonomiXmlMottatt extends BaseEntitet {
     private Long sekvens;
 
     @Convert(converter = BooleanToStringConverter.class)
-    @Column(name = "tilkoblet", nullable = false)
+    @Column(name = "tilkoblet")
     private boolean tilkoblet = false;
 
     @Version

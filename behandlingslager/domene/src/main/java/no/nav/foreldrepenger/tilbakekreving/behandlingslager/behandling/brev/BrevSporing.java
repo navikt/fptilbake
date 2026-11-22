@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
@@ -22,15 +23,19 @@ public class BrevSporing extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BREV_SPORING")
     private Long id;
 
+    @NotNull
     @Column(name = "BEHANDLING_ID", nullable = false, updatable = false)
     private Long behandlingId;
 
+    @NotNull
     @Column(name = "JOURNALPOST_ID", nullable = false)
     private String journalpostId;
 
+    @NotNull
     @Column(name = "DOKUMENT_ID", nullable = false)
     private String dokumentId;
 
+    @NotNull
     @Convert(converter = BrevType.KodeverdiConverter.class)
     @Column(name = "brev_type", nullable = false)
     private BrevType brevType = BrevType.UDEFINERT;

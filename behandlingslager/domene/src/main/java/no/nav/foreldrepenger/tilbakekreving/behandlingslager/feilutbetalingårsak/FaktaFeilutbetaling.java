@@ -23,7 +23,7 @@ public class FaktaFeilutbetaling extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_FAKTA_FEILUTBETALING")
     private Long id;
 
-    @Column(name = "begrunnelse", nullable = false)
+    @Column(name = "begrunnelse")
     private String begrunnelse;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "faktaFeilutbetaling")

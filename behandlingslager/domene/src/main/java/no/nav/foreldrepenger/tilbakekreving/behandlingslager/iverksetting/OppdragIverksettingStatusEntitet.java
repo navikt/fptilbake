@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
@@ -23,9 +24,11 @@ public class OppdragIverksettingStatusEntitet extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_IVERKSETTING_STATUS_OS")
     private Long id;
 
+    @NotNull
     @Column(name = "behandling_id", updatable = false, nullable = false)
     private Long behandlingId;
 
+    @NotNull
     @Column(name = "vedtak_id", updatable = false, nullable = false)
     private String vedtakId;
 

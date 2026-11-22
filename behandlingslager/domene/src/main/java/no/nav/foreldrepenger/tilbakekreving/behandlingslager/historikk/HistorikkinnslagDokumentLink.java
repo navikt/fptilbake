@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseCreateableEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
@@ -24,9 +25,11 @@ public class HistorikkinnslagDokumentLink extends BaseCreateableEntitet implemen
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_HISTORIKKINNSLAG2_DOK_LINK")
     private Long id;
 
+    @NotNull
     @Column(name = "link_tekst", updatable=false, nullable = false)
     private String linkTekst;
 
+    @NotNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "historikkinnslag_id", nullable = false)
     private Historikkinnslag historikkinnslag;

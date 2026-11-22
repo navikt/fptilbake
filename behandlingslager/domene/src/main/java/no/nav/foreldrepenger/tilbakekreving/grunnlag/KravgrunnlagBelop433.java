@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
@@ -25,9 +26,11 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_KRAV_GRUNNLAG_BELOP_433")
     private Long id;
 
-    @Column(name = "klasse_kode")
+    @NotNull
+    @Column(name = "klasse_kode", nullable = false)
     private String klasseKode;
 
+    @NotNull
     @Convert(converter = KlasseType.KodeverdiConverter.class)
     @Column(name = "klasse_type", nullable = false, updatable = false)
     private KlasseType klasseType;
@@ -35,6 +38,7 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
     @Column(name = "oppr_utbet_belop")
     private BigDecimal opprUtbetBelop = BigDecimal.ZERO;
 
+    @NotNull
     @Column(name = "ny_belop", nullable = false, updatable = false)
     private BigDecimal nyBelop = BigDecimal.ZERO;
 
@@ -44,7 +48,8 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
     @Column(name = "uinnkrevd_belop")
     private BigDecimal uinnkrevdBelop = BigDecimal.ZERO;
 
-    @Column(name = "skatt_prosent")
+    @NotNull
+    @Column(name = "skatt_prosent", nullable = false)
     private BigDecimal skattProsent = BigDecimal.ZERO;
 
     @Column(name = "resultat_kode")
@@ -56,6 +61,7 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
     @Column(name = "skyld_kode")
     private String skyldKode;
 
+    @NotNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "krav_grunnlag_periode_432_id", nullable = false, updatable = false)
     private KravgrunnlagPeriode432 kravgrunnlagPeriode432;

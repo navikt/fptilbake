@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
@@ -23,12 +24,14 @@ public class VilkårVurderingSærligGrunnEntitet extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VILKAAR_SAERLIG_GRUNN")
     private Long id;
 
+    @NotNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "vurder_aktsomhet_id", nullable = false, updatable = false)
     private VilkårVurderingAktsomhetEntitet vurdertAktsomhet;
 
+    @NotNull
     @Convert(converter = SærligGrunn.KodeverdiConverter.class)
-    @Column(name = "saerlig_grunn")
+    @Column(name = "saerlig_grunn", nullable = false)
     private SærligGrunn grunn;
 
     @Column(name = "begrunnelse")

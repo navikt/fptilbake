@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -24,23 +25,29 @@ public class KravVedtakStatus437 extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_KRAV_VEDTAK_STATUS_437")
     private Long id;
 
+    @NotNull
     @Column(name = "vedtak_id", nullable = false, updatable = false)
     private Long vedtakId;
 
+    @NotNull
     @Convert(converter = KravStatusKode.KodeverdiConverter.class)
     @Column(name = "krav_status_kode", nullable = false, updatable = false)
     private KravStatusKode kravStatusKode;
 
+    @NotNull
     @Convert(converter = FagOmrådeKode.KodeverdiConverter.class)
     @Column(name = "fag_omraade_kode", nullable = false)
     private FagOmrådeKode fagOmrådeKode;
 
+    @NotNull
     @Column(name = "fagsystem_id", nullable = false, updatable = false)
     private String fagSystemId;
 
+    @NotNull
     @Column(name = "gjelder_vedtak_id", nullable = false, updatable = false)
     private String gjelderVedtakId;
 
+    @NotNull
     @Convert(converter = GjelderType.KodeverdiConverter.class)
     @Column(name = "gjelder_type", nullable = false, updatable = false)
     private GjelderType gjelderType;

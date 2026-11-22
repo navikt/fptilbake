@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev;
 
 import java.util.Objects;
 
-import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -12,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -24,18 +24,20 @@ public class VedtaksbrevFritekstPeriode extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VEDTAKSBREV_PERIODE")
     private Long id;
 
+    @NotNull
     @Column(name = "BEHANDLING_ID", nullable = false, updatable = false)
     private Long behandlingId;
 
+    @NotNull
     @Embedded
-    @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false))
-    @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
     private Periode periode;
 
+    @NotNull
     @Convert(converter = VedtaksbrevFritekstType.KodeverdiConverter.class)
     @Column(name = "FRITEKST_TYPE", nullable = false)
     private VedtaksbrevFritekstType fritekstType;
 
+    @NotNull
     @Column(name = "FRITEKST", nullable = false)
     private String fritekst;
 

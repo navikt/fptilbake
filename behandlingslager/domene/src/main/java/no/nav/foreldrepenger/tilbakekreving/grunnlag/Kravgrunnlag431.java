@@ -19,6 +19,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -38,20 +39,24 @@ public class Kravgrunnlag431 extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_KRAV_GRUNNLAG_431")
     private Long id;
 
-    @Column(name = "ekstern_kravgrunnlag_id", nullable = false, updatable = false)
+    @Column(name = "ekstern_kravgrunnlag_id", updatable = false)
     private String eksternKravgrunnlagId;
 
+    @NotNull
     @Column(name = "vedtak_id", nullable = false, updatable = false)
     private Long vedtakId;
 
+    @NotNull
     @Convert(converter = KravStatusKode.KodeverdiConverter.class)
     @Column(name = "krav_status_kode", nullable = false, updatable = false)
     private KravStatusKode kravStatusKode;
 
+    @NotNull
     @Convert(converter = FagOmrådeKode.KodeverdiConverter.class)
     @Column(name = "fag_omraade_kode", nullable = false)
     private FagOmrådeKode fagOmrådeKode;
 
+    @NotNull
     @Column(name = "fagsystem_id", nullable = false, updatable = false)
     private String fagSystemId;
 
@@ -61,16 +66,20 @@ public class Kravgrunnlag431 extends BaseEntitet {
     @Column(name = "omgjort_vedtak_id")
     private Long omgjortVedtakId;
 
+    @NotNull
     @Column(name = "gjelder_vedtak_id", nullable = false, updatable = false)
     private String gjelderVedtakId;
 
+    @NotNull
     @Convert(converter = GjelderType.KodeverdiConverter.class)
     @Column(name = "gjelder_type", nullable = false, updatable = false)
     private GjelderType gjelderType;
 
+    @NotNull
     @Column(name = "utbetales_til_id", nullable = false, updatable = false)
     private String utbetalesTilId;
 
+    @NotNull
     @Convert(converter = GjelderType.KodeverdiConverter.class)
     @Column(name = "utbet_id_type", nullable = false, updatable = false)
     private GjelderType utbetGjelderType;
@@ -81,18 +90,23 @@ public class Kravgrunnlag431 extends BaseEntitet {
     @Column(name = "beregnes_renter")
     private String beregnesRenter;
 
+    @NotNull
     @Column(name = "ansvarlig_enhet", nullable = false)
     private String ansvarligEnhet;
 
+    @NotNull
     @Column(name = "bosted_enhet", nullable = false, updatable = false)
     private String bostedEnhet;
 
+    @NotNull
     @Column(name = "behandl_enhet", nullable = false, updatable = false)
     private String behandlendeEnhet;
 
+    @NotNull
     @Column(name = "kontroll_felt", nullable = false, updatable = false)
     private String kontrollFelt;
 
+    @NotNull
     @Column(name = "saksbeh_id", nullable = false)
     private String saksBehId;
 

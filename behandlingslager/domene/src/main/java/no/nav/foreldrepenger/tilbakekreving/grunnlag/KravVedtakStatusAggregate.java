@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
@@ -24,11 +25,13 @@ class KravVedtakStatusAggregate extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GR_KRAV_VEDTAK_STATUS")
     private Long id;
 
+    @NotNull
     @ManyToOne(optional = false)
-    @JoinColumn(name = "krav_vedtak_status_id", nullable = false, unique = true)
+    @JoinColumn(name = "krav_vedtak_status_id", nullable = false)
     private KravVedtakStatus437 kravVedtakStatus;
 
-    @Column(name = "behandling_id", nullable = false, unique = true)
+    @NotNull
+    @Column(name = "behandling_id", nullable = false)
     private Long behandlingId;
 
     @Convert(converter = BooleanToStringConverter.class)

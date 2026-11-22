@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -29,21 +30,25 @@ public class VergeEntitet extends BaseEntitet {
     @Column(name = "aktoer_id")
     private AktørId vergeAktørId;
 
+    @NotNull
     @Embedded
     @AttributeOverride(name = "fom", column = @Column(name = "gyldig_fom", nullable = false))
     @AttributeOverride(name = "tom", column = @Column(name = "gyldig_tom", nullable = false))
     private Periode gyldigPeriode; //NOSONAR
 
+    @NotNull
     @Convert(converter = VergeType.KodeverdiConverter.class)
-    @Column(name = "verge_type")
+    @Column(name = "verge_type", nullable = false)
     private VergeType vergeType = VergeType.UDEFINERT;
 
     @Column(name = "orgnr")
     private String organisasjonsnummer;
 
+    @NotNull
     @Column(name = "navn", nullable = false)
     private String navn;
 
+    @NotNull
     @Column(name = "kilde", nullable = false)
     private String kilde;
 

@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotNull;
 
 @Embeddable
 public class Periode {
@@ -15,10 +16,12 @@ public class Periode {
     public static final Comparator<Periode> COMPARATOR = Comparator.comparing(Periode::getFom).thenComparing(Periode::getTom);
     private static final DateTimeFormatter DATO_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
-    @Column(name = "fom")
+    @NotNull
+    @Column(name = "fom", nullable = false)
     private LocalDate fom;
 
-    @Column(name = "tom")
+    @NotNull
+    @Column(name = "tom", nullable = false)
     private LocalDate tom;
 
     private Periode() {

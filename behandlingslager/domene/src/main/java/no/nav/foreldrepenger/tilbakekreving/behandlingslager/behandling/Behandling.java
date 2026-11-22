@@ -30,6 +30,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.annotations.NaturalId;
 
@@ -76,14 +77,17 @@ public class Behandling extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BEHANDLING")
     private Long id;
 
+    @NotNull
     @NaturalId
-    @Column(name = "uuid")
+    @Column(name = "uuid", nullable = false, unique = true)
     private UUID uuid;
 
+    @NotNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "fagsak_id", nullable = false, updatable = false)
     private Fagsak fagsak;
 
+    @NotNull
     @Convert(converter = BehandlingStatus.KodeverdiConverter.class)
     @Column(name = "behandling_status", nullable = false)
     private BehandlingStatus status = BehandlingStatus.OPPRETTET;
@@ -91,6 +95,7 @@ public class Behandling extends BaseEntitet {
     @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true, mappedBy = "behandling")
     private List<BehandlingStegTilstand> behandlingStegTilstander = new ArrayList<>(1);
 
+    @NotNull
     @Convert(converter = BehandlingType.KodeverdiConverter.class)
     @Column(name = "behandling_type", nullable = false)
     private BehandlingType behandlingType = BehandlingType.UDEFINERT;
@@ -110,7 +115,8 @@ public class Behandling extends BaseEntitet {
     private long versjon;
 
     // Har sysdate som default value
-    @Column(name = "opprettet_dato")
+    @NotNull
+    @Column(name = "opprettet_dato", nullable = false)
     private LocalDateTime opprettetDato;
 
     @Column(name = "avsluttet_dato")
@@ -132,6 +138,7 @@ public class Behandling extends BaseEntitet {
     @Column(name = "MANUELT_OPPRETTET", nullable = false)
     private boolean manueltOpprettet = false;
 
+    @NotNull
     @Convert(converter = SaksbehandlingType.verdiConverter.class)
     @Column(name = "SAKSBEHANDLING_TYPE", nullable = false)
     private SaksbehandlingType saksbehandlingType = SaksbehandlingType.ORDINÆR;

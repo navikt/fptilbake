@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
@@ -27,10 +28,12 @@ public class VurderPåNyttÅrsak extends BaseEntitet implements IndexKey {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VURDER_PAA_NYTT_AARSAK")
     private Long id;
 
+    @NotNull
     @Convert(converter = VurderÅrsak.KodeverdiConverter.class)
     @Column(name = "aarsak_type", nullable = false, updatable = false)
     private VurderÅrsak årsaksType;
 
+    @NotNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "aksjonspunkt_id", nullable = false, updatable = false)
     private Aksjonspunkt aksjonspunkt;

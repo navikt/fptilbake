@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
@@ -30,16 +31,20 @@ public class BehandlingVedtak extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
+    @NotNull
     @Column(name = "VEDTAK_DATO", nullable = false)
     private LocalDate vedtaksdato;
 
+    @NotNull
     @Column(name = "ANSVARLIG_SAKSBEHANDLER", nullable = false)
     private String ansvarligSaksbehandler;
 
+    @NotNull
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "BEHANDLING_RESULTAT_ID", nullable = false, updatable = false, unique = true)
     private Behandlingsresultat behandlingsresultat;
 
+    @NotNull
     @Convert(converter = IverksettingStatus.KodeverdiConverter.class)
     @Column(name = "iverksetting_status", nullable = false)
     private IverksettingStatus iverksettingStatus = IverksettingStatus.UDEFINERT;

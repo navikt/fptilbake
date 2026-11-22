@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårs
 import java.time.LocalDate;
 import java.util.Objects;
 
-import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -14,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
@@ -28,21 +28,23 @@ public class FaktaFeilutbetalingPeriode extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_FAKTA_FEILUTB_PERIODE")
     private Long id;
 
+    @NotNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "fakta_feilutbetaling_id", nullable = false, updatable = false)
     private FaktaFeilutbetaling faktaFeilutbetaling;
 
+    @NotNull
     @Embedded
-    @AttributeOverride(name = "fom", column = @Column(name = "fom", nullable = false, updatable = false))
-    @AttributeOverride(name = "tom", column = @Column(name = "tom", nullable = false, updatable = false))
     private Periode periode;
 
+    @NotNull
     @Convert(converter = HendelseType.KodeverdiConverter.class)
-    @Column(name = "hendelse_type")
+    @Column(name = "hendelse_type", nullable = false)
     private HendelseType hendelseType;
 
+    @NotNull
     @Convert(converter = HendelseUnderType.KodeverdiConverter.class)
-    @Column(name = "hendelse_undertype")
+    @Column(name = "hendelse_undertype", nullable = false)
     private HendelseUnderType hendelseUndertype;
 
     protected FaktaFeilutbetalingPeriode() {

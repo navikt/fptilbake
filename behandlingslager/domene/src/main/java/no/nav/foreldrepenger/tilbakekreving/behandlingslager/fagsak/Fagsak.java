@@ -31,6 +31,7 @@ public class Fagsak extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_FAGSAK")
     private Long id;
 
+    @NotNull
     @ManyToOne(cascade = {CascadeType.ALL}, optional = false)
     @JoinColumn(name = "bruker_id", nullable = false)
     private NavBruker navBruker;
@@ -49,6 +50,7 @@ public class Fagsak extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
+    @NotNull
     @Convert(converter = FagsakYtelseType.KodeverdiConverter.class)
     @Column(name = "ytelse_type", nullable = false)
     private FagsakYtelseType fagsakYtelseType = FagsakYtelseType.FORELDREPENGER;
