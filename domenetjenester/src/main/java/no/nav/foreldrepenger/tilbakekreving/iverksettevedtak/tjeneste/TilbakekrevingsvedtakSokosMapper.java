@@ -26,7 +26,7 @@ final class TilbakekrevingsvedtakSokosMapper {
         if (vedtakId > 999_999_999) {
             throw new IllegalArgumentException("vedtakId er større enn tillatt i Sokos-kontrakten: " + vedtakId);
         }
-        var uid = KontekstHolder.getKontekst().getUid();
+        var uid = KontekstHolder.getKontekst().getUid().replace("-", "");
         var brukSaksbehandlerId = uid.substring(0, Math.min(8, uid.length()));
         return new TilbakekrevingsvedtakRequest(KodeAksjon.FATTE_VEDTAK, vedtakId, TilbakekrevingsvedtakMapper.vedatkFagsystemDato(kravgrunnlag),
             Optional.ofNullable(kravgrunnlag.getHjemmelKode()).orElse(KODE_HJEMMEL),
