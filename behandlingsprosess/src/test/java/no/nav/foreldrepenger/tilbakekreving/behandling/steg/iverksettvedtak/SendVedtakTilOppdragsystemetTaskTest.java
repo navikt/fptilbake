@@ -35,7 +35,6 @@ import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.Tilbakekre
 import no.nav.foreldrepenger.tilbakekreving.sokos.SokosTilbakekrevingKlient;
 import no.nav.foreldrepenger.tilbakekreving.sokos.TilbakekrevingsvedtakRequest;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 
 @CdiDbAwareTest
@@ -82,7 +81,6 @@ class SendVedtakTilOppdragsystemetTaskTest {
         assertThat(request.getValue().kodeAksjon()).isEqualTo(KodeAksjon.FATTE_VEDTAK);
         assertThat(request.getValue().vedtakId().longValue()).isEqualTo(kravgrunnlagRepository.finnKravgrunnlag(behandling.getId()).getVedtakId());
         assertThat(request.getValue().kodeHjemmel()).isEqualTo("22-15");
-        assertThat(DefaultJsonMapper.toJson(request.getValue())).doesNotContain("\"renterBeregnes\"", "\"renterPeriodeBeregnes\"");
         assertThat(request.getValue().perioder()).isNotEmpty();
         assertThat(request.getValue().perioder().getFirst().posteringer()).isNotEmpty();
         var status = oppdragIverksettingStatusRepository.hentOppdragIverksettingStatus(behandling.getId());
@@ -105,9 +103,9 @@ class SendVedtakTilOppdragsystemetTaskTest {
         var sokosTjeneste = mock(TilbakekrevingsvedtakTjeneste.class);
         var dato = LocalDate.of(2026, 1, 15);
         var request = new TilbakekrevingsvedtakRequest(KodeAksjon.FATTE_VEDTAK, 1412, dato,
-            "22-15", "8020", "kontrollfelt", "Z999999", null,
+            "22-15", false, "8020", "kontrollfelt", "Z999999", null,
             List.of(new TilbakekrevingsvedtakRequest.Periode(
-                dato, dato, BigDecimal.ZERO,
+                dato, dato, false, BigDecimal.ZERO,
                 List.of(new TilbakekrevingsvedtakRequest.Postering("FPATORD", BigDecimal.ONE,
                     BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
                     "FULL_TILBAKEKREV", "ANNET", "IKKE_FORDELT")))));

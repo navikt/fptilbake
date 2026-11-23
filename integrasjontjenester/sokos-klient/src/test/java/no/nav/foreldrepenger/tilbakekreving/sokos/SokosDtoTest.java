@@ -15,12 +15,12 @@ class SokosDtoTest {
         assertJsonRoundtrip("""
             {
               "kodeAksjon": "8", "vedtakId": 892793, "vedtaksDato": "2026-01-15",
-              "kodeHjemmel": "22-15", "enhetAnsvarlig": "8020",
+              "kodeHjemmel": "22-15", "renterBeregnes": false, "enhetAnsvarlig": "8020",
               "kontrollfelt": "2026-01-15-01.12.34.123456", "saksbehandlerId": "Z999999",
               "datoTilleggsfrist": "2026-03-15",
               "perioder": [{
                 "periodeFom": "2026-01-01", "periodeTom": "2026-01-31",
-                "belopRenter": 150.50,
+                "renterPeriodeBeregnes": false, "belopRenter": 150.50,
                 "posteringer": [{
                   "kodeKlasse": "SPATORD", "belopOpprinneligUtbetalt": 10000.00,
                   "belopNy": 8000.00, "belopTilbakekreves": 2000.00,
