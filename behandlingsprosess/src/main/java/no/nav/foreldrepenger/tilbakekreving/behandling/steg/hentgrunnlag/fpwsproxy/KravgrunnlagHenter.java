@@ -50,8 +50,7 @@ public class KravgrunnlagHenter {
     @Inject
     public KravgrunnlagHenter(ØkonomiProxyKlient økonomiProxyKlient, HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy,
                              SokosTilbakekrevingKlient sokosTilbakekrevingKlient, HentKravgrunnlagMapperSokos hentKravgrunnlagMapperSokos) {
-        this(økonomiProxyKlient, hentKravgrunnlagMapperProxy, sokosTilbakekrevingKlient, hentKravgrunnlagMapperSokos,
-            () -> (ENV.isProd() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) || ENV.isLocal());
+        this(økonomiProxyKlient, hentKravgrunnlagMapperProxy, sokosTilbakekrevingKlient, hentKravgrunnlagMapperSokos, () -> ENV.isLocal());
     }
 
     public KravgrunnlagHenter(ØkonomiProxyKlient økonomiProxyKlient, HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy,
