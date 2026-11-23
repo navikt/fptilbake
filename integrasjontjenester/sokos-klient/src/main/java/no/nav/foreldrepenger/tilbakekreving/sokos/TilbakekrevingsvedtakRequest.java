@@ -10,6 +10,7 @@ public record TilbakekrevingsvedtakRequest(KodeAksjon kodeAksjon,
                                            Integer vedtakId,
                                            LocalDate vedtaksDato,
                                            String kodeHjemmel,
+                                           boolean renterBeregnes,
                                            String enhetAnsvarlig,
                                            String kontrollfelt,
                                            String saksbehandlerId,
@@ -18,6 +19,7 @@ public record TilbakekrevingsvedtakRequest(KodeAksjon kodeAksjon,
 
     public record Periode(LocalDate periodeFom,
                           LocalDate periodeTom,
+                          boolean renterPeriodeBeregnes,
                           BigDecimal belopRenter,
                           List<Postering> posteringer) {
     }

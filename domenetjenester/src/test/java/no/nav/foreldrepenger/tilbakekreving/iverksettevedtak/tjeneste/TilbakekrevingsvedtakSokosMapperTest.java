@@ -61,15 +61,14 @@ class TilbakekrevingsvedtakSokosMapperTest {
         assertThat(request.kontrollfelt()).isEqualTo("kontrollfelt");
         assertThat(request.saksbehandlerId()).isNotBlank();
         assertThat(request.perioder()).containsExactly(
-            new TilbakekrevingsvedtakRequest.Periode(dato.minusDays(14), dato, BigDecimal.TEN, List.of(
+            new TilbakekrevingsvedtakRequest.Periode(dato.minusDays(14), dato, false, BigDecimal.TEN, List.of(
                 new TilbakekrevingsvedtakRequest.Postering("FPATORD", BigDecimal.valueOf(1000), BigDecimal.valueOf(800),
                     BigDecimal.valueOf(200), BigDecimal.ZERO, BigDecimal.valueOf(50),
                     "FULL_TILBAKEKREV", "ANNET", "IKKE_FORDELT"),
                 new TilbakekrevingsvedtakRequest.Postering("TREKK", BigDecimal.ZERO, BigDecimal.ZERO,
                     BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", "", ""))));
         assertThat(DefaultJsonMapper.toJson(request))
-            .contains("\"kodeResultat\":\"\"", "\"kodeAarsak\":\"\"", "\"kodeSkyld\":\"\"")
-            .doesNotContain("\"renterBeregnes\"", "\"renterPeriodeBeregnes\"");
+            .contains("\"kodeResultat\":\"\"", "\"kodeAarsak\":\"\"", "\"kodeSkyld\":\"\"");
 
         KontekstHolder.fjernKontekst();
     }

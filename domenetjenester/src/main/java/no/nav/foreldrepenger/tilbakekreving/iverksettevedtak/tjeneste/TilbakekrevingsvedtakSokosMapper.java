@@ -29,14 +29,14 @@ final class TilbakekrevingsvedtakSokosMapper {
         var uid = KontekstHolder.getKontekst().getUid().replace("-", "");
         var brukSaksbehandlerId = uid.substring(0, Math.min(8, uid.length()));
         return new TilbakekrevingsvedtakRequest(KodeAksjon.FATTE_VEDTAK, vedtakId, TilbakekrevingsvedtakMapper.vedatkFagsystemDato(kravgrunnlag),
-            Optional.ofNullable(kravgrunnlag.getHjemmelKode()).orElse(KODE_HJEMMEL),
+            Optional.ofNullable(kravgrunnlag.getHjemmelKode()).orElse(KODE_HJEMMEL), false,
             kravgrunnlag.getAnsvarligEnhet(), kravgrunnlag.getKontrollFelt(), brukSaksbehandlerId, tilleggsfristUtgangspunkt,
             perioder.stream().map(TilbakekrevingsvedtakSokosMapper::tilPeriode).toList());
     }
 
     private static TilbakekrevingsvedtakRequest.Periode tilPeriode(TilbakekrevingPeriode periode) {
         return new TilbakekrevingsvedtakRequest.Periode(periode.getPeriode().getFom(), periode.getPeriode().getTom(),
-            periode.getRenter(), periode.getBeløp().stream().map(TilbakekrevingsvedtakSokosMapper::tilPostering).toList());
+            false, periode.getRenter(), periode.getBeløp().stream().map(TilbakekrevingsvedtakSokosMapper::tilPostering).toList());
     }
 
     private static TilbakekrevingsvedtakRequest.Postering tilPostering(TilbakekrevingBeløp beløp) {
