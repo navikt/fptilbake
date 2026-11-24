@@ -5,7 +5,6 @@ import java.util.Optional;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dokdist.Distribusjonstype;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dokdist.DokdistKlient;
@@ -16,7 +15,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
 @ProsessTask("publiser.journalpost.dokdist")
-@FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class PubliserJournalpostTask implements ProsessTaskHandler {
 
     protected static final String MOTTAKER = "mottaker";

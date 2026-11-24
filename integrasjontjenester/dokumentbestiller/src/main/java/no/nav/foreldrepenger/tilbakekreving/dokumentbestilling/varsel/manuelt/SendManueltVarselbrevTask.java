@@ -16,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
@@ -26,7 +25,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @Dependent
 @ProsessTask(value = "brev.sendManueltVarsel", maxFailedRuns = 5, firstDelay = 60)
-@FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendManueltVarselbrevTask implements ProsessTaskHandler {
 
     public static final String MAL_TYPE = "malType";

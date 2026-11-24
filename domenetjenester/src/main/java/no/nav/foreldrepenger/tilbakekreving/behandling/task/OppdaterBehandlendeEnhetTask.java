@@ -11,7 +11,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -20,7 +19,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
 @ProsessTask(value = "oppgavebehandling.oppdaterEnhet", prioritet = 4)
-@FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class OppdaterBehandlendeEnhetTask implements ProsessTaskHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(OppdaterBehandlendeEnhetTask.class);

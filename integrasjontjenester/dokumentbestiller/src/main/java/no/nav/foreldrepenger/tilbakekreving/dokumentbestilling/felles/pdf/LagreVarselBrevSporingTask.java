@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -12,7 +11,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
 @ProsessTask("brev.sporing.varsel")
-@FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class LagreVarselBrevSporingTask implements ProsessTaskHandler {
 
     protected static final String VARSLET_BELOEP = "varsletBeloep";

@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
@@ -30,7 +29,6 @@ import no.nav.vedtak.mapper.json.DefaultJsonMapper;
 
 @ApplicationScoped
 @ProsessTask(value = "fplos.oppgavebehandling.behandlingshendelse", prioritet = 2)
-@FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class FpLosPubliserEventTask implements ProsessTaskHandler {
 
     public static final String PROPERTY_EVENT_NAME = "eventName";

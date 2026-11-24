@@ -14,7 +14,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -25,7 +24,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
  */
 @ApplicationScoped
 @ProsessTask("behandlingskontroll.fortsettBehandling")
-@FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class FortsettBehandlingTask implements ProsessTaskHandler {
 
     public static final String MANUELL_FORTSETTELSE = "manuellFortsettelse";

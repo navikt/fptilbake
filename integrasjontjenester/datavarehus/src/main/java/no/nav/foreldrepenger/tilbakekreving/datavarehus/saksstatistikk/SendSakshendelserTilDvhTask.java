@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.aiven.AivenSakshendelserKafkaProducer;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
@@ -13,7 +12,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
 @ProsessTask(value = "dvh.send.sakshendelser", prioritet = 2)
-@FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class SendSakshendelserTilDvhTask implements ProsessTaskHandler {
 
     private AivenSakshendelserKafkaProducer aivenSakshendelserKafkaProducer;
