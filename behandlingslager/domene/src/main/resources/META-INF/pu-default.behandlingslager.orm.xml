@@ -7,7 +7,6 @@
 
     <sequence-generator name="SEQ_BRUKER" allocation-size="50" sequence-name="SEQ_BRUKER"/>
     <sequence-generator name="SEQ_FAGSAK" allocation-size="50" sequence-name="SEQ_FAGSAK"/>
-    <sequence-generator name="SEQ_FAGSAK_PROSESS_TASK" allocation-size="50" sequence-name="SEQ_FAGSAK_PROSESS_TASK"/>
     <sequence-generator name="SEQ_BEHANDLING" allocation-size="50" sequence-name="SEQ_BEHANDLING"/>
     <sequence-generator name="SEQ_BEHANDLING_RESULTAT" allocation-size="50" sequence-name="SEQ_BEHANDLING_RESULTAT"/>
     <sequence-generator name="SEQ_EKSTERN_BEHANDLING" allocation-size="50" sequence-name="SEQ_EKSTERN_BEHANDLING"/>
@@ -27,7 +26,6 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsessTask"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat"/>

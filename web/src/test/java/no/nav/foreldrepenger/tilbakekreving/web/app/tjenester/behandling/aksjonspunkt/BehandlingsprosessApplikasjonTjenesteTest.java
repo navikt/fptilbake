@@ -10,7 +10,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ProsesseringAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
@@ -101,7 +101,7 @@ class BehandlingsprosessApplikasjonTjenesteTest {
     }
 
     private BehandlingsprosessApplikasjonTjenesteImpl initSut(String gruppe, ProsessTaskData taskData) {
-        BehandlingskontrollAsynkTjeneste tjeneste = Mockito.mock(BehandlingskontrollAsynkTjeneste.class);
+        ProsesseringAsynkTjeneste tjeneste = Mockito.mock(ProsesseringAsynkTjeneste.class);
 
         Map<String, ProsessTaskData> data = new HashMap<>();
         data.put(gruppe, taskData);

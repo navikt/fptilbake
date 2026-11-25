@@ -23,8 +23,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsessTaskRepository;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,8 +73,6 @@ import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ActionType;
 import no.nav.vedtak.sikkerhet.abac.beskyttet.ResourceType;
 
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
-
 @Path("/forvaltningBehandling")
 @ApplicationScoped
 @Transactional
@@ -95,7 +91,6 @@ public class ForvaltningBehandlingRestTjeneste {
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private BehandlingTilstandTjeneste behandlingTilstandTjeneste;
-    private FagsakProsessTaskRepository fagsakProsessTaskRepository;
 
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
 
@@ -112,7 +107,6 @@ public class ForvaltningBehandlingRestTjeneste {
                                              KravgrunnlagTjeneste kravgrunnlagTjeneste,
                                              EksternBehandlingRepository eksternBehandlingRepository,
                                              BehandlingTilstandTjeneste behandlingTilstandTjeneste,
-                                             FagsakProsessTaskRepository fagsakProsessTaskRepository,
                                              TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.behandlingresultatRepository = behandlingresultatRepository;
@@ -123,7 +117,6 @@ public class ForvaltningBehandlingRestTjeneste {
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
         this.eksternBehandlingRepository = eksternBehandlingRepository;
         this.behandlingTilstandTjeneste = behandlingTilstandTjeneste;
-        this.fagsakProsessTaskRepository = fagsakProsessTaskRepository;
         this.tilbakekrevingsvedtakTjeneste = tilbakekrevingsvedtakTjeneste;
     }
 
@@ -462,19 +455,6 @@ public class ForvaltningBehandlingRestTjeneste {
         }
         TilbakekrevingVedtakDTO vedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandling.getId());
         return Response.ok(vedtak).build();
-    }
-
-    @POST
-    @Path("/fjern-fagsak-prosesstask-avsluttet")
-    @Consumes(APPLICATION_JSON)
-    @Produces(APPLICATION_JSON)
-    @Operation(description = "Fjern fagsakprosesstask for avsluttede behandlinger", tags = "FORVALTNING-teknisk")
-    @BeskyttetRessurs(actionType = ActionType.CREATE, resourceType = ResourceType.DRIFT, sporingslogg = false)
-    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response fjernFagsakProsesstaskAvsluttetBehandling() {
-        fagsakProsessTaskRepository.fjernForAvsluttedeBehandlinger();
-        fagsakProsessTaskRepository.fjernForAvsluttedeTasks();
-        return Response.ok().build();
     }
 
     private void fjernKoblingTilHenlagteBehandlinger(ØkonomiXmlMottatt mottattXml, Long behandlingIdSomTilkobles) {

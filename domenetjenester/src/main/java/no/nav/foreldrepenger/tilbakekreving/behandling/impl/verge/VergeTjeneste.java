@@ -8,8 +8,8 @@ import java.util.Optional;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ProsesseringAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.dto.OpprettVerge;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -25,7 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 public class VergeTjeneste {
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
-    private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
+    private ProsesseringAsynkTjeneste prosesseringAsynkTjeneste;
     private BehandlingRepository behandlingRepository;
     private VergeRepository vergeRepository;
     private HistorikkinnslagRepository historikkRepository;
@@ -37,10 +37,10 @@ public class VergeTjeneste {
 
     @Inject
     public VergeTjeneste(BehandlingskontrollTjeneste behandlingskontrollTjeneste,
-                         BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste,
+                         ProsesseringAsynkTjeneste prosesseringAsynkTjeneste,
                          BehandlingRepositoryProvider repositoryProvider, OpprettVergeTjeneste opprettVergeTjeneste) {
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
-        this.behandlingskontrollAsynkTjeneste = behandlingskontrollAsynkTjeneste;
+        this.prosesseringAsynkTjeneste = prosesseringAsynkTjeneste;
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.vergeRepository = repositoryProvider.getVergeRepository();
         this.historikkRepository = repositoryProvider.getHistorikkinnslagRepository();
@@ -69,14 +69,14 @@ public class VergeTjeneste {
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, List.of(AksjonspunktDefinisjon.AVKLAR_VERGE));
         behandlingskontrollTjeneste.behandlingTilbakeføringHvisTidligereBehandlingSteg(kontekst, FAKTA_VERGE);
         behandlingRepository.lagre(behandling, kontekst.getSkriveLås());
-        behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
+        prosesseringAsynkTjeneste.asynkProsesserBehandling(behandling);
     }
 
     public void fjernVergeGrunnlagOgAksjonspunkt(Behandling behandling) {
         avbrytVergeAksjonspunktHvisFinnes(behandling);
         vergeRepository.fjernVergeInformasjon(behandling.getId());
         opprettHistorikkinnslagForFjernetVerge(behandling);
-        behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
+        prosesseringAsynkTjeneste.asynkProsesserBehandling(behandling);
     }
 
     public Optional<VergeEntitet> hentVergeInformasjon(Long behandlingId) {

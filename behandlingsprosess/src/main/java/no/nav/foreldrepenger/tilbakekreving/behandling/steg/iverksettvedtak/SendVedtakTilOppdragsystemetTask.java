@@ -5,15 +5,12 @@ import java.util.function.BooleanSupplier;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import no.nav.vedtak.mapper.json.DefaultJsonMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
@@ -26,7 +23,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
 @ProsessTask(value = "iverksetteVedtak.sendVedtakTilOppdragsystemet", prioritet = 2)
-@FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(SendVedtakTilOppdragsystemetTask.class);

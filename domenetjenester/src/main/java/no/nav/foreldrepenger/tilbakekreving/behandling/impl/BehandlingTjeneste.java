@@ -14,8 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -61,7 +59,7 @@ public class BehandlingTjeneste {
     private BehandlingVedtakRepository behandlingVedtakRepository;
     private VergeRepository vergeRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
-    private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
+    private ProsesseringAsynkTjeneste prosesseringAsynkTjeneste;
     private FagsakTjeneste fagsakTjeneste;
     private BehandlingHistorikkTjeneste behandlingHistorikkTjeneste;
     private FagsystemKlient fagsystemKlient;
@@ -73,12 +71,13 @@ public class BehandlingTjeneste {
 
     @Inject
     public BehandlingTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
-                              BehandlingskontrollProvider behandlingskontrollProvider,
+                              BehandlingskontrollTjeneste behandlingskontrollTjeneste,
+                              ProsesseringAsynkTjeneste prosesseringAsynkTjeneste,
                               FagsakTjeneste fagsakTjeneste,
                               BehandlingHistorikkTjeneste behandlingHistorikkTjeneste,
                               FagsystemKlient fagsystemKlient) {
-        this.behandlingskontrollTjeneste = behandlingskontrollProvider.getBehandlingskontrollTjeneste();
-        this.behandlingskontrollAsynkTjeneste = behandlingskontrollProvider.getBehandlingskontrollAsynkTjeneste();
+        this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
+        this.prosesseringAsynkTjeneste = prosesseringAsynkTjeneste;
         this.fagsakTjeneste = fagsakTjeneste;
         this.behandlingHistorikkTjeneste = behandlingHistorikkTjeneste;
         this.fagsystemKlient = fagsystemKlient;
@@ -129,7 +128,7 @@ public class BehandlingTjeneste {
                                             AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                             BehandlingType behandlingType) {
         Behandling behandling = opprettFørstegangsbehandling(saksnummer, eksternUuid, henvisning, aktørId, fagsakYtelseType, behandlingType, false);
-        behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
+        prosesseringAsynkTjeneste.asynkProsesserBehandling(behandling);
         return behandling.getId();
     }
 

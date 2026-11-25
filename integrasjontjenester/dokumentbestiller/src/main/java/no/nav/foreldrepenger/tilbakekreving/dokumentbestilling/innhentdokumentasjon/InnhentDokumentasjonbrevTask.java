@@ -16,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.felles.Frister;
@@ -26,7 +25,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @Dependent
 @ProsessTask("brev.sendInnhentDokumentasjon")
-@FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class InnhentDokumentasjonbrevTask implements ProsessTaskHandler {
 
     private BehandlingRepository behandlingRepository;

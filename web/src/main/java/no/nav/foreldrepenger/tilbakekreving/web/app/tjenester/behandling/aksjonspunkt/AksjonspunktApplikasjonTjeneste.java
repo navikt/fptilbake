@@ -11,11 +11,10 @@ import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.spi.CDI;
 import jakarta.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ProsesseringAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingSaksbehandlerEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingEventPubliserer;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
@@ -33,7 +32,7 @@ public class AksjonspunktApplikasjonTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
-    private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
+    private ProsesseringAsynkTjeneste prosesseringAsynkTjeneste;
     private BehandlingEventPubliserer behandlingEventPubliserer;
 
     AksjonspunktApplikasjonTjeneste() {
@@ -42,11 +41,12 @@ public class AksjonspunktApplikasjonTjeneste {
 
     @Inject
     public AksjonspunktApplikasjonTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                           BehandlingskontrollProvider behandlingskontrollProvider,
+                                           BehandlingskontrollTjeneste behandlingskontrollTjeneste,
+                                           ProsesseringAsynkTjeneste prosesseringAsynkTjeneste,
                                            BehandlingEventPubliserer behandlingEventPubliserer) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.behandlingskontrollTjeneste = behandlingskontrollProvider.getBehandlingskontrollTjeneste();
-        this.behandlingskontrollAsynkTjeneste = behandlingskontrollProvider.getBehandlingskontrollAsynkTjeneste();
+        this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
+        this.prosesseringAsynkTjeneste = prosesseringAsynkTjeneste;
         this.behandlingEventPubliserer = behandlingEventPubliserer;
     }
 
@@ -64,7 +64,7 @@ public class AksjonspunktApplikasjonTjeneste {
             // Skal ikke fortsette behandling dersom behandling ble satt på vent
             return;
         }
-        behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
+        prosesseringAsynkTjeneste.asynkProsesserBehandling(behandling);
     }
 
     private void spolTilbakeTilTidligsteAksjonspunkt(Collection<? extends AksjonspunktKode> aksjonspunktDtoer,

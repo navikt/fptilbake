@@ -28,13 +28,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingT
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.GjenopptaBehandlingMedGrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ProsesseringAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurderForeldelseHistorikkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingHistorikkInnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRepository;
@@ -96,12 +95,10 @@ public abstract class FellesTestOppsett {
 
     protected BehandlingskontrollTjeneste behandlingskontrollTjeneste;;
     protected GjenopptaBehandlingMedGrunnlagTjeneste gjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingMedGrunnlagTjeneste.class);
-    protected BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste = mock(BehandlingskontrollAsynkTjeneste.class);
+    protected ProsesseringAsynkTjeneste prosesseringAsynkTjeneste = mock(ProsesseringAsynkTjeneste.class);
     protected PersoninfoAdapter mockTpsTjeneste = mock(PersoninfoAdapter.class);
     protected FagsystemKlient mockFagsystemKlient = mock(FagsystemKlient.class);
     protected SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
-
-    protected BehandlingskontrollProvider behandlingskontrollProvider;
 
     protected BehandlingRepositoryProvider repoProvider;
     protected NavBrukerRepository brukerRepository;
@@ -149,7 +146,6 @@ public abstract class FellesTestOppsett {
         this.entityManager = entityManager;
         var behandlinskontrollServiceProvider = new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null);
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(behandlinskontrollServiceProvider);
-        behandlingskontrollProvider =  new BehandlingskontrollProvider(behandlingskontrollTjeneste, behandlingskontrollAsynkTjeneste);
         repoProvider = new BehandlingRepositoryProvider(entityManager);
         brukerRepository = new NavBrukerRepository(entityManager);
         grunnlagRepository = repoProvider.getGrunnlagRepository();
@@ -173,7 +169,7 @@ public abstract class FellesTestOppsett {
         revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider, behandlingskontrollTjeneste);
         faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repoProvider, kravgrunnlagTjeneste, mockFagsystemKlient);
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
-        behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollProvider,
+        behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollTjeneste, prosesseringAsynkTjeneste,
                 fagsakTjeneste, new BehandlingHistorikkTjeneste(historikkinnslagRepository, historikkTjeneste), mockFagsystemKlient);
         testUtility = new TestUtility(behandlingTjeneste, fagsakTjeneste, entityManager);
         aktørId = testUtility.genererAktørId();

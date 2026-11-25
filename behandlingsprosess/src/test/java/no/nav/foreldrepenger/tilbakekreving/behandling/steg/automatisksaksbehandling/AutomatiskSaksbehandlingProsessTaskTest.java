@@ -92,7 +92,7 @@ class AutomatiskSaksbehandlingProsessTaskTest {
     @Test
     void skal_saksbehandle_automatisk() {
         System.setProperty("app.name", "fptilbake");
-        var antallKlareFør = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).size();
+        var antallKlareFør = taskTjeneste.finnAktive(ProsessTaskStatus.KLAR).size();
         automatiskSaksbehandlingProsessTask.doTask(lagProsesTaskData());
         behandling = behandlingRepository.hentBehandling(behandlingId);
         assertThat(behandling.isAutomatiskSaksbehandlet()).isTrue();
@@ -100,7 +100,7 @@ class AutomatiskSaksbehandlingProsessTaskTest {
         assertThat(behandling.getAnsvarligBeslutter()).isEqualTo("VL");
         assertThat(behandling.getStatus()).isEqualByComparingTo(BehandlingStatus.IVERKSETTER_VEDTAK);
 
-        var prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
+        var prosessTasker = taskTjeneste.finnAktive(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker.size() - antallKlareFør).isEqualTo(3);
         var prosessTaskNavn = prosessTasker.stream()
                 .map(ProsessTaskData::taskType)

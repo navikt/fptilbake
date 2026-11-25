@@ -5,7 +5,6 @@ import jakarta.inject.Inject;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.aiven.AivenVedtakKafkaProducer;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.VedtakOppsummeringMapper;
@@ -17,7 +16,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
 @ProsessTask(value = "dvh.send.vedtak", prioritet = 2)
-@FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
 
     private ProsessTaskTjeneste taskTjeneste;

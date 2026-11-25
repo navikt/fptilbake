@@ -20,7 +20,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
@@ -38,7 +37,6 @@ import no.nav.vedtak.log.mdc.MDCOperations;
 
 @ApplicationScoped
 @ProsessTask(value = "fplos.oppgavebehandling.PubliserEvent", prioritet = 2)
-@FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class K9LosPubliserEventTask implements ProsessTaskHandler {
 
     public static final String PROPERTY_EVENT_NAME = "eventName";

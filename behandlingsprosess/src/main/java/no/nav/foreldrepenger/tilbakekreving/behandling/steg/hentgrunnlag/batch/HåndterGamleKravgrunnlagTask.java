@@ -2,14 +2,13 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch;
 
 import java.util.Optional;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -18,7 +17,6 @@ import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 @ApplicationScoped
 @ProsessTask(value = "kravgrunnlag.gammelt.håndter", prioritet = 2)
-@FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class HåndterGamleKravgrunnlagTask implements ProsessTaskHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(HåndterGamleKravgrunnlagTask.class);

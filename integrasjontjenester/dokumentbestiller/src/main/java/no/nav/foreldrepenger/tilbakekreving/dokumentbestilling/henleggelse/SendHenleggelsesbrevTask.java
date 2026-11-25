@@ -1,23 +1,21 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
-import java.util.Optional;
-import java.util.UUID;
-
 @Dependent
 @ProsessTask("brev.sendhenleggelse")
-@FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class SendHenleggelsesbrevTask implements ProsessTaskHandler {
 
     private HenleggelsesbrevTjeneste henleggelsesbrevTjeneste;
