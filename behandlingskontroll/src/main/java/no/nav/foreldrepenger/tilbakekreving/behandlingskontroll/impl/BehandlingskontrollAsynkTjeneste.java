@@ -44,15 +44,13 @@ public class BehandlingskontrollAsynkTjeneste {
 
     private Map<String, ProsessTaskData> nesteProsessTaskPerGruppe(Map<String, List<ProsessTaskData>> tasks) {
         // velg top task per gruppe
-        return tasks.entrySet().stream()
-                .filter(e -> !e.getValue().isEmpty())
-                .map(e -> e.getValue()
-                        .stream()
-                        .min(
-                                Comparator.comparing(ProsessTaskData::getSekvens)
-                                        .thenComparing(Comparator.comparing(ProsessTaskData::getStatus).reversed()) /* NB: avhenger av enum ordinal! */)
-                        .orElseThrow())
-                .collect(Collectors.toMap(ProsessTaskData::getGruppe, Function.identity()));
+        return tasks.values().stream()
+            .filter(ptdList -> !ptdList.isEmpty())
+            .map(ptdList -> ptdList.stream()
+                .min(Comparator.comparing(ProsessTaskData::getSekvens) /* NB: neste avhenger av enum ordinal! */
+                    .thenComparing(Comparator.comparing(ProsessTaskData::getStatus).reversed()))
+                .orElseThrow())
+            .collect(Collectors.toMap(ProsessTaskData::getGruppe, Function.identity()));
     }
 
     private List<ProsessTaskData> sjekkStatusProsessTasks(Saksnummer saksnummer, Long behandlingId, String gruppe) {
