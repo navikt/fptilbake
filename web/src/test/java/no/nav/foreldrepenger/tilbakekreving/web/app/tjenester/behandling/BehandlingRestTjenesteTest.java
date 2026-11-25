@@ -29,11 +29,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ProsesseringAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatiskgjenoppta.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -96,7 +96,7 @@ class BehandlingRestTjenesteTest {
     private BehandlingsprosessApplikasjonTjeneste behandlingsprosessTjeneste = mock(BehandlingsprosessApplikasjonTjeneste.class);
     private HenleggBehandlingTjeneste henleggBehandlingTjenesteMock = mock(HenleggBehandlingTjeneste.class);
     private BehandlingRevurderingTjeneste revurderingTjenesteMock = mock(BehandlingRevurderingTjeneste.class);
-    private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjenesteMock = mock(BehandlingskontrollAsynkTjeneste.class);
+    private ProsesseringAsynkTjeneste prosesseringAsynkTjenesteMock = mock(ProsesseringAsynkTjeneste.class);
     private BehandlendeEnhetTjeneste behandlendeEnhetTjenesteMock = mock(BehandlendeEnhetTjeneste.class);
     private VergeTjeneste vergeTjenesteMock = mock(VergeTjeneste.class);
     private HistorikkTjeneste historikkTjeneste = mock(HistorikkTjeneste.class);
@@ -104,7 +104,7 @@ class BehandlingRestTjenesteTest {
     private BehandlingRestTjeneste behandlingRestTjeneste = new BehandlingRestTjeneste(behandlingTjenesteMock, gjenopptaBehandlingTjenesteMock,
         revurderingTjenesteMock, behandlendeEnhetTjenesteMock, behandlingDtoTjenesteMock, taskTjeneste, vergeTjenesteMock,
         mock(TotrinnTjeneste.class), mock(DokumentBehandlingTjeneste.class), henleggBehandlingTjenesteMock,
-        behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock, historikkTjeneste);
+        behandlingsprosessTjeneste, prosesseringAsynkTjenesteMock, historikkTjeneste);
 
     private static SaksnummerDto saksnummerDto = new SaksnummerDto(GYLDIG_SAKSNR);
     private static FpsakUuidDto fpsakUuidDto = new FpsakUuidDto(EKSTERN_BEHANDLING_UUID);
@@ -133,7 +133,7 @@ class BehandlingRestTjenesteTest {
 
     @Test
     void test_skal_opprette_ny_behandling_for_revurdering() throws URISyntaxException {
-        when(behandlingskontrollAsynkTjenesteMock.asynkProsesserBehandling(any(Behandling.class))).thenReturn("1");
+        when(prosesseringAsynkTjenesteMock.asynkProsesserBehandling(any(Behandling.class))).thenReturn("1");
         when(behandlingTjenesteMock.hentEnhetForEksternBehandling(any())).thenReturn(new OrganisasjonsEnhet("9999", "Generisk"));
         when(revurderingTjenesteMock.opprettRevurdering(any(Long.class), any(BehandlingÅrsakType.class), any(OrganisasjonsEnhet.class), any(String.class)))
                 .thenReturn(mockBehandling());

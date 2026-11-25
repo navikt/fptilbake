@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl;
+package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -18,16 +18,16 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
-public class BehandlingskontrollAsynkTjeneste {
+public class ProsesseringAsynkTjeneste {
 
     private ProsessTaskTjeneste taskTjeneste;
 
-    BehandlingskontrollAsynkTjeneste() {
+    ProsesseringAsynkTjeneste() {
         // CDI
     }
 
     @Inject
-    public BehandlingskontrollAsynkTjeneste(ProsessTaskTjeneste taskTjeneste) {
+    public ProsesseringAsynkTjeneste(ProsessTaskTjeneste taskTjeneste) {
         this.taskTjeneste = taskTjeneste;
     }
 

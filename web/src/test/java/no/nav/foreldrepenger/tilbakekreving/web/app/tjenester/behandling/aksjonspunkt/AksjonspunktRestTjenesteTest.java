@@ -19,16 +19,14 @@ import java.util.UUID;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ProsesseringAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -49,7 +47,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftetAksjonspunktDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.FatteVedtakDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.VurderForeldelseDto;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 class AksjonspunktRestTjenesteTest {
 
@@ -61,11 +58,9 @@ class AksjonspunktRestTjenesteTest {
     private final BehandlingRepository behandlingRepositoryMock = mock(BehandlingRepository.class);
     private final TotrinnRepository totrinnRepositoryMock = mock(TotrinnRepository.class);
     private final BehandlingRepositoryProvider repositoryProviderMock = mock(BehandlingRepositoryProvider.class);
-    private final ProsessTaskTjeneste taskTjenesteMock = mock(ProsessTaskTjeneste.class);
 
     private final BehandlingskontrollTjeneste behandlingskontrollTjenesteMock = mock(BehandlingskontrollTjeneste.class);
-    private final BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjenesteMock = mock(BehandlingskontrollAsynkTjeneste.class);
-    private final BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(behandlingskontrollTjenesteMock, behandlingskontrollAsynkTjenesteMock);
+    private final ProsesseringAsynkTjeneste prosesseringAsynkTjenesteMock = mock(ProsesseringAsynkTjeneste.class);
 
     private AksjonspunktRestTjeneste aksjonspunktRestTjeneste;
 
@@ -76,7 +71,8 @@ class AksjonspunktRestTjenesteTest {
         when(repositoryProviderMock.getBehandlingRepository()).thenReturn(behandlingRepositoryMock);
 
         BehandlingTjeneste behandlingTjeneste = new BehandlingTjeneste(repositoryProviderMock,
-                behandlingskontrollProvider,
+                behandlingskontrollTjenesteMock,
+                prosesseringAsynkTjenesteMock,
                 mock(FagsakTjeneste.class),
                 mock(BehandlingHistorikkTjeneste.class),
                 mock(FagsystemKlient.class));

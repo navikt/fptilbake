@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ProsesseringAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.KravgrunnlagSokosTestUtils;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.HentKravgrunnlagMapperProxy;
@@ -31,9 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwspro
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.sokos.HentKravgrunnlagMapperSokos;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
@@ -105,13 +104,11 @@ class HåndterGamleKravgrunnlagTaskTest {
                 entityManager, new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
         hentKravgrunnlagMapperSokos = new HentKravgrunnlagMapperSokos(tpsAdapterWrapper);
         var lesKravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
-        var behandlingskontrollProvider = new BehandlingskontrollProvider(
-                behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
         var historikkTjeneste = new HistorikkTjeneste(behandlingRepository, repositoryProvider.getHistorikkinnslagRepository());
         var behandlingHistorikkTjeneste = new BehandlingHistorikkTjeneste(repositoryProvider.getHistorikkinnslagRepository(), historikkTjeneste);
         var fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
-        behandlingTjeneste = new BehandlingTjeneste(repositoryProvider,
-                behandlingskontrollProvider, fagsakTjeneste, behandlingHistorikkTjeneste, fagsystemKlientMock);
+        behandlingTjeneste = new BehandlingTjeneste(repositoryProvider, behandlingskontrollTjeneste, mock(ProsesseringAsynkTjeneste.class),
+            fagsakTjeneste, behandlingHistorikkTjeneste, fagsystemKlientMock);
         var kravgrunnlagHenter = new KravgrunnlagHenter(mock(ØkonomiProxyKlient.class), mock(HentKravgrunnlagMapperProxy.class),
             sokosTilbakekrevingKlient, hentKravgrunnlagMapperSokos, () -> true);
         var håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(

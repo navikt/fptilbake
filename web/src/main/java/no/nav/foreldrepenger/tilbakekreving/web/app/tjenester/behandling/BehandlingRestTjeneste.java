@@ -37,12 +37,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ProsesseringAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatiskgjenoppta.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.finn.FinnGrunnlagTask;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
@@ -131,7 +131,7 @@ public class BehandlingRestTjeneste {
     private BehandlingsprosessApplikasjonTjeneste behandlingsprosessTjeneste;
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
     private BehandlingRevurderingTjeneste revurderingTjeneste;
-    private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
+    private ProsesseringAsynkTjeneste prosesseringAsynkTjeneste;
     private BehandlendeEnhetTjeneste behandlendeEnhetTjeneste;
     private TotrinnTjeneste totrinnTjeneste;
     private DokumentBehandlingTjeneste dokumentBehandlingTjeneste;
@@ -154,7 +154,7 @@ public class BehandlingRestTjeneste {
                                   DokumentBehandlingTjeneste dokumentBehandlingTjeneste,
                                   HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                   BehandlingsprosessApplikasjonTjeneste behandlingsprosessTjeneste,
-                                  BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste,
+                                  ProsesseringAsynkTjeneste prosesseringAsynkTjeneste,
                                   HistorikkTjeneste historikkTjeneste) {
         this.behandlingTjeneste = behandlingTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
@@ -163,7 +163,7 @@ public class BehandlingRestTjeneste {
         this.behandlingsprosessTjeneste = behandlingsprosessTjeneste;
         this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
         this.revurderingTjeneste = revurderingTjeneste;
-        this.behandlingskontrollAsynkTjeneste = behandlingskontrollAsynkTjeneste;
+        this.prosesseringAsynkTjeneste = prosesseringAsynkTjeneste;
         this.behandlendeEnhetTjeneste = enhetTjeneste;
         this.taskTjeneste = taskTjeneste;
         this.totrinnTjeneste = totrinnTjeneste;
@@ -204,7 +204,7 @@ public class BehandlingRestTjeneste {
             var enhet = behandlingTjeneste.hentEnhetForEksternBehandling(opprettBehandlingDto.getEksternUuid());
             Behandling revurdering = revurderingTjeneste.opprettRevurdering(tbkBehandlingId, opprettBehandlingDto.getBehandlingArsakType(), enhet,
                 Optional.ofNullable(KontekstHolder.getKontekst()).map(Kontekst::getUid).orElse(null));
-            String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(revurdering);
+            String gruppe = prosesseringAsynkTjeneste.asynkProsesserBehandling(revurdering);
             return Redirect.tilBehandlingPollStatus(request, revurdering.getUuid(), Optional.of(gruppe));
         }
         return Response.ok().build();

@@ -17,9 +17,8 @@ import org.mockito.Mockito;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingHistorikkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ProsesseringAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRepository;
@@ -57,8 +56,6 @@ public abstract class FellesTestOppsett {
     protected PersoninfoAdapter mockTpsTjeneste = mock(PersoninfoAdapter.class);
     protected FagsystemKlient mockFagsystemKlient = mock(FagsystemKlient.class);
 
-    protected BehandlingskontrollProvider behandlingskontrollProvider;
-
     protected BehandlingRepositoryProvider repoProvider;
     protected NavBrukerRepository brukerRepository;
     protected KravgrunnlagRepository grunnlagRepository;
@@ -87,7 +84,6 @@ public abstract class FellesTestOppsett {
     public final void init(EntityManager entityManager) {
         this.entityManager = entityManager;
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
-        behandlingskontrollProvider = new BehandlingskontrollProvider(behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
         repoProvider = new BehandlingRepositoryProvider(entityManager);
         brukerRepository = new NavBrukerRepository(entityManager);
         grunnlagRepository = repoProvider.getGrunnlagRepository();
@@ -96,7 +92,7 @@ public abstract class FellesTestOppsett {
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider, behandlingskontrollTjeneste);
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
-        behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollProvider,
+        behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollTjeneste, mock(ProsesseringAsynkTjeneste.class),
                 fagsakTjeneste, mock(BehandlingHistorikkTjeneste.class), mockFagsystemKlient);
         testUtility = new TestUtility(behandlingTjeneste);
         aktørId = testUtility.genererAktørId();

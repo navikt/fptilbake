@@ -6,7 +6,7 @@ import java.util.Optional;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ProsesseringAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.VurderProsessTaskStatusForPollingApi;
@@ -17,7 +17,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 public class BehandlingsprosessApplikasjonTjenesteImpl implements BehandlingsprosessApplikasjonTjeneste {
 
     BehandlingRepository behandlingRepository;
-    BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
+    ProsesseringAsynkTjeneste prosesseringAsynkTjeneste;
 
     BehandlingsprosessApplikasjonTjenesteImpl() {
         // CDI
@@ -26,15 +26,15 @@ public class BehandlingsprosessApplikasjonTjenesteImpl implements Behandlingspro
     /**
      * test only
      */
-    BehandlingsprosessApplikasjonTjenesteImpl(BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste) {
-        this.behandlingskontrollAsynkTjeneste = behandlingskontrollAsynkTjeneste;
+    BehandlingsprosessApplikasjonTjenesteImpl(ProsesseringAsynkTjeneste prosesseringAsynkTjeneste) {
+        this.prosesseringAsynkTjeneste = prosesseringAsynkTjeneste;
     }
 
     @Inject
     public BehandlingsprosessApplikasjonTjenesteImpl(BehandlingRepository behandlingRepository,
-                                                     BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste) {
+                                                     ProsesseringAsynkTjeneste prosesseringAsynkTjeneste) {
         this.behandlingRepository = behandlingRepository;
-        this.behandlingskontrollAsynkTjeneste = behandlingskontrollAsynkTjeneste;
+        this.prosesseringAsynkTjeneste = prosesseringAsynkTjeneste;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class BehandlingsprosessApplikasjonTjenesteImpl implements Behandlingspro
     public Optional<AsyncPollingStatus> sjekkProsessTaskPågårForBehandling(Behandling behandling, String gruppe) {
         Long behandlingId = behandling.getId();
 
-        Map<String, ProsessTaskData> nesteTask = behandlingskontrollAsynkTjeneste.sjekkProsessTaskPågårForBehandling(behandling, gruppe);
+        Map<String, ProsessTaskData> nesteTask = prosesseringAsynkTjeneste.sjekkProsessTaskPågårForBehandling(behandling, gruppe);
         return new VurderProsessTaskStatusForPollingApi(behandlingId).sjekkStatusNesteProsessTask(gruppe, nesteTask);
     }
 }
