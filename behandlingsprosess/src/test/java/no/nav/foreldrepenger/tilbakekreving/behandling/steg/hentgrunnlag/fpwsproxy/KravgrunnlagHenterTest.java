@@ -135,11 +135,11 @@ class KravgrunnlagHenterTest {
 
     @Test
     void beholder_spesialhåndtering_for_manglende_og_sperret_grunnlag() {
-        assertThatThrownBy(() -> KravgrunnlagHenter.validerFeilkoder("B420010I"))
+        assertThatThrownBy(() -> KravgrunnlagHenter.validerFeilkoder(KravgrunnlagHenter.SOKOS_KRAVGRUNNLAG_IKKE_FUNNET))
             .isInstanceOf(ManglendeKravgrunnlagException.class);
-        assertThatThrownBy(() -> KravgrunnlagHenter.validerDetaljer(new HentKravgrunnlagDetaljerResponse(4, "B420012I", null)))
+        assertThatThrownBy(() -> KravgrunnlagHenter.validerDetaljer(new HentKravgrunnlagDetaljerResponse(4, KravgrunnlagHenter.SOKOS_KRAVGRUNNLAG_SPERRET, null)))
             .isInstanceOf(SperringKravgrunnlagException.class);
-        when(sokos.hentKravgrunnlag(any())).thenThrow(new SokosKravgrunnlagException("B420010I"));
+        when(sokos.hentKravgrunnlag(any())).thenThrow(new SokosKravgrunnlagException(KravgrunnlagHenter.SOKOS_KRAVGRUNNLAG_IKKE_FUNNET));
         assertThatThrownBy(() -> henter().hentKravgrunnlagFraOS(null, request(KodeAksjon.HENT_GRUNNLAG_OMGJØRING, BigInteger.valueOf(570598))))
             .isInstanceOf(ManglendeKravgrunnlagException.class);
     }

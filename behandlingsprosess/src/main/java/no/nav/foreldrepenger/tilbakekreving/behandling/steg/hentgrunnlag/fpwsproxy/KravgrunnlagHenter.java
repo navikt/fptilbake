@@ -30,6 +30,8 @@ public class KravgrunnlagHenter {
 
     public static final String ANSVARLIG_ENHET_NØS = "8020";
     public static final String OKO_SAKSBEH_ID = "K231B433";
+    static final String SOKOS_KRAVGRUNNLAG_IKKE_FUNNET = "Kravgrunnlag ikke funnet";
+    static final String SOKOS_KRAVGRUNNLAG_SPERRET = "Kravgrunnlag sperret";
 
     private static final Environment ENV = Environment.current();
     private static final Fagsystem HVILKEN_TILBAKE = ApplicationName.hvilkenTilbake();
@@ -154,10 +156,10 @@ public class KravgrunnlagHenter {
     }
 
     static void validerFeilkoder(String melding) {
-        if (melding != null && melding.contains("B420010I")) {
+        if (melding != null && (melding.contains("B420010I") || SOKOS_KRAVGRUNNLAG_IKKE_FUNNET.equals(melding))) {
             throw new ManglendeKravgrunnlagException("FPT-539080", "Fikk feil fra OS ved henting av kravgrunnlag. Kravgrunnlaget finnes ikke.");
         }
-        if (melding != null && melding.contains("B420012I")) {
+        if (melding != null && (melding.contains("B420012I") || SOKOS_KRAVGRUNNLAG_SPERRET.equals(melding))) {
             throw new SperringKravgrunnlagException("FPT-539081", "Fikk feil fra OS ved henting av kravgrunnlag. Kravgrunnlaget er sperret.");
         }
     }

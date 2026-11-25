@@ -82,12 +82,9 @@ public class HåndterGamleKravgrunnlagTjeneste {
         } catch (SperringKravgrunnlagException e) {
             LOG.info("Kravgrunnlag er sperret med følgende respons:{}", e.getMessage());
             return hentSperretKravgrunnlag(økonomiXmlMottatt);
-        } catch (UkjentKvitteringFraOSException e) {
+        } catch (UkjentKvitteringFraOSException|SokosKravgrunnlagException e) {
             // ikke arkiver xml i tilfelle ukjent feil kommer fra økonomi
             LOG.warn(e.getMessage());
-        } catch (SokosKravgrunnlagException e) {
-            // ikke arkiver xml i tilfelle ukjent feil kommer fra økonomi
-            LOG.warn(e.melding());
         }
 
         LOG.info("Finner ikke grunnlag.");
