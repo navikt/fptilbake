@@ -74,13 +74,13 @@ class SokosTilbakekrevingKlientTest {
         var respons = httpRespons(400, """
             {
               "timestamp": "2026-01-15T12:34:56Z", "status": 400,
-              "error": "Bad Request", "message": "B420010I", "path": "/kravgrunnlag/detaljer"
+              "error": "Bad Request", "message": "Kravgrunnlag ikke funnet", "path": "/kravgrunnlag/detaljer"
             }
             """);
 
         assertThatThrownBy(() -> SokosTilbakekrevingKlient.handleKravgrunnlagResponse(respons))
             .isInstanceOfSatisfying(SokosKravgrunnlagException.class,
-                feil -> assertThat(feil.melding()).isEqualTo("B420010I"));
+                feil -> assertThat(feil.melding()).isEqualTo("Kravgrunnlag ikke funnet"));
     }
 
     @ParameterizedTest

@@ -154,7 +154,7 @@ class HåndterGamleKravgrunnlagTaskTest {
     @Test
     void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_grunnlaget_ikke_finnes_i_økonomi() {
         when(sokosTilbakekrevingKlient.hentKravgrunnlag(any()))
-                .thenThrow(new SokosKravgrunnlagException("B420010I"));
+                .thenThrow(new SokosKravgrunnlagException("Kravgrunnlag ikke funnet"));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNotNull();
         assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNull();
@@ -174,7 +174,7 @@ class HåndterGamleKravgrunnlagTaskTest {
     @Test
     void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_grunnlaget_er_sperret() {
         when(sokosTilbakekrevingKlient.hentKravgrunnlag(any()))
-                .thenThrow(new SokosKravgrunnlagException("B420012I"));
+                .thenThrow(new SokosKravgrunnlagException("Kravgrunnlag sperret"));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
         var økonomiXmlMottatt = mottattXmlRepository.finnMottattXml(mottattXmlId);
@@ -251,7 +251,7 @@ class HåndterGamleKravgrunnlagTaskTest {
         var behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
         when(sokosTilbakekrevingKlient.hentKravgrunnlag(any()))
-                .thenThrow(new SokosKravgrunnlagException("B420012I"));
+                .thenThrow(new SokosKravgrunnlagException("Kravgrunnlag sperret"));
 
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
