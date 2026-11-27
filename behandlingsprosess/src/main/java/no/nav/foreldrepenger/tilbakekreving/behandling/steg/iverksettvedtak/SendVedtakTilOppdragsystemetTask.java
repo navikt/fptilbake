@@ -11,10 +11,8 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningsresultatTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.fpwsproxy.ØkonomiProxyKlient;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.iverksetting.OppdragIverksettingStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.sokos.SokosTilbakekrevingKlient;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -26,7 +24,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(SendVedtakTilOppdragsystemetTask.class);
-    private static final Fagsystem HVILKEN_TILBAKE = ApplicationName.hvilkenTilbake();
     private static final Environment ENV = Environment.current();
 
     private OppdragIverksettingStatusRepository oppdragIverksettingStatusRepository;
@@ -41,8 +38,6 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
         // CDI krav
     }
 
-    // (ENV.isDev() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) ||
-
     @Inject
     public SendVedtakTilOppdragsystemetTask(OppdragIverksettingStatusRepository oppdragIverksettingStatusRepository,
                                             BeregningsresultatTjeneste beregningsresultatTjeneste,
@@ -51,7 +46,7 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
                                             SokosTilbakekrevingKlient sokosTilbakekrevingKlient) {
         this(oppdragIverksettingStatusRepository, beregningsresultatTjeneste, tilbakekrevingsvedtakTjeneste,
             økonomiProxyKlient, sokosTilbakekrevingKlient,
-            () -> (ENV.isProd() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) || ENV.isLocal());
+            () -> ENV.isProd() || ENV.isLocal());
     }
 
     SendVedtakTilOppdragsystemetTask(OppdragIverksettingStatusRepository oppdragIverksettingStatusRepository,
@@ -74,8 +69,6 @@ public class SendVedtakTilOppdragsystemetTask implements ProsessTaskHandler {
         beregningsresultatTjeneste.beregnOgLagre(behandlingId); //midlertidig her for å raskere kunne fase ut håndtering av lagret XML
         if (brukSokos.getAsBoolean()) {
             var request = tilbakekrevingsvedtakTjeneste.lagSokosTilbakekrevingsvedtak(behandlingId);
-            //LOG.info("Tilbakekrevingsvedtak sokos {}", request);
-            //LOG.info("Tilbakekrevingsvedtak sokos json {}", DefaultJsonMapper.toJson(request));
             sokosTilbakekrevingKlient.iverksettTilbakekrevingsvedtak(request);
             oppdragIverksettingStatusRepository.registrerKvittertVedtak(behandlingId, request.vedtakId().toString());
             LOG.info("Tilbakekrevingsvedtak sendt OK til oppdragsystemet via Sokos. BehandlingId={}", behandlingId);

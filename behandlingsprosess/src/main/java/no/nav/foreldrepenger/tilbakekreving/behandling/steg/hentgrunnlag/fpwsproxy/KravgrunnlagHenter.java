@@ -14,8 +14,6 @@ import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.AnnullerKravGrunnlagDto;
 import no.nav.foreldrepenger.kontrakter.fpwsproxy.tilbakekreving.kravgrunnlag.request.HentKravgrunnlagDetaljDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.sokos.HentKravgrunnlagMapperSokos;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.sokos.HentKravgrunnlagDetaljerRequest;
@@ -34,7 +32,6 @@ public class KravgrunnlagHenter {
     static final String SOKOS_KRAVGRUNNLAG_SPERRET = "Kravgrunnlag sperret";
 
     private static final Environment ENV = Environment.current();
-    private static final Fagsystem HVILKEN_TILBAKE = ApplicationName.hvilkenTilbake();
     private static final Logger LOG = LoggerFactory.getLogger(KravgrunnlagHenter.class);
 
     private HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy;
@@ -48,12 +45,11 @@ public class KravgrunnlagHenter {
     }
 
 
-    // (ENV.isDev() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE))
     @Inject
     public KravgrunnlagHenter(ØkonomiProxyKlient økonomiProxyKlient, HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy,
                              SokosTilbakekrevingKlient sokosTilbakekrevingKlient, HentKravgrunnlagMapperSokos hentKravgrunnlagMapperSokos) {
         this(økonomiProxyKlient, hentKravgrunnlagMapperProxy, sokosTilbakekrevingKlient, hentKravgrunnlagMapperSokos,
-            () -> (ENV.isProd() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) || ENV.isLocal());
+            () -> ENV.isProd() || ENV.isLocal());
     }
 
     public KravgrunnlagHenter(ØkonomiProxyKlient økonomiProxyKlient, HentKravgrunnlagMapperProxy hentKravgrunnlagMapperProxy,
@@ -86,9 +82,6 @@ public class KravgrunnlagHenter {
             behandlingId != null ? " " + behandlingId : "",
             hentKravgrunnlagRequest.kravgrunnlagId());
         var kravgrunnlag431 = brukSokos.getAsBoolean() ? hentFraSokos(hentKravgrunnlagRequest) : hentFraProxy(hentKravgrunnlagRequest);
-        if (!brukSokos.getAsBoolean() && ENV.isProd() && Fagsystem.FPTILBAKE.equals(HVILKEN_TILBAKE)) {
-            sammenlignMedSokos(hentKravgrunnlagRequest, kravgrunnlag431);
-        }
         LOG.info("Kravgrunnlag hentet OK");
         return kravgrunnlag431;
     }
@@ -128,19 +121,6 @@ public class KravgrunnlagHenter {
         } catch (SokosKravgrunnlagException e) {
             validerFeilkoder(e.melding());
             throw e;
-        }
-    }
-
-    private void sammenlignMedSokos(HentKravgrunnlagRequest request, Kravgrunnlag431 original) {
-        try {
-            var sokos = hentFraSokos(request);
-            if (Kravgrunnlag431.likUtenomRenterBeregnet(original, sokos)) {
-                LOG.info("Kravgrunnlag fra proxy og Sokos er identiske for kravgrunnlagId {}", request.kravgrunnlagId());
-            } else {
-                LOG.info("Kravgrunnlag fra proxy og Sokos er IKKE identiske for kravgrunnlagId proxy {} sokos {}.", original, sokos);
-            }
-        } catch (Exception e) {
-            LOG.info("Kravgrunnlag fra proxy og Sokos kunne ikke hente fra Sokos for kravgrunnlagId {}.", request.kravgrunnlagId(), e);
         }
     }
 
